@@ -26,7 +26,8 @@ public sealed class CapabilityGrantValidationProfileTests
 
         Assert.Equal("issuer-1", options.Issuer);
         Assert.Equal("gateway-1", options.Audience);
-        Assert.Collection(options.Scopes, scope => Assert.Equal("robotics.execute", scope));
+        string scope = Assert.Single(options.Scopes);
+        Assert.Equal("robotics.execute", scope);
         Assert.True(options.RequireProof);
         Assert.True(options.RequireUseCheck);
         Assert.False(options.RequireAcknowledgmentReference);
@@ -135,7 +136,15 @@ public sealed class CapabilityGrantValidationProfileTests
     [Fact]
     public async Task LegacyNoOptionsPathRetainsMetadataOnlyBehavior()
     {
-        SignedGovernanceArtifact<CapabilityTokenGrant> signedGrant = CreateSignedGrant(CreateGrant());
+        DateTimeOffset currentUtc = DateTimeOffset.UtcNow;
+        var grant = CapabilityTokenGrant.Create(
+            tokenId: "grant-profile-legacy",
+            issuer: "issuer-1",
+            audience: "gateway-1",
+            scopes: ["robotics.execute"],
+            issuedUtc: currentUtc.AddMinutes(-5),
+            expiresUtc: currentUtc.AddHours(1));
+        SignedGovernanceArtifact<CapabilityTokenGrant> signedGrant = CreateSignedGrant(grant);
 
         CapabilityGrantValidationResult result = await CapabilityGrantValidator.ValidateAsync(
             signedGrant,

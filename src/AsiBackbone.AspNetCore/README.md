@@ -2,7 +2,7 @@
 
 ASP.NET Core host adapters for Accountable Systems Infrastructure governance primitives.
 
-Stable `3.1.x` package family. `3.1.0` is the current minor release for this package.
+Stable `3.2.x` package family. `3.2.0` is the current minor release for this package.
 
 This package acts as a thin web-host adapter around `AsiBackbone.Core`.
 

@@ -47,11 +47,11 @@ The `2.0.0` release established the simplified `AsiBackbone.*` package and names
 
 ### Current `3.x` stable family
 
-`3.1.0` is the current stable minor release. It preserves the `AsiBackbone.*` package IDs and namespaces and the binary assembly identity `3.0.0.0` established by `3.0.0`.
+`3.2.0` is the current stable minor release. It preserves the `AsiBackbone.*` package IDs and namespaces and the binary assembly identity `3.0.0.0` established by `3.0.0`.
 
 | Package | `3.x` stable role |
 | --- | --- |
-| `AsiBackbone.Core` | Framework-neutral governance primitives and durable artifact contracts for the current `3.x` line, including policy evaluation, governance decisions, threat-model contributor hooks, metadata budget validation helpers, constraint-exception denial behavior, governed execution-to-mutation accountability receipts, capability-proof trust pinning, and builder-style audit residue construction. |
+| `AsiBackbone.Core` | Framework-neutral governance primitives and durable artifact contracts for the current `3.x` line, including policy evaluation, governance decisions, threat-model contributor hooks, metadata budget validation helpers, constraint-exception denial behavior, governed execution-to-mutation accountability receipts, capability-proof trust pinning, explicit capability-grant validation profiles, and builder-style audit residue construction. |
 | `AsiBackbone.DependencyInjection` | Explicit builder facade and host-selected provider registration composition path. |
 | `AsiBackbone.Storage.InMemory` | Non-durable storage helpers for tests, samples, local validation, lifecycle events, and outbox proof paths. |
 | `AsiBackbone.EntityFrameworkCore` | EF Core host-owned persistence helpers for audit, acknowledgment, lifecycle, JSON metadata storage guidance, and outbox records. |
@@ -117,6 +117,7 @@ Expected stable-line behavior:
 | `3.0.0` | `3.0.0` | `3.0.0.0` | `3.0.0.0` | `3.0.0+...` |
 | `3.0.1` | `3.0.1` | `3.0.0.0` | `3.0.1.0` | `3.0.1+...` |
 | `3.1.0` | `3.1.0` | `3.0.0.0` | `3.1.0.0` | `3.1.0+...` |
+| `3.2.0` | `3.2.0` | `3.0.0.0` | `3.2.0.0` | `3.2.0+...` |
 
 Before cutting stable releases, release validation should verify that `AssemblyVersion`, `FileVersion`, `InformationalVersion`, package metadata, release notes, and repository tags match this policy.
 
@@ -147,6 +148,9 @@ Before cutting a stable release or stable package-family expansion, the release 
 
 ## Related documentation
 
+- [3.2.0 Release Notes](release-notes-320.md)
+- [3.2.0 Release Readiness Record](release-readiness-320.md)
+- [3.2.0 Consumer Verification Guide](consumer-verification-320.md)
 - [3.1.0 Release Notes](release-notes-310.md)
 - [3.1.0 Release Readiness Record](release-readiness-310.md)
 - [3.1.0 Consumer Verification Guide](consumer-verification-310.md)

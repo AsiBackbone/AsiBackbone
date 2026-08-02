@@ -29,7 +29,7 @@ These pages are the best first stops for implementation-first adoption.
 
 ## Current stable package family
 
-Stable `3.x` is the current release line, and `3.1.0` is the current minor release. The package family preserves the existing `AsiBackbone.*` package IDs and namespaces and the `3.0.0.0` binary assembly identity. This release adds governed execution-to-mutation accountability receipts, optional capability-proof trust pinning, conservative actor-type claim trust controls, and supporting audit-integrity, reliability, testing, and supply-chain hardening.
+Stable `3.x` is the current release line, and `3.2.0` is the current minor release. The package family preserves the existing `AsiBackbone.*` package IDs and namespaces and the `3.0.0.0` binary assembly identity. This release adds explicit capability-grant validation profiles for consequential execution boundaries and intentional metadata-only inspection while preserving the existing configurable validation path for `3.x` compatibility.
 
 The historical `3.0.0` release established the current major line and binary assembly identity.
 
@@ -109,6 +109,7 @@ Package-specific READMEs and release notes define which surfaces are stable, opt
 * [Project Boundaries and Non-Claims](articles/project-boundaries.md)
 * [Production Wording and Stable Signing Boundaries](articles/production-wording-and-alpha-limitations.md)
 * [Supply-Chain Provenance and Package SBOMs](articles/supply-chain-provenance.md)
+* [3.2.0 Consumer Verification Guide](articles/consumer-verification-320.md)
 * [3.1.0 Consumer Verification Guide](articles/consumer-verification-310.md)
 * [3.0.1 Consumer Verification Guide](articles/consumer-verification-301.md)
 * [3.0.0 Consumer Verification Guide](articles/consumer-verification-300.md)
@@ -127,6 +128,9 @@ Package-specific READMEs and release notes define which surfaces are stable, opt
 * [Quality Reports](quality/)
 * [Performance Benchmark Baseline](articles/performance-benchmark-baseline.md)
 * [Release Validation](articles/release-validation.md)
+* [3.2.0 Consumer Verification Guide](articles/consumer-verification-320.md)
+* [3.2.0 Release Readiness Record](articles/release-readiness-320.md)
+* [3.2.0 Release Notes](articles/release-notes-320.md)
 * [3.1.0 Consumer Verification Guide](articles/consumer-verification-310.md)
 * [3.1.0 Release Readiness Record](articles/release-readiness-310.md)
 * [3.1.0 Release Notes](articles/release-notes-310.md)
