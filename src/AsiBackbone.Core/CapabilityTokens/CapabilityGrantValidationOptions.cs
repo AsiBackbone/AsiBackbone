@@ -132,6 +132,84 @@ public sealed class CapabilityGrantValidationOptions
             requiredProofHashAlgorithm);
     }
 
+    public static CapabilityGrantValidationOptions CreateExecutionBoundary(
+        string? issuer = null,
+        string? audience = null,
+        IEnumerable<string>? scopes = null,
+        DateTimeOffset? validationUtc = null,
+        string? policyVersion = null,
+        string? policyHash = null,
+        string? acknowledgmentId = null,
+        string? handshakeId = null,
+        string? gatewayBinding = null,
+        string? resourceBinding = null,
+        bool requireAcknowledgmentReference = false,
+        bool requireUseCheck = true,
+        int maxUseCount = 1,
+        TimeSpan allowedClockSkew = default,
+        string? expectedProofKeyId = null,
+        string? expectedProofKeyVersion = null,
+        string? expectedProofPolicyVersion = null,
+        string? expectedProofPolicyHash = null,
+        string? requiredProofProvider = null,
+        string? requiredProofHashAlgorithm = null)
+    {
+        return Create(
+            issuer: issuer,
+            audience: audience,
+            scopes: scopes,
+            validationUtc: validationUtc,
+            policyVersion: policyVersion,
+            policyHash: policyHash,
+            acknowledgmentId: acknowledgmentId,
+            handshakeId: handshakeId,
+            gatewayBinding: gatewayBinding,
+            resourceBinding: resourceBinding,
+            requireProof: true,
+            requireAcknowledgmentReference: requireAcknowledgmentReference,
+            requireUseCheck: requireUseCheck,
+            maxUseCount: maxUseCount,
+            allowedClockSkew: allowedClockSkew,
+            expectedProofKeyId: expectedProofKeyId,
+            expectedProofKeyVersion: expectedProofKeyVersion,
+            expectedProofPolicyVersion: expectedProofPolicyVersion,
+            expectedProofPolicyHash: expectedProofPolicyHash,
+            requiredProofProvider: requiredProofProvider,
+            requiredProofHashAlgorithm: requiredProofHashAlgorithm);
+    }
+
+    public static CapabilityGrantValidationOptions CreateMetadataValidation(
+        string? issuer = null,
+        string? audience = null,
+        IEnumerable<string>? scopes = null,
+        DateTimeOffset? validationUtc = null,
+        string? policyVersion = null,
+        string? policyHash = null,
+        string? acknowledgmentId = null,
+        string? handshakeId = null,
+        string? gatewayBinding = null,
+        string? resourceBinding = null,
+        bool requireAcknowledgmentReference = false,
+        TimeSpan allowedClockSkew = default)
+    {
+        return Create(
+            issuer: issuer,
+            audience: audience,
+            scopes: scopes,
+            validationUtc: validationUtc,
+            policyVersion: policyVersion,
+            policyHash: policyHash,
+            acknowledgmentId: acknowledgmentId,
+            handshakeId: handshakeId,
+            gatewayBinding: gatewayBinding,
+            resourceBinding: resourceBinding,
+            requireProof: false,
+            requireAcknowledgmentReference: requireAcknowledgmentReference,
+            requireUseCheck: false,
+            maxUseCount: 1,
+            allowedClockSkew: allowedClockSkew);
+    }
+
     private static IReadOnlyList<string> NormalizeScopes(IEnumerable<string>? scopes)
     {
         if (scopes is null)

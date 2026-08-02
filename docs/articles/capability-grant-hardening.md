@@ -26,11 +26,28 @@ In this software project, **ASI** means **Accountable Systems Infrastructure**. 
 
 The grant model is not a wire format. Hosts decide whether they serialize it as JSON, wrap it in a signed envelope, store it server-side, or project it into another provider-owned format.
 
+## Validation profiles
+
+`CapabilityGrantValidationOptions` provides explicit profiles so callers can communicate whether validation is occurring at a consequential execution boundary or is intentionally limited to metadata and time-bound checks.
+
+| Profile | Proof | Acknowledgment reference | Bounded-use/replay check | Intended use |
+| --- | --- | --- | --- | --- |
+| `CreateExecutionBoundary(...)` | Required | Optional; caller can require it | Required by default; caller must explicitly disable it when another boundary owns replay/use enforcement | Operational gateways and other consequential execution boundaries |
+| `CreateMetadataValidation(...)` | Not performed | Optional; caller can require it | Not performed | Structural, temporal, policy, scope, and binding validation where proof/use enforcement is intentionally out of scope |
+| `Create(...)` | Configurable; default is off | Configurable; default is off | Configurable; default is off | Backward-compatible 3.x configuration path |
+
+> [!CAUTION]
+> Calling `CapabilityGrantValidator.ValidateAsync(signedGrant)` without explicit options preserves the existing 3.x behavior. It validates metadata and temporal constraints using `CapabilityGrantValidationOptions.Create()` defaults, but it does **not** verify the signed artifact proof and does **not** perform a bounded-use/replay check. Do not treat the no-options path as execution-boundary validation.
+
+The execution-boundary profile always requires proof verification. Bounded-use validation is enabled by default with `maxUseCount: 1`, but the host can explicitly set `requireUseCheck: false` when replay/use enforcement is performed atomically by another trusted execution boundary. That opt-out should be intentional and documented by the host.
+
+The metadata-validation profile intentionally does not expose proof or use-check switches. If proof or bounded-use behavior is needed, use `CreateExecutionBoundary(...)` or the fully configurable `Create(...)` factory instead.
+
 ## Validation at the execution boundary
 
 Use `CapabilityGrantValidator.ValidateAsync(...)` before follow-on execution. Validation can check:
 
-- proof when configured through the existing signing verification seam;
+- proof through the existing signing verification seam;
 - issuer and audience;
 - expiration and not-before time, with optional host-selected clock-skew tolerance;
 - required scopes;
@@ -39,28 +56,56 @@ Use `CapabilityGrantValidator.ValidateAsync(...)` before follow-on execution. Va
 - gateway and resource bindings;
 - bounded-use state through an `ICapabilityGrantUseStore`.
 
-Example:
+Use the explicit execution-boundary profile for consequential execution:
 
 ```csharp
 CapabilityGrantValidationResult result = await CapabilityGrantValidator.ValidateAsync(
     signedGrant,
-    CapabilityGrantValidationOptions.Create(
+    CapabilityGrantValidationOptions.CreateExecutionBoundary(
         issuer: "policy-engine",
         audience: "robotics-gateway",
         scopes: ["robotics.execute"],
         policyVersion: "policy-v1",
         policyHash: "policy-hash",
         acknowledgmentId: "ack-123",
-        requireProof: true,
         requireAcknowledgmentReference: true,
-        requireUseCheck: true,
         maxUseCount: 1),
     verificationService,
     useStore,
     cancellationToken);
 ```
 
-Proceed only when `result.ShouldAllow` is true.
+Proceed only when `result.ShouldAllow` is true. The strict profile fails closed when proof verification is unavailable and defers when the required bounded-use store is unavailable.
+
+## Intentional metadata-only validation
+
+Some hosts need to inspect a grant before reaching the execution boundary, for example while routing a request, validating expected scope or policy bindings, or presenting diagnostic information. Use the explicitly named metadata profile for that case:
+
+```csharp
+CapabilityGrantValidationResult metadataResult = await CapabilityGrantValidator.ValidateAsync(
+    signedGrant,
+    CapabilityGrantValidationOptions.CreateMetadataValidation(
+        issuer: "policy-engine",
+        audience: "robotics-gateway",
+        scopes: ["robotics.execute"],
+        policyVersion: "policy-v1",
+        policyHash: "policy-hash"),
+    cancellationToken: cancellationToken);
+```
+
+A successful metadata-only result means only that the configured structural and temporal checks passed. It does not establish proof authenticity, replay resistance, single-use enforcement, authentication, authorization, or permission to execute an external action.
+
+## 3.x migration guidance
+
+The explicit profiles are additive and do not silently change existing 3.x behavior.
+
+- Existing calls to `CapabilityGrantValidationOptions.Create(...)` continue to honor their current arguments and defaults.
+- Existing calls to `ValidateAsync(signedGrant)` continue to use the legacy default options where proof, acknowledgment-reference, and bounded-use checks are disabled.
+- New operational-gateway and consequential-execution code should prefer `CreateExecutionBoundary(...)`.
+- Code that intentionally performs only structural or temporal validation should prefer `CreateMetadataValidation(...)` so the reduced validation contract is visible in code review.
+- Hosts migrating an existing execution boundary should supply both an `IAsiBackboneSignatureVerificationService` and, when the profile keeps its default bounded-use requirement, an `ICapabilityGrantUseStore`.
+
+The ambiguous no-options path remains available for 3.x compatibility. A future major version may tighten or remove that path; such a change would require explicit migration guidance rather than a silent behavioral change.
 
 ## Clock-skew tolerance
 
@@ -69,7 +114,7 @@ Proceed only when `result.ShouldAllow` is true.
 A distributed host may opt into an explicit tolerance:
 
 ```csharp
-CapabilityGrantValidationOptions options = CapabilityGrantValidationOptions.Create(
+CapabilityGrantValidationOptions options = CapabilityGrantValidationOptions.CreateMetadataValidation(
     validationUtc: hostClockUtc,
     allowedClockSkew: TimeSpan.FromSeconds(15));
 ```
@@ -124,6 +169,8 @@ For high-risk workflows, use checks should be atomic at the host storage boundar
 ## Reference in-memory use store
 
 `AsiBackbone.Storage.InMemory` includes `InMemoryCapabilityGrantUseStore` as a reference implementation for tests, samples, and local validation.
+
+The following sample intentionally isolates bounded-use behavior and does not represent the complete execution-boundary profile:
 
 ```csharp
 using AsiBackbone.Storage.InMemory.CapabilityTokens;
