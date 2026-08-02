@@ -11,10 +11,13 @@ public sealed class CapabilityGrantValidationProfileTests
 {
     private static readonly DateTimeOffset Now = new(2026, 8, 2, 12, 0, 0, TimeSpan.Zero);
 
+    /// <summary>
+    /// Verifies that the execution-boundary profile requires proof and bounded-use validation by default.
+    /// </summary>
     [Fact]
     public void CreateExecutionBoundaryRequiresProofAndBoundedUseByDefault()
     {
-        CapabilityGrantValidationOptions options = CapabilityGrantValidationOptions.CreateExecutionBoundary(
+        var options = CapabilityGrantValidationOptions.CreateExecutionBoundary(
             issuer: " issuer-1 ",
             audience: " gateway-1 ",
             scopes: [" robotics.execute ", "robotics.execute"],
@@ -31,10 +34,13 @@ public sealed class CapabilityGrantValidationProfileTests
         Assert.Equal("provider-1", options.RequiredProofProvider);
     }
 
+    /// <summary>
+    /// Verifies that callers can explicitly disable bounded-use validation when another trusted boundary owns that responsibility.
+    /// </summary>
     [Fact]
     public void CreateExecutionBoundaryAllowsCallerToMakeBoundedUseExplicitlyOptional()
     {
-        CapabilityGrantValidationOptions options = CapabilityGrantValidationOptions.CreateExecutionBoundary(
+        var options = CapabilityGrantValidationOptions.CreateExecutionBoundary(
             requireUseCheck: false,
             maxUseCount: 4);
 
@@ -43,10 +49,13 @@ public sealed class CapabilityGrantValidationProfileTests
         Assert.Equal(4, options.MaxUseCount);
     }
 
+    /// <summary>
+    /// Verifies that the metadata-validation profile intentionally disables proof and bounded-use checks.
+    /// </summary>
     [Fact]
     public void CreateMetadataValidationDisablesProofAndUseChecks()
     {
-        CapabilityGrantValidationOptions options = CapabilityGrantValidationOptions.CreateMetadataValidation(
+        var options = CapabilityGrantValidationOptions.CreateMetadataValidation(
             issuer: "issuer-1",
             audience: "gateway-1",
             requireAcknowledgmentReference: true);
@@ -57,6 +66,10 @@ public sealed class CapabilityGrantValidationProfileTests
         Assert.Equal(1, options.MaxUseCount);
     }
 
+    /// <summary>
+    /// Verifies that execution-boundary validation fails closed when proof verification is required but no verifier is available.
+    /// </summary>
+    /// <returns>A task representing the asynchronous test operation.</returns>
     [Fact]
     public async Task ExecutionBoundaryProfileDeniesWithoutProofVerifier()
     {
@@ -73,6 +86,10 @@ public sealed class CapabilityGrantValidationProfileTests
         Assert.Equal("capability.proof-verifier-missing", result.FailureCode);
     }
 
+    /// <summary>
+    /// Verifies that execution-boundary validation defers when proof succeeds but the required bounded-use store is unavailable.
+    /// </summary>
+    /// <returns>A task representing the asynchronous test operation.</returns>
     [Fact]
     public async Task ExecutionBoundaryProfileDefersWithoutUseStoreAfterProofPasses()
     {
@@ -92,6 +109,10 @@ public sealed class CapabilityGrantValidationProfileTests
         Assert.Equal("capability.use-store-missing", result.FailureCode);
     }
 
+    /// <summary>
+    /// Verifies that metadata-only validation can succeed without a proof verifier or bounded-use store.
+    /// </summary>
+    /// <returns>A task representing the asynchronous test operation.</returns>
     [Fact]
     public async Task MetadataValidationProfileAllowsWithoutProofVerifierOrUseStore()
     {
@@ -107,6 +128,10 @@ public sealed class CapabilityGrantValidationProfileTests
         Assert.Equal(CapabilityTokenValidationCategory.Valid, result.Category);
     }
 
+    /// <summary>
+    /// Verifies that the legacy no-options validator path retains its existing metadata-only behavior for 3.x compatibility.
+    /// </summary>
+    /// <returns>A task representing the asynchronous test operation.</returns>
     [Fact]
     public async Task LegacyNoOptionsPathRetainsMetadataOnlyBehavior()
     {
@@ -134,7 +159,7 @@ public sealed class CapabilityGrantValidationProfileTests
 
     private static SignedGovernanceArtifact<CapabilityTokenGrant> CreateSignedGrant(CapabilityTokenGrant grant)
     {
-        CanonicalPayload payload = CanonicalPayload.Create(
+        var payload = CanonicalPayload.Create(
             CanonicalArtifactTypes.CapabilityTokenGrant,
             grant.TokenId,
             grant.SchemaVersion,
@@ -147,7 +172,7 @@ public sealed class CapabilityGrantValidationProfileTests
                 ["scopes"] = grant.Scopes.ToArray()
             });
         CanonicalPayloadHash hash = CanonicalPayloadHasher.ComputeHash(payload);
-        SigningMetadata signingMetadata = SigningMetadata.Create(
+        var signingMetadata = SigningMetadata.Create(
             signingHash: hash.HashValue,
             hashAlgorithm: hash.HashAlgorithm,
             signature: "fake-signature",
