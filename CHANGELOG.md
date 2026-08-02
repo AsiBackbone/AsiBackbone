@@ -4,6 +4,94 @@ All notable changes to this project are documented in this file.
 
 This project follows the spirit of [Keep a Changelog](https://keepachangelog.com/) and adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [3.2.0] - 2026-08-02
+
+### Release summary
+
+`3.2.0` is a backward-compatible minor release for the stable `3.x`
+AsiBackbone package family. It strengthens capability-grant validation at
+consequential execution boundaries by introducing explicit validation
+profiles that distinguish strict execution-boundary enforcement from
+intentional metadata-only inspection.
+
+The release reduces ambiguity around signed capability grants without
+silently changing existing `3.x` behavior. Hosts can now opt into a
+clearly named execution-boundary profile that requires proof verification
+and enables bounded-use validation by default, while metadata-only
+validation remains available through an explicitly named reduced-validation
+profile.
+
+AsiBackbone continues to provide governance and accountability primitives
+rather than replacing host authentication, authorization, durable replay
+storage, signature-key custody, external execution controls, or compliance
+responsibility.
+
+### Added
+
+* Added `CapabilityGrantValidationOptions.CreateExecutionBoundary(...)`
+  for consequential execution and operational-gateway validation. (#649)
+* Added `CapabilityGrantValidationOptions.CreateMetadataValidation(...)`
+  for intentional structural, temporal, scope, policy, and binding
+  validation without proof or bounded-use enforcement. (#649)
+* Added execution-boundary defaults that require signed-artifact proof
+  verification and enable bounded-use validation with a default maximum
+  use count of one. (#649)
+* Added explicit support for hosts to disable the execution-boundary
+  bounded-use check when replay or use enforcement is owned atomically by
+  another trusted host boundary. (#649)
+* Added focused tests covering validation-profile defaults, missing proof
+  verification, unavailable bounded-use storage, metadata-only validation,
+  and preservation of the legacy no-options behavior. (#649)
+* Added documentation describing execution-boundary, metadata-only, and
+  backward-compatible `Create(...)` validation semantics. (#649)
+* Added `3.x` migration guidance for consumers adopting the explicit
+  validation profiles. (#649)
+
+### Changed
+
+* Updated execution-boundary guidance and examples to prefer
+  `CreateExecutionBoundary(...)` and to proceed only when
+  `CapabilityGrantValidationResult.ShouldAllow` is `true`. (#649)
+* Clarified that `CapabilityGrantValidator.ValidateAsync(signedGrant)`
+  without explicit validation options preserves the existing `3.x`
+  metadata-oriented behavior and does not automatically verify proof or
+  perform bounded-use/replay checks. (#649)
+* Clarified metadata-only validation semantics so a successful result is
+  not interpreted as proof authenticity, replay resistance,
+  authentication, authorization, or permission to execute an external
+  action. (#649)
+* Updated `SQLitePCLRaw.bundle_e_sqlite3` from `3.0.3` to `3.0.4` and
+  refreshed the affected reproducible NuGet lock files.
+* Updated repository GitHub Actions dependencies, including CodeQL,
+  OpenSSF Scorecard, Zizmor, checkout, and .NET setup actions.
+* Preserved the existing `CapabilityGrantValidationOptions.Create(...)`
+  defaults and the no-options `ValidateAsync(...)` path for compatibility
+  throughout the `3.x` line.
+
+### Fixed
+
+* Fixed PowerShell environment-variable expansion in the quality-report
+  workflow so Core branch-coverage validation receives the configured
+  project, configuration, coverage-output, threshold, and workspace
+  values correctly.
+* Updated the corresponding quality-report coverage input path to use
+  the corrected PowerShell environment-variable syntax.
+
+### Compatibility
+
+* Package IDs and public namespaces remain unchanged.
+* The target framework remains `net10.0`.
+* `AssemblyVersion` remains `3.0.0.0` for compatible `3.x` releases.
+* The new capability-grant validation profiles are additive.
+* Existing consumers using `CapabilityGrantValidationOptions.Create(...)`
+  retain their current validation behavior.
+* Existing consumers using `ValidateAsync(signedGrant)` without explicit
+  options are not silently moved to proof or bounded-use enforcement.
+* Hosts remain responsible for authentication, authorization, durable and
+  concurrency-safe replay protection, signing-key trust, persistence,
+  external execution, and operational safety controls.
+
+
 ## [3.1.0] - 2026-07-20
 
 ### Release summary
