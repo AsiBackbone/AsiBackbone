@@ -135,7 +135,15 @@ public sealed class CapabilityGrantValidationProfileTests
     [Fact]
     public async Task LegacyNoOptionsPathRetainsMetadataOnlyBehavior()
     {
-        SignedGovernanceArtifact<CapabilityTokenGrant> signedGrant = CreateSignedGrant(CreateGrant());
+        DateTimeOffset currentUtc = DateTimeOffset.UtcNow;
+        CapabilityTokenGrant grant = CapabilityTokenGrant.Create(
+            tokenId: "grant-profile-legacy",
+            issuer: "issuer-1",
+            audience: "gateway-1",
+            scopes: ["robotics.execute"],
+            issuedUtc: currentUtc.AddMinutes(-5),
+            expiresUtc: currentUtc.AddHours(1));
+        SignedGovernanceArtifact<CapabilityTokenGrant> signedGrant = CreateSignedGrant(grant);
 
         CapabilityGrantValidationResult result = await CapabilityGrantValidator.ValidateAsync(
             signedGrant,
