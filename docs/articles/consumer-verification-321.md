@@ -38,7 +38,7 @@ Verify that the selected package version is exactly:
 
 ```text
 3.2.1
-````
+```
 
 Confirm that no unexpected package source overrides the intended NuGet source
 order in the consuming environment.
