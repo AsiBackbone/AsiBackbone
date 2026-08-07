@@ -29,7 +29,12 @@ These pages are the best first stops for implementation-first adoption.
 
 ## Current stable package family
 
-Stable `3.x` is the current release line, and `3.2.1` is the current patch release. The package family preserves the existing `AsiBackbone.*` package IDs and namespaces and the `3.0.0.0` binary assembly identity. This release adds explicit capability-grant validation profiles for consequential execution boundaries and intentional metadata-only inspection while preserving the existing configurable validation path for `3.x` compatibility.
+Stable `3.2.x` package family. `3.2.1` is the current patch release.
+The package family carries forward the governance-spine surface, including the
+explicit capability-grant validation profiles introduced in `3.2.0`, while
+`3.2.1` updates the canonical repository, documentation, Source Link, citation,
+SBOM, validation, and package metadata following the transfer to the
+`AsiBackbone` GitHub organization.
 
 The historical `3.0.0` release established the current major line and binary assembly identity.
 

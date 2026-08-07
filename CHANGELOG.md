@@ -4,6 +4,71 @@ All notable changes to this project are documented in this file.
 
 This project follows the spirit of [Keep a Changelog](https://keepachangelog.com/) and adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [3.2.1] - 2026-08-07
+
+### Release summary
+
+`3.2.1` is a backward-compatible patch release for the stable `3.2.x`
+AsiBackbone package family. It marks the transfer of the canonical project
+repository from the personal `cdcavell` GitHub namespace to the dedicated
+`AsiBackbone` organization.
+
+The release updates repository, documentation, Source Link, citation, SBOM,
+validation, workflow, sample, and package metadata to establish
+`AsiBackbone/AsiBackbone` as the canonical project location.
+
+No public API, runtime governance behavior, package ID, public namespace,
+target-framework, or binary assembly identity change is introduced by this
+release.
+
+### Changed
+
+* Updated the canonical repository location from
+  `https://github.com/cdcavell/AsiBackbone` to
+  `https://github.com/AsiBackbone/AsiBackbone`.
+* Updated the canonical GitHub Pages documentation location to
+  `https://asibackbone.github.io/AsiBackbone/`.
+* Updated NuGet repository and project metadata for newly published packages.
+* Updated Source Link validation expectations for `3.2.1` and later releases
+  to use the organization-owned canonical repository.
+* Updated citation metadata and Zenodo metadata for the organization-owned
+  repository and documentation locations.
+* Updated SPDX SBOM document namespace and creator metadata to reflect the
+  organization-owned project location.
+* Updated documentation publishing configuration, repository badges,
+  documentation links, security-reporting links, samples, issue references,
+  and repository navigation to use the canonical organization locations.
+* Updated NetCoreApplicationTemplate references to
+  `AsiBackbone/NetCoreApplicationTemplate` where applicable.
+* Updated `AsiBackbone.Templates` fallback package references from `3.2.0`
+  to `3.2.1`.
+* Updated release-facing documentation to classify `3.2.1` as a patch release
+  in the stable `3.2.x` line.
+
+### Compatibility
+
+* Package IDs remain unchanged.
+* Public namespaces remain unchanged.
+* Public APIs remain unchanged.
+* Runtime governance behavior remains unchanged.
+* Target framework remains `net10.0`.
+* `AssemblyVersion` remains `3.0.0.0`.
+* `FileVersion` advances to `3.2.1.0`.
+* Existing `3.2.x` consumers require no source-code migration.
+* Capability-grant validation profiles introduced in `3.2.0` are carried
+  forward unchanged.
+* Repository-transfer changes affect canonical project, documentation,
+  Source Link, citation, SBOM, provenance, and package metadata locations
+  rather than the runtime contract.
+
+### Package signing
+
+NuGet package signing remains intentionally deferred while AsiBackbone is
+independently maintained. Release integrity continues to rely on the official
+NuGet source, the canonical public repository and release tags, Source Link
+metadata, SBOM generation, provenance artifacts where available, and
+transparent release practices.
+
 ## [3.2.0] - 2026-08-02
 
 ### Release summary

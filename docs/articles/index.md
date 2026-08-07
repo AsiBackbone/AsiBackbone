@@ -11,7 +11,12 @@ Use the header search box for package names, API concepts, and article titles. S
 
 ## Current stable package posture
 
-Stable `3.x` is the current package line, and `3.2.1` is the current patch release.
+Stable `3.2.x` package family. `3.2.1` is the current patch release.
+The package family carries forward the governance-spine surface, including the
+explicit capability-grant validation profiles introduced in `3.2.0`, while
+`3.2.1` updates the canonical repository, documentation, Source Link, citation,
+SBOM, validation, and package metadata following the transfer to the
+`AsiBackbone` GitHub organization.
 
 The historical `3.0.0` release established the current major line and binary assembly identity while preserving the `AsiBackbone.*` package IDs and namespaces established by the `2.0.0` public rename from `CDCavell.AsiBackbone.*`.
 
