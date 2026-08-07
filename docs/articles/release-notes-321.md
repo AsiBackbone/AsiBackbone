@@ -133,9 +133,7 @@ source projects are available.
 - FileVersion advances to 3.2.1.0.
 - Existing 3.2.x consumers require no source-code migration.
 - Capability-grant validation profiles introduced in 3.2.0 remain unchanged.
-- Authentication, authorization, durable replay protection, signing-key
-- custody, persistence, external execution, monitoring, and operational
-- safety controls remain host-owned responsibilities.
+- Authentication, authorization, durable replay protection, signing-key custody, persistence, external execution, monitoring, and operational safety controls remain host-owned responsibilities.
 
 ### Repository metadata transition boundary
 

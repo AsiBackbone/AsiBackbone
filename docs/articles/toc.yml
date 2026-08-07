@@ -23,6 +23,18 @@
       href: templates.md
     - name: Why AsiBackbone?
       href: why-asi-backbone.md
+    - name: 3.2.1 Release Notes
+      href: release-notes-321.md
+    - name: 3.2.1 Consumer Verification Guide
+      href: consumer-verification-321.md
+    - name: 3.2.0 Release Notes
+      href: release-notes-320.md
+    - name: 3.2.0 Consumer Verification Guide
+      href: consumer-verification-320.md
+    - name: 3.1.0 Release Notes
+      href: release-notes-310.md
+    - name: 3.1.0 Consumer Verification Guide
+      href: consumer-verification-310.md
     - name: 3.0.1 Release Notes
       href: release-notes-301.md
     - name: 3.0.1 Consumer Verification Guide
@@ -162,6 +174,12 @@
       href: production-wording-and-alpha-limitations.md
     - name: Supply-Chain Provenance and Package SBOMs
       href: supply-chain-provenance.md
+    - name: 3.2.1 Consumer Verification Guide
+      href: consumer-verification-321.md
+    - name: 3.2.0 Consumer Verification Guide
+      href: consumer-verification-320.md
+    - name: 3.1.0 Consumer Verification Guide
+      href: consumer-verification-310.md
     - name: 3.0.1 Consumer Verification Guide
       href: consumer-verification-301.md
     - name: 3.0.0 Consumer Verification Guide
@@ -216,6 +234,19 @@
       href: supply-chain-provenance.md
     - name: Post-2.0.0 Documentation Currency Review
       href: post-200-documentation-currency-review.md
+
+    - name: 3.2.1 Consumer Verification Guide
+      href: consumer-verification-321.md
+    - name: 3.2.1 Release Readiness Record
+      href: release-readiness-321.md
+    - name: 3.2.0 Consumer Verification Guide
+      href: consumer-verification-320.md
+    - name: 3.2.0 Release Readiness Record
+      href: release-readiness-320.md
+    - name: 3.1.0 Consumer Verification Guide
+      href: consumer-verification-310.md
+    - name: 3.1.0 Release Readiness Record
+      href: release-readiness-310.md
     - name: 3.0.1 Consumer Verification Guide
       href: consumer-verification-301.md
     - name: 3.0.1 Release Readiness Record
@@ -242,6 +273,7 @@
       href: release-readiness-121.md
     - name: 1.2.0 Release Readiness Record
       href: release-readiness-120.md
+
     - name: API Baseline and Boundary Checks
       href: api-baseline-and-boundary-checks.md
     - name: Public API XML Documentation
@@ -250,6 +282,13 @@
       href: implicit-usings-posture.md
     - name: Developer Checklist
       href: developer-checklist.md
+
+    - name: 3.2.1 Release Notes
+      href: release-notes-321.md
+    - name: 3.2.0 Release Notes
+      href: release-notes-320.md
+    - name: 3.1.0 Release Notes
+      href: release-notes-310.md
     - name: 3.0.1 Release Notes
       href: release-notes-301.md
     - name: 3.0.0 Release Notes

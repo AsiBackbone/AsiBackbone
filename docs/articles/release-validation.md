@@ -6,7 +6,7 @@ The binary assembly identity for the `3.x` line remains `3.0.0.0`.
 
 In this software project, **ASI** means **Accountable Systems Infrastructure**. Release validation should confirm that the package family remains practical governance infrastructure and that implementation claims stay within the documented software boundary. See [Release Cadence and Readiness](release-cadence-and-readiness.md) for the release-stream and stabilization guidance that complements this checklist.
 
-The [3.2.0 Release Readiness Record](release-readiness-320.md) is the current release-candidate control sheet. The [3.2.0 Consumer Verification Guide](consumer-verification-320.md) documents the consumer-facing package-source, package ID, capability-validation, Source Link, SBOM/provenance, and deferred package-signing verification path. Earlier readiness records are retained for traceability.
+The [3.2.1 Release Readiness Record](release-readiness-321.md) is the current release-candidate control sheet. The [3.2.1 Consumer Verification Guide](consumer-verification-321.md) documents the consumer-facing package-source, package ID, capability-validation, Source Link, SBOM/provenance, and deferred package-signing verification path. Earlier readiness records are retained for traceability.
 
 ## Required checks before tagging a stable release
 
