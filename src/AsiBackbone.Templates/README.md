@@ -38,4 +38,4 @@ The `asibackbone-webapi` template includes:
 
 ## Boundary notes
 
-Generated projects are intentionally local-first. They are not production durability, production signing, legal non-repudiation, tamper-evidence, authentication, authorization, deployment hardening, or compliance certification by default. See [Project Boundaries and Non-Claims](https://cdcavell.github.io/AsiBackbone/articles/project-boundaries.html) for the full scope statement.
+Generated projects are intentionally local-first. They are not production durability, production signing, legal non-repudiation, tamper-evidence, authentication, authorization, deployment hardening, or compliance certification by default. See [Project Boundaries and Non-Claims](https://asibackbone.github.io/AsiBackbone/articles/project-boundaries.html) for the full scope statement.

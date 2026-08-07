@@ -169,7 +169,7 @@ public sealed class AsiBackboneEndpointGovernanceTests
             new AsiBackboneEndpointGovernanceOptions
             {
                 EnableDevelopmentDiagnostics = true,
-                DevelopmentDiagnosticsDocumentationBaseUrl = "https://cdcavell.github.io/AsiBackbone/articles/"
+                DevelopmentDiagnosticsDocumentationBaseUrl = "https://asibackbone.github.io/AsiBackbone/articles/"
             });
 
         await middleware.InvokeAsync(
@@ -400,7 +400,7 @@ public sealed class AsiBackboneEndpointGovernanceTests
             .Configure<AsiBackboneEndpointGovernanceOptions>(options =>
             {
                 options.EnableDevelopmentDiagnostics = true;
-                options.DevelopmentDiagnosticsDocumentationBaseUrl = "https://cdcavell.github.io/AsiBackbone/articles";
+                options.DevelopmentDiagnosticsDocumentationBaseUrl = "https://asibackbone.github.io/AsiBackbone/articles";
             })
             .AddAsiBackboneAspNetCore()
             .BuildServiceProvider(validateScopes: true);

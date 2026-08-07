@@ -17,7 +17,7 @@ concurrency:
 env:
   CONFIGURATION: Release
   SOLUTION_FILE: './AsiBackbone.slnx'
-  PAGES_BASE_URL: 'https://cdcavell.github.io/AsiBackbone'
+  PAGES_BASE_URL: 'https://AsiBackbone.github.io/AsiBackbone'
   CORE_COVERAGE_OUTPUT: '${{ github.workspace }}/artifacts/core-coverage'
   CORE_BRANCH_COVERAGE_THRESHOLD: 90
 

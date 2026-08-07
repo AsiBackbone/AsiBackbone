@@ -121,8 +121,8 @@ if ([string]::IsNullOrWhiteSpace($ExpectedVersion)) {
     $ExpectedVersion = Resolve-Version $directoryVersionPrefix $directoryVersionSuffix
 }
 
-$expectedProjectUrl = 'https://cdcavell.github.io/AsiBackbone/'
-$expectedRepositoryUrl = 'https://github.com/cdcavell/AsiBackbone'
+$expectedProjectUrl = 'https://asibackbone.github.io/AsiBackbone/'
+$expectedRepositoryUrl = 'https://github.com/AsiBackbone/AsiBackbone'
 $expectedVersionParts = $ExpectedVersion -split '\.'
 $expectedStablePackageFamily = if ($expectedVersionParts.Count -ge 2) {
     'Stable `' + $expectedVersionParts[0] + '.' + $expectedVersionParts[1] + '.x` package family'

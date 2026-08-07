@@ -8,7 +8,7 @@
     <!-- Generate packages.lock.json for reproducible restores. -->
     <RestorePackagesWithLockFile>true</RestorePackagesWithLockFile>
 
-    <VersionPrefix>3.2.0</VersionPrefix>
+    <VersionPrefix>3.2.1</VersionPrefix>
     <VersionSuffix></VersionSuffix>
     <Version Condition="'$(VersionSuffix)' == ''">$(VersionPrefix)</Version>
     <Version Condition="'$(VersionSuffix)' != ''">$(VersionPrefix)-$(VersionSuffix)</Version>
@@ -19,7 +19,7 @@
       FileVersion, and InformationalVersion with each package release.
     -->
     <AssemblyVersion>3.0.0.0</AssemblyVersion>
-    <FileVersion>3.2.0.0</FileVersion>
+    <FileVersion>3.2.1.0</FileVersion>
     <InformationalVersion>$(Version)+$(RepositoryUrl)</InformationalVersion>
 
     <ContinuousIntegrationBuild Condition="'$(GITHUB_ACTIONS)' == 'true'">true</ContinuousIntegrationBuild>
@@ -41,9 +41,9 @@
       projects can opt into a scoped baseline after their project properties load.
     -->
 
-    <RepositoryUrl>https://github.com/cdcavell/AsiBackbone</RepositoryUrl>
+    <RepositoryUrl>https://github.com/AsiBackbone/AsiBackbone</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
-    <PackageProjectUrl>https://cdcavell.github.io/AsiBackbone/</PackageProjectUrl>
+    <PackageProjectUrl>https://asibackbone.github.io/AsiBackbone/</PackageProjectUrl>
   </PropertyGroup>
 
   <PropertyGroup>

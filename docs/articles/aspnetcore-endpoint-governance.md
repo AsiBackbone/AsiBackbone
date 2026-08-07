@@ -167,7 +167,7 @@ Local development hosts can opt into richer ProblemDetails diagnostics for endpo
 builder.Services.Configure<AsiBackboneEndpointGovernanceOptions>(options =>
 {
     options.EnableDevelopmentDiagnostics = builder.Environment.IsDevelopment();
-    options.DevelopmentDiagnosticsDocumentationBaseUrl = "https://cdcavell.github.io/AsiBackbone/articles/";
+    options.DevelopmentDiagnosticsDocumentationBaseUrl = "https://asibackbone.github.io/AsiBackbone/articles/";
 });
 ```
 

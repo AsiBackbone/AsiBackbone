@@ -14,13 +14,13 @@ Current coverage-hardening references:
 
 | Issue | Focus | Coverage type |
 | --- | --- | --- |
-| [#246](https://github.com/cdcavell/AsiBackbone/issues/246) | Capability grant validation branches. | xUnit line/branch coverage. |
-| [#247](https://github.com/cdcavell/AsiBackbone/issues/247) | Signing verifier and verification policy outcome branches. | xUnit line/branch coverage. |
-| [#248](https://github.com/cdcavell/AsiBackbone/issues/248) | Canonical payload builder branches for audit, lifecycle, emission, and outbox artifacts. | xUnit line/branch coverage. |
-| [#249](https://github.com/cdcavell/AsiBackbone/issues/249) | Governance emission and durable outbox domain branches. | xUnit line/branch coverage. |
-| [#250](https://github.com/cdcavell/AsiBackbone/issues/250) | DLP classification policy branches. | xUnit line/branch coverage. |
-| [#262](https://github.com/cdcavell/AsiBackbone/issues/262) | Core-specific branch coverage quality gate. | CI/reporting coverage gate. |
-| [#563](https://github.com/cdcavell/AsiBackbone/issues/563) | Narrow mutation targets for high-risk package boundaries. | Targeted mutation analysis. |
+| [#246](https://github.com/AsiBackbone/AsiBackbone/issues/246) | Capability grant validation branches. | xUnit line/branch coverage. |
+| [#247](https://github.com/AsiBackbone/AsiBackbone/issues/247) | Signing verifier and verification policy outcome branches. | xUnit line/branch coverage. |
+| [#248](https://github.com/AsiBackbone/AsiBackbone/issues/248) | Canonical payload builder branches for audit, lifecycle, emission, and outbox artifacts. | xUnit line/branch coverage. |
+| [#249](https://github.com/AsiBackbone/AsiBackbone/issues/249) | Governance emission and durable outbox domain branches. | xUnit line/branch coverage. |
+| [#250](https://github.com/AsiBackbone/AsiBackbone/issues/250) | DLP classification policy branches. | xUnit line/branch coverage. |
+| [#262](https://github.com/AsiBackbone/AsiBackbone/issues/262) | Core-specific branch coverage quality gate. | CI/reporting coverage gate. |
+| [#563](https://github.com/AsiBackbone/AsiBackbone/issues/563) | Narrow mutation targets for high-risk package boundaries. | Targeted mutation analysis. |
 
 Mutation scope should expand only when a narrow target adds meaningful assertion-strength signal beyond normal unit, integration, smoke, and release-validation gates.
 

@@ -56,12 +56,12 @@ The first mutation-triage pass focused on evaluator, decision, audit, and handsh
 
 | Issue | Focus | Relationship to mutation triage |
 | --- | --- | --- |
-| [#246](https://github.com/cdcavell/AsiBackbone/issues/246) | Capability grant validation branches. | Coverage hardening for public capability validation behavior. |
-| [#247](https://github.com/cdcavell/AsiBackbone/issues/247) | Signing verifier and verification policy outcome branches. | Coverage hardening for signing/verification trust behavior. |
-| [#248](https://github.com/cdcavell/AsiBackbone/issues/248) | Canonical payload builder branches. | Coverage hardening for deterministic signing/hash payload behavior. |
-| [#249](https://github.com/cdcavell/AsiBackbone/issues/249) | Governance emission and durable outbox domain branches. | Coverage hardening for provider-neutral emission/outbox public behavior. |
-| [#250](https://github.com/cdcavell/AsiBackbone/issues/250) | DLP/classification policy branches. | Coverage hardening for DLP failure-policy public behavior. |
-| [#262](https://github.com/cdcavell/AsiBackbone/issues/262) | Core-specific branch coverage quality gate. | CI/reporting guard that separates Core branch coverage from repository-wide line coverage. |
+| [#246](https://github.com/AsiBackbone/AsiBackbone/issues/246) | Capability grant validation branches. | Coverage hardening for public capability validation behavior. |
+| [#247](https://github.com/AsiBackbone/AsiBackbone/issues/247) | Signing verifier and verification policy outcome branches. | Coverage hardening for signing/verification trust behavior. |
+| [#248](https://github.com/AsiBackbone/AsiBackbone/issues/248) | Canonical payload builder branches. | Coverage hardening for deterministic signing/hash payload behavior. |
+| [#249](https://github.com/AsiBackbone/AsiBackbone/issues/249) | Governance emission and durable outbox domain branches. | Coverage hardening for provider-neutral emission/outbox public behavior. |
+| [#250](https://github.com/AsiBackbone/AsiBackbone/issues/250) | DLP/classification policy branches. | Coverage hardening for DLP failure-policy public behavior. |
+| [#262](https://github.com/AsiBackbone/AsiBackbone/issues/262) | Core-specific branch coverage quality gate. | CI/reporting guard that separates Core branch coverage from repository-wide line coverage. |
 
 These issues should be read as public-behavior coverage work. They do not automatically mean Stryker.NET mutation scope has expanded to every related type. Mutation expansion should remain explicit, targeted, and documented.
 

@@ -100,4 +100,4 @@ Canonical receipt payloads are available through `GovernedOperationExecutionRece
 
 ## NCAT companion integration
 
-NetCoreApplicationTemplate issue [#365](https://github.com/cdcavell/NetCoreApplicationTemplate/issues/365) owns the NCAT-specific mutation-audit context, mutation batch identifier, value-protection policy, transaction atomicity, and mutation-batch completion result. AsiBackbone remains independent of NCAT, EF Core, ASP.NET Core, and any persistence provider.
+NetCoreApplicationTemplate issue [#365](https://github.com/AsiBackbone/NetCoreApplicationTemplate/issues/365) owns the NCAT-specific mutation-audit context, mutation batch identifier, value-protection policy, transaction atomicity, and mutation-batch completion result. AsiBackbone remains independent of NCAT, EF Core, ASP.NET Core, and any persistence provider.

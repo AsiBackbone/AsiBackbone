@@ -6,7 +6,7 @@ param(
     [Parameter(Mandatory = $true)]
     [string]$OutputDirectory,
 
-    [string]$DocumentNamespaceBase = 'https://github.com/cdcavell/AsiBackbone/sbom'
+    [string]$DocumentNamespaceBase = 'https://github.com/AsiBackbone/AsiBackbone/sbom'
 )
 
 Set-StrictMode -Version Latest
@@ -293,7 +293,7 @@ foreach ($packageFile in $packageFiles) {
             created = $createdUtc
             creators = @(
                 'Tool: AsiBackbone New-NuGetPackageSbom.ps1',
-                'Organization: cdcavell/AsiBackbone'
+                'Organization: AsiBackbone/AsiBackbone'
             )
         }
         packages = @($spdxPackages.ToArray())

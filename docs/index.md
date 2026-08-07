@@ -25,11 +25,16 @@ These pages are the best first stops for implementation-first adoption.
 * [Progressive Adoption Ladder](articles/progressive-adoption.md)
 * [Getting Started](articles/getting-started.md)
 * [Documentation Articles](articles/)
-* [Security Policy and Vulnerability Disclosure](https://github.com/cdcavell/AsiBackbone/blob/main/SECURITY.md)
+* [Security Policy and Vulnerability Disclosure](https://github.com/AsiBackbone/AsiBackbone/blob/main/SECURITY.md)
 
 ## Current stable package family
 
-Stable `3.x` is the current release line, and `3.2.0` is the current minor release. The package family preserves the existing `AsiBackbone.*` package IDs and namespaces and the `3.0.0.0` binary assembly identity. This release adds explicit capability-grant validation profiles for consequential execution boundaries and intentional metadata-only inspection while preserving the existing configurable validation path for `3.x` compatibility.
+Stable `3.2.x` package family. `3.2.1` is the current patch release.
+The package family carries forward the governance-spine surface, including the
+explicit capability-grant validation profiles introduced in `3.2.0`, while
+`3.2.1` updates the canonical repository, documentation, Source Link, citation,
+SBOM, validation, and package metadata following the transfer to the
+`AsiBackbone` GitHub organization.
 
 The historical `3.0.0` release established the current major line and binary assembly identity.
 
@@ -109,6 +114,7 @@ Package-specific READMEs and release notes define which surfaces are stable, opt
 * [Project Boundaries and Non-Claims](articles/project-boundaries.md)
 * [Production Wording and Stable Signing Boundaries](articles/production-wording-and-alpha-limitations.md)
 * [Supply-Chain Provenance and Package SBOMs](articles/supply-chain-provenance.md)
+* [3.2.1 Consumer Verification Guide](articles/consumer-verification-321.md)
 * [3.2.0 Consumer Verification Guide](articles/consumer-verification-320.md)
 * [3.1.0 Consumer Verification Guide](articles/consumer-verification-310.md)
 * [3.0.1 Consumer Verification Guide](articles/consumer-verification-301.md)
@@ -128,6 +134,9 @@ Package-specific READMEs and release notes define which surfaces are stable, opt
 * [Quality Reports](quality/)
 * [Performance Benchmark Baseline](articles/performance-benchmark-baseline.md)
 * [Release Validation](articles/release-validation.md)
+* [3.2.1 Consumer Verification Guide](articles/consumer-verification-321.md)
+* [3.2.1 Release Readiness Record](articles/release-readiness-321.md)
+* [3.2.1 Release Notes](articles/release-notes-321.md)
 * [3.2.0 Consumer Verification Guide](articles/consumer-verification-320.md)
 * [3.2.0 Release Readiness Record](articles/release-readiness-320.md)
 * [3.2.0 Release Notes](articles/release-notes-320.md)

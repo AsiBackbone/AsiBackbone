@@ -2,11 +2,11 @@
 
 ASP.NET Core host adapters for Accountable Systems Infrastructure governance primitives.
 
-Stable `3.2.x` package family. `3.2.0` is the current minor release for this package.
+Stable `3.2.x` package family. `3.2.1` is the current patch release for this package.
 
 This package acts as a thin web-host adapter around `AsiBackbone.Core`.
 
-> **New to AsiBackbone?** Start with the concept, not this package: [Intent to Execution: An Accountability Pattern](https://cdcavell.github.io/AsiBackbone/articles/intent-to-execution-pattern.html) and the [documentation site](https://cdcavell.github.io/AsiBackbone/). This README covers one package in the family.
+> **New to AsiBackbone?** Start with the concept, not this package: [Intent to Execution: An Accountability Pattern](https://asibackbone.github.io/AsiBackbone/articles/intent-to-execution-pattern.html) and the [documentation site](https://asibackbone.github.io/AsiBackbone/). This README covers one package in the family.
 
 > **Important:**
 > This package provides host adapters only. Low-level helpers do not enforce decisions automatically; endpoint-governance middleware acts only when the host explicitly adds it to the pipeline and registers the required host-owned policy, capability, audit, persistence, and transaction services. Attributes and route-builder calls do not by themselves make audit records durable, immutable, tamper-evident, or transactionally safe.

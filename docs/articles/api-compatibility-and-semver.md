@@ -2,7 +2,7 @@
 
 This article defines the public API compatibility promise for the stable AsiBackbone package family and documents how semantic versioning applies after stabilization.
 
-It complements the historical stable API review tracked in [issue #13](https://github.com/cdcavell/AsiBackbone/issues/13). The `2.0.0` release moved public package IDs and namespaces from `CDCavell.AsiBackbone.*` to `AsiBackbone.*`. The `3.0.0` release established the current `3.x` stable line and binary assembly identity while preserving the existing `AsiBackbone.*` package IDs and namespaces.
+It complements the historical stable API review tracked in [issue #13](https://github.com/AsiBackbone/AsiBackbone/issues/13). The `2.0.0` release moved public package IDs and namespaces from `CDCavell.AsiBackbone.*` to `AsiBackbone.*`. The `3.0.0` release established the current `3.x` stable line and binary assembly identity while preserving the existing `AsiBackbone.*` package IDs and namespaces.
 
 > [!NOTE]
 > Additive public API or package surface should use a minor version bump even when the change is backward-compatible. Patch releases should be reserved for fixes, documentation, packaging, tests, and implementation hardening that do not expand the stable public surface.
@@ -47,7 +47,7 @@ The `2.0.0` release established the simplified `AsiBackbone.*` package and names
 
 ### Current `3.x` stable family
 
-`3.2.0` is the current stable minor release. It preserves the `AsiBackbone.*` package IDs and namespaces and the binary assembly identity `3.0.0.0` established by `3.0.0`.
+`3.2.1` is the current stable patch release. It preserves the `AsiBackbone.*` package IDs and namespaces and the binary assembly identity `3.0.0.0` established by `3.0.0`.
 
 | Package | `3.x` stable role |
 | --- | --- |
@@ -118,6 +118,7 @@ Expected stable-line behavior:
 | `3.0.1` | `3.0.1` | `3.0.0.0` | `3.0.1.0` | `3.0.1+...` |
 | `3.1.0` | `3.1.0` | `3.0.0.0` | `3.1.0.0` | `3.1.0+...` |
 | `3.2.0` | `3.2.0` | `3.0.0.0` | `3.2.0.0` | `3.2.0+...` |
+| `3.2.1` | `3.2.1` | `3.0.0.0` | `3.2.1.0` | `3.2.1+...` |
 
 Before cutting stable releases, release validation should verify that `AssemblyVersion`, `FileVersion`, `InformationalVersion`, package metadata, release notes, and repository tags match this policy.
 

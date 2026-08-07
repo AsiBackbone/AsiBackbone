@@ -159,7 +159,7 @@ Historical review status: Complete, pending final `dotnet test` at the time of t
 
 Before cutting a stable `1.0.0` release, the release readiness review was expected to confirm:
 
-- the stable API review in [issue #13](https://github.com/cdcavell/AsiBackbone/issues/13) was complete or intentionally deferred with follow-up issues;
+- the stable API review in [issue #13](https://github.com/AsiBackbone/AsiBackbone/issues/13) was complete or intentionally deferred with follow-up issues;
 - the [API Compatibility and Semantic Versioning](api-compatibility-and-semver.md) statement was published and linked from documentation navigation;
 - the stable package list was identified before release notes were finalized;
 - preview, provider-specific, gateway, signing, robotics, telemetry, and cloud-emission packages were not implied to be part of the stable Core contract unless they completed their own stable API review;

@@ -73,7 +73,7 @@ Recommended concise reference:
 
 For repository-root or package README files, use the published documentation link:
 
-> AsiBackbone is a governance spine, not an intelligence engine. See [Project Boundaries and Non-Claims](https://cdcavell.github.io/AsiBackbone/articles/project-boundaries.html) for the full scope statement.
+> AsiBackbone is a governance spine, not an intelligence engine. See [Project Boundaries and Non-Claims](https://asibackbone.github.io/AsiBackbone/articles/project-boundaries.html) for the full scope statement.
 
 ## How to phrase the boundary
 

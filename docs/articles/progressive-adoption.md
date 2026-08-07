@@ -15,7 +15,7 @@ Most new users should start with one of these paths:
 | --- | --- | --- |
 | Understand the absolute Core-only decision shape | This page, [Level 1](#level-1-core-decision-pipeline-only) | `AsiBackbone.Core` |
 | Gate one ASP.NET Core endpoint and inspect audit residue locally | [First 15 Minutes: Standard API Gating](quickstart-api-gating.md) | `Core`, `AspNetCore`, `Storage.InMemory` |
-| Review the current stable package family before broader adoption | [3.2.0 Release Notes](release-notes-320.md) | Install only the packages required by the selected boundary |
+| Review the current stable package family before broader adoption | [3.2.1 Release Notes](release-notes-321.md) | Install only the packages required by the selected boundary |
 
 Everything else is an add-on.
 

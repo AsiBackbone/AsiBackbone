@@ -55,7 +55,7 @@ builder.Services.AddAsiBackboneRegulatedGovernance();
 
 The regulated helper adds the ASP.NET Core adapter, strict fail-closed evaluator and endpoint options, required governance metadata, redacted development-diagnostics metadata values, and the provider-neutral metadata sanitizer with the recommended budget. It does not register host policy rules, metadata classifiers, capability proof verification, durable replay protection, durable audit/outbox persistence, authentication, authorization, or production signing.
 
-After enabling it, explicitly exempt intentionally public endpoints such as health checks with `AllowMissingGovernanceMetadata()`. Register reviewed `IGovernanceMetadataClassifier` implementations and production host dependencies before deployment. See the [Regulated Governance Profile](https://cdcavell.github.io/AsiBackbone/articles/regulated-governance-profile.html).
+After enabling it, explicitly exempt intentionally public endpoints such as health checks with `AllowMissingGovernanceMetadata()`. Register reviewed `IGovernanceMetadataClassifier` implementations and production host dependencies before deployment. See the [Regulated Governance Profile](https://asibackbone.github.io/AsiBackbone/articles/regulated-governance-profile.html).
 
 This profile is a governance posture, not a legal or compliance certification.
 
@@ -72,11 +72,11 @@ This generated app uses safe local-development defaults. Before production use, 
 
 ## Boundaries
 
-This scaffold is a runnable adoption starting point. It keeps execution behavior and operational controls with the host application. For the full AsiBackbone scope statement, see [Project Boundaries and Non-Claims](https://cdcavell.github.io/AsiBackbone/articles/project-boundaries.html).
+This scaffold is a runnable adoption starting point. It keeps execution behavior and operational controls with the host application. For the full AsiBackbone scope statement, see [Project Boundaries and Non-Claims](https://asibackbone.github.io/AsiBackbone/articles/project-boundaries.html).
 
 ## Documentation
 
-- https://cdcavell.github.io/AsiBackbone/articles/templates.html
-- https://cdcavell.github.io/AsiBackbone/articles/quickstart-api-gating.html
-- https://cdcavell.github.io/AsiBackbone/articles/aspnetcore-endpoint-governance.html
-- https://cdcavell.github.io/AsiBackbone/articles/regulated-governance-profile.html
+- https://asibackbone.github.io/AsiBackbone/articles/templates.html
+- https://asibackbone.github.io/AsiBackbone/articles/quickstart-api-gating.html
+- https://asibackbone.github.io/AsiBackbone/articles/aspnetcore-endpoint-governance.html
+- https://asibackbone.github.io/AsiBackbone/articles/regulated-governance-profile.html
