@@ -126,7 +126,7 @@ For production-style hosts, add durable audit/outbox persistence, signing or ver
 
 ## Package family
 
-Stable `3.2.x` package family. `3.2.1` is the current minor release. The package family carries forward the governance-spine surface and adds explicit capability-grant validation profiles for execution-boundary enforcement and intentional metadata-only inspection, while preserving the governed execution-to-mutation accountability receipts, optional capability-proof trust pinning, and conservative ASP.NET Core actor-type claim trust controls introduced earlier in the `3.x` line.
+Stable `3.2.x` package family. `3.2.1` is the current patch release. The package family carries forward the governance-spine surface and adds explicit capability-grant validation profiles for execution-boundary enforcement and intentional metadata-only inspection, while preserving the governed execution-to-mutation accountability receipts, optional capability-proof trust pinning, and conservative ASP.NET Core actor-type claim trust controls introduced earlier in the `3.x` line.
 
 The historical `3.0.0` release established the current major release line and binary assembly identity while preserving the simplified `AsiBackbone.*` package IDs and namespaces established by `2.0.0`.
 
@@ -185,7 +185,7 @@ The full, categorized documentation set lives at the [documentation site](https:
 
 ## Current status
 
-Stable `3.2.x` is the current released line, with `3.2.1` as the current minor release candidate. This release preserves the simplified `AsiBackbone.*` package and namespace identity and the binary assembly identity `3.0.0.0`.
+Stable `3.2.x` is the current released line, with `3.2.1` as the current patch release candidate. This release preserves the simplified `AsiBackbone.*` package and namespace identity and the binary assembly identity `3.0.0.0`.
 
 The stable API contract is documented in [API Compatibility and SemVer](https://github.com/AsiBackbone/AsiBackbone/blob/main/docs/articles/api-compatibility-and-semver.md). The current release is recorded in [3.2.0 Release Notes](https://github.com/AsiBackbone/AsiBackbone/blob/main/docs/articles/release-notes-320.md) and [3.2.0 Release Readiness Record](https://github.com/AsiBackbone/AsiBackbone/blob/main/docs/articles/release-readiness-320.md). Consumers can use the [3.2.0 Consumer Verification Guide](https://github.com/AsiBackbone/AsiBackbone/blob/main/docs/articles/consumer-verification-320.md) for package-source, package ID, capability-validation profile, Source Link, SBOM, provenance, and deferred-signing checks. Earlier release records remain available for historical traceability.
 

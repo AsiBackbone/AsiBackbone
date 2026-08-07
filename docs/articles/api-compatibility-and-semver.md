@@ -47,7 +47,7 @@ The `2.0.0` release established the simplified `AsiBackbone.*` package and names
 
 ### Current `3.x` stable family
 
-`3.2.1` is the current stable minor release. It preserves the `AsiBackbone.*` package IDs and namespaces and the binary assembly identity `3.0.0.0` established by `3.0.0`.
+`3.2.1` is the current stable patch release. It preserves the `AsiBackbone.*` package IDs and namespaces and the binary assembly identity `3.0.0.0` established by `3.0.0`.
 
 | Package | `3.x` stable role |
 | --- | --- |

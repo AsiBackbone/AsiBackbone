@@ -29,7 +29,7 @@ These pages are the best first stops for implementation-first adoption.
 
 ## Current stable package family
 
-Stable `3.x` is the current release line, and `3.2.1` is the current minor release. The package family preserves the existing `AsiBackbone.*` package IDs and namespaces and the `3.0.0.0` binary assembly identity. This release adds explicit capability-grant validation profiles for consequential execution boundaries and intentional metadata-only inspection while preserving the existing configurable validation path for `3.x` compatibility.
+Stable `3.x` is the current release line, and `3.2.1` is the current patch release. The package family preserves the existing `AsiBackbone.*` package IDs and namespaces and the `3.0.0.0` binary assembly identity. This release adds explicit capability-grant validation profiles for consequential execution boundaries and intentional metadata-only inspection while preserving the existing configurable validation path for `3.x` compatibility.
 
 The historical `3.0.0` release established the current major line and binary assembly identity.
 

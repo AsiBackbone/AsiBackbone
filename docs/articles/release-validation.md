@@ -1,6 +1,6 @@
 # Stable Release Validation
 
-This article documents the reusable release-blocking validation path for stable release lines. The current released stable package family is `3.x`, with `3.2.1` as the current minor release.
+This article documents the reusable release-blocking validation path for stable release lines. The current released stable package family is `3.x`, with `3.2.1` as the current patch release.
 
 The binary assembly identity for the `3.x` line remains `3.0.0.0`.
 

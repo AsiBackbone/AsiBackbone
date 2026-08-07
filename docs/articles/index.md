@@ -11,7 +11,7 @@ Use the header search box for package names, API concepts, and article titles. S
 
 ## Current stable package posture
 
-Stable `3.x` is the current package line, and `3.2.1` is the current minor release.
+Stable `3.x` is the current package line, and `3.2.1` is the current patch release.
 
 The historical `3.0.0` release established the current major line and binary assembly identity while preserving the `AsiBackbone.*` package IDs and namespaces established by the `2.0.0` public rename from `CDCavell.AsiBackbone.*`.
 
