@@ -13,7 +13,7 @@ Configure endpoint governance options from the ASP.NET Core host:
 builder.Services.Configure<AsiBackboneEndpointGovernanceOptions>(options =>
 {
     options.EnableDevelopmentDiagnostics = builder.Environment.IsDevelopment();
-    options.DevelopmentDiagnosticsDocumentationBaseUrl = "https://cdcavell.github.io/AsiBackbone/articles/";
+    options.DevelopmentDiagnosticsDocumentationBaseUrl = "https://asibackbone.github.io/AsiBackbone/articles/";
 });
 ```
 
@@ -69,7 +69,7 @@ A missing capability validator in local development may return a response shaped
     "endpoint.operation_name",
     "endpoint.requires_liability_handshake"
   ],
-  "documentationUrl": "https://cdcavell.github.io/AsiBackbone/articles/endpoint-governance-development-diagnostics.html"
+  "documentationUrl": "https://asibackbone.github.io/AsiBackbone/articles/endpoint-governance-development-diagnostics.html"
 }
 ```
 

@@ -72,7 +72,7 @@ dotnet tool restore
 ## Clone the repository
 
 ```bash
-git clone https://github.com/cdcavell/AsiBackbone.git
+git clone https://github.com/AsiBackbone/AsiBackbone.git
 cd AsiBackbone
 ```
 

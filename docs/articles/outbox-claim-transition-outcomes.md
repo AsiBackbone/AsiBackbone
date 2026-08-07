@@ -1,6 +1,6 @@
 # Claimed Outbox Transition Outcomes
 
-Issue: [#590](https://github.com/cdcavell/AsiBackbone/issues/590)
+Issue: [#590](https://github.com/AsiBackbonecdcavell/AsiBackbone/issues/590)
 
 Status: **Implemented as an additive compatibility-preserving contract.**
 

@@ -29,13 +29,13 @@
   ],
   "related_identifiers": [
     {
-      "identifier": "https://github.com/cdcavell/AsiBackbone",
+      "identifier": "https://github.com/AsiBackbone/AsiBackbone",
       "relation": "isIdenticalTo",
       "scheme": "url",
       "resource_type": "software"
     },
     {
-      "identifier": "https://github.com/cdcavell/NetCoreApplicationTemplate",
+      "identifier": "https://github.com/AsiBackbone/NetCoreApplicationTemplate",
       "relation": "references",
       "scheme": "url",
       "resource_type": "software"

@@ -2,7 +2,7 @@
 
 This design record captures the selected direction for multi-worker governance outbox claim and lease support.
 
-Issue: [#407](https://github.com/cdcavell/AsiBackbone/issues/407), implemented baseline for [#464](https://github.com/cdcavell/AsiBackbone/issues/464)
+Issue: [#407](https://github.com/AsiBackbone/AsiBackbone/issues/407), implemented baseline for [#464](https://github.com/AsiBackbone/AsiBackbone/issues/464)
 
 Status: **Accepted design direction; initial provider-neutral claim contracts and opt-in drain/store support implemented.** Provider-specific stronger atomic claim patterns remain host/provider-owned.
 

@@ -30,7 +30,7 @@ For `3.0.1`, verify:
 - package version: `3.0.1`;
 - assembly version: `3.0.0.0`;
 - file version: `3.0.1.0`;
-- repository URL: `https://github.com/cdcavell/AsiBackbone`;
+- repository URL: `https://github.com/AsiBackbone/AsiBackbone`;
 - public package IDs and namespaces remain in the existing `AsiBackbone.*` family.
 
 Rebuild consumers after updating package references and run the host's policy, audit, acknowledgment, capability, outbox, signing, and endpoint-governance tests as applicable.

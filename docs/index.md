@@ -25,7 +25,7 @@ These pages are the best first stops for implementation-first adoption.
 * [Progressive Adoption Ladder](articles/progressive-adoption.md)
 * [Getting Started](articles/getting-started.md)
 * [Documentation Articles](articles/)
-* [Security Policy and Vulnerability Disclosure](https://github.com/cdcavell/AsiBackbone/blob/main/SECURITY.md)
+* [Security Policy and Vulnerability Disclosure](https://github.com/AsiBackbone/AsiBackbone/blob/main/SECURITY.md)
 
 ## Current stable package family
 

@@ -41,9 +41,9 @@
       projects can opt into a scoped baseline after their project properties load.
     -->
 
-    <RepositoryUrl>https://github.com/cdcavell/AsiBackbone</RepositoryUrl>
+    <RepositoryUrl>https://github.com/AsiBackbone/AsiBackbone</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
-    <PackageProjectUrl>https://cdcavell.github.io/AsiBackbone/</PackageProjectUrl>
+    <PackageProjectUrl>https://asibackbone.github.io/AsiBackbone/</PackageProjectUrl>
   </PropertyGroup>
 
   <PropertyGroup>

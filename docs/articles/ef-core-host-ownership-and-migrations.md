@@ -206,7 +206,7 @@ That separation is intentional. ASI Backbone provides the accountability model a
 
 ## NetCoreApplicationTemplate usage
 
-`cdcavell/NetCoreApplicationTemplate` can be a preferred validation host because it already emphasizes secure defaults, logging, deployment-friendly documentation, and enterprise-ready ASP.NET Core structure.
+`AsiBackbone/NetCoreApplicationTemplate` can be a preferred validation host because it already emphasizes secure defaults, logging, deployment-friendly documentation, and enterprise-ready ASP.NET Core structure.
 
 It is not required.
 

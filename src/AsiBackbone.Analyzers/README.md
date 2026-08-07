@@ -2,7 +2,7 @@
 
 Roslyn analyzer safety rails for Accountable Systems Infrastructure governance flows.
 
-> **New to AsiBackbone?** Start with the concept, not this package: [Intent to Execution: An Accountability Pattern](https://cdcavell.github.io/AsiBackbone/articles/intent-to-execution-pattern.html) and the [documentation site](https://cdcavell.github.io/AsiBackbone/). This README covers one package in the family.
+> **New to AsiBackbone?** Start with the concept, not this package: [Intent to Execution: An Accountability Pattern](https://asibackbone.github.io/AsiBackbone/articles/intent-to-execution-pattern.html) and the [documentation site](https://cdcavell.github.io/AsiBackbone/). This README covers one package in the family.
 
 > **Important:**
 > This package does not add runtime enforcement, persistence, transactions, audit storage, outbox delivery, legal protection, or compliance certification.

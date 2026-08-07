@@ -30,13 +30,13 @@ Current Core coverage includes provider-neutral governance emission contracts, d
 
 Tracked Core coverage-hardening work includes:
 
-- [#246 — Core capability grant validation branch gaps](https://github.com/cdcavell/AsiBackbone/issues/246)
-- [#247 — Core signing verifier and policy outcome branch gaps](https://github.com/cdcavell/AsiBackbone/issues/247)
-- [#248 — Core canonical payload builder branch gaps](https://github.com/cdcavell/AsiBackbone/issues/248)
-- [#249 — Core governance emission and outbox branch gaps](https://github.com/cdcavell/AsiBackbone/issues/249)
-- [#250 — Core DLP classification policy branch gaps](https://github.com/cdcavell/AsiBackbone/issues/250)
-- [#262 — Core-specific branch coverage quality gate](https://github.com/cdcavell/AsiBackbone/issues/262)
-- [#563 — targeted mutation expansion across high-risk packages](https://github.com/cdcavell/AsiBackbone/issues/563)
+- [#246 — Core capability grant validation branch gaps](https://github.com/AsiBackbone/AsiBackbone/issues/246)
+- [#247 — Core signing verifier and policy outcome branch gaps](https://github.com/AsiBackbone/AsiBackbone/issues/247)
+- [#248 — Core canonical payload builder branch gaps](https://github.com/AsiBackbone/AsiBackbone/issues/248)
+- [#249 — Core governance emission and outbox branch gaps](https://github.com/AsiBackbone/AsiBackbone/issues/249)
+- [#250 — Core DLP classification policy branch gaps](https://github.com/AsiBackbone/AsiBackbone/issues/250)
+- [#262 — Core-specific branch coverage quality gate](https://github.com/AsiBackbone/AsiBackbone/issues/262)
+- [#563 — targeted mutation expansion across high-risk packages](https://github.com/AsiBackbone/AsiBackbone/issues/563)
 
 ## Available reports
 

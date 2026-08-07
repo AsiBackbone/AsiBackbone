@@ -7,7 +7,7 @@ In this software project, **ASI** means **Accountable Systems Infrastructure**. 
 > [!IMPORTANT]
 > Documentation should describe only implemented and released behavior as current behavior. The stable `3.x` family carries forward Core signing-ready and verification primitives, the local-development signing provider, and the managed-key adapter boundary. These surfaces still have important limits: local-development signing is for tests and samples, the managed-key package is an adapter boundary, and signing alone does not create production-grade audit guarantees without host-owned storage, key management, verification, monitoring, and retention controls.
 
-For sensitive security concerns, use the repository [Security Policy and Vulnerability Disclosure](https://github.com/cdcavell/AsiBackbone/blob/main/SECURITY.md). This article is a public wording guide, not a private reporting channel or certification statement.
+For sensitive security concerns, use the repository [Security Policy and Vulnerability Disclosure](https://github.com/AsiBackbone/AsiBackbone/blob/main/SECURITY.md). This article is a public wording guide, not a private reporting channel or certification statement.
 
 ## Current-stage wording rules
 
@@ -132,7 +132,7 @@ Before merging documentation for provider or security work, confirm:
 
 ## Related documentation
 
-- [Security Policy and Vulnerability Disclosure](https://github.com/cdcavell/AsiBackbone/blob/main/SECURITY.md)
+- [Security Policy and Vulnerability Disclosure](https://github.com/AsiBackbone/AsiBackbone/blob/main/SECURITY.md)
 - [Privacy and Signing Boundaries](privacy-and-signing-boundaries.md)
 - [Signing-Ready Receipts and Key Handling](signing-ready-receipts-and-key-handling.md)
 - [Signing Provider Package Boundary](signing-provider-package-boundary.md)

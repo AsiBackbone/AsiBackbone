@@ -17,7 +17,7 @@ param(
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 
-$expectedRepositoryUrl = 'https://github.com/cdcavell/AsiBackbone'
+$expectedRepositoryUrl = 'https://github.com/AsiBackbone/AsiBackbone'
 
 $packageIds = @(
     'AsiBackbone.Core',

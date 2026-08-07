@@ -1,6 +1,6 @@
 # AsiBackbone Code Review — Performance Focus, Tied to Benchmark Baseline
 
-**Repository:** [cdcavell/AsiBackbone](https://github.com/cdcavell/AsiBackbone) (branch: `main`)
+**Repository:** [AsiBackbone/AsiBackbone](https://github.com/AsiBackbone/AsiBackbone) (branch: `main`)
 **Reviewed:** July 2026 · Package family version `1.1.0`–`3.0.0` line (CHANGELOG shows active `3.0.0` work on `main`)
 **Inputs:** Two uploaded BenchmarkDotNet reports (`AsiBackboneHotPathBenchmarks`, `PolicyEvaluatorAllocationBenchmarks`), full source of the benchmarked hot paths, and the project's own architecture/performance documentation.
 

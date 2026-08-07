@@ -1,6 +1,6 @@
 # EF Core Outbox Bulk-Claim Performance Evaluation
 
-Issue: [#589](https://github.com/cdcavell/AsiBackbone/issues/589)
+Issue: [#589](https://github.com/AsiBackbone/AsiBackbone/issues/589)
 
 Status: **Evaluation complete. Keep the portable per-row implementation as the production baseline. Do not add provider-specific raw SQL to `EfCoreGovernanceOutboxStore`.**
 

@@ -89,7 +89,7 @@ None of these has a settled answer. That is the point of writing the pattern dow
 
 ## A concrete specimen
 
-[AsiBackbone](https://github.com/cdcavell/AsiBackbone) is one .NET-native implementation of this pattern — a governance spine of framework-neutral primitives (policy context, constraint evaluation, explicit decisions, acknowledgment, audit residue, capability tokens) with host-owned execution and optional persistence, signing, and telemetry seams. It is offered as something to read and react to as much as something to install: a worked example of the stages above, with deliberate boundaries about what it does and does not do.
+[AsiBackbone](https://github.com/AsiBackbone/AsiBackbone) is one .NET-native implementation of this pattern — a governance spine of framework-neutral primitives (policy context, constraint evaluation, explicit decisions, acknowledgment, audit residue, capability tokens) with host-owned execution and optional persistence, signing, and telemetry seams. It is offered as something to read and react to as much as something to install: a worked example of the stages above, with deliberate boundaries about what it does and does not do.
 
 If the pattern is useful to you and the specimen is not, that is a perfectly good outcome. The map matters more than any single road drawn on it.
 

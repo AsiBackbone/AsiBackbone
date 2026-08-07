@@ -3,8 +3,8 @@ message: "If you use this software, please cite it using the metadata below."
 title: "ASI Backbone"
 version: "3.2.1"
 date-released: "2026-08-07"
-repository-code: "https://github.com/cdcavell/AsiBackbone"
-url: "https://cdcavell.github.io/AsiBackbone/"
+repository-code: "https://github.com/AsiBackbone/AsiBackbone"
+url: "https://asibackbone.github.io/AsiBackbone/"
 type: software
 license: MIT
 identifiers:

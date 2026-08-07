@@ -1,17 +1,17 @@
-![AsiBackbone governance spine icon](https://raw.githubusercontent.com/cdcavell/ASIBackbone/main/docs/images/social-preview.png)
+![AsiBackbone governance spine icon](https://raw.githubusercontent.com/AsiBackbone/ASIBackbone/main/docs/images/social-preview.png)
 
 # AsiBackbone
 
-[![CI](https://github.com/cdcavell/AsiBackbone/actions/workflows/ci.yml/badge.svg)](https://github.com/cdcavell/AsiBackbone/actions/workflows/ci.yml)
-[![Line Coverage Gate](https://img.shields.io/badge/line%20coverage%20gate-75%25-brightgreen)](https://cdcavell.github.io/AsiBackbone/coverage/index.html)
-[![Core Branch Coverage Gate](https://img.shields.io/badge/core%20branch%20gate-90%25-brightgreen)](https://cdcavell.github.io/AsiBackbone/coverage/core/index.html)
+[![CI](https://github.com/AsiBackbone/AsiBackbone/actions/workflows/ci.yml/badge.svg)](https://github.com/AsiBackbone/AsiBackbone/actions/workflows/ci.yml)
+[![Line Coverage Gate](https://img.shields.io/badge/line%20coverage%20gate-75%25-brightgreen)](https://AsiBackbone.github.io/AsiBackbone/coverage/index.html)
+[![Core Branch Coverage Gate](https://img.shields.io/badge/core%20branch%20gate-90%25-brightgreen)](https://AsiBackbone.github.io/AsiBackbone/coverage/core/index.html)
 [![OpenSSF Best Practices](https://www.bestpractices.dev/projects/13630/badge)](https://www.bestpractices.dev/projects/13630)
-[![Documentation](https://github.com/cdcavell/AsiBackbone/actions/workflows/publish-docs.yml/badge.svg)](https://github.com/cdcavell/AsiBackbone/actions/workflows/publish-docs.yml)
-[![Docs](https://img.shields.io/badge/docs-GitHub%20Pages-blue)](https://cdcavell.github.io/AsiBackbone/)
+[![Documentation](https://github.com/AsiBackbone/AsiBackbone/actions/workflows/publish-docs.yml/badge.svg)](https://github.com/AsiBackbone/AsiBackbone/actions/workflows/publish-docs.yml)
+[![Docs](https://img.shields.io/badge/docs-GitHub%20Pages-blue)](https://AsiBackbone.github.io/AsiBackbone/)
 [![.NET](https://img.shields.io/badge/.NET-10.0-purple)](https://dotnet.microsoft.com/)
 [![License](https://img.shields.io/badge/license-MIT-blue)](LICENSE.txt)
 [![Security Policy](https://img.shields.io/badge/security-policy-blue)](SECURITY.md)
-[![GitHub Release](https://img.shields.io/github/v/release/cdcavell/AsiBackbone?sort=semver&display_name=tag&label=release)](https://github.com/cdcavell/AsiBackbone/releases)
+[![GitHub Release](https://img.shields.io/github/v/release/AsiBackbone/AsiBackbone?sort=semver&display_name=tag&label=release)](https://github.com/AsiBackbone/AsiBackbone/releases)
 [![Zenodo DOI](https://img.shields.io/badge/DOI-10.5281%2Fzenodo.20546032-blue)](https://doi.org/10.5281/zenodo.20546032)
 
 **Accountable Systems Infrastructure for governed .NET decision flow.**
@@ -55,7 +55,7 @@ Use plain engineering translations first:
 
 ## First code path
 
-The snippet below is an intentionally small README slice, not a complete `Program.cs`. It shows the primary governance path: build safe context, evaluate policy, write audit residue, and let the host execute only after the decision allows it. The full compile-ready walkthrough lives in [First 15 Minutes: Standard API Gating](https://cdcavell.github.io/AsiBackbone/articles/quickstart-api-gating.html).
+The snippet below is an intentionally small README slice, not a complete `Program.cs`. It shows the primary governance path: build safe context, evaluate policy, write audit residue, and let the host execute only after the decision allows it. The full compile-ready walkthrough lives in [First 15 Minutes: Standard API Gating](https://AsiBackbone.github.io/AsiBackbone/articles/quickstart-api-gating.html).
 
 ```csharp
 // Registration: Core evaluator + one host-owned rule + local in-memory audit sink.
@@ -152,42 +152,42 @@ Stable `3.2.x` packages intentionally target `net10.0`. Consumers should plan on
 
 The project is not multi-targeting .NET 8 for `3.2.x`. That is an explicit adoption decision, not a defect workaround. The current package family uses a single repository-wide `TargetFramework` of `net10.0`, the EF Core integration is aligned with centrally managed EF Core `10.0.x` dependencies, and backporting the full package, analyzer, template, CI, packaging, and smoke-test surface would add compatibility overhead for a short-lived adoption window.
 
-If meaningful external consumer demand appears, additional TFM support can be reconsidered in a later release with CI, packaging validation, analyzer compatibility, template smoke tests, and documentation updated together. See the [Target Framework Support Decision Record](https://github.com/cdcavell/AsiBackbone/blob/main/docs/articles/target-framework-support.md).
+If meaningful external consumer demand appears, additional TFM support can be reconsidered in a later release with CI, packaging validation, analyzer compatibility, template smoke tests, and documentation updated together. See the [Target Framework Support Decision Record](https://github.com/AsiBackbone/AsiBackbone/blob/main/docs/articles/target-framework-support.md).
 
 ## Start here
 
 For **implementation-first adoption**:
 
-- [Implementation-First Adoption Path](https://cdcavell.github.io/AsiBackbone/articles/implementation-first-adoption.html) — plain engineering translations and the recommended first reading path.
-- [First 15 Minutes: Standard API Gating](https://cdcavell.github.io/AsiBackbone/articles/quickstart-api-gating.html)
-- [AddAsiBackbone Builder Facade](https://cdcavell.github.io/AsiBackbone/articles/add-asibackbone-builder-facade.html)
-- [dotnet new Templates](https://cdcavell.github.io/AsiBackbone/articles/templates.html)
-- [Target Framework Support Decision Record](https://github.com/cdcavell/AsiBackbone/blob/main/docs/articles/target-framework-support.md)
-- [Reference Deployment: Plain ASP.NET Core Host Evidence](https://cdcavell.github.io/AsiBackbone/articles/reference-deployment.html)
-- [Testing Harness](https://cdcavell.github.io/AsiBackbone/articles/testing-harness.html)
-- [Strict Governance Profile](https://cdcavell.github.io/AsiBackbone/articles/strict-governance-profile.html)
-- [Threat Model Contributors](https://cdcavell.github.io/AsiBackbone/articles/threat-model-contributors.html)
-- [Project Boundaries and Non-Claims](https://cdcavell.github.io/AsiBackbone/articles/project-boundaries.html)
-- [Terminology Map](https://cdcavell.github.io/AsiBackbone/articles/terminology-map.html)
-- [Progressive Adoption Ladder](https://cdcavell.github.io/AsiBackbone/articles/progressive-adoption.html)
-- [Production Managed-Key Integration Guide](https://cdcavell.github.io/AsiBackbone/articles/production-managed-key-integration.html)
+- [Implementation-First Adoption Path](https://AsiBackbone.github.io/AsiBackbone/articles/implementation-first-adoption.html) — plain engineering translations and the recommended first reading path.
+- [First 15 Minutes: Standard API Gating](https://AsiBackbone.github.io/AsiBackbone/articles/quickstart-api-gating.html)
+- [AddAsiBackbone Builder Facade](https://AsiBackbone.github.io/AsiBackbone/articles/add-asibackbone-builder-facade.html)
+- [dotnet new Templates](https://AsiBackbone.github.io/AsiBackbone/articles/templates.html)
+- [Target Framework Support Decision Record](https://github.com/AsiBackbone/AsiBackbone/blob/main/docs/articles/target-framework-support.md)
+- [Reference Deployment: Plain ASP.NET Core Host Evidence](https://AsiBackbone.github.io/AsiBackbone/articles/reference-deployment.html)
+- [Testing Harness](https://AsiBackbone.github.io/AsiBackbone/articles/testing-harness.html)
+- [Strict Governance Profile](https://AsiBackbone.github.io/AsiBackbone/articles/strict-governance-profile.html)
+- [Threat Model Contributors](https://AsiBackbone.github.io/AsiBackbone/articles/threat-model-contributors.html)
+- [Project Boundaries and Non-Claims](https://AsiBackbone.github.io/AsiBackbone/articles/project-boundaries.html)
+- [Terminology Map](https://AsiBackbone.github.io/AsiBackbone/articles/terminology-map.html)
+- [Progressive Adoption Ladder](https://AsiBackbone.github.io/AsiBackbone/articles/progressive-adoption.html)
+- [Production Managed-Key Integration Guide](https://AsiBackbone.github.io/AsiBackbone/articles/production-managed-key-integration.html)
 
 For **optional conceptual background**:
 
-- [Intent to Execution: An Accountability Pattern](https://cdcavell.github.io/AsiBackbone/articles/intent-to-execution-pattern.html)
-- [Core Governance Flow Diagrams](https://cdcavell.github.io/AsiBackbone/articles/core-governance-flow-diagrams.html)
-- [ASI Backbone Concept Synopsis](https://cdcavell.github.io/AsiBackbone/articles/asi-backbone-concept.html)
-- [Dynamic Liability Handshake](https://cdcavell.github.io/AsiBackbone/articles/dynamic-liability-handshake.html)
-- [Core Domain Language](https://cdcavell.github.io/AsiBackbone/articles/core-domain-language.html)
-- [Host-Owned Execution Enforcement](https://cdcavell.github.io/AsiBackbone/articles/host-owned-execution-enforcement.html)
+- [Intent to Execution: An Accountability Pattern](https://AsiBackbone.github.io/AsiBackbone/articles/intent-to-execution-pattern.html)
+- [Core Governance Flow Diagrams](https://AsiBackbone.github.io/AsiBackbone/articles/core-governance-flow-diagrams.html)
+- [ASI Backbone Concept Synopsis](https://AsiBackbone.github.io/AsiBackbone/articles/asi-backbone-concept.html)
+- [Dynamic Liability Handshake](https://AsiBackbone.github.io/AsiBackbone/articles/dynamic-liability-handshake.html)
+- [Core Domain Language](https://AsiBackbone.github.io/AsiBackbone/articles/core-domain-language.html)
+- [Host-Owned Execution Enforcement](https://AsiBackbone.github.io/AsiBackbone/articles/host-owned-execution-enforcement.html)
 
-The full, categorized documentation set lives at the [documentation site](https://cdcavell.github.io/AsiBackbone/).
+The full, categorized documentation set lives at the [documentation site](https://AsiBackbone.github.io/AsiBackbone/).
 
 ## Current status
 
 Stable `3.2.x` is the current released line, with `3.2.1` as the current minor release candidate. This release preserves the simplified `AsiBackbone.*` package and namespace identity and the binary assembly identity `3.0.0.0`.
 
-The stable API contract is documented in [API Compatibility and SemVer](https://github.com/cdcavell/AsiBackbone/blob/main/docs/articles/api-compatibility-and-semver.md). The current release is recorded in [3.2.0 Release Notes](https://github.com/cdcavell/AsiBackbone/blob/main/docs/articles/release-notes-320.md) and [3.2.0 Release Readiness Record](https://github.com/cdcavell/AsiBackbone/blob/main/docs/articles/release-readiness-320.md). Consumers can use the [3.2.0 Consumer Verification Guide](https://github.com/cdcavell/AsiBackbone/blob/main/docs/articles/consumer-verification-320.md) for package-source, package ID, capability-validation profile, Source Link, SBOM, provenance, and deferred-signing checks. Earlier release records remain available for historical traceability.
+The stable API contract is documented in [API Compatibility and SemVer](https://github.com/AsiBackbone/AsiBackbone/blob/main/docs/articles/api-compatibility-and-semver.md). The current release is recorded in [3.2.0 Release Notes](https://github.com/AsiBackbone/AsiBackbone/blob/main/docs/articles/release-notes-320.md) and [3.2.0 Release Readiness Record](https://github.com/AsiBackbone/AsiBackbone/blob/main/docs/articles/release-readiness-320.md). Consumers can use the [3.2.0 Consumer Verification Guide](https://github.com/AsiBackbone/AsiBackbone/blob/main/docs/articles/consumer-verification-320.md) for package-source, package ID, capability-validation profile, Source Link, SBOM, provenance, and deferred-signing checks. Earlier release records remain available for historical traceability.
 
 ## Security and vulnerability reporting
 
@@ -203,13 +203,13 @@ AsiBackbone               = optional governance/module package family
 Consumer application      = chooses whether to use either or both
 ```
 
-A consumer should be able to use AsiBackbone in an application generated from NetCoreApplicationTemplate, in an existing ASP.NET Core application, or in a custom host that provides the required infrastructure. See [NetCoreApplicationTemplate Host Validation](https://github.com/cdcavell/AsiBackbone/blob/main/docs/articles/netcoreapplicationtemplate-host-validation.md).
+A consumer should be able to use AsiBackbone in an application generated from NetCoreApplicationTemplate, in an existing ASP.NET Core application, or in a custom host that provides the required infrastructure. See [NetCoreApplicationTemplate Host Validation](https://github.com/AsiBackbone/AsiBackbone/blob/main/docs/articles/netcoreapplicationtemplate-host-validation.md).
 
 ## Alignment boundary
 
-AsiBackbone is a governance spine, not an intelligence engine. It implements governance-oriented software primitives for accountable decision flow and keeps execution authority with the host application. See [Project Boundaries and Non-Claims](https://cdcavell.github.io/AsiBackbone/articles/project-boundaries.html) for the full scope statement and safe wording guidance.
+AsiBackbone is a governance spine, not an intelligence engine. It implements governance-oriented software primitives for accountable decision flow and keeps execution authority with the host application. See [Project Boundaries and Non-Claims](https://AsiBackbone.github.io/AsiBackbone/articles/project-boundaries.html) for the full scope statement and safe wording guidance.
 
-> **Current NuGet packages are intentionally published without package signing.** This is a deliberate governance decision while the project is independently maintained, balancing operational complexity against practical value. Instead, the project emphasizes transparent source code, GitHub releases, Source Link, SBOM generation, and package provenance. Package signing remains on the long-term roadmap and will be reconsidered as the project's community, governance, and operational needs evolve. For current package verification guidance, see the [**3.2.0 Consumer Verification Guide**](https://cdcavell.github.io/AsiBackbone/articles/consumer-verification-320.html).
+> **Current NuGet packages are intentionally published without package signing.** This is a deliberate governance decision while the project is independently maintained, balancing operational complexity against practical value. Instead, the project emphasizes transparent source code, GitHub releases, Source Link, SBOM generation, and package provenance. Package signing remains on the long-term roadmap and will be reconsidered as the project's community, governance, and operational needs evolve. For current package verification guidance, see the [**3.2.0 Consumer Verification Guide**](https://AsiBackbone.github.io/AsiBackbone/articles/consumer-verification-320.html).
 
 ## Design principles
 
