@@ -1,6 +1,6 @@
 # Stable Release Validation
 
-This article documents the reusable release-blocking validation path for stable release lines. The current released stable package family is `3.x`, with `3.2.0` as the current minor release.
+This article documents the reusable release-blocking validation path for stable release lines. The current released stable package family is `3.x`, with `3.2.1` as the current minor release.
 
 The binary assembly identity for the `3.x` line remains `3.0.0.0`.
 
@@ -115,10 +115,10 @@ For every stable release, the release readiness record should explicitly confirm
 
 ## Source Link metadata validation
 
-After `3.2.0` packages are published and visible on NuGet, maintainers should run:
+After `3.2.1` packages are published and visible on NuGet, maintainers should run:
 
 ```powershell
-./scripts/Validate-Source-Link-commit-metadata.ps1 -Version 3.2.0
+./scripts/Validate-Source-Link-commit-metadata.ps1 -Version 3.2.1
 ```
 
 This post-publish check downloads the published packages and confirms the expected repository type, repository URL, and non-empty repository commit metadata are present.

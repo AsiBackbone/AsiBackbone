@@ -26,7 +26,7 @@ Major releases should be rare. They should be reserved for identity, namespace, 
 
 ## Current `3.x` stabilization posture
 
-`3.x` is the current stable package line, and `3.2.0` is the current minor release.
+`3.x` is the current stable package line, and `3.2.1` is the current minor release.
 
 The historical `3.0.0` release established the major-line binary identity while preserving the existing `AsiBackbone.*` package IDs and namespaces.
 
