@@ -148,24 +148,24 @@ jobs:
         run: ./scripts/New-NuGetPackageSbom.ps1 -PackageDirectory '${{ env.PACKAGE_OUTPUT }}' -OutputDirectory '${{ env.SBOM_OUTPUT }}'
 
       - name: Attest package provenance
-        uses: actions/attest-build-provenance@0f67c3f4856b2e3261c31976d6725780e5e4c373 # v4
+        uses: actions/attest-build-provenance@4d101475d8b20a2381f78447822ac1eab6504dd8 # v4.2.2
         with:
           subject-path: ${{ env.PACKAGE_OUTPUT }}/*.nupkg
 
       - name: Attest package SBOM provenance
-        uses: actions/attest-build-provenance@0f67c3f4856b2e3261c31976d6725780e5e4c373 # v4
+        uses: actions/attest-build-provenance@4d101475d8b20a2381f78447822ac1eab6504dd8 # v4.2.2
         with:
           subject-path: ${{ env.SBOM_OUTPUT }}/*.json
 
       - name: Upload package artifacts
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: asi-backbone-packages
           path: ${{ env.PACKAGE_OUTPUT }}/*.nupkg
           if-no-files-found: error
 
       - name: Upload package SBOM artifacts
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: asi-backbone-package-sboms
           path: ${{ env.SBOM_OUTPUT }}/*.json
