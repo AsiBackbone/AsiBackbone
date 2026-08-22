@@ -23,6 +23,10 @@
       href: templates.md
     - name: Why AsiBackbone?
       href: why-asi-backbone.md
+    - name: 3.2.2 Release Notes
+      href: release-notes-322.md
+    - name: 3.2.2 Consumer Verification Guide
+      href: consumer-verification-322.md
     - name: 3.2.1 Release Notes
       href: release-notes-321.md
     - name: 3.2.1 Consumer Verification Guide
@@ -174,6 +178,8 @@
       href: production-wording-and-alpha-limitations.md
     - name: Supply-Chain Provenance and Package SBOMs
       href: supply-chain-provenance.md
+    - name: 3.2.2 Consumer Verification Guide
+      href: consumer-verification-322.md
     - name: 3.2.1 Consumer Verification Guide
       href: consumer-verification-321.md
     - name: 3.2.0 Consumer Verification Guide
@@ -235,6 +241,12 @@
     - name: Post-2.0.0 Documentation Currency Review
       href: post-200-documentation-currency-review.md
 
+    - name: 3.2.2 Consumer Verification Guide
+      href: consumer-verification-322.md
+    - name: 3.2.2 Release Readiness Record
+      href: release-readiness-322.md
+    - name: 3.2.2 Release Notes
+      href: release-notes-322.md
     - name: 3.2.1 Consumer Verification Guide
       href: consumer-verification-321.md
     - name: 3.2.1 Release Readiness Record

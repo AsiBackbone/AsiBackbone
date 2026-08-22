@@ -1,8 +1,8 @@
 {
   "title": "ASI Backbone",
-  "version": "3.2.1",
+  "version": "3.2.2",
   "upload_type": "software",
-  "description": "AsiBackbone 3.2.1 is a backward-compatible patch release for the stable 3.2.x line marking the transfer of the canonical project repository from the cdcavell GitHub namespace to the dedicated AsiBackbone organization. The release updates repository, documentation, Source Link, citation, SBOM, validation, and package metadata while preserving existing package IDs, public namespaces, runtime behavior, the net10.0 target, and AssemblyVersion 3.0.0.0.",
+  "description": "AsiBackbone 3.2.2 is a backward-compatible maintenance patch for the stable 3.2.x line. It refreshes approved .NET dependencies and SHA-pinned GitHub Actions/security tooling, and normalizes repository metadata without changing package IDs, public namespaces, public APIs, runtime governance behavior, the net10.0 target, or AssemblyVersion 3.0.0.0.",
   "creators": [
     {
       "name": "Cavell, Christopher D.",
