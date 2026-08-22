@@ -29,12 +29,13 @@ These pages are the best first stops for implementation-first adoption.
 
 ## Current stable package family
 
-Stable `3.2.x` package family. `3.2.1` is the current patch release.
+Stable `3.2.x` package family. `3.2.2` is the current patch release.
 The package family carries forward the governance-spine surface, including the
-explicit capability-grant validation profiles introduced in `3.2.0`, while
-`3.2.1` updates the canonical repository, documentation, Source Link, citation,
-SBOM, validation, and package metadata following the transfer to the
-`AsiBackbone` GitHub organization.
+explicit capability-grant validation profiles introduced in `3.2.0` and the
+organization-owned repository metadata established in `3.2.1`. `3.2.2` is a
+maintenance patch that refreshes approved .NET dependencies and SHA-pinned
+workflow/security tooling without changing the public API or runtime governance
+contract.
 
 The historical `3.0.0` release established the current major line and binary assembly identity.
 
@@ -114,6 +115,7 @@ Package-specific READMEs and release notes define which surfaces are stable, opt
 * [Project Boundaries and Non-Claims](articles/project-boundaries.md)
 * [Production Wording and Stable Signing Boundaries](articles/production-wording-and-alpha-limitations.md)
 * [Supply-Chain Provenance and Package SBOMs](articles/supply-chain-provenance.md)
+* [3.2.2 Consumer Verification Guide](articles/consumer-verification-322.md)
 * [3.2.1 Consumer Verification Guide](articles/consumer-verification-321.md)
 * [3.2.0 Consumer Verification Guide](articles/consumer-verification-320.md)
 * [3.1.0 Consumer Verification Guide](articles/consumer-verification-310.md)
@@ -134,6 +136,9 @@ Package-specific READMEs and release notes define which surfaces are stable, opt
 * [Quality Reports](quality/)
 * [Performance Benchmark Baseline](articles/performance-benchmark-baseline.md)
 * [Release Validation](articles/release-validation.md)
+* [3.2.2 Consumer Verification Guide](articles/consumer-verification-322.md)
+* [3.2.2 Release Readiness Record](articles/release-readiness-322.md)
+* [3.2.2 Release Notes](articles/release-notes-322.md)
 * [3.2.1 Consumer Verification Guide](articles/consumer-verification-321.md)
 * [3.2.1 Release Readiness Record](articles/release-readiness-321.md)
 * [3.2.1 Release Notes](articles/release-notes-321.md)

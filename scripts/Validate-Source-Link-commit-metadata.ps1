@@ -3,14 +3,14 @@
     - When no -Version value is supplied, the script validates the currently documented
       default package version below.
     - For future releases, pass the released package version explicitly, for example:
-        ./scripts/Validate-Source-Link-commit-metadata.ps1 -Version '3.2.1'
+        ./scripts/Validate-Source-Link-commit-metadata.ps1 -Version '3.2.2'
     - Use -KeepArtifacts only when troubleshooting. By default, downloaded and extracted
       NuGet package verification artifacts are cleaned up before the script exits.
 #>
 
 [CmdletBinding()]
 param(
-    [string]$Version = '3.2.1',
+    [string]$Version = '3.2.2',
     [switch]$KeepArtifacts
 )
 

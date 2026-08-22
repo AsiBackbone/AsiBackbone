@@ -11,12 +11,13 @@ Use the header search box for package names, API concepts, and article titles. S
 
 ## Current stable package posture
 
-Stable `3.2.x` package family. `3.2.1` is the current patch release.
+Stable `3.2.x` package family. `3.2.2` is the current patch release.
 The package family carries forward the governance-spine surface, including the
-explicit capability-grant validation profiles introduced in `3.2.0`, while
-`3.2.1` updates the canonical repository, documentation, Source Link, citation,
-SBOM, validation, and package metadata following the transfer to the
-`AsiBackbone` GitHub organization.
+explicit capability-grant validation profiles introduced in `3.2.0` and the
+organization-owned repository metadata established in `3.2.1`. `3.2.2` is a
+maintenance patch that refreshes approved .NET dependencies and SHA-pinned
+workflow/security tooling without changing the public API or runtime governance
+contract.
 
 The historical `3.0.0` release established the current major line and binary assembly identity while preserving the `AsiBackbone.*` package IDs and namespaces established by the `2.0.0` public rename from `CDCavell.AsiBackbone.*`.
 
@@ -24,18 +25,17 @@ Released stable package surfaces include Core, DependencyInjection,
 Storage.InMemory, EntityFrameworkCore, AspNetCore, Testing, Templates,
 Analyzers, OpenTelemetry, Signing.LocalDevelopment, and Signing.ManagedKey.
 
-`3.2.1` carries forward the explicit capability-grant validation profiles
-introduced in `3.2.0` for consequential execution boundaries and intentional
-metadata-only inspection while updating canonical repository, documentation,
-Source Link, citation, SBOM, validation, and package metadata following the
-transfer to the `AsiBackbone` GitHub organization.
+`3.2.2` carries forward the explicit capability-grant validation profiles
+introduced in `3.2.0` and the canonical organization-owned repository metadata
+established in `3.2.1`. The patch refreshes dependency and release-tooling
+inputs without changing their runtime semantics.
 
 Event Hubs, Purview, Azure-specific non-signing SDK adapters, Aspire runtime
 packages, robotics, immutable storage, and additional non-signing provider
 packages remain design-only, strategy-only, sample-only, host-owned, or
 future-provider work unless a later stable release explicitly ships them.
 
-The release process includes explicit [Release Cadence and Readiness](release-cadence-and-readiness.md) guidance for patch, minor, and major release selection, package metadata, Source Link, SBOM/provenance, documentation links, and future package identity or namespace changes. The [3.2.1 Consumer Verification Guide](consumer-verification-321.md) gives consumers a conservative package-source, package ID, capability-validation, Source Link, SBOM/provenance, and deferred-signing verification path.
+The release process includes explicit [Release Cadence and Readiness](release-cadence-and-readiness.md) guidance for patch, minor, and major release selection, package metadata, Source Link, SBOM/provenance, documentation links, and future package identity or namespace changes. The [3.2.2 Consumer Verification Guide](consumer-verification-322.md) gives consumers a conservative package-source, package ID, dependency, Source Link, SBOM/provenance, and deferred-signing verification path.
 
 ## Start here / implementation-first usage
 
@@ -50,6 +50,8 @@ The release process includes explicit [Release Cadence and Readiness](release-ca
 * [AddAsiBackbone Builder Facade](add-asibackbone-builder-facade.md)
 * [dotnet new Templates](templates.md)
 * [Why AsiBackbone?](why-asi-backbone.md)
+* [3.2.2 Release Notes](release-notes-322.md)
+* [3.2.2 Consumer Verification Guide](consumer-verification-322.md)
 * [3.2.1 Release Notes](release-notes-321.md)
 * [3.2.1 Consumer Verification Guide](consumer-verification-321.md)
 * [3.2.0 Release Notes](release-notes-320.md)
@@ -143,6 +145,7 @@ These pages describe signing, verification, capability, and cryptographic-harden
 * [Project Boundaries and Non-Claims](project-boundaries.md)
 * [Production Wording and Stable Signing Boundaries](production-wording-and-alpha-limitations.md)
 * [Supply-Chain Provenance and Package SBOMs](supply-chain-provenance.md)
+* [3.2.2 Consumer Verification Guide](consumer-verification-322.md)
 * [3.2.1 Consumer Verification Guide](consumer-verification-321.md)
 * [3.2.0 Consumer Verification Guide](consumer-verification-320.md)
 * [3.1.0 Consumer Verification Guide](consumer-verification-310.md)
@@ -181,6 +184,9 @@ These pages remain available as strategy or design material. They are not releas
 * [Release Cadence and Readiness](release-cadence-and-readiness.md)
 * [Release Validation](release-validation.md)
 * [Supply-Chain Provenance and Package SBOMs](supply-chain-provenance.md)
+* [3.2.2 Consumer Verification Guide](consumer-verification-322.md)
+* [3.2.2 Release Readiness Record](release-readiness-322.md)
+* [3.2.2 Release Notes](release-notes-322.md)
 * [3.2.1 Consumer Verification Guide](consumer-verification-321.md)
 * [3.2.1 Release Readiness Record](release-readiness-321.md)
 * [3.2.0 Consumer Verification Guide](consumer-verification-320.md)

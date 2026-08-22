@@ -317,7 +317,7 @@ published `3.2.1` packages.
 ## Verify SBOM metadata
 
 Where package SBOMs are provided, inspect the SPDX artifacts and confirm that
-current `3.2.1` metadata references the organization-owned project location.
+the `3.2.1` release metadata references the organization-owned project location.
 
 Expected canonical repository identity:
 

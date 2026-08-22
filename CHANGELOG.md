@@ -4,6 +4,59 @@ All notable changes to this project are documented in this file.
 
 This project follows the spirit of [Keep a Changelog](https://keepachangelog.com/) and adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [3.2.2] - 2026-08-22
+
+### Release summary
+
+`3.2.2` is a backward-compatible maintenance patch for the stable `3.2.x`
+AsiBackbone package family. It carries forward the `3.2.1` software contract
+while refreshing approved dependencies and SHA-pinned CI, security, and release
+tooling.
+
+No runtime source files changed relative to `v3.2.1`. Package IDs, public
+namespaces, public APIs, runtime governance behavior, the `net10.0` target, and
+the stable `3.x` binary assembly identity remain unchanged.
+
+### Changed
+
+* Updated `Microsoft.EntityFrameworkCore`,
+  `Microsoft.EntityFrameworkCore.InMemory`,
+  `Microsoft.EntityFrameworkCore.Relational`, and
+  `Microsoft.EntityFrameworkCore.Sqlite` from `10.0.10` to `10.0.11`.
+* Updated `Microsoft.Extensions.Logging.Abstractions` from `10.0.10` to
+  `10.0.11`.
+* Updated `Microsoft.NET.Test.Sdk` from `18.8.1` to `18.9.0`.
+* Refreshed SHA-pinned GitHub Actions used by CI, release validation, package
+  provenance, CodeQL, OpenSSF/OWASP, and workflow-security checks. The current
+  release-candidate set includes CodeQL `4.37.7`,
+  `actions/attest-build-provenance` `4.2.2`, and Zizmor action `0.6.2`.
+* Aligned action version comments with their pinned commit SHAs in package and
+  release-validation workflows.
+* Normalized `.config/dotnet-tools.json` line endings without changing the
+  configured tool version or tool behavior.
+
+### Compatibility
+
+* Package IDs remain unchanged.
+* Public namespaces remain unchanged.
+* Public APIs remain unchanged.
+* Runtime governance behavior remains unchanged.
+* Target framework remains `net10.0`.
+* `AssemblyVersion` remains `3.0.0.0`.
+* `FileVersion` advances to `3.2.2.0`.
+* Existing `3.2.x` consumers require no source-code migration solely because
+  of this patch release.
+* Capability-grant validation profiles introduced in `3.2.0` remain unchanged.
+* Canonical organization-owned repository and documentation metadata
+  established in `3.2.1` remain unchanged.
+
+### Package signing
+
+NuGet package signing remains intentionally deferred while AsiBackbone is
+independently maintained. Consumers should continue to use the official NuGet
+source, canonical repository and release tag, Source Link metadata, SBOMs, and
+provenance artifacts where available as complementary verification signals.
+
 ## [3.2.1] - 2026-08-07
 
 ### Release summary

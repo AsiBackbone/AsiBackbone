@@ -47,7 +47,7 @@ The `2.0.0` release established the simplified `AsiBackbone.*` package and names
 
 ### Current `3.x` stable family
 
-`3.2.1` is the current stable patch release. It preserves the `AsiBackbone.*` package IDs and namespaces and the binary assembly identity `3.0.0.0` established by `3.0.0`.
+`3.2.2` is the current stable patch release. It preserves the `AsiBackbone.*` package IDs and namespaces and the binary assembly identity `3.0.0.0` established by `3.0.0`.
 
 | Package | `3.x` stable role |
 | --- | --- |
@@ -119,6 +119,7 @@ Expected stable-line behavior:
 | `3.1.0` | `3.1.0` | `3.0.0.0` | `3.1.0.0` | `3.1.0+...` |
 | `3.2.0` | `3.2.0` | `3.0.0.0` | `3.2.0.0` | `3.2.0+...` |
 | `3.2.1` | `3.2.1` | `3.0.0.0` | `3.2.1.0` | `3.2.1+...` |
+| `3.2.2` | `3.2.2` | `3.0.0.0` | `3.2.2.0` | `3.2.2+...` |
 
 Before cutting stable releases, release validation should verify that `AssemblyVersion`, `FileVersion`, `InformationalVersion`, package metadata, release notes, and repository tags match this policy.
 
@@ -149,6 +150,12 @@ Before cutting a stable release or stable package-family expansion, the release 
 
 ## Related documentation
 
+- [3.2.2 Release Notes](release-notes-322.md)
+- [3.2.2 Release Readiness Record](release-readiness-322.md)
+- [3.2.2 Consumer Verification Guide](consumer-verification-322.md)
+- [3.2.1 Release Notes](release-notes-321.md)
+- [3.2.1 Release Readiness Record](release-readiness-321.md)
+- [3.2.1 Consumer Verification Guide](consumer-verification-321.md)
 - [3.2.0 Release Notes](release-notes-320.md)
 - [3.2.0 Release Readiness Record](release-readiness-320.md)
 - [3.2.0 Consumer Verification Guide](consumer-verification-320.md)
