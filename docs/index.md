@@ -7,6 +7,14 @@ In this software project, **ASI** means **Accountable Systems Infrastructure**. 
 > [!IMPORTANT]
 > AsiBackbone provides framework-neutral building blocks and host integration seams for governing consequential actions in software systems. Host applications remain responsible for authentication, authorization, execution, persistence, deployment, monitoring, compliance review, and operational controls. For the canonical boundary reference, see [Project Boundaries and Non-Claims](articles/project-boundaries.md).
 
+## Documentation ownership
+
+This site is primarily the implementation, API, package, integration, security, operations, compatibility, and release documentation for the AsiBackbone product. It remains authoritative for released package and runtime behavior.
+
+[ASI Backbone Learning](https://asibackbone.github.io/Learning/) is the canonical educational and architectural source for organization-level concepts, terminology lineage, tutorials, comparisons, tradeoffs, labs, and general governed-execution teaching. Its source is maintained in the [AsiBackbone/Learning repository](https://github.com/AsiBackbone/Learning). Learning does not override product API or runtime truth documented here.
+
+See [Documentation Ownership](articles/documentation-ownership.md) for the cross-repository ownership matrix and contribution routing rule.
+
 ## Search, navigation, and source links
 
 The documentation site uses the DocFX search box in the header. Source for every page lives in the repository under `docs/`, and the site header includes a Repository link for viewing or editing documentation files.
@@ -22,6 +30,7 @@ These pages are the best first stops for implementation-first adoption.
 * [Reference Deployment: Plain ASP.NET Core Host Evidence](articles/reference-deployment.md)
 * [Terminology Map](articles/terminology-map.md)
 * [Project Boundaries and Non-Claims](articles/project-boundaries.md)
+* [Documentation Ownership](articles/documentation-ownership.md)
 * [Progressive Adoption Ladder](articles/progressive-adoption.md)
 * [Getting Started](articles/getting-started.md)
 * [Documentation Articles](articles/)
