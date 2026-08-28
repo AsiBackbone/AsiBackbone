@@ -16,6 +16,16 @@ Contributions should preserve the stable package direction:
 - preserve the documented implicit-usings posture unless a project-specific change improves package-boundary reviewability;
 - avoid overclaiming around signing, tamper-evidence, privacy, compliance, AI, or physical execution.
 
+## Documentation ownership
+
+Before adding or substantially expanding documentation, decide which repository owns the subject:
+
+- Put organization-level concepts, architecture education, terminology lineage, tutorials, comparisons, tradeoffs, labs, and general governed-execution teaching in [AsiBackbone/Learning](https://github.com/AsiBackbone/Learning). The published educational site is [ASI Backbone Learning](https://asibackbone.github.io/Learning/).
+- Keep package installation/configuration, public API/type behavior, compile-ready package examples, runtime semantics, integration boundaries, security/cryptographic implementation posture, provider operations, compatibility, releases, consumer verification, and maintainer evidence in this repository.
+- When a page mixes both concerns, keep the concrete AsiBackbone implementation/API material here and link to Learning for the broader architectural explanation instead of maintaining duplicate educational narratives.
+
+Learning is the educational source of truth; it does not override AsiBackbone package, API, configuration, or runtime behavior. See [Documentation Ownership](docs/articles/documentation-ownership.md) for the canonical matrix and routing rule.
+
 ## Local setup
 
 Install:

@@ -5,6 +5,12 @@ This section maps the AsiBackbone documentation set for the stable `3.x` Account
 > [!IMPORTANT]
 > In this software project, **ASI** means **Accountable Systems Infrastructure**. AsiBackbone is governance infrastructure for accountable software decision flow, not an artificial superintelligence implementation. See [Project Boundaries and Non-Claims](project-boundaries.md) for the canonical boundary reference.
 
+## Documentation ownership
+
+Articles in this repository are authoritative when they document concrete AsiBackbone package, API, configuration, runtime, integration, security, operations, compatibility, release, or maintainer behavior. See [Documentation Ownership](documentation-ownership.md) for the canonical cross-repository matrix.
+
+General architectural education belongs in [ASI Backbone Learning](https://asibackbone.github.io/Learning/) ([source](https://github.com/AsiBackbone/Learning)). Existing conceptual articles may remain here for continuity while follow-up restructuring is performed, but they should not be expanded into a competing educational source; new or deeper general explanations should link to Learning. Learning does not control AsiBackbone product API or runtime truth.
+
 ## Search and navigation
 
 Use the header search box for package names, API concepts, and article titles. Search is enabled for the published DocFX site; if a newly merged page is missing from results, wait for the documentation publish workflow to finish and refresh the browser cache. Source files live under `docs/` in the repository, and the site header includes a Repository link for source review or edits.
