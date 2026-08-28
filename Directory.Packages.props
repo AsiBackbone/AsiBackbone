@@ -20,6 +20,6 @@
     <PackageVersion Include="coverlet.collector" Version="10.0.1" />
     <PackageVersion Include="coverlet.msbuild" Version="10.0.1" />
     <PackageVersion Include="SQLitePCLRaw.bundle_e_sqlite3" Version="3.0.4" />
-    <PackageVersion Include="FsCheck" Version="3.3.3" />
+    <PackageVersion Include="FsCheck" Version="3.4.0" />
   </ItemGroup>
 </Project>
