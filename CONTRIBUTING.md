@@ -26,6 +26,24 @@ Before adding or substantially expanding documentation, decide which repository 
 
 Learning is the educational source of truth; it does not override AsiBackbone package, API, configuration, or runtime behavior. See [Documentation Ownership](docs/articles/documentation-ownership.md) for the canonical matrix and routing rule.
 
+### Documentation URL continuity and link guardrails
+
+When educational authority moves from this repository to Learning:
+
+- preserve the established AsiBackbone documentation URL when practical;
+- replace the old page with a concise transition/product-boundary page rather than silently deleting it;
+- name the canonical Learning destination explicitly;
+- retain useful product/API/runtime links on the preserved page;
+- link Learning back to concrete AsiBackbone implementation or API pages, not back to a transition page in a way that creates a redirect loop.
+
+Critical cross-repository routes are tracked in `eng/docs/cross-repository-links.json`. After building DocFX, validate the transition pages, published Learning destinations, current product/API/release destinations, and selected Learning-to-AsiBackbone links with:
+
+```powershell
+./scripts/Validate-DocumentationLinks.ps1
+```
+
+If a release changes the current release-note or consumer-verification URL, update the link manifest in the same pull request.
+
 ## Local setup
 
 Install:

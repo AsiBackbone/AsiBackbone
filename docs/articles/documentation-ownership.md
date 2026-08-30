@@ -46,6 +46,32 @@ Use this test before creating or expanding a page:
 
 For mixed topics, keep the exact implementation contract and compile-ready product usage in AsiBackbone, then link to Learning for the broader explanation, alternatives, or teaching material. Do not maintain two independent canonical explanations of the same general concept.
 
+## URL continuity and cross-repository link contract
+
+Moving educational authority to Learning does not mean removing the established AsiBackbone URL.
+
+For a page that becomes Learning-owned:
+
+1. Keep the existing AsiBackbone path published when practical.
+2. Replace the old body with a short transition or product-boundary page.
+3. State the canonical Learning destination explicitly.
+4. Keep concrete AsiBackbone implementation/API links on the transition page when they remain useful.
+5. Point Learning directly to the relevant product, API, release, or implementation destination. Do not point Learning back to a transition page in a way that creates a circular redirect/pointer pattern.
+
+The curated continuity contract is stored in `eng/docs/cross-repository-links.json`. It records:
+
+- preserved transition-page paths and their canonical Learning destinations;
+- critical published Learning and AsiBackbone destinations;
+- selected reciprocal Learning-to-AsiBackbone links that must remain present.
+
+After building the DocFX site, run:
+
+```powershell
+./scripts/Validate-DocumentationLinks.ps1
+```
+
+The validator confirms that transition source files still name the canonical Learning target, the old DocFX output paths still exist, critical published destinations resolve, and selected reciprocal links remain present. Stable release validation and the documentation publishing workflow run the same guardrail.
+
 ## Authority when content overlaps
 
 Use the product repository as the controlling source for:
