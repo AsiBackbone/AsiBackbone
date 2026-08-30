@@ -93,7 +93,7 @@ foreach ($transition in @($manifest.transitionPages)) {
     }
     else {
         $sourceText = Get-Content -LiteralPath $resolvedSourcePath -Raw
-        if (-not $sourceText.Contains($canonicalUrl, [System.StringComparison]::Ordinal)) {
+        if ($sourceText.IndexOf($canonicalUrl, [System.StringComparison]::Ordinal) -lt 0) {
             Add-Failure "Transition page '$sourcePath' no longer names its canonical Learning destination: $canonicalUrl"
         }
     }
@@ -106,7 +106,7 @@ foreach ($transition in @($manifest.transitionPages)) {
     }
 
     $oldPublishedUrl = 'https://asibackbone.github.io/AsiBackbone/' + $publishedPath
-    if ($canonicalUrl.Equals($oldPublishedUrl, [System.StringComparison]::OrdinalIgnoreCase)) {
+    if ([string]::Equals($canonicalUrl, $oldPublishedUrl, [System.StringComparison]::OrdinalIgnoreCase)) {
         Add-Failure "Transition page '$sourcePath' points to itself instead of a canonical Learning destination."
     }
 
@@ -157,7 +157,7 @@ if (-not $SkipRemote) {
         }
 
         $content = [string]$responses[$sourceUrl].Content
-        if (-not $content.Contains($expectedDestination, [System.StringComparison]::OrdinalIgnoreCase)) {
+        if ($content.IndexOf($expectedDestination, [System.StringComparison]::OrdinalIgnoreCase) -lt 0) {
             if ([string]::IsNullOrWhiteSpace($name)) {
                 $name = $sourceUrl
             }
