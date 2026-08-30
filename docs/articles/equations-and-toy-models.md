@@ -30,6 +30,6 @@ Intent
 - [Core API Domain Model](core-domain-language.md)
 - [Constraint Exception Policy](constraint-exception-policy.md)
 - [Policy Versioning and Decision Provenance](https://asibackbone.github.io/Learning/governance/policy-versioning-and-decision-provenance.html)
-- [Generated API Reference](../api/)
+- [Generated API Reference](../api-reference.md)
 
 The Learning article owns the general equation and toy-model explanation. This repository owns the concrete types, outcomes, runtime behavior, and package contracts.
