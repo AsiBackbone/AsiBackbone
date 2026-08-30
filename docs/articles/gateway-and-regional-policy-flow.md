@@ -34,7 +34,7 @@ Depending on the integration, a host may use:
 - signing/verification providers where configured;
 - ASP.NET Core or host-specific integration.
 
-Use the [Generated API Reference](../api/) and the package-specific guides for exact contracts.
+Use the [Generated API Reference](../api-reference.md) and the package-specific guides for exact contracts.
 
 ## What the gateway still owns
 
