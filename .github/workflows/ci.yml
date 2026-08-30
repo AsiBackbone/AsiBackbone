@@ -125,6 +125,7 @@ jobs:
           -BranchThreshold "$env:CORE_BRANCH_COVERAGE_THRESHOLD"
           -NoBuild
           -NoRestore
+
       - name: Test adapter and provider package coverage baselines
         shell: pwsh
         run: >

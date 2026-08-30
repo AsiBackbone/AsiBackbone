@@ -73,7 +73,14 @@ function Invoke-TestProjectCoverage {
         '--verbosity',
         'normal',
         '--results-directory',
-        $ResultsDirectory,
+        $ResultsDirectory
+    )
+
+    if ($NoRestore) { $arguments += '--no-restore' }
+    if ($NoBuild) { $arguments += '--no-build' }
+
+    $arguments += @(
+        '--',
         '--coverlet',
         '--coverlet-output-format',
         'cobertura',
@@ -81,8 +88,6 @@ function Invoke-TestProjectCoverage {
         $projectName
     )
 
-    if ($NoRestore) { $arguments += '--no-restore' }
-    if ($NoBuild) { $arguments += '--no-build' }
     if (-not [string]::IsNullOrWhiteSpace($Include)) {
         $arguments += @('--coverlet-include', $Include)
     }

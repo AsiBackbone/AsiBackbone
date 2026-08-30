@@ -104,8 +104,6 @@ foreach ($target in $targets) {
 
     $packageOutputDirectory = Join-Path $outputRootAbsolutePath $safeOutputName
     New-Item -ItemType Directory -Path $packageOutputDirectory -Force | Out-Null
-    $coverageOutputPrefix = Join-Path $packageOutputDirectory 'coverage'
-
     Write-Host ('Validating package coverage baseline for ' + $target.Package)
 
     $exitCode = 0

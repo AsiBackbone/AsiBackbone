@@ -69,6 +69,7 @@ jobs:
           -BranchThreshold "$env:CORE_BRANCH_COVERAGE_THRESHOLD"
           -NoBuild
           -NoRestore
+
       - name: List Core coverage outputs
         shell: pwsh
         run: |
