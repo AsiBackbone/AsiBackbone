@@ -39,7 +39,7 @@ The concrete contracts support fields such as:
 - host-provided metadata;
 - accepted/rejected state and timestamp.
 
-Use the [Generated API Reference](../api/) for exact members and signatures.
+Use the [Generated API Reference](../api-reference.md) for exact members and signatures.
 
 ## Host-owned responsibilities
 
