@@ -70,7 +70,7 @@ jobs:
         run: ./scripts/Validate-DebugSolutionBuildCoverage.ps1 -SolutionPath "$env:SOLUTION_PATH"
 
       - name: Restore dependencies
-        run: dotnet restore "$SOLUTION_PATH" --locked-mode
+        run: dotnet restore "$SOLUTION_PATH" --locked-mode -p:Configuration="$CONFIGURATION"
 
       - name: Build Debug solution smoke
         run: dotnet build "$SOLUTION_PATH" --configuration Debug --no-restore
@@ -83,7 +83,7 @@ jobs:
 
       - name: Run tests
         run: >
-          dotnet test "$SOLUTION_PATH"
+          dotnet test --solution "$SOLUTION_PATH"
           --configuration "$CONFIGURATION"
           --no-restore
           --no-build
