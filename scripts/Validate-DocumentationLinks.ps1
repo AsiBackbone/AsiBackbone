@@ -38,7 +38,7 @@ function Invoke-DocumentationRequest {
 
     for ($attempt = 1; $attempt -le $RetryCount; $attempt++) {
         try {
-            $response = Invoke-WebRequest -Uri $Url -Method Get -MaximumRedirection 5 -TimeoutSec $TimeoutSeconds -Headers @{ 'User-Agent' = 'AsiBackbone-documentation-link-validator' }
+            $response = Invoke-WebRequest -Uri $Url -Method Get -MaximumRedirection 5 -TimeoutSec $TimeoutSeconds -UseBasicParsing -Headers @{ 'User-Agent' = 'AsiBackbone-documentation-link-validator' }
 
             $statusCode = [int]$response.StatusCode
             if ($statusCode -ge 200 -and $statusCode -lt 400) {
