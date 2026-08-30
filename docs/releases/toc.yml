@@ -1,0 +1,75 @@
+- name: Releases & Compatibility
+  href: index.md
+
+- name: Current Release
+  items:
+    - name: 3.2.2 Release Notes
+      href: ../articles/release-notes-322.md
+    - name: 3.2.2 Consumer Verification Guide
+      href: ../articles/consumer-verification-322.md
+    - name: API Compatibility and SemVer
+      href: ../articles/api-compatibility-and-semver.md
+    - name: Schema Versioning
+      href: ../articles/schema-versioning.md
+    - name: Target Framework Support
+      href: ../articles/target-framework-support.md
+
+- name: Changelog & Upgrade Guidance
+  items:
+    - name: Repository CHANGELOG
+      href: https://github.com/AsiBackbone/AsiBackbone/blob/main/CHANGELOG.md
+    - name: "Upgrade Guide: 1.0.0 to 1.1.0"
+      href: ../articles/upgrade-100-to-110.md
+
+- name: 3.x Archive
+  items:
+    - name: 3.2.1 Release Notes
+      href: ../articles/release-notes-321.md
+    - name: 3.2.1 Consumer Verification Guide
+      href: ../articles/consumer-verification-321.md
+    - name: 3.2.0 Release Notes
+      href: ../articles/release-notes-320.md
+    - name: 3.2.0 Consumer Verification Guide
+      href: ../articles/consumer-verification-320.md
+    - name: 3.1.0 Release Notes
+      href: ../articles/release-notes-310.md
+    - name: 3.1.0 Consumer Verification Guide
+      href: ../articles/consumer-verification-310.md
+    - name: 3.0.1 Release Notes
+      href: ../articles/release-notes-301.md
+    - name: 3.0.1 Consumer Verification Guide
+      href: ../articles/consumer-verification-301.md
+    - name: 3.0.0 Release Notes
+      href: ../articles/release-notes-300.md
+    - name: 3.0.0 Consumer Verification Guide
+      href: ../articles/consumer-verification-300.md
+
+- name: 2.x Archive
+  items:
+    - name: 2.3.0 Release Notes
+      href: ../articles/release-notes-230.md
+    - name: 2.2.1 Release Notes
+      href: ../articles/release-notes-221.md
+    - name: 2.2.0 Release Notes
+      href: ../articles/release-notes-220.md
+    - name: 2.1.0 Release Notes
+      href: ../articles/release-notes-210.md
+    - name: 2.0.2 Release Notes
+      href: ../articles/release-notes-202.md
+    - name: 2.0.1 Release Notes
+      href: ../articles/release-notes-201.md
+    - name: 2.0.0 Release Notes
+      href: ../articles/release-notes-200.md
+
+- name: 1.x Archive
+  items:
+    - name: 1.2.1 Release Notes
+      href: ../articles/release-notes-121.md
+    - name: 1.2.0 Release Notes
+      href: ../articles/release-notes-120.md
+    - name: 1.1.x Release Notes
+      href: ../articles/release-notes-110.md
+    - name: 1.0.0 Release Notes
+      href: ../articles/release-notes-100.md
+    - name: 1.0.0 Quickstart
+      href: ../articles/quickstart-100.md
