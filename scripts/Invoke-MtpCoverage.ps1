@@ -86,8 +86,11 @@ function Invoke-TestProjectCoverage {
     if ($NoRestore) { $arguments += '--no-restore' }
     if ($NoBuild) { $arguments += '--no-build' }
 
+    # .NET SDK 10.0.303 forwards unrecognized MTP extension switches directly
+    # to the test application. Do not insert a "--" separator here: that SDK
+    # treats tokens after the separator as positional/unmatched arguments and
+    # can misclassify an existing results directory as a project directory.
     $arguments += @(
-        '--',
         '--coverlet',
         '--coverlet-output-format',
         'cobertura',
