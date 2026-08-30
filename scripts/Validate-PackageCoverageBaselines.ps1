@@ -108,43 +108,36 @@ foreach ($target in $targets) {
 
     Write-Host ('Validating package coverage baseline for ' + $target.Package)
 
-    $testArguments = @(
-        'test',
-        $testProjectAbsolutePath,
-        '--configuration',
-        $Configuration,
-        '--verbosity',
-        'normal',
-        '/p:ContinuousIntegrationBuild=true',
-        '/p:CollectCoverage=true',
-        '/p:CoverletOutputFormat=cobertura',
-        ('/p:CoverletOutput=' + $coverageOutputPrefix),
-        ('/p:Include=' + $target.Include),
-        '/p:Exclude=[*.Tests]*',
-        ('/p:Threshold=' + $threshold),
-        '/p:ThresholdType=line',
-        '/p:ThresholdStat=total'
-    )
-
-    if ($NoRestore) {
-        $testArguments += '--no-restore'
-    }
-
-    if ($NoBuild) {
-        $testArguments += '--no-build'
-    }
-
-    & dotnet @testArguments
-    $exitCode = $LASTEXITCODE
-    $coverageReportPath = $coverageOutputPrefix + '.cobertura.xml'
+    $exitCode = 0
+    $coverageReportPath = Join-Path $packageOutputDirectory 'coverage.cobertura.xml'
     $relativeCoverageReportPath = Get-RepositoryRelativePath -Path $coverageReportPath
 
-    if ($exitCode -ne 0) {
-        $failureMessage = 'Package coverage baseline failed for {0}. Test project: {1}; threshold: {2}%; exit code: {3}.' -f `
+    try {
+        $coverageArguments = @{
+            ProjectPath = $testProjectAbsolutePath
+            Configuration = $Configuration
+            OutputRoot = $packageOutputDirectory
+            Include = $target.Include
+            LineThreshold = $threshold
+        }
+
+        if ($NoRestore) {
+            $coverageArguments['NoRestore'] = $true
+        }
+
+        if ($NoBuild) {
+            $coverageArguments['NoBuild'] = $true
+        }
+
+        & (Join-Path $PSScriptRoot 'Invoke-MtpCoverage.ps1') @coverageArguments
+    }
+    catch {
+        $exitCode = 1
+        $failureMessage = 'Package coverage baseline failed for {0}. Test project: {1}; threshold: {2}%. {3}' -f `
             $target.Package,
             $target.TestProject,
             $threshold,
-            $exitCode
+            $_.Exception.Message
 
         Write-Warning $failureMessage
 
@@ -155,7 +148,6 @@ foreach ($target in $targets) {
             ExitCode = $exitCode
         }
     }
-
     $results += [pscustomobject]@{
         Package = $target.Package
         TestProject = $target.TestProject
