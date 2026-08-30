@@ -9,6 +9,8 @@ This page defines the documentation ownership contract between `AsiBackbone/AsiB
 
 - Product implementation and API documentation: [AsiBackbone documentation](https://asibackbone.github.io/AsiBackbone/) and [AsiBackbone repository](https://github.com/AsiBackbone/AsiBackbone).
 - Architecture education and general teaching: [ASI Backbone Learning](https://asibackbone.github.io/Learning/) and [AsiBackbone/Learning repository](https://github.com/AsiBackbone/Learning).
+- Canonical educational terminology: [Learning Architecture Glossary](https://asibackbone.github.io/Learning/architecture/glossary.html) and [Terminology and Established Architecture Concepts](https://asibackbone.github.io/Learning/architecture/terminology-and-established-concepts.html).
+- Product/API terminology mappings: [AsiBackbone API Glossary](glossary.md), [AsiBackbone API Terminology Map](terminology-map.md), and [Core API Domain Model](core-domain-language.md).
 
 ## Ownership matrix
 
@@ -16,7 +18,9 @@ This page defines the documentation ownership contract between `AsiBackbone/AsiB
 | --- | --- |
 | Organization-level concepts and education | Learning |
 | Architecture tutorials and tradeoff analysis | Learning |
+| Canonical educational definitions and glossary | Learning |
 | Terminology lineage and established-concept mapping | Learning |
+| Exact terminology-to-API/type mappings | AsiBackbone |
 | Labs and general teaching samples | Learning |
 | General AI/governance education | Learning |
 | Package installation and configuration | AsiBackbone |

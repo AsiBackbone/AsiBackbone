@@ -51,7 +51,8 @@ Use these pages to establish the product boundary before integrating the package
 * [Package and Integration Boundaries](integration-boundaries.md)
 * [Target Framework Support](target-framework-support.md)
 * [Documentation Ownership](documentation-ownership.md)
-* [Terminology Map](terminology-map.md)
+* [AsiBackbone API Terminology Map](terminology-map.md)
+* [AsiBackbone API Glossary](glossary.md)
 * [Core Governance Flow Diagrams](core-governance-flow-diagrams.md)
 
 ## Get started
@@ -68,7 +69,7 @@ Use these pages to establish the product boundary before integrating the package
 
 Use the [Generated API Reference](../api/) for public types and members. These guides explain package-level integration boundaries and supported extension surfaces.
 
-* [Core Domain Language](core-domain-language.md)
+* [Core API Domain Model](core-domain-language.md)
 * [ASP.NET Core Integration Boundary](aspnetcore-integration-boundary.md)
 * [ASP.NET Core Endpoint Governance](aspnetcore-endpoint-governance.md)
 * [EF Core Integration Boundary](ef-core-integration-boundary.md)

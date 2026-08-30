@@ -11,8 +11,10 @@
       href: target-framework-support.md
     - name: Documentation Ownership
       href: documentation-ownership.md
-    - name: Terminology Map
+    - name: AsiBackbone API Terminology Map
       href: terminology-map.md
+    - name: AsiBackbone API Glossary
+      href: glossary.md
     - name: Core Governance Flow Diagrams
       href: core-governance-flow-diagrams.md
 
@@ -37,7 +39,7 @@
   items:
     - name: Generated API Reference
       href: ../api/
-    - name: Core Domain Language
+    - name: Core API Domain Model
       href: core-domain-language.md
     - name: Package and Integration Boundaries
       href: integration-boundaries.md
@@ -328,6 +330,10 @@
       href: https://asibackbone.github.io/Learning/
     - name: ASI Backbone Learning Repository
       href: https://github.com/AsiBackbone/Learning
+    - name: Canonical Architecture Glossary
+      href: https://asibackbone.github.io/Learning/architecture/glossary.html
+    - name: Terminology & Established Concepts
+      href: https://asibackbone.github.io/Learning/architecture/terminology-and-established-concepts.html
     - name: Why AsiBackbone?
       href: why-asi-backbone.md
     - name: "Intent to Execution: An Accountability Pattern"
@@ -344,8 +350,6 @@
       href: use-cases.md
     - name: Enterprise Adoption Personas
       href: enterprise-adoption-personas.md
-    - name: Glossary
-      href: glossary.md
 
 - name: Historical Design Records
   items:
