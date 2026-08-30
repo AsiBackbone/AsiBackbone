@@ -76,11 +76,38 @@ NUGETCONFIG
 smoke_project_dir="$work_root/ExternalConsumerSmoke.Tests"
 smoke_project="$smoke_project_dir/ExternalConsumerSmoke.Tests.csproj"
 
-dotnet new xunit \
-  --name ExternalConsumerSmoke.Tests \
-  --output "$smoke_project_dir" \
-  --framework net10.0 \
-  --no-restore
+test_sdk_version="$(get_central_package_version "Microsoft.NET.Test.Sdk")"
+xunit_version="$(get_central_package_version "xunit.v3")"
+xunit_runner_version="$(get_central_package_version "xunit.runner.visualstudio")"
+
+if [ -z "$test_sdk_version" ] || [ -z "$xunit_version" ] || [ -z "$xunit_runner_version" ]; then
+  echo "Unable to resolve MTP/xUnit test package versions from Directory.Packages.props."
+  exit 1
+fi
+
+mkdir -p "$smoke_project_dir"
+
+cat > "$smoke_project" <<CSPROJ
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <OutputType>Exe</OutputType>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <IsPackable>false</IsPackable>
+    <TestingPlatformDotnetTestSupport>true</TestingPlatformDotnetTestSupport>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="$test_sdk_version" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="$xunit_runner_version">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="xunit.v3" Version="$xunit_version" />
+  </ItemGroup>
+</Project>
+CSPROJ
 
 pushd "$work_root" > /dev/null
 
@@ -396,8 +423,6 @@ internal sealed record SmokeDecisionResponse(
     string LedgerRecordId,
     int EfLedgerRecordCount);
 CSHARP
-
-rm "$smoke_project_dir/UnitTest1.cs"
 
 dotnet test --project "$smoke_project" --configuration "$configuration" --verbosity normal
 
