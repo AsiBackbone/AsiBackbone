@@ -258,4 +258,4 @@ This keeps the policy layer observable and testable without turning it into an i
 
 ## Product API reference
 
-Use the [Generated API Reference](../api/) for exact members and signatures. Key surfaces used by this page include [`IAsiBackboneDecisionPolicy<TContext>`](xref:AsiBackbone.Core.Evaluation.IAsiBackboneDecisionPolicy`1), [`IAsiBackbonePolicyEvaluator<TContext>`](xref:AsiBackbone.Core.Evaluation.IAsiBackbonePolicyEvaluator`1), and [`GovernanceDecision`](xref:AsiBackbone.Core.Decisions.GovernanceDecision).
+Use the [Generated API Reference](../api-reference.md) for exact members and signatures. Key surfaces used by this page include [`IAsiBackboneDecisionPolicy<TContext>`](xref:AsiBackbone.Core.Evaluation.IAsiBackboneDecisionPolicy`1), [`IAsiBackbonePolicyEvaluator<TContext>`](xref:AsiBackbone.Core.Evaluation.IAsiBackbonePolicyEvaluator`1), and [`GovernanceDecision`](xref:AsiBackbone.Core.Decisions.GovernanceDecision).
