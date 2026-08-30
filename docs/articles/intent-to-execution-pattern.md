@@ -28,6 +28,6 @@ The host still owns the real side effect, authentication/authorization, authorit
 - [Acknowledgment Workflow](dynamic-liability-handshake.md)
 - [Host-Owned Execution Enforcement](host-owned-execution-enforcement.md)
 - [Capability Grant Hardening](capability-grant-hardening.md)
-- [Generated API Reference](../api/)
+- [Generated API Reference](../api-reference.md)
 
 Use Learning for the architectural pattern and tradeoffs. Use this repository for exact product semantics.

@@ -30,7 +30,7 @@ Use these product-owned references:
 - [Acknowledgment Workflow](dynamic-liability-handshake.md)
 - [Capability Grant Hardening](capability-grant-hardening.md)
 - [Host-Owned Execution Enforcement](host-owned-execution-enforcement.md)
-- [Generated API Reference](../api/)
+- [Generated API Reference](../api-reference.md)
 
 ## What the host still owns
 

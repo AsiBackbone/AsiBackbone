@@ -13,6 +13,8 @@
 - [ ] Ran `dotnet format AsiBackbone.slnx --verify-no-changes --verbosity minimal`.
 - [ ] Ran `dotnet tool restore`.
 - [ ] Ran `dotnet tool run docfx docs/docfx.json`.
+- [ ] Ran `./scripts/Validate-DocumentationLinks.ps1` after the DocFX build.
+- [ ] Documentation ownership/URL continuity reviewed (or not applicable): general teaching belongs in Learning; package/API/runtime truth belongs in AsiBackbone; established public URLs are preserved with transition pages when authority moves.
 - [ ] Ran external-consumer smoke test: `bash ./eng/smoke-tests/external-consumer-smoke.sh`.
 - [ ] Ran stable-package integration smoke test: `bash ./eng/smoke-tests/stable-package-integration-smoke.sh`.
 - [ ] Not applicable / explained below.

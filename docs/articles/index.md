@@ -67,7 +67,7 @@ Use these pages to establish the product boundary before integrating the package
 
 ## Packages & API
 
-Use the [Generated API Reference](../api/) for public types and members. These guides explain package-level integration boundaries and supported extension surfaces.
+Use the [Generated API Reference](../api-reference.md) for public types and members. These guides explain package-level integration boundaries and supported extension surfaces.
 
 * [Core API Domain Model](core-domain-language.md)
 * [ASP.NET Core Integration Boundary](aspnetcore-integration-boundary.md)
@@ -171,4 +171,4 @@ Former conceptual URLs remain searchable as short continuity stubs, but canonica
 
 - [Implementation-First Adoption Path](implementation-first-adoption.md)
 - [First 15 Minutes: Standard API Gating](quickstart-api-gating.md)
-- [Generated API Reference](../api/)
+- [Generated API Reference](../api-reference.md)

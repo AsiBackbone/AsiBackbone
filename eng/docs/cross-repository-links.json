@@ -1,0 +1,91 @@
+{
+  "transitionPages": [
+    {
+      "sourcePath": "docs/articles/asi-backbone-concept.md",
+      "publishedPath": "articles/asi-backbone-concept.html",
+      "canonicalUrl": "https://asibackbone.github.io/Learning/architecture/accountable-systems-infrastructure-and-governed-execution.html"
+    },
+    {
+      "sourcePath": "docs/articles/why-asi-backbone.md",
+      "publishedPath": "articles/why-asi-backbone.html",
+      "canonicalUrl": "https://asibackbone.github.io/Learning/architecture/accountable-systems-infrastructure-and-governed-execution.html"
+    },
+    {
+      "sourcePath": "docs/articles/equations-and-toy-models.md",
+      "publishedPath": "articles/equations-and-toy-models.html",
+      "canonicalUrl": "https://asibackbone.github.io/Learning/architecture/constraint-conditioned-decision-model.html"
+    },
+    {
+      "sourcePath": "docs/articles/intent-to-execution-pattern.md",
+      "publishedPath": "articles/intent-to-execution-pattern.html",
+      "canonicalUrl": "https://asibackbone.github.io/Learning/architecture/intent-to-execution-accountability-pattern.html"
+    },
+    {
+      "sourcePath": "docs/articles/governance-tool-comparisons.md",
+      "publishedPath": "articles/governance-tool-comparisons.html",
+      "canonicalUrl": "https://asibackbone.github.io/Learning/architecture/governance-tool-selection-and-composition.html"
+    },
+    {
+      "sourcePath": "docs/articles/gateway-and-regional-policy-flow.md",
+      "publishedPath": "articles/gateway-and-regional-policy-flow.html",
+      "canonicalUrl": "https://asibackbone.github.io/Learning/advanced/regional-policy-and-operational-gateways.html"
+    },
+    {
+      "sourcePath": "docs/articles/enterprise-adoption-personas.md",
+      "publishedPath": "articles/enterprise-adoption-personas.html",
+      "canonicalUrl": "https://asibackbone.github.io/Learning/getting-started/adoption-personas-and-entry-points.html"
+    }
+  ],
+  "publishedDestinations": [
+    {
+      "name": "ASI Backbone Learning home",
+      "url": "https://asibackbone.github.io/Learning/"
+    },
+    {
+      "name": "AsiBackbone product documentation",
+      "url": "https://asibackbone.github.io/AsiBackbone/"
+    },
+    {
+      "name": "AsiBackbone generated API reference",
+      "url": "https://asibackbone.github.io/AsiBackbone/api/AsiBackbone.Core.Decisions.GovernanceDecision.html"
+    },
+    {
+      "name": "Current release notes",
+      "url": "https://asibackbone.github.io/AsiBackbone/articles/release-notes-322.html"
+    },
+    {
+      "name": "Current consumer verification guide",
+      "url": "https://asibackbone.github.io/AsiBackbone/articles/consumer-verification-322.html"
+    },
+    {
+      "name": "Product standards mapping",
+      "url": "https://asibackbone.github.io/AsiBackbone/articles/external-framework-and-standards-mapping.html"
+    }
+  ],
+  "reciprocalLinks": [
+    {
+      "name": "Learning governance-tool comparison points to product documentation",
+      "sourceUrl": "https://asibackbone.github.io/Learning/architecture/governance-tool-selection-and-composition.html",
+      "expectedDestination": "https://asibackbone.github.io/AsiBackbone/"
+    },
+    {
+      "name": "Learning regulated-systems article points to product standards mapping",
+      "sourceUrl": "https://asibackbone.github.io/Learning/advanced/governed-execution-in-regulated-systems.html",
+      "expectedDestination": "https://asibackbone.github.io/AsiBackbone/articles/external-framework-and-standards-mapping.html"
+    }
+  ],
+  "localPublishedPaths": [
+    {
+      "name": "Stable API reference landing",
+      "path": "api-reference.html"
+    },
+    {
+      "name": "Current release notes",
+      "path": "articles/release-notes-322.html"
+    },
+    {
+      "name": "Current consumer verification guide",
+      "path": "articles/consumer-verification-322.html"
+    }
+  ]
+}

@@ -96,6 +96,10 @@ jobs:
       - name: Build DocFX site
         run: dotnet tool run docfx -- docs/docfx.json
 
+      - name: Validate documentation continuity and cross-repository links
+        shell: pwsh
+        run: ./scripts/Validate-DocumentationLinks.ps1
+
       - name: Pack packages
         shell: bash
         run: |

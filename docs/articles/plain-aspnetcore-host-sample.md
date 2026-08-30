@@ -93,4 +93,4 @@ This sample does not:
 
 ## Product API reference
 
-Use the [Generated API Reference](../api/) for exact public types, members, and signatures exercised by the sample. The package documentation and released source remain authoritative for runtime behavior.
+Use the [Generated API Reference](../api-reference.md) for exact public types, members, and signatures exercised by the sample. The package documentation and released source remain authoritative for runtime behavior.

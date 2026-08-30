@@ -138,4 +138,4 @@ A policy version is a readable generation label. A policy hash/fingerprint ident
 - [Policy Evaluator Pipeline](policy-evaluator-pipeline.md)
 - [Host-Owned Execution Enforcement](host-owned-execution-enforcement.md)
 - [Capability Grant Hardening](capability-grant-hardening.md)
-- [Generated API Reference](../api/)
+- [Generated API Reference](../api-reference.md)

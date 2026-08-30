@@ -21,7 +21,7 @@ See [Documentation Ownership](articles/documentation-ownership.md) for the cross
 | --- | --- |
 | Install and configure AsiBackbone | [Implementation-First Adoption Path](articles/implementation-first-adoption.md) and [First 15 Minutes: Standard API Gating](articles/quickstart-api-gating.md) |
 | Register the package family in a host | [AddAsiBackbone Builder Facade](articles/add-asibackbone-builder-facade.md) and [Getting Started](articles/getting-started.md) |
-| Find a package or public type | [Documentation Articles](articles/) and [API Reference](api/) |
+| Find a package or public type | [Documentation Articles](articles/) and [API Reference](api-reference.md) |
 | Understand runtime decision behavior | [Policy Evaluator Pipeline](articles/policy-evaluator-pipeline.md) |
 | Persist, observe, sign, verify, or harden a deployment | [Production Hardening: Evaluator and Outbox](articles/production-hardening-evaluator-and-outbox.md) |
 | Run a concrete integration path | [Plain ASP.NET Core Host Sample](articles/plain-aspnetcore-host-sample.md) and [Samples & Scenarios](articles/) |
@@ -81,7 +81,7 @@ Package-specific READMEs and release notes define which surfaces are stable, opt
 ### Packages and API
 
 * [Documentation Articles](articles/)
-* [Generated API Reference](api/)
+* [Generated API Reference](api-reference.md)
 * [Core API Domain Model](articles/core-domain-language.md)
 * [ASP.NET Core Integration Boundary](articles/aspnetcore-integration-boundary.md)
 * [EF Core Integration Boundary](articles/ef-core-integration-boundary.md)

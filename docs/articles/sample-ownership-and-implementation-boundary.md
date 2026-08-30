@@ -69,7 +69,7 @@ An AsiBackbone implementation sample should identify:
 2. how to build, run, or consume the example;
 3. which responsibilities remain host-owned;
 4. relevant production and security boundaries;
-5. the [Generated API Reference](../api/) where practical;
+5. the [Generated API Reference](../api-reference.md) where practical;
 6. a Learning link for deeper architecture explanation rather than duplicating the lesson.
 
 Preferred cross-link language:

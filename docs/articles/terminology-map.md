@@ -102,4 +102,4 @@ For implementation work, continue here:
 2. [Core API Domain Model](core-domain-language.md)
 3. [Policy Evaluator Pipeline](policy-evaluator-pipeline.md)
 4. [ASP.NET Core Endpoint Governance](aspnetcore-endpoint-governance.md)
-5. [Generated API Reference](../api/)
+5. [Generated API Reference](../api-reference.md)

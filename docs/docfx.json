@@ -21,6 +21,7 @@
       {
         "files": [
           "index.md",
+          "api-reference.md",
           "**/toc.yml",
           "articles/**/*.md",
           "quality/**/*.md",

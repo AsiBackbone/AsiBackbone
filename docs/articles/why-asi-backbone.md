@@ -30,6 +30,6 @@ For stack-neutral comparison guidance, see:
 - [First 15 Minutes: Standard API Gating](quickstart-api-gating.md)
 - [Getting Started](getting-started.md)
 - [Adoption and Target Use Cases](use-cases.md)
-- [Generated API Reference](../api/)
+- [Generated API Reference](../api-reference.md)
 
 Learning explains the broader architecture. AsiBackbone documentation defines what the shipped packages actually do.
