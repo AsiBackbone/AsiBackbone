@@ -85,7 +85,9 @@ function Invoke-TestProjectCoverage {
         '--coverlet-output-format',
         'cobertura',
         '--coverlet-file-prefix',
-        $projectName
+        $projectName,
+        '--coverlet-exclude-assemblies-without-sources',
+        'MissingAll'
     )
 
     if (-not [string]::IsNullOrWhiteSpace($Include)) {
@@ -150,7 +152,7 @@ foreach ($testProject in $testProjects) {
 }
 
 $reports = @(
-    Get-ChildItem -Path $outputRootAbsolute -Filter '*.coverage.cobertura.xml' -File -Recurse |
+    Get-ChildItem -Path $outputRootAbsolute -Filter '*.cobertura*.xml' -File -Recurse |
         Sort-Object FullName
 )
 if ($reports.Count -eq 0) {
