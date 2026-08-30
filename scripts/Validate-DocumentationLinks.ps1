@@ -113,6 +113,27 @@ foreach ($transition in @($manifest.transitionPages)) {
     [void]$remoteUrls.Add($canonicalUrl)
 }
 
+foreach ($localPath in @($manifest.localPublishedPaths)) {
+    $name = [string]$localPath.name
+    $publishedPath = [string]$localPath.path
+
+    if ([string]::IsNullOrWhiteSpace($publishedPath)) {
+        Add-Failure 'Each localPublishedPaths entry must provide path.'
+        continue
+    }
+
+    if (Test-Path -LiteralPath $resolvedSiteRoot -PathType Container) {
+        $resolvedPublishedPath = Join-Path $resolvedSiteRoot $publishedPath
+        if (-not (Test-Path -LiteralPath $resolvedPublishedPath -PathType Leaf)) {
+            if ([string]::IsNullOrWhiteSpace($name)) {
+                $name = $publishedPath
+            }
+
+            Add-Failure "Required DocFX output is missing for '$name': $publishedPath"
+        }
+    }
+}
+
 foreach ($destination in @($manifest.publishedDestinations)) {
     $url = [string]$destination.url
     if ([string]::IsNullOrWhiteSpace($url)) {
@@ -176,4 +197,4 @@ if ($failures.Count -gt 0) {
     exit 1
 }
 
-Write-Host ("Documentation continuity/link validation passed. Transition pages: {0}; published/reciprocal URLs tracked: {1}." -f @($manifest.transitionPages).Count, $remoteUrls.Count)
+Write-Host ("Documentation continuity/link validation passed. Transition pages: {0}; required local outputs: {1}; published/reciprocal URLs tracked: {2}." -f @($manifest.transitionPages).Count, @($manifest.localPublishedPaths).Count, $remoteUrls.Count)
