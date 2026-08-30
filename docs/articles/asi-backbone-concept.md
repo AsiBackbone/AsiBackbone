@@ -1,105 +1,62 @@
-# ASI Backbone Concept Synopsis
+# ASI Backbone Concept: Product Boundary
 
 In this software project, **ASI** means **Accountable Systems Infrastructure**.
 
-AsiBackbone is a .NET governance spine for consequential software actions. It is inspired by broader Eden/Backbone governance ideas, but the repository implements practical software infrastructure: policy evaluation, decision results, acknowledgment workflows, audit residue, durable outbox persistence, optional provider emission, capability-scoped execution, signing-ready metadata, and host integration.
+The broader architecture teaching for Accountable Systems Infrastructure is canonical in [ASI Backbone Learning](https://asibackbone.github.io/Learning/architecture/accountable-systems-infrastructure-and-governed-execution.html).
 
-> [!IMPORTANT]
-> AsiBackbone does not implement artificial superintelligence, host AI models, train AI models, control robots, certify compliance, or prove the Eden/Backbone framework.
+This page is retained at its existing URL for continuity and documents only the concrete product boundary.
 
-## The practical concept
+## What AsiBackbone implements today
 
-AsiBackbone sits at the boundary between proposed intent and host-owned execution.
+AsiBackbone is a .NET governance spine for consequential software actions. The stable package family provides implementation surfaces for:
 
-A host application may receive a request, AI-agent proposal, administrative operation, workflow action, API call, infrastructure change, or external gateway command. Before the host executes that action, AsiBackbone helps the host ask:
+- policy context and constraint evaluation;
+- explicit governance decisions;
+- acknowledgment/responsibility workflows;
+- audit residue and lifecycle events;
+- capability-scoped continuation authority;
+- durable local audit/outbox persistence;
+- optional governance emission;
+- host-owned execution boundaries.
 
-- Which actor or system requested this?
-- Which regional, local, organizational, risk, or operational constraints apply?
-- Which governance outcome is appropriate?
-- Does the actor need to acknowledge responsibility or risk first?
-- Which policy version and policy hash shaped the decision?
-- Should follow-on execution be scoped through a short-lived capability grant?
-- What audit residue and lifecycle events should be preserved?
-- Should a minimized governance envelope be emitted to an observability or governance provider?
+The generated API reference and implementation guides define the exact public types and runtime semantics.
 
-The result is not an autonomous intelligence. It is accountable decision infrastructure.
+## Package and API surface
 
-## Core flow
+Use these product-owned references:
 
-```text
-Intent or request
-  -> Actor and policy context
-  -> Constraint evaluation
-  -> Governance decision
-  -> Required acknowledgment when applicable
-  -> Audit residue and lifecycle event
-  -> Optional capability grant
-  -> Durable local audit/outbox persistence
-  -> Optional provider emission
-  -> Host-owned execution or rejection
-```
-
-The host remains responsible for authentication, authorization, persistence registration, endpoint exposure, UI rendering, exporter configuration, legal/compliance review, and operational execution.
-
-## Supported decision outcomes
-
-AsiBackbone narrows a proposed action into a framework-neutral governance decision:
-
-- `Allowed`
-- `Warning`
-- `Denied`
-- `Deferred`
-- `AcknowledgmentRequired`
-- `EscalationRecommended`
-
-These outcomes are the software expression of controlled collapse: open intent becomes an explainable decision under active policy structure.
-
-## Relationship to Eden/Backbone language
-
-The broader Eden/Backbone framework uses collapse language to describe how open possibility becomes realized form under constraints.
-
-AsiBackbone maps that idea into software without making physical, metaphysical, or artificial-superintelligence claims:
-
-| Broader concept | Software implementation meaning |
-| --- | --- |
-| Open possibility | Proposed intent or request |
-| Active structure | Policies, constraints, actor context, risk context, and gateway limits |
-| Collapse boundary | Governance decision before execution |
-| Residue | Audit record, lifecycle event, outbox entry, or emission envelope |
-| Return/review path | Defer, escalate, require acknowledgment, retry, dead-letter, or review |
-
-This keeps the conceptual inspiration useful while preserving the software boundary.
-
-## Current package areas
-
-The first stable package family centers on Core, in-memory storage, EF Core persistence, and ASP.NET Core integration. Current source also includes analyzer, OpenTelemetry, and signing-provider package projects for the `1.x` line.
-
-Package-specific documentation and release notes define what is stable, optional, local-only, or future-facing.
-
-## Safe wording
-
-Use wording such as:
-
-- "Accountable Systems Infrastructure"
-- "governance spine"
-- "policy-controlled decision flow"
-- "host-owned execution"
-- "audit residue and lifecycle events"
-- "durable local/outbox persistence before optional provider emission"
-- "signing-ready or provider-signed artifacts, depending on the deployed package and host configuration"
-
-Avoid wording such as:
-
-- "AsiBackbone implements artificial superintelligence"
-- "AsiBackbone controls robots"
-- "AsiBackbone guarantees compliance"
-- "AsiBackbone is tamper-evident by default"
-- "AsiBackbone proves the Eden Hypothesis"
-
-## Related articles
-
-- [Core Domain Language](core-domain-language.md)
+- [Core API Domain Model](core-domain-language.md)
 - [Policy Evaluator Pipeline](policy-evaluator-pipeline.md)
-- [Equations and Toy Models](equations-and-toy-models.md)
-- [Dynamic Liability Handshake](dynamic-liability-handshake.md)
-- [Gateway and Regional Policy Flow](gateway-and-regional-policy-flow.md)
+- [Acknowledgment Workflow](dynamic-liability-handshake.md)
+- [Capability Grant Hardening](capability-grant-hardening.md)
+- [Host-Owned Execution Enforcement](host-owned-execution-enforcement.md)
+- [Generated API Reference](../api/)
+
+## What the host still owns
+
+The consuming application remains responsible for:
+
+- authentication and ordinary authorization;
+- authoritative actor/resource lookup;
+- policy authorship and policy-source retention;
+- persistence registration and migrations;
+- UI and workflow presentation;
+- secrets, credentials, and key custody;
+- external or physical execution;
+- operational safety and compliance review.
+
+## Production and security boundaries
+
+AsiBackbone does not implement artificial superintelligence, train or host AI models, control robots, certify compliance, or make an audit record tamper-evident by default.
+
+Use the product security and operations documentation for exact signing, verification, outbox, persistence, and production-hardening behavior.
+
+## Deeper Learning material
+
+For the general architecture and conceptual lineage, use:
+
+- [Accountable Systems Infrastructure and Governed Execution](https://asibackbone.github.io/Learning/architecture/accountable-systems-infrastructure-and-governed-execution.html)
+- [Intent to Execution: An Accountability Pattern](https://asibackbone.github.io/Learning/architecture/intent-to-execution-accountability-pattern.html)
+- [Constraint-Conditioned Decision Model](https://asibackbone.github.io/Learning/architecture/constraint-conditioned-decision-model.html)
+
+Learning is the educational source of truth. This repository remains authoritative for package/API/runtime truth.

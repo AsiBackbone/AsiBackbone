@@ -328,28 +328,20 @@
   items:
     - name: ASI Backbone Learning Site
       href: https://asibackbone.github.io/Learning/
-    - name: ASI Backbone Learning Repository
-      href: https://github.com/AsiBackbone/Learning
-    - name: Canonical Architecture Glossary
-      href: https://asibackbone.github.io/Learning/architecture/glossary.html
-    - name: Terminology & Established Concepts
-      href: https://asibackbone.github.io/Learning/architecture/terminology-and-established-concepts.html
-    - name: Why AsiBackbone?
-      href: why-asi-backbone.md
-    - name: "Intent to Execution: An Accountability Pattern"
-      href: intent-to-execution-pattern.md
-    - name: ASI Backbone Concept Synopsis
-      href: asi-backbone-concept.md
-    - name: Gateway and Regional Policy Flow
-      href: gateway-and-regional-policy-flow.md
-    - name: Equations and Toy Models
-      href: equations-and-toy-models.md
-    - name: Governance Tool Comparisons
-      href: governance-tool-comparisons.md
-    - name: Adoption and Target Use Cases
-      href: use-cases.md
-    - name: Enterprise Adoption Personas
-      href: enterprise-adoption-personas.md
+    - name: Accountable Systems Infrastructure
+      href: https://asibackbone.github.io/Learning/architecture/accountable-systems-infrastructure-and-governed-execution.html
+    - name: Intent to Execution Accountability Pattern
+      href: https://asibackbone.github.io/Learning/architecture/intent-to-execution-accountability-pattern.html
+    - name: Constraint-Conditioned Decision Model
+      href: https://asibackbone.github.io/Learning/architecture/constraint-conditioned-decision-model.html
+    - name: Governance Tool Selection and Composition
+      href: https://asibackbone.github.io/Learning/architecture/governance-tool-selection-and-composition.html
+    - name: Adoption Personas and Entry Points
+      href: https://asibackbone.github.io/Learning/getting-started/adoption-personas-and-entry-points.html
+    - name: Regional Policy and Operational Gateways
+      href: https://asibackbone.github.io/Learning/advanced/regional-policy-and-operational-gateways.html
+    - name: Governed Execution in Regulated Systems
+      href: https://asibackbone.github.io/Learning/advanced/governed-execution-in-regulated-systems.html
 
 - name: Historical Design Records
   items:
