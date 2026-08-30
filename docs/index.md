@@ -33,13 +33,13 @@ The DocFX header search is available for package names, API concepts, and articl
 
 ## Current stable package family
 
-Stable `3.2.x` package family. `3.2.2` is the current patch release.
+Stable `3.2.x` package family. `3.2.3` is the current patch release.
 The package family carries forward the governance-spine surface, including the
 explicit capability-grant validation profiles introduced in `3.2.0` and the
-organization-owned repository metadata established in `3.2.1`. `3.2.2` is a
-maintenance patch that refreshes approved .NET dependencies and SHA-pinned
-workflow/security tooling without changing the public API or runtime governance
-contract.
+organization-owned repository metadata established in `3.2.1`. `3.2.3` is a
+backward-compatible maintenance patch focused on xUnit 4 / Microsoft Testing
+Platform migration, documentation ownership and navigation, and release/link
+guardrails without changing the public API or runtime governance contract.
 
 The historical `3.0.0` release established the current major line and binary assembly identity.
 
@@ -111,8 +111,8 @@ Package-specific READMEs and release notes define which surfaces are stable, opt
 
 ### Releases and compatibility
 
-* [3.2.2 Release Notes](articles/release-notes-322.md)
-* [3.2.2 Consumer Verification Guide](articles/consumer-verification-322.md)
+* [3.2.3 Release Notes](articles/release-notes-323.md)
+* [3.2.3 Consumer Verification Guide](articles/consumer-verification-323.md)
 * [API Compatibility and SemVer](articles/api-compatibility-and-semver.md)
 * [Schema Versioning](articles/schema-versioning.md)
 * [Release Validation](articles/release-validation.md)
@@ -126,7 +126,7 @@ Historical release notes and verification records remain available under [Releas
 * [Performance Benchmark Baseline](articles/performance-benchmark-baseline.md)
 * [API Baseline and Boundary Checks](articles/api-baseline-and-boundary-checks.md)
 * [Release Cadence and Readiness](articles/release-cadence-and-readiness.md)
-* [3.2.2 Release Readiness Record](articles/release-readiness-322.md)
+* [3.2.3 Release Readiness Record](articles/release-readiness-323.md)
 
 
 ### Historical records
