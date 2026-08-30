@@ -4,6 +4,66 @@ All notable changes to this project are documented in this file.
 
 This project follows the spirit of [Keep a Changelog](https://keepachangelog.com/) and adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [3.2.3] - 2026-08-30
+
+### Release summary
+
+`3.2.3` is a backward-compatible maintenance patch for the stable `3.2.x`
+AsiBackbone package family. It carries forward the `3.2.2` runtime and public
+API contract while modernizing repository test/coverage infrastructure and
+reorganizing documentation ownership, navigation, and release evidence.
+
+No production runtime source files under `src/AsiBackbone.*` changed relative
+to `v3.2.2`. Package IDs, public namespaces, public APIs, runtime governance
+behavior, the `net10.0` target, and the stable `3.x` binary assembly identity
+remain unchanged.
+
+### Changed
+
+* Migrated repository tests from xUnit `3.2.2` / VSTest-oriented execution to
+  xUnit `4.0.0` with Microsoft Testing Platform.
+* Enabled Microsoft Testing Platform as the repository test runner in
+  `global.json`.
+* Replaced `coverlet.collector` / `coverlet.msbuild` with `coverlet.MTP` and
+  added reusable MTP coverage orchestration.
+* Updated CI, release-validation, package-publish, quality-report, and smoke-test
+  paths for MTP-compatible execution and coverage gating.
+* Defined `AsiBackbone/Learning` as the canonical organization-level
+  educational source while keeping `AsiBackbone/AsiBackbone` authoritative for
+  package, API, runtime, security, operations, compatibility, release, and
+  maintainer documentation.
+* Reorganized DocFX information architecture around implementation,
+  releases/compatibility, maintainer evidence, and historical records.
+* Added documentation-ownership and cross-repository link guardrails while
+  preserving historical inbound URLs where appropriate.
+* Consolidated the DocFX top navigation into grouped Documentation,
+  Releases & Evidence, and Resources menus.
+* Refreshed SHA-pinned CodeQL actions from `4.37.7` to `4.37.8`.
+
+### Compatibility
+
+* Package IDs remain unchanged.
+* Public namespaces remain unchanged.
+* Public APIs remain unchanged.
+* Runtime governance behavior remains unchanged.
+* Target framework remains `net10.0`.
+* `AssemblyVersion` remains `3.0.0.0`.
+* `FileVersion` advances to `3.2.3.0`.
+* Existing `3.2.x` consumers require no source-code migration solely because
+  of this patch release.
+* The xUnit/MTP migration is repository test infrastructure and does not expand
+  the runtime package contract.
+* Authentication, authorization, persistence, signing-key custody, external
+  execution, monitoring, and operational safety remain host-owned
+  responsibilities.
+
+### Package signing
+
+NuGet package signing remains intentionally deferred while AsiBackbone is
+independently maintained. Consumers should continue to use the official NuGet
+source, canonical repository and release tag, Source Link metadata, SBOMs, and
+provenance artifacts where available as complementary verification signals.
+
 ## [3.2.2] - 2026-08-22
 
 ### Release summary

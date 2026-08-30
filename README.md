@@ -134,13 +134,13 @@ For production-style hosts, add durable audit/outbox persistence, signing or ver
 
 ## Package family
 
-Stable `3.2.x` package family. `3.2.2` is the current patch release.
+Stable `3.2.x` package family. `3.2.3` is the current patch release.
 The package family carries forward the governance-spine surface, including the
 explicit capability-grant validation profiles introduced in `3.2.0` and the
-organization-owned repository metadata established in `3.2.1`. `3.2.2` is a
-maintenance patch that refreshes approved .NET dependencies and SHA-pinned
-workflow/security tooling without changing the public API or runtime governance
-contract.
+organization-owned repository metadata established in `3.2.1`. `3.2.3` is a
+backward-compatible maintenance patch focused on xUnit 4 / Microsoft Testing
+Platform migration, documentation ownership and navigation, and release/link
+guardrails without changing the public API or runtime governance contract.
 
 The historical `3.0.0` release established the current major release line and binary assembly identity while preserving the simplified `AsiBackbone.*` package IDs and namespaces established by `2.0.0`.
 
@@ -199,9 +199,9 @@ The full, categorized documentation set lives at the [documentation site](https:
 
 ## Current status
 
-Stable `3.2.x` is the current released line, with `3.2.2` as the current patch release. This release preserves the simplified `AsiBackbone.*` package and namespace identity and the binary assembly identity `3.0.0.0`.
+Stable `3.2.x` is the current released line, with `3.2.3` as the current patch release. This release preserves the simplified `AsiBackbone.*` package and namespace identity and the binary assembly identity `3.0.0.0`.
 
-The stable API contract is documented in [API Compatibility and SemVer](https://github.com/AsiBackbone/AsiBackbone/blob/main/docs/articles/api-compatibility-and-semver.md). The current release is recorded in [3.2.2 Release Notes](https://github.com/AsiBackbone/AsiBackbone/blob/main/docs/articles/release-notes-322.md) and [3.2.2 Release Readiness Record](https://github.com/AsiBackbone/AsiBackbone/blob/main/docs/articles/release-readiness-322.md). Consumers can use the [3.2.2 Consumer Verification Guide](https://github.com/AsiBackbone/AsiBackbone/blob/main/docs/articles/consumer-verification-322.md) for package-source, package ID, dependency, Source Link, SBOM, provenance, and deferred-signing checks. Earlier release records remain available for historical traceability.
+The stable API contract is documented in [API Compatibility and SemVer](https://github.com/AsiBackbone/AsiBackbone/blob/main/docs/articles/api-compatibility-and-semver.md). The current release is recorded in [3.2.3 Release Notes](https://github.com/AsiBackbone/AsiBackbone/blob/main/docs/articles/release-notes-323.md) and [3.2.3 Release Readiness Record](https://github.com/AsiBackbone/AsiBackbone/blob/main/docs/articles/release-readiness-323.md). Consumers can use the [3.2.3 Consumer Verification Guide](https://github.com/AsiBackbone/AsiBackbone/blob/main/docs/articles/consumer-verification-323.md) for package-source, package ID, test-infrastructure scope, Source Link, SBOM, provenance, and deferred-signing checks. Earlier release records remain available for historical traceability.
 
 ## Security and vulnerability reporting
 
@@ -223,7 +223,7 @@ A consumer should be able to use AsiBackbone in an application generated from Ne
 
 AsiBackbone is a governance spine, not an intelligence engine. It implements governance-oriented software primitives for accountable decision flow and keeps execution authority with the host application. See [Project Boundaries and Non-Claims](https://asibackbone.github.io/AsiBackbone/articles/project-boundaries.html) for the full scope statement and safe wording guidance.
 
-> **Current NuGet packages are intentionally published without package signing.** This is a deliberate governance decision while the project is independently maintained, balancing operational complexity against practical value. Instead, the project emphasizes transparent source code, GitHub releases, Source Link, SBOM generation, and package provenance. Package signing remains on the long-term roadmap and will be reconsidered as the project's community, governance, and operational needs evolve. For current package verification guidance, see the [**3.2.2 Consumer Verification Guide**](https://asibackbone.github.io/AsiBackbone/articles/consumer-verification-322.html).
+> **Current NuGet packages are intentionally published without package signing.** This is a deliberate governance decision while the project is independently maintained, balancing operational complexity against practical value. Instead, the project emphasizes transparent source code, GitHub releases, Source Link, SBOM generation, and package provenance. Package signing remains on the long-term roadmap and will be reconsidered as the project's community, governance, and operational needs evolve. For current package verification guidance, see the [**3.2.3 Consumer Verification Guide**](https://asibackbone.github.io/AsiBackbone/articles/consumer-verification-323.html).
 
 ## Design principles
 
