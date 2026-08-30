@@ -108,14 +108,37 @@ function Assert-CoverageThreshold {
     param([Parameter(Mandatory = $true)][string]$CoveragePath)
 
     [xml]$coverage = Get-Content -LiteralPath $CoveragePath -Raw
-    $root = $coverage.coverage
-    if ($null -eq $root) {
+    $root = $coverage.DocumentElement
+    if ($null -eq $root -or $root.Name -ne 'coverage') {
         throw ('Coverage report does not contain a Cobertura coverage root: ' + $CoveragePath)
     }
 
     $culture = [System.Globalization.CultureInfo]::InvariantCulture
-    $lineRate = [double]::Parse([string]$root.'line-rate', $culture) * 100.0
-    $branchRate = [double]::Parse([string]$root.'branch-rate', $culture) * 100.0
+    $numberStyles = [System.Globalization.NumberStyles]::Float
+    $lineRateText = $root.GetAttribute('line-rate')
+    $branchRateText = $root.GetAttribute('branch-rate')
+
+    if ([string]::IsNullOrWhiteSpace($lineRateText)) {
+        throw ('Cobertura report is missing the line-rate attribute: ' + $CoveragePath)
+    }
+
+    if ([string]::IsNullOrWhiteSpace($branchRateText)) {
+        throw ('Cobertura report is missing the branch-rate attribute: ' + $CoveragePath)
+    }
+
+    $lineRateValue = 0.0
+    $branchRateValue = 0.0
+
+    if (-not [double]::TryParse($lineRateText, $numberStyles, $culture, [ref]$lineRateValue)) {
+        throw ('Cobertura line-rate is not a valid invariant-culture number: ' + $lineRateText)
+    }
+
+    if (-not [double]::TryParse($branchRateText, $numberStyles, $culture, [ref]$branchRateValue)) {
+        throw ('Cobertura branch-rate is not a valid invariant-culture number: ' + $branchRateText)
+    }
+
+    $lineRate = $lineRateValue * 100.0
+    $branchRate = $branchRateValue * 100.0
     Write-Host ('Line coverage: {0:N2}%' -f $lineRate)
     Write-Host ('Branch coverage: {0:N2}%' -f $branchRate)
 
