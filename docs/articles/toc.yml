@@ -201,10 +201,10 @@
 
 - name: Releases & Compatibility
   items:
-    - name: 3.2.2 Release Notes
-      href: release-notes-322.md
-    - name: 3.2.2 Consumer Verification Guide
-      href: consumer-verification-322.md
+    - name: 3.2.3 Release Notes
+      href: release-notes-323.md
+    - name: 3.2.3 Consumer Verification Guide
+      href: consumer-verification-323.md
     - name: API Compatibility and SemVer
       href: api-compatibility-and-semver.md
     - name: Schema Versioning
