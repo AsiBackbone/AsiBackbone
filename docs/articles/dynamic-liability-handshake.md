@@ -1,117 +1,73 @@
-# Dynamic Liability Handshake
+# Acknowledgment Workflow
 
-The **Dynamic Liability Handshake** is the broader conceptual name for AsiBackbone's acknowledgment and responsibility-handshake workflow.
+The broader **Dynamic Liability Handshake** idea is taught in Learning through [Acknowledgment and Audit Residue](https://asibackbone.github.io/Learning/tutorials/acknowledgment-and-audit-residue.html) and the [Intent to Execution accountability pattern](https://asibackbone.github.io/Learning/architecture/intent-to-execution-accountability-pattern.html).
 
-In the implementation, the language is intentionally grounded. Core types use terms such as `LiabilityHandshakeRequest`, `LiabilityHandshakeAcknowledgment`, acknowledgment, responsibility handshake, risk level, reason code, policy version, policy hash, and correlation metadata.
+This page is authoritative for the concrete AsiBackbone acknowledgment workflow.
 
 > [!IMPORTANT]
-> The handshake records acknowledgment context. It does not create legal protection, legal non-repudiation, compliance certification, production tamper-evidence, or a substitute for organizational/legal review by itself.
+> The workflow records an acknowledgment checkpoint. It does not create legal protection, legal non-repudiation, compliance certification, production tamper-evidence, or a substitute for organizational/legal review.
 
-## Purpose
+## Implemented product role
 
-Some software actions should not move directly from request to execution.
+Core exposes grounded responsibility-handshake records including `LiabilityHandshakeRequest` and `LiabilityHandshakeAcknowledgment`.
 
-A consequential action may need a deliberate pause where the requesting actor is shown the reason for the pause, the required acknowledgment text, and the risk or responsibility context before the host proceeds.
+A typical product flow is:
 
-The handshake is that pause point.
-
-## Typical flow
-
-```text
+~~~text
 Governance decision requires acknowledgment
   -> Host creates handshake request
-  -> Host presents required acknowledgment text/code
+  -> Host presents the required acknowledgment
   -> Actor accepts or rejects
-  -> Host records acknowledgment response
-  -> Host links acknowledgment to audit residue and lifecycle events
+  -> Host records the acknowledgment response
+  -> Host links the response to audit/lifecycle evidence
   -> Host decides whether execution may continue
-```
+~~~
 
-The host owns presentation, authentication, authorization, storage, execution behavior, and policy for what an accepted or rejected acknowledgment means.
+## Product data carried by the workflow
 
-## Request contents
+The concrete contracts support fields such as:
 
-A handshake request can carry:
-
-- stable handshake ID;
-- actor ID, actor type, and display name;
+- stable handshake and acknowledgment identifiers;
+- actor identity/type/display information;
 - operation name;
-- reason code;
-- human-readable message;
-- required acknowledgment code;
+- reason and acknowledgment codes;
 - required acknowledgment text;
-- risk level;
-- risk category;
-- correlation ID;
-- trace ID;
-- policy version;
-- policy hash;
+- risk information;
+- correlation and trace identifiers;
+- policy version/hash;
 - schema version;
-- host-provided metadata.
+- host-provided metadata;
+- accepted/rejected state and timestamp.
 
-This makes the request explainable and auditable without requiring a specific web framework, storage provider, or UI.
+Use the [Generated API Reference](../api/) for exact members and signatures.
 
-## Acknowledgment contents
+## Host-owned responsibilities
 
-An acknowledgment response can carry:
+The consuming host owns:
 
-- stable acknowledgment ID;
-- handshake ID;
-- actor ID, actor type, and display name;
-- acknowledgment code;
-- accepted/rejected result;
-- UTC timestamp;
-- correlation ID;
-- trace ID;
-- schema version;
-- host-provided metadata.
+- authentication and authorization of the acknowledging actor;
+- UI/presentation and accessibility;
+- policy defining when acknowledgment is required;
+- storage-provider selection and retention;
+- whether accepted acknowledgment permits continuation;
+- re-evaluation/freshness rules before execution;
+- actual execution.
 
-The acknowledgment is not the execution itself. It is the recorded actor response to the responsibility checkpoint.
+## Production/security boundaries
 
-## Relationship to governance decisions
+An acknowledgment record is evidence of a response, not a transferable execution credential by itself.
 
-A governance decision can produce `AcknowledgmentRequired` when constraints and decision policy determine that immediate execution should not proceed without actor confirmation.
+Do not describe it as:
 
-The handshake then lets the host produce a separate record showing that the actor was presented the required acknowledgment and either accepted or rejected it.
+- acceptance of all legal liability;
+- proof of regulatory compliance;
+- tamper-proof or legally non-repudiable by default;
+- a substitute for current authorization or execution-boundary checks.
 
-## Relationship to audit residue
+## Related product documentation
 
-The handshake should be linked to audit residue and lifecycle events whenever the host preserves durable accountability records.
-
-Recommended lifecycle mapping:
-
-```text
-DecisionEvaluated
-  -> AcknowledgmentRequested
-  -> AcknowledgmentCompleted
-  -> CapabilityTokenIssued, if applicable
-  -> GatewayExecutionStarted, if applicable
-  -> GatewayExecutionCompleted or GatewayExecutionDenied
-  -> ExternalEmissionQueued, if applicable
-```
-
-This lets reviewers follow the decision path without rewriting the original audit record.
-
-## Safe wording
-
-Use wording such as:
-
-- "The actor acknowledged the required responsibility statement."
-- "The host recorded the acknowledgment response."
-- "The acknowledgment is linked to audit residue and lifecycle metadata."
-- "The host remains responsible for deciding whether acknowledgment permits execution."
-
-Avoid wording such as:
-
-- "The user accepted all legal liability."
-- "The handshake guarantees compliance."
-- "The record is legally non-repudiable."
-- "The handshake makes the audit trail tamper-proof."
-
-## Related articles
-
-- [Core Domain Language](core-domain-language.md)
+- [Core API Domain Model](core-domain-language.md)
 - [Policy Evaluator Pipeline](policy-evaluator-pipeline.md)
-- [ASP.NET Core Integration Boundary](aspnetcore-integration-boundary.md)
-- [ASP.NET Core Endpoint Governance](aspnetcore-endpoint-governance.md)
+- [Host-Owned Execution Enforcement](host-owned-execution-enforcement.md)
 - [Signed Audit and Outbox Records](signed-audit-and-outbox-records.md)
+- [Verification Policy and Result Handling](verification-policy-and-result-handling.md)
