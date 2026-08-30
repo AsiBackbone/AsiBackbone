@@ -32,6 +32,12 @@ This page defines the documentation ownership contract between `AsiBackbone/AsiB
 | Release notes, compatibility, migration, consumer verification | AsiBackbone |
 | Quality, benchmark, release-readiness, maintainer evidence | AsiBackbone |
 
+## Sample and tutorial boundary
+
+The ownership matrix above is applied concretely in [Sample Ownership and Implementation Boundary](sample-ownership-and-implementation-boundary.md). That page classifies the current quickstarts, runnable sample hosts, public API examples, templates, and integration scenarios.
+
+Use the [Learning executable sample catalog](https://asibackbone.github.io/Learning/samples/) for standalone teaching samples, labs, exercises, and vendor-neutral runnable examples. Use this repository for examples whose purpose is to exercise the shipped AsiBackbone packages and APIs.
+
 ## Routing rule for new documentation
 
 Use this test before creating or expanding a page:

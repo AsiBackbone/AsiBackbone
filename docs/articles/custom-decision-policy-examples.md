@@ -1,5 +1,8 @@
 # Custom Decision Policy Examples
 
+> [!NOTE]
+> This page is a package/API example. For policy-design education, alternative patterns, and tradeoffs, see [Constraint-Conditioned Decision Model](https://asibackbone.github.io/Learning/architecture/constraint-conditioned-decision-model.html) and the [Learning executable sample catalog](https://asibackbone.github.io/Learning/samples/).
+
 This article shows host-owned `IAsiBackboneDecisionPolicy<TContext>` patterns for composing constraint results into a final governance decision.
 
 Use custom decision policies when individual constraints are not enough to describe the final host posture. Constraints should answer narrow rule questions. A decision policy can then apply broader orchestration rules such as local overlays, risk thresholds, acknowledgment requirements, or escalation routing.
@@ -252,3 +255,7 @@ This keeps the policy layer observable and testable without turning it into an i
 - [Acknowledgment Workflow](dynamic-liability-handshake.md)
 - [Host-Owned Execution Enforcement](host-owned-execution-enforcement.md)
 - [ASP.NET Core Endpoint Governance](aspnetcore-endpoint-governance.md)
+
+## Product API reference
+
+Use the [Generated API Reference](../api/) for exact members and signatures. Key surfaces used by this page include [`IAsiBackboneDecisionPolicy<TContext>`](xref:AsiBackbone.Core.Evaluation.IAsiBackboneDecisionPolicy`1), [`IAsiBackbonePolicyEvaluator<TContext>`](xref:AsiBackbone.Core.Evaluation.IAsiBackbonePolicyEvaluator`1), and [`GovernanceDecision`](xref:AsiBackbone.Core.Decisions.GovernanceDecision).
