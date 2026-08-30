@@ -38,7 +38,7 @@
 - name: Packages & API
   items:
     - name: Generated API Reference
-      href: ../api/
+      href: ../api-reference.md
     - name: Core API Domain Model
       href: core-domain-language.md
     - name: Package and Integration Boundaries
