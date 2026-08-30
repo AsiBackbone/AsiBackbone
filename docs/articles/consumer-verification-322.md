@@ -100,8 +100,8 @@ URL remains:
 https://asibackbone.github.io/AsiBackbone/
 ```
 
-The organization-owned source repository and documentation site established in
-`3.2.1` remain canonical for `3.2.2`.
+For the historical `3.2.2` release, the organization-owned source repository
+and documentation site established in `3.2.1` remained canonical.
 
 ## Verify package version and assembly identity
 

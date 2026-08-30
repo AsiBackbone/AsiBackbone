@@ -251,8 +251,8 @@
       "asibackbone.aspnetcore": {
         "type": "Project",
         "dependencies": {
-          "AsiBackbone.Core": "[3.2.2, )",
-          "AsiBackbone.DependencyInjection": "[3.2.2, )"
+          "AsiBackbone.Core": "[3.2.3, )",
+          "AsiBackbone.DependencyInjection": "[3.2.3, )"
         }
       },
       "asibackbone.core": {
