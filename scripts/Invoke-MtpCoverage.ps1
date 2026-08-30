@@ -86,11 +86,16 @@ function Invoke-TestProjectCoverage {
     if ($NoRestore) { $arguments += '--no-restore' }
     if ($NoBuild) { $arguments += '--no-build' }
 
-    # .NET SDK 10.0.303 forwards unrecognized MTP extension switches directly
-    # to the test application. Do not insert a "--" separator here: that SDK
-    # treats tokens after the separator as positional/unmatched arguments and
-    # can misclassify an existing results directory as a project directory.
-    $arguments += @(
+    # Keep Coverlet extension switches out of the dotnet-test parser. .NET SDK
+    # 10.0.303 treats unrecognized MTP extension arguments as positional tokens
+    # while discovering the project/solution, which can cause a valid results
+    # directory to be misclassified as a positional project directory.
+    #
+    # coverlet.MTP supports supplying extension switches through the
+    # TestingPlatformCommandLineArguments MSBuild property. The test application
+    # receives these arguments after project discovery, avoiding the SDK parser
+    # ambiguity while preserving the same MTP/Coverlet behavior.
+    $coverletArguments = @(
         '--coverlet',
         '--coverlet-output-format',
         'cobertura',
@@ -101,11 +106,14 @@ function Invoke-TestProjectCoverage {
     )
 
     if (-not [string]::IsNullOrWhiteSpace($Include)) {
-        $arguments += @('--coverlet-include', $Include)
+        $coverletArguments += @('--coverlet-include', $Include)
     }
     if (-not [string]::IsNullOrWhiteSpace($Exclude)) {
-        $arguments += @('--coverlet-exclude', $Exclude)
+        $coverletArguments += @('--coverlet-exclude', $Exclude)
     }
+
+    $testingPlatformCommandLineArguments = $coverletArguments -join ' '
+    $arguments += "--property:TestingPlatformCommandLineArguments=$testingPlatformCommandLineArguments"
 
     Write-Host ('Running MTP coverage for ' + $Path)
     Push-Location $RepositoryRoot
