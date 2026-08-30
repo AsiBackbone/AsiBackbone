@@ -174,8 +174,10 @@
     - name: External Governance, Regulatory, and Standards Mapping
       href: external-framework-and-standards-mapping.md
 
-- name: Samples & Scenarios
+- name: Package Samples & Integration Scenarios
   items:
+    - name: Sample Ownership and Implementation Boundary
+      href: sample-ownership-and-implementation-boundary.md
     - name: Plain ASP.NET Core Host Sample
       href: plain-aspnetcore-host-sample.md
     - name: Aspire AppHost Sample

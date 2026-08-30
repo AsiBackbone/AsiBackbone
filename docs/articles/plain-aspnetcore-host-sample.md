@@ -1,5 +1,8 @@
 # Plain ASP.NET Core Host Sample
 
+> [!NOTE]
+> This is a compile-ready package integration sample. For vendor-neutral architecture teaching and standalone executable exercises, use [ASI Backbone Learning](https://asibackbone.github.io/Learning/) and its [Executable Samples](https://asibackbone.github.io/Learning/samples/).
+
 The plain ASP.NET Core host sample is the canonical in-repository validation path for AsiBackbone.
 
 It exists to prove that AsiBackbone integrates with a standard ASP.NET Core application without requiring `NetCoreApplicationTemplate` or another application template.
@@ -87,3 +90,7 @@ This sample does not:
 - host AI models
 - execute robotics or physical control flows
 - choose production persistence, migrations, or deployment strategy for consuming applications
+
+## Product API reference
+
+Use the [Generated API Reference](../api/) for exact public types, members, and signatures exercised by the sample. The package documentation and released source remain authoritative for runtime behavior.
