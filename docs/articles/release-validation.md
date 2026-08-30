@@ -43,7 +43,7 @@ Use these commands before treating local validation as release evidence:
 ```bash
 dotnet restore AsiBackbone.slnx --locked-mode
 dotnet build AsiBackbone.slnx --configuration Release --no-restore
-dotnet test AsiBackbone.slnx --configuration Release --no-build --no-restore
+dotnet test --solution AsiBackbone.slnx --configuration Release --no-build --no-restore
 ```
 
 The default Debug solution build should include all first-party package and test projects:

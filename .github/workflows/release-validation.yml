@@ -83,7 +83,7 @@ jobs:
 
       - name: Run tests
         run: >
-          dotnet test "$SOLUTION_PATH"
+          dotnet test --solution "$SOLUTION_PATH"
           --configuration "$CONFIGURATION"
           --no-restore
           --no-build

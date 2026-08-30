@@ -47,7 +47,7 @@ Run the standard solution checks before opening a pull request:
 ```bash
 dotnet restore AsiBackbone.slnx
 dotnet build AsiBackbone.slnx --configuration Release
-dotnet test AsiBackbone.slnx --configuration Release --no-build --no-restore
+dotnet test --solution AsiBackbone.slnx --configuration Release --no-build --no-restore
 ```
 
 These commands intentionally use `Release`. The repository CI and stable release validation workflows also use the `Release` solution configuration for restore, build, test, formatting, package, documentation, and smoke-test validation. A `Debug` solution build is a local inner-loop or IDE convenience build only and is not evidence that the complete source/test surface was validated. The reviewed `Debug|*` solution exclusions and their rationale are documented in the [Developer Checklist](docs/articles/developer-checklist.md#solution-build-configurations).

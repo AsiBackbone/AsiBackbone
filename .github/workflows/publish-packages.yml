@@ -80,7 +80,7 @@ jobs:
 
       - name: Run tests
         run: >
-          dotnet test "${{ env.SOLUTION_PATH }}"
+          dotnet test --solution "${{ env.SOLUTION_PATH }}"
           --configuration "${{ env.CONFIGURATION }}"
           --no-restore
           --no-build

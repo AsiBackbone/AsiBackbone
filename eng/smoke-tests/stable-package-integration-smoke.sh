@@ -456,6 +456,6 @@ CSHARP
 
 rm "$smoke_project_dir/UnitTest1.cs"
 
-dotnet test "$smoke_project" --configuration "$configuration" --verbosity normal
+dotnet test --project "$smoke_project" --configuration "$configuration" --verbosity normal
 
 echo "Stable package integration smoke tests completed successfully."
