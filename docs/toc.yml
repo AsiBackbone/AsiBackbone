@@ -1,26 +1,27 @@
 - name: Overview
   href: index.md
 
-- name: Get Started
-  href: articles/implementation-first-adoption.md
+- name: Documentation
+  items:
+    - name: Get Started
+      href: articles/implementation-first-adoption.md
+    - name: Implementation & Operations
+      href: articles/
+    - name: API Reference
+      href: api-reference.md
 
-- name: Implementation & Operations
-  href: articles/
+- name: Releases & Evidence
+  items:
+    - name: Releases & Compatibility
+      href: releases/
+    - name: Maintainer & Quality Evidence
+      href: maintainers/
+    - name: Historical Records
+      href: history/
 
-- name: API Reference
-  href: api-reference.md
-
-- name: Releases & Compatibility
-  href: releases/
-
-- name: Maintainer & Quality Evidence
-  href: maintainers/
-
-- name: Historical Records
-  href: history/
-
-- name: Learn the Architecture
-  href: https://asibackbone.github.io/Learning/
-
-- name: Repository
-  href: https://github.com/AsiBackbone/AsiBackbone
+- name: Resources
+  items:
+    - name: Learn the Architecture
+      href: https://asibackbone.github.io/Learning/
+    - name: Repository
+      href: https://github.com/AsiBackbone/AsiBackbone
