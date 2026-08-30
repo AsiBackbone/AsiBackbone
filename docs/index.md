@@ -11,7 +11,7 @@ In this software project, **ASI** means **Accountable Systems Infrastructure**. 
 
 This site is authoritative for concrete AsiBackbone package, API, configuration, runtime, integration, security, operations, compatibility, release, and maintainer behavior.
 
-For architecture concepts, tutorials, comparisons, tradeoffs, labs, and general governed-execution education, use [ASI Backbone Learning](https://asibackbone.github.io/Learning/). Its source is maintained in the [AsiBackbone/Learning repository](https://github.com/AsiBackbone/Learning). Learning does not override product API or runtime truth documented here.
+For architecture concepts, tutorials, comparisons, tradeoffs, labs, and general governed-execution education, use [ASI Backbone Learning](https://asibackbone.github.io/Learning/). Its [Architecture Glossary](https://asibackbone.github.io/Learning/architecture/glossary.html) is the canonical educational terminology reference, with lineage maintained in [Terminology and Established Architecture Concepts](https://asibackbone.github.io/Learning/architecture/terminology-and-established-concepts.html). Learning does not override product API or runtime truth documented here.
 
 See [Documentation Ownership](articles/documentation-ownership.md) for the cross-repository ownership matrix and contribution routing rule.
 
@@ -67,7 +67,8 @@ Package-specific READMEs and release notes define which surfaces are stable, opt
 * [Package and Integration Boundaries](articles/integration-boundaries.md)
 * [Target Framework Support](articles/target-framework-support.md)
 * [Documentation Ownership](articles/documentation-ownership.md)
-* [Terminology Map](articles/terminology-map.md)
+* [AsiBackbone API Terminology Map](articles/terminology-map.md)
+* [AsiBackbone API Glossary](articles/glossary.md)
 
 ### Get started
 
@@ -81,6 +82,7 @@ Package-specific READMEs and release notes define which surfaces are stable, opt
 
 * [Documentation Articles](articles/)
 * [Generated API Reference](api/)
+* [Core API Domain Model](articles/core-domain-language.md)
 * [ASP.NET Core Integration Boundary](articles/aspnetcore-integration-boundary.md)
 * [EF Core Integration Boundary](articles/ef-core-integration-boundary.md)
 * [Testing Harness](articles/testing-harness.md)
