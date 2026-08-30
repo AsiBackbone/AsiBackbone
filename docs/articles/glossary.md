@@ -65,7 +65,7 @@ The following statements are implementation boundaries, not replacement teaching
 
 - [Core API Domain Model](core-domain-language.md)
 - [AsiBackbone API Terminology Map](terminology-map.md)
-- [Generated API Reference](../api/)
+- [Generated API Reference](../api-reference.md)
 - [Policy Evaluator Pipeline](policy-evaluator-pipeline.md)
 - [Project Boundaries and Non-Claims](project-boundaries.md)
 - [Documentation Ownership](documentation-ownership.md)
