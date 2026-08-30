@@ -47,7 +47,7 @@
     },
     {
       "name": "AsiBackbone generated API reference",
-      "url": "https://asibackbone.github.io/AsiBackbone/api/"
+      "url": "https://asibackbone.github.io/AsiBackbone/api/AsiBackbone.Core.Decisions.GovernanceDecision.html"
     },
     {
       "name": "Current release notes",
@@ -72,6 +72,20 @@
       "name": "Learning regulated-systems article points to product standards mapping",
       "sourceUrl": "https://asibackbone.github.io/Learning/advanced/governed-execution-in-regulated-systems.html",
       "expectedDestination": "https://asibackbone.github.io/AsiBackbone/articles/external-framework-and-standards-mapping.html"
+    }
+  ],
+  "localPublishedPaths": [
+    {
+      "name": "Stable API reference landing",
+      "path": "api-reference.html"
+    },
+    {
+      "name": "Current release notes",
+      "path": "articles/release-notes-322.html"
+    },
+    {
+      "name": "Current consumer verification guide",
+      "path": "articles/consumer-verification-322.html"
     }
   ]
 }
