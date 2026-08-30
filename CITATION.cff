@@ -1,8 +1,8 @@
 cff-version: 1.2.0
 message: "If you use this software, please cite it using the metadata below."
 title: "ASI Backbone"
-version: "3.2.2"
-date-released: "2026-08-22"
+version: "3.2.3"
+date-released: "2026-08-30"
 repository-code: "https://github.com/AsiBackbone/AsiBackbone"
 url: "https://asibackbone.github.io/AsiBackbone/"
 type: software
@@ -15,7 +15,7 @@ authors:
   - family-names: "Cavell"
     given-names: "Christopher D."
     orcid: "https://orcid.org/0009-0002-2113-0245"
-abstract: "AsiBackbone 3.2.2 is a backward-compatible maintenance patch for the stable 3.2.x line. It refreshes approved .NET dependencies and SHA-pinned GitHub Actions/security tooling, and normalizes repository metadata without changing package IDs, public namespaces, public APIs, runtime governance behavior, the net10.0 target, or AssemblyVersion 3.0.0.0."
+abstract: "AsiBackbone 3.2.3 is a backward-compatible maintenance patch for the stable 3.2.x line. It migrates repository test and coverage infrastructure to xUnit 4 and Microsoft Testing Platform, clarifies the documentation ownership boundary with ASI Backbone Learning, reorganizes product documentation and release evidence, and strengthens documentation-link and workflow guardrails without changing package IDs, public namespaces, public APIs, runtime governance behavior, the net10.0 target, or AssemblyVersion 3.0.0.0."
 keywords:
   - asi-backbone
   - dotnet
