@@ -40,48 +40,35 @@ jobs:
           global-json-file: global.json
 
       - name: Restore
-        run: dotnet restore ${{ env.SOLUTION_FILE }} --locked-mode
+        run: dotnet restore ${{ env.SOLUTION_FILE }} --locked-mode -p:Configuration=${{ env.CONFIGURATION }}
 
       - name: Build
         run: dotnet build ${{ env.SOLUTION_FILE }} --configuration ${{ env.CONFIGURATION }} --no-restore /p:ContinuousIntegrationBuild=true
 
+      - name: Restore .NET tools
+        run: dotnet tool restore
+
       - name: Run tests with coverage
         shell: pwsh
-        run: |
-          dotnet test ${{ env.SOLUTION_FILE }} `
-          --configuration ${{ env.CONFIGURATION }} `
-          --no-restore `
-          --no-build `
-          --verbosity normal `
-          --collect:"XPlat Code Coverage" `
-          --logger "trx" `
-          --results-directory "./artifacts/test-results" `
-          /p:ContinuousIntegrationBuild=true
+        run: >
+          ./scripts/Invoke-MtpCoverage.ps1
+          -SolutionPath "$env:SOLUTION_FILE"
+          -Configuration "$env:CONFIGURATION"
+          -OutputRoot "./artifacts/test-results"
+          -NoBuild
+          -NoRestore
 
       - name: Run Core tests with branch coverage gate
         shell: pwsh
-        run: |
-          dotnet test "${env:CORE_TEST_PROJECT}" `
-            --configuration "${env:CONFIGURATION}" `
-            --no-restore `
-            --no-build `
-            --verbosity normal `
-            --logger "trx" `
-            --results-directory "./artifacts/core-test-results" `
-            /p:ContinuousIntegrationBuild=true `
-            /p:CollectCoverage=true `
-            /p:CoverletOutputFormat=cobertura `
-            /p:CoverletOutput="${env:CORE_COVERAGE_OUTPUT}/" `
-            /p:Include="[AsiBackbone.Core]*" `
-            /p:Exclude="[*.Tests]*" `
-            /p:Threshold="${env:CORE_BRANCH_COVERAGE_THRESHOLD}" `
-            /p:ThresholdType=branch `
-            /p:ThresholdStat=total
-        env:
-          CORE_TEST_PROJECT: ${{ env.CORE_TEST_PROJECT }}
-          CONFIGURATION: ${{ env.CONFIGURATION }}
-          CORE_COVERAGE_OUTPUT: ${{ env.CORE_COVERAGE_OUTPUT }}
-          CORE_BRANCH_COVERAGE_THRESHOLD: ${{ env.CORE_BRANCH_COVERAGE_THRESHOLD }}
+        run: >
+          ./scripts/Invoke-MtpCoverage.ps1
+          -ProjectPath "$env:CORE_TEST_PROJECT"
+          -Configuration "$env:CONFIGURATION"
+          -OutputRoot "$env:CORE_COVERAGE_OUTPUT"
+          -Include "[AsiBackbone.Core]*"
+          -BranchThreshold "$env:CORE_BRANCH_COVERAGE_THRESHOLD"
+          -NoBuild
+          -NoRestore
 
       - name: List Core coverage outputs
         shell: pwsh
@@ -91,14 +78,12 @@ jobs:
         env:
           WORKSPACE: ${{ github.workspace }}
 
-      - name: Restore .NET tools
-        run: dotnet tool restore
 
       - name: Generate coverage report
         shell: pwsh
         run: |
           dotnet reportgenerator `
-            -reports:"./artifacts/test-results/**/coverage.cobertura.xml" `
+            -reports:"./artifacts/test-results/coverage.cobertura.xml" `
             -targetdir:"./artifacts/coverage-report" `
             -reporttypes:"Html;MarkdownSummaryGithub;Cobertura" `
             -assemblyfilters:"-*.Tests" `

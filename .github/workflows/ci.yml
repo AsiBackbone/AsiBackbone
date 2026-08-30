@@ -80,7 +80,7 @@ jobs:
         run: ./scripts/Validate-DebugSolutionBuildCoverage.ps1 -SolutionPath "$env:SOLUTION_PATH"
 
       - name: Restore
-        run: dotnet restore "$SOLUTION_PATH" --locked-mode
+        run: dotnet restore "$SOLUTION_PATH" --locked-mode -p:Configuration="$CONFIGURATION"
 
       - name: Build Debug solution smoke
         run: dotnet build "$SOLUTION_PATH" --configuration Debug --no-restore
@@ -100,33 +100,31 @@ jobs:
       - name: Verify formatting
         run: dotnet format "$SOLUTION_PATH" --verify-no-changes --verbosity minimal
 
+      - name: Restore .NET tools
+        run: dotnet tool restore
+
       - name: Test with coverage gate
+        shell: pwsh
         run: >
-          dotnet test "$SOLUTION_PATH"
-          --configuration "$CONFIGURATION"
-          --no-build
-          --verbosity normal
-          /p:CollectCoverage=true
-          /p:CoverletOutputFormat=cobertura
-          /p:CoverletOutput="${{ github.workspace }}/${{ env.COVERAGE_OUTPUT }}/"
-          /p:Threshold=75
-          /p:ThresholdType=line
-          /p:ThresholdStat=total
+          ./scripts/Invoke-MtpCoverage.ps1
+          -SolutionPath "$env:SOLUTION_PATH"
+          -Configuration "$env:CONFIGURATION"
+          -OutputRoot "${{ github.workspace }}/${{ env.COVERAGE_OUTPUT }}"
+          -LineThreshold 75
+          -NoBuild
+          -NoRestore
 
       - name: Test Core with branch coverage gate
+        shell: pwsh
         run: >
-          dotnet test "$CORE_TEST_PROJECT"
-          --configuration "$CONFIGURATION"
-          --no-build
-          --verbosity normal
-          /p:CollectCoverage=true
-          /p:CoverletOutputFormat=cobertura
-          /p:CoverletOutput="${{ github.workspace }}/${{ env.CORE_COVERAGE_OUTPUT }}/"
-          /p:Include="[AsiBackbone.Core]*"
-          /p:Exclude="[*.Tests]*"
-          /p:Threshold="$CORE_BRANCH_COVERAGE_THRESHOLD"
-          /p:ThresholdType=branch
-          /p:ThresholdStat=total
+          ./scripts/Invoke-MtpCoverage.ps1
+          -ProjectPath "$env:CORE_TEST_PROJECT"
+          -Configuration "$env:CONFIGURATION"
+          -OutputRoot "${{ github.workspace }}/${{ env.CORE_COVERAGE_OUTPUT }}"
+          -Include "[AsiBackbone.Core]*"
+          -BranchThreshold "$env:CORE_BRANCH_COVERAGE_THRESHOLD"
+          -NoBuild
+          -NoRestore
 
       - name: Test adapter and provider package coverage baselines
         shell: pwsh
@@ -252,7 +250,7 @@ jobs:
           build-mode: none
 
       - name: Restore dependencies
-        run: dotnet restore ${{ env.SOLUTION_PATH }} --locked-mode
+        run: dotnet restore ${{ env.SOLUTION_PATH }} --locked-mode -p:Configuration=${{ env.CONFIGURATION }}
 
       - name: Build solution for CodeQL
         run: dotnet build ${{ env.SOLUTION_PATH }} --configuration ${{ env.CONFIGURATION }} --no-restore /p:ContinuousIntegrationBuild=true
