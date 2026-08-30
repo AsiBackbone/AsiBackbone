@@ -1,0 +1,67 @@
+- name: Maintainer & Quality Evidence
+  href: index.md
+
+- name: Current Release Evidence
+  items:
+    - name: 3.2.2 Release Readiness Record
+      href: ../articles/release-readiness-322.md
+    - name: Release Cadence and Readiness
+      href: ../articles/release-cadence-and-readiness.md
+    - name: Stable Release Validation
+      href: ../articles/release-validation.md
+    - name: Quality Reports
+      href: ../quality/index.md
+
+- name: Quality & Engineering Evidence
+  items:
+    - name: Performance Benchmark Baseline
+      href: ../articles/performance-benchmark-baseline.md
+    - name: Policy Evaluator Allocation Review
+      href: ../articles/policy-evaluator-allocation-review.md
+    - name: EF Core Outbox Bulk-Claim Performance Evaluation
+      href: ../articles/efcore-outbox-bulk-claim-evaluation.md
+    - name: API Baseline and Boundary Checks
+      href: ../articles/api-baseline-and-boundary-checks.md
+    - name: Public API XML Documentation
+      href: ../articles/public-api-xml-documentation.md
+    - name: Production Placeholder Exception Guardrails
+      href: ../articles/production-placeholder-exception-guardrails.md
+    - name: Post-2.0.0 Documentation Currency Review
+      href: ../articles/post-200-documentation-currency-review.md
+    - name: Implicit Usings Posture
+      href: ../articles/implicit-usings-posture.md
+    - name: Developer Checklist
+      href: ../articles/developer-checklist.md
+    - name: Cryptographic Security Hardening Roadmap
+      href: ../articles/cryptographic-security-hardening-roadmap.md
+
+- name: Historical Readiness Archive
+  items:
+    - name: 3.2.1 Release Readiness Record
+      href: ../articles/release-readiness-321.md
+    - name: 3.2.0 Release Readiness Record
+      href: ../articles/release-readiness-320.md
+    - name: 3.1.0 Release Readiness Record
+      href: ../articles/release-readiness-310.md
+    - name: 3.0.1 Release Readiness Record
+      href: ../articles/release-readiness-301.md
+    - name: 3.0.0 Release Readiness Record
+      href: ../articles/release-readiness-300.md
+    - name: 2.3.0 Release Readiness Record
+      href: ../articles/release-readiness-230.md
+    - name: 2.2.1 Release Readiness Record
+      href: ../articles/release-readiness-221.md
+    - name: 2.2.0 Release Readiness Record
+      href: ../articles/release-readiness-220.md
+    - name: 2.1.0 Release Readiness Record
+      href: ../articles/release-readiness-210.md
+    - name: 2.0.2 Release Readiness Record
+      href: ../articles/release-readiness-202.md
+    - name: 2.0.1 Release Readiness Record
+      href: ../articles/release-readiness-201.md
+    - name: 2.0.0 Release Readiness Record
+      href: ../articles/release-readiness-200.md
+    - name: 1.2.1 Release Readiness Record
+      href: ../articles/release-readiness-121.md
+    - name: 1.2.0 Release Readiness Record
+      href: ../articles/release-readiness-120.md
