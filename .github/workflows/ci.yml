@@ -80,7 +80,7 @@ jobs:
         run: ./scripts/Validate-DebugSolutionBuildCoverage.ps1 -SolutionPath "$env:SOLUTION_PATH"
 
       - name: Restore
-        run: dotnet restore "$SOLUTION_PATH" --locked-mode
+        run: dotnet restore "$SOLUTION_PATH" --locked-mode -p:Configuration="$CONFIGURATION"
 
       - name: Build Debug solution smoke
         run: dotnet build "$SOLUTION_PATH" --configuration Debug --no-restore
@@ -250,7 +250,7 @@ jobs:
           build-mode: none
 
       - name: Restore dependencies
-        run: dotnet restore ${{ env.SOLUTION_PATH }} --locked-mode
+        run: dotnet restore ${{ env.SOLUTION_PATH }} --locked-mode -p:Configuration=${{ env.CONFIGURATION }}
 
       - name: Build solution for CodeQL
         run: dotnet build ${{ env.SOLUTION_PATH }} --configuration ${{ env.CONFIGURATION }} --no-restore /p:ContinuousIntegrationBuild=true

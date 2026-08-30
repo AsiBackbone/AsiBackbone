@@ -41,7 +41,7 @@ Before cutting a stable release tag, confirm the following checks have passed on
 Use these commands before treating local validation as release evidence:
 
 ```bash
-dotnet restore AsiBackbone.slnx --locked-mode
+dotnet restore AsiBackbone.slnx --locked-mode -p:Configuration=Release
 dotnet build AsiBackbone.slnx --configuration Release --no-restore
 dotnet test --solution AsiBackbone.slnx --configuration Release --no-build --no-restore
 ```

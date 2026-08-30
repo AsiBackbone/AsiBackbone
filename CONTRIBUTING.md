@@ -45,7 +45,7 @@ dotnet tool restore
 Run the standard solution checks before opening a pull request:
 
 ```bash
-dotnet restore AsiBackbone.slnx
+dotnet restore AsiBackbone.slnx -p:Configuration=Release
 dotnet build AsiBackbone.slnx --configuration Release
 dotnet test --solution AsiBackbone.slnx --configuration Release --no-build --no-restore
 ```
