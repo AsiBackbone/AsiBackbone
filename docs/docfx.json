@@ -24,7 +24,10 @@
           "**/toc.yml",
           "articles/**/*.md",
           "quality/**/*.md",
-          "api/**/*.yml"
+          "api/**/*.yml",
+          "releases/**/*.md",
+          "maintainers/**/*.md",
+          "history/**/*.md"
         ]
       }
     ],

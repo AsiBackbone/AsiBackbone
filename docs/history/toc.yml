@@ -1,0 +1,21 @@
+- name: Historical Records
+  href: index.md
+
+- name: Superseded Design Records
+  items:
+    - name: OpenTelemetry Provider Design (Superseded)
+      href: ../articles/opentelemetry-governance-emission-provider-design.md
+
+- name: Alpha & Early Package Records
+  items:
+    - name: Historical Alpha Package Boundary
+      href: ../articles/alpha-package-boundary.md
+    - name: Historical Core Alpha Readiness Review
+      href: ../articles/core-alpha-readiness-review.md
+    - name: Historical Stable API Review
+      href: ../articles/stable-api-review.md
+
+- name: Early Readiness Records
+  items:
+    - name: Historical 1.1.0 Release Readiness Record
+      href: ../articles/release-readiness-checklist.md

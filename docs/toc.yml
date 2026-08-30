@@ -11,10 +11,13 @@
   href: api/
 
 - name: Releases & Compatibility
-  href: articles/release-notes-322.md
+  href: releases/
 
-- name: Quality Evidence
-  href: quality/
+- name: Maintainer & Quality Evidence
+  href: maintainers/
+
+- name: Historical Records
+  href: history/
 
 - name: Learn the Architecture
   href: https://asibackbone.github.io/Learning/

@@ -25,8 +25,8 @@ See [Documentation Ownership](articles/documentation-ownership.md) for the cross
 | Understand runtime decision behavior | [Policy Evaluator Pipeline](articles/policy-evaluator-pipeline.md) |
 | Persist, observe, sign, verify, or harden a deployment | [Production Hardening: Evaluator and Outbox](articles/production-hardening-evaluator-and-outbox.md) |
 | Run a concrete integration path | [Plain ASP.NET Core Host Sample](articles/plain-aspnetcore-host-sample.md) and [Samples & Scenarios](articles/) |
-| Check compatibility or release changes | [3.2.2 Release Notes](articles/release-notes-322.md) and [API Compatibility and SemVer](articles/api-compatibility-and-semver.md) |
-| Review readiness, benchmarks, or quality evidence | [Quality Reports](quality/) and [3.2.2 Release Readiness Record](articles/release-readiness-322.md) |
+| Check compatibility, release changes, or upgrade history | [Releases & Compatibility](releases/) |
+| Review readiness, benchmarks, or quality evidence | [Maintainer & Quality Evidence](maintainers/) |
 | Learn the broader architecture | [ASI Backbone Learning](https://asibackbone.github.io/Learning/) |
 
 The DocFX header search is available for package names, API concepts, and article titles. Source for every page lives under `docs/`, and the site header includes a Repository link for source review or edits.
@@ -117,15 +117,23 @@ Package-specific READMEs and release notes define which surfaces are stable, opt
 * [Schema Versioning](articles/schema-versioning.md)
 * [Release Validation](articles/release-validation.md)
 
-Historical release notes remain available under **Releases & Compatibility** in the article navigation without occupying the primary adoption path.
+Historical release notes and verification records remain available under [Releases & Compatibility](releases/) without occupying the primary adoption path.
 
 ### Maintainer and quality evidence
 
+* [Maintainer & Quality Evidence](maintainers/)
 * [Quality Reports](quality/)
 * [Performance Benchmark Baseline](articles/performance-benchmark-baseline.md)
 * [API Baseline and Boundary Checks](articles/api-baseline-and-boundary-checks.md)
 * [Release Cadence and Readiness](articles/release-cadence-and-readiness.md)
 * [3.2.2 Release Readiness Record](articles/release-readiness-322.md)
+
+
+### Historical records
+
+* [Historical and Superseded Records](history/)
+
+Historical and superseded records remain public and searchable for traceability without being presented as current implementation guidance.
 
 ## Learn the architecture
 

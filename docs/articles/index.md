@@ -144,29 +144,22 @@ These pages cover production hardening, durable audit/outbox behavior, observabi
 
 ## Releases & compatibility
 
-Start with the current release and compatibility rules. Older release notes and consumer-verification guides remain available in the left navigation without dominating the implementation path.
+Start with the current release and compatibility rules. Older release notes, consumer-verification guides, and upgrade records are preserved under [Releases & Compatibility](../releases/) so they remain easy to find without dominating the implementation navigation.
 
 * [3.2.2 Release Notes](release-notes-322.md)
 * [3.2.2 Consumer Verification Guide](consumer-verification-322.md)
 * [API Compatibility and SemVer](api-compatibility-and-semver.md)
 * [Schema Versioning](schema-versioning.md)
 * [Target Framework Support](target-framework-support.md)
-* [Release Validation](release-validation.md)
-* [Upgrade Guide: 1.0.0 to 1.1.0](upgrade-100-to-110.md)
+* [Release and Upgrade History](../releases/)
 
 ## Maintainer / quality evidence
 
-These pages are published for release, compatibility, benchmark, and maintenance evidence. They are intentionally separate from consumer implementation guidance.
+Release-readiness records, benchmark reviews, coverage/mutation/concurrency evidence, documentation-claim validation, and maintainer checklists are published under [Maintainer & Quality Evidence](../maintainers/). They remain searchable and public, but are intentionally outside the normal consumer implementation path.
 
-* [Quality Reports](../quality/index.md)
-* [Performance Benchmark Baseline](performance-benchmark-baseline.md)
-* [Policy Evaluator Allocation Review](policy-evaluator-allocation-review.md)
-* [EF Core Outbox Bulk-Claim Performance Evaluation](efcore-outbox-bulk-claim-evaluation.md)
-* [API Baseline and Boundary Checks](api-baseline-and-boundary-checks.md)
-* [Public API XML Documentation](public-api-xml-documentation.md)
-* [Release Cadence and Readiness](release-cadence-and-readiness.md)
-* [3.2.2 Release Readiness Record](release-readiness-322.md)
-* [Developer Checklist](developer-checklist.md)
+## Historical records
+
+Superseded design proposals, alpha-era package/readiness records, and historical API reviews are preserved under [Historical and Superseded Records](../history/). These records are retained for traceability and should not be read as current package behavior.
 
 ## Learn the architecture
 

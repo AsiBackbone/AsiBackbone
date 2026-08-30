@@ -4,6 +4,9 @@ This article documents the design for an OpenTelemetry-first governance emission
 
 Issue: #144.
 
+> [!NOTE]
+> **Historical/superseded design record.** This page preserves the pre-implementation design used for issue #144. For current released behavior and package guidance, use [OpenTelemetry Governance Emission Provider](opentelemetry-governance-emission-provider.md). The material below is retained without rewriting the original design history.
+
 In this software project, **ASI** means **Accountable Systems Infrastructure**. AsiBackbone is a governance spine for consequential software decision flow. It is not an AI model host, robot controller, observability backend, SIEM product, cloud governance platform, signing product, or compliance guarantee by itself.
 
 ## Purpose
