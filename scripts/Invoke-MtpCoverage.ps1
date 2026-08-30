@@ -64,16 +64,23 @@ function Invoke-TestProjectCoverage {
     $projectName = [System.IO.Path]::GetFileNameWithoutExtension($Path)
     New-Item -ItemType Directory -Path $ResultsDirectory -Force | Out-Null
 
+    # .NET 10 MTP argument parsing on Unix can misclassify rooted option values
+    # (for example, /home/runner/...) as switch-like tokens. Invoke from the
+    # repository root and pass relative paths so the same command line is
+    # portable across Windows and Linux.
+    $projectArgument = [System.IO.Path]::GetRelativePath($RepositoryRoot, $Path)
+    $resultsDirectoryArgument = [System.IO.Path]::GetRelativePath($RepositoryRoot, $ResultsDirectory)
+
     $arguments = @(
         'test',
         '--project',
-        $Path,
+        $projectArgument,
         '--configuration',
         $Configuration,
         '--verbosity',
         'normal',
         '--results-directory',
-        $ResultsDirectory
+        $resultsDirectoryArgument
     )
 
     if ($NoRestore) { $arguments += '--no-restore' }
@@ -98,9 +105,15 @@ function Invoke-TestProjectCoverage {
     }
 
     Write-Host ('Running MTP coverage for ' + $Path)
-    & dotnet @arguments
-    if ($LASTEXITCODE -ne 0) {
-        throw ('Tests failed for ' + $Path + ' with exit code ' + $LASTEXITCODE + '.')
+    Push-Location $RepositoryRoot
+    try {
+        & dotnet @arguments
+        if ($LASTEXITCODE -ne 0) {
+            throw ('Tests failed for ' + $Path + ' with exit code ' + $LASTEXITCODE + '.')
+        }
+    }
+    finally {
+        Pop-Location
     }
 }
 
