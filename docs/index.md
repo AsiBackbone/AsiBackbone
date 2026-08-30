@@ -1,40 +1,35 @@
 # ASI Backbone Documentation
 
-Welcome to the AsiBackbone documentation site.
+Welcome to the AsiBackbone product documentation.
 
 In this software project, **ASI** means **Accountable Systems Infrastructure**. AsiBackbone is a .NET governance and policy-control package family implemented as practical software infrastructure. The project is a governance spine, not an intelligence engine.
 
 > [!IMPORTANT]
-> AsiBackbone provides framework-neutral building blocks and host integration seams for governing consequential actions in software systems. Host applications remain responsible for authentication, authorization, execution, persistence, deployment, monitoring, compliance review, and operational controls. For the canonical boundary reference, see [Project Boundaries and Non-Claims](articles/project-boundaries.md).
+> AsiBackbone provides framework-neutral building blocks and host integration seams for governing consequential actions in software systems. Host applications remain responsible for authentication, authorization, execution, persistence, deployment, monitoring, compliance review, and operational controls. See [Project Boundaries and Non-Claims](articles/project-boundaries.md) for the canonical boundary reference.
 
-## Documentation ownership
+## Product documentation versus architecture education
 
-This site is primarily the implementation, API, package, integration, security, operations, compatibility, and release documentation for the AsiBackbone product. It remains authoritative for released package and runtime behavior.
+This site is authoritative for concrete AsiBackbone package, API, configuration, runtime, integration, security, operations, compatibility, release, and maintainer behavior.
 
-[ASI Backbone Learning](https://asibackbone.github.io/Learning/) is the canonical educational and architectural source for organization-level concepts, terminology lineage, tutorials, comparisons, tradeoffs, labs, and general governed-execution teaching. Its source is maintained in the [AsiBackbone/Learning repository](https://github.com/AsiBackbone/Learning). Learning does not override product API or runtime truth documented here.
+For architecture concepts, tutorials, comparisons, tradeoffs, labs, and general governed-execution education, use [ASI Backbone Learning](https://asibackbone.github.io/Learning/). Its source is maintained in the [AsiBackbone/Learning repository](https://github.com/AsiBackbone/Learning). Learning does not override product API or runtime truth documented here.
 
 See [Documentation Ownership](articles/documentation-ownership.md) for the cross-repository ownership matrix and contribution routing rule.
 
-## Search, navigation, and source links
+## Choose a task
 
-The documentation site uses the DocFX search box in the header. Source for every page lives in the repository under `docs/`, and the site header includes a Repository link for viewing or editing documentation files.
+| Goal | Start here |
+| --- | --- |
+| Install and configure AsiBackbone | [Implementation-First Adoption Path](articles/implementation-first-adoption.md) and [First 15 Minutes: Standard API Gating](articles/quickstart-api-gating.md) |
+| Register the package family in a host | [AddAsiBackbone Builder Facade](articles/add-asibackbone-builder-facade.md) and [Getting Started](articles/getting-started.md) |
+| Find a package or public type | [Documentation Articles](articles/) and [API Reference](api/) |
+| Understand runtime decision behavior | [Policy Evaluator Pipeline](articles/policy-evaluator-pipeline.md) |
+| Persist, observe, sign, verify, or harden a deployment | [Production Hardening: Evaluator and Outbox](articles/production-hardening-evaluator-and-outbox.md) |
+| Run a concrete integration path | [Plain ASP.NET Core Host Sample](articles/plain-aspnetcore-host-sample.md) and [Samples & Scenarios](articles/) |
+| Check compatibility or release changes | [3.2.2 Release Notes](articles/release-notes-322.md) and [API Compatibility and SemVer](articles/api-compatibility-and-semver.md) |
+| Review readiness, benchmarks, or quality evidence | [Quality Reports](quality/) and [3.2.2 Release Readiness Record](articles/release-readiness-322.md) |
+| Learn the broader architecture | [ASI Backbone Learning](https://asibackbone.github.io/Learning/) |
 
-## Start here
-
-These pages are the best first stops for implementation-first adoption.
-
-* [Implementation-First Adoption Path](articles/implementation-first-adoption.md)
-* [First 15 Minutes: Standard API Gating](articles/quickstart-api-gating.md)
-* [AddAsiBackbone Builder Facade](articles/add-asibackbone-builder-facade.md)
-* [dotnet new Templates](articles/templates.md)
-* [Reference Deployment: Plain ASP.NET Core Host Evidence](articles/reference-deployment.md)
-* [Terminology Map](articles/terminology-map.md)
-* [Project Boundaries and Non-Claims](articles/project-boundaries.md)
-* [Documentation Ownership](articles/documentation-ownership.md)
-* [Progressive Adoption Ladder](articles/progressive-adoption.md)
-* [Getting Started](articles/getting-started.md)
-* [Documentation Articles](articles/)
-* [Security Policy and Vulnerability Disclosure](https://github.com/AsiBackbone/AsiBackbone/blob/main/SECURITY.md)
+The DocFX header search is available for package names, API concepts, and article titles. Source for every page lives under `docs/`, and the site header includes a Repository link for source review or edits.
 
 ## Current stable package family
 
@@ -64,114 +59,72 @@ AsiBackbone.Signing.ManagedKey
 
 Package-specific READMEs and release notes define which surfaces are stable, optional, local-only, or future-facing. A design page being present in the documentation does not mean the corresponding provider package has shipped as stable.
 
-## Core documentation areas
+## Product documentation map
 
-### Implementation-first adoption
+### Overview and boundaries
+
+* [Project Boundaries and Non-Claims](articles/project-boundaries.md)
+* [Package and Integration Boundaries](articles/integration-boundaries.md)
+* [Target Framework Support](articles/target-framework-support.md)
+* [Documentation Ownership](articles/documentation-ownership.md)
+* [Terminology Map](articles/terminology-map.md)
+
+### Get started
 
 * [Implementation-First Adoption Path](articles/implementation-first-adoption.md)
 * [First 15 Minutes: Standard API Gating](articles/quickstart-api-gating.md)
 * [AddAsiBackbone Builder Facade](articles/add-asibackbone-builder-facade.md)
 * [dotnet new Templates](articles/templates.md)
 * [Reference Deployment: Plain ASP.NET Core Host Evidence](articles/reference-deployment.md)
-* [Plain ASP.NET Core Host Sample](articles/plain-aspnetcore-host-sample.md)
-* [Aspire AppHost Sample](articles/aspire-apphost-sample.md)
-* [NetCoreApplicationTemplate Host Validation](articles/netcoreapplicationtemplate-host-validation.md)
 
-### Core concepts and domain language
+### Packages and API
 
-* [Core Governance Flow Diagrams](articles/core-governance-flow-diagrams.md)
-* [Core Domain Language](articles/core-domain-language.md)
-* [Policy Evaluator Pipeline](articles/policy-evaluator-pipeline.md)
-* [Threat Model Contributors](articles/threat-model-contributors.md)
-* [Strict Governance Profile](articles/strict-governance-profile.md)
-* [Custom Decision Policy Examples](articles/custom-decision-policy-examples.md)
-* [Host-Owned Execution Enforcement](articles/host-owned-execution-enforcement.md)
-* [Dynamic Liability Handshake](articles/dynamic-liability-handshake.md)
-* [Glossary](articles/glossary.md)
-
-### Package integration, observability, and signing
-
-* [EF Core Integration Boundary](articles/ef-core-integration-boundary.md)
-* [EF Core JSON Metadata Storage](articles/ef-core-json-metadata-storage.md)
+* [Documentation Articles](articles/)
+* [Generated API Reference](api/)
 * [ASP.NET Core Integration Boundary](articles/aspnetcore-integration-boundary.md)
-* [ASP.NET Core Endpoint Governance](articles/aspnetcore-endpoint-governance.md)
+* [EF Core Integration Boundary](articles/ef-core-integration-boundary.md)
 * [Testing Harness](articles/testing-harness.md)
-* [Schema Versioning](articles/schema-versioning.md)
-* [API Compatibility and SemVer](articles/api-compatibility-and-semver.md)
-* [Observability and Governance Emission Architecture](articles/observability-and-governance-emission-architecture.md)
-* [Governance Emission Contract](articles/governance-emission-contract.md)
-* [Durable Audit and Outbox Persistence](articles/durable-audit-outbox-persistence.md)
-* [Hosted Governance Outbox Drain](articles/hosted-governance-outbox-drain.md)
-* [EF Core Outbox Bulk-Claim Performance Evaluation](articles/efcore-outbox-bulk-claim-evaluation.md)
-* [Claimed Outbox Transition Outcomes](articles/outbox-claim-transition-outcomes.md)
+* [Roslyn Analyzers](articles/roslyn-analyzers.md)
 * [OpenTelemetry Governance Emission Provider](articles/opentelemetry-governance-emission-provider.md)
 * [Signing Provider Package Boundary](articles/signing-provider-package-boundary.md)
-* [Managed-Key Signing Provider](articles/managed-key-signing-provider.md)
 
-### Optional conceptual and scenario background
+### Implementation guides
 
-* [Intent to Execution: An Accountability Pattern](articles/intent-to-execution-pattern.md)
-* [ASI Backbone Concept Synopsis](articles/asi-backbone-concept.md)
-* [Gateway and Regional Policy Flow](articles/gateway-and-regional-policy-flow.md)
-* [Equations and Toy Models](articles/equations-and-toy-models.md)
-* [Governance Tool Comparisons](articles/governance-tool-comparisons.md)
-* [Adoption and Target Use Cases](articles/use-cases.md)
-* [Enterprise Adoption Personas](articles/enterprise-adoption-personas.md)
-* [Government and Regulated Systems](articles/government-and-regulated-systems.md)
+* [Policy Evaluator Pipeline](articles/policy-evaluator-pipeline.md)
+* [Custom Decision Policy Examples](articles/custom-decision-policy-examples.md)
+* [Acknowledgment Workflow](articles/dynamic-liability-handshake.md)
+* [Host-Owned Execution Enforcement](articles/host-owned-execution-enforcement.md)
+* [Capability Grant Hardening](articles/capability-grant-hardening.md)
 
-### Security and cryptographic boundaries
+### Security and operations
 
-* [Project Boundaries and Non-Claims](articles/project-boundaries.md)
-* [Production Wording and Stable Signing Boundaries](articles/production-wording-and-alpha-limitations.md)
-* [Supply-Chain Provenance and Package SBOMs](articles/supply-chain-provenance.md)
-* [3.2.2 Consumer Verification Guide](articles/consumer-verification-322.md)
-* [3.2.1 Consumer Verification Guide](articles/consumer-verification-321.md)
-* [3.2.0 Consumer Verification Guide](articles/consumer-verification-320.md)
-* [3.1.0 Consumer Verification Guide](articles/consumer-verification-310.md)
-* [3.0.1 Consumer Verification Guide](articles/consumer-verification-301.md)
-* [3.0.0 Consumer Verification Guide](articles/consumer-verification-300.md)
+* [Production Hardening: Evaluator and Outbox](articles/production-hardening-evaluator-and-outbox.md)
+* [Durable Audit and Outbox Persistence](articles/durable-audit-outbox-persistence.md)
+* [Observability and Governance Emission Architecture](articles/observability-and-governance-emission-architecture.md)
+* [DLP and Classification Failure Policy](articles/dlp-classification-failure-policy.md)
 * [Signing-Ready Receipts and Key Handling](articles/signing-ready-receipts-and-key-handling.md)
-* [Signed Audit and Outbox Records](articles/signed-audit-and-outbox-records.md)
 * [Verification Policy and Result Handling](articles/verification-policy-and-result-handling.md)
 * [Key Rotation and Retired-Key Verification](articles/key-rotation-and-retired-key-verification.md)
-* [Capability Grant Hardening](articles/capability-grant-hardening.md)
-* [Capability Proof Trust Pinning](articles/capability-proof-trust-pinning.md)
-* [Audit Integrity Chain Model](articles/audit-integrity-chain-model.md)
-* [Cryptographic Security Posture and Production Guidance](articles/cryptographic-security-posture.md)
-* [Cryptographic Security Hardening Roadmap](articles/cryptographic-security-hardening-roadmap.md)
+* [Security Policy and Vulnerability Disclosure](https://github.com/AsiBackbone/AsiBackbone/blob/main/SECURITY.md)
 
-### Quality and release process
+### Releases and compatibility
+
+* [3.2.2 Release Notes](articles/release-notes-322.md)
+* [3.2.2 Consumer Verification Guide](articles/consumer-verification-322.md)
+* [API Compatibility and SemVer](articles/api-compatibility-and-semver.md)
+* [Schema Versioning](articles/schema-versioning.md)
+* [Release Validation](articles/release-validation.md)
+
+Historical release notes remain available under **Releases & Compatibility** in the article navigation without occupying the primary adoption path.
+
+### Maintainer and quality evidence
 
 * [Quality Reports](quality/)
 * [Performance Benchmark Baseline](articles/performance-benchmark-baseline.md)
-* [Release Validation](articles/release-validation.md)
-* [3.2.2 Consumer Verification Guide](articles/consumer-verification-322.md)
-* [3.2.2 Release Readiness Record](articles/release-readiness-322.md)
-* [3.2.2 Release Notes](articles/release-notes-322.md)
-* [3.2.1 Consumer Verification Guide](articles/consumer-verification-321.md)
-* [3.2.1 Release Readiness Record](articles/release-readiness-321.md)
-* [3.2.1 Release Notes](articles/release-notes-321.md)
-* [3.2.0 Consumer Verification Guide](articles/consumer-verification-320.md)
-* [3.2.0 Release Readiness Record](articles/release-readiness-320.md)
-* [3.2.0 Release Notes](articles/release-notes-320.md)
-* [3.1.0 Consumer Verification Guide](articles/consumer-verification-310.md)
-* [3.1.0 Release Readiness Record](articles/release-readiness-310.md)
-* [3.1.0 Release Notes](articles/release-notes-310.md)
-* [3.0.1 Consumer Verification Guide](articles/consumer-verification-301.md)
-* [3.0.1 Release Readiness Record](articles/release-readiness-301.md)
-* [3.0.1 Release Notes](articles/release-notes-301.md)
-* [3.0.0 Consumer Verification Guide](articles/consumer-verification-300.md)
-* [3.0.0 Release Readiness Record](articles/release-readiness-300.md)
-* [3.0.0 Release Notes](articles/release-notes-300.md)
-* [2.3.0 Release Readiness Record](articles/release-readiness-230.md)
-* [2.3.0 Release Notes](articles/release-notes-230.md)
-* [2.2.1 Release Readiness Record](articles/release-readiness-221.md)
-* [2.2.1 Release Notes](articles/release-notes-221.md)
-* [2.2.0 Release Readiness Record](articles/release-readiness-220.md)
-* [2.2.0 Release Notes](articles/release-notes-220.md)
-* [2.1.0 Release Readiness Record](articles/release-readiness-210.md)
-* [2.1.0 Release Notes](articles/release-notes-210.md)
-* [2.0.2 Release Readiness Record](articles/release-readiness-202.md)
-* [2.0.2 Release Notes](articles/release-notes-202.md)
 * [API Baseline and Boundary Checks](articles/api-baseline-and-boundary-checks.md)
-* [Developer Checklist](articles/developer-checklist.md)
+* [Release Cadence and Readiness](articles/release-cadence-and-readiness.md)
+* [3.2.2 Release Readiness Record](articles/release-readiness-322.md)
+
+## Learn the architecture
+
+General architecture teaching is maintained in [ASI Backbone Learning](https://asibackbone.github.io/Learning/). Retained conceptual articles in this repository remain available for continuity and historical context, but they are intentionally separated from the main implementation/API navigation.

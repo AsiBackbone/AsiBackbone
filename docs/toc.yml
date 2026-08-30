@@ -1,14 +1,23 @@
-- name: Start Here
+- name: Overview
   href: index.md
 
-- name: Current Documentation
+- name: Get Started
+  href: articles/implementation-first-adoption.md
+
+- name: Implementation & Operations
   href: articles/
 
 - name: API Reference
   href: api/
 
-- name: Quality Reports
+- name: Releases & Compatibility
+  href: articles/release-notes-322.md
+
+- name: Quality Evidence
   href: quality/
+
+- name: Learn the Architecture
+  href: https://asibackbone.github.io/Learning/
 
 - name: Repository
   href: https://github.com/AsiBackbone/AsiBackbone
