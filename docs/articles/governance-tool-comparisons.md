@@ -23,6 +23,6 @@ Those tools may govern adjacent boundaries. AsiBackbone remains focused on expli
 - [AI Agent Gateway](scenarios/ai-agent-gateway.md)
 - [Observability and Governance Emission Architecture](observability-and-governance-emission-architecture.md)
 - [External Governance, Regulatory, and Standards Mapping](external-framework-and-standards-mapping.md)
-- [Generated API Reference](../api/)
+- [Generated API Reference](../api-reference.md)
 
 For tradeoffs and comparison teaching, use Learning. For exact AsiBackbone package behavior, use this product documentation.
