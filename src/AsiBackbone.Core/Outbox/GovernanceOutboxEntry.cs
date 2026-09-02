@@ -111,8 +111,12 @@ public sealed class GovernanceOutboxEntry
     public int RetryCount { get; }
 
     /// <summary>
-    /// Gets the maximum retry count before the entry should transition to dead-lettered.
+    /// Gets the persisted maximum retry count retained for storage compatibility.
     /// </summary>
+    /// <remarks>
+    /// Retry eligibility and threshold dead-lettering are controlled by <see cref="AsiBackboneGovernanceOutboxOptions" />
+    /// when the entry is processed by <see cref="AsiBackboneGovernanceOutboxDrain" />.
+    /// </remarks>
     public int MaxRetryCount { get; }
 
     /// <summary>
@@ -275,7 +279,7 @@ public sealed class GovernanceOutboxEntry
     /// </summary>
     public bool IsRetryReady(DateTimeOffset utcNow)
     {
-        return !IsDelivered && !IsDeadLettered && RetryCount < MaxRetryCount && Status is GovernanceEmissionStatus.Deferred or GovernanceEmissionStatus.Failed or GovernanceEmissionStatus.RetryableFailure && (NextRetryUtc is null || NextRetryUtc <= utcNow.ToUniversalTime());
+        return !IsDelivered && !IsDeadLettered && Status is GovernanceEmissionStatus.Deferred or GovernanceEmissionStatus.Failed or GovernanceEmissionStatus.RetryableFailure && (NextRetryUtc is null || NextRetryUtc <= utcNow.ToUniversalTime());
     }
 
     /// <summary>
@@ -400,21 +404,19 @@ public sealed class GovernanceOutboxEntry
         ArgumentNullException.ThrowIfNull(governanceEmissionError);
 
         int nextRetryCount = RetryCount + 1;
-        GovernanceEmissionStatus nextStatus = nextRetryCount >= MaxRetryCount
-            ? GovernanceEmissionStatus.DeadLettered
-            : governanceEmissionError.IsRetryable
-                ? GovernanceEmissionStatus.RetryableFailure
-                : GovernanceEmissionStatus.Failed;
+        GovernanceEmissionStatus nextStatus = governanceEmissionError.IsRetryable
+            ? GovernanceEmissionStatus.RetryableFailure
+            : GovernanceEmissionStatus.Failed;
 
         return Copy(
             nextStatus,
             updatedUtc,
             nextRetryCount,
-            nextStatus is GovernanceEmissionStatus.DeadLettered ? null : nextRetryUtc,
+            nextRetryUtc,
             governanceEmissionError,
             governanceEmissionError.ProviderName,
             providerRecordId: null,
-            nextStatus is GovernanceEmissionStatus.DeadLettered ? governanceEmissionError.Message : null,
+            deadLetterReason: null,
             Metadata,
             claimOwner: null,
             claimToken: null,

@@ -11,7 +11,7 @@ In this software project, **ASI** means **Accountable Systems Infrastructure**. 
 | Option | Default | Purpose |
 | --- | --- | --- |
 | `MaxRetryAttempts` | `5` | Maximum failed emission attempts permitted before the drain applies its poison-message policy. The failure currently being processed counts toward the threshold. |
-| `DeadLetterOnMaxRetryAttempts` | `true` | Dead-letters the entry when the configured threshold is reached. When disabled, the entry-level `MaxRetryCount` policy remains responsible for terminal handling. |
+| `DeadLetterOnMaxRetryAttempts` | `true` | Dead-letters the entry when the configured threshold is reached. When disabled, retry failures remain eligible for later drain attempts until the host applies another terminal policy. |
 | `DeadLetterReasonCode` | `outbox.max_retry_attempts_exceeded` | Stable provider-neutral error code recorded on threshold dead-lettering. |
 | `DeadLetterReasonMessage` | `Governance outbox entry exceeded the configured maximum retry attempts.` | Stable provider-neutral diagnostic and dead-letter reason. |
 
@@ -55,16 +55,17 @@ and DeadLetterOnMaxRetryAttempts = true
 
 The threshold is deliberately enforced in the drain rather than delegated to a provider SDK. This keeps poison-message behavior consistent across emitters and across claim and non-claim stores.
 
-## Entry-level and drain-level limits
+## Authoritative retry policy
 
-`GovernanceOutboxEntry` also carries `MaxRetryCount`. The two controls have different ownership:
+`AsiBackboneGovernanceOutboxOptions` is the authoritative retry and poison-message policy for the built-in drain:
 
-- `MaxRetryAttempts` is the host-configured drain policy applied consistently to every attempted emission handled by that drain.
-- `MaxRetryCount` is persisted with an individual outbox entry and remains a storage/domain safety boundary.
+- `MaxRetryAttempts` applies consistently to every attempted emission handled by the drain.
+- `DeadLetterOnMaxRetryAttempts` determines whether reaching that threshold creates a terminal dead-letter transition.
+- `DeadLetterReasonCode` and `DeadLetterReasonMessage` supply the stable provider-neutral terminal reason.
 
-When drain-level dead-lettering is enabled, the earlier applicable threshold wins. Hosts should configure these values intentionally and document which limit is authoritative for their deployment.
+`GovernanceOutboxEntry.MaxRetryCount` remains in the model and EF Core schema for persisted-record compatibility. The built-in stores do not use it to suppress retry selection, and `GovernanceOutboxEntry.MarkFailed(...)` does not use it to create a terminal transition. This prevents the legacy default of five from overriding the host-configured drain options.
 
-Disabling `DeadLetterOnMaxRetryAttempts` does not create unlimited retries by itself. The persisted entry-level limit may still dead-letter the entry. A custom store or replay workflow must not silently reset retry history without an explicit, audited remediation decision.
+Disabling `DeadLetterOnMaxRetryAttempts` allows continued retries through the built-in drain. Hosts that disable it should provide an explicit alternative terminal, quarantine, or manual-review policy and must not silently reset retry history without an audited remediation decision.
 
 ## Alerting responsibilities
 

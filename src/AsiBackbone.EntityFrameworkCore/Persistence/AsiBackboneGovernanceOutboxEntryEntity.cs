@@ -41,7 +41,7 @@ public sealed class AsiBackboneGovernanceOutboxEntryEntity : AsiBackboneEntity
     public int RetryCount { get; set; }
 
     /// <summary>
-    /// Gets or sets the maximum retry count before dead-lettering.
+    /// Gets or sets the legacy maximum retry count retained for persisted-schema compatibility.
     /// </summary>
     public int MaxRetryCount { get; set; }
 

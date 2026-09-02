@@ -144,10 +144,12 @@ public sealed class EfCoreGovernanceOutboxPersistenceTests
 
         IReadOnlyList<GovernanceOutboxEntry> retryReady = await store.FindRetryReadyAsync(
             utcNow,
-            2,
+            10,
             TestContext.Current.CancellationToken);
 
-        Assert.Equal(["retry-ready-a", "retry-ready-b"], [.. retryReady.Select(entry => entry.OutboxEntryId)]);
+        Assert.Equal(
+            ["retry-exhausted", "retry-ready-a", "retry-ready-b", "retry-ready-c"],
+            [.. retryReady.Select(entry => entry.OutboxEntryId)]);
     }
 
     /// <summary>
