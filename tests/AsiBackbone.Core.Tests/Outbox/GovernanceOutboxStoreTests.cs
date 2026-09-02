@@ -438,7 +438,7 @@ public sealed class GovernanceOutboxStoreTests
                 [" key "] = " value "
             });
         GovernanceOutboxEntry failedEntry = entry.MarkFailed(nonRetryableError, now.AddMinutes(1), now.AddSeconds(1));
-        GovernanceOutboxEntry maxRetryEntry = GovernanceOutboxEntry.Create(envelope, "entry-2", now, maxRetryCount: 1)
+        GovernanceOutboxEntry legacyMaxRetryEntry = GovernanceOutboxEntry.Create(envelope, "entry-2", now, maxRetryCount: 1)
             .MarkFailed(nonRetryableError, now.AddMinutes(1), now.AddSeconds(1));
         var restoredWithoutFullClaim = GovernanceOutboxEntry.Restore(
             envelope,
@@ -457,9 +457,9 @@ public sealed class GovernanceOutboxStoreTests
         Assert.Equal(GovernanceEmissionStatus.Failed, failedEntry.Status);
         Assert.Equal(now.AddMinutes(1), failedEntry.NextRetryUtc);
         Assert.Equal("provider", failedEntry.ProviderName);
-        Assert.Equal(GovernanceEmissionStatus.DeadLettered, maxRetryEntry.Status);
-        Assert.Null(maxRetryEntry.NextRetryUtc);
-        Assert.Equal("Provider failed.", maxRetryEntry.DeadLetterReason);
+        Assert.Equal(GovernanceEmissionStatus.Failed, legacyMaxRetryEntry.Status);
+        Assert.Equal(now.AddMinutes(1), legacyMaxRetryEntry.NextRetryUtc);
+        Assert.Null(legacyMaxRetryEntry.DeadLetterReason);
         Assert.False(restoredWithoutFullClaim.HasClaim);
         Assert.True(restoredWithoutFullClaim.CanBeClaimed(now));
         _ = Assert.Throws<ArgumentException>(() => entry.MarkDelivered(GovernanceEmissionResult.Failed(nonRetryableError)));

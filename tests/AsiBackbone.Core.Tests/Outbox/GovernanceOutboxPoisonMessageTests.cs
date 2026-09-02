@@ -62,7 +62,38 @@ public sealed class GovernanceOutboxPoisonMessageTests
     }
 
     /// <summary>
-    /// Verifies that hosts may disable drain-level dead-lettering and retain the entry-level retry policy.
+    /// Verifies that a configured threshold above the legacy persisted default remains authoritative.
+    /// </summary>
+    [Fact]
+    public async Task DrainAsyncHonorsConfiguredMaxRetryAttemptsAbovePersistedDefault()
+    {
+        var store = new InMemoryGovernanceOutboxStore();
+        DateTimeOffset firstAttemptUtc = new(2026, 7, 9, 13, 30, 0, TimeSpan.Zero);
+        _ = await store.EnqueueAsync(CreateEnvelope("configured-ten"), TestContext.Current.CancellationToken);
+        var options = new AsiBackboneGovernanceOutboxOptions { MaxRetryAttempts = 10 };
+        var drain = new AsiBackboneGovernanceOutboxDrain(
+            store,
+            new RetryableFailureEmitter(),
+            outboxOptions: Options.Create(options));
+
+        var attempts = new List<GovernanceOutboxEntry>();
+        for (int attempt = 0; attempt < options.MaxRetryAttempts; attempt++)
+        {
+            attempts.Add(Assert.Single(await drain.DrainAsync(
+                firstAttemptUtc.AddMinutes(attempt),
+                cancellationToken: TestContext.Current.CancellationToken)));
+        }
+
+        Assert.All(attempts.Take(9), attempt => Assert.Equal(GovernanceEmissionStatus.RetryableFailure, attempt.Status));
+        GovernanceOutboxEntry terminalAttempt = attempts[9];
+        Assert.True(terminalAttempt.IsDeadLettered);
+        Assert.Equal(9, terminalAttempt.RetryCount);
+        Assert.Equal(AsiBackboneGovernanceOutboxOptions.DefaultDeadLetterReasonCode, terminalAttempt.LastError?.Code);
+        Assert.Equal(AsiBackboneGovernanceOutboxOptions.DefaultDeadLetterReasonMessage, terminalAttempt.DeadLetterReason);
+    }
+
+    /// <summary>
+    /// Verifies that disabling drain-level dead-lettering continues beyond the legacy persisted retry maximum.
     /// </summary>
     [Fact]
     public async Task DrainAsyncContinuesRetryingWhenDrainDeadLetterPolicyIsDisabled()
@@ -80,11 +111,17 @@ public sealed class GovernanceOutboxPoisonMessageTests
             new RetryableFailureEmitter(),
             outboxOptions: Options.Create(options));
 
-        GovernanceOutboxEntry attempted = Assert.Single(await drain.DrainAsync(
-            firstAttemptUtc,
-            cancellationToken: TestContext.Current.CancellationToken));
+        GovernanceOutboxEntry? attempted = null;
+        for (int attempt = 0; attempt < 10; attempt++)
+        {
+            attempted = Assert.Single(await drain.DrainAsync(
+                firstAttemptUtc.AddMinutes(attempt),
+                cancellationToken: TestContext.Current.CancellationToken));
+        }
 
+        Assert.NotNull(attempted);
         Assert.Equal(GovernanceEmissionStatus.RetryableFailure, attempted.Status);
+        Assert.Equal(10, attempted.RetryCount);
         Assert.False(attempted.IsDeadLettered);
     }
 

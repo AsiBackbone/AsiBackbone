@@ -131,7 +131,6 @@ public sealed class EfCoreGovernanceOutboxStore : IAsiBackboneGovernanceOutboxCl
                 outboxEntry.Status == GovernanceEmissionStatus.Deferred ||
                 outboxEntry.Status == GovernanceEmissionStatus.Failed ||
                 outboxEntry.Status == GovernanceEmissionStatus.RetryableFailure)
-            .Where(outboxEntry => outboxEntry.RetryCount < outboxEntry.MaxRetryCount)
             .Where(outboxEntry => outboxEntry.NextRetryUtc == null || outboxEntry.NextRetryUtc <= normalizedUtcNow)
             .OrderBy(outboxEntry => outboxEntry.NextRetryUtc ?? outboxEntry.UpdatedUtc)
             .ThenBy(outboxEntry => outboxEntry.OutboxEntryId)
@@ -176,7 +175,6 @@ public sealed class EfCoreGovernanceOutboxStore : IAsiBackboneGovernanceOutboxCl
                 outboxEntry.Status == GovernanceEmissionStatus.Deferred ||
                 outboxEntry.Status == GovernanceEmissionStatus.Failed ||
                 outboxEntry.Status == GovernanceEmissionStatus.RetryableFailure)
-            .Where(outboxEntry => outboxEntry.RetryCount < outboxEntry.MaxRetryCount)
             .Where(outboxEntry => outboxEntry.NextRetryUtc == null || outboxEntry.NextRetryUtc <= request.UtcNow)
             .Where(outboxEntry => outboxEntry.ClaimToken == null || outboxEntry.ClaimExpiresUtc == null || outboxEntry.ClaimExpiresUtc <= request.UtcNow)
             .OrderBy(outboxEntry => outboxEntry.NextRetryUtc ?? outboxEntry.UpdatedUtc)
@@ -614,7 +612,6 @@ public sealed class EfCoreGovernanceOutboxStore : IAsiBackboneGovernanceOutboxCl
     private static bool IsRetryReadyClaimEligible(AsiBackboneGovernanceOutboxEntryEntity entity, DateTimeOffset utcNow)
     {
         return (entity.Status is GovernanceEmissionStatus.Deferred or GovernanceEmissionStatus.Failed or GovernanceEmissionStatus.RetryableFailure)
-            && entity.RetryCount < entity.MaxRetryCount
             && (entity.NextRetryUtc is null || entity.NextRetryUtc <= utcNow.ToUniversalTime())
             && IsClaimAvailable(entity, utcNow);
     }

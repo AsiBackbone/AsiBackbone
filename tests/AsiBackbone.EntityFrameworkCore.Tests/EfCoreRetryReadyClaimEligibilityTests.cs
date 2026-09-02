@@ -52,20 +52,20 @@ public sealed class EfCoreRetryReadyClaimEligibilityTests
     }
 
     /// <summary>
-    /// Verifies the strict retry-count boundary used before a retry-ready entry may be claimed.
+    /// Verifies that the legacy persisted retry maximum does not override drain retry policy.
     /// </summary>
     [Fact]
-    public void EligibilityRequiresRetryCountBelowMaximum()
+    public void EligibilityIgnoresPersistedMaximumRetryCount()
     {
         DateTimeOffset utcNow = new(2026, 7, 10, 18, 0, 0, TimeSpan.Zero);
 
         Assert.True(IsRetryReadyClaimEligible(
             CreateEligibilityEntity(retryCount: 4, maxRetryCount: 5),
             utcNow));
-        Assert.False(IsRetryReadyClaimEligible(
+        Assert.True(IsRetryReadyClaimEligible(
             CreateEligibilityEntity(retryCount: 5, maxRetryCount: 5),
             utcNow));
-        Assert.False(IsRetryReadyClaimEligible(
+        Assert.True(IsRetryReadyClaimEligible(
             CreateEligibilityEntity(retryCount: 6, maxRetryCount: 5),
             utcNow));
     }

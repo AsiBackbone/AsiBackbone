@@ -175,17 +175,17 @@ public sealed class GovernanceOutboxEntryTests
     }
 
     /// <summary>
-    /// Tests that the IsRetryReady method correctly evaluates the retry readiness of governance outbox entries based on their status, retry count, maximum retry count, and next retry timestamp.
+    /// Tests that the IsRetryReady method correctly evaluates retry readiness from status and retry timing without applying the legacy persisted maximum.
     /// </summary>
     [Fact]
-    public void IsRetryReadyCoversTerminalPendingMaxRetryAndRetryTimingBranches()
+    public void IsRetryReadyCoversTerminalPendingLegacyMaxRetryAndRetryTimingBranches()
     {
         DateTimeOffset now = new(2026, 6, 17, 13, 10, 0, TimeSpan.Zero);
 
         Assert.False(RestoreEntry(GovernanceEmissionStatus.Delivered).IsRetryReady(now));
         Assert.False(RestoreEntry(GovernanceEmissionStatus.DeadLettered).IsRetryReady(now));
         Assert.False(RestoreEntry(GovernanceEmissionStatus.Pending).IsRetryReady(now));
-        Assert.False(RestoreEntry(
+        Assert.True(RestoreEntry(
             GovernanceEmissionStatus.Failed,
             retryCount: 5,
             maxRetryCount: 5).IsRetryReady(now));
@@ -213,10 +213,10 @@ public sealed class GovernanceOutboxEntryTests
     }
 
     /// <summary>
-    /// Tests that marking a governance outbox entry as failed correctly updates the status, retry count, next retry timestamp, last error, provider name, and dead letter reason for non-retryable failures, retryable failures, and entries that have reached the maximum retry count and are dead-lettered.
+    /// Tests that marking a governance outbox entry as failed records failure state without applying the legacy persisted maximum retry count.
     /// </summary>
     [Fact]
-    public void MarkFailedCoversNonRetryableRetryableAndMaxRetryDeadLetterBranches()
+    public void MarkFailedCoversNonRetryableRetryableAndLegacyMaxRetryBranches()
     {
         DateTimeOffset retryUtc = RetryLocal;
         DateTimeOffset updatedUtc = UpdatedLocal;
@@ -234,7 +234,7 @@ public sealed class GovernanceOutboxEntryTests
             .MarkFailed(nonRetryableError, retryUtc, updatedUtc);
         GovernanceOutboxEntry retryableFailure = GovernanceOutboxEntry.Create(CreateEnvelope())
             .MarkFailed(retryableError, retryUtc, updatedUtc);
-        GovernanceOutboxEntry deadLettered = RestoreEntry(
+        GovernanceOutboxEntry legacyMaxRetryFailure = RestoreEntry(
             GovernanceEmissionStatus.RetryableFailure,
             retryCount: 1,
             maxRetryCount: 2,
@@ -254,12 +254,12 @@ public sealed class GovernanceOutboxEntryTests
         Assert.Equal("provider", retryableFailure.ProviderName);
         Assert.Null(retryableFailure.DeadLetterReason);
 
-        Assert.True(deadLettered.IsDeadLettered);
-        Assert.Equal(GovernanceEmissionStatus.DeadLettered, deadLettered.Status);
-        Assert.Equal(2, deadLettered.RetryCount);
-        Assert.Null(deadLettered.NextRetryUtc);
-        Assert.Equal("provider.timeout", deadLettered.LastError?.Code);
-        Assert.Equal("Provider timed out.", deadLettered.DeadLetterReason);
+        Assert.False(legacyMaxRetryFailure.IsDeadLettered);
+        Assert.Equal(GovernanceEmissionStatus.RetryableFailure, legacyMaxRetryFailure.Status);
+        Assert.Equal(2, legacyMaxRetryFailure.RetryCount);
+        Assert.Equal(new DateTimeOffset(2026, 6, 17, 13, 10, 0, TimeSpan.Zero), legacyMaxRetryFailure.NextRetryUtc);
+        Assert.Equal("provider.timeout", legacyMaxRetryFailure.LastError?.Code);
+        Assert.Null(legacyMaxRetryFailure.DeadLetterReason);
     }
 
     /// <summary>

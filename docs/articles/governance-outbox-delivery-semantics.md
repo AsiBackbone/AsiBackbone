@@ -76,9 +76,9 @@ The outbox state model uses `GovernanceEmissionStatus`:
 | `RetryableFailure` | Delivery failed and is expected to be retryable. |
 | `DeadLettered` | Terminal failure/quarantine state. |
 
-`RetryCount`, `MaxRetryCount`, and `NextRetryUtc` provide provider-neutral retry scheduling. `LastError`, `ProviderName`, `ProviderRecordId`, and `DeadLetterReason` preserve safe diagnostic state for operations and recovery.
+`RetryCount` and `NextRetryUtc` provide provider-neutral retry scheduling. `MaxRetryCount` is retained for persisted-record compatibility; the built-in drain uses `AsiBackboneGovernanceOutboxOptions.MaxRetryAttempts` as its authoritative threshold. `LastError`, `ProviderName`, `ProviderRecordId`, and `DeadLetterReason` preserve safe diagnostic state for operations and recovery.
 
-Poison-message handling remains host policy. A host may dead-letter immediately for known permanent failures, dead-letter after `MaxRetryCount`, or route records to a manual review process before retrying. Dead-lettering should not erase the local audit context.
+Poison-message handling remains host policy. A host may dead-letter immediately for known permanent failures, use the drain's configured maximum retry attempts, disable automatic threshold dead-lettering, or route records to a manual review process before retrying. Dead-lettering should not erase the local audit context.
 
 ## Concurrency semantics
 
