@@ -72,6 +72,12 @@ public sealed class EfCoreGovernanceOutboxStore : IAsiBackboneGovernanceOutboxCl
         }
         else
         {
+            GovernanceOutboxEntry currentEntry = ToEntry(existingEntity);
+            if (IsTerminal(currentEntry))
+            {
+                return currentEntry;
+            }
+
             persistedEntity.Id = existingEntity.Id;
             persistedEntity.ConcurrencyStamp = AsiBackboneEntity.NewConcurrencyStamp();
             dbContext.Entry(existingEntity).CurrentValues.SetValues(persistedEntity);
@@ -197,6 +203,11 @@ public sealed class EfCoreGovernanceOutboxStore : IAsiBackboneGovernanceOutboxCl
         ArgumentNullException.ThrowIfNull(result);
 
         GovernanceOutboxEntry entry = await RequireEntryAsync(outboxEntryId, cancellationToken).ConfigureAwait(false);
+        if (IsTerminal(entry))
+        {
+            return entry;
+        }
+
         GovernanceOutboxEntry updatedEntry = entry.MarkDelivered(result);
 
         return await SaveAsync(updatedEntry, cancellationToken).ConfigureAwait(false);
@@ -225,6 +236,11 @@ public sealed class EfCoreGovernanceOutboxStore : IAsiBackboneGovernanceOutboxCl
         ArgumentNullException.ThrowIfNull(governanceEmissionError);
 
         GovernanceOutboxEntry entry = await RequireEntryAsync(outboxEntryId, cancellationToken).ConfigureAwait(false);
+        if (IsTerminal(entry))
+        {
+            return entry;
+        }
+
         GovernanceOutboxEntry updatedEntry = entry.MarkFailed(governanceEmissionError, nextRetryUtc);
 
         return await SaveAsync(updatedEntry, cancellationToken).ConfigureAwait(false);
@@ -258,6 +274,11 @@ public sealed class EfCoreGovernanceOutboxStore : IAsiBackboneGovernanceOutboxCl
         ArgumentNullException.ThrowIfNull(governanceEmissionError);
 
         GovernanceOutboxEntry entry = await RequireEntryAsync(outboxEntryId, cancellationToken).ConfigureAwait(false);
+        if (IsTerminal(entry))
+        {
+            return entry;
+        }
+
         GovernanceOutboxEntry updatedEntry = entry.MarkDeadLettered(governanceEmissionError, deadLetterReason);
 
         return await SaveAsync(updatedEntry, cancellationToken).ConfigureAwait(false);

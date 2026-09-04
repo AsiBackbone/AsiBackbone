@@ -17,6 +17,12 @@ When one of these methods loses an optimistic-concurrency race, the original EF 
 
 This boundary avoids silently reporting another writer's durable state as though it were applied by the current invocation.
 
+## Terminal entries
+
+The four non-claim mutation methods return an existing `Delivered` or `DeadLettered` entry unchanged when the entry loaded for the mutation is terminal. They do not replace its provider evidence, error details, timestamps, or concurrency stamp. In particular, saving a stale deferred snapshot cannot reopen a terminal entry loaded by `SaveAsync`.
+
+If another writer completes the entry after the mutation loads a nonterminal row, or the host context already tracks a stale nonterminal row, an attempted update still uses EF Core optimistic concurrency and propagates `DbUpdateConcurrencyException`. The host remains responsible for reloading durable state after that conflict. This protection does not prevent duplicate provider calls made before persistence by non-claim workers.
+
 ## Why there is no hidden retry
 
 A generic retry inside the store would not know whether the requested transition is still correct or idempotent after another writer wins.
