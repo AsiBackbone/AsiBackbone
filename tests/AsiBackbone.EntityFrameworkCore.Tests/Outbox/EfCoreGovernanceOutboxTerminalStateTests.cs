@@ -52,7 +52,7 @@ public sealed class EfCoreGovernanceOutboxTerminalStateTests
         await using (GovernanceOutboxTestDbContext mutationContext = new(options))
         {
             var store = new EfCoreGovernanceOutboxStore(mutationContext);
-            GovernanceEmissionError error = GovernanceEmissionError.Create("late.error", "Late failure.", isRetryable: true);
+            var error = GovernanceEmissionError.Create("late.error", "Late failure.", isRetryable: true);
             GovernanceOutboxEntry result = mutation switch
             {
                 "save" => await store.SaveAsync(snapshot.MarkDeferred(nextRetryUtc: DateTimeOffset.UtcNow.AddMinutes(1)), cancellationToken),
