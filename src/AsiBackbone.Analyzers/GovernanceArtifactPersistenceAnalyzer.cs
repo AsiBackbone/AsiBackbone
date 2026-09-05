@@ -32,6 +32,14 @@ public sealed class GovernanceArtifactPersistenceAnalyzer : DiagnosticAnalyzer
         "AsiBackbone.Core.Handshakes.LiabilityHandshakeAcknowledgment",
         "AsiBackbone.Core.Outbox.GovernanceOutboxEntry");
 
+    private static readonly ImmutableHashSet<string> PersistenceBoundaryTypeNames = ImmutableHashSet.Create(
+        StringComparer.Ordinal,
+        "AsiBackbone.Core.Audit.IAsiBackboneAuditLedgerStore",
+        "AsiBackbone.Core.Audit.IAsiBackboneAuditResidueLifecycleStore",
+        "AsiBackbone.Core.Audit.IAsiBackboneAuditSink",
+        "AsiBackbone.Core.CapabilityTokens.ICapabilityGrantUseStore",
+        "AsiBackbone.Core.Outbox.IAsiBackboneGovernanceOutboxStore");
+
     public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => [Rule];
 
     public override void Initialize(AnalysisContext context)
@@ -69,7 +77,8 @@ public sealed class GovernanceArtifactPersistenceAnalyzer : DiagnosticAnalyzer
     {
         var assignment = (ISimpleAssignmentOperation)context.Operation;
 
-        if (IsSuppressedByHostMarker(context.ContainingSymbol) || assignment.Target is not IDiscardOperation)
+        if (IsSuppressedByHostMarker(context.ContainingSymbol)
+            || (assignment.Target is not IDiscardOperation && !IsKnownAsyncWrapper(assignment.Value.Type)))
         {
             return;
         }
@@ -111,7 +120,7 @@ public sealed class GovernanceArtifactPersistenceAnalyzer : DiagnosticAnalyzer
 
         return operation switch
         {
-            IInvocationOperation => true,
+            IInvocationOperation invocationOperation => !IsPersistenceBoundaryInvocation(invocationOperation),
             IObjectCreationOperation => true,
             IPropertyReferenceOperation => true,
             IConditionalOperation conditionalOperation => IsArtifactProducerOperation(conditionalOperation.WhenTrue)
@@ -120,6 +129,19 @@ public sealed class GovernanceArtifactPersistenceAnalyzer : DiagnosticAnalyzer
                 || IsArtifactProducerOperation(coalesceOperation.WhenNull),
             _ => false
         };
+    }
+
+    private static bool IsPersistenceBoundaryInvocation(IInvocationOperation invocation)
+    {
+        return invocation.Instance?.Type is INamedTypeSymbol receiverType
+            && (IsPersistenceBoundaryType(receiverType)
+                || receiverType.AllInterfaces.Any(IsPersistenceBoundaryType));
+    }
+
+    private static bool IsPersistenceBoundaryType(INamedTypeSymbol type)
+    {
+        string typeName = type.OriginalDefinition.ToDisplayString(SymbolDisplayFormat.CSharpErrorMessageFormat);
+        return PersistenceBoundaryTypeNames.Contains(typeName);
     }
 
     private static ITypeSymbol? GetGovernanceArtifactType(ITypeSymbol? type)
@@ -136,18 +158,32 @@ public sealed class GovernanceArtifactPersistenceAnalyzer : DiagnosticAnalyzer
 
     private static ITypeSymbol? UnwrapKnownWrapper(ITypeSymbol? type)
     {
-        if (type is not INamedTypeSymbol namedType || !namedType.IsGenericType || namedType.TypeArguments.Length != 1)
+        while (type is INamedTypeSymbol { IsGenericType: true, TypeArguments.Length: 1 } namedType)
         {
-            return type;
+            string namespaceName = namedType.ContainingNamespace?.ToDisplayString(SymbolDisplayFormat.CSharpErrorMessageFormat) ?? string.Empty;
+
+            if ((namespaceName == "System.Threading.Tasks" && (namedType.Name == "Task" || namedType.Name == "ValueTask"))
+                || (namespaceName == "AsiBackbone.Core.Results" && namedType.Name == "OperationResult"))
+            {
+                type = namedType.TypeArguments[0];
+                continue;
+            }
+
+            break;
+        }
+
+        return type;
+    }
+
+    private static bool IsKnownAsyncWrapper(ITypeSymbol? type)
+    {
+        if (type is not INamedTypeSymbol { IsGenericType: true, TypeArguments.Length: 1 } namedType)
+        {
+            return false;
         }
 
         string namespaceName = namedType.ContainingNamespace?.ToDisplayString(SymbolDisplayFormat.CSharpErrorMessageFormat) ?? string.Empty;
-
-        return namespaceName == "System.Threading.Tasks" && (namedType.Name == "Task" || namedType.Name == "ValueTask")
-            ? namedType.TypeArguments[0]
-            : namespaceName == "AsiBackbone.Core.Results" && namedType.Name == "OperationResult"
-            ? namedType.TypeArguments[0]
-            : type;
+        return namespaceName == "System.Threading.Tasks" && (namedType.Name == "Task" || namedType.Name == "ValueTask");
     }
 
     private static bool IsSuppressedByHostMarker(ISymbol? symbol)

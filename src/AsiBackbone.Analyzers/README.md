@@ -34,6 +34,15 @@ GovernanceDecision decision = GovernanceDecision.Allow();
 return decision;
 ```
 
+Calls through the built-in audit, outbox, and capability-use persistence interfaces are recognized as persistence boundaries, so their artifact-returning write operations can be awaited without triggering `ASIB001`:
+
+```csharp
+await auditLedgerStore.AppendAsync(record, cancellationToken); // No ASIB001
+await governanceOutboxStore.SaveAsync(entry, cancellationToken); // No ASIB001
+```
+
+Assigning an unawaited `Task<T>` or `ValueTask<T>` that produces a governance artifact still triggers `ASIB001`. Await the operation before storing or continuing the artifact.
+
 ## ASIB002 - Do not wire local-development signing in production branches
 
 `ASIB002` warns when a local-development signing type is registered, instantiated, or passed into a service-registration call inside an explicit production branch.

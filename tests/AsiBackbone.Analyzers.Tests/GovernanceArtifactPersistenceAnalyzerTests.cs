@@ -134,6 +134,98 @@ public sealed class GovernanceArtifactPersistenceAnalyzerTests
     }
 
     /// <summary>
+    /// Tests that awaiting an artifact-returning persistence store call does not report a diagnostic.
+    /// </summary>
+    /// <returns>
+    /// A task representing the asynchronous operation.
+    /// </returns>
+    [Fact]
+    public async Task AwaitedPersistenceStoreCallDoesNotReport()
+    {
+        string source = """
+            using System.Threading.Tasks;
+            using AsiBackbone.Core.Audit;
+            using AsiBackbone.Core.Results;
+
+            public static class Sample
+            {
+                public static async Task ExecuteAsync(AuditLedgerStore store, AuditLedgerRecord record)
+                {
+                    await store.AppendAsync(record);
+                }
+            }
+
+            namespace AsiBackbone.Core.Audit
+            {
+                public sealed class AuditLedgerRecord;
+
+                public interface IAsiBackboneAuditLedgerStore
+                {
+                    ValueTask<OperationResult<AuditLedgerRecord>> AppendAsync(AuditLedgerRecord record);
+                }
+
+                public sealed class AuditLedgerStore : IAsiBackboneAuditLedgerStore
+                {
+                    public ValueTask<OperationResult<AuditLedgerRecord>> AppendAsync(AuditLedgerRecord record) => default;
+                }
+            }
+
+            namespace AsiBackbone.Core.Results
+            {
+                public sealed class OperationResult<T>;
+            }
+            """;
+
+        ImmutableArray<Diagnostic> diagnostics = await GetAnalyzerDiagnosticsAsync(source);
+
+        Assert.Empty(diagnostics);
+    }
+
+    /// <summary>
+    /// Tests that assigning an unawaited artifact-producing operation still reports the ASIB001 diagnostic.
+    /// </summary>
+    /// <returns>
+    /// A task representing the asynchronous operation.
+    /// </returns>
+    [Fact]
+    public async Task UnawaitedArtifactProducerAssignmentReportsASIB001()
+    {
+        string source = """
+            using System.Threading.Tasks;
+            using AsiBackbone.Core.Decisions;
+            using AsiBackbone.Core.Evaluation;
+
+            public sealed class Sample
+            {
+                private ValueTask<GovernanceDecision> pendingDecision;
+
+                public void Execute(IAsiBackbonePolicyEvaluator evaluator)
+                {
+                    pendingDecision = evaluator.EvaluateAsync();
+                }
+            }
+
+            namespace AsiBackbone.Core.Decisions
+            {
+                public sealed class GovernanceDecision;
+            }
+
+            namespace AsiBackbone.Core.Evaluation
+            {
+                public interface IAsiBackbonePolicyEvaluator
+                {
+                    ValueTask<GovernanceDecision> EvaluateAsync();
+                }
+            }
+            """;
+
+        ImmutableArray<Diagnostic> diagnostics = await GetAnalyzerDiagnosticsAsync(source);
+
+        Diagnostic diagnostic = Assert.Single(diagnostics);
+        Assert.Equal(GovernanceArtifactPersistenceAnalyzer.DiagnosticId, diagnostic.Id);
+    }
+
+    /// <summary>
     /// Tests that an <see cref="OperationResult{T}"/> of a <see cref="GovernanceDecision"/> reports the ASIB001 diagnostic.
     /// </summary>
     /// <returns>
