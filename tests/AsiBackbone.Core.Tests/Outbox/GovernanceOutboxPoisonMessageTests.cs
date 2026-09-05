@@ -70,7 +70,7 @@ public sealed class GovernanceOutboxPoisonMessageTests
         var store = new InMemoryGovernanceOutboxStore();
         DateTimeOffset firstAttemptUtc = new(2026, 7, 9, 13, 30, 0, TimeSpan.Zero);
         _ = await store.EnqueueAsync(CreateEnvelope("configured-ten"), TestContext.Current.CancellationToken);
-        var options = new AsiBackboneGovernanceOutboxOptions { MaxRetryAttempts = 10 };
+        var options = new AsiBackboneGovernanceOutboxOptions { MaxRetryAttempts = 10, UseClaimLeases = false };
         var drain = new AsiBackboneGovernanceOutboxDrain(
             store,
             new RetryableFailureEmitter(),
@@ -104,7 +104,8 @@ public sealed class GovernanceOutboxPoisonMessageTests
         var options = new AsiBackboneGovernanceOutboxOptions
         {
             MaxRetryAttempts = 1,
-            DeadLetterOnMaxRetryAttempts = false
+            DeadLetterOnMaxRetryAttempts = false,
+            UseClaimLeases = false
         };
         var drain = new AsiBackboneGovernanceOutboxDrain(
             store,
@@ -134,7 +135,7 @@ public sealed class GovernanceOutboxPoisonMessageTests
         var store = new InMemoryGovernanceOutboxStore();
         DateTimeOffset drainUtc = new(2026, 7, 9, 15, 0, 0, TimeSpan.Zero);
         _ = await store.EnqueueAsync(CreateEnvelope("pending"), TestContext.Current.CancellationToken);
-        var options = new AsiBackboneGovernanceOutboxOptions { MaxRetryAttempts = 1 };
+        var options = new AsiBackboneGovernanceOutboxOptions { MaxRetryAttempts = 1, UseClaimLeases = false };
         var drain = new AsiBackboneGovernanceOutboxDrain(
             store,
             new PendingEmitter(),

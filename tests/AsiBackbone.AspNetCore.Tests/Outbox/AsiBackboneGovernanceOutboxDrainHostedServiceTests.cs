@@ -210,6 +210,7 @@ public sealed class AsiBackboneGovernanceOutboxDrainHostedServiceTests
         _ = services.AddLogging();
         _ = services.AddSingleton(store);
         _ = services.AddSingleton(emitter);
+        _ = services.Configure<AsiBackboneGovernanceOutboxOptions>(outboxOptions => outboxOptions.UseClaimLeases = false);
         _ = services.AddAsiBackboneGovernanceOutboxDrainWorker(configure);
 
         return services.BuildServiceProvider();

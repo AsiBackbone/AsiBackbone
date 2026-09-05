@@ -134,6 +134,15 @@ public static class AsiBackboneAspNetCoreServiceCollectionExtensions
     /// <summary>
     /// Adds the host-owned governance outbox drain worker using default scheduling options.
     /// </summary>
+    /// <remarks>
+    /// The worker is local to the process in which it is registered, so every replica of a horizontally scaled host runs
+    /// its own worker against the same durable outbox. Coordination before provider emission comes from
+    /// <see cref="AsiBackboneGovernanceOutboxOptions.UseClaimLeases" />, which is enabled by default and requires a store
+    /// implementing <see cref="IAsiBackboneGovernanceOutboxClaimStore" />; the drain throws when it is enabled against a
+    /// store that cannot claim. Disabling it allows two replicas to select and emit the same envelope, so a host that opts
+    /// out should partition work, run the worker on a single role, or rely on provider-side idempotency.
+    /// Claiming coordinates workers; it does not by itself create an exactly-once delivery guarantee.
+    /// </remarks>
     /// <param name="services">The service collection to add services to.</param>
     /// <returns>The same service collection so calls can be chained.</returns>
     public static IServiceCollection AddAsiBackboneGovernanceOutboxDrainWorker(this IServiceCollection services)
@@ -144,6 +153,15 @@ public static class AsiBackboneAspNetCoreServiceCollectionExtensions
     /// <summary>
     /// Adds the host-owned governance outbox drain worker using configured scheduling options.
     /// </summary>
+    /// <remarks>
+    /// The worker is local to the process in which it is registered, so every replica of a horizontally scaled host runs
+    /// its own worker against the same durable outbox. Coordination before provider emission comes from
+    /// <see cref="AsiBackboneGovernanceOutboxOptions.UseClaimLeases" />, which is enabled by default and requires a store
+    /// implementing <see cref="IAsiBackboneGovernanceOutboxClaimStore" />; the drain throws when it is enabled against a
+    /// store that cannot claim. Disabling it allows two replicas to select and emit the same envelope, so a host that opts
+    /// out should partition work, run the worker on a single role, or rely on provider-side idempotency.
+    /// Claiming coordinates workers; it does not by itself create an exactly-once delivery guarantee.
+    /// </remarks>
     /// <param name="services">The service collection to add services to.</param>
     /// <param name="configure">The worker options configuration callback.</param>
     /// <returns>The same service collection so calls can be chained.</returns>

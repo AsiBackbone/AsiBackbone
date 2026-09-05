@@ -18,9 +18,62 @@ public sealed class AsiBackboneGovernanceOutboxOptionsTests
 
         options.Validate();
 
-        Assert.False(options.UseClaimLeases);
-        Assert.Null(options.ClaimWorkerId);
+        Assert.True(options.UseClaimLeases);
+        Assert.Equal(AsiBackboneGovernanceOutboxOptions.DefaultClaimWorkerId, options.ClaimWorkerId);
         Assert.True(options.ClaimLeaseDuration > TimeSpan.Zero);
+        Assert.Equal(AsiBackboneGovernanceOutboxOptions.DefaultClaimPageSize, options.ClaimPageSize);
+        Assert.Equal(AsiBackboneGovernanceOutboxOptions.DefaultMaxClaimAttempts, options.MaxClaimAttempts);
+        Assert.True(options.DeadLetterOnMaxClaimAttempts);
+    }
+
+    /// <summary>
+    /// Validates that the default claim worker identifier distinguishes the machine and process so replicas do not share a claim owner.
+    /// </summary>
+    [Fact]
+    public void DefaultClaimWorkerIdCombinesMachineNameAndProcessId()
+    {
+        Assert.Equal(
+            $"{Environment.MachineName}:{Environment.ProcessId}",
+            AsiBackboneGovernanceOutboxOptions.DefaultClaimWorkerId);
+    }
+
+    /// <summary>
+    /// Validates that a non-positive claim page size is rejected.
+    /// </summary>
+    [Fact]
+    public void ValidateRejectsNonPositiveClaimPageSize()
+    {
+        var options = new AsiBackboneGovernanceOutboxOptions { ClaimPageSize = 0 };
+
+        InvalidOperationException exception = Assert.Throws<InvalidOperationException>(options.Validate);
+
+        Assert.Contains(nameof(AsiBackboneGovernanceOutboxOptions.ClaimPageSize), exception.Message, StringComparison.Ordinal);
+    }
+
+    /// <summary>
+    /// Validates that a non-positive maximum claim attempt threshold is rejected.
+    /// </summary>
+    [Fact]
+    public void ValidateRejectsNonPositiveMaxClaimAttempts()
+    {
+        var options = new AsiBackboneGovernanceOutboxOptions { MaxClaimAttempts = 0 };
+
+        InvalidOperationException exception = Assert.Throws<InvalidOperationException>(options.Validate);
+
+        Assert.Contains(nameof(AsiBackboneGovernanceOutboxOptions.MaxClaimAttempts), exception.Message, StringComparison.Ordinal);
+    }
+
+    /// <summary>
+    /// Validates that clearing the worker identifier while claim leases remain enabled is rejected.
+    /// </summary>
+    [Fact]
+    public void ValidateRejectsClearedClaimWorkerIdWhileClaimLeasesRemainEnabled()
+    {
+        var options = new AsiBackboneGovernanceOutboxOptions { ClaimWorkerId = null };
+
+        InvalidOperationException exception = Assert.Throws<InvalidOperationException>(options.Validate);
+
+        Assert.Contains(nameof(AsiBackboneGovernanceOutboxOptions.ClaimWorkerId), exception.Message, StringComparison.Ordinal);
     }
 
     /// <summary>

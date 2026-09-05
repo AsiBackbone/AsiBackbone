@@ -6,14 +6,22 @@ The goal is to help hosts avoid accidental duplicate emissions when an ASP.NET C
 
 ## Summary decision
 
-For the current release line, the default outbox drain remains a single-worker selection-and-emit path. Multi-worker coordination is available through an explicit opt-in claim/lease path rather than a silent behavior change to the existing find APIs.
+Claim leasing is enabled by default. `AsiBackboneGovernanceOutboxOptions.UseClaimLeases` defaults to `true`, and `ClaimWorkerId` defaults to the machine name and process identifier so replicas of the same deployment do not share a claim owner. The previous default left two replicas free to select and emit the same envelope, which is not a safe default for a durable outbox.
 
-The existing `FindPendingAsync` and `FindRetryReadyAsync` APIs remain safe for single active worker usage and for local/test validation. They return candidate rows; they do not claim, lease, lock, or hide rows from another worker.
+Enabling claim leases requires a store implementing `IAsiBackboneGovernanceOutboxClaimStore`. Both shipped stores do. A host supplying its own store that does not implement it must set `UseClaimLeases` to `false`; the drain throws rather than silently falling back, because falling back would restore the duplicate-emission behavior the default exists to prevent.
 
-Hosts that need multiple workers against the same durable rows can opt into claim leasing by using a claim-capable store and enabling `AsiBackboneGovernanceOutboxOptions.UseClaimLeases`. Claim leases reduce duplicate selection risk for cooperating workers, but downstream provider delivery remains at-least-once unless the provider and host enforce idempotency.
+Hosts that opt out keep the previous behavior: `FindPendingAsync` and `FindRetryReadyAsync` return candidate rows and do not claim, lease, lock, or hide rows from another worker. That path is safe for a single active worker and for local or test validation, and it requires partitioning, a single worker role, or provider-side idempotency when scaled.
+
+Claim leasing reduces duplicate selection between cooperating workers. Downstream provider delivery remains at-least-once unless the provider and host enforce idempotency.
 
 The selected design direction is recorded in [Outbox Claim and Lease Design Record](outbox-claim-lease-design.md).
 
+## Lease scope and bounded reclaim
+
+Two properties bound what a lease covers and how long an entry can be recycled:
+
+- `ClaimPageSize` (default `10`) limits how many entries are claimed under one lease before the drain claims again. A drain pass claims a page, drains it, then claims the next page from a fresh clock reading. Leasing a whole batch at once let a slow emitter exhaust the lease partway through, leaving later entries reclaimable by a peer while they were still in flight.
+- `MaxClaimAttempts` (default `5`) bounds reclaim. An emitter that hangs or is killed mid-emission leaves an entry claimed but never failed, so its retry count never advances and the retry-based poison-message policy never applies. The claim count does advance on every reclaim, so it is the only signal that can end that loop. The check runs before emission, so a repeatedly reclaimed entry is not handed to the emitter again. Setting `DeadLetterOnMaxClaimAttempts` to `false` restores the unbounded behavior.
 ## Repeatable validation path
 
 Issue #311 adds a CI-friendly EF Core validation path for concurrent outbox/lifecycle writes, retryable drain failures, and drain-worker contention:
@@ -26,7 +34,8 @@ The validation deliberately confirms both sides of the reliability story:
 
 - EF Core-backed local outbox and lifecycle records can be preserved under concurrent host-owned context writes in the tested SQLite relational path.
 - Retryable provider failures remain represented as local outbox state and can be queried as retry-ready work.
-- Workers that use the non-claiming drain path can still reach the same pending entry before final state is saved, so that path should not be described as exactly-once or duplicate-proof.
+- Workers using the default claim-lease path emit a contended pending entry exactly once (`ConcurrentDrainWorkersEmitPendingEntryOnceUnderDefaultClaimLeases`).
+- Workers that opt out of claim leases can still reach the same pending entry before final state is saved (`ConcurrentDrainWorkersCanReachSamePendingEntryWhenClaimLeasesAreDisabled`), so that path should not be described as exactly-once or duplicate-proof.
 
 See [EF Core Outbox Concurrency Validation](../quality/ef-core-outbox-concurrency-validation.md) for the local command and interpretation guidance.
 

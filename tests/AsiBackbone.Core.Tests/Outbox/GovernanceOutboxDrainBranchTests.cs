@@ -2,6 +2,7 @@ using AsiBackbone.Core.Audit;
 using AsiBackbone.Core.Emissions;
 using AsiBackbone.Core.Outbox;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Xunit;
 
 namespace AsiBackbone.Core.Tests.Outbox;
@@ -13,6 +14,15 @@ public sealed class GovernanceOutboxDrainBranchTests
 {
     private static readonly DateTimeOffset DrainUtc = new(2026, 6, 18, 1, 30, 0, TimeSpan.Zero);
     private static readonly DateTimeOffset CreatedUtc = new(2026, 6, 18, 1, 0, 0, TimeSpan.Zero);
+
+    /// <summary>
+    /// Builds options that exercise the non-claim drain path, which these branch tests target with a store that is not claim-capable.
+    /// </summary>
+    /// <returns>Outbox options with claim leases disabled.</returns>
+    private static IOptions<AsiBackboneGovernanceOutboxOptions> NonClaimOptions()
+    {
+        return Options.Create(new AsiBackboneGovernanceOutboxOptions { UseClaimLeases = false });
+    }
 
     /// <summary>
     /// Tests that the constructor of <see cref="AsiBackboneGovernanceOutboxDrain"/> throws an <see cref="ArgumentNullException"/> when either the outbox store or the emitter is null.
@@ -62,7 +72,7 @@ public sealed class GovernanceOutboxDrainBranchTests
         var emitter = new QueueEmitter(
             GovernanceEmissionResult.Delivered(providerName: "sink", providerRecordId: "record-1"),
             GovernanceEmissionResult.Delivered(providerName: "sink", providerRecordId: "record-2"));
-        var drain = new AsiBackboneGovernanceOutboxDrain(store, emitter);
+        var drain = new AsiBackboneGovernanceOutboxDrain(store, emitter, outboxOptions: NonClaimOptions());
 
         IReadOnlyList<GovernanceOutboxEntry> drained = await drain.DrainAsync(
             DrainUtc,
@@ -98,7 +108,7 @@ public sealed class GovernanceOutboxDrainBranchTests
         var emitter = new QueueEmitter(
             GovernanceEmissionResult.Delivered(providerName: "sink", providerRecordId: "record-1"),
             GovernanceEmissionResult.Delivered(providerName: "sink", providerRecordId: "record-2"));
-        var drain = new AsiBackboneGovernanceOutboxDrain(store, emitter);
+        var drain = new AsiBackboneGovernanceOutboxDrain(store, emitter, outboxOptions: NonClaimOptions());
 
         IReadOnlyList<GovernanceOutboxEntry> drained = await drain.DrainAsync(
             DrainUtc.ToOffset(TimeSpan.FromHours(-5)),
@@ -129,7 +139,8 @@ public sealed class GovernanceOutboxDrainBranchTests
         var drain = new AsiBackboneGovernanceOutboxDrain(
             store,
             new ThrowingEmitter(providerFailure),
-            logger);
+            logger,
+            NonClaimOptions());
 
         GovernanceOutboxEntry drained = Assert.Single(await drain.DrainAsync(
             DrainUtc,
@@ -168,7 +179,8 @@ public sealed class GovernanceOutboxDrainBranchTests
         var store = new RecordingOutboxStore(pendingEntries: [entry]);
         var drain = new AsiBackboneGovernanceOutboxDrain(
             store,
-            new CancellingEmitter(cancellationTokenSource));
+            new CancellingEmitter(cancellationTokenSource),
+            outboxOptions: NonClaimOptions());
 
         _ = await Assert.ThrowsAsync<OperationCanceledException>(
             async () => await drain.DrainAsync(
@@ -193,7 +205,8 @@ public sealed class GovernanceOutboxDrainBranchTests
         var store = new RecordingOutboxStore(pendingEntries: [entry]);
         var drain = new AsiBackboneGovernanceOutboxDrain(
             store,
-            new QueueEmitter(GovernanceEmissionResult.DeadLettered(error)));
+            new QueueEmitter(GovernanceEmissionResult.DeadLettered(error)),
+            outboxOptions: NonClaimOptions());
 
         GovernanceOutboxEntry drained = Assert.Single(await drain.DrainAsync(
             DrainUtc,
@@ -218,7 +231,8 @@ public sealed class GovernanceOutboxDrainBranchTests
         var store = new RecordingOutboxStore(pendingEntries: [entry]);
         var drain = new AsiBackboneGovernanceOutboxDrain(
             store,
-            new QueueEmitter(GovernanceEmissionResult.Pending(providerName: "sink")));
+            new QueueEmitter(GovernanceEmissionResult.Pending(providerName: "sink")),
+            outboxOptions: NonClaimOptions());
 
         GovernanceOutboxEntry drained = Assert.Single(await drain.DrainAsync(
             DrainUtc,
@@ -245,7 +259,8 @@ public sealed class GovernanceOutboxDrainBranchTests
         var store = new RecordingOutboxStore(pendingEntries: [entry]);
         var drain = new AsiBackboneGovernanceOutboxDrain(
             store,
-            new QueueEmitter(GovernanceEmissionResult.Deferred(retryAfterUtc: retryAfterUtc)));
+            new QueueEmitter(GovernanceEmissionResult.Deferred(retryAfterUtc: retryAfterUtc)),
+            outboxOptions: NonClaimOptions());
 
         GovernanceOutboxEntry drained = Assert.Single(await drain.DrainAsync(
             DrainUtc,
