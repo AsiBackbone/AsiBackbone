@@ -114,23 +114,35 @@ public sealed class LocalDevelopmentSigningService : IAsiBackboneSigningService,
 
         if (!FixedTimeHashEquals(request.SigningHash, metadata.SigningHash))
         {
-            return ValueTask.FromResult(SignatureVerificationResult.Failed("localdev.signature.hash-mismatch", "The verification hash does not match the hash recorded in signing metadata."));
+            return ValueTask.FromResult(SignatureVerificationResult.Failed(
+                "localdev.signature.hash-mismatch",
+                SignatureVerificationCategory.HashMismatch,
+                "The verification hash does not match the hash recorded in signing metadata."));
         }
 
         if (!IsSupportedHashAlgorithm(metadata.HashAlgorithm))
         {
-            return ValueTask.FromResult(SignatureVerificationResult.Failed("localdev.signature.hash-algorithm-unsupported", "The local-development verifier supports SHA-256 signing metadata only."));
+            return ValueTask.FromResult(SignatureVerificationResult.Failed(
+                "localdev.signature.hash-algorithm-unsupported",
+                SignatureVerificationCategory.UnsupportedAlgorithm,
+                "The local-development verifier supports SHA-256 signing metadata only."));
         }
 
         if (!string.Equals(metadata.SignatureAlgorithm, NormalizeRequired(options.SignatureAlgorithm, LocalDevelopmentSigningOptions.DefaultSignatureAlgorithm), StringComparison.Ordinal))
         {
-            return ValueTask.FromResult(SignatureVerificationResult.Failed("localdev.signature.algorithm-mismatch", "The signature algorithm does not match the configured local-development provider."));
+            return ValueTask.FromResult(SignatureVerificationResult.Failed(
+                "localdev.signature.algorithm-mismatch",
+                SignatureVerificationCategory.UnsupportedAlgorithm,
+                "The signature algorithm does not match the configured local-development provider."));
         }
 
         if (!string.Equals(metadata.KeyId, NormalizeRequired(options.KeyId, LocalDevelopmentSigningOptions.DefaultKeyId), StringComparison.Ordinal)
             || !string.Equals(metadata.KeyVersion, NormalizeRequired(options.KeyVersion, LocalDevelopmentSigningOptions.DefaultKeyVersion), StringComparison.Ordinal))
         {
-            return ValueTask.FromResult(SignatureVerificationResult.Failed("localdev.signature.key-mismatch", "The signature key reference does not match the configured local-development provider."));
+            return ValueTask.FromResult(SignatureVerificationResult.Failed(
+                "localdev.signature.key-mismatch",
+                SignatureVerificationCategory.UnknownKeyVersion,
+                "The signature key reference does not match the configured local-development provider."));
         }
 
         try
@@ -145,16 +157,25 @@ public sealed class LocalDevelopmentSigningService : IAsiBackboneSigningService,
 
                 return ValueTask.FromResult(verified
                     ? SignatureVerificationResult.Verified()
-                    : SignatureVerificationResult.Failed("localdev.signature.invalid", "The local-development signature did not verify."));
+                    : SignatureVerificationResult.Failed(
+                        "localdev.signature.invalid",
+                        SignatureVerificationCategory.InvalidSignature,
+                        "The local-development signature did not verify."));
             }
         }
         catch (FormatException)
         {
-            return ValueTask.FromResult(SignatureVerificationResult.Failed("localdev.signature.malformed", "The signature value is not valid Base64."));
+            return ValueTask.FromResult(SignatureVerificationResult.Failed(
+                "localdev.signature.malformed",
+                SignatureVerificationCategory.InvalidSignature,
+                "The signature value is not valid Base64."));
         }
         catch (Exception exception) when (exception is CryptographicException or ObjectDisposedException or InvalidOperationException)
         {
-            return ValueTask.FromResult(SignatureVerificationResult.Failed("localdev.verification.failed", exception.GetType().Name));
+            return ValueTask.FromResult(SignatureVerificationResult.Failed(
+                "localdev.verification.failed",
+                SignatureVerificationCategory.Failed,
+                exception.GetType().Name));
         }
     }
 

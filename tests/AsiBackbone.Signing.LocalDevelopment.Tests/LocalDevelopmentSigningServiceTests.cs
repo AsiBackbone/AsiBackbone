@@ -72,6 +72,7 @@ public sealed class LocalDevelopmentSigningServiceTests
 
         Assert.True(verificationResult.IsValid);
         Assert.Equal("Verified", verificationResult.Status);
+        Assert.Equal(SignatureVerificationCategory.Valid, verificationResult.Category);
         Assert.Null(verificationResult.FailureCode);
     }
 
@@ -95,6 +96,7 @@ public sealed class LocalDevelopmentSigningServiceTests
 
         Assert.False(verificationResult.IsValid);
         Assert.Equal("localdev.signature.hash-mismatch", verificationResult.FailureCode);
+        Assert.Equal(SignatureVerificationCategory.HashMismatch, verificationResult.Category);
     }
 
     /// <summary>

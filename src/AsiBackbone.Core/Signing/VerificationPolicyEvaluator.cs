@@ -58,6 +58,11 @@ public static class VerificationPolicyEvaluator
             return SignatureVerificationCategory.MissingSignature;
         }
 
+        if (verificationResult.Category is SignatureVerificationCategory explicitCategory)
+        {
+            return explicitCategory;
+        }
+
         string failureCode = verificationResult.FailureCode ?? string.Empty;
 
         foreach (CategoryRule rule in FailureCodeCategoryRules)
