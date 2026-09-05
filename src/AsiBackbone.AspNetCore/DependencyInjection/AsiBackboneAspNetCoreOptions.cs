@@ -60,6 +60,17 @@ public sealed class AsiBackboneAspNetCoreOptions
     public bool UseHttpContextTraceIdentifierAsCorrelationId { get; set; } = true;
 
     /// <summary>
+    /// Gets or sets a value indicating whether correlation identifiers supplied through configured HTTP headers are
+    /// trusted. The default is <see langword="false" />.
+    /// </summary>
+    /// <remarks>
+    /// Enable this only when a trusted ingress removes caller-supplied correlation headers and writes its own values.
+    /// Enabling it for requests received directly from untrusted callers lets those callers choose audit correlation
+    /// identifiers.
+    /// </remarks>
+    public bool TrustInboundCorrelationIdHeaders { get; set; }
+
+    /// <summary>
     /// Gets or sets the primary HTTP header name preferred for correlation identifier propagation.
     /// </summary>
     public string CorrelationIdHeaderName

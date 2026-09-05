@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using AsiBackbone.AspNetCore.Correlation;
 using AsiBackbone.AspNetCore.DependencyInjection;
 using AsiBackbone.Core;
@@ -16,10 +17,10 @@ namespace AsiBackbone.AspNetCore.Tests.Correlation;
 public sealed class HttpContextAsiBackboneRequestCorrelationResolverTests
 {
     /// <summary>
-    /// Tests that <see cref="HttpContextAsiBackboneRequestCorrelationResolver.ResolveRequestCorrelation"/> uses the configured correlation ID header before falling back to the trace identifier.
+    /// Tests that <see cref="HttpContextAsiBackboneRequestCorrelationResolver.ResolveRequestCorrelation"/> ignores inbound correlation identifiers by default.
     /// </summary>
     [Fact]
-    public void ResolveRequestCorrelationUsesConfiguredHeaderBeforeTraceIdentifier()
+    public void ResolveRequestCorrelationIgnoresConfiguredHeaderByDefault()
     {
         DefaultHttpContext httpContext = new()
         {
@@ -31,8 +32,9 @@ public sealed class HttpContextAsiBackboneRequestCorrelationResolverTests
 
         AsiBackboneHttpRequestCorrelation correlation = resolver.ResolveRequestCorrelation();
 
-        Assert.Equal("correlation-456", correlation.CorrelationId);
+        Assert.Equal("trace-123", correlation.CorrelationId);
         Assert.Equal("trace-123", correlation.TraceId);
+        Assert.Equal("trace-123", correlation.Metadata[AsiBackboneHttpRequestMetadataKeys.TraceIdentifier]);
     }
 
     /// <summary>
@@ -48,9 +50,12 @@ public sealed class HttpContextAsiBackboneRequestCorrelationResolverTests
         };
         httpContext.Request.Headers["X-Correlation-ID"] = maximumLengthValue;
 
-        AsiBackboneHttpRequestCorrelation correlation = CreateResolver(httpContext).ResolveRequestCorrelation();
+        AsiBackboneHttpRequestCorrelation correlation = CreateResolver(
+            httpContext,
+            options => options.TrustInboundCorrelationIdHeaders = true).ResolveRequestCorrelation();
 
         Assert.Equal(maximumLengthValue, correlation.CorrelationId);
+        Assert.Equal("trace-maximum", correlation.Metadata[AsiBackboneHttpRequestMetadataKeys.TraceIdentifier]);
     }
 
     /// <summary>
@@ -67,7 +72,9 @@ public sealed class HttpContextAsiBackboneRequestCorrelationResolverTests
             'a',
             AsiBackboneIdentifierLimits.MaximumLength + 1);
 
-        AsiBackboneHttpRequestCorrelation correlation = CreateResolver(httpContext).ResolveRequestCorrelation();
+        AsiBackboneHttpRequestCorrelation correlation = CreateResolver(
+            httpContext,
+            options => options.TrustInboundCorrelationIdHeaders = true).ResolveRequestCorrelation();
 
         Assert.Equal("trace-overlength", correlation.CorrelationId);
     }
@@ -91,7 +98,9 @@ public sealed class HttpContextAsiBackboneRequestCorrelationResolverTests
         };
         httpContext.Request.Headers["X-Correlation-ID"] = $"correlation{controlCharacter}forged";
 
-        AsiBackboneHttpRequestCorrelation correlation = CreateResolver(httpContext).ResolveRequestCorrelation();
+        AsiBackboneHttpRequestCorrelation correlation = CreateResolver(
+            httpContext,
+            options => options.TrustInboundCorrelationIdHeaders = true).ResolveRequestCorrelation();
 
         Assert.Equal("trace-control", correlation.CorrelationId);
         Assert.DoesNotContain(controlCharacter, correlation.CorrelationId!);
@@ -113,7 +122,9 @@ public sealed class HttpContextAsiBackboneRequestCorrelationResolverTests
             "  valid-correlation  ",
         ]);
 
-        AsiBackboneHttpRequestCorrelation correlation = CreateResolver(httpContext).ResolveRequestCorrelation();
+        AsiBackboneHttpRequestCorrelation correlation = CreateResolver(
+            httpContext,
+            options => options.TrustInboundCorrelationIdHeaders = true).ResolveRequestCorrelation();
 
         Assert.Equal("valid-correlation", correlation.CorrelationId);
     }
@@ -130,7 +141,9 @@ public sealed class HttpContextAsiBackboneRequestCorrelationResolverTests
         };
         httpContext.Request.Headers["X-Correlation-ID"] = "   ";
 
-        AsiBackboneHttpRequestCorrelation correlation = CreateResolver(httpContext).ResolveRequestCorrelation();
+        AsiBackboneHttpRequestCorrelation correlation = CreateResolver(
+            httpContext,
+            options => options.TrustInboundCorrelationIdHeaders = true).ResolveRequestCorrelation();
 
         Assert.Equal("trace-whitespace", correlation.CorrelationId);
     }
@@ -168,7 +181,11 @@ public sealed class HttpContextAsiBackboneRequestCorrelationResolverTests
 
         HttpContextAsiBackboneRequestCorrelationResolver resolver = CreateResolver(
             httpContext,
-            options => options.CorrelationIdHeaderNames = ["X-Tenant-Correlation"]);
+            options =>
+            {
+                options.TrustInboundCorrelationIdHeaders = true;
+                options.CorrelationIdHeaderNames = ["X-Tenant-Correlation"];
+            });
 
         AsiBackboneHttpRequestCorrelation correlation = resolver.ResolveRequestCorrelation();
 
@@ -195,6 +212,7 @@ public sealed class HttpContextAsiBackboneRequestCorrelationResolverTests
         AsiBackboneHttpRequestCorrelation correlation = resolver.ResolveRequestCorrelation();
 
         Assert.Equal(HttpMethods.Post, correlation.Metadata[AsiBackboneHttpRequestMetadataKeys.Method]);
+        Assert.Equal("trace-route", correlation.Metadata[AsiBackboneHttpRequestMetadataKeys.TraceIdentifier]);
         Assert.Equal("/api/widgets/{id}", correlation.Metadata[AsiBackboneHttpRequestMetadataKeys.RoutePattern]);
         Assert.Equal("Widget endpoint", correlation.Metadata[AsiBackboneHttpRequestMetadataKeys.EndpointDisplayName]);
         Assert.Equal("42", correlation.Metadata[$"{AsiBackboneHttpRequestMetadataKeys.RouteValuePrefix}id"]);
@@ -264,6 +282,26 @@ public sealed class HttpContextAsiBackboneRequestCorrelationResolverTests
 
         Assert.Null(correlation.CorrelationId);
         Assert.Empty(correlation.Metadata);
+    }
+
+    /// <summary>
+    /// Verifies that the server-owned trace identifier remains available when an Activity supplies a different trace ID.
+    /// </summary>
+    [Fact]
+    public void ResolveRequestCorrelationRecordsServerTraceIdentifierAlongsideActivityTrace()
+    {
+        DefaultHttpContext httpContext = new()
+        {
+            TraceIdentifier = "server-trace-123",
+        };
+        using Activity activity = new("request");
+        _ = activity.Start();
+
+        AsiBackboneHttpRequestCorrelation correlation = CreateResolver(httpContext).ResolveRequestCorrelation();
+
+        Assert.Equal(activity.Id, correlation.TraceId);
+        Assert.Equal("server-trace-123", correlation.CorrelationId);
+        Assert.Equal("server-trace-123", correlation.Metadata[AsiBackboneHttpRequestMetadataKeys.TraceIdentifier]);
     }
 
     private static HttpContextAsiBackboneRequestCorrelationResolver CreateResolver(

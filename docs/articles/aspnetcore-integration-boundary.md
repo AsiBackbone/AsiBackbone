@@ -95,6 +95,7 @@ builder.Services.AddAsiBackboneAspNetCore(options =>
     options.IncludeEndpointMetadata = true;
     options.IncludeRequestMethod = true;
     options.IncludeRequestPath = false;
+    options.TrustInboundCorrelationIdHeaders = true;
     options.CorrelationIdHeaderNames = ["X-Correlation-ID", "X-Request-ID"];
 });
 ```
@@ -114,11 +115,14 @@ The ASP.NET Core package does not implicitly register EF Core, in-memory persist
 
 The default resolver:
 
-- checks configured correlation headers such as `X-Correlation-ID` and `X-Request-ID`;
-- falls back to `HttpContext.TraceIdentifier` when no configured header is present;
+- ignores caller-controlled correlation headers;
+- falls back to `HttpContext.TraceIdentifier` when header trust is disabled or no valid trusted header is present;
 - captures a trace identifier from `Activity.Current` or the ASP.NET Core trace identifier;
+- always records the server-owned `HttpContext.TraceIdentifier` as `http.trace_identifier` metadata;
 - emits safe request metadata such as method, route pattern, endpoint display name, and route values;
 - excludes sensitive request data such as headers, query strings, request bodies, cookies, and tokens by default.
+
+Set `TrustInboundCorrelationIdHeaders` to `true` only behind a trusted ingress that removes any caller-supplied values for the configured headers and writes its own correlation identifier. The resolver continues to reject blank, overlength, and control-character values after opt-in. Do not enable header trust on an endpoint that receives requests directly from untrusted callers, because doing so lets a caller choose the audit correlation key.
 
 Example usage:
 

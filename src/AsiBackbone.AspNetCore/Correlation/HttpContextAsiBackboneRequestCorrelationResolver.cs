@@ -12,9 +12,10 @@ namespace AsiBackbone.AspNetCore.Correlation;
 /// Resolves safe request correlation data from the current ASP.NET Core HTTP context.
 /// </summary>
 /// <remarks>
-/// Client-supplied correlation identifiers are accepted only when their trimmed value is printable and does not exceed
-/// <see cref="AsiBackboneIdentifierLimits.MaximumLength" /> characters. Invalid header values are ignored so the resolver
-/// can continue to another configured value or use the existing host-generated fallback.
+/// Client-supplied correlation identifiers are ignored by default. A host may explicitly trust configured headers when
+/// a trusted ingress removes caller-supplied values and writes its own. Trusted values are accepted only when their
+/// trimmed value is printable and does not exceed <see cref="AsiBackboneIdentifierLimits.MaximumLength" /> characters.
+/// The server-owned <see cref="HttpContext.TraceIdentifier" /> is always retained in safe request metadata.
 /// </remarks>
 public sealed class HttpContextAsiBackboneRequestCorrelationResolver : IAsiBackboneHttpRequestCorrelationResolver
 {
@@ -50,24 +51,27 @@ public sealed class HttpContextAsiBackboneRequestCorrelationResolver : IAsiBackb
 
     private string? ResolveCorrelationId(HttpContext httpContext)
     {
-        foreach (string headerName in options.CorrelationIdHeaderNames)
+        if (options.TrustInboundCorrelationIdHeaders)
         {
-            if (string.IsNullOrWhiteSpace(headerName))
+            foreach (string headerName in options.CorrelationIdHeaderNames)
             {
-                continue;
-            }
-
-            if (!httpContext.Request.Headers.TryGetValue(headerName, out StringValues values))
-            {
-                continue;
-            }
-
-            foreach (string? candidate in values)
-            {
-                string? normalizedCandidate = NormalizeClientCorrelationId(candidate);
-                if (normalizedCandidate is not null)
+                if (string.IsNullOrWhiteSpace(headerName))
                 {
-                    return normalizedCandidate;
+                    continue;
+                }
+
+                if (!httpContext.Request.Headers.TryGetValue(headerName, out StringValues values))
+                {
+                    continue;
+                }
+
+                foreach (string? candidate in values)
+                {
+                    string? normalizedCandidate = NormalizeClientCorrelationId(candidate);
+                    if (normalizedCandidate is not null)
+                    {
+                        return normalizedCandidate;
+                    }
                 }
             }
         }
@@ -108,7 +112,10 @@ public sealed class HttpContextAsiBackboneRequestCorrelationResolver : IAsiBackb
 
     private Dictionary<string, string> ResolveMetadata(HttpContext httpContext)
     {
-        Dictionary<string, string> metadata = new(StringComparer.Ordinal);
+        Dictionary<string, string> metadata = new(StringComparer.Ordinal)
+        {
+            [AsiBackboneHttpRequestMetadataKeys.TraceIdentifier] = httpContext.TraceIdentifier
+        };
 
         if (options.IncludeRequestMethod && !string.IsNullOrWhiteSpace(httpContext.Request.Method))
         {

@@ -38,6 +38,7 @@ public sealed class AsiBackboneAspNetCoreServiceCollectionExtensionsTests
         Assert.True(options.IncludeRequestMethod);
         Assert.False(options.IncludeRequestPath);
         Assert.True(options.UseHttpContextTraceIdentifierAsCorrelationId);
+        Assert.False(options.TrustInboundCorrelationIdHeaders);
         Assert.Equal("X-Correlation-ID", options.CorrelationIdHeaderName);
         Assert.Contains("X-Request-ID", options.CorrelationIdHeaderNames);
         Assert.Contains("Traceparent", options.CorrelationIdHeaderNames);
@@ -141,6 +142,7 @@ public sealed class AsiBackboneAspNetCoreServiceCollectionExtensionsTests
             options.IncludeRequestMethod = false;
             options.IncludeRequestPath = true;
             options.UseHttpContextTraceIdentifierAsCorrelationId = false;
+            options.TrustInboundCorrelationIdHeaders = true;
             options.CorrelationIdHeaderName = "X-Request-ID";
         });
 
@@ -152,6 +154,7 @@ public sealed class AsiBackboneAspNetCoreServiceCollectionExtensionsTests
         Assert.False(options.IncludeRequestMethod);
         Assert.True(options.IncludeRequestPath);
         Assert.False(options.UseHttpContextTraceIdentifierAsCorrelationId);
+        Assert.True(options.TrustInboundCorrelationIdHeaders);
         Assert.Equal("X-Request-ID", options.CorrelationIdHeaderName);
     }
 
