@@ -150,7 +150,7 @@ POST /sample/ergonomic/controller
 Those endpoints demonstrate the ASP.NET Core integration shape:
 
 ```csharp
-.RequireGovernancePolicy<SampleEndpointPolicy>()
+.MarkGovernancePolicy<SampleEndpointPolicy>()
 .RequireLiabilityHandshake()
 .RequireCapabilityGrant("sample.high-risk.execute")
 .EmitGovernanceAudit();

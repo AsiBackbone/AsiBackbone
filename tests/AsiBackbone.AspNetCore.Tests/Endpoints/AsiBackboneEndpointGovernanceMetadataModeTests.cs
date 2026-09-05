@@ -34,7 +34,7 @@ public sealed class AsiBackboneEndpointGovernanceMetadataModeTests
     }
 
     /// <summary>
-    /// Tests that converting an AsiBackboneEndpointGovernanceDescriptor to metadata using the reduced metadata mode only includes the operation name and excludes other metadata entries.
+    /// Tests that reduced metadata mode keeps the operation name and the policy marker while excluding the remaining entries.
     /// </summary>
     [Fact]
     public void DescriptorToMetadataCanUseReducedMode()
@@ -43,12 +43,15 @@ public sealed class AsiBackboneEndpointGovernanceMetadataModeTests
 
         IReadOnlyDictionary<string, string> metadata = descriptor.ToMetadata(AsiBackboneEndpointGovernanceMetadataMode.Reduced);
 
-        KeyValuePair<string, string> item = Assert.Single(metadata);
-        Assert.Equal("endpoint.operation_name", item.Key);
-        Assert.Equal("sample.metadata", item.Value);
+        Assert.Equal("sample.metadata", metadata["endpoint.operation_name"]);
+
+        // The policy marker survives reduction so a host decision policy keyed on it cannot be silently disabled by a
+        // metadata setting. Everything else is still dropped from the hot path.
+        Assert.Equal(
+            descriptor.ToMetadata()["endpoint.policy_types"],
+            metadata["endpoint.policy_types"]);
         Assert.False(metadata.ContainsKey("endpoint.requires_liability_handshake"));
         Assert.False(metadata.ContainsKey("endpoint.emit_governance_audit"));
-        Assert.False(metadata.ContainsKey("endpoint.policy_types"));
         Assert.False(metadata.ContainsKey("endpoint.capability_scopes"));
     }
 
@@ -87,9 +90,61 @@ public sealed class AsiBackboneEndpointGovernanceMetadataModeTests
 
         Assert.True(result.CanExecute);
         Assert.NotNull(evaluator.CapturedMetadata);
-        KeyValuePair<string, string> item = Assert.Single(evaluator.CapturedMetadata);
+
+        // Reduced mode keeps the policy marker. Dropping it would let a metadata setting silently disable a host
+        // decision policy that varies its outcome by policy type, which is a permissive change made by the wrong knob.
+        Assert.Equal(2, evaluator.CapturedMetadata.Count);
+        Assert.Equal("sample.metadata.reduced", evaluator.CapturedMetadata["endpoint.operation_name"]);
+        Assert.Equal(
+            descriptor.ToMetadata(AsiBackboneEndpointGovernanceMetadataMode.Full)["endpoint.policy_types"],
+            evaluator.CapturedMetadata["endpoint.policy_types"]);
+        Assert.DoesNotContain("endpoint.requires_liability_handshake", evaluator.CapturedMetadata.Keys, StringComparer.Ordinal);
+    }
+
+    /// <summary>
+    /// Tests that reduced metadata mode omits the policy marker entirely when the endpoint carries no policy type.
+    /// </summary>
+    [Fact]
+    public void ReducedMetadataOmitsPolicyTypesWhenEndpointHasNoPolicyMarker()
+    {
+        var endpoint = new Endpoint(
+            static _ => Task.CompletedTask,
+            new EndpointMetadataCollection(new EmitGovernanceAuditAttribute()),
+            "sample.metadata.reduced.nopolicy");
+        var descriptor = AsiBackboneEndpointGovernanceDescriptor.FromEndpoint(endpoint);
+
+        IReadOnlyDictionary<string, string> reduced =
+            descriptor.ToMetadata(AsiBackboneEndpointGovernanceMetadataMode.Reduced);
+
+        KeyValuePair<string, string> item = Assert.Single(reduced);
         Assert.Equal("endpoint.operation_name", item.Key);
-        Assert.Equal("sample.metadata.reduced", item.Value);
+        Assert.Equal("sample.metadata.reduced.nopolicy", item.Value);
+    }
+
+    /// <summary>
+    /// Tests that reduced metadata mode records every policy marker on an endpoint that carries more than one.
+    /// </summary>
+    [Fact]
+    public void ReducedMetadataRecordsEveryPolicyMarkerOnTheEndpoint()
+    {
+        var endpoint = new Endpoint(
+            static _ => Task.CompletedTask,
+            new EndpointMetadataCollection(
+                new RequireGovernancePolicyAttribute(typeof(SamplePolicy)),
+                new RequireGovernancePolicyAttribute(typeof(SecondSamplePolicy))),
+            "sample.metadata.reduced.multi");
+        var descriptor = AsiBackboneEndpointGovernanceDescriptor.FromEndpoint(endpoint);
+
+        IReadOnlyDictionary<string, string> reduced =
+            descriptor.ToMetadata(AsiBackboneEndpointGovernanceMetadataMode.Reduced);
+
+        Assert.Equal(
+            descriptor.ToMetadata(AsiBackboneEndpointGovernanceMetadataMode.Full)["endpoint.policy_types"],
+            reduced["endpoint.policy_types"]);
+    }
+
+    private sealed class SecondSamplePolicy
+    {
     }
 
     /// <summary>

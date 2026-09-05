@@ -86,7 +86,7 @@ app.MapGet("/sample/decision", async (
     });
 })
 .WithDisplayName("template.sample.decision")
-.RequireGovernancePolicy<SampleEndpointPolicy>()
+.MarkGovernancePolicy(typeof(SampleEndpointPolicy))
 .RequireCapabilityGrant("sample.execute")
 .EmitGovernanceAudit();
 
@@ -95,7 +95,7 @@ app.MapPost("/sample/minimal/execute", () => Results.Ok(new
     message = "Minimal API endpoint executed after AsiBackbone endpoint governance metadata was evaluated."
 }))
 .WithDisplayName("template.sample.minimal.execute")
-.RequireGovernancePolicy<SampleEndpointPolicy>()
+.MarkGovernancePolicy(typeof(SampleEndpointPolicy))
 .RequireCapabilityGrant("sample.execute")
 .EmitGovernanceAudit();
 

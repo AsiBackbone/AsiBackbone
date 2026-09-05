@@ -168,7 +168,7 @@ app.MapPost("/api/orders/{region}/approve", async (
 // Endpoint metadata gives the route a governance identity for later middleware-based orchestration.
 // In this first-run sample, the handler performs the gate explicitly so every step is visible.
 .WithDisplayName("orders.approve")
-.RequireGovernancePolicy<OrderApprovalPolicy>()
+.MarkGovernancePolicy<OrderApprovalPolicy>()
 .EmitGovernanceAudit();
 
 app.MapGet("/api/audit", (InMemoryAuditLedger auditLedger) => Results.Ok(auditLedger.Records));
@@ -300,7 +300,7 @@ Set `TreatConstraintExceptionAsDenial = false` only when the host has intentiona
 The quickstart attaches endpoint metadata with:
 
 ```csharp
-.RequireGovernancePolicy<OrderApprovalPolicy>()
+.MarkGovernancePolicy<OrderApprovalPolicy>()
 .EmitGovernanceAudit();
 ```
 

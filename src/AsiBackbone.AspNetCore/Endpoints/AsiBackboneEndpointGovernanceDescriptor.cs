@@ -30,7 +30,7 @@ public sealed class AsiBackboneEndpointGovernanceDescriptor
         RequiresLiabilityHandshake = requiresLiabilityHandshake;
         CapabilityScopes = capabilityScopes;
         EmitGovernanceAudit = emitGovernanceAudit;
-        reducedMetadata = CreateReducedMetadata(OperationName);
+        reducedMetadata = CreateReducedMetadata(OperationName, PolicyTypes);
         fullMetadata = CreateFullMetadata();
     }
 
@@ -258,13 +258,24 @@ public sealed class AsiBackboneEndpointGovernanceDescriptor
         return new ReadOnlyDictionary<string, string>(metadata);
     }
 
-    private static ReadOnlyDictionary<string, string> CreateReducedMetadata(string operationName)
+    private static ReadOnlyDictionary<string, string> CreateReducedMetadata(
+        string operationName,
+        IReadOnlyList<Type> policyTypes)
     {
-        return new ReadOnlyDictionary<string, string>(
-            new Dictionary<string, string>(1, StringComparer.Ordinal)
-            {
-                ["endpoint.operation_name"] = operationName
-            });
+        // Policy types are retained in Reduced mode. A host decision policy that varies its outcome by
+        // endpoint.policy_types would otherwise stop seeing the marker under Reduced and silently fall back to
+        // uniform behavior, which is a permissive change made by a metadata setting rather than a policy one.
+        var metadata = new Dictionary<string, string>(policyTypes.Count > 0 ? 2 : 1, StringComparer.Ordinal)
+        {
+            ["endpoint.operation_name"] = operationName
+        };
+
+        if (policyTypes.Count > 0)
+        {
+            metadata["endpoint.policy_types"] = JoinPolicyTypeNames(policyTypes);
+        }
+
+        return new ReadOnlyDictionary<string, string>(metadata);
     }
 
     private static string JoinPolicyTypeNames(IReadOnlyList<Type> policyTypes)

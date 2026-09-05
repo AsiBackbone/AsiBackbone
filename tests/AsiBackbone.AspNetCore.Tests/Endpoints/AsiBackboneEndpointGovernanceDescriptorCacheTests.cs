@@ -39,7 +39,9 @@ public sealed class AsiBackboneEndpointGovernanceDescriptorCacheTests
         Assert.Equal("true", firstFullMetadata["endpoint.emit_governance_audit"]);
         Assert.Contains(nameof(SamplePolicy), firstFullMetadata["endpoint.policy_types"], StringComparison.Ordinal);
         Assert.Equal("robotics.execute", firstFullMetadata["endpoint.capability_scopes"]);
-        Assert.DoesNotContain("endpoint.policy_types", firstReducedMetadata.Keys);
+        // The policy marker is retained in reduced metadata; the remaining full-mode entries are not.
+        Assert.Equal(firstFullMetadata["endpoint.policy_types"], firstReducedMetadata["endpoint.policy_types"]);
+        Assert.DoesNotContain("endpoint.capability_scopes", firstReducedMetadata.Keys);
     }
 
     private sealed class SamplePolicy

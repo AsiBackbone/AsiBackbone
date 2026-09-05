@@ -32,7 +32,7 @@ Hosts that intentionally mutate options at runtime should validate their mutatio
 
 ```csharp
 app.MapPost("/high-risk-action", handler)
-    .RequireGovernancePolicy<MyStrictPolicy>()
+    .MarkGovernancePolicy<MyStrictPolicy>()
     .RequireLiabilityHandshake()
     .RequireCapabilityGrant("robotics.execute")
     .EmitGovernanceAudit();
@@ -40,11 +40,38 @@ app.MapPost("/high-risk-action", handler)
 
 The fluent methods add endpoint metadata. The middleware resolves that metadata into an `AsiBackboneEndpointGovernanceDescriptor`, builds a framework-neutral evaluation context, and delegates policy evaluation, capability validation, handshake creation, and audit emission to registered host-owned services.
 
+### What the policy marker does, and what it does not
+
+`MarkGovernancePolicy<TPolicy>()` records a marker. It does not select an evaluation path.
+
+The framework does not resolve the marked type or derive a constraint set from it. The registered `IAsiBackbonePolicyEvaluator` evaluates **every** registered constraint on **every** governed endpoint, whichever policy type an endpoint carries. What the marker controls is whether policy evaluation runs at all: an endpoint with no policy marker skips the policy stage.
+
+Two endpoints marked with different policy types therefore evaluate identically unless the host makes them differ. The marker reaches evaluation as the `endpoint.policy_types` metadata entry, so the supported way to vary behavior by policy is a host-supplied `IAsiBackboneDecisionPolicy<AsiBackboneConstraintEvaluationContext>` that reads that entry and adjusts the composed decision:
+
+```csharp
+public sealed class PolicyAwareDecisionPolicy : IAsiBackboneDecisionPolicy<AsiBackboneConstraintEvaluationContext>
+{
+    public ValueTask<GovernanceDecision> ApplyAsync(
+        AsiBackboneConstraintEvaluationContext context,
+        GovernanceDecision composedDecision,
+        IReadOnlyList<ConstraintEvaluationResult> constraintResults,
+        CancellationToken cancellationToken = default)
+    {
+        // context.Metadata["endpoint.policy_types"] carries the marked type names.
+        return ValueTask.FromResult(composedDecision);
+    }
+}
+```
+
+`endpoint.policy_types` is retained under `AsiBackboneEndpointGovernanceMetadataMode.Reduced` for exactly this reason: dropping it would let a metadata setting silently disable a host decision policy that depends on it.
+
+`RequireGovernancePolicy` is the former name of this method and is obsolete. It never resolved the policy type either; the name overstated what it did. It still records the same metadata and can be replaced with `MarkGovernancePolicy` without behavior change.
+
 Endpoints that intentionally prefer a latency-optimized first-block fast-abort policy path can add endpoint metadata:
 
 ```csharp
 app.MapPost("/high-risk-action", handler)
-    .RequireGovernancePolicy<MyStrictPolicy>()
+    .MarkGovernancePolicy<MyStrictPolicy>()
     .ShortCircuitOnFirstDenial();
 ```
 

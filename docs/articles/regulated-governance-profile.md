@@ -124,7 +124,7 @@ Governed endpoints should state their required policy, capability, acknowledgmen
 
 ```csharp
 app.MapPost("/payments/{id}/approve", ApprovePayment)
-    .RequireGovernancePolicy<PaymentApprovalPolicy>()
+    .MarkGovernancePolicy<PaymentApprovalPolicy>()
     .RequireCapabilityGrant("payments.approve")
     .RequireLiabilityHandshake()
     .EmitGovernanceAudit();

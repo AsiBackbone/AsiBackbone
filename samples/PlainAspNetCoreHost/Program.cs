@@ -60,7 +60,7 @@ app.MapPost("/sample/ergonomic/minimal", () => Results.Ok(new
     message = "Minimal API endpoint executed after AsiBackbone endpoint governance metadata was evaluated."
 }))
 .WithDisplayName("sample.ergonomic.minimal")
-.RequireGovernancePolicy<SampleEndpointPolicy>()
+.MarkGovernancePolicy(typeof(SampleEndpointPolicy))
 .RequireLiabilityHandshake()
 .RequireCapabilityGrant("sample.high-risk.execute")
 .EmitGovernanceAudit();

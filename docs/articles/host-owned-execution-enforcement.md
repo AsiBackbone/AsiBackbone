@@ -69,7 +69,7 @@ app.UseAuthorization();
 app.UseAsiBackboneEndpointGovernance();
 
 app.MapPost("/payments/approve", ApprovePaymentAsync)
-    .RequireGovernancePolicy<PaymentApprovalPolicy>()
+    .MarkGovernancePolicy<PaymentApprovalPolicy>()
     .EmitGovernanceAudit();
 ```
 
