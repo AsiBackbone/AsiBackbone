@@ -14,7 +14,8 @@ public sealed class AsiBackboneGovernanceOutboxDrainWorkerOptions
     /// </summary>
     /// <remarks>
     /// Runtime changes supplied through <c>IOptionsMonitor</c> pause or resume new drain cycles without restarting the
-    /// process. A worker that starts disabled remains alive and waits without creating scopes or resolving scoped stores.
+    /// process. A worker that starts disabled validates its scoped drain dependencies once, then remains alive and waits
+    /// without starting drain cycles or retaining scoped services.
     /// Re-enabling normally takes effect immediately through the options change notification, with the configured
     /// <see cref="PollingInterval" /> serving as a fallback observation interval.
     /// For multi-replica hosts, enable this only on the selected worker role or partition owner unless the outbox store

@@ -46,6 +46,45 @@ public sealed class AsiBackboneGovernanceOutboxDrainHostedServiceTests
     }
 
     /// <summary>
+    /// Verifies that the worker fails host startup when a required scoped drain dependency is missing.
+    /// </summary>
+    /// <param name="registerStore">Whether the outbox store is registered.</param>
+    /// <param name="registerEmitter">Whether the governance emitter is registered.</param>
+    /// <param name="missingServiceName">The missing service name expected in the dependency-resolution error.</param>
+    [Theory]
+    [InlineData(false, true, "IAsiBackboneGovernanceOutboxStore")]
+    [InlineData(true, false, "IAsiBackboneGovernanceEmitter")]
+    public async Task WorkerFailsStartupWhenRequiredDrainDependencyIsMissing(
+        bool registerStore,
+        bool registerEmitter,
+        string missingServiceName)
+    {
+        ServiceCollection services = new();
+        _ = services.AddLogging();
+
+        if (registerStore)
+        {
+            _ = services.AddSingleton<IAsiBackboneGovernanceOutboxStore, RecordingGovernanceOutboxStore>();
+        }
+
+        if (registerEmitter)
+        {
+            _ = services.AddSingleton<IAsiBackboneGovernanceEmitter>(
+                new RecordingGovernanceEmitter(_ => GovernanceEmissionResult.Delivered("test-sink")));
+        }
+
+        _ = services.AddAsiBackboneGovernanceOutboxDrainWorker();
+
+        using ServiceProvider provider = services.BuildServiceProvider();
+        IHostedService hostedService = Assert.Single(provider.GetServices<IHostedService>());
+
+        InvalidOperationException exception = await Assert.ThrowsAsync<InvalidOperationException>(() =>
+            hostedService.StartAsync(TestContext.Current.CancellationToken));
+
+        Assert.Contains(missingServiceName, exception.Message, StringComparison.Ordinal);
+    }
+
+    /// <summary>
     /// Tests that when the worker is disabled, it does not attempt to drain any entries from the outbox store.
     /// </summary>
     /// <returns>

@@ -16,7 +16,7 @@ public sealed class AsiBackboneGovernanceOutboxDrainRuntimeOptionsTests
     private static readonly TimeSpan TestTimeout = TimeSpan.FromSeconds(5);
 
     /// <summary>
-    /// Verifies that a startup-disabled worker remains alive, reacts to option changes, pauses without creating scopes, and resumes without a process restart.
+    /// Verifies that a startup-disabled worker validates dependencies, remains alive, pauses drain scopes, and resumes without a process restart.
     /// </summary>
     [Fact]
     public async Task StartupDisabledWorkerCanEnableDisableAndReenableAtRuntime()
@@ -27,7 +27,7 @@ public sealed class AsiBackboneGovernanceOutboxDrainRuntimeOptionsTests
         await harness.Service.StartAsync(TestContext.Current.CancellationToken);
         await Task.Delay(TimeSpan.FromMilliseconds(50), TestContext.Current.CancellationToken);
 
-        Assert.Equal(0, harness.ScopeFactory.CreateScopeCallCount);
+        Assert.Equal(1, harness.ScopeFactory.CreateScopeCallCount);
         Assert.Equal(0, harness.Store.FindPendingCallCount);
 
         harness.Options.Set(CreateOptions(enabled: true));
@@ -65,7 +65,7 @@ public sealed class AsiBackboneGovernanceOutboxDrainRuntimeOptionsTests
         await harness.Service.StopAsync(CancellationToken.None)
             .WaitAsync(TimeSpan.FromSeconds(1), TestContext.Current.CancellationToken);
 
-        Assert.Equal(0, harness.ScopeFactory.CreateScopeCallCount);
+        Assert.Equal(1, harness.ScopeFactory.CreateScopeCallCount);
     }
 
     private static AsiBackboneGovernanceOutboxDrainWorkerOptions CreateOptions(bool enabled)
