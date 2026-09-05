@@ -7,6 +7,7 @@ using AsiBackbone.EntityFrameworkCore.Outbox;
 using AsiBackbone.EntityFrameworkCore.Persistence;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using Xunit;
 
 namespace AsiBackbone.EntityFrameworkCore.Tests;
@@ -64,11 +65,57 @@ public sealed class EfCoreOutboxConcurrencyValidationTests
     }
 
     /// <summary>
-    /// Verifies the current intentional limitation: two workers can select the same pending entry before either worker saves final state.
+    /// Verifies that under the default claim-lease configuration two concurrent workers emit a pending entry exactly once.
     /// </summary>
     /// <returns>A task that represents the asynchronous test operation.</returns>
     [Fact]
-    public async Task ConcurrentDrainWorkersCanReachSamePendingEntryBeforeStateTransition()
+    public async Task ConcurrentDrainWorkersEmitPendingEntryOnceUnderDefaultClaimLeases()
+    {
+        await using SqliteConnection keeperConnection = await OpenSharedMemoryConnectionAsync();
+        DbContextOptions<HostOwnedGovernanceDbContext> options = CreateOptions(keeperConnection.ConnectionString);
+        await EnsureCreatedAsync(options);
+
+        string outboxEntryId;
+        await using (HostOwnedGovernanceDbContext seedContext = new(options))
+        {
+            var store = new EfCoreGovernanceOutboxStore(seedContext);
+            GovernanceOutboxEntry entry = await store.EnqueueAsync(
+                CreateEnvelope(1),
+                TestContext.Current.CancellationToken);
+            outboxEntryId = entry.OutboxEntryId;
+        }
+
+        var emitter = new CoordinatedDeliveredEmitter(expectedEmissionCount: 1);
+
+        // Distinct worker identifiers model two replicas, which is what the machine-name plus process-id default produces.
+        Task<IReadOnlyList<GovernanceOutboxEntry>> firstDrain = DrainWithNewContextAsync(options, emitter, "worker-a");
+        Task<IReadOnlyList<GovernanceOutboxEntry>> secondDrain = DrainWithNewContextAsync(options, emitter, "worker-b");
+
+        Exception?[] drainExceptions = await Task.WhenAll(
+            CaptureExceptionAsync(firstDrain),
+            CaptureExceptionAsync(secondDrain));
+
+        await using HostOwnedGovernanceDbContext verificationContext = new(options);
+        var verificationStore = new EfCoreGovernanceOutboxStore(verificationContext);
+        GovernanceOutboxEntry? persistedEntry = await verificationStore.FindByOutboxEntryIdAsync(
+            outboxEntryId,
+            TestContext.Current.CancellationToken);
+        IReadOnlyList<GovernanceOutboxEntry> pendingEntries = await verificationStore.FindPendingAsync(
+            cancellationToken: TestContext.Current.CancellationToken);
+
+        Assert.Equal(1, emitter.EmissionCount);
+        Assert.All(drainExceptions, Assert.Null);
+        Assert.NotNull(persistedEntry);
+        Assert.Equal(GovernanceEmissionStatus.Delivered, persistedEntry.Status);
+        Assert.DoesNotContain(pendingEntries, entry => entry.OutboxEntryId == outboxEntryId);
+    }
+
+    /// <summary>
+    /// Verifies the documented consequence of opting out of claim leases: two workers can select the same pending entry before either worker saves final state.
+    /// </summary>
+    /// <returns>A task that represents the asynchronous test operation.</returns>
+    [Fact]
+    public async Task ConcurrentDrainWorkersCanReachSamePendingEntryWhenClaimLeasesAreDisabled()
     {
         await using SqliteConnection keeperConnection = await OpenSharedMemoryConnectionAsync();
         DbContextOptions<HostOwnedGovernanceDbContext> options = CreateOptions(keeperConnection.ConnectionString);
@@ -85,8 +132,8 @@ public sealed class EfCoreOutboxConcurrencyValidationTests
         }
 
         var emitter = new CoordinatedDeliveredEmitter(expectedEmissionCount: 2);
-        Task<IReadOnlyList<GovernanceOutboxEntry>> firstDrain = DrainWithNewContextAsync(options, emitter);
-        Task<IReadOnlyList<GovernanceOutboxEntry>> secondDrain = DrainWithNewContextAsync(options, emitter);
+        Task<IReadOnlyList<GovernanceOutboxEntry>> firstDrain = DrainWithNewContextAsync(options, emitter, workerId: null);
+        Task<IReadOnlyList<GovernanceOutboxEntry>> secondDrain = DrainWithNewContextAsync(options, emitter, workerId: null);
 
         Exception?[] drainExceptions = await Task.WhenAll(
             CaptureExceptionAsync(firstDrain),
@@ -192,13 +239,29 @@ public sealed class EfCoreOutboxConcurrencyValidationTests
         return new WriteEvidence(entry.OutboxEntryId, lifecycleEvent.EventId);
     }
 
+    /// <summary>
+    /// Drains a single entry on its own context, claiming as <paramref name="workerId" /> or opting out of claim leases when it is null.
+    /// </summary>
+    /// <param name="options">The database context options shared by the competing drains.</param>
+    /// <param name="emitter">The emitter observing emission counts across both drains.</param>
+    /// <param name="workerId">The claim owner, or null to disable claim leases and exercise the opt-out path.</param>
+    /// <returns>The entries attempted by this drain.</returns>
     private static async Task<IReadOnlyList<GovernanceOutboxEntry>> DrainWithNewContextAsync(
         DbContextOptions<HostOwnedGovernanceDbContext> options,
-        IAsiBackboneGovernanceEmitter emitter)
+        IAsiBackboneGovernanceEmitter emitter,
+        string? workerId)
     {
         await using HostOwnedGovernanceDbContext context = new(options);
         var store = new EfCoreGovernanceOutboxStore(context);
-        var drain = new AsiBackboneGovernanceOutboxDrain(store, emitter);
+        var outboxOptions = new AsiBackboneGovernanceOutboxOptions
+        {
+            UseClaimLeases = workerId is not null,
+            ClaimWorkerId = workerId ?? AsiBackboneGovernanceOutboxOptions.DefaultClaimWorkerId
+        };
+        var drain = new AsiBackboneGovernanceOutboxDrain(
+            store,
+            emitter,
+            outboxOptions: Options.Create(outboxOptions));
 
         return await drain.DrainAsync(
             new DateTimeOffset(2026, 6, 19, 12, 0, 0, TimeSpan.Zero),

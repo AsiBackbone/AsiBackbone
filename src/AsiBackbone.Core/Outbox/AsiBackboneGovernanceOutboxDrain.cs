@@ -29,6 +29,11 @@ public sealed class AsiBackboneGovernanceOutboxDrain(
         new EventId(19701, nameof(LogGovernanceEmissionException)),
         "Governance outbox emission threw an exception for outbox entry {OutboxEntryId} on attempt {AttemptCount}. Emitter provider: {EmitterProvider}. Next retry UTC: {NextRetryUtc}. Correlation ID: {CorrelationId}. Audit residue ID: {AuditResidueId}.");
 
+    private static readonly Action<ILogger, string, int, int, string?, Exception?> LogGovernanceClaimAttemptsExceeded = LoggerMessage.Define<string, int, int, string?>(
+        LogLevel.Warning,
+        new EventId(19702, nameof(LogGovernanceClaimAttemptsExceeded)),
+        "Governance outbox entry {OutboxEntryId} was claimed {ClaimAttemptCount} times without reaching a terminal state, exceeding the configured maximum of {MaxClaimAttempts}. The entry is being dead-lettered without a further emission attempt. Correlation ID: {CorrelationId}.");
+
     private readonly IAsiBackboneGovernanceOutboxStore outboxStore = outboxStore ?? throw new ArgumentNullException(nameof(outboxStore));
     private readonly IAsiBackboneGovernanceEmitter emitter = emitter ?? throw new ArgumentNullException(nameof(emitter));
     private readonly ILogger<AsiBackboneGovernanceOutboxDrain> logger = logger ?? NullLogger<AsiBackboneGovernanceOutboxDrain>.Instance;
@@ -57,7 +62,13 @@ public sealed class AsiBackboneGovernanceOutboxDrain(
 
         if (retryOptions.UseClaimLeases)
         {
-            return await DrainClaimedAsync(drainUtc, maxCount, cancellationToken).ConfigureAwait(false);
+            // A caller-supplied timestamp is honored for every page so deterministic tests stay deterministic;
+            // otherwise each page is leased from a fresh reading taken when that page is claimed.
+            Func<DateTimeOffset> claimClock = utcNow.HasValue
+                ? () => drainUtc
+                : static () => DateTimeOffset.UtcNow;
+
+            return await DrainClaimedAsync(claimClock, maxCount, cancellationToken).ConfigureAwait(false);
         }
 
         IReadOnlyList<GovernanceOutboxEntry> pendingEntries = await outboxStore
@@ -78,41 +89,92 @@ public sealed class AsiBackboneGovernanceOutboxDrain(
     }
 
     private async ValueTask<IReadOnlyList<GovernanceOutboxEntry>> DrainClaimedAsync(
-        DateTimeOffset drainUtc,
+        Func<DateTimeOffset> claimClock,
         int maxCount,
         CancellationToken cancellationToken)
     {
         if (outboxStore is not IAsiBackboneGovernanceOutboxClaimStore claimStore)
         {
-            throw new InvalidOperationException("Claim leases are enabled, but the configured outbox store does not implement IAsiBackboneGovernanceOutboxClaimStore.");
+            throw new InvalidOperationException("Claim leases are enabled, but the configured outbox store does not implement IAsiBackboneGovernanceOutboxClaimStore. Supply a claim-capable store or set AsiBackboneGovernanceOutboxOptions.UseClaimLeases to false, which allows concurrent hosts to emit the same envelope more than once.");
         }
 
         string workerId = retryOptions.ClaimWorkerId ?? throw new InvalidOperationException("ClaimWorkerId is required when claim leases are enabled.");
+
+        List<GovernanceOutboxEntry> drainedEntries = [];
+        int remainingCount = maxCount;
+
+        // Entries are claimed a page at a time rather than leasing the whole batch at once, so a slow emitter
+        // cannot exhaust a single lease across the batch and leave later entries reclaimable while in flight.
+        while (remainingCount > 0)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+
+            int pageSize = Math.Min(retryOptions.ClaimPageSize, remainingCount);
+            DateTimeOffset pageUtc = claimClock().ToUniversalTime();
+
+            IReadOnlyList<GovernanceOutboxClaim> pageClaims = await ClaimPageAsync(
+                claimStore,
+                workerId,
+                pageUtc,
+                pageSize,
+                cancellationToken)
+                .ConfigureAwait(false);
+
+            if (pageClaims.Count == 0)
+            {
+                break;
+            }
+
+            IReadOnlyList<GovernanceOutboxEntry> pageEntries = await DrainClaimsAsync(
+                claimStore,
+                pageClaims,
+                pageUtc,
+                cancellationToken)
+                .ConfigureAwait(false);
+
+            drainedEntries.AddRange(pageEntries);
+            remainingCount -= pageClaims.Count;
+
+            if (pageClaims.Count < pageSize)
+            {
+                break;
+            }
+        }
+
+        return drainedEntries;
+    }
+
+    private async ValueTask<IReadOnlyList<GovernanceOutboxClaim>> ClaimPageAsync(
+        IAsiBackboneGovernanceOutboxClaimStore claimStore,
+        string workerId,
+        DateTimeOffset pageUtc,
+        int pageSize,
+        CancellationToken cancellationToken)
+    {
         var pendingRequest = GovernanceOutboxClaimRequest.Create(
             workerId,
-            drainUtc,
+            pageUtc,
             retryOptions.ClaimLeaseDuration,
-            maxCount);
+            pageSize);
         IReadOnlyList<GovernanceOutboxClaim> pendingClaims = await claimStore
             .ClaimPendingAsync(pendingRequest, cancellationToken)
             .ConfigureAwait(false);
 
-        if (pendingClaims.Count >= maxCount)
+        if (pendingClaims.Count >= pageSize)
         {
-            return await DrainClaimsAsync(claimStore, pendingClaims, drainUtc, cancellationToken).ConfigureAwait(false);
+            return pendingClaims;
         }
 
         var retryRequest = GovernanceOutboxClaimRequest.Create(
             workerId,
-            drainUtc,
+            pageUtc,
             retryOptions.ClaimLeaseDuration,
-            maxCount - pendingClaims.Count);
+            pageSize - pendingClaims.Count);
         IReadOnlyList<GovernanceOutboxClaim> retryReadyClaims = await claimStore
             .ClaimRetryReadyAsync(retryRequest, cancellationToken)
             .ConfigureAwait(false);
 
-        IReadOnlyList<GovernanceOutboxClaim> claimsToDrain = MergeClaims(pendingClaims, retryReadyClaims, maxCount);
-        return await DrainClaimsAsync(claimStore, claimsToDrain, drainUtc, cancellationToken).ConfigureAwait(false);
+        return MergeClaims(pendingClaims, retryReadyClaims, pageSize);
     }
 
     private async ValueTask<IReadOnlyList<GovernanceOutboxEntry>> DrainEntriesAsync(
@@ -278,6 +340,26 @@ public sealed class AsiBackboneGovernanceOutboxDrain(
         DateTimeOffset drainUtc,
         CancellationToken cancellationToken)
     {
+        // An emitter that hangs or is killed mid-emission leaves the entry claimed but never failed, so its retry
+        // count does not advance and the retry-based poison-message policy never fires. The claim count does
+        // advance on every reclaim, so it is the only signal that bounds that loop. Checked before emission so a
+        // repeatedly reclaimed entry is not handed to the emitter again.
+        if (ShouldDeadLetterForClaimAttempts(claim.Entry))
+        {
+            var claimExhaustedError = GovernanceEmissionError.Create(
+                retryOptions.MaxClaimAttemptsReasonCode,
+                retryOptions.MaxClaimAttemptsReasonMessage);
+
+            LogClaimAttemptsExceeded(claim.Entry);
+
+            return await claimStore.MarkClaimDeadLetteredAsync(
+                claim,
+                claimExhaustedError,
+                retryOptions.MaxClaimAttemptsReasonMessage,
+                cancellationToken)
+                .ConfigureAwait(false);
+        }
+
         GovernanceEmissionResult result;
 
         try
@@ -485,6 +567,13 @@ public sealed class AsiBackboneGovernanceOutboxDrain(
             && entry.RetryCount + 1 >= retryOptions.MaxRetryAttempts;
     }
 
+    private bool ShouldDeadLetterForClaimAttempts(GovernanceOutboxEntry entry)
+    {
+        // The store has already stamped this claim, so ClaimAttemptCount includes the current attempt.
+        return retryOptions.DeadLetterOnMaxClaimAttempts
+            && entry.ClaimAttemptCount > retryOptions.MaxClaimAttempts;
+    }
+
     private GovernanceEmissionError CreateMaxRetryError(GovernanceEmissionError failure)
     {
         return GovernanceEmissionError.Create(
@@ -505,6 +594,17 @@ public sealed class AsiBackboneGovernanceOutboxDrain(
             entry.Envelope.CorrelationId,
             entry.Envelope.AuditResidueId,
             exception);
+    }
+
+    private void LogClaimAttemptsExceeded(GovernanceOutboxEntry entry)
+    {
+        LogGovernanceClaimAttemptsExceeded(
+            logger,
+            entry.OutboxEntryId,
+            entry.ClaimAttemptCount,
+            retryOptions.MaxClaimAttempts,
+            entry.Envelope.CorrelationId,
+            null);
     }
 
     private static GovernanceEmissionError CreateExceptionError(Exception exception)
@@ -541,7 +641,12 @@ public sealed class AsiBackboneGovernanceOutboxDrain(
             DeadLetterReasonMessage = resolved.DeadLetterReasonMessage.Trim(),
             UseClaimLeases = resolved.UseClaimLeases,
             ClaimWorkerId = string.IsNullOrWhiteSpace(resolved.ClaimWorkerId) ? null : resolved.ClaimWorkerId.Trim(),
-            ClaimLeaseDuration = resolved.ClaimLeaseDuration
+            ClaimLeaseDuration = resolved.ClaimLeaseDuration,
+            ClaimPageSize = resolved.ClaimPageSize,
+            MaxClaimAttempts = resolved.MaxClaimAttempts,
+            DeadLetterOnMaxClaimAttempts = resolved.DeadLetterOnMaxClaimAttempts,
+            MaxClaimAttemptsReasonCode = resolved.MaxClaimAttemptsReasonCode.Trim(),
+            MaxClaimAttemptsReasonMessage = resolved.MaxClaimAttemptsReasonMessage.Trim()
         };
     }
 

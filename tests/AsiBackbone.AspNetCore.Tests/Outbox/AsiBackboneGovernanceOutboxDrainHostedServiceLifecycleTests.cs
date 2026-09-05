@@ -296,7 +296,7 @@ public sealed class AsiBackboneGovernanceOutboxDrainHostedServiceLifecycleTests
         {
             _ = services.AddSingleton<IAsiBackboneGovernanceOutboxStore>(store);
             _ = services.AddSingleton<IAsiBackboneGovernanceEmitter>(NoOpGovernanceEmitter.Instance);
-            _ = services.AddSingleton(Options.Create(new AsiBackboneGovernanceOutboxOptions()));
+            _ = services.AddSingleton(Options.Create(new AsiBackboneGovernanceOutboxOptions { UseClaimLeases = false }));
             _ = services.AddScoped<AsiBackboneGovernanceOutboxDrain>();
         }
 

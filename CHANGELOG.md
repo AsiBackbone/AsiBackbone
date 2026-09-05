@@ -6,9 +6,22 @@ This project follows the spirit of [Keep a Changelog](https://keepachangelog.com
 
 ## [Unreleased]
 
+### Changed
+
+* **Breaking:** `AsiBackboneGovernanceOutboxOptions.UseClaimLeases` now defaults to `true`, and `ClaimWorkerId` defaults to the machine name and process identifier (#697). Two hosts running the default drain worker against the same durable outbox previously emitted every entry twice. Hosts supplying a custom outbox store that does not implement `IAsiBackboneGovernanceOutboxClaimStore` must set `UseClaimLeases` to `false`; the drain throws rather than falling back, because falling back would restore the duplicate-emission behavior the default exists to prevent. Both shipped stores are claim-capable and need no change.
+
+### Added
+
+* Added `AsiBackboneGovernanceOutboxOptions.ClaimPageSize` (default `10`) so a drain pass leases entries a page at a time instead of holding one lease across the whole batch (#697). A slow emitter can no longer exhaust a single lease partway through a batch and leave later entries reclaimable by a peer while they are still in flight.
+* Added `AsiBackboneGovernanceOutboxOptions.MaxClaimAttempts` (default `5`), `DeadLetterOnMaxClaimAttempts`, `MaxClaimAttemptsReasonCode`, and `MaxClaimAttemptsReasonMessage` to bound reclaim (#697). An emitter that hangs or is killed mid-emission leaves an entry claimed but never failed, so its retry count never advances and the retry-based poison-message policy never applies; the claim count does advance on every reclaim. Entries past the threshold are dead-lettered before emission is attempted.
+
 ### Fixed
 
 * Preserve delivered and dead-lettered EF Core outbox entries during non-claim saves and status transitions, including stale deferred saves (#695). Terminal no-ops preserve existing evidence and the concurrency stamp; write conflicts still propagate to the caller.
+
+### Compatibility
+
+* The claim-lease default change alters runtime behavior without changing any public signature. It is a behavior break for hosts that supply a non-claim-capable outbox store, and a behavior improvement for every host using the shipped stores. Claim leasing coordinates workers before provider emission; it does not by itself create an exactly-once delivery guarantee.
 
 ## [3.2.3] - 2026-08-30
 
