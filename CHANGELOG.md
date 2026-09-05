@@ -4,6 +4,12 @@ All notable changes to this project are documented in this file.
 
 This project follows the spirit of [Keep a Changelog](https://keepachangelog.com/) and adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Fixed
+
+* Preserve delivered and dead-lettered EF Core outbox entries during non-claim saves and status transitions, including stale deferred saves (#695). Terminal no-ops preserve existing evidence and the concurrency stamp; write conflicts still propagate to the caller.
+
 ## [3.2.3] - 2026-08-30
 
 ### Release summary
