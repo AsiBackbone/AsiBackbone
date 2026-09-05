@@ -134,7 +134,6 @@ dotnet add "$smoke_project" package SQLitePCLRaw.bundle_e_sqlite3 --version "$sq
 popd > /dev/null
 
 cat > "$smoke_project_dir/StablePackageIntegrationSmokeTests.cs" <<'CSHARP'
-using System.Globalization;
 using System.Net.Http.Json;
 using AsiBackbone.AspNetCore.Actors;
 using AsiBackbone.AspNetCore.Correlation;
@@ -314,18 +313,9 @@ public sealed class StablePackageIntegrationSmokeTests
             policyVersion: "stable-capability-policy-v1",
             policyHash: "stable-capability-policy-hash");
 
-        var payload = CanonicalPayload.Create(
-            CanonicalArtifactTypes.CapabilityTokenGrant,
-            grant.TokenId,
-            grant.SchemaVersion,
-            CanonicalPayloadOptions.DefaultCanonicalizationVersion,
-            new Dictionary<string, object?>
-            {
-                ["audience"] = grant.Audience,
-                ["expiresUtc"] = grant.ExpiresUtc.ToString("O", CultureInfo.InvariantCulture),
-                ["issuer"] = grant.Issuer,
-                ["scopes"] = grant.Scopes.ToArray()
-            });
+        // Built through the shared builder so the smoke test signs every grant field, matching what a
+        // consumer of the stable package should do.
+        CanonicalPayload payload = CanonicalPayloadBuilder.ForCapabilityTokenGrant(grant);
         CanonicalPayloadHash hash = CanonicalPayloadHasher.ComputeHash(payload);
         var signingMetadata = SigningMetadata.Create(
             signingHash: hash.HashValue,

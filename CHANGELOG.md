@@ -6,6 +6,10 @@ This project follows the spirit of [Keep a Changelog](https://keepachangelog.com
 
 ## [Unreleased]
 
+### Added
+
+* Added `CanonicalPayloadBuilder.ForCapabilityTokenGrant`, covering every field a `CapabilityTokenGrant` carries (#699). `CanonicalArtifactTypes.CapabilityTokenGrant` existed but had no builder, so every consumer invented its own payload. The repository's own reference implementations in the validator tests and the stable-package smoke script hashed four fields — `audience`, `expiresUtc`, `issuer`, and `scopes` — while `CapabilityGrantValidator` enforces `NotBeforeUtc`, `PolicyVersion`, `PolicyHash`, `AcknowledgmentId`, `HandshakeId`, `GatewayBinding`, `ResourceBinding`, `SubjectId`, `OperationName`, and `IssuedUtc` as well. Fields outside the payload are outside the proof, so a value changed after signing still validated. Scopes are normalized to a sorted, de-duplicated, ordinal set; grant metadata remains filtered through `CanonicalPayloadOptions.AllowsMetadataKey`, whose allow-list is empty by default, so metadata is unbound unless a host opts a key in. Both reference implementations now use the builder.
+
 ### Deprecated
 
 * `RequireGovernancePolicy` on the endpoint route-builder extensions is obsolete in favor of `MarkGovernancePolicy` (#698). The framework never resolved the marked policy type or selected constraints from it, so the `Require` name overstated what the method did. The replacement records identical metadata; migrating is a rename with no behavior change. The generic `MarkGovernancePolicy<TPolicy>` overload constrains `TPolicy` to `IAsiBackboneDecisionPolicy<AsiBackboneConstraintEvaluationContext>` to point at the mechanism that actually varies behavior by policy; the `Type` overload remains unconstrained for plain marker types.

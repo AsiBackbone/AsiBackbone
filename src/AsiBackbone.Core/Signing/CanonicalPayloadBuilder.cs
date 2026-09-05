@@ -1,5 +1,6 @@
 using System.Globalization;
 using AsiBackbone.Core.Audit;
+using AsiBackbone.Core.CapabilityTokens;
 using AsiBackbone.Core.Emissions;
 using AsiBackbone.Core.Outbox;
 using AsiBackbone.Core.Serialization;
@@ -127,6 +128,61 @@ public static class CanonicalPayloadBuilder
             CanonicalArtifactTypes.GovernanceOutboxEntry,
             entry.OutboxEntryId,
             entry.Envelope.SchemaVersion,
+            effectiveOptions.CanonicalizationVersion,
+            content);
+    }
+
+    /// <summary>
+    /// Builds a canonical payload for a capability token grant.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// Every field the grant carries is included, so the resulting hash binds the whole grant rather than a subset of
+    /// it. A payload that omits a field leaves that field outside the proof while
+    /// <see cref="CapabilityGrantValidator" /> still enforces it, which lets a modified value pass
+    /// validation against a signature computed before the change. Scopes are normalized to a sorted, de-duplicated,
+    /// ordinal set, so two grants that differ only in scope ordering produce the same hash.
+    /// </para>
+    /// <para>
+    /// Metadata is the one exception, and deliberately so: it is filtered through
+    /// <see cref="CanonicalPayloadOptions.AllowsMetadataKey" />, whose allow-list is empty by default. With default
+    /// options no grant metadata reaches the proof at all, which keeps unbounded and potentially sensitive host data
+    /// out of hashed payloads. A host that puts security-relevant data in grant metadata has no binding for it until
+    /// that key is added to the allow-list.
+    /// </para>
+    /// </remarks>
+    /// <param name="grant">The capability token grant to canonicalize.</param>
+    /// <param name="options">Canonicalization options, including the metadata allow-list.</param>
+    /// <returns>A deterministic canonical payload for the grant.</returns>
+    public static CanonicalPayload ForCapabilityTokenGrant(CapabilityTokenGrant grant, CanonicalPayloadOptions? options = null)
+    {
+        ArgumentNullException.ThrowIfNull(grant);
+        CanonicalPayloadOptions effectiveOptions = options ?? CanonicalPayloadOptions.Default;
+
+        SortedDictionary<string, object?> content = new(StringComparer.Ordinal)
+        {
+            ["acknowledgmentId"] = grant.AcknowledgmentId,
+            ["audience"] = grant.Audience,
+            ["expiresUtc"] = FormatUtc(grant.ExpiresUtc),
+            ["gatewayBinding"] = grant.GatewayBinding,
+            ["handshakeId"] = grant.HandshakeId,
+            ["issuedUtc"] = FormatUtc(grant.IssuedUtc),
+            ["issuer"] = grant.Issuer,
+            ["metadata"] = FilterMetadata(grant.Metadata, effectiveOptions),
+            ["notBeforeUtc"] = FormatUtc(grant.NotBeforeUtc),
+            ["operationName"] = grant.OperationName,
+            ["policyHash"] = grant.PolicyHash,
+            ["policyVersion"] = grant.PolicyVersion,
+            ["resourceBinding"] = grant.ResourceBinding,
+            ["scopes"] = NormalizeStringSet(grant.Scopes),
+            ["subjectId"] = grant.SubjectId,
+            ["tokenId"] = grant.TokenId
+        };
+
+        return CanonicalPayload.Create(
+            CanonicalArtifactTypes.CapabilityTokenGrant,
+            grant.TokenId,
+            grant.SchemaVersion,
             effectiveOptions.CanonicalizationVersion,
             content);
     }
