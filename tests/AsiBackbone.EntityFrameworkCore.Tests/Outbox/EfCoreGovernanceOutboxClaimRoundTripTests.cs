@@ -16,15 +16,15 @@ namespace AsiBackbone.EntityFrameworkCore.Tests.Outbox;
 public sealed class EfCoreGovernanceOutboxClaimRoundTripTests
 {
     /// <summary>
-    /// Verifies an uncontended batch performs one candidate query plus one read and one update for every successful claim.
+    /// Verifies an uncontended batch performs one set-based update plus one token-based read regardless of batch size.
     /// </summary>
     /// <param name="batchSize">The requested number of pending claims.</param>
     /// <param name="expectedCommandCount">The expected number of relational database commands.</param>
     [Theory]
-    [InlineData(1, 3)]
-    [InlineData(10, 21)]
-    [InlineData(50, 101)]
-    [InlineData(100, 201)]
+    [InlineData(1, 2)]
+    [InlineData(10, 2)]
+    [InlineData(50, 2)]
+    [InlineData(100, 2)]
     public async Task ClaimPendingUsesExpectedPortableRoundTripShape(int batchSize, int expectedCommandCount)
     {
         CancellationToken cancellationToken = TestContext.Current.CancellationToken;
@@ -87,7 +87,7 @@ public sealed class EfCoreGovernanceOutboxClaimRoundTripTests
         Assert.Equal(batchSize, claims.Count);
         Assert.Equal(expectedCommandCount, interceptor.CommandCount);
         Assert.Equal(expectedIds, claims.Select(claim => claim.OutboxEntryId));
-        Assert.Equal(batchSize, claims.Select(claim => claim.ClaimToken).Distinct(StringComparer.Ordinal).Count());
+        _ = Assert.Single(claims.Select(claim => claim.ClaimToken).Distinct(StringComparer.Ordinal));
         Assert.All(claims, claim =>
         {
             Assert.Equal("round-trip-worker", claim.WorkerId);

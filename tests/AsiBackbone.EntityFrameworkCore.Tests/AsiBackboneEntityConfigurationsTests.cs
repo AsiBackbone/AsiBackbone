@@ -64,7 +64,7 @@ public sealed class AsiBackboneEntityConfigurationsTests
         AssertOptionalMaxLength(entityType, nameof(AsiBackboneAuditLedgerRecordEntity.ActorDisplayName), 256);
         AssertRequiredMaxLength(entityType, nameof(AsiBackboneAuditLedgerRecordEntity.OperationName), 256);
         AssertRequiredMaxLength(entityType, nameof(AsiBackboneAuditLedgerRecordEntity.Outcome), 128);
-        AssertRequired(entityType, nameof(AsiBackboneAuditLedgerRecordEntity.ReasonCodesJson));
+        AssertRequiredMaxLength(entityType, nameof(AsiBackboneAuditLedgerRecordEntity.ReasonCodesJson), 65536);
         AssertOptionalMaxLength(entityType, nameof(AsiBackboneAuditLedgerRecordEntity.CorrelationId), 128);
         AssertOptionalMaxLength(entityType, nameof(AsiBackboneAuditLedgerRecordEntity.TraceId), 128);
         AssertOptionalMaxLength(entityType, nameof(AsiBackboneAuditLedgerRecordEntity.PolicyVersion), 128);
@@ -76,34 +76,35 @@ public sealed class AsiBackboneEntityConfigurationsTests
         AssertOptionalMaxLength(entityType, nameof(AsiBackboneAuditLedgerRecordEntity.RecordHash), 512);
         AssertOptionalMaxLength(entityType, nameof(AsiBackboneAuditLedgerRecordEntity.SignatureKeyId), 128);
         AssertOptionalMaxLength(entityType, nameof(AsiBackboneAuditLedgerRecordEntity.SignatureAlgorithm), 128);
-        AssertRequired(entityType, nameof(AsiBackboneAuditLedgerRecordEntity.MetadataJson));
+        AssertOptionalMaxLength(entityType, nameof(AsiBackboneAuditLedgerRecordEntity.SignatureValue), 16384);
+        AssertRequiredMaxLength(entityType, nameof(AsiBackboneAuditLedgerRecordEntity.MetadataJson), 65536);
 
+        Assert.Equal(6, entityType.GetIndexes().Count());
         AssertHasUniqueIndex(entityType, nameof(AsiBackboneAuditLedgerRecordEntity.RecordId));
-        AssertHasIndex(entityType, nameof(AsiBackboneAuditLedgerRecordEntity.EventId));
-        AssertHasIndex(entityType, nameof(AsiBackboneAuditLedgerRecordEntity.OccurredUtc));
-        AssertHasIndex(entityType, nameof(AsiBackboneAuditLedgerRecordEntity.RecordedUtc));
-        AssertHasIndex(entityType, nameof(AsiBackboneAuditLedgerRecordEntity.ActorId));
-        AssertHasIndex(entityType, nameof(AsiBackboneAuditLedgerRecordEntity.ActorType));
-        AssertHasIndex(entityType, nameof(AsiBackboneAuditLedgerRecordEntity.OperationName));
-        AssertHasIndex(entityType, nameof(AsiBackboneAuditLedgerRecordEntity.Outcome));
-        AssertHasIndex(entityType, nameof(AsiBackboneAuditLedgerRecordEntity.CorrelationId));
-        AssertHasIndex(entityType, nameof(AsiBackboneAuditLedgerRecordEntity.TraceId));
-        AssertHasIndex(entityType, nameof(AsiBackboneAuditLedgerRecordEntity.PolicyVersion));
-        AssertHasIndex(entityType, nameof(AsiBackboneAuditLedgerRecordEntity.PolicyHash));
-        AssertHasIndex(entityType, nameof(AsiBackboneAuditLedgerRecordEntity.HandshakeId));
-        AssertHasIndex(entityType, nameof(AsiBackboneAuditLedgerRecordEntity.AcknowledgmentId));
-        AssertHasIndex(entityType, nameof(AsiBackboneAuditLedgerRecordEntity.CapabilityTokenId));
-        AssertHasIndex(entityType, nameof(AsiBackboneAuditLedgerRecordEntity.RecordHash));
+        AssertHasIndex(
+            entityType,
+            nameof(AsiBackboneAuditLedgerRecordEntity.RecordedUtc),
+            nameof(AsiBackboneAuditLedgerRecordEntity.RecordId));
 
         AssertHasIndex(
             entityType,
             nameof(AsiBackboneAuditLedgerRecordEntity.ActorId),
-            nameof(AsiBackboneAuditLedgerRecordEntity.RecordedUtc));
+            nameof(AsiBackboneAuditLedgerRecordEntity.RecordedUtc),
+            nameof(AsiBackboneAuditLedgerRecordEntity.RecordId));
 
         AssertHasIndex(
             entityType,
             nameof(AsiBackboneAuditLedgerRecordEntity.CorrelationId),
-            nameof(AsiBackboneAuditLedgerRecordEntity.RecordedUtc));
+            nameof(AsiBackboneAuditLedgerRecordEntity.RecordedUtc),
+            nameof(AsiBackboneAuditLedgerRecordEntity.RecordId));
+
+        AssertHasIndex(
+            entityType,
+            nameof(AsiBackboneAuditLedgerRecordEntity.TraceId),
+            nameof(AsiBackboneAuditLedgerRecordEntity.RecordedUtc),
+            nameof(AsiBackboneAuditLedgerRecordEntity.RecordId));
+
+        AssertHasIndex(entityType, nameof(AsiBackboneAuditLedgerRecordEntity.PreviousRecordHash));
     }
 
     /// <summary>

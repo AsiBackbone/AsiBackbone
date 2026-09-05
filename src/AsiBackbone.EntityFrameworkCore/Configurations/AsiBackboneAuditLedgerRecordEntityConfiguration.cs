@@ -27,6 +27,8 @@ public sealed class AsiBackboneAuditLedgerRecordEntityConfiguration
     private const int SignatureKeyVersionMaxLength = 128;
     private const int SignatureAlgorithmMaxLength = 128;
     private const int SignatureProviderMaxLength = 128;
+    private const int SignatureValueMaxLength = 16384;
+    private const int SerializedJsonMaxLength = 65536;
     private const int ConcurrencyStampMaxLength = 64;
 
     /// <inheritdoc />
@@ -88,7 +90,8 @@ public sealed class AsiBackboneAuditLedgerRecordEntityConfiguration
             .HasMaxLength(OutcomeMaxLength);
 
         _ = builder.Property(record => record.ReasonCodesJson)
-            .IsRequired();
+            .IsRequired()
+            .HasMaxLength(SerializedJsonMaxLength);
 
         _ = builder.Property(record => record.CorrelationId)
             .HasMaxLength(CorrelationMaxLength);
@@ -159,7 +162,8 @@ public sealed class AsiBackboneAuditLedgerRecordEntityConfiguration
         _ = builder.Property(record => record.SignatureAlgorithm)
             .HasMaxLength(SignatureAlgorithmMaxLength);
 
-        _ = builder.Property(record => record.SignatureValue);
+        _ = builder.Property(record => record.SignatureValue)
+            .HasMaxLength(SignatureValueMaxLength);
 
         _ = builder.Property(record => record.SignatureProvider)
             .HasMaxLength(SignatureProviderMaxLength);
@@ -167,83 +171,39 @@ public sealed class AsiBackboneAuditLedgerRecordEntityConfiguration
         _ = builder.Property(record => record.SignedUtc);
 
         _ = builder.Property(record => record.MetadataJson)
-            .IsRequired();
+            .IsRequired()
+            .HasMaxLength(SerializedJsonMaxLength);
 
         _ = builder.HasIndex(record => record.RecordId)
             .IsUnique();
 
-        _ = builder.HasIndex(record => record.SchemaVersion);
-
-        _ = builder.HasIndex(record => record.EventId);
-
-        _ = builder.HasIndex(record => record.AuditResidueId);
-
-        _ = builder.HasIndex(record => record.OccurredUtc);
-
-        _ = builder.HasIndex(record => record.RecordedUtc);
-
-        _ = builder.HasIndex(record => record.ActorId);
-
-        _ = builder.HasIndex(record => record.ActorType);
-
-        _ = builder.HasIndex(record => record.OperationName);
-
-        _ = builder.HasIndex(record => record.Outcome);
-
-        _ = builder.HasIndex(record => record.CorrelationId);
-
-        _ = builder.HasIndex(record => record.TraceId);
-
-        _ = builder.HasIndex(record => record.SpanId);
-
-        _ = builder.HasIndex(record => record.PolicyVersion);
-
-        _ = builder.HasIndex(record => record.PolicyHash);
-
-        _ = builder.HasIndex(record => record.PolicyScope);
-
-        _ = builder.HasIndex(record => record.TenantHash);
-
-        _ = builder.HasIndex(record => record.OrganizationHash);
-
-        _ = builder.HasIndex(record => record.EmitterStatus);
-
-        _ = builder.HasIndex(record => record.EmitterProvider);
-
-        _ = builder.HasIndex(record => record.OutboxSequence);
-
-        _ = builder.HasIndex(record => record.GatewayExecutionId);
-
-        _ = builder.HasIndex(record => record.DecisionStage);
-
-        _ = builder.HasIndex(record => record.HandshakeId);
-
-        _ = builder.HasIndex(record => record.AcknowledgmentId);
-
-        _ = builder.HasIndex(record => record.CapabilityTokenId);
-
-        _ = builder.HasIndex(record => record.RecordHash);
-
-        _ = builder.HasIndex(record => record.SigningHash);
-
-        _ = builder.HasIndex(record => record.SignatureKeyId);
-
-        _ = builder.HasIndex(record => record.SignatureKeyVersion);
-
-        _ = builder.HasIndex(record => record.SignatureProvider);
-
-        _ = builder.HasIndex(record => record.SignedUtc);
+        _ = builder.HasIndex(record => new
+        {
+            record.RecordedUtc,
+            record.RecordId
+        });
 
         _ = builder.HasIndex(record => new
         {
             record.ActorId,
-            record.RecordedUtc
+            record.RecordedUtc,
+            record.RecordId
         });
 
         _ = builder.HasIndex(record => new
         {
             record.CorrelationId,
-            record.RecordedUtc
+            record.RecordedUtc,
+            record.RecordId
         });
+
+        _ = builder.HasIndex(record => new
+        {
+            record.TraceId,
+            record.RecordedUtc,
+            record.RecordId
+        });
+
+        _ = builder.HasIndex(record => record.PreviousRecordHash);
     }
 }
