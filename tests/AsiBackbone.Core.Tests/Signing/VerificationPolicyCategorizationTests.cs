@@ -117,6 +117,54 @@ public sealed class VerificationPolicyCategorizationTests
     }
 
     /// <summary>
+    /// Verifies an explicit category takes precedence over misleading free-form failure-code text.
+    /// </summary>
+    /// <param name="failureCode">A failure code whose text would otherwise infer a different category.</param>
+    /// <param name="explicitCategory">The category supplied by the verification provider.</param>
+    [Theory]
+    [InlineData("provider.key-unavailable", SignatureVerificationCategory.RevokedKey)]
+    [InlineData("verification-error", SignatureVerificationCategory.InvalidSignature)]
+    [InlineData("signature.hash-mismatch", SignatureVerificationCategory.Failed)]
+    public void CategorizePrioritizesExplicitCategory(
+        string failureCode,
+        SignatureVerificationCategory explicitCategory)
+    {
+        var result = SignatureVerificationResult.Failed(
+            failureCode,
+            explicitCategory);
+
+        SignatureVerificationCategory category = VerificationPolicyEvaluator.Categorize(result);
+
+        Assert.Equal(explicitCategory, result.Category);
+        Assert.Equal(explicitCategory, category);
+    }
+
+    /// <summary>
+    /// Verifies the legacy failure factory retains failure-code inference for compatibility.
+    /// </summary>
+    [Fact]
+    public void CategorizeUsesFailureCodeOnlyWhenCategoryIsAbsent()
+    {
+        var result = SignatureVerificationResult.Failed("provider.key-unavailable");
+
+        SignatureVerificationCategory category = VerificationPolicyEvaluator.Categorize(result);
+
+        Assert.Null(result.Category);
+        Assert.Equal(SignatureVerificationCategory.ProviderUnavailable, category);
+    }
+
+    /// <summary>
+    /// Verifies a failed result cannot claim the successful category.
+    /// </summary>
+    [Fact]
+    public void FailedRejectsValidCategory()
+    {
+        _ = Assert.Throws<ArgumentOutOfRangeException>(() => SignatureVerificationResult.Failed(
+            "verification-error",
+            SignatureVerificationCategory.Valid));
+    }
+
+    /// <summary>
     /// Verifies the categorizer rejects a null verification result.
     /// </summary>
     [Fact]

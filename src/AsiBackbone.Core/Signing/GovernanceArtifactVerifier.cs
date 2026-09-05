@@ -65,6 +65,7 @@ public static class GovernanceArtifactVerifier
     {
         var providerUnavailableResult = SignatureVerificationResult.Failed(
             "signature.provider-unavailable",
+            SignatureVerificationCategory.ProviderUnavailable,
             exception.GetType().Name);
 
         return VerificationPolicyEvaluator.Evaluate(artifact, providerUnavailableResult, options);
@@ -83,16 +84,19 @@ public static class GovernanceArtifactVerifier
             : !string.Equals(metadata.SigningHash, artifact.SigningHash, StringComparison.Ordinal)
             ? SignatureVerificationResult.Failed(
                 "signature.hash-mismatch",
+                SignatureVerificationCategory.HashMismatch,
                 "The signing metadata hash does not match the canonical artifact hash.")
             : metadata.HashAlgorithm is not null
             && !string.Equals(metadata.HashAlgorithm, artifact.HashAlgorithm, StringComparison.OrdinalIgnoreCase)
             ? SignatureVerificationResult.Failed(
                 "signature.hash-algorithm-unsupported",
+                SignatureVerificationCategory.HashMismatch,
                 "The signing metadata hash algorithm does not match the canonical artifact hash algorithm.")
             : context.RequiredHashAlgorithm is not null
             && !string.Equals(context.RequiredHashAlgorithm, artifact.HashAlgorithm, StringComparison.OrdinalIgnoreCase)
             ? SignatureVerificationResult.Failed(
                 "signature.hash-algorithm-unsupported",
+                SignatureVerificationCategory.HashMismatch,
                 "The canonical artifact hash algorithm does not match the required verification policy algorithm.")
             : !MatchesCanonicalMetadata(metadata, "artifact_id", artifact.ArtifactId)
             || !MatchesCanonicalMetadata(metadata, "artifact_type", artifact.ArtifactType)
@@ -100,26 +104,31 @@ public static class GovernanceArtifactVerifier
             || !MatchesCanonicalMetadata(metadata, "payload_schema_version", artifact.CanonicalHash.PayloadSchemaVersion)
             ? SignatureVerificationResult.Failed(
                 "signature.canonicalization-mismatch",
+                SignatureVerificationCategory.CanonicalizationMismatch,
                 "The signing metadata canonical artifact descriptors do not match the artifact being verified.")
             : context.ExpectedKeyId is not null
             && !string.Equals(context.ExpectedKeyId, metadata.KeyId, StringComparison.Ordinal)
             ? SignatureVerificationResult.Failed(
                 "signature.key-version-unknown",
+                SignatureVerificationCategory.UnknownKeyVersion,
                 "The signing key identifier does not match the verification policy expectation.")
             : context.ExpectedKeyVersion is not null
             && !string.Equals(context.ExpectedKeyVersion, metadata.KeyVersion, StringComparison.Ordinal)
             ? SignatureVerificationResult.Failed(
                 "signature.key-version-unknown",
+                SignatureVerificationCategory.UnknownKeyVersion,
                 "The signing key version does not match the verification policy expectation.")
             : context.RequiredProvider is not null
             && !string.Equals(context.RequiredProvider, metadata.Provider, StringComparison.Ordinal)
             ? SignatureVerificationResult.Failed(
                 "signature.provider-unavailable",
+                SignatureVerificationCategory.ProviderUnavailable,
                 "The signing provider does not match the required verification policy provider.")
             : !MatchesOptionalPolicyMetadata(metadata, "policy_version", context.ExpectedPolicyVersion)
             || !MatchesOptionalPolicyMetadata(metadata, "policy_hash", context.ExpectedPolicyHash)
             ? SignatureVerificationResult.Failed(
                 "signature.canonicalization-mismatch",
+                SignatureVerificationCategory.CanonicalizationMismatch,
                 "The signing metadata policy context does not match the verification policy expectation.")
             : null;
     }

@@ -98,7 +98,8 @@ public sealed class VerificationPolicyHandlingTests
     {
         SignedGovernanceArtifact<string> artifact = CreateSignedArtifact();
         var verifier = new StubVerificationService(SignatureVerificationResult.Failed(
-            "signature.invalid",
+            "verification-error",
+            SignatureVerificationCategory.InvalidSignature,
             "The signature did not verify."));
 
         VerificationPolicyOutcome outcome = await GovernanceArtifactVerifier.VerifyAsync(
@@ -110,7 +111,7 @@ public sealed class VerificationPolicyHandlingTests
         Assert.False(outcome.ShouldAllow);
         Assert.Equal(SignatureVerificationCategory.InvalidSignature, outcome.Category);
         Assert.Equal(VerificationPolicyAction.Deny, outcome.Action);
-        Assert.Equal("signature.invalid", outcome.FailureCode);
+        Assert.Equal("verification-error", outcome.FailureCode);
     }
 
     /// <summary>

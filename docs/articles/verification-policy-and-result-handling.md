@@ -41,6 +41,17 @@ Do not treat `IsSigned` as permission to execute, emit, or trust a high-assuranc
 
 These categories do not require Core to know how a provider resolves keys. Provider-specific lookup remains outside Core.
 
+Verification providers should attach a category when creating failures so policy does not depend on free-form failure-code text:
+
+```csharp
+return SignatureVerificationResult.Failed(
+    "provider.key-unavailable",
+    SignatureVerificationCategory.RevokedKey,
+    "The configured verification key was deleted.");
+```
+
+`VerificationPolicyEvaluator` gives the explicit category precedence over the failure code. The overload of `Failed` without a category remains available for compatibility and uses the established case-insensitive failure-code rules before falling back to `Failed`. New providers should use the categorized overload.
+
 ## Host policy actions
 
 `VerificationPolicyAction` maps verification categories to host decisions:
