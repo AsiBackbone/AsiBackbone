@@ -26,6 +26,27 @@ In this software project, **ASI** means **Accountable Systems Infrastructure**. 
 
 The grant model is not a wire format. Hosts decide whether they serialize it as JSON, wrap it in a signed envelope, store it server-side, or project it into another provider-owned format.
 
+## Canonical payload for a signed grant
+
+Use `CanonicalPayloadBuilder.ForCapabilityTokenGrant` to build the payload a grant is signed over:
+
+```csharp
+CanonicalPayload payload = CanonicalPayloadBuilder.ForCapabilityTokenGrant(grant);
+CanonicalPayloadHash hash = CanonicalPayloadHasher.ComputeHash(payload);
+```
+
+The builder covers every field the grant carries, so the hash binds the whole grant. A hand-rolled payload that signs only a few fields leaves the rest outside the proof while the validator still enforces them, which means a value that was changed after signing can still pass validation. Scopes are normalized to a sorted, de-duplicated, ordinal set, so grants that differ only in scope ordering hash identically; a different scope set does not.
+
+> [!IMPORTANT]
+> Grant metadata is filtered through `CanonicalPayloadOptions.AllowsMetadataKey`, and the default allow-list is empty. With default options **no grant metadata is included in the proof**. This keeps unbounded and potentially sensitive host data out of hashed payloads, but it also means security-relevant data placed in grant metadata is unbound until its key is allow-listed:
+>
+> ```csharp
+> CanonicalPayloadOptions options = CanonicalPayloadOptions.Create(metadataKeyAllowList: ["region"]);
+> CanonicalPayload payload = CanonicalPayloadBuilder.ForCapabilityTokenGrant(grant, options);
+> ```
+>
+> Use the same options wherever the payload is rebuilt, or the hashes will not agree.
+
 ## Validation profiles
 
 `CapabilityGrantValidationOptions` provides explicit profiles so callers can communicate whether validation is occurring at a consequential execution boundary or is intentionally limited to metadata and time-bound checks.

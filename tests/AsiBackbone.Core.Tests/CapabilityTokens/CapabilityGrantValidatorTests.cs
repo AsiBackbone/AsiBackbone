@@ -558,18 +558,10 @@ public sealed class CapabilityGrantValidatorTests
 
     private static SignedGovernanceArtifact<CapabilityTokenGrant> CreateSignedGrant(CapabilityTokenGrant grant)
     {
-        var payload = CanonicalPayload.Create(
-            CanonicalArtifactTypes.CapabilityTokenGrant,
-            grant.TokenId,
-            grant.SchemaVersion,
-            CanonicalPayloadOptions.DefaultCanonicalizationVersion,
-            new Dictionary<string, object?>
-            {
-                ["audience"] = grant.Audience,
-                ["expiresUtc"] = grant.ExpiresUtc.ToString("O", System.Globalization.CultureInfo.InvariantCulture),
-                ["issuer"] = grant.Issuer,
-                ["scopes"] = grant.Scopes.ToArray()
-            });
+        // Built through the shared builder rather than by hand. The previous inline payload signed four of the
+        // grant's fields, so a test grant could differ in expiry window, bindings, or policy version and still
+        // produce the same hash, which is not the shape a real signed grant has.
+        CanonicalPayload payload = CanonicalPayloadBuilder.ForCapabilityTokenGrant(grant);
         CanonicalPayloadHash hash = CanonicalPayloadHasher.ComputeHash(payload);
         var signingMetadata = SigningMetadata.Create(
             signingHash: hash.HashValue,
