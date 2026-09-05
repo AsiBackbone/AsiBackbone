@@ -58,12 +58,20 @@ public sealed class AsiBackboneEndpointGovernanceMiddleware
         {
             if (options.RequireGovernanceMetadata && !endpointAllowsMissingGovernance)
             {
+                // A null endpoint and an endpoint carrying no governance metadata both fail closed here, but they
+                // have different causes and different fixes. A null endpoint usually means this middleware runs
+                // before endpoint routing, in which case every request looks ungoverned; reporting it under the same
+                // stage as "this endpoint declares no metadata" hides a pipeline-ordering fault as a metadata gap.
+                string decisionStage = endpoint is null
+                    ? "aspnetcore.endpoint.governance.unresolved_endpoint"
+                    : "aspnetcore.endpoint.governance.metadata";
+
                 IResult missingGovernanceResult = CreateDefaultForbiddenResult(
                     httpContext,
                     options,
                     descriptor,
                     result: null,
-                    decisionStage: "aspnetcore.endpoint.governance.metadata");
+                    decisionStage: decisionStage);
 
                 await missingGovernanceResult.ExecuteAsync(httpContext).ConfigureAwait(false);
                 return;
