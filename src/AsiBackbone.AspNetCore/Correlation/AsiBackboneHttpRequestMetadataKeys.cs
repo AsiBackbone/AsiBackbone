@@ -6,6 +6,11 @@ namespace AsiBackbone.AspNetCore.Correlation;
 public static class AsiBackboneHttpRequestMetadataKeys
 {
     /// <summary>
+    /// Metadata key for the server-owned ASP.NET Core HTTP context trace identifier.
+    /// </summary>
+    public const string TraceIdentifier = "http.trace_identifier";
+
+    /// <summary>
     /// Metadata key for the safe HTTP method value.
     /// </summary>
     public const string Method = "http.method";

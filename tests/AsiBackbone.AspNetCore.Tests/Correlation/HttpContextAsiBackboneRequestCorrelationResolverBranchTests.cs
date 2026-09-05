@@ -28,7 +28,11 @@ public sealed class HttpContextAsiBackboneRequestCorrelationResolverBranchTests
 
         HttpContextAsiBackboneRequestCorrelationResolver resolver = CreateResolver(
             httpContext,
-            options => options.CorrelationIdHeaderNames = [" ", "X-Blank", "X-Valid"]);
+            options =>
+            {
+                options.TrustInboundCorrelationIdHeaders = true;
+                options.CorrelationIdHeaderNames = [" ", "X-Blank", "X-Valid"];
+            });
 
         AsiBackboneHttpRequestCorrelation correlation = resolver.ResolveRequestCorrelation();
 
@@ -164,7 +168,8 @@ public sealed class HttpContextAsiBackboneRequestCorrelationResolverBranchTests
 
         AsiBackboneHttpRequestCorrelation correlation = resolver.ResolveRequestCorrelation();
 
-        Assert.Empty(correlation.Metadata);
+        _ = Assert.Single(correlation.Metadata);
+        Assert.Equal("trace-exclusions", correlation.Metadata[AsiBackboneHttpRequestMetadataKeys.TraceIdentifier]);
     }
 
     private static HttpContextAsiBackboneRequestCorrelationResolver CreateResolver(

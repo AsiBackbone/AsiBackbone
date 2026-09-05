@@ -30,6 +30,7 @@ builder.Services.AddAsiBackboneAspNetCore(options =>
     options.IncludeEndpointMetadata = true;
     options.IncludeRequestMethod = true;
     options.IncludeRequestPath = false;
+    options.TrustInboundCorrelationIdHeaders = true;
     options.CorrelationIdHeaderNames = ["X-Correlation-ID", "X-Request-ID"];
 });
 ```
@@ -103,15 +104,14 @@ The worker resolves the drain from a scoped service provider so host-owned durab
 
 The default resolver:
 
-- checks configured correlation headers such as `X-Correlation-ID` and `X-Request-ID`;
-- trims and preserves valid printable client values up to `AsiBackboneIdentifierLimits.MaximumLength` characters;
-- ignores whitespace-only, oversized, or control-character-bearing values and continues to another configured value or the normal fallback;
-- falls back to `HttpContext.TraceIdentifier` when no acceptable configured header value is available;
+- ignores caller-controlled correlation headers;
+- falls back to `HttpContext.TraceIdentifier` when header trust is disabled or no valid trusted header is present;
 - captures a trace identifier from `Activity.Current` or the ASP.NET Core trace identifier;
+- always records the server-owned `HttpContext.TraceIdentifier` as `http.trace_identifier` metadata;
 - emits safe request metadata such as method, route pattern, endpoint display name, and route values;
 - excludes sensitive request data such as headers, query strings, request bodies, cookies, and tokens by default.
 
-Invalid correlation headers are not truncated or partially sanitized. The entire client value is discarded so two distinct hostile values cannot collapse into the same accepted identifier and control characters cannot reach logging, governance records, or bounded persistence columns. Server-generated fallback behavior is unchanged.
+Set `TrustInboundCorrelationIdHeaders` to `true` only behind a trusted ingress that removes caller-supplied values for the configured headers and writes its own correlation identifier. Opted-in values are trimmed and accepted only when printable and no longer than `AsiBackboneIdentifierLimits.MaximumLength`. Invalid values are discarded in full rather than truncated or partially sanitized. Do not enable header trust for requests received directly from untrusted callers, because doing so lets a caller choose the audit correlation key.
 
 Example usage:
 

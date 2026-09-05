@@ -1,3 +1,4 @@
+using AsiBackbone.AspNetCore.Correlation;
 using AsiBackbone.AspNetCore.DependencyInjection;
 using AsiBackbone.AspNetCore.Endpoints;
 using AsiBackbone.Core.Constraints;
@@ -93,8 +94,11 @@ public sealed class AsiBackboneEndpointGovernanceMetadataModeTests
 
         // Reduced mode keeps the policy marker. Dropping it would let a metadata setting silently disable a host
         // decision policy that varies its outcome by policy type, which is a permissive change made by the wrong knob.
-        Assert.Equal(2, evaluator.CapturedMetadata.Count);
+        Assert.Equal(3, evaluator.CapturedMetadata.Count);
         Assert.Equal("sample.metadata.reduced", evaluator.CapturedMetadata["endpoint.operation_name"]);
+        Assert.Equal(
+            "trace-reduced-metadata",
+            evaluator.CapturedMetadata[AsiBackboneHttpRequestMetadataKeys.TraceIdentifier]);
         Assert.Equal(
             descriptor.ToMetadata(AsiBackboneEndpointGovernanceMetadataMode.Full)["endpoint.policy_types"],
             evaluator.CapturedMetadata["endpoint.policy_types"]);
