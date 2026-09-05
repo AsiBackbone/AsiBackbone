@@ -86,10 +86,15 @@ public sealed class DefaultAsiBackboneEndpointGovernanceService : IAsiBackboneEn
         }
 
         endpointMetadata = metadataStage.Metadata;
+
+        // The sanitized dictionary already contains request metadata, so it is authoritative. Merging request
+        // metadata underneath it again would reintroduce any entry the sanitizer dropped: a dropped key is simply
+        // absent from the sanitized result, so there would be nothing to override the raw value.
         AsiBackboneConstraintEvaluationContext evaluationContext = correlation.ToEvaluationContext(
             endpointOptions.PolicyVersion,
             endpointOptions.PolicyHash,
-            endpointMetadata);
+            endpointMetadata,
+            mergeRequestMetadata: false);
 
         DecisionStageResult policyStage = await EvaluatePolicyAsync(
             httpContext,
