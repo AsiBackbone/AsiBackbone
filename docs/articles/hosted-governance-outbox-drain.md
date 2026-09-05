@@ -16,6 +16,8 @@ The hosted drain worker:
 
 The worker is intentionally an integration host, not an emitter provider. It can run with the no-op emitter for proof-path validation, with an in-memory store for development, or with durable EF Core storage and an OpenTelemetry-style emitter when those provider packages are available.
 
+The worker validates its scoped drain dependency graph during host startup. Registration requires both an `IAsiBackboneGovernanceOutboxStore` and an `IAsiBackboneGovernanceEmitter`; if either dependency cannot be resolved, startup logs a critical error and fails instead of leaving a worker that polls forever without draining. The startup scope is disposed immediately. Normal drain passes continue to create their own scopes so scoped stores and host-owned `DbContext` instances are not retained by the hosted service.
+
 Store and emitter implementations are host-provided services that can dominate drain throughput. Keep them async, cancellable, batch-aware, bounded, and observable. See [High-Throughput Host Service Guidance](high-throughput-host-services.md) for blocking-I/O anti-patterns, batching guidance, queue/backpressure expectations, and the host/framework responsibility boundary.
 
 ## No-op proof path
@@ -70,7 +72,7 @@ High-throughput production hosts should load-test the selected `BatchSize`, `Pol
 | `Enabled` | `true` | Allows the worker to be registered but disabled by configuration. Runtime changes pause or resume new drain cycles without restarting the process. In scaled deployments, set this to `true` only for the selected worker role or partition owner unless the host has implemented durable claiming. |
 | `BatchSize` | `100` | Maximum number of pending/retry-ready entries attempted per drain pass. |
 | `PollingInterval` | `30s` | Delay between normal drain passes and the fallback check interval while disabled when the options source does not raise change notifications. |
-| `FailureDelay` | `30s` | Delay after worker-level failures such as DI or storage exceptions. Provider failures returned through the emitter are still persisted by the Core drain. |
+| `FailureDelay` | `30s` | Delay after runtime worker-level failures such as storage exceptions. Missing drain dependencies fail startup. Provider failures returned through the emitter are still persisted by the Core drain. |
 | `RetryClock` | `DateTimeOffset.UtcNow` | Clock source used for retry-ready lookups. Tests can replace this with a fixed clock. |
 | `DrainOnShutdown` | `false` | Optionally attempts one final drain pass after the background loop has stopped. Do not enable this on many replicas unless duplicate drain behavior is understood. |
 | `ShutdownDrainTimeout` | `5s` | Time budget for the optional shutdown drain. |
@@ -79,10 +81,10 @@ High-throughput production hosts should load-test the selected `BatchSize`, `Pol
 
 `AsiBackboneGovernanceOutboxDrainHostedService` uses `IOptionsMonitor<AsiBackboneGovernanceOutboxDrainWorkerOptions>` for runtime configuration. The service remains alive when `Enabled` is `false`, including when the process starts in the disabled state.
 
-When disabled, the worker:
+When disabled, the worker validates its drain dependencies once during startup and then:
 
-- does not create dependency-injection scopes;
-- does not resolve scoped stores or `DbContext` instances;
+- does not create drain-cycle dependency-injection scopes;
+- does not resolve additional scoped stores or `DbContext` instances;
 - does not start new drain cycles;
 - waits for an options change notification, the fallback `PollingInterval`, or application shutdown.
 
@@ -130,7 +132,7 @@ Choose polling intervals based on operational urgency and provider stability:
 
 Emitter failures should be returned as provider-neutral `GovernanceEmissionResult` values whenever possible. The Core drain then persists deferred, retryable, failed, or dead-letter state transitions through the outbox store.
 
-If the provider throws unexpectedly, the Core drain converts the exception into a retryable provider-neutral outbox failure and schedules the next retry using `AsiBackboneGovernanceOutboxOptions.RetryDelay`. If the worker itself fails before or outside emission, such as a DI or storage exception, the hosted worker waits for `FailureDelay` before the next pass.
+If the provider throws unexpectedly, the Core drain converts the exception into a retryable provider-neutral outbox failure and schedules the next retry using `AsiBackboneGovernanceOutboxOptions.RetryDelay`. Missing or unresolvable drain dependencies fail host startup. If the running worker later encounters a transient store or infrastructure exception outside emission, it waits for `FailureDelay` before the next pass.
 
 ## Operational reliability guidance
 

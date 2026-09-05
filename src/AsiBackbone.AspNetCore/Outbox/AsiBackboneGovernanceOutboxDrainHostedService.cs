@@ -10,7 +10,11 @@ namespace AsiBackbone.AspNetCore.Outbox;
 /// Runs the provider-neutral governance outbox drain from an ASP.NET Core or generic-host background worker.
 /// </summary>
 /// <remarks>
-/// Hosting remains outside Core. The worker resolves the drain through a scoped service provider so durable providers that depend on scoped infrastructure, such as a host-owned EF Core <c>DbContext</c>, remain safe to use. Runtime changes to <see cref="AsiBackboneGovernanceOutboxDrainWorkerOptions.Enabled" /> pause or resume new drain cycles without terminating the hosted service.
+/// Hosting remains outside Core. Startup validates the scoped drain dependency graph and fails when the store or emitter
+/// cannot be resolved. Each drain cycle then resolves the drain through a new scoped service provider so durable providers
+/// that depend on scoped infrastructure, such as a host-owned EF Core <c>DbContext</c>, remain safe to use. Runtime changes
+/// to <see cref="AsiBackboneGovernanceOutboxDrainWorkerOptions.Enabled" /> pause or resume new drain cycles without
+/// terminating the hosted service.
 /// </remarks>
 public sealed class AsiBackboneGovernanceOutboxDrainHostedService(
     IServiceScopeFactory scopeFactory,
@@ -42,12 +46,41 @@ public sealed class AsiBackboneGovernanceOutboxDrainHostedService(
         new EventId(19805, nameof(LogWorkerFailed)),
         "Governance outbox drain worker failed before the next polling interval.");
 
+    private static readonly Action<ILogger, Exception?> LogStartupValidationFailed = LoggerMessage.Define(
+        LogLevel.Critical,
+        new EventId(19806, nameof(LogStartupValidationFailed)),
+        "Governance outbox drain worker startup validation failed. Ensure an outbox store and governance emitter are registered.");
+
     private readonly IServiceScopeFactory scopeFactory = scopeFactory ?? throw new ArgumentNullException(nameof(scopeFactory));
     private readonly IOptionsMonitor<AsiBackboneGovernanceOutboxDrainWorkerOptions> optionsMonitor = optionsMonitor ?? throw new ArgumentNullException(nameof(optionsMonitor));
     private readonly ILogger<AsiBackboneGovernanceOutboxDrainHostedService> logger = logger ?? throw new ArgumentNullException(nameof(logger));
     private readonly Lock optionsChangedSync = new();
     private TaskCompletionSource optionsChanged = CreateOptionsChangedSource();
     private long optionsVersion;
+
+    /// <inheritdoc />
+    public override Task StartAsync(CancellationToken cancellationToken)
+    {
+        try
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            optionsMonitor.CurrentValue.Validate();
+
+            using IServiceScope scope = scopeFactory.CreateScope();
+            _ = scope.ServiceProvider.GetRequiredService<AsiBackboneGovernanceOutboxDrain>();
+        }
+        catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
+        {
+            throw;
+        }
+        catch (Exception exception)
+        {
+            LogStartupValidationFailed(logger, exception);
+            throw;
+        }
+
+        return base.StartAsync(cancellationToken);
+    }
 
     /// <inheritdoc />
     public override async Task StopAsync(CancellationToken cancellationToken)

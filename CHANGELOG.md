@@ -17,6 +17,7 @@ This project follows the spirit of [Keep a Changelog](https://keepachangelog.com
 
 ### Fixed
 
+* The hosted governance outbox drain now validates its scoped drain dependencies during host startup and fails startup with a critical diagnostic when the outbox store or governance emitter cannot be resolved (#704). Missing registrations previously produced warning-only polling failures forever while the outbox remained undrained.
 * `UseEfCoreAuditLedger<TDbContext>`, `UseEfCoreAuditLifecycle<TDbContext>`, and `UseEfCoreGovernanceOutbox<TDbContext>` now bind their stores to the context named at each call site instead of registering the open `DbContext` service (#702). All three registered `DbContext`, so the last call won for every store: a host calling `UseEfCoreAuditLedger<AuditDb>()` and then `UseEfCoreGovernanceOutbox<OutboxDb>()` got every store bound to `OutboxDb`, failing only at runtime when a store reached for a set that context does not have. The registrations also collided with any `DbContext` registration the host owned. No public type or signature changed; the stores still take a `DbContext` constructor parameter.
 
 ### Changed

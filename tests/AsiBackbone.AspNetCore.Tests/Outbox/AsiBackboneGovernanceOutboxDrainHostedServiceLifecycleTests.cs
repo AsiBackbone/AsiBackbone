@@ -16,11 +16,11 @@ public sealed class AsiBackboneGovernanceOutboxDrainHostedServiceLifecycleTests
     private static readonly TimeSpan TestTimeout = TimeSpan.FromSeconds(5);
 
     /// <summary>
-    /// Verifies that a worker disabled at startup exits without creating a scope or attempting a drain.
+    /// Verifies that a worker disabled at startup validates its dependencies without attempting a drain.
     /// </summary>
     /// <returns>A task that represents the asynchronous test operation.</returns>
     [Fact]
-    public async Task DisabledAtStartupExitsWithoutCreatingScopeOrDraining()
+    public async Task DisabledAtStartupValidatesDependenciesWithoutDraining()
     {
         AsiBackboneGovernanceOutboxDrainWorkerOptions options = CreateOptions(enabled: false);
         using WorkerHarness harness = CreateHarness(options);
@@ -29,7 +29,7 @@ public sealed class AsiBackboneGovernanceOutboxDrainHostedServiceLifecycleTests
         await WaitAsync(harness.Logger.WaitForEventAsync(19803));
         await StopAsync(harness.Service);
 
-        Assert.Equal(0, harness.ScopeFactory.CreateScopeCallCount);
+        Assert.Equal(1, harness.ScopeFactory.CreateScopeCallCount);
         Assert.Equal(0, harness.Store.FindPendingCallCount);
         Assert.Contains(harness.Logger.Entries, entry => entry.EventId.Id == 19803);
     }
@@ -66,23 +66,22 @@ public sealed class AsiBackboneGovernanceOutboxDrainHostedServiceLifecycleTests
     }
 
     /// <summary>
-    /// Verifies that a missing scoped drain follows the worker-level failure path and retries after <c>FailureDelay</c> rather than the normal polling interval.
+    /// Verifies that a missing scoped drain fails startup instead of entering the polling retry loop.
     /// </summary>
     /// <returns>A task that represents the asynchronous test operation.</returns>
     [Fact]
-    public async Task MissingScopedDrainUsesFailureDelayBeforeRetrying()
+    public async Task MissingScopedDrainFailsStartupAndLogsCritical()
     {
         AsiBackboneGovernanceOutboxDrainWorkerOptions options = CreateOptions();
-        options.PollingInterval = TimeSpan.FromDays(1);
-        options.FailureDelay = TimeSpan.FromMilliseconds(20);
         using WorkerHarness harness = CreateHarness(options, registerDrain: false);
 
-        await harness.Service.StartAsync(TestContext.Current.CancellationToken);
-        await WaitAsync(harness.ScopeFactory.WaitForCreateScopeCallCountAsync(2));
-        await StopAsync(harness.Service);
+        _ = await Assert.ThrowsAsync<InvalidOperationException>(() =>
+            harness.Service.StartAsync(TestContext.Current.CancellationToken));
 
-        Assert.True(harness.ScopeFactory.CreateScopeCallCount >= 2);
-        Assert.Contains(harness.Logger.Entries, entry => entry.EventId.Id == 19805 && entry.Exception is InvalidOperationException);
+        Assert.Equal(1, harness.ScopeFactory.CreateScopeCallCount);
+        LogEntry entry = Assert.Single(harness.Logger.Entries, entry => entry.EventId.Id == 19806);
+        Assert.Equal(LogLevel.Critical, entry.LogLevel);
+        _ = Assert.IsType<InvalidOperationException>(entry.Exception);
     }
 
     /// <summary>
@@ -113,13 +112,14 @@ public sealed class AsiBackboneGovernanceOutboxDrainHostedServiceLifecycleTests
     {
         AsiBackboneGovernanceOutboxDrainWorkerOptions options = CreateOptions();
         options.FailureDelay = TimeSpan.FromDays(1);
-        using WorkerHarness harness = CreateHarness(options, registerDrain: false);
+        var store = new RecordingOutboxStore((_, _) => throw new InvalidOperationException("Simulated store failure."));
+        using WorkerHarness harness = CreateHarness(options, store);
 
         await harness.Service.StartAsync(TestContext.Current.CancellationToken);
-        await WaitAsync(harness.ScopeFactory.WaitForCreateScopeCallCountAsync(1));
+        await WaitAsync(harness.Logger.WaitForEventAsync(19805));
         await StopAsync(harness.Service);
 
-        Assert.Equal(1, harness.ScopeFactory.CreateScopeCallCount);
+        Assert.Equal(1, harness.Store.FindPendingCallCount);
         Assert.Contains(harness.Logger.Entries, entry => entry.EventId.Id == 19805);
     }
 
