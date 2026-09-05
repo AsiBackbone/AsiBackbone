@@ -73,10 +73,11 @@ public sealed class DefaultAsiBackboneEndpointGovernanceService : IAsiBackboneEn
         AsiBackboneHttpRequestCorrelation correlation = requestCorrelationResolver.ResolveRequestCorrelation();
         IReadOnlyDictionary<string, string> endpointMetadata = descriptor.ToMetadata(endpointOptions.MetadataMode);
 
+        IReadOnlyDictionary<string, string> mergedMetadata = correlation.MergeMetadata(endpointMetadata);
         MetadataStageResult metadataStage = await SanitizeMetadataAsync(
             optionalServices,
             correlation,
-            endpointMetadata,
+            mergedMetadata,
             cancellationToken).ConfigureAwait(false);
 
         if (metadataStage.TerminalResult is not null)
