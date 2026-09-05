@@ -473,6 +473,39 @@ public sealed class CanonicalPayloadHashingTests
         Assert.Equal("record-1", signingMetadata.Metadata["artifact_id"]);
     }
 
+    /// <summary>
+    /// Verifies that the algorithm selected during payload construction is retained and honored by the hasher.
+    /// </summary>
+    [Fact]
+    public void ConfiguredSha512AlgorithmIsUsedByBuiltInHasher()
+    {
+        var options = CanonicalPayloadOptions.Create(hashAlgorithm: "sha512");
+        AuditLedgerRecord record = CreateAuditLedgerRecord(["alpha"], new Dictionary<string, string>());
+
+        CanonicalPayload payload = CanonicalPayloadBuilder.ForAuditLedgerRecord(record, options);
+        CanonicalPayloadHash hash = CanonicalPayloadHasher.ComputeHash(payload);
+
+        Assert.Equal("SHA-512", options.HashAlgorithm);
+        Assert.Equal("SHA-512", payload.HashAlgorithm);
+        Assert.Equal("SHA-512", hash.HashAlgorithm);
+        Assert.Equal(128, hash.HashValue.Length);
+    }
+
+    /// <summary>
+    /// Verifies that unsupported configured algorithms fail explicitly instead of falling back to SHA-256.
+    /// </summary>
+    [Fact]
+    public void UnsupportedConfiguredHashAlgorithmFailsExplicitly()
+    {
+        var options = CanonicalPayloadOptions.Create(hashAlgorithm: "SHA-384");
+        AuditLedgerRecord record = CreateAuditLedgerRecord(["alpha"], new Dictionary<string, string>());
+        CanonicalPayload payload = CanonicalPayloadBuilder.ForAuditLedgerRecord(record, options);
+
+        NotSupportedException exception = Assert.Throws<NotSupportedException>(() => CanonicalPayloadHasher.ComputeHash(payload));
+
+        Assert.Contains("SHA-256 and SHA-512", exception.Message, StringComparison.Ordinal);
+    }
+
     private static AuditLedgerRecord CreateAuditLedgerRecord(IEnumerable<string> reasonCodes, IReadOnlyDictionary<string, string> metadata)
     {
         var actor = AsiBackboneActorContext.Service("system-1", "System");

@@ -116,11 +116,12 @@ public sealed class CanonicalPayloadHash
     {
         string normalized = hashAlgorithm.Trim();
 
-        return normalized.Equals("SHA256", StringComparison.OrdinalIgnoreCase)
-            ? CanonicalPayloadOptions.DefaultHashAlgorithm
-            : normalized.Equals(CanonicalPayloadOptions.DefaultHashAlgorithm, StringComparison.OrdinalIgnoreCase)
-                ? CanonicalPayloadOptions.DefaultHashAlgorithm
-                : normalized;
+        return normalized.ToUpperInvariant() switch
+        {
+            "SHA256" or "SHA-256" => CanonicalPayloadOptions.DefaultHashAlgorithm,
+            "SHA512" or "SHA-512" => "SHA-512",
+            _ => normalized
+        };
     }
 }
 
@@ -140,15 +141,17 @@ public static class CanonicalPayloadHasher
 
         string algorithm = CanonicalPayloadHash.NormalizeHashAlgorithm(
             string.IsNullOrWhiteSpace(hashAlgorithm)
-                ? CanonicalPayloadOptions.DefaultHashAlgorithm
+                ? payload.HashAlgorithm
                 : hashAlgorithm);
 
-        if (!algorithm.Equals(CanonicalPayloadOptions.DefaultHashAlgorithm, StringComparison.Ordinal))
+        byte[] payloadBytes = payload.ToUtf8Bytes();
+        byte[] hashBytes = algorithm switch
         {
-            throw new NotSupportedException($"The built-in canonical payload hasher supports {CanonicalPayloadOptions.DefaultHashAlgorithm}. Host or provider packages may implement additional algorithms separately.");
-        }
+            CanonicalPayloadOptions.DefaultHashAlgorithm => SHA256.HashData(payloadBytes),
+            "SHA-512" => SHA512.HashData(payloadBytes),
+            _ => throw new NotSupportedException($"The built-in canonical payload hasher supports {CanonicalPayloadOptions.DefaultHashAlgorithm} and SHA-512. Host or provider packages may implement additional algorithms separately.")
+        };
 
-        byte[] hashBytes = SHA256.HashData(payload.ToUtf8Bytes());
         string hashValue = Convert.ToHexString(hashBytes).ToLowerInvariant();
 
         return CanonicalPayloadHash.Create(

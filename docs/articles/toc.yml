@@ -153,6 +153,8 @@
       href: dlp-classification-scanner-integration.md
     - name: Signing-Ready Receipts and Key Handling
       href: signing-ready-receipts-and-key-handling.md
+    - name: Canonical JSON v1 Format
+      href: canonical-json-v1.md
     - name: Signed Audit and Outbox Records
       href: signed-audit-and-outbox-records.md
     - name: Verification Policy and Result Handling
