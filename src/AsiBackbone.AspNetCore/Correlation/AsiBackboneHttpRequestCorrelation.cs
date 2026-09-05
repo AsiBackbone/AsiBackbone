@@ -47,17 +47,55 @@ public sealed class AsiBackboneHttpRequestCorrelation(
     /// <param name="policyVersion">Optional policy version.</param>
     /// <param name="policyHash">Optional policy hash.</param>
     /// <param name="metadata">Optional host-provided metadata to merge with safe request metadata.</param>
+    /// <param name="mergeRequestMetadata">
+    /// When <see langword="true" /> (the default), <see cref="Metadata" /> is merged underneath
+    /// <paramref name="metadata" />. Pass <see langword="false" /> when <paramref name="metadata" /> already contains
+    /// request metadata and is authoritative — for example after sanitization, where re-merging would reintroduce
+    /// entries the sanitizer removed. <paramref name="metadata" /> is still key-normalized either way.
+    /// </param>
     /// <returns>A framework-neutral constraint evaluation context.</returns>
+    /// <remarks>
+    /// Merging layers <paramref name="metadata" /> over <see cref="Metadata" /> by key, so a caller that rewrites a
+    /// request-derived value overrides it, but a caller that <em>removes</em> one does not: with nothing to override
+    /// the raw entry, the merge puts it back. Sanitized metadata must therefore be passed with
+    /// <paramref name="mergeRequestMetadata" /> set to <see langword="false" />.
+    /// </remarks>
     public AsiBackboneConstraintEvaluationContext ToEvaluationContext(
         string? policyVersion = null,
         string? policyHash = null,
-        IReadOnlyDictionary<string, string>? metadata = null)
+        IReadOnlyDictionary<string, string>? metadata = null,
+        bool mergeRequestMetadata = true)
     {
         return new AsiBackboneConstraintEvaluationContext(
             CorrelationId,
             policyVersion,
             policyHash,
-            MergeMetadata(metadata));
+            mergeRequestMetadata ? MergeMetadata(metadata) : NormalizeSuppliedMetadata(metadata));
+    }
+
+    /// <summary>
+    /// Normalizes supplied metadata keys and values without merging request metadata underneath them.
+    /// </summary>
+    /// <param name="metadata">The metadata to normalize.</param>
+    /// <returns>A normalized metadata dictionary containing only the supplied entries.</returns>
+    private static IReadOnlyDictionary<string, string> NormalizeSuppliedMetadata(
+        IReadOnlyDictionary<string, string>? metadata)
+    {
+        if (metadata is null || metadata.Count == 0)
+        {
+            return EmptyMetadata;
+        }
+
+        Dictionary<string, string> normalized = new(StringComparer.Ordinal);
+
+        foreach (KeyValuePair<string, string> item in metadata)
+        {
+            AddIfValid(normalized, item.Key, item.Value);
+        }
+
+        return normalized.Count == 0
+            ? EmptyMetadata
+            : new ReadOnlyDictionary<string, string>(normalized);
     }
 
     /// <summary>
