@@ -63,10 +63,13 @@ builder.Services.AddAsiBackbone(backbone =>
 Manual EF Core audit ledger registration:
 
 ```csharp
-builder.Services.AddScoped<DbContext>(provider =>
-    provider.GetRequiredService<ApplicationDbContext>());
-builder.Services.AddScoped<IAsiBackboneAuditLedgerStore, EfCoreAuditLedgerStore>();
+builder.Services.AddScoped<IAsiBackboneAuditLedgerStore>(provider =>
+    ActivatorUtilities.CreateInstance<EfCoreAuditLedgerStore>(
+        provider,
+        provider.GetRequiredService<ApplicationDbContext>()));
 ```
+
+Bind each store to the context it should use rather than registering the open `DbContext` service. Registering `DbContext` makes the last such registration win for every store, so a host that points different stores at different contexts silently gets one of them, and it collides with any `DbContext` registration the host already owns.
 
 Builder equivalent:
 
