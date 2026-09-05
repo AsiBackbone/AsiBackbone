@@ -51,6 +51,9 @@ await using (AsyncServiceScope scope = app.Services.CreateAsyncScope())
     _ = await dbContext.Database.EnsureCreatedAsync().ConfigureAwait(false);
 }
 
+// Endpoint governance reads the selected endpoint, so it must run after routing. This host relies on
+// WebApplication inserting UseRouting at the front of the pipeline; a host that calls UseRouting itself can
+// pass requireEndpointRoutingRegistered: true to turn that ordering requirement into a startup failure.
 app.UseAsiBackboneEndpointGovernance();
 
 app.MapGet("/", () => Results.Redirect("/sample/decision"));

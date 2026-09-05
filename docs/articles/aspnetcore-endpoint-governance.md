@@ -20,6 +20,32 @@ Hosts that use policy metadata should register an `IAsiBackbonePolicyEvaluator<A
 
 Because those services may run before the protected endpoint executes, their implementation choices affect request throughput. Keep request-time evaluators, validators, and audit sinks async, cancellable, bounded, and free of blocking calls such as `.Result`, `.Wait()`, `Thread.Sleep`, synchronous network calls, synchronous database calls, or unbounded `Task.Run` work. See [High-Throughput Host Service Guidance](high-throughput-host-services.md) for request hot-path examples, anti-patterns, queue/backpressure guidance, and the framework/host responsibility boundary.
 
+## Middleware ordering
+
+Endpoint governance reads the *selected* endpoint's metadata, so it must run after endpoint routing has selected one. Register it after `UseRouting` and after authentication, so an actor context is available:
+
+```csharp
+app.UseRouting();
+app.UseAuthentication();
+app.UseAuthorization();
+app.UseAsiBackboneEndpointGovernance();
+```
+
+Placed before routing, every request reaches the middleware with no endpoint. No governance metadata is found, and the request is forwarded **ungoverned** unless `RequireGovernanceMetadata` is enabled. Nothing fails; endpoints that declare policies, capability grants, or handshakes are simply never evaluated.
+
+A Minimal API host that never calls `UseRouting` is still correct: `WebApplication` inserts routing at the front of the pipeline when endpoints are mapped, so the endpoint is available by the time this middleware runs.
+
+A host that calls `UseRouting` explicitly can turn the ordering requirement into a startup failure:
+
+```csharp
+app.UseRouting();
+app.UseAsiBackboneEndpointGovernance(requireEndpointRoutingRegistered: true);
+```
+
+This is off by default because it cannot be checked reliably. The routing marker it inspects is legitimately absent in the Minimal API case above, so enabling it by default would fail startup for hosts that are correctly configured.
+
+When `RequireGovernanceMetadata` is enabled, a request with no selected endpoint fails closed and is reported under the `aspnetcore.endpoint.governance.unresolved_endpoint` decision stage, distinct from the `aspnetcore.endpoint.governance.metadata` stage used when an endpoint was selected but declares no governance metadata. The two have different causes and different fixes.
+
 ## Options validation posture
 
 `AddAsiBackboneAspNetCore()` registers endpoint-governance options validation with startup validation. Invalid endpoint-governance options fail through the configured options validation path instead of being revalidated on every request.

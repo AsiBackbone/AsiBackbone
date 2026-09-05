@@ -8,6 +8,7 @@ This project follows the spirit of [Keep a Changelog](https://keepachangelog.com
 
 ### Added
 
+
 * Added `CanonicalPayloadBuilder.ForCapabilityTokenGrant`, covering every field a `CapabilityTokenGrant` carries (#699). `CanonicalArtifactTypes.CapabilityTokenGrant` existed but had no builder, so every consumer invented its own payload. The repository's own reference implementations in the validator tests and the stable-package smoke script hashed four fields — `audience`, `expiresUtc`, `issuer`, and `scopes` — while `CapabilityGrantValidator` enforces `NotBeforeUtc`, `PolicyVersion`, `PolicyHash`, `AcknowledgmentId`, `HandshakeId`, `GatewayBinding`, `ResourceBinding`, `SubjectId`, `OperationName`, and `IssuedUtc` as well. Fields outside the payload are outside the proof, so a value changed after signing still validated. Scopes are normalized to a sorted, de-duplicated, ordinal set; grant metadata remains filtered through `CanonicalPayloadOptions.AllowsMetadataKey`, whose allow-list is empty by default, so metadata is unbound unless a host opts a key in. Both reference implementations now use the builder.
 
 ### Deprecated
@@ -16,6 +17,7 @@ This project follows the spirit of [Keep a Changelog](https://keepachangelog.com
 
 ### Changed
 
+* A request with no selected endpoint now reports the `aspnetcore.endpoint.governance.unresolved_endpoint` decision stage instead of sharing `aspnetcore.endpoint.governance.metadata` with endpoints that declare no governance metadata (#700). Both still fail closed only when `RequireGovernanceMetadata` is enabled; the change makes a pipeline-ordering fault distinguishable from a metadata gap, since they have different causes and different fixes.
 * `endpoint.policy_types` is now retained under `AsiBackboneEndpointGovernanceMetadataMode.Reduced` (#698). It was previously dropped, so a host decision policy that varied its outcome by policy type silently stopped seeing the marker under Reduced mode and fell back to uniform behavior — a permissive change produced by a metadata setting rather than a policy one. Reduced mode still drops every other descriptor entry.
 * Documented on `MarkGovernancePolicy`, `RequireGovernancePolicyAttribute`, `AsiBackboneTestHarnessPolicyEvaluator`, and `AsiBackboneTestHarnessOptions.SetPolicyResult` that an endpoint's policy type is a marker rather than an evaluation selector (#698). The registered evaluator runs every registered constraint on every governed endpoint; varying behavior by policy requires a host-supplied `IAsiBackboneDecisionPolicy` that reads `endpoint.policy_types`. The Testing harness keeps its per-policy result API, now labeled as simulating that host policy rather than framework behavior.
 
