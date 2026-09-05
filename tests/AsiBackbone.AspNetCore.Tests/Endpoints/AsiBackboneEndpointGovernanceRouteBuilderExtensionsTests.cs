@@ -1,5 +1,8 @@
 using System.Reflection;
 using AsiBackbone.AspNetCore.Endpoints;
+using AsiBackbone.Core.Constraints;
+using AsiBackbone.Core.Decisions;
+using AsiBackbone.Core.Evaluation;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.AspNetCore.Routing.Patterns;
@@ -13,10 +16,10 @@ namespace AsiBackbone.AspNetCore.Tests.Endpoints;
 public sealed class AsiBackboneEndpointGovernanceRouteBuilderExtensionsTests
 {
     /// <summary>
-    /// Tests that the <see cref="AsiBackboneEndpointGovernanceRouteBuilderExtensions.RequireGovernancePolicy{TPolicy}(RouteHandlerBuilder)"/> method returns the same <see cref="RouteHandlerBuilder"/> instance.
+    /// Tests that the <see cref="AsiBackboneEndpointGovernanceRouteBuilderExtensions.MarkGovernancePolicy{TPolicy}(RouteHandlerBuilder)"/> method returns the same <see cref="RouteHandlerBuilder"/> instance.
     /// </summary>
     [Fact]
-    public void RequireGovernancePolicy_RouteHandlerBuilder_ReturnsSameBuilder()
+    public void MarkGovernancePolicy_RouteHandlerBuilder_ReturnsSameBuilder()
     {
         var app = WebApplication.Create();
 
@@ -24,21 +27,21 @@ public sealed class AsiBackboneEndpointGovernanceRouteBuilderExtensionsTests
             "/governed",
             static () => Microsoft.AspNetCore.Http.Results.Ok());
 
-        RouteHandlerBuilder returned = routeBuilder.RequireGovernancePolicy<TestPolicy>();
+        RouteHandlerBuilder returned = routeBuilder.MarkGovernancePolicy<TestDecisionPolicy>();
 
         Assert.Same(routeBuilder, returned);
     }
 
     /// <summary>
-    /// Tests that the <c>AsiBackboneEndpointGovernanceRouteBuilderExtensions.RequireGovernancePolicy{TPolicy}(IEndpointConventionBuilder)</c> method adds the correct metadata to the endpoint and returns the same <see cref="IEndpointConventionBuilder"/> instance.
+    /// Tests that the <c>MarkGovernancePolicy(IEndpointConventionBuilder, Type)</c> method adds the correct metadata to the endpoint and returns the same builder instance.
     /// </summary>
     [Fact]
-    public void RequireGovernancePolicy_EndpointConventionBuilder_AddsPolicyMetadataAndReturnsSameBuilder()
+    public void MarkGovernancePolicy_EndpointConventionBuilder_AddsPolicyMetadataAndReturnsSameBuilder()
     {
         var builder = new CapturingEndpointConventionBuilder();
 
         CapturingEndpointConventionBuilder returned =
-            builder.RequireGovernancePolicy(typeof(TestPolicy));
+            builder.MarkGovernancePolicy(typeof(TestPolicy));
 
         Assert.Same(builder, returned);
 
@@ -50,6 +53,54 @@ public sealed class AsiBackboneEndpointGovernanceRouteBuilderExtensionsTests
             Assert.Single(endpointBuilder.Metadata.OfType<RequireGovernancePolicyAttribute>());
 
         Assert.Equal(typeof(TestPolicy), metadata.PolicyType);
+    }
+
+    /// <summary>
+    /// Tests that the obsolete generic marker still records the same metadata as its replacement so existing callers keep working.
+    /// </summary>
+    [Fact]
+    public void ObsoleteRequireGovernancePolicy_RecordsSameMetadataAsMarkGovernancePolicy()
+    {
+        var obsoleteBuilder = new CapturingEndpointConventionBuilder();
+        var currentBuilder = new CapturingEndpointConventionBuilder();
+
+        // The obsolete overloads are exercised deliberately: they remain the supported path for existing callers
+        // until they are removed, so their forwarding behavior needs coverage.
+#pragma warning disable CS0618 // Type or member is obsolete
+        _ = obsoleteBuilder.RequireGovernancePolicy(typeof(TestPolicy));
+#pragma warning restore CS0618
+        _ = currentBuilder.MarkGovernancePolicy(typeof(TestPolicy));
+
+        EndpointBuilder obsoleteEndpoint = CreateEndpointBuilder();
+        EndpointBuilder currentEndpoint = CreateEndpointBuilder();
+        Assert.Single(obsoleteBuilder.Conventions)(obsoleteEndpoint);
+        Assert.Single(currentBuilder.Conventions)(currentEndpoint);
+
+        RequireGovernancePolicyAttribute obsoleteMetadata =
+            Assert.Single(obsoleteEndpoint.Metadata.OfType<RequireGovernancePolicyAttribute>());
+        RequireGovernancePolicyAttribute currentMetadata =
+            Assert.Single(currentEndpoint.Metadata.OfType<RequireGovernancePolicyAttribute>());
+
+        Assert.Equal(currentMetadata.PolicyType, obsoleteMetadata.PolicyType);
+    }
+
+    /// <summary>
+    /// Tests that the obsolete overloads carry an <see cref="ObsoleteAttribute"/> pointing callers at the replacement.
+    /// </summary>
+    [Fact]
+    public void ObsoleteRequireGovernancePolicyOverloadsNameTheReplacement()
+    {
+        MethodInfo[] obsoleteOverloads = [.. typeof(AsiBackboneEndpointGovernanceRouteBuilderExtensions)
+            .GetMethods(BindingFlags.Public | BindingFlags.Static)
+            .Where(method => method.Name == "RequireGovernancePolicy")];
+
+        Assert.Equal(2, obsoleteOverloads.Length);
+        Assert.All(obsoleteOverloads, method =>
+        {
+            ObsoleteAttribute? obsolete = method.GetCustomAttribute<ObsoleteAttribute>();
+            Assert.NotNull(obsolete);
+            Assert.Contains("MarkGovernancePolicy", obsolete.Message, StringComparison.Ordinal);
+        });
     }
 
     /// <summary>
@@ -113,15 +164,15 @@ public sealed class AsiBackboneEndpointGovernanceRouteBuilderExtensionsTests
     }
 
     /// <summary>
-    /// Tests that the <c>AsiBackboneEndpointGovernanceRouteBuilderExtensions.RequireGovernancePolicy{TPolicy}(IEndpointConventionBuilder)</c> method throws an <see cref="ArgumentNullException"/> when the policy type is null.
+    /// Tests that the <c>MarkGovernancePolicy(IEndpointConventionBuilder, Type)</c> method throws an <see cref="ArgumentNullException"/> when the policy type is null.
     /// </summary>
     [Fact]
-    public void RequireGovernancePolicy_ThrowsWhenPolicyTypeIsNull()
+    public void MarkGovernancePolicy_ThrowsWhenPolicyTypeIsNull()
     {
         var builder = new CapturingEndpointConventionBuilder();
 
         ArgumentNullException exception = Assert.Throws<ArgumentNullException>(
-            () => builder.RequireGovernancePolicy(null!));
+            () => builder.MarkGovernancePolicy(null!));
 
         Assert.Equal("policyType", exception.ParamName);
     }
@@ -201,5 +252,17 @@ public sealed class AsiBackboneEndpointGovernanceRouteBuilderExtensionsTests
 
     private sealed class TestPolicy
     {
+    }
+
+    private sealed class TestDecisionPolicy : IAsiBackboneDecisionPolicy<AsiBackboneConstraintEvaluationContext>
+    {
+        public ValueTask<GovernanceDecision> ApplyAsync(
+            AsiBackboneConstraintEvaluationContext context,
+            GovernanceDecision composedDecision,
+            IReadOnlyList<ConstraintEvaluationResult> constraintResults,
+            CancellationToken cancellationToken = default)
+        {
+            return ValueTask.FromResult(composedDecision);
+        }
     }
 }

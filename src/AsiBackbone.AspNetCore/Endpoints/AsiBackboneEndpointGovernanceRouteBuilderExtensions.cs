@@ -1,3 +1,5 @@
+using AsiBackbone.Core.Constraints;
+using AsiBackbone.Core.Evaluation;
 using Microsoft.AspNetCore.Builder;
 
 namespace AsiBackbone.AspNetCore.Endpoints;
@@ -8,14 +10,55 @@ namespace AsiBackbone.AspNetCore.Endpoints;
 public static class AsiBackboneEndpointGovernanceRouteBuilderExtensions
 {
     /// <summary>
+    /// Marks a Minimal API route handler endpoint with the host-defined decision policy that governs it.
+    /// </summary>
+    /// <remarks>
+    /// This records a marker, not an enforcement rule. The framework does not resolve <typeparamref name="TPolicy" />
+    /// or select constraints from it: the registered <c>IAsiBackbonePolicyEvaluator</c> evaluates every registered
+    /// constraint on every governed endpoint regardless of which policy an endpoint is marked with. The marker reaches
+    /// evaluation as the <c>endpoint.policy_types</c> metadata entry, where a host-supplied
+    /// <see cref="IAsiBackboneDecisionPolicy{TContext}" /> can read it and vary its own outcome. Marking two endpoints
+    /// with different policy types does not by itself make them evaluate differently.
+    /// </remarks>
+    /// <typeparam name="TPolicy">The host-registered decision policy that governs the endpoint.</typeparam>
+    /// <param name="builder">The route handler builder.</param>
+    /// <returns>The same builder so calls can be chained.</returns>
+    public static RouteHandlerBuilder MarkGovernancePolicy<TPolicy>(this RouteHandlerBuilder builder)
+        where TPolicy : IAsiBackboneDecisionPolicy<AsiBackboneConstraintEvaluationContext>
+    {
+        return builder.MarkGovernancePolicy(typeof(TPolicy));
+    }
+
+    /// <summary>
+    /// Marks an endpoint with the host-defined policy type that governs it.
+    /// </summary>
+    /// <remarks>
+    /// This records a marker, not an enforcement rule. See
+    /// <see cref="MarkGovernancePolicy{TPolicy}(RouteHandlerBuilder)" /> for what the framework does and does not do
+    /// with the recorded type. This overload accepts any type so hosts can mark endpoints with a plain marker type
+    /// rather than a registered decision policy.
+    /// </remarks>
+    /// <typeparam name="TBuilder">The endpoint convention builder type.</typeparam>
+    /// <param name="builder">The endpoint convention builder.</param>
+    /// <param name="policyType">The host-defined policy marker or decision policy type.</param>
+    /// <returns>The same builder so calls can be chained.</returns>
+    public static TBuilder MarkGovernancePolicy<TBuilder>(this TBuilder builder, Type policyType)
+        where TBuilder : IEndpointConventionBuilder
+    {
+        ArgumentNullException.ThrowIfNull(policyType);
+        return AddEndpointMetadata(builder, new RequireGovernancePolicyAttribute(policyType));
+    }
+
+    /// <summary>
     /// Adds a host-defined governance policy marker to a Minimal API route handler endpoint.
     /// </summary>
     /// <typeparam name="TPolicy">The host-defined policy marker or resolver type.</typeparam>
     /// <param name="builder">The route handler builder.</param>
     /// <returns>The same builder so calls can be chained.</returns>
+    [Obsolete("The framework never resolved the policy type or selected constraints from it, so the 'Require' name overstated what this does. Use MarkGovernancePolicy, which records the same metadata under an accurate name.")]
     public static RouteHandlerBuilder RequireGovernancePolicy<TPolicy>(this RouteHandlerBuilder builder)
     {
-        return builder.RequireGovernancePolicy(typeof(TPolicy));
+        return builder.MarkGovernancePolicy(typeof(TPolicy));
     }
 
     /// <summary>
@@ -25,11 +68,11 @@ public static class AsiBackboneEndpointGovernanceRouteBuilderExtensions
     /// <param name="builder">The endpoint convention builder.</param>
     /// <param name="policyType">The host-defined policy marker or resolver type.</param>
     /// <returns>The same builder so calls can be chained.</returns>
+    [Obsolete("The framework never resolved the policy type or selected constraints from it, so the 'Require' name overstated what this does. Use MarkGovernancePolicy, which records the same metadata under an accurate name.")]
     public static TBuilder RequireGovernancePolicy<TBuilder>(this TBuilder builder, Type policyType)
         where TBuilder : IEndpointConventionBuilder
     {
-        ArgumentNullException.ThrowIfNull(policyType);
-        return AddEndpointMetadata(builder, new RequireGovernancePolicyAttribute(policyType));
+        return builder.MarkGovernancePolicy(policyType);
     }
 
     /// <summary>

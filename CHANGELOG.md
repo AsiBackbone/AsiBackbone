@@ -6,7 +6,14 @@ This project follows the spirit of [Keep a Changelog](https://keepachangelog.com
 
 ## [Unreleased]
 
+### Deprecated
+
+* `RequireGovernancePolicy` on the endpoint route-builder extensions is obsolete in favor of `MarkGovernancePolicy` (#698). The framework never resolved the marked policy type or selected constraints from it, so the `Require` name overstated what the method did. The replacement records identical metadata; migrating is a rename with no behavior change. The generic `MarkGovernancePolicy<TPolicy>` overload constrains `TPolicy` to `IAsiBackboneDecisionPolicy<AsiBackboneConstraintEvaluationContext>` to point at the mechanism that actually varies behavior by policy; the `Type` overload remains unconstrained for plain marker types.
+
 ### Changed
+
+* `endpoint.policy_types` is now retained under `AsiBackboneEndpointGovernanceMetadataMode.Reduced` (#698). It was previously dropped, so a host decision policy that varied its outcome by policy type silently stopped seeing the marker under Reduced mode and fell back to uniform behavior — a permissive change produced by a metadata setting rather than a policy one. Reduced mode still drops every other descriptor entry.
+* Documented on `MarkGovernancePolicy`, `RequireGovernancePolicyAttribute`, `AsiBackboneTestHarnessPolicyEvaluator`, and `AsiBackboneTestHarnessOptions.SetPolicyResult` that an endpoint's policy type is a marker rather than an evaluation selector (#698). The registered evaluator runs every registered constraint on every governed endpoint; varying behavior by policy requires a host-supplied `IAsiBackboneDecisionPolicy` that reads `endpoint.policy_types`. The Testing harness keeps its per-policy result API, now labeled as simulating that host policy rather than framework behavior.
 
 * **Breaking:** `AsiBackboneGovernanceOutboxOptions.UseClaimLeases` now defaults to `true`, and `ClaimWorkerId` defaults to the machine name and process identifier (#697). Two hosts running the default drain worker against the same durable outbox previously emitted every entry twice. Hosts supplying a custom outbox store that does not implement `IAsiBackboneGovernanceOutboxClaimStore` must set `UseClaimLeases` to `false`; the drain throws rather than falling back, because falling back would restore the duplicate-emission behavior the default exists to prevent. Both shipped stores are claim-capable and need no change.
 

@@ -11,7 +11,7 @@ Use the testing harness when an endpoint has governance metadata such as:
 
 ```csharp
 app.MapPost("/robotics/execute", () => Results.Ok())
-    .RequireGovernancePolicy<RobotExecutionPolicy>()
+    .MarkGovernancePolicy<RobotExecutionPolicy>()
     .RequireCapabilityGrant("robotics.execute")
     .EmitGovernanceAudit();
 ```
@@ -53,6 +53,8 @@ builder.Services.AddAsiBackboneTestHarness(harness =>
         GovernanceDecision.Deny("test.denied", "Denied by test harness."));
 });
 ```
+
+> **`SetPolicyResult` simulates host policy, not framework behavior.** AsiBackbone does not select constraints or decisions from an endpoint's policy type; every registered constraint runs on every governed endpoint. Configuring different results for two policy types asserts against a host-supplied `IAsiBackboneDecisionPolicy` that reads `endpoint.policy_types`, which the application must actually implement. Without it, both endpoints evaluate identically at runtime. See [ASP.NET Core Endpoint Governance](aspnetcore-endpoint-governance.md).
 
 For stricter tests, require every endpoint policy marker to be explicitly configured:
 

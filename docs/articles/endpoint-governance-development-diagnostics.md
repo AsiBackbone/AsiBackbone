@@ -79,7 +79,7 @@ Exact fields depend on the failing stage, configured metadata mode, and the deci
 
 ### `endpoint.policy_evaluator.missing`
 
-The endpoint has `[RequireGovernancePolicy]` or `.RequireGovernancePolicy<TPolicy>()`, but no `IAsiBackbonePolicyEvaluator<AsiBackboneConstraintEvaluationContext>` is registered.
+The endpoint has `[RequireGovernancePolicy]` or `.MarkGovernancePolicy<TPolicy>()`, but no `IAsiBackbonePolicyEvaluator<AsiBackboneConstraintEvaluationContext>` is registered.
 
 Register a host-owned evaluator:
 

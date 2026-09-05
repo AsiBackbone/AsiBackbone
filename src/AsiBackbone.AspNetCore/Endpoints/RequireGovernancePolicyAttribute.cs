@@ -1,12 +1,22 @@
 namespace AsiBackbone.AspNetCore.Endpoints;
 
 /// <summary>
-/// Marks an ASP.NET Core endpoint as requiring host-defined AsiBackbone governance policy evaluation.
+/// Marks an ASP.NET Core endpoint with the host-defined AsiBackbone policy type that governs it.
 /// </summary>
 /// <remarks>
+/// <para>
+/// The recorded type is a marker, not an enforcement rule. The framework does not resolve it or select constraints
+/// from it: the registered policy evaluator evaluates every registered constraint on every governed endpoint,
+/// whichever policy type an endpoint carries. Presence of this attribute is what causes policy evaluation to run at
+/// all; the type identifies which policy the host intends, and reaches evaluation as the
+/// <c>endpoint.policy_types</c> metadata entry where a host-supplied decision policy can read it. Marking two
+/// endpoints with different policy types does not by itself make them evaluate differently.
+/// </para>
+/// <para>
 /// Initializes a new instance of the <see cref="RequireGovernancePolicyAttribute" /> class.
+/// </para>
 /// </remarks>
-/// <param name="policyType">The host-defined policy marker or resolver type associated with the endpoint.</param>
+/// <param name="policyType">The host-defined policy marker or decision policy type associated with the endpoint.</param>
 [AttributeUsage(AttributeTargets.Class | AttributeTargets.Method, AllowMultiple = true, Inherited = true)]
 public sealed class RequireGovernancePolicyAttribute(Type policyType) : Attribute, IAsiBackboneEndpointGovernancePolicyMetadata
 {

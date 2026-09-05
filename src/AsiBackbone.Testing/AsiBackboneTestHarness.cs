@@ -123,6 +123,16 @@ public sealed class AsiBackboneTestHarnessOptions
     /// <summary>
     /// Sets a deterministic result for a policy marker type.
     /// </summary>
+    /// <remarks>
+    /// This is a harness-only capability. It simulates a host-supplied decision policy that reads the
+    /// <c>endpoint.policy_types</c> metadata entry and varies its outcome by policy type. AsiBackbone itself does not
+    /// select constraints or decisions from an endpoint's policy type, so configuring different results for two policy
+    /// types asserts against host policy the application must actually implement. Without that host decision policy,
+    /// both endpoints evaluate identically at runtime.
+    /// </remarks>
+    /// <param name="policyType">The policy marker type to configure a result for.</param>
+    /// <param name="decision">The decision the harness returns for endpoints marked with that type.</param>
+    /// <returns>The same options instance so calls can be chained.</returns>
     public AsiBackboneTestHarnessOptions SetPolicyResult(Type policyType, GovernanceDecision decision)
     {
         ArgumentNullException.ThrowIfNull(policyType);
@@ -220,7 +230,17 @@ public static class AsiBackboneTestHarnessServiceCollectionExtensions
 /// Deterministic policy evaluator used by the test harness.
 /// </summary>
 /// <remarks>
+/// <para>
+/// Selecting a decision per policy token simulates a host-supplied decision policy that reads the
+/// <c>endpoint.policy_types</c> metadata entry and varies its outcome. It does not mirror framework behavior: the
+/// framework never resolves an endpoint's policy type or selects constraints from it, and the registered evaluator
+/// evaluates every registered constraint on every governed endpoint. A test that configures different results for
+/// two policy tokens is asserting against host policy it must actually implement, not against something AsiBackbone
+/// provides. Without such a host decision policy, both endpoints evaluate identically in production.
+/// </para>
+/// <para>
 /// Initializes a new instance of the <see cref="AsiBackboneTestHarnessPolicyEvaluator" /> class.
+/// </para>
 /// </remarks>
 public sealed class AsiBackboneTestHarnessPolicyEvaluator(AsiBackboneTestHarnessOptions options) : IAsiBackbonePolicyEvaluator<AsiBackboneConstraintEvaluationContext>
 {
