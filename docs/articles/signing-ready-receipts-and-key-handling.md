@@ -61,6 +61,8 @@ The Core canonicalization contract uses a deterministic JSON envelope with these
 | `canonicalizationVersion` | Binds the payload to the deterministic serialization rules. |
 | `content` | Contains the artifact-specific, minimized governance content. |
 
+The exact byte contract, including escaping, number formatting, and a golden interoperability vector, is defined in [Canonical JSON v1 Format](canonical-json-v1.md). This format is AsiBackbone-specific and is not RFC 8785 JSON Canonicalization Scheme (JCS).
+
 Canonicalization rules:
 
 * JSON object properties are emitted in ordinal key order.
@@ -68,8 +70,8 @@ Canonicalization rules:
 * Null properties are retained so absence and presence remain explicit.
 * Unordered string collections such as reason-code sets are trimmed, de-duplicated, and sorted ordinally.
 * Metadata is excluded unless the host supplies an explicit `CanonicalPayloadOptions` allow-list. This prevents diagnostic or provider-specific metadata from silently changing signable payloads.
-* The built-in hasher computes SHA-256 over the UTF-8 bytes of the canonical JSON payload.
-* Additional hash algorithms should be implemented by host or provider packages rather than forcing Core to depend on a concrete key-management or crypto-provider stack.
+* The built-in hasher computes the algorithm selected by `CanonicalPayloadOptions.HashAlgorithm` over the UTF-8 bytes of the canonical JSON payload. SHA-256 is the default; SHA-512 is also supported.
+* Unsupported algorithms fail explicitly. Host or provider packages may implement additional algorithms without changing the canonical bytes.
 
 `CanonicalPayloadHash.ToSigningMetadata()` can copy the hash into `SigningMetadata.SigningHash` and add descriptor metadata such as artifact type, artifact ID, canonicalization version, and payload schema version. This metadata is still unsigned until a host or provider uses `IAsiBackboneSigningService` and records a signature value, signature algorithm, key ID, and key version.
 
@@ -114,6 +116,7 @@ The Core tests use deterministic canonical payload builders, stable hash asserti
 
 ## Related documentation
 
+- [Canonical JSON v1 Format](canonical-json-v1.md)
 - [Production Wording and Stable Signing Boundaries](production-wording-and-alpha-limitations.md)
 - [Signing Provider Package Boundary](signing-provider-package-boundary.md)
 - [Managed-Key Signing Provider](managed-key-signing-provider.md)

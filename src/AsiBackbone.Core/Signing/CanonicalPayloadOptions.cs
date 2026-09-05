@@ -32,7 +32,7 @@ public sealed class CanonicalPayloadOptions
         ArgumentException.ThrowIfNullOrWhiteSpace(hashAlgorithm);
 
         CanonicalizationVersion = canonicalizationVersion.Trim();
-        HashAlgorithm = hashAlgorithm.Trim();
+        HashAlgorithm = CanonicalPayloadHash.NormalizeHashAlgorithm(hashAlgorithm);
         MetadataKeyAllowList = metadataKeyAllowList;
     }
 

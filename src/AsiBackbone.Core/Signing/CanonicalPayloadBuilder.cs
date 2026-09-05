@@ -26,6 +26,7 @@ public static class CanonicalPayloadBuilder
             auditResidueId,
             residue.SchemaVersion,
             effectiveOptions.CanonicalizationVersion,
+            effectiveOptions.HashAlgorithm,
             BuildAuditResidueContent(residue, effectiveOptions, auditResidueId));
     }
 
@@ -50,6 +51,7 @@ public static class CanonicalPayloadBuilder
             record.RecordId,
             record.SchemaVersion,
             effectiveOptions.CanonicalizationVersion,
+            effectiveOptions.HashAlgorithm,
             content);
     }
 
@@ -80,6 +82,7 @@ public static class CanonicalPayloadBuilder
             lifecycleEvent.EventId,
             AsiBackboneSchemaVersions.StableArtifactsV1,
             effectiveOptions.CanonicalizationVersion,
+            effectiveOptions.HashAlgorithm,
             content);
     }
 
@@ -96,6 +99,7 @@ public static class CanonicalPayloadBuilder
             envelope.EnvelopeId,
             envelope.SchemaVersion,
             effectiveOptions.CanonicalizationVersion,
+            effectiveOptions.HashAlgorithm,
             BuildGovernanceEmissionEnvelopeContent(envelope, effectiveOptions));
     }
 
@@ -129,6 +133,7 @@ public static class CanonicalPayloadBuilder
             entry.OutboxEntryId,
             entry.Envelope.SchemaVersion,
             effectiveOptions.CanonicalizationVersion,
+            effectiveOptions.HashAlgorithm,
             content);
     }
 
@@ -184,6 +189,7 @@ public static class CanonicalPayloadBuilder
             grant.TokenId,
             grant.SchemaVersion,
             effectiveOptions.CanonicalizationVersion,
+            effectiveOptions.HashAlgorithm,
             content);
     }
 

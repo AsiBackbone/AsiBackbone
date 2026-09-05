@@ -14,12 +14,14 @@ public sealed class CanonicalPayload
         string artifactId,
         string payloadSchemaVersion,
         string canonicalizationVersion,
+        string hashAlgorithm,
         string canonicalJson)
     {
         ArtifactType = artifactType;
         ArtifactId = artifactId;
         PayloadSchemaVersion = payloadSchemaVersion;
         CanonicalizationVersion = canonicalizationVersion;
+        HashAlgorithm = hashAlgorithm;
         CanonicalJson = canonicalJson;
     }
 
@@ -44,6 +46,11 @@ public sealed class CanonicalPayload
     public string CanonicalizationVersion { get; }
 
     /// <summary>
+    /// Gets the hash algorithm selected for the canonical payload bytes.
+    /// </summary>
+    public string HashAlgorithm { get; }
+
+    /// <summary>
     /// Gets the deterministic JSON payload to hash or sign.
     /// </summary>
     public string CanonicalJson { get; }
@@ -58,16 +65,38 @@ public sealed class CanonicalPayload
         string canonicalizationVersion,
         IReadOnlyDictionary<string, object?> content)
     {
+        return Create(
+            artifactType,
+            artifactId,
+            payloadSchemaVersion,
+            canonicalizationVersion,
+            CanonicalPayloadOptions.DefaultHashAlgorithm,
+            content);
+    }
+
+    /// <summary>
+    /// Creates a canonical payload envelope around deterministic artifact content with a selected hash algorithm.
+    /// </summary>
+    public static CanonicalPayload Create(
+        string artifactType,
+        string artifactId,
+        string payloadSchemaVersion,
+        string canonicalizationVersion,
+        string hashAlgorithm,
+        IReadOnlyDictionary<string, object?> content)
+    {
         ArgumentException.ThrowIfNullOrWhiteSpace(artifactType);
         ArgumentException.ThrowIfNullOrWhiteSpace(artifactId);
         ArgumentException.ThrowIfNullOrWhiteSpace(payloadSchemaVersion);
         ArgumentException.ThrowIfNullOrWhiteSpace(canonicalizationVersion);
+        ArgumentException.ThrowIfNullOrWhiteSpace(hashAlgorithm);
         ArgumentNullException.ThrowIfNull(content);
 
         string normalizedArtifactType = artifactType.Trim();
         string normalizedArtifactId = artifactId.Trim();
         string normalizedPayloadSchemaVersion = payloadSchemaVersion.Trim();
         string normalizedCanonicalizationVersion = canonicalizationVersion.Trim();
+        string normalizedHashAlgorithm = CanonicalPayloadHash.NormalizeHashAlgorithm(hashAlgorithm);
 
         SortedDictionary<string, object?> envelope = new(StringComparer.Ordinal)
         {
@@ -83,6 +112,7 @@ public sealed class CanonicalPayload
             normalizedArtifactId,
             normalizedPayloadSchemaVersion,
             normalizedCanonicalizationVersion,
+            normalizedHashAlgorithm,
             CanonicalPayloadJson.Serialize(envelope));
     }
 
