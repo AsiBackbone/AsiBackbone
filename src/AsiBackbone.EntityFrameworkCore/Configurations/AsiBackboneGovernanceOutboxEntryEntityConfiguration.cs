@@ -24,6 +24,8 @@ public sealed class AsiBackboneGovernanceOutboxEntryEntityConfiguration
     private const int HashMaxLength = 512;
     private const int ContentTypeMaxLength = 256;
     private const int PayloadTypeMaxLength = 128;
+    private const int DiagnosticTextMaxLength = 4096;
+    private const int SerializedJsonMaxLength = 65536;
     private const int ConcurrencyStampMaxLength = 64;
 
     private static readonly ValueConverter<DateTimeOffset, long> DateTimeOffsetToUtcTicksConverter = new(
@@ -86,8 +88,14 @@ public sealed class AsiBackboneGovernanceOutboxEntryEntityConfiguration
         _ = builder.Property(outboxEntry => outboxEntry.ProviderRecordId)
             .HasMaxLength(IdentifierMaxLength);
 
+        _ = builder.Property(outboxEntry => outboxEntry.DeadLetterReason)
+            .HasMaxLength(DiagnosticTextMaxLength);
+
         _ = builder.Property(outboxEntry => outboxEntry.LastErrorCode)
             .HasMaxLength(ErrorCodeMaxLength);
+
+        _ = builder.Property(outboxEntry => outboxEntry.LastErrorMessage)
+            .HasMaxLength(DiagnosticTextMaxLength);
 
         _ = builder.Property(outboxEntry => outboxEntry.LastErrorProviderName)
             .HasMaxLength(ProviderMaxLength);
@@ -96,7 +104,8 @@ public sealed class AsiBackboneGovernanceOutboxEntryEntityConfiguration
             .HasMaxLength(ProviderErrorCodeMaxLength);
 
         _ = builder.Property(outboxEntry => outboxEntry.MetadataJson)
-            .IsRequired();
+            .IsRequired()
+            .HasMaxLength(SerializedJsonMaxLength);
 
         _ = builder.Property(outboxEntry => outboxEntry.ClaimOwner)
             .HasMaxLength(IdentifierMaxLength);
@@ -184,7 +193,8 @@ public sealed class AsiBackboneGovernanceOutboxEntryEntityConfiguration
             .HasMaxLength(StageMaxLength);
 
         _ = builder.Property(outboxEntry => outboxEntry.EnvelopeMetadataJson)
-            .IsRequired();
+            .IsRequired()
+            .HasMaxLength(SerializedJsonMaxLength);
 
         _ = builder.Property(outboxEntry => outboxEntry.EnvelopePayloadType)
             .HasMaxLength(PayloadTypeMaxLength);
@@ -199,49 +209,14 @@ public sealed class AsiBackboneGovernanceOutboxEntryEntityConfiguration
             .HasMaxLength(HashMaxLength);
 
         _ = builder.Property(outboxEntry => outboxEntry.EnvelopePayloadMetadataJson)
-            .IsRequired();
+            .IsRequired()
+            .HasMaxLength(SerializedJsonMaxLength);
 
         _ = builder.HasIndex(outboxEntry => outboxEntry.OutboxEntryId)
             .IsUnique();
 
-        _ = builder.HasIndex(outboxEntry => outboxEntry.Status);
-
-        _ = builder.HasIndex(outboxEntry => outboxEntry.NextRetryUtc);
-
-        _ = builder.HasIndex(outboxEntry => outboxEntry.CreatedUtc);
-
-        _ = builder.HasIndex(outboxEntry => outboxEntry.UpdatedUtc);
-
-        _ = builder.HasIndex(outboxEntry => outboxEntry.DeliveredUtc);
-
-        _ = builder.HasIndex(outboxEntry => outboxEntry.ProviderName);
-
-        _ = builder.HasIndex(outboxEntry => outboxEntry.ProviderRecordId);
-
-        _ = builder.HasIndex(outboxEntry => outboxEntry.LastErrorCode);
-
-        _ = builder.HasIndex(outboxEntry => outboxEntry.ClaimOwner);
-
         _ = builder.HasIndex(outboxEntry => outboxEntry.ClaimToken);
 
-        _ = builder.HasIndex(outboxEntry => outboxEntry.ClaimExpiresUtc);
-
-        _ = builder.HasIndex(outboxEntry => outboxEntry.EnvelopeId);
-
-        _ = builder.HasIndex(outboxEntry => outboxEntry.EnvelopeEventId);
-
-        _ = builder.HasIndex(outboxEntry => outboxEntry.EnvelopeCorrelationId);
-
-        _ = builder.HasIndex(outboxEntry => outboxEntry.EnvelopeAuditResidueId);
-
-        _ = builder.HasIndex(outboxEntry => outboxEntry.EnvelopePolicyVersion);
-
-        _ = builder.HasIndex(outboxEntry => outboxEntry.EnvelopePolicyHash);
-
-        _ = builder.HasIndex(outboxEntry => outboxEntry.EnvelopeTraceId);
-
-        _ = builder.HasIndex(outboxEntry => outboxEntry.EnvelopeOutboxSequence);
-
         _ = builder.HasIndex(outboxEntry => new
         {
             outboxEntry.Status,
@@ -274,16 +249,5 @@ public sealed class AsiBackboneGovernanceOutboxEntryEntityConfiguration
             outboxEntry.OutboxEntryId
         });
 
-        _ = builder.HasIndex(outboxEntry => new
-        {
-            outboxEntry.EnvelopeCorrelationId,
-            outboxEntry.CreatedUtc
-        });
-
-        _ = builder.HasIndex(outboxEntry => new
-        {
-            outboxEntry.EnvelopeAuditResidueId,
-            outboxEntry.CreatedUtc
-        });
     }
 }

@@ -95,7 +95,11 @@ Use the outbox store when a host needs local durability across process restarts 
 
 The EF Core adapter is durable storage only. It does not drain the outbox by itself and does not add a cloud-provider SDK dependency to Core.
 
-`EfCoreGovernanceOutboxStore` participates in EF Core optimistic concurrency through the configured `ConcurrencyStamp` token. That protects state updates from stale writes, but it is not an atomic claim-before-emit mechanism. Multiple workers can still read the same pending row before either worker saves the final delivered/failed state.
+`EfCoreGovernanceOutboxStore` acquires a claim batch with one set-based `ExecuteUpdateAsync` operation and then reads the claimed rows by an opaque batch token. Cooperating workers therefore cannot claim the same currently eligible row, and the number of database commands remains constant as the requested batch grows. Claim leases still do not provide exactly-once provider delivery; hosts retain responsibility for downstream idempotency and recovery after lease expiration.
+
+The default model bounds signature values at 16,384 characters, provider error and dead-letter text at 4,096 characters, and serialized metadata/reason-code JSON at 65,536 characters. Ledger and outbox indexes cover the queries exposed by the package stores, including the audit hash-chain link, rather than indexing every persisted attribute.
+
+Hosts upgrading an existing database should generate and review a host-owned migration for these length and index changes. Before applying a narrowing migration, check existing rows for values that exceed the new limits. Hosts with additional application-specific query patterns may add their own indexes after applying the package configuration.
 
 ### Non-claim mutation concurrency ownership
 
@@ -105,7 +109,7 @@ The caller owns durable-state reload, conflict resolution, retry policy, and ide
 
 For competing or scaled workers, prefer claim leasing and the outcome-aware claim contract so write ownership is explicit. See [EF Core Outbox Non-Claim Concurrency Ownership](https://asibackbone.github.io/AsiBackbone/articles/efcore-outbox-non-claim-concurrency-ownership.html) and [Outbox Multi-Worker Concurrency Guidance](https://asibackbone.github.io/AsiBackbone/articles/outbox-multi-worker-concurrency.html).
 
-For scaled-out deployments, run one active worker per durable outbox partition unless the host adds provider-specific claim/lease behavior or downstream idempotency. See the DocFX article `Outbox Multi-Worker Concurrency` for the detailed deployment guidance.
+For scaled-out deployments, use the claim-aware drain path and retain downstream idempotency. Hosts may still partition work or add provider-specific locking when their operational model requires stronger coordination. See the DocFX article `Outbox Multi-Worker Concurrency` for the detailed deployment guidance.
 
 ## Registering EF Core stores
 

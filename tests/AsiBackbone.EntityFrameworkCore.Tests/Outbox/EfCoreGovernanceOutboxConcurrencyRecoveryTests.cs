@@ -1,3 +1,4 @@
+using System.Data.Common;
 using AsiBackbone.Core.Emissions;
 using AsiBackbone.Core.Outbox;
 using AsiBackbone.EntityFrameworkCore.Outbox;
@@ -15,10 +16,10 @@ namespace AsiBackbone.EntityFrameworkCore.Tests.Outbox;
 public sealed class EfCoreGovernanceOutboxConcurrencyRecoveryTests
 {
     /// <summary>
-    /// Verifies a losing claim race returns no claim, detaches the conflicted entity, and leaves the context usable for a later retry.
+    /// Verifies a competing set-based claim observes the winner atomically and leaves the context usable for a later retry.
     /// </summary>
     [Fact]
-    public async Task ClaimRaceReturnsNoClaimDetachesConflictAndAllowsSubsequentRetry()
+    public async Task SetBasedClaimRaceReturnsNoClaimAndAllowsSubsequentRetry()
     {
         CancellationToken cancellationToken = TestContext.Current.CancellationToken;
         await using SqliteConnection keeperConnection = await EfCoreGovernanceOutboxTestHost.OpenSharedMemoryKeeperConnectionAsync(cancellationToken);
@@ -28,7 +29,7 @@ public sealed class EfCoreGovernanceOutboxConcurrencyRecoveryTests
         const string outboxEntryId = "claim-race-entry";
         await SeedPendingEntryAsync(durableOptions, outboxEntryId, cancellationToken);
 
-        var interceptor = new OneShotSaveChangesInterceptor();
+        var interceptor = new OneShotCommandInterceptor();
         DbContextOptions<GovernanceOutboxTestDbContext> losingOptions = EfCoreGovernanceOutboxTestHost.CreateOptions(
             keeperConnection.ConnectionString,
             interceptor);
@@ -92,7 +93,7 @@ public sealed class EfCoreGovernanceOutboxConcurrencyRecoveryTests
         Assert.Equal(outboxEntryId, retryClaim.OutboxEntryId);
         Assert.Equal("worker-retry", retryClaim.WorkerId);
         Assert.Equal(2, retryClaim.Entry.ClaimAttemptCount);
-        _ = Assert.Single(losingContext.ChangeTracker.Entries<AsiBackboneGovernanceOutboxEntryEntity>());
+        Assert.Empty(losingContext.ChangeTracker.Entries<AsiBackboneGovernanceOutboxEntryEntity>());
     }
 
     /// <summary>
@@ -285,6 +286,38 @@ public sealed class EfCoreGovernanceOutboxConcurrencyRecoveryTests
         {
             _ = eventData;
             Func<CancellationToken, Task>? callback = Interlocked.Exchange(ref beforeSaveAsync, null);
+            if (callback is not null)
+            {
+                await callback(cancellationToken).ConfigureAwait(false);
+            }
+
+            return result;
+        }
+    }
+
+    private sealed class OneShotCommandInterceptor : DbCommandInterceptor
+    {
+        private Func<CancellationToken, Task>? beforeCommandAsync;
+
+        public void Arm(Func<CancellationToken, Task> callback)
+        {
+            ArgumentNullException.ThrowIfNull(callback);
+
+            if (Interlocked.CompareExchange(ref beforeCommandAsync, callback, null) is not null)
+            {
+                throw new InvalidOperationException("The command interceptor is already armed.");
+            }
+        }
+
+        public override async ValueTask<InterceptionResult<int>> NonQueryExecutingAsync(
+            DbCommand command,
+            CommandEventData eventData,
+            InterceptionResult<int> result,
+            CancellationToken cancellationToken = default)
+        {
+            _ = command;
+            _ = eventData;
+            Func<CancellationToken, Task>? callback = Interlocked.Exchange(ref beforeCommandAsync, null);
             if (callback is not null)
             {
                 await callback(cancellationToken).ConfigureAwait(false);
