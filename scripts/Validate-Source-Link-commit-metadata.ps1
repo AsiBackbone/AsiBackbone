@@ -1,16 +1,25 @@
 <#
+    Validates that the AsiBackbone packages published to nuget.org carry the Source Link
+    repository metadata that README.md and SECURITY.md tell consumers to verify: a git
+    repository type, this repository's URL, and a non-empty commit.
+
     Runtime behavior:
-    - When no -Version value is supplied, the script validates the currently documented
-      default package version below.
-    - For future releases, pass the released package version explicitly, for example:
+    - When no -Version value is supplied, the script validates the version declared by
+      Directory.Build.props, so the default cannot drift away from the repository.
+    - To validate a specific released package version, pass it explicitly, for example:
         ./scripts/Validate-Source-Link-commit-metadata.ps1 -Version '3.2.3'
+    - nuget.org does not serve a package the moment it is pushed. Use
+      -WaitForPublicationMinutes to poll until every package is downloadable; the
+      default of 0 fails immediately, which is what a manual run of an
+      already-published version wants.
     - Use -KeepArtifacts only when troubleshooting. By default, downloaded and extracted
       NuGet package verification artifacts are cleaned up before the script exits.
 #>
 
 [CmdletBinding()]
 param(
-    [string]$Version = '3.2.3',
+    [string]$Version,
+    [int]$WaitForPublicationMinutes = 0,
     [switch]$KeepArtifacts
 )
 
@@ -18,6 +27,74 @@ Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 
 $expectedRepositoryUrl = 'https://github.com/AsiBackbone/AsiBackbone'
+$repoRoot = Split-Path -Parent $PSScriptRoot
+
+function Get-DeclaredVersion {
+    $propsPath = Join-Path $repoRoot 'Directory.Build.props'
+
+    if (-not (Test-Path -LiteralPath $propsPath -PathType Leaf)) {
+        throw "Directory.Build.props was not found at $propsPath; pass -Version explicitly."
+    }
+
+    [xml]$props = Get-Content -LiteralPath $propsPath -Raw
+
+    $properties = @($props.Project.PropertyGroup.ChildNodes | Where-Object {
+        $_.NodeType -eq [System.Xml.XmlNodeType]::Element
+    })
+
+    $prefix = @($properties | Where-Object { $_.Name -eq 'VersionPrefix' } | Select-Object -First 1)
+    if ($prefix.Count -eq 0) {
+        throw "VersionPrefix was not found in Directory.Build.props; pass -Version explicitly."
+    }
+
+    $prefixValue = $prefix[0].InnerText.Trim()
+    $suffix = @($properties | Where-Object { $_.Name -eq 'VersionSuffix' } | Select-Object -First 1)
+    $suffixValue = if ($suffix.Count -eq 0) { '' } else { $suffix[0].InnerText.Trim() }
+
+    if ([string]::IsNullOrWhiteSpace($suffixValue)) {
+        return $prefixValue
+    }
+
+    return "$prefixValue-$suffixValue"
+}
+
+function Save-PublishedPackage {
+    <#
+        Downloads a published package, tolerating the delay between `dotnet nuget push`
+        and nuget.org serving the package from the flat container.
+    #>
+    param(
+        [Parameter(Mandatory = $true)][string]$Uri,
+        [Parameter(Mandatory = $true)][string]$OutFile,
+        [Parameter(Mandatory = $true)][datetime]$Deadline
+    )
+
+    $delaySeconds = 15
+
+    while ($true) {
+        try {
+            Invoke-WebRequest -Uri $Uri -OutFile $OutFile
+            return
+        }
+        catch {
+            if ((Get-Date) -ge $Deadline) {
+                throw
+            }
+
+            Write-Host "Package is not downloadable yet ($Uri); retrying in $delaySeconds second(s)."
+            Start-Sleep -Seconds $delaySeconds
+        }
+    }
+}
+
+if ([string]::IsNullOrWhiteSpace($Version)) {
+    $Version = Get-DeclaredVersion
+    Write-Host "No -Version supplied; validating the version declared by Directory.Build.props: $Version."
+}
+
+Write-Host "Validating Source Link repository metadata for AsiBackbone $Version on nuget.org."
+
+$deadline = (Get-Date).AddMinutes($WaitForPublicationMinutes)
 
 $packageIds = @(
     'AsiBackbone.Core',
@@ -52,7 +129,7 @@ try {
 
         $packageUrl = "https://api.nuget.org/v3-flatcontainer/$idLower/$Version/$idLower.$Version.nupkg"
 
-        Invoke-WebRequest -Uri $packageUrl -OutFile $nupkgPath
+        Save-PublishedPackage -Uri $packageUrl -OutFile $nupkgPath -Deadline $deadline
         Copy-Item -LiteralPath $nupkgPath -Destination $zipPath -Force
         Expand-Archive -LiteralPath $zipPath -DestinationPath $packageDirectory -Force
 

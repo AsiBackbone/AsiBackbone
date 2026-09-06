@@ -2,6 +2,13 @@ name: Publish Quality Reports
 
 on:
   workflow_dispatch:
+    inputs:
+      package_version:
+        description: >-
+          Published package version whose Source Link metadata should be validated,
+          for example 3.2.3. Leave empty to skip the Source Link validation job.
+        required: false
+        default: ''
   release:
     types: [published]
 
@@ -187,3 +194,49 @@ jobs:
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@cd2ce8fcbc39b97be8ca5fce6e763baed58fa128 # v5
+
+  validate-source-link:
+    name: Validate published Source Link metadata
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+
+    # On a release, validate the version that was just published. A manual run
+    # validates only the version the operator names, so dispatching this workflow
+    # for the documentation reports alone does not reach out to nuget.org.
+    if: github.event_name == 'release' || inputs.package_version != ''
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Resolve package version
+        id: package_version
+        shell: pwsh
+        env:
+          RELEASE_TAG: ${{ github.event.release.tag_name }}
+          INPUT_VERSION: ${{ inputs.package_version }}
+        run: |
+          $version = if (-not [string]::IsNullOrWhiteSpace($env:INPUT_VERSION)) {
+              $env:INPUT_VERSION.Trim()
+          }
+          else {
+              $env:RELEASE_TAG.Trim() -replace '^v', ''
+          }
+
+          if ($version -notmatch '^\d+\.\d+\.\d+(-[0-9A-Za-z.-]+)?$') {
+              throw "Resolved package version '$version' is not a valid release version."
+          }
+
+          "version=$version" >> $env:GITHUB_OUTPUT
+
+      - name: Validate published Source Link commit metadata
+        shell: pwsh
+        env:
+          PACKAGE_VERSION: ${{ steps.package_version.outputs.version }}
+        run: >
+          ./scripts/Validate-Source-Link-commit-metadata.ps1
+          -Version "$env:PACKAGE_VERSION"
+          -WaitForPublicationMinutes 20

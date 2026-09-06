@@ -117,13 +117,15 @@ For every stable release, the release readiness record should explicitly confirm
 
 ## Source Link metadata validation
 
-After `3.2.3` packages are published and visible on NuGet, maintainers should run:
+The `Publish Quality Reports` workflow runs this check automatically on `release: published`, resolving the version from the release tag and waiting up to 20 minutes for nuget.org to serve the newly pushed packages. A release whose packages lack the expected Source Link metadata therefore fails a workflow rather than waiting on a manual step.
+
+To validate a version by hand — for example when re-checking an older release — run:
 
 ```powershell
 ./scripts/Validate-Source-Link-commit-metadata.ps1 -Version 3.2.3
 ```
 
-This post-publish check downloads the published packages and confirms the expected repository type, repository URL, and non-empty repository commit metadata are present.
+This post-publish check downloads the published packages and confirms the expected repository type, repository URL, and non-empty repository commit metadata are present. Omitting `-Version` validates the version declared by `Directory.Build.props`. The same workflow can be dispatched manually with a `package_version` input to re-run the check against any published version; leaving that input empty skips it.
 
 ## Deferred checks
 
