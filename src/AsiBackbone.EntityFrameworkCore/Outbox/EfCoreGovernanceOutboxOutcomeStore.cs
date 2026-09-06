@@ -26,7 +26,7 @@ public sealed class EfCoreGovernanceOutboxOutcomeStore : IAsiBackboneGovernanceO
     private static readonly Action<ILogger, string, string, string, string, Exception?> LogClaimTransitionNotApplied =
         LoggerMessage.Define<string, string, string, string>(
             LogLevel.Warning,
-            new EventId(19801, nameof(LogClaimTransitionNotApplied)),
+            new EventId(19901, nameof(LogClaimTransitionNotApplied)),
             "Claimed governance outbox transition was not applied by worker {WorkerId} for entry {OutboxEntryId}. Outcome: {Outcome}. Durable status: {DurableStatus}.");
 
     private readonly DbContext dbContext;

@@ -230,6 +230,8 @@ AsiBackboneAcknowledgmentChallengeResult result = acknowledgmentChallengeService
 
 A successful challenge result contains a Core `LiabilityHandshakeAcknowledgment`. Failed responses return an `OperationResult` with a reason code, such as a handshake mismatch or acknowledgment-code mismatch. The package does not persist challenge state; hosts decide whether to store the Core handshake request, serialize it into protected state, or associate it with an existing workflow.
 
+`RequireLiabilityHandshake` metadata creates and returns a challenge when policy evaluation requires acknowledgment; it does not, by itself, consume a later response or replay the original endpoint. Without host-owned challenge storage and a response path that calls `HandleResponse`, repeating the governed request continues to return `428 Precondition Required`. The Plain ASP.NET Core Host sample demonstrates the complete host-owned round trip with `POST /sample/acknowledgments/challenges` and `POST /sample/acknowledgments/responses`. Its in-memory challenge store is illustrative only; production hosts should use protected, bounded-lifetime state and revalidate authorization and policy before performing the consequential operation.
+
 ## Plain ASP.NET Core Host Compatibility
 
 A plain ASP.NET Core application can use the package with only standard ASP.NET Core dependencies.
