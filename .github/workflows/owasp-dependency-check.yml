@@ -57,20 +57,22 @@ jobs:
       - name: Set up .NET
         uses: actions/setup-dotnet@a98b56852c35b8e3190ac28c8c2271da59106c68 # v6.0.0
         with:
-          dotnet-version: '10.0.x'
+          global-json-file: global.json
 
       # Restore so the full transitive dependency graph (obj/project.assets.json)
       # is available for Dependency-Check's NuGet analyzers to read.
       - name: Restore dependencies
         run: dotnet restore ./AsiBackbone.slnx --locked-mode
 
-      - name: Run OWASP Dependency-Check
+      - name: Run OWASP Dependency-Check (fail on CVSS 7 or higher)
         uses: dependency-check/Dependency-Check_Action@75ba02d6183445fe0761d26e836bde58b1560600 # 1.1.0
         with:
           project: 'AsiBackbone'
           path: '.'
           format: 'ALL'
-          others: '--suppression=/github/workspace/dependency-check-suppressions.xml'
+          others: >-
+            --failOnCVSS 7
+            --suppression=/github/workspace/dependency-check-suppressions.xml
 
       - name: Upload report artifact
         if: always()

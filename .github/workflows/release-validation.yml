@@ -13,10 +13,8 @@ on:
     tags:
       - 'v*.*.*'
 
-permissions:
-  contents: read
-  id-token: write
-  attestations: write
+# Deny all GitHub token permissions unless granted by a job.
+permissions: {}
 
 concurrency:
   group: stable-release-validation-${{ github.ref }}
@@ -34,6 +32,9 @@ jobs:
   stable-release-validation:
     name: Restore, build, test, docs, pack, and smoke
     runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
 
     steps:
       - name: Checkout repository
@@ -158,18 +159,6 @@ jobs:
         shell: bash
         run: bash ./eng/smoke-tests/stable-package-integration-smoke.sh
 
-      - name: Attest package provenance
-        if: github.event_name != 'pull_request'
-        uses: actions/attest-build-provenance@4d101475d8b20a2381f78447822ac1eab6504dd8 # v4.2.2
-        with:
-          subject-path: ${{ env.PACKAGE_OUTPUT }}/*.nupkg
-
-      - name: Attest package SBOM provenance
-        if: github.event_name != 'pull_request'
-        uses: actions/attest-build-provenance@4d101475d8b20a2381f78447822ac1eab6504dd8 # v4.2.2
-        with:
-          subject-path: ${{ env.SBOM_OUTPUT }}/*.json
-
       - name: Upload package artifacts
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
@@ -183,3 +172,37 @@ jobs:
           name: asi-backbone-release-validation-package-sboms
           path: ${{ env.SBOM_OUTPUT }}/*.json
           if-no-files-found: error
+
+  attest-artifacts:
+    name: Attest validated package artifacts
+    if: github.event_name != 'pull_request'
+    needs: stable-release-validation
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
+      id-token: write
+      attestations: write
+
+    steps:
+      - name: Download package artifacts
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          name: asi-backbone-release-validation-packages
+          path: ${{ env.PACKAGE_OUTPUT }}
+
+      - name: Download package SBOM artifacts
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          name: asi-backbone-release-validation-package-sboms
+          path: ${{ env.SBOM_OUTPUT }}
+
+      - name: Attest package provenance
+        uses: actions/attest-build-provenance@4d101475d8b20a2381f78447822ac1eab6504dd8 # v4.2.2
+        with:
+          subject-path: ${{ env.PACKAGE_OUTPUT }}/*.nupkg
+
+      - name: Attest package SBOM provenance
+        uses: actions/attest-build-provenance@4d101475d8b20a2381f78447822ac1eab6504dd8 # v4.2.2
+        with:
+          subject-path: ${{ env.SBOM_OUTPUT }}/*.json

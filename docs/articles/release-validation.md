@@ -22,6 +22,7 @@ Before cutting a stable release tag, confirm the following checks have passed on
 | Public API XML documentation inventory | CI, release readiness record | Inventories `CS1591` gaps for selected public package projects while staged enforcement is phased in. |
 | Formatting | CI, stable release validation, package publish | Confirms source formatting is stable before release. |
 | Tests | CI, stable release validation, package publish | Confirms the solution test suite passes before packaging or publishing. |
+| Dependency vulnerability analysis | dependency review, OWASP Dependency-Check | Blocks newly introduced dependencies at moderate severity or higher and fails OWASP scans for findings with CVSS 7 or higher unless a reviewed suppression applies. |
 | Package creation | CI, stable release validation, package publish | Confirms every package project under `src`, excluding template-content projects, can be packed. |
 | Package version validation | stable release validation, package publish | Confirms generated package versions and tag identity align with repository version metadata. |
 | NuGet metadata validation | stable release validation, package publish | Confirms generated `.nupkg` metadata, README files, IDs, descriptions, tags, license metadata, project URL, repository URL, and repository commit metadata align before publication. |
@@ -64,6 +65,7 @@ The following workflows form the reusable gate for stable release candidates:
 
 - `CI` validates dependency review for pull requests, Debug solution build coverage, solution restore/build/test, public API XML documentation inventory, formatting, package creation, package SBOM generation, template package smoke validation, coverage output, and CodeQL analysis.
 - `External Consumer Smoke Test` validates package-consumer wiring through the external consumer and stable package integration smoke scripts.
+- `OWASP Dependency-Check software composition analysis` restores with the SDK selected by `global.json`, publishes its reports, and fails when an unsuppressed dependency finding has CVSS 7 or higher.
 - `Publish Documentation` validates the DocFX build used for the documentation site.
 - `Stable Release Validation` provides a single release-candidate gate for version metadata, Debug solution build coverage, locked restore, build, formatting, tests, DocFX, package creation, generated package version validation, generated NuGet metadata validation, SBOM generation, template package smoke validation, smoke checks, and provenance handling where supported.
 - `Publish AsiBackbone Packages` repeats release-critical validation before package publish.
@@ -78,7 +80,7 @@ If a tag is pushed and package validation fails, do not publish replacement pack
 
 The `Stable Release Validation` workflow runs on pull requests to `main`, pushes to `main`, `v*.*.*` tags, and manual dispatch.
 
-The workflow validates .NET SDK setup, version metadata, Debug solution build coverage, locked restore, Release build, formatting, tests, tool restore, DocFX, package creation, package versions, NuGet metadata, package SBOM generation, template package smoke validation, external consumer smoke tests, stable package integration smoke tests, provenance handling where supported, and artifact upload.
+The workflow validates .NET SDK setup, version metadata, Debug solution build coverage, locked restore, Release build, formatting, tests, tool restore, DocFX, package creation, package versions, NuGet metadata, package SBOM generation, template package smoke validation, external consumer smoke tests, stable package integration smoke tests, and artifact upload. On non-pull-request events, a separate dependent job receives the OIDC and attestation permissions needed to attest the validated package and SBOM artifacts; pull-request validation receives neither permission.
 
 ## Package publish validation
 
