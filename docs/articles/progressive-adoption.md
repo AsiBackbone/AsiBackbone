@@ -15,7 +15,7 @@ Most new users should start with one of these paths:
 | --- | --- | --- |
 | Understand the absolute Core-only decision shape | This page, [Level 1](#level-1-core-decision-pipeline-only) | `AsiBackbone.Core` |
 | Gate one ASP.NET Core endpoint and inspect audit residue locally | [First 15 Minutes: Standard API Gating](quickstart-api-gating.md) | `Core`, `AspNetCore`, `Storage.InMemory` |
-| Review the current stable package family before broader adoption | [3.2.3 Release Notes](release-notes-323.md) | Install only the packages required by the selected boundary |
+| Review the current stable package family before broader adoption | [4.0.0 Release Notes](release-notes-400.md) | Install only the packages required by the selected boundary |
 
 Everything else is an add-on.
 
@@ -27,7 +27,7 @@ Everything else is an add-on.
 | 2 | Acknowledgment / handshake and audit residue | You need a human/system responsibility checkpoint or local decision evidence. | `Core`; optionally `Storage.InMemory` for samples/tests |
 | 3 | Durable audit and outbox persistence | Governance records must survive restarts, provider outages, or retries. | `Core`, `EntityFrameworkCore` or a host-owned store |
 | 4 | Hosted drain worker and provider emission | You want local outbox entries delivered to a provider after local persistence. | `Core`, `AspNetCore`, durable store, one emitter |
-| 5 | OpenTelemetry / Azure Monitor / Purview-style integration | You want dashboards, diagnostics, alerting, or governance enrichment downstream. | `OpenTelemetry` for released provider projection; host OpenTelemetry exporters; Purview remains strategy-only in the stable `3.x` package family |
+| 5 | OpenTelemetry / Azure Monitor / Purview-style integration | You want dashboards, diagnostics, alerting, or governance enrichment downstream. | `OpenTelemetry` for released provider projection; host OpenTelemetry exporters; Purview remains strategy-only in the stable `4.x` package family |
 | 6 | Signing-ready or managed-key host integration | You need signed or verified governance artifacts and have key-management responsibilities defined. | `Core`, `Signing.LocalDevelopment` for local proof paths, `Signing.ManagedKey` for host-owned managed-key clients |
 
 Cross-cutting add-ons:
@@ -201,7 +201,7 @@ Start with:
 - [Observability and Governance Emission Architecture](observability-and-governance-emission-architecture.md)
 - [Strategy-Only: Purview Governance and Lineage Enrichment](purview-governance-lineage-enrichment-strategy.md)
 
-In the stable `3.x` package family, OpenTelemetry is the concrete released governance emission provider. Azure Monitor is reached through host-configured OpenTelemetry exporters. Purview remains strategy-only unless a later release ships a concrete provider package.
+In the stable `4.x` package family, OpenTelemetry is the concrete released governance emission provider. Azure Monitor is reached through host-configured OpenTelemetry exporters. Purview remains strategy-only unless a later release ships a concrete provider package.
 
 ## Level 6: signing-ready or managed-key host integration
 

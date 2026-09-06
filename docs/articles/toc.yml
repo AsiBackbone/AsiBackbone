@@ -203,10 +203,12 @@
 
 - name: Releases & Compatibility
   items:
-    - name: 3.2.3 Release Notes
-      href: release-notes-323.md
-    - name: 3.2.3 Consumer Verification Guide
-      href: consumer-verification-323.md
+    - name: 4.0.0 Release Notes
+      href: release-notes-400.md
+    - name: 4.0.0 Migration Guide
+      href: upgrade-323-to-400.md
+    - name: 4.0.0 Consumer Verification Guide
+      href: consumer-verification-400.md
     - name: API Compatibility and SemVer
       href: api-compatibility-and-semver.md
     - name: Schema Versioning

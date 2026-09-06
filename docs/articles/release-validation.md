@@ -1,12 +1,12 @@
 # Stable Release Validation
 
-This article documents the reusable release-blocking validation path for stable release lines. The current released stable package family is `3.x`, with `3.2.3` as the current patch release.
+This article documents the reusable release-blocking validation path for stable release lines. The current released stable package family is `4.x`, with `4.0.0` as the current major release.
 
-The binary assembly identity for the `3.x` line remains `3.0.0.0`.
+The binary assembly identity for the `4.x` line is `4.0.0.0`.
 
 In this software project, **ASI** means **Accountable Systems Infrastructure**. Release validation should confirm that the package family remains practical governance infrastructure and that implementation claims stay within the documented software boundary. See [Release Cadence and Readiness](release-cadence-and-readiness.md) for the release-stream and stabilization guidance that complements this checklist.
 
-The [3.2.3 Release Readiness Record](release-readiness-323.md) is the current release-candidate control sheet. The [3.2.3 Consumer Verification Guide](consumer-verification-323.md) documents the consumer-facing package-source, package ID, test-infrastructure scope, Source Link, SBOM/provenance, and deferred package-signing verification path. Earlier readiness records are retained for traceability.
+The [4.0.0 Release Readiness Record](release-readiness-400.md) is the current release-candidate control sheet. The [4.0.0 Migration Guide](upgrade-323-to-400.md) documents the breaking outbox default, and the [4.0.0 Consumer Verification Guide](consumer-verification-400.md) covers package-source, Source Link, SBOM/provenance, and deferred package-signing verification. Earlier readiness records are retained for traceability.
 
 ## Required checks before tagging a stable release
 
@@ -122,7 +122,7 @@ The `Publish Quality Reports` workflow runs this check automatically on `release
 To validate a version by hand — for example when re-checking an older release — run:
 
 ```powershell
-./scripts/Validate-Source-Link-commit-metadata.ps1 -Version 3.2.3
+./scripts/Validate-Source-Link-commit-metadata.ps1 -Version 4.0.0
 ```
 
 This post-publish check downloads the published packages and confirms the expected repository type, repository URL, and non-empty repository commit metadata are present. Omitting `-Version` validates the version declared by `Directory.Build.props`. The same workflow can be dispatched manually with a `package_version` input to re-run the check against any published version; leaving that input empty skips it.
@@ -140,6 +140,10 @@ NuGet package signing is currently a known open supply-chain readiness item. Unt
 - [Release Cadence and Readiness](release-cadence-and-readiness.md)
 - [Public API XML Documentation](public-api-xml-documentation.md)
 - [Supply-Chain Provenance and Package SBOMs](supply-chain-provenance.md)
+- [4.0.0 Consumer Verification Guide](consumer-verification-400.md)
+- [4.0.0 Migration Guide](upgrade-323-to-400.md)
+- [4.0.0 Release Readiness Record](release-readiness-400.md)
+- [4.0.0 Release Notes](release-notes-400.md)
 - [3.2.3 Consumer Verification Guide](consumer-verification-323.md)
 - [3.2.3 Release Readiness Record](release-readiness-323.md)
 - [3.2.3 Release Notes](release-notes-323.md)

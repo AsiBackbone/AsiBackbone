@@ -128,21 +128,19 @@ app.MapPost("/api/orders/{region}/approve", async (
 });
 ```
 
-The `3.x` evaluator defaults are intentionally fail-closed for governed surfaces: empty policy structures deny, eligible ordinary constraint exceptions deny with `asibackbone.policy.constraint_exception`, and threat-contributor exceptions deny. Set `TreatConstraintExceptionAsDenial = false` only when a host intentionally wants fail-fast exception propagation through its own exception, transaction, retry, telemetry, or incident-response boundary.
+The `4.x` evaluator defaults are intentionally fail-closed for governed surfaces: empty policy structures deny, eligible ordinary constraint exceptions deny with `asibackbone.policy.constraint_exception`, and threat-contributor exceptions deny. Set `TreatConstraintExceptionAsDenial = false` only when a host intentionally wants fail-fast exception propagation through its own exception, transaction, retry, telemetry, or incident-response boundary.
 
 For production-style hosts, add durable audit/outbox persistence, signing or verification, DLP/classification, provider emission, and operational monitoring only where the host has explicitly chosen and configured those boundaries.
 
 ## Package family
 
-Stable `3.2.x` package family. `3.2.3` is the current patch release.
-The package family carries forward the governance-spine surface, including the
-explicit capability-grant validation profiles introduced in `3.2.0` and the
-organization-owned repository metadata established in `3.2.1`. `3.2.3` is a
-backward-compatible maintenance patch focused on xUnit 4 / Microsoft Testing
-Platform migration, documentation ownership and navigation, and release/link
-guardrails without changing the public API or runtime governance contract.
+Stable `4.0.x` package family. `4.0.0` is the current major release. It enables
+governance outbox claim leasing by default, bounds abandoned-claim recovery,
+hardens endpoint metadata and correlation handling, and expands canonical
+payload and verification APIs. Package IDs and public namespaces remain
+unchanged, while the binary assembly identity advances to `4.0.0.0`.
 
-The historical `3.0.0` release established the current major release line and binary assembly identity while preserving the simplified `AsiBackbone.*` package IDs and namespaces established by `2.0.0`.
+Consumers upgrading from `3.2.3` should review the [4.0.0 migration guide](https://github.com/AsiBackbone/AsiBackbone/blob/main/docs/articles/upgrade-323-to-400.md), especially when using a custom governance outbox store.
 
 | Package | Role |
 | --- | --- |
@@ -162,9 +160,9 @@ Runtime governance-residue signing remains provider-neutral through `AsiBackbone
 
 ## Supported target framework
 
-Stable `3.2.x` packages intentionally target `net10.0`. Consumers should plan on a .NET 10 SDK/runtime or later for the current package line.
+Stable `4.x` packages intentionally target `net10.0`. Consumers should plan on a .NET 10 SDK/runtime or later for the current package line.
 
-The project is not multi-targeting .NET 8 for `3.2.x`. That is an explicit adoption decision, not a defect workaround. The current package family uses a single repository-wide `TargetFramework` of `net10.0`, the EF Core integration is aligned with centrally managed EF Core `10.0.x` dependencies, and backporting the full package, analyzer, template, CI, packaging, and smoke-test surface would add compatibility overhead for a short-lived adoption window.
+The project is not multi-targeting .NET 8 for `4.x`. That is an explicit adoption decision, not a defect workaround. The current package family uses a single repository-wide `TargetFramework` of `net10.0`, the EF Core integration is aligned with centrally managed EF Core `10.0.x` dependencies, and backporting the full package, analyzer, template, CI, packaging, and smoke-test surface would add compatibility overhead for a short-lived adoption window.
 
 If meaningful external consumer demand appears, additional TFM support can be reconsidered in a later release with CI, packaging validation, analyzer compatibility, template smoke tests, and documentation updated together. See the [Target Framework Support Decision Record](https://github.com/AsiBackbone/AsiBackbone/blob/main/docs/articles/target-framework-support.md).
 
@@ -199,9 +197,9 @@ The full, categorized documentation set lives at the [documentation site](https:
 
 ## Current status
 
-Stable `3.2.x` is the current released line, with `3.2.3` as the current patch release. This release preserves the simplified `AsiBackbone.*` package and namespace identity and the binary assembly identity `3.0.0.0`.
+Stable `4.x` is the current released line, with `4.0.0` as the current major release. Package IDs and public namespaces remain unchanged, and the binary assembly identity is `4.0.0.0`.
 
-The stable API contract is documented in [API Compatibility and SemVer](https://github.com/AsiBackbone/AsiBackbone/blob/main/docs/articles/api-compatibility-and-semver.md). The current release is recorded in [3.2.3 Release Notes](https://github.com/AsiBackbone/AsiBackbone/blob/main/docs/articles/release-notes-323.md) and [3.2.3 Release Readiness Record](https://github.com/AsiBackbone/AsiBackbone/blob/main/docs/articles/release-readiness-323.md). Consumers can use the [3.2.3 Consumer Verification Guide](https://github.com/AsiBackbone/AsiBackbone/blob/main/docs/articles/consumer-verification-323.md) for package-source, package ID, test-infrastructure scope, Source Link, SBOM, provenance, and deferred-signing checks. Earlier release records remain available for historical traceability.
+The stable API contract is documented in [API Compatibility and SemVer](https://github.com/AsiBackbone/AsiBackbone/blob/main/docs/articles/api-compatibility-and-semver.md). The current release is recorded in [4.0.0 Release Notes](https://github.com/AsiBackbone/AsiBackbone/blob/main/docs/articles/release-notes-400.md) and [4.0.0 Release Readiness Record](https://github.com/AsiBackbone/AsiBackbone/blob/main/docs/articles/release-readiness-400.md). Consumers can use the [4.0.0 Consumer Verification Guide](https://github.com/AsiBackbone/AsiBackbone/blob/main/docs/articles/consumer-verification-400.md) for package-source, migration, Source Link, SBOM, provenance, and deferred-signing checks. Earlier release records remain available for historical traceability.
 
 ## Security and vulnerability reporting
 
@@ -223,7 +221,7 @@ A consumer should be able to use AsiBackbone in an application generated from Ne
 
 AsiBackbone is a governance spine, not an intelligence engine. It implements governance-oriented software primitives for accountable decision flow and keeps execution authority with the host application. See [Project Boundaries and Non-Claims](https://asibackbone.github.io/AsiBackbone/articles/project-boundaries.html) for the full scope statement and safe wording guidance.
 
-> **Current NuGet packages are intentionally published without package signing.** This is a deliberate governance decision while the project is independently maintained, balancing operational complexity against practical value. Instead, the project emphasizes transparent source code, GitHub releases, Source Link, SBOM generation, and package provenance. Package signing remains on the long-term roadmap and will be reconsidered as the project's community, governance, and operational needs evolve. For current package verification guidance, see the [**3.2.3 Consumer Verification Guide**](https://asibackbone.github.io/AsiBackbone/articles/consumer-verification-323.html).
+> **Current NuGet packages are intentionally published without package signing.** This is a deliberate governance decision while the project is independently maintained, balancing operational complexity against practical value. Instead, the project emphasizes transparent source code, GitHub releases, Source Link, SBOM generation, and package provenance. Package signing remains on the long-term roadmap and will be reconsidered as the project's community, governance, and operational needs evolve. For current package verification guidance, see the [**4.0.0 Consumer Verification Guide**](https://asibackbone.github.io/AsiBackbone/articles/consumer-verification-400.html).
 
 ## Design principles
 

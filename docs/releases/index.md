@@ -6,10 +6,11 @@ Current package/runtime behavior is documented in the product articles and gener
 
 ## Current release
 
-Stable package family: `3.2.x`. Current patch release: `3.2.3`.
+Stable package family: `4.x`. Current major release: `4.0.0`.
 
-- [3.2.3 Release Notes](../articles/release-notes-323.md)
-- [3.2.3 Consumer Verification Guide](../articles/consumer-verification-323.md)
+- [4.0.0 Release Notes](../articles/release-notes-400.md)
+- [4.0.0 Migration Guide](../articles/upgrade-323-to-400.md)
+- [4.0.0 Consumer Verification Guide](../articles/consumer-verification-400.md)
 - [API Compatibility and Semantic Versioning](../articles/api-compatibility-and-semver.md)
 - [Schema Versioning](../articles/schema-versioning.md)
 - [Target Framework Support](../articles/target-framework-support.md)
@@ -25,6 +26,8 @@ The upgrade guide is a historical version-to-version record. Use current compati
 
 ### 3.x
 
+- [3.2.3 Release Notes](../articles/release-notes-323.md)
+- [3.2.3 Consumer Verification Guide](../articles/consumer-verification-323.md)
 - [3.2.2 Release Notes](../articles/release-notes-322.md)
 - [3.2.2 Consumer Verification Guide](../articles/consumer-verification-322.md)
 - [3.2.1 Release Notes](../articles/release-notes-321.md)

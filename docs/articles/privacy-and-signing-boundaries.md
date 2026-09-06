@@ -1,11 +1,11 @@
 # Privacy, Metadata, and Signing Boundaries
 
-This article documents the current stable `3.x` boundary for metadata privacy, identifier handling, signing-ready fields, released signing providers, host responsibilities, and future provider work.
+This article documents the current stable `4.x` boundary for metadata privacy, identifier handling, signing-ready fields, released signing providers, host responsibilities, and future provider work.
 
 In this software project, **ASI** means **Accountable Systems Infrastructure**. AsiBackbone provides governance-oriented software building blocks. It does not provide legal, compliance, privacy, security, or cryptographic guarantees by itself.
 
 > [!IMPORTANT]
-> The stable `3.x` package family includes metadata budget and sanitation primitives, signing-ready Core metadata, released local-development signing, and a managed-key adapter boundary. These surfaces do not provide production key custody, tamper-evidence, immutable storage, automatic privacy classification, legal non-repudiation, or compliance certification by themselves.
+> The stable `4.x` package family includes metadata budget and sanitation primitives, signing-ready Core metadata, released local-development signing, and a managed-key adapter boundary. These surfaces do not provide production key custody, tamper-evidence, immutable storage, automatic privacy classification, legal non-repudiation, or compliance certification by themselves.
 
 ## Current stable boundary summary
 
@@ -189,7 +189,7 @@ The host must decide which requests are allowed to reach AsiBackbone and which a
 
 ## Released, host-owned, and future provider work
 
-The stable `3.x` package family includes released provider or provider-adjacent surfaces for OpenTelemetry governance emission, local-development signing, and managed-key signing adapter boundaries.
+The stable `4.x` package family includes released provider or provider-adjacent surfaces for OpenTelemetry governance emission, local-development signing, and managed-key signing adapter boundaries.
 
 Other provider areas remain host-owned, strategy-only, design-only, sample-only, preview, or future-provider work unless a later stable release explicitly ships them.
 

@@ -67,7 +67,7 @@ A successful metadata-only result means only that the configured structural and 
 
 Existing calls to `CapabilityGrantValidationOptions.Create(...)` retain their current arguments and defaults.
 
-Existing calls to `CapabilityGrantValidator.ValidateAsync(signedGrant)` without explicit options also retain the current `3.x` behavior. That no-options path does not automatically verify signed proof or perform bounded-use/replay checks and should not be treated as execution-boundary validation.
+Existing calls to `CapabilityGrantValidator.ValidateAsync(signedGrant)` without explicit options also retain the current `4.x` behavior. That no-options path does not automatically verify signed proof or perform bounded-use/replay checks and should not be treated as execution-boundary validation.
 
 ## Verify Source Link repository metadata
 
