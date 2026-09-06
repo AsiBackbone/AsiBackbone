@@ -7,73 +7,40 @@
         https://dependency-check.github.io/DependencyCheck/dependency-suppression.1.4.xsd">
 
     <!--
-    Cross-ecosystem OpenTelemetry findings applying to Go or C++
-    implementations rather than the .NET NuGet packages.
+    Every entry must name a package that appears in a committed lock file, and
+    every entry must expire at the end of the next quarter so the rationale is
+    re-reviewed rather than inherited indefinitely.
+
+    Package versions are deliberately not pinned. These are cross-ecosystem
+    identifier collisions, so the rationale is a property of the CVE-to-package
+    mapping rather than of any one version; pinning a version silently disables
+    the suppression at the next dependency bump.
   -->
 
-    <suppress until="2027-01-31Z">
+    <!--
+    Cross-ecosystem OpenTelemetry findings applying to Go or C++
+    implementations rather than the .NET NuGet packages. Both packages resolve
+    transitively through the Aspire AppHost sample.
+  -->
+
+    <suppress until="2026-12-31Z">
         <notes>
             <![CDATA[
       Reviewed cross-ecosystem false positives for the .NET OTLP exporter.
     ]]>
         </notes>
-        <packageUrl regex="true">^pkg:nuget/OpenTelemetry\.Exporter\.OpenTelemetryProtocol@1\.17\.0$</packageUrl>
+        <packageUrl regex="true">^pkg:nuget/OpenTelemetry\.Exporter\.OpenTelemetryProtocol@.*$</packageUrl>
         <vulnerabilityName regex="true">^CVE-2026-(39882|39883|41178|44967)$</vulnerabilityName>
     </suppress>
 
-    <suppress until="2027-01-31Z">
+    <suppress until="2026-12-31Z">
         <notes>
             <![CDATA[
       Reviewed cross-ecosystem false positives for OpenTelemetry .NET hosting.
     ]]>
         </notes>
-        <packageUrl regex="true">^pkg:nuget/OpenTelemetry\.Extensions\.Hosting@1\.17\.0$</packageUrl>
+        <packageUrl regex="true">^pkg:nuget/OpenTelemetry\.Extensions\.Hosting@.*$</packageUrl>
         <vulnerabilityName regex="true">^CVE-2026-(39882|39883|41178|44967)$</vulnerabilityName>
-    </suppress>
-
-    <suppress until="2027-01-31Z">
-        <notes>
-            <![CDATA[
-      Reviewed cross-ecosystem false positives for ASP.NET Core instrumentation.
-    ]]>
-        </notes>
-        <packageUrl regex="true">^pkg:nuget/OpenTelemetry\.Instrumentation\.AspNetCore@1\.16\.0$</packageUrl>
-        <vulnerabilityName regex="true">^CVE-2026-(39882|39883|41178|44967)$</vulnerabilityName>
-    </suppress>
-
-    <suppress until="2027-01-31Z">
-        <notes>
-            <![CDATA[
-      Reviewed cross-ecosystem false positives for HTTP instrumentation.
-    ]]>
-        </notes>
-        <packageUrl regex="true">^pkg:nuget/OpenTelemetry\.Instrumentation\.Http@1\.16\.0$</packageUrl>
-        <vulnerabilityName regex="true">^CVE-2026-(39882|39883|41178|44967)$</vulnerabilityName>
-    </suppress>
-
-    <!--
-    CVE-2012-2055 applies to historical GitHub Enterprise behavior,
-    not these NuGet packages.
-  -->
-
-    <suppress until="2027-01-31Z">
-        <notes>
-            <![CDATA[
-      CVE-2012-2055 does not apply to the ASP.NET Core GitHub OAuth client.
-    ]]>
-        </notes>
-        <packageUrl regex="true">^pkg:nuget/AspNet\.Security\.OAuth\.GitHub@10\.0\.0$</packageUrl>
-        <vulnerabilityName>CVE-2012-2055</vulnerabilityName>
-    </suppress>
-
-    <suppress until="2027-01-31Z">
-        <notes>
-            <![CDATA[
-      CVE-2012-2055 does not apply to Microsoft Source Link.
-    ]]>
-        </notes>
-        <packageUrl regex="true">^pkg:nuget/Microsoft\.SourceLink\.GitHub@10\.0\.301$</packageUrl>
-        <vulnerabilityName>CVE-2012-2055</vulnerabilityName>
     </suppress>
 
 </suppressions>

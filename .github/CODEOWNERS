@@ -17,7 +17,6 @@
 # Documentation and architecture decisions
 /docs/ @cdcavell
 README.md @cdcavell
-PACKAGE-README.md @cdcavell
 CHANGELOG.md @cdcavell
 
 # GitHub workflows, issue templates, and repository automation
@@ -27,8 +26,7 @@ CHANGELOG.md @cdcavell
 /.github/CODEOWNERS @cdcavell
 
 # Template packaging and scaffold configuration
-/.template.config/ @cdcavell
-/.template.content/ @cdcavell
+/src/AsiBackbone.Templates/ @cdcavell
 Directory.Build.props @cdcavell
 Directory.Packages.props @cdcavell
 global.json @cdcavell
