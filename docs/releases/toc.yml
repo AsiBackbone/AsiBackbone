@@ -3,10 +3,12 @@
 
 - name: Current Release
   items:
-    - name: 3.2.3 Release Notes
-      href: ../articles/release-notes-323.md
-    - name: 3.2.3 Consumer Verification Guide
-      href: ../articles/consumer-verification-323.md
+    - name: 4.0.0 Release Notes
+      href: ../articles/release-notes-400.md
+    - name: 4.0.0 Migration Guide
+      href: ../articles/upgrade-323-to-400.md
+    - name: 4.0.0 Consumer Verification Guide
+      href: ../articles/consumer-verification-400.md
     - name: API Compatibility and SemVer
       href: ../articles/api-compatibility-and-semver.md
     - name: Schema Versioning
@@ -23,6 +25,10 @@
 
 - name: 3.x Archive
   items:
+    - name: 3.2.3 Release Notes
+      href: ../articles/release-notes-323.md
+    - name: 3.2.3 Consumer Verification Guide
+      href: ../articles/consumer-verification-323.md
     - name: 3.2.2 Release Notes
       href: ../articles/release-notes-322.md
     - name: 3.2.2 Consumer Verification Guide

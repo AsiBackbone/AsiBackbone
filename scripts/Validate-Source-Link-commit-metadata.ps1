@@ -7,7 +7,7 @@
     - When no -Version value is supplied, the script validates the version declared by
       Directory.Build.props, so the default cannot drift away from the repository.
     - To validate a specific released package version, pass it explicitly, for example:
-        ./scripts/Validate-Source-Link-commit-metadata.ps1 -Version '3.2.3'
+        ./scripts/Validate-Source-Link-commit-metadata.ps1 -Version '4.0.0'
     - nuget.org does not serve a package the moment it is pushed. Use
       -WaitForPublicationMinutes to poll until every package is downloadable; the
       default of 0 fails immediately, which is what a manual run of an

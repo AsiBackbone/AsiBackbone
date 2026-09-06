@@ -1,6 +1,6 @@
 # AsiBackbone Product Documentation
 
-This section organizes the stable `3.x` Accountable Systems Infrastructure documentation around product implementation, API use, operations, compatibility, and release evidence.
+This section organizes the stable `4.x` Accountable Systems Infrastructure documentation around product implementation, API use, operations, compatibility, and release evidence.
 
 > [!IMPORTANT]
 > In this software project, **ASI** means **Accountable Systems Infrastructure**. AsiBackbone is governance infrastructure for accountable software decision flow, not an artificial superintelligence implementation. See [Project Boundaries and Non-Claims](project-boundaries.md) for the canonical boundary reference.
@@ -13,31 +13,26 @@ General architectural education belongs in [ASI Backbone Learning](https://asiba
 
 ## Current stable package posture
 
-Stable `3.2.x` package family. `3.2.3` is the current patch release.
-The package family carries forward the governance-spine surface, including the
-explicit capability-grant validation profiles introduced in `3.2.0` and the
-organization-owned repository metadata established in `3.2.1`. `3.2.3` is a
-backward-compatible maintenance patch focused on xUnit 4 / Microsoft Testing
-Platform migration, documentation ownership and navigation, and release/link
-guardrails without changing the public API or runtime governance contract.
-
-The historical `3.0.0` release established the current major line and binary assembly identity while preserving the `AsiBackbone.*` package IDs and namespaces established by the `2.0.0` public rename from `CDCavell.AsiBackbone.*`.
+Stable `4.x` package family. `4.0.0` is the current major release. It enables
+governance outbox claim leasing by default, bounds abandoned-claim recovery,
+hardens endpoint metadata and correlation handling, and expands canonical
+payload and verification APIs. Package IDs and public namespaces remain
+unchanged; the binary assembly identity advances to `4.0.0.0`.
 
 Released stable package surfaces include Core, DependencyInjection,
 Storage.InMemory, EntityFrameworkCore, AspNetCore, Testing, Templates,
 Analyzers, OpenTelemetry, Signing.LocalDevelopment, and Signing.ManagedKey.
 
-`3.2.3` carries forward the stable runtime contract from `3.2.2` while
-modernizing repository test/coverage execution and separating product
-implementation documentation from organization-level education. These changes
-do not alter released runtime governance semantics.
+Consumers upgrading from `3.2.3` must review the outbox claim-store boundary.
+The shipped stores support claim leasing; custom stores must implement
+`IAsiBackboneGovernanceOutboxClaimStore` or explicitly disable claim leases.
 
 Event Hubs, Purview, Azure-specific non-signing SDK adapters, Aspire runtime
 packages, robotics, immutable storage, and additional non-signing provider
 packages remain design-only, strategy-only, sample-only, host-owned, or
 future-provider work unless a later stable release explicitly ships them.
 
-The release process includes explicit [Release Cadence and Readiness](release-cadence-and-readiness.md) guidance for patch, minor, and major release selection, package metadata, Source Link, SBOM/provenance, documentation links, and future package identity or namespace changes. The [3.2.3 Consumer Verification Guide](consumer-verification-323.md) gives consumers a conservative package-source, package ID, test-infrastructure scope, Source Link, SBOM/provenance, and deferred-signing verification path.
+The release process includes explicit [Release Cadence and Readiness](release-cadence-and-readiness.md) guidance for patch, minor, and major release selection, package metadata, Source Link, SBOM/provenance, documentation links, and future package identity or namespace changes. The [4.0.0 Migration Guide](upgrade-323-to-400.md) covers the breaking default, and the [4.0.0 Consumer Verification Guide](consumer-verification-400.md) gives consumers a conservative package-source, migration, Source Link, SBOM/provenance, and deferred-signing verification path.
 
 ## Search and navigation
 
@@ -146,8 +141,9 @@ These pages cover production hardening, durable audit/outbox behavior, observabi
 
 Start with the current release and compatibility rules. Older release notes, consumer-verification guides, and upgrade records are preserved under [Releases & Compatibility](../releases/) so they remain easy to find without dominating the implementation navigation.
 
-* [3.2.3 Release Notes](release-notes-323.md)
-* [3.2.3 Consumer Verification Guide](consumer-verification-323.md)
+* [4.0.0 Release Notes](release-notes-400.md)
+* [4.0.0 Migration Guide](upgrade-323-to-400.md)
+* [4.0.0 Consumer Verification Guide](consumer-verification-400.md)
 * [API Compatibility and SemVer](api-compatibility-and-semver.md)
 * [Schema Versioning](schema-versioning.md)
 * [Target Framework Support](target-framework-support.md)

@@ -19,7 +19,7 @@ public static class AsiBackboneStrictGovernanceServiceCollectionExtensions
     /// Thrown when <paramref name="services" /> is <see langword="null" />.
     /// </exception>
     /// <remarks>
-    /// This helper keeps strict posture explicit in the current 3.x line while giving production hosts a single opt-in call for
+    /// This helper keeps strict posture explicit in the current 4.x line while giving production hosts a single opt-in call for
     /// fail-closed evaluation posture. It configures options only; hosts still own authentication, authorization,
     /// constraint registration, endpoint metadata, persistence, and execution enforcement.
     /// </remarks>
