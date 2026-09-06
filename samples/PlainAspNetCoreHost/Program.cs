@@ -189,7 +189,7 @@ app.MapPost("/sample/acknowledgments/challenges", (
     SampleAcknowledgmentChallengeStore challengeStore) =>
 {
     var actor = AsiBackboneActorContext.Human("sample-user", "Sample User");
-    GovernanceDecision decision = GovernanceDecision.RequireAcknowledgment(
+    var decision = GovernanceDecision.RequireAcknowledgment(
         "sample.acknowledgment.required",
         "The sample operation requires an explicit acknowledgment before the host proceeds.",
         correlationId: Guid.NewGuid().ToString("N"),
