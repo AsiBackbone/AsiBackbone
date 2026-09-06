@@ -167,6 +167,8 @@ The controller version uses the equivalent attributes:
 
 These paths are useful as evidence that endpoint metadata can carry governance requirements into middleware, but the sample still keeps execution host-owned. The endpoint body returns only after endpoint-governance metadata has been evaluated by the ASP.NET Core integration path.
 
+The sample also exposes `POST /sample/acknowledgments/challenges` and `POST /sample/acknowledgments/responses` to demonstrate a complete host-owned acknowledgment round trip. The first endpoint creates and temporarily stores a challenge; the second retrieves it and calls `IAsiBackboneAcknowledgmentChallengeService.HandleResponse`. This illustrative in-memory workflow is separate from `RequireLiabilityHandshake` metadata: the middleware returns `428 Precondition Required` when acknowledgment is required, while the host remains responsible for accepting the response, retaining protected challenge state, revalidating authority and current policy, and deciding whether execution may proceed.
+
 ## What this reference deployment does not claim
 
 This reference deployment does not claim that AsiBackbone:

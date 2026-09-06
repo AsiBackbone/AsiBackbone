@@ -1,5 +1,6 @@
 using AsiBackbone.AspNetCore.DependencyInjection;
 using AsiBackbone.AspNetCore.Endpoints;
+using AsiBackbone.AspNetCore.Handshakes;
 using AsiBackbone.Core.Actors;
 using AsiBackbone.Core.Audit;
 using AsiBackbone.Core.Constraints;
@@ -38,6 +39,7 @@ builder.Services.AddSingleton<InMemoryAuditLedger>();
 builder.Services.AddSingleton<IAsiBackboneAuditSink>(serviceProvider =>
     serviceProvider.GetRequiredService<InMemoryAuditLedger>());
 builder.Services.AddSingleton<IAsiBackboneEndpointCapabilityGrantValidator, SampleEndpointCapabilityGrantValidator>();
+builder.Services.AddSingleton<SampleAcknowledgmentChallengeStore>();
 
 builder.Services.AddSingleton<IAsiBackboneConstraint<AsiBackboneConstraintEvaluationContext>, RegionConstraint>();
 builder.Services.AddSingleton<IAsiBackboneDecisionPolicy<AsiBackboneConstraintEvaluationContext>, ConsequentialActionDecisionPolicy>();
@@ -182,6 +184,52 @@ app.MapGet("/sample/audit/{correlationId}", (
     string correlationId,
     InMemoryAuditLedger auditLedger) => Results.Ok(auditLedger.GetByCorrelationId(correlationId)));
 
+app.MapPost("/sample/acknowledgments/challenges", (
+    IAsiBackboneAcknowledgmentChallengeService challengeService,
+    SampleAcknowledgmentChallengeStore challengeStore) =>
+{
+    var actor = AsiBackboneActorContext.Human("sample-user", "Sample User");
+    var decision = GovernanceDecision.RequireAcknowledgment(
+        "sample.acknowledgment.required",
+        "The sample operation requires an explicit acknowledgment before the host proceeds.",
+        correlationId: Guid.NewGuid().ToString("N"),
+        policyVersion: "sample-policy-v1",
+        policyHash: "sample-policy-hash");
+
+    AsiBackboneAcknowledgmentChallenge challenge = challengeService.CreateChallenge(
+        actor,
+        "sample.acknowledgment.execute",
+        decision);
+
+    challengeStore.Add(challenge);
+    return Results.Json(challenge, statusCode: StatusCodes.Status428PreconditionRequired);
+})
+.WithDisplayName("sample.acknowledgments.create");
+
+app.MapPost("/sample/acknowledgments/responses", (
+    AsiBackboneAcknowledgmentChallengeRequest response,
+    IAsiBackboneAcknowledgmentChallengeService challengeService,
+    SampleAcknowledgmentChallengeStore challengeStore) =>
+{
+    if (string.IsNullOrWhiteSpace(response.HandshakeId)
+        || !challengeStore.TryTake(response.HandshakeId, out AsiBackboneAcknowledgmentChallenge? challenge))
+    {
+        return Results.NotFound(new { reasonCode = "sample.acknowledgment.challenge_not_found" });
+    }
+
+    var actor = AsiBackboneActorContext.Human("sample-user", "Sample User");
+    AsiBackboneAcknowledgmentChallengeResult result = challengeService.HandleResponse(challenge!, actor, response);
+
+    return result.Acknowledged
+        ? Results.Ok(new
+        {
+            message = "The host validated the acknowledgment and may now run its separately authorized operation.",
+            acknowledgment = result.Acknowledgment
+        })
+        : Results.BadRequest(result.Result);
+})
+.WithDisplayName("sample.acknowledgments.respond");
+
 app.MapGet("/sample/ledger/{correlationId}", async (
     string correlationId,
     IAsiBackboneAuditLedgerStore ledgerStore,
@@ -266,6 +314,24 @@ internal sealed class ConsequentialActionDecisionPolicy : IAsiBackboneDecisionPo
 
 internal sealed class SampleEndpointPolicy
 {
+}
+
+internal sealed class SampleAcknowledgmentChallengeStore
+{
+    private readonly System.Collections.Concurrent.ConcurrentDictionary<string, AsiBackboneAcknowledgmentChallenge> challenges =
+        new(StringComparer.Ordinal);
+
+    public void Add(AsiBackboneAcknowledgmentChallenge challenge)
+    {
+        ArgumentNullException.ThrowIfNull(challenge);
+        _ = challenges.TryAdd(challenge.HandshakeId, challenge);
+    }
+
+    public bool TryTake(string handshakeId, out AsiBackboneAcknowledgmentChallenge? challenge)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(handshakeId);
+        return challenges.TryRemove(handshakeId.Trim(), out challenge);
+    }
 }
 
 internal sealed class SampleEndpointCapabilityGrantValidator : IAsiBackboneEndpointCapabilityGrantValidator
