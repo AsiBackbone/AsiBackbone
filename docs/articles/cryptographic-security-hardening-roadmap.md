@@ -7,7 +7,7 @@ Issue: #207.
 In this software project, **ASI** means **Accountable Systems Infrastructure**. AsiBackbone is a governance spine for consequential software decision flow. It is not an intelligence engine, signing appliance, key-management system, immutable ledger, blockchain product, compliance certification service, or legal evidence system by itself.
 
 > [!IMPORTANT]
-> Status note: the stable `3.2.x` package family includes released surfaces for canonical hashing/signing seams, provider-neutral signing and verification abstractions, local-development signing, managed-key adapter boundaries, signed audit/outbox metadata, and verification-policy/result handling. This roadmap is retained for traceability of the hardening sequence. Those released surfaces still do **not** create production tamper-evidence, immutability, legal non-repudiation, or compliance certification by themselves; production claims require concrete host storage, signing, verification, key-management, rotation, retention, and operational controls.
+> Status note: the stable `4.x` package family includes released surfaces for canonical hashing/signing seams, provider-neutral signing and verification abstractions, local-development signing, managed-key adapter boundaries, signed audit/outbox metadata, capability-grant canonical payload construction, and verification-policy/result handling. This roadmap is retained for traceability of the hardening sequence. Those released surfaces still do **not** create production tamper-evidence, immutability, legal non-repudiation, or compliance certification by themselves; production claims require concrete host storage, signing, verification, key-management, rotation, retention, and operational controls.
 
 ## Roadmap goals
 

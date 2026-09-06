@@ -24,13 +24,13 @@ Minor releases should be paced enough to let additive surfaces be reviewed, docu
 
 Major releases should be rare. They should be reserved for identity, namespace, public API, durable artifact, binary identity, or package-boundary breaks that are strongly justified and documented in advance.
 
-## Current `3.x` stabilization posture
+## Current `4.x` stabilization posture
 
-`3.x` is the current stable package line, and `3.2.3` is the current patch release.
+`4.x` is the current stable package line, and `4.0.0` is the current major release.
 
-The historical `3.0.0` release established the major-line binary identity while preserving the existing `AsiBackbone.*` package IDs and namespaces.
+The `4.0.0` release advances the major-line binary identity while preserving the existing `AsiBackbone.*` package IDs and namespaces.
 
-Future `3.x` releases should prioritize compatibility, documentation clarity, patch-level release correction, and carefully scoped additive improvements. Additional breaking changes should be avoided unless strongly justified by consumer safety, correctness, maintainability, or a documented architectural boundary that cannot be preserved compatibly.
+Future `4.x` releases should prioritize compatibility, documentation clarity, patch-level release correction, and carefully scoped additive improvements. Additional breaking changes should be avoided unless strongly justified by consumer safety, correctness, maintainability, or a documented architectural boundary that cannot be preserved compatibly.
 
 For cautious consumers, a young major line should be interpreted as canonical but still settling. The project should let that line stabilize through release validation, documentation currency, package metadata correction, consumer smoke testing, and real issue triage before introducing another broad breaking change.
 
@@ -112,6 +112,10 @@ Avoid:
 
 - [Governance](../../GOVERNANCE.md)
 - [Release Validation](release-validation.md)
+- [4.0.0 Release Readiness Record](release-readiness-400.md)
+- [4.0.0 Release Notes](release-notes-400.md)
+- [4.0.0 Migration Guide](upgrade-323-to-400.md)
+- [4.0.0 Consumer Verification Guide](consumer-verification-400.md)
 - [3.2.3 Release Readiness Record](release-readiness-323.md)
 - [3.2.3 Release Notes](release-notes-323.md)
 - [3.2.3 Consumer Verification Guide](consumer-verification-323.md)

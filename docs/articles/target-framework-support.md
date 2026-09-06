@@ -2,17 +2,17 @@
 
 ## Status
 
-Accepted for the stable `3.2.x` package family.
+Accepted for the stable `4.x` package family.
 
 ## Decision
 
-The `3.2.x` AsiBackbone package family stays .NET 10+ by targeting `net10.0`. The project will not multi-target .NET 8 for the `3.2.x` release line.
+The `4.x` AsiBackbone package family stays .NET 10+ by targeting `net10.0`. The project will not multi-target .NET 8 for the `4.x` release line.
 
 This decision applies to released package projects, templates, samples, analyzers, tests, smoke validation, and release documentation unless a later release explicitly changes the supported target-framework posture.
 
 ## Current support boundary
 
-Consumers should use a .NET 10 SDK/runtime or later when adopting the `3.2.x` packages.
+Consumers should use a .NET 10 SDK/runtime or later when adopting the `4.x` packages.
 
 The repository uses a single shared target framework in `Directory.Build.props`:
 
@@ -32,20 +32,20 @@ The decision is to document the intentional boundary instead of refactoring the 
 - The current package family already has a broad validation surface: Core, ASP.NET Core, EF Core, OpenTelemetry, analyzers, templates, samples, tests, package metadata, SBOM/provenance, and documentation.
 - Multi-targeting would require coordinated updates across CI, packaging validation, analyzer compatibility, template smoke tests, consumer verification, release notes, and published documentation.
 - .NET 8 is in maintenance support and reaches end of support on November 10, 2026, according to [Microsoft's .NET support policy](https://dotnet.microsoft.com/en-us/platform/support/policy/dotnet-core).
-- No current external consumer demand has been identified that justifies adding the compatibility burden to the `3.2.x` line.
+- No current external consumer demand has been identified that justifies adding the compatibility burden to the `4.x` line.
 
 ## Consequences
 
 ### Positive
 
-- Keeps the `3.2.x` line simple, current, and easier to validate.
+- Keeps the `4.x` line simple, current, and easier to validate.
 - Avoids partial compatibility where only some packages support an older TFM.
 - Keeps EF Core, ASP.NET Core, analyzers, templates, and smoke tests on one platform baseline.
 - Reduces release risk before wider public promotion.
 
 ### Tradeoffs
 
-- Consumers still on .NET 8 cannot adopt the `3.2.x` packages without upgrading their host application.
+- Consumers still on .NET 8 cannot adopt the `4.x` packages without upgrading their host application.
 - Some framework-neutral surfaces, such as `AsiBackbone.Core`, might technically be easier to multi-target than provider packages, but partial targeting would add documentation and expectation-management risk.
 - Adoption may be narrower until more hosts move to .NET 10 or later.
 
@@ -71,9 +71,9 @@ If multi-targeting is pursued later, it should be handled as a coordinated relea
 
 ## Consumer wording
 
-Use this wording for the `3.2.x` line:
+Use this wording for the `4.x` line:
 
-> AsiBackbone `3.2.x` targets `net10.0`. Consumers should use a .NET 10 SDK/runtime or later. The project does not multi-target .NET 8 for this release line; compatibility can be reconsidered in a future release if real consumer demand justifies the full validation surface.
+> AsiBackbone `4.x` targets `net10.0`. Consumers should use a .NET 10 SDK/runtime or later. The project does not multi-target .NET 8 for this release line; compatibility can be reconsidered in a future release if real consumer demand justifies the full validation surface.
 
 Avoid wording that implies .NET 8 support is planned, promised, or blocked by a single package defect. The current posture is an intentional support-boundary decision.
 

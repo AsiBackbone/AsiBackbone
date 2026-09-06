@@ -33,15 +33,11 @@ The DocFX header search is available for package names, API concepts, and articl
 
 ## Current stable package family
 
-Stable `3.2.x` package family. `3.2.3` is the current patch release.
-The package family carries forward the governance-spine surface, including the
-explicit capability-grant validation profiles introduced in `3.2.0` and the
-organization-owned repository metadata established in `3.2.1`. `3.2.3` is a
-backward-compatible maintenance patch focused on xUnit 4 / Microsoft Testing
-Platform migration, documentation ownership and navigation, and release/link
-guardrails without changing the public API or runtime governance contract.
-
-The historical `3.0.0` release established the current major line and binary assembly identity.
+Stable `4.x` package family. `4.0.0` is the current major release. It enables
+governance outbox claim leasing by default, adds bounded reclaim and
+dead-letter behavior, hardens endpoint metadata and correlation handling, and
+expands canonical payload and verification APIs. Package IDs and public
+namespaces remain unchanged; the binary assembly identity is `4.0.0.0`.
 
 ```text
 AsiBackbone.Core
@@ -111,8 +107,9 @@ Package-specific READMEs and release notes define which surfaces are stable, opt
 
 ### Releases and compatibility
 
-* [3.2.3 Release Notes](articles/release-notes-323.md)
-* [3.2.3 Consumer Verification Guide](articles/consumer-verification-323.md)
+* [4.0.0 Release Notes](articles/release-notes-400.md)
+* [4.0.0 Migration Guide](articles/upgrade-323-to-400.md)
+* [4.0.0 Consumer Verification Guide](articles/consumer-verification-400.md)
 * [API Compatibility and SemVer](articles/api-compatibility-and-semver.md)
 * [Schema Versioning](articles/schema-versioning.md)
 * [Release Validation](articles/release-validation.md)
@@ -126,7 +123,7 @@ Historical release notes and verification records remain available under [Releas
 * [Performance Benchmark Baseline](articles/performance-benchmark-baseline.md)
 * [API Baseline and Boundary Checks](articles/api-baseline-and-boundary-checks.md)
 * [Release Cadence and Readiness](articles/release-cadence-and-readiness.md)
-* [3.2.3 Release Readiness Record](articles/release-readiness-323.md)
+* [4.0.0 Release Readiness Record](articles/release-readiness-400.md)
 
 
 ### Historical records

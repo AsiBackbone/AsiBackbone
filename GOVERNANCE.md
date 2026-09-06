@@ -194,7 +194,7 @@ change is intended.
 
 ### Current stable-line posture
 
-`3.x` is the current stable package identity line for the `AsiBackbone.*`
+`4.x` is the current stable package identity line for the `AsiBackbone.*`
 package IDs and namespaces. Additional breaking changes should be avoided unless
 strongly justified by consumer safety, correctness, maintainability, or a clearly
 documented architectural boundary that cannot be preserved compatibly.

@@ -8,17 +8,17 @@ In this software project, **ASI** means **Accountable Systems Infrastructure**. 
 
 ## Supported versions
 
-Security review and vulnerability handling focus on the current stable `3.x` release line.
+Security review and vulnerability handling focus on the current stable `4.x` release line.
 
 | Version line | Support posture |
 | --- | --- |
-| `3.x` | Supported stable line. Please prefer the latest available `3.x` patch when validating or reporting a concern. |
-| `2.x` | Previous stable line. Supported only for migration-sensitive reports that also affect or inform the current `3.x` package family. |
-| `1.x` | Historical stable line. Supported only for migration-sensitive reports that also affect or inform the current `3.x` package family. |
+| `4.x` | Supported stable line. Please prefer the latest available `4.x` patch when validating or reporting a concern. |
+| `3.x` | Previous stable line. Supported only for migration-sensitive reports that also affect or inform the current `4.x` package family. |
+| `2.x`, `1.x` | Historical stable lines. Supported only for migration-sensitive reports that also affect or inform the current `4.x` package family. |
 | `0.x`, alpha, beta, preview, or historical package lines | Not supported except when a maintainer explicitly asks for comparison or reproduction details. |
 | Unreleased `main` branch changes | Reviewed on a best-effort basis before release, but not treated as a supported production release line. |
 
-A report that affects supported `3.x` packages may still result in documentation, sample, analyzer, package, or release-process changes depending on where the actual risk lives.
+A report that affects supported `4.x` packages may still result in documentation, sample, analyzer, package, or release-process changes depending on where the actual risk lives.
 
 ## How to report a vulnerability or sensitive concern
 

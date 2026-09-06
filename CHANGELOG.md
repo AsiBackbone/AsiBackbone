@@ -6,8 +6,24 @@ This project follows the spirit of [Keep a Changelog](https://keepachangelog.com
 
 ## [Unreleased]
 
+## [4.0.0] - 2026-09-06
+
+### Release summary
+
+`4.0.0` starts the stable `4.x` AsiBackbone package family. It advances the
+binary assembly identity to `4.0.0.0` and makes governance outbox claim leasing
+the safe default. Package IDs, public namespaces, and the `net10.0` target
+remain unchanged.
+
+The major-version boundary is required because hosts supplying a custom outbox
+store must now implement `IAsiBackboneGovernanceOutboxClaimStore` or explicitly
+disable claim leasing. The release also adds bounded claim recovery, canonical
+capability-grant payload construction, explicit signature failure categories,
+endpoint metadata and correlation hardening, and EF Core persistence fixes.
+
 ### Added
 
+* Added 4.0.0 release notes, migration guidance, consumer verification, and a release-readiness record.
 
 * Added `CanonicalPayloadBuilder.ForCapabilityTokenGrant`, covering every field a `CapabilityTokenGrant` carries (#699). `CanonicalArtifactTypes.CapabilityTokenGrant` existed but had no builder, so every consumer invented its own payload. The repository's own reference implementations in the validator tests and the stable-package smoke script hashed four fields — `audience`, `expiresUtc`, `issuer`, and `scopes` — while `CapabilityGrantValidator` enforces `NotBeforeUtc`, `PolicyVersion`, `PolicyHash`, `AcknowledgmentId`, `HandshakeId`, `GatewayBinding`, `ResourceBinding`, `SubjectId`, `OperationName`, and `IssuedUtc` as well. Fields outside the payload are outside the proof, so a value changed after signing still validated. Scopes are normalized to a sorted, de-duplicated, ordinal set; grant metadata remains filtered through `CanonicalPayloadOptions.AllowsMetadataKey`, whose allow-list is empty by default, so metadata is unbound unless a host opts a key in. Both reference implementations now use the builder.
 
@@ -22,6 +38,7 @@ This project follows the spirit of [Keep a Changelog](https://keepachangelog.com
 
 ### Changed
 
+* Promoted central package metadata from `3.2.3` to `4.0.0`, advanced `AssemblyVersion` to `4.0.0.0`, and aligned citation, Zenodo, template, lock-file, Source Link, and current-release documentation metadata.
 * Endpoint governance metadata sanitization now runs after request-derived metadata is merged, and the sanitized result is treated as authoritative when the evaluation context is built (#701). Request-derived values such as the `email` segment of `/users/{email}` were previously merged in after sanitization and never inspected. Building the evaluation context re-merged raw request metadata underneath the sanitized dictionary, so a redacted value overrode the raw entry by key but a dropped key — absent from the sanitized dictionary, with nothing to override the raw entry — was silently restored, leaving the strongest non-terminal sanitization action with no effect. `AsiBackboneHttpRequestCorrelation.ToEvaluationContext` gained a `mergeRequestMetadata` parameter, defaulting to `true`, so callers holding already-merged metadata can opt out of the second merge.
 * A request with no selected endpoint now reports the `aspnetcore.endpoint.governance.unresolved_endpoint` decision stage instead of sharing `aspnetcore.endpoint.governance.metadata` with endpoints that declare no governance metadata (#700). Both still fail closed only when `RequireGovernanceMetadata` is enabled; the change makes a pipeline-ordering fault distinguishable from a metadata gap, since they have different causes and different fixes.
 * `endpoint.policy_types` is now retained under `AsiBackboneEndpointGovernanceMetadataMode.Reduced` (#698). It was previously dropped, so a host decision policy that varied its outcome by policy type silently stopped seeing the marker under Reduced mode and fell back to uniform behavior — a permissive change produced by a metadata setting rather than a policy one. Reduced mode still drops every other descriptor entry.
@@ -41,6 +58,20 @@ This project follows the spirit of [Keep a Changelog](https://keepachangelog.com
 ### Compatibility
 
 * The claim-lease default change alters runtime behavior without changing any public signature. It is a behavior break for hosts that supply a non-claim-capable outbox store, and a behavior improvement for every host using the shipped stores. Claim leasing coordinates workers before provider emission; it does not by itself create an exactly-once delivery guarantee.
+
+### Migration
+
+* Update all `AsiBackbone.*` package references from `3.2.3` to `4.0.0` and
+  rebuild applications against `AssemblyVersion` `4.0.0.0`.
+* Custom outbox stores should implement
+  `IAsiBackboneGovernanceOutboxClaimStore`. Hosts may temporarily set
+  `UseClaimLeases = false`, accepting duplicate-prone concurrent delivery.
+* Review `ClaimWorkerId`, `ClaimPageSize`, `MaxClaimAttempts`, and
+  `DeadLetterOnMaxClaimAttempts` against the host's worker and incident model.
+* Rename obsolete `RequireGovernancePolicy` endpoint calls to
+  `MarkGovernancePolicy`; the replacement records the same policy marker.
+* Review the trusted inbound-correlation-ID opt-in and endpoint middleware
+  ordering described in the [4.0.0 Migration Guide](docs/articles/upgrade-323-to-400.md).
 
 ## [3.2.3] - 2026-08-30
 

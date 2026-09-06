@@ -8,18 +8,18 @@
     <!-- Generate packages.lock.json for reproducible restores. -->
     <RestorePackagesWithLockFile>true</RestorePackagesWithLockFile>
 
-    <VersionPrefix>3.2.3</VersionPrefix>
+    <VersionPrefix>4.0.0</VersionPrefix>
     <VersionSuffix></VersionSuffix>
     <Version Condition="'$(VersionSuffix)' == ''">$(VersionPrefix)</Version>
     <Version Condition="'$(VersionSuffix)' != ''">$(VersionPrefix)-$(VersionSuffix)</Version>
 
     <!--
       AssemblyVersion is the stable binary identity for the current major line.
-      Keep it fixed at 3.0.0.0 for compatible 3.x releases; move NuGet Version,
+      Keep it fixed at 4.0.0.0 for compatible 4.x releases; move NuGet Version,
       FileVersion, and InformationalVersion with each package release.
     -->
-    <AssemblyVersion>3.0.0.0</AssemblyVersion>
-    <FileVersion>3.2.3.0</FileVersion>
+    <AssemblyVersion>4.0.0.0</AssemblyVersion>
+    <FileVersion>4.0.0.0</FileVersion>
     <InformationalVersion>$(Version)+$(RepositoryUrl)</InformationalVersion>
 
     <ContinuousIntegrationBuild Condition="'$(GITHUB_ACTIONS)' == 'true'">true</ContinuousIntegrationBuild>
