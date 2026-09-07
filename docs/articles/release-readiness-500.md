@@ -113,6 +113,7 @@ tests detect the defect rather than only exercising the new code paths.
 
 - [5.0.0 Release Notes](release-notes-500.md)
 - [5.0.0 Migration Guide](upgrade-400-to-500.md)
+- [5.0.0 Consumer Verification Guide](consumer-verification-500.md)
 - [Release Validation](release-validation.md)
 - [Release Cadence and Readiness](release-cadence-and-readiness.md)
 - [API Compatibility and SemVer](api-compatibility-and-semver.md)

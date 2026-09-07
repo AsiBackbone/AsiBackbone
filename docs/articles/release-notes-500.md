@@ -104,4 +104,5 @@ exactly as it did in `4.x`, so grants signed before this release keep verifying.
 * [4.0.0 to 5.0.0 Migration Guide](upgrade-400-to-500.md)
 * [API Compatibility and SemVer](api-compatibility-and-semver.md)
 * [Cryptographic Security Posture](cryptographic-security-posture.md)
+* [5.0.0 Consumer Verification Guide](consumer-verification-500.md)
 * [Regulated Storage and Signing Verification Checklist](regulated-storage-and-signing-verification-checklist.md)

@@ -111,6 +111,7 @@ Package-specific READMEs and release notes define which surfaces are stable, opt
 
 * [5.0.0 Release Notes](articles/release-notes-500.md)
 * [5.0.0 Migration Guide](articles/upgrade-400-to-500.md)
+* [5.0.0 Consumer Verification Guide](articles/consumer-verification-500.md)
 * [4.0.0 Release Notes](articles/release-notes-400.md)
 * [4.0.0 Migration Guide](articles/upgrade-323-to-400.md)
 * [4.0.0 Consumer Verification Guide](articles/consumer-verification-400.md)

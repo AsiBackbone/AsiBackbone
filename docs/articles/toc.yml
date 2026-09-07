@@ -209,6 +209,8 @@
       href: upgrade-400-to-500.md
     - name: 5.0.0 Release Readiness Record
       href: release-readiness-500.md
+    - name: 5.0.0 Consumer Verification Guide
+      href: consumer-verification-500.md
     - name: 4.0.0 Release Notes
       href: release-notes-400.md
     - name: 4.0.0 Migration Guide

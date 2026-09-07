@@ -216,3 +216,4 @@ depended on enumeration order. Normalize metadata keys before signing.
 * [API Compatibility and SemVer](api-compatibility-and-semver.md)
 * [Regulated Storage and Signing Verification Checklist](regulated-storage-and-signing-verification-checklist.md)
 * [Schema Versioning](schema-versioning.md)
+* [5.0.0 Consumer Verification Guide](consumer-verification-500.md)

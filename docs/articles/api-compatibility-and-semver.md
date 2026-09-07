@@ -2,7 +2,7 @@
 
 This article defines the public API compatibility promise for the stable AsiBackbone package family and documents how semantic versioning applies after stabilization.
 
-It complements the historical stable API review tracked in [issue #13](https://github.com/AsiBackbone/AsiBackbone/issues/13). The `2.0.0` release moved public package IDs and namespaces from `CDCavell.AsiBackbone.*` to `AsiBackbone.*`. The `3.0.0` release established the prior binary assembly identity, and `4.0.0` starts the current stable line while preserving the existing package IDs and namespaces.
+It complements the historical stable API review tracked in [issue #13](https://github.com/AsiBackbone/AsiBackbone/issues/13). The `2.0.0` release moved public package IDs and namespaces from `CDCavell.AsiBackbone.*` to `AsiBackbone.*`. The `3.0.0` release established the prior binary assembly identity, `4.0.0` started the previous stable line, and `5.0.0` starts the current stable line while preserving the existing package IDs and namespaces.
 
 > [!NOTE]
 > Additive public API or package surface should use a minor version bump even when the change is backward-compatible. Patch releases should be reserved for fixes, documentation, packaging, tests, and implementation hardening that do not expand the stable public surface.
@@ -158,6 +158,7 @@ Before cutting a stable release or stable package-family expansion, the release 
 
 - [4.0.0 Release Notes](release-notes-400.md)
 - [5.0.0 Release Readiness Record](release-readiness-500.md)
+- [5.0.0 Consumer Verification Guide](consumer-verification-500.md)
 - [4.0.0 Release Readiness Record](release-readiness-400.md)
 - [4.0.0 Migration Guide](upgrade-323-to-400.md)
 - [4.0.0 Consumer Verification Guide](consumer-verification-400.md)
