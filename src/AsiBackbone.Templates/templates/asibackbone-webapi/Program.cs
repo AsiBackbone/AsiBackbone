@@ -102,9 +102,15 @@ app.MapPost("/sample/minimal/execute", () => Results.Ok(new
 .RequireCapabilityGrant("sample.execute")
 .EmitGovernanceAudit();
 
+// Audit residue records who attempted what and why it was allowed or denied, so reading it is a governed operation
+// rather than an open lookup. It carries its own capability requirement, separate from executing the sample endpoints.
 app.MapGet("/sample/audit/{correlationId}", (
     string correlationId,
-    InMemoryAuditLedger auditLedger) => Results.Ok(auditLedger.GetByCorrelationId(correlationId)));
+    InMemoryAuditLedger auditLedger) => Results.Ok(auditLedger.GetByCorrelationId(correlationId)))
+.WithDisplayName("template.sample.audit.read")
+.MarkGovernancePolicy(typeof(SampleEndpointPolicy))
+.RequireCapabilityGrant("sample.audit.read")
+.EmitGovernanceAudit();
 
 app.MapControllers();
 

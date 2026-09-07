@@ -309,7 +309,19 @@ public static class CanonicalPayloadBuilder
                 continue;
             }
 
-            filteredMetadata[item.Key.Trim()] = item.Value?.Trim() ?? string.Empty;
+            string normalizedKey = item.Key.Trim();
+
+            // Trimming keys before hashing makes "k" and " k" the same key. Overwriting silently made the hashed payload
+            // depend on enumeration order, so the same logical metadata could hash two ways and one key's value could
+            // displace another's inside the signed payload.
+            if (filteredMetadata.ContainsKey(normalizedKey))
+            {
+                throw new ArgumentException(
+                    $"Canonical payload metadata contains keys that collide after trimming: '{normalizedKey}'. Normalize metadata keys before signing so the hashed payload does not depend on enumeration order.",
+                    nameof(metadata));
+            }
+
+            filteredMetadata[normalizedKey] = item.Value?.Trim() ?? string.Empty;
         }
 
         return filteredMetadata;

@@ -11,6 +11,11 @@ public sealed class AsiBackboneHttpActorContextOptions
     /// <summary>
     /// Gets the default stable identifier claim types checked for authenticated actors.
     /// </summary>
+    /// <remarks>
+    /// Email claims are deliberately absent. Actor identifiers are persisted verbatim and indexed in durable audit rows,
+    /// and an email address is both personal data and a mutable identifier, so a host that wants one must add it
+    /// explicitly and accept the retention consequences.
+    /// </remarks>
     public static IReadOnlyList<string> DefaultActorIdClaimTypes { get; } =
     [
         ClaimTypes.NameIdentifier,
@@ -18,19 +23,19 @@ public sealed class AsiBackboneHttpActorContextOptions
         "oid",
         "client_id",
         "azp",
-        ClaimTypes.Email,
     ];
 
     /// <summary>
     /// Gets the default display-name claim types checked for authenticated actors.
     /// </summary>
+    /// <remarks>
+    /// Email claims are deliberately absent, for the retention reason described on <see cref="DefaultActorIdClaimTypes" />.
+    /// </remarks>
     public static IReadOnlyList<string> DefaultDisplayNameClaimTypes { get; } =
     [
         ClaimTypes.Name,
         "name",
         "preferred_username",
-        ClaimTypes.Email,
-        "email",
     ];
 
     /// <summary>
