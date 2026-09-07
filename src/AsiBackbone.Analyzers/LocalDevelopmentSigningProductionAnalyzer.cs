@@ -10,6 +10,11 @@ public sealed class LocalDevelopmentSigningProductionAnalyzer : DiagnosticAnalyz
 {
     public const string DiagnosticId = "ASIB002";
 
+    /// <summary>
+    /// Reports local-development signing wired with no environment guard at all.
+    /// </summary>
+    public const string UnguardedDiagnosticId = "ASIB003";
+
     private const string LocalDevelopmentNamespace = "AsiBackbone.Signing.LocalDevelopment";
 
     private static readonly DiagnosticDescriptor Rule = new(
@@ -21,7 +26,21 @@ public sealed class LocalDevelopmentSigningProductionAnalyzer : DiagnosticAnalyz
         isEnabledByDefault: true,
         description: "LocalDevelopment signing providers generate in-process keys for tests, samples, and local proof paths only. They should not be registered or instantiated on a production configuration path.");
 
-    public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => [Rule];
+    /// <remarks>
+    /// <see cref="Rule" /> only fires on a call the analyzer can see inside a production branch, so an unconditional
+    /// registration — the shape that actually reaches production — was never reported. The runtime guard in
+    /// <c>UseLocalDevelopmentSigning</c> throws in Production; this rule surfaces the same problem at build time.
+    /// </remarks>
+    private static readonly DiagnosticDescriptor UnguardedRule = new(
+        UnguardedDiagnosticId,
+        "Guard local-development signing by environment",
+        "Local-development signing type '{0}' is wired without an environment guard; it will be registered in whichever environment this code runs in",
+        "AsiBackbone.ProductionSafety",
+        DiagnosticSeverity.Warning,
+        isEnabledByDefault: true,
+        description: "LocalDevelopment signing providers generate an in-process key that is never persisted, so artifacts they sign stop verifying after a restart. Registration should sit behind an environment check, or set LocalDevelopmentSigningOptions.AllowInProduction to state the intent explicitly.");
+
+    public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => [Rule, UnguardedRule];
 
     public override void Initialize(AnalysisContext context)
     {
@@ -36,8 +55,14 @@ public sealed class LocalDevelopmentSigningProductionAnalyzer : DiagnosticAnalyz
         var invocation = (IInvocationOperation)context.Operation;
 
         if (IsSuppressedByHostMarker(context.ContainingSymbol)
-            || !IsInsideProductionBranch(invocation)
             || IsNestedInsideInvocationThatAlreadyReferencesLocalDevelopment(invocation))
+        {
+            return;
+        }
+
+        bool insideProductionBranch = IsInsideProductionBranch(invocation);
+
+        if (!insideProductionBranch && IsInsideEnvironmentConditional(invocation))
         {
             return;
         }
@@ -50,7 +75,7 @@ public sealed class LocalDevelopmentSigningProductionAnalyzer : DiagnosticAnalyz
 
         context.ReportDiagnostic(
             Diagnostic.Create(
-                Rule,
+                insideProductionBranch ? Rule : UnguardedRule,
                 invocation.Syntax.GetLocation(),
                 localDevelopmentType.ToDisplayString(SymbolDisplayFormat.CSharpErrorMessageFormat)));
     }
@@ -149,6 +174,62 @@ public sealed class LocalDevelopmentSigningProductionAnalyzer : DiagnosticAnalyz
         }
 
         return false;
+    }
+
+    /// <summary>
+    /// Determines whether the operation sits inside any conditional that tests the host environment.
+    /// </summary>
+    /// <remarks>
+    /// A registration guarded by an environment check — for either the production or the non-production side — is a
+    /// deliberate choice the host has already made. Only registrations with no environment check at all are reported by
+    /// <see cref="UnguardedRule" />.
+    /// </remarks>
+    private static bool IsInsideEnvironmentConditional(IOperation operation)
+    {
+        for (IOperation? current = operation.Parent; current is not null; current = current.Parent)
+        {
+            if (current is IConditionalOperation conditionalOperation
+                && ConditionReferencesEnvironment(conditionalOperation.Condition))
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private static bool ConditionReferencesEnvironment(IOperation operation)
+    {
+        operation = Unwrap(operation);
+
+        if (IsEnvironmentNameReference(operation))
+        {
+            return true;
+        }
+
+        switch (operation)
+        {
+            case IInvocationOperation invocationOperation:
+                IMethodSymbol method = invocationOperation.TargetMethod.ReducedFrom ?? invocationOperation.TargetMethod;
+                string namespaceName = method.ContainingNamespace?.ToDisplayString(SymbolDisplayFormat.CSharpErrorMessageFormat) ?? string.Empty;
+
+                return namespaceName.Equals("Microsoft.Extensions.Hosting", StringComparison.Ordinal)
+                    || InvocationComparesEnvironmentNameToProduction(invocationOperation)
+                    || IsEnvironmentNameReference(invocationOperation.Instance);
+
+            case IBinaryOperation binaryOperation:
+                return ConditionReferencesEnvironment(binaryOperation.LeftOperand)
+                    || ConditionReferencesEnvironment(binaryOperation.RightOperand);
+
+            case IUnaryOperation unaryOperation:
+                return ConditionReferencesEnvironment(unaryOperation.Operand);
+
+            case IPropertyReferenceOperation propertyReference:
+                return propertyReference.Property.Name.Contains("Environment", StringComparison.Ordinal);
+
+            default:
+                return false;
+        }
     }
 
     private static bool IsProductionLikeCondition(IOperation operation)

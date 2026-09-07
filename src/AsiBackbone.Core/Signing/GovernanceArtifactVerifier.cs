@@ -75,6 +75,48 @@ public static class GovernanceArtifactVerifier
         SignedGovernanceArtifact<TArtifact> artifact,
         VerificationPolicyContext context)
     {
+        SignatureVerificationResult? metadataResult = ValidateSigningMetadata(artifact, context);
+
+        return metadataResult ?? ValidateCanonicalBinding(artifact);
+    }
+
+    /// <summary>
+    /// Recomputes the canonical payload hash and rejects an artifact whose signed hash is not the hash of its own canonical payload.
+    /// </summary>
+    /// <remarks>
+    /// Without this step the provider verifies a signature over a hash the artifact carries about itself, which leaves the
+    /// artifact content unbound to the signature. A caller that rehydrates an artifact from storage or a queue can otherwise
+    /// present modified content beside an authentic hash and signature pair and receive a valid outcome.
+    /// </remarks>
+    private static SignatureVerificationResult? ValidateCanonicalBinding<TArtifact>(
+        SignedGovernanceArtifact<TArtifact> artifact)
+    {
+        CanonicalPayloadHash recomputedHash;
+
+        try
+        {
+            recomputedHash = CanonicalPayloadHasher.ComputeHash(artifact.CanonicalPayload, artifact.HashAlgorithm);
+        }
+        catch (NotSupportedException)
+        {
+            return SignatureVerificationResult.Failed(
+                "signature.hash-algorithm-unsupported",
+                SignatureVerificationCategory.UnsupportedAlgorithm,
+                "The canonical payload hash cannot be recomputed with the built-in hasher, so the signed hash is not bound to the artifact content.");
+        }
+
+        return string.Equals(recomputedHash.HashValue, artifact.CanonicalHash.HashValue, StringComparison.Ordinal)
+            ? null
+            : SignatureVerificationResult.Failed(
+                "signature.hash-mismatch",
+                SignatureVerificationCategory.HashMismatch,
+                "The canonical payload does not hash to the signed canonical hash value.");
+    }
+
+    private static SignatureVerificationResult? ValidateSigningMetadata<TArtifact>(
+        SignedGovernanceArtifact<TArtifact> artifact,
+        VerificationPolicyContext context)
+    {
         SigningMetadata metadata = artifact.SigningMetadata;
 
         return artifact.HasNoSignature || !metadata.HasSignature
@@ -109,14 +151,14 @@ public static class GovernanceArtifactVerifier
             : context.ExpectedKeyId is not null
             && !string.Equals(context.ExpectedKeyId, metadata.KeyId, StringComparison.Ordinal)
             ? SignatureVerificationResult.Failed(
-                "signature.key-version-unknown",
-                SignatureVerificationCategory.UnknownKeyVersion,
+                "signature.key-not-trusted",
+                SignatureVerificationCategory.UntrustedKey,
                 "The signing key identifier does not match the verification policy expectation.")
             : context.ExpectedKeyVersion is not null
             && !string.Equals(context.ExpectedKeyVersion, metadata.KeyVersion, StringComparison.Ordinal)
             ? SignatureVerificationResult.Failed(
-                "signature.key-version-unknown",
-                SignatureVerificationCategory.UnknownKeyVersion,
+                "signature.key-not-trusted",
+                SignatureVerificationCategory.UntrustedKey,
                 "The signing key version does not match the verification policy expectation.")
             : context.RequiredProvider is not null
             && !string.Equals(context.RequiredProvider, metadata.Provider, StringComparison.Ordinal)
@@ -133,10 +175,18 @@ public static class GovernanceArtifactVerifier
             : null;
     }
 
+    /// <summary>
+    /// Requires a canonical descriptor to be present in signing metadata and to match the artifact being verified.
+    /// </summary>
+    /// <remarks>
+    /// An absent descriptor previously matched anything, which let a signature produced for one artifact type or identifier
+    /// be presented alongside a different artifact. The shipped factories always write these descriptors, so a signed
+    /// artifact that is missing one did not come from a canonical signing path.
+    /// </remarks>
     private static bool MatchesCanonicalMetadata(SigningMetadata metadata, string key, string expectedValue)
     {
-        return !metadata.Metadata.TryGetValue(key, out string? value)
-            || string.Equals(value, expectedValue, StringComparison.Ordinal);
+        return metadata.Metadata.TryGetValue(key, out string? value)
+            && string.Equals(value, expectedValue, StringComparison.Ordinal);
     }
 
     private static bool MatchesOptionalPolicyMetadata(SigningMetadata metadata, string key, string? expectedValue)

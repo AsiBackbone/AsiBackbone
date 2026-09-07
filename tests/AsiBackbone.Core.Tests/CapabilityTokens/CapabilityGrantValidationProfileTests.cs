@@ -42,6 +42,7 @@ public sealed class CapabilityGrantValidationProfileTests
     public void CreateExecutionBoundaryAllowsCallerToMakeBoundedUseExplicitlyOptional()
     {
         var options = CapabilityGrantValidationOptions.CreateExecutionBoundary(
+            audience: "gateway-1",
             requireUseCheck: false,
             maxUseCount: 4);
 
@@ -78,7 +79,7 @@ public sealed class CapabilityGrantValidationProfileTests
 
         CapabilityGrantValidationResult result = await CapabilityGrantValidator.ValidateAsync(
             signedGrant,
-            CapabilityGrantValidationOptions.CreateExecutionBoundary(validationUtc: Now),
+            CapabilityGrantValidationOptions.CreateExecutionBoundary(audience: "gateway-1", validationUtc: Now),
             cancellationToken: TestContext.Current.CancellationToken);
 
         Assert.False(result.ShouldAllow);
@@ -99,7 +100,7 @@ public sealed class CapabilityGrantValidationProfileTests
 
         CapabilityGrantValidationResult result = await CapabilityGrantValidator.ValidateAsync(
             signedGrant,
-            CapabilityGrantValidationOptions.CreateExecutionBoundary(validationUtc: Now),
+            CapabilityGrantValidationOptions.CreateExecutionBoundary(audience: "gateway-1", validationUtc: Now),
             verifier,
             cancellationToken: TestContext.Current.CancellationToken);
 
@@ -130,11 +131,15 @@ public sealed class CapabilityGrantValidationProfileTests
     }
 
     /// <summary>
-    /// Verifies that the legacy no-options validator path retains its existing metadata-only behavior for 3.x compatibility.
+    /// Verifies that the no-options validator path denies rather than validating an unexpired grant against nothing.
     /// </summary>
+    /// <remarks>
+    /// The omitted-options path previously built permissive defaults — no proof, no use check, and no issuer, audience, or
+    /// scope expectations — so the simplest call returned Valid for any grant that had not expired.
+    /// </remarks>
     /// <returns>A task representing the asynchronous test operation.</returns>
     [Fact]
-    public async Task LegacyNoOptionsPathRetainsMetadataOnlyBehavior()
+    public async Task NoOptionsPathDeniesInsteadOfValidatingAgainstNothing()
     {
         DateTimeOffset currentUtc = DateTimeOffset.UtcNow;
         var grant = CapabilityTokenGrant.Create(
@@ -150,9 +155,10 @@ public sealed class CapabilityGrantValidationProfileTests
             signedGrant,
             cancellationToken: TestContext.Current.CancellationToken);
 
-        Assert.True(result.IsValid);
-        Assert.True(result.ShouldAllow);
-        Assert.Equal(CapabilityTokenValidationCategory.Valid, result.Category);
+        Assert.False(result.IsValid);
+        Assert.False(result.ShouldAllow);
+        Assert.Equal(VerificationPolicyAction.Deny, result.Action);
+        Assert.Equal("capability.validation-options-required", result.FailureCode);
     }
 
     private static CapabilityTokenGrant CreateGrant()
@@ -168,18 +174,7 @@ public sealed class CapabilityGrantValidationProfileTests
 
     private static SignedGovernanceArtifact<CapabilityTokenGrant> CreateSignedGrant(CapabilityTokenGrant grant)
     {
-        var payload = CanonicalPayload.Create(
-            CanonicalArtifactTypes.CapabilityTokenGrant,
-            grant.TokenId,
-            grant.SchemaVersion,
-            CanonicalPayloadOptions.DefaultCanonicalizationVersion,
-            new Dictionary<string, object?>
-            {
-                ["audience"] = grant.Audience,
-                ["expiresUtc"] = grant.ExpiresUtc.ToString("O", System.Globalization.CultureInfo.InvariantCulture),
-                ["issuer"] = grant.Issuer,
-                ["scopes"] = grant.Scopes.ToArray()
-            });
+        CanonicalPayload payload = CanonicalPayloadBuilder.ForCapabilityTokenGrant(grant);
         CanonicalPayloadHash hash = CanonicalPayloadHasher.ComputeHash(payload);
         var signingMetadata = SigningMetadata.Create(
             signingHash: hash.HashValue,

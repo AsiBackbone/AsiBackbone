@@ -2,14 +2,14 @@
 
 This article defines the public API compatibility promise for the stable AsiBackbone package family and documents how semantic versioning applies after stabilization.
 
-It complements the historical stable API review tracked in [issue #13](https://github.com/AsiBackbone/AsiBackbone/issues/13). The `2.0.0` release moved public package IDs and namespaces from `CDCavell.AsiBackbone.*` to `AsiBackbone.*`. The `3.0.0` release established the prior binary assembly identity, and `4.0.0` starts the current stable line while preserving the existing package IDs and namespaces.
+It complements the historical stable API review tracked in [issue #13](https://github.com/AsiBackbone/AsiBackbone/issues/13). The `2.0.0` release moved public package IDs and namespaces from `CDCavell.AsiBackbone.*` to `AsiBackbone.*`. The `3.0.0` release established the prior binary assembly identity, `4.0.0` started the previous stable line, and `5.0.0` starts the current stable line while preserving the existing package IDs and namespaces.
 
 > [!NOTE]
 > Additive public API or package surface should use a minor version bump even when the change is backward-compatible. Patch releases should be reserved for fixes, documentation, packaging, tests, and implementation hardening that do not expand the stable public surface.
 
-## Compatibility promise for the stable `4.x` line
+## Compatibility promise for the stable `5.x` line
 
-Starting with `4.0.0`, packages identified as stable are expected to preserve their documented public API surface for consumers within the same major version.
+Starting with `5.0.0`, packages identified as stable are expected to preserve their documented public API surface for consumers within the same major version. The same promise applied within the `4.x` line.
 
 The compatibility promise applies to:
 
@@ -45,13 +45,17 @@ The `1.1.x` and `1.2.x` releases expanded the stable `1.x` contract with compati
 
 The `2.0.0` release established the simplified `AsiBackbone.*` package and namespace identity after the public rename from `CDCavell.AsiBackbone.*`. `2.0.1`, `2.0.2`, `2.1.0`, `2.1.1`, `2.2.0`, `2.2.1`, and `2.3.0` preserved that package/namespace boundary while adding compatible package and host-facing surfaces.
 
-### Current `4.x` stable family
+### `4.x` stable family
 
-`4.0.0` is the current stable major release. It preserves the `AsiBackbone.*` package IDs and namespaces while advancing the binary assembly identity to `4.0.0.0` and changing the governance outbox claim-leasing default.
+`4.0.0` established the previous stable line. It preserved the `AsiBackbone.*` package IDs and namespaces while advancing the binary assembly identity to `4.0.0.0` and changing the governance outbox claim-leasing default.
 
-| Package | `4.x` stable role |
+### Current `5.x` stable family
+
+`5.0.0` is the current stable major release. It preserves the `AsiBackbone.*` package IDs and namespaces while advancing the binary assembly identity to `5.0.0.0`. It is a security release: verification binds signed artifact content to its signature, capability proofs bind to the grant being evaluated, partial audit chains require an anchor, and the zero value of several governance enums becomes a rejected sentinel rather than a permissive default.
+
+| Package | `5.x` stable role |
 | --- | --- |
-| `AsiBackbone.Core` | Framework-neutral governance primitives and durable artifact contracts for the current `4.x` line, including policy evaluation, governance decisions, threat-model contributor hooks, metadata budget validation helpers, constraint-exception denial behavior, governed execution-to-mutation accountability receipts, capability-proof trust pinning, explicit capability-grant validation profiles, and canonical capability-grant payload construction. |
+| `AsiBackbone.Core` | Framework-neutral governance primitives and durable artifact contracts for the current `5.x` line, including policy evaluation, governance decisions, threat-model contributor hooks, metadata budget validation helpers, constraint-exception denial behavior, governed execution-to-mutation accountability receipts, capability-proof trust pinning, explicit capability-grant validation profiles, and canonical capability-grant payload construction. |
 | `AsiBackbone.DependencyInjection` | Explicit builder facade and host-selected provider registration composition path. |
 | `AsiBackbone.Storage.InMemory` | Non-durable storage helpers for tests, samples, local validation, lifecycle events, and outbox proof paths. |
 | `AsiBackbone.EntityFrameworkCore` | EF Core host-owned persistence helpers for audit, acknowledgment, lifecycle, JSON metadata storage guidance, and outbox records. |
@@ -96,7 +100,7 @@ For future releases, additive public API or package changes should be grouped in
 
 ## Assembly version policy
 
-For the stable `4.x` package line, AsiBackbone keeps `AssemblyVersion` fixed at `4.0.0.0` for compatible minor and patch releases. NuGet package `Version`, `FileVersion`, and `InformationalVersion` continue to move with each package release.
+For the stable `5.x` package line, AsiBackbone keeps `AssemblyVersion` fixed at `5.0.0.0` for compatible minor and patch releases. NuGet package `Version`, `FileVersion`, and `InformationalVersion` continue to move with each package release.
 
 Expected stable-line behavior:
 
@@ -153,6 +157,8 @@ Before cutting a stable release or stable package-family expansion, the release 
 ## Related documentation
 
 - [4.0.0 Release Notes](release-notes-400.md)
+- [5.0.0 Release Readiness Record](release-readiness-500.md)
+- [5.0.0 Consumer Verification Guide](consumer-verification-500.md)
 - [4.0.0 Release Readiness Record](release-readiness-400.md)
 - [4.0.0 Migration Guide](upgrade-323-to-400.md)
 - [4.0.0 Consumer Verification Guide](consumer-verification-400.md)

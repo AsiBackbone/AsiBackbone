@@ -130,6 +130,44 @@ public sealed class LocalDevelopmentSigningProductionAnalyzerTests
         Assert.Empty(diagnostics);
     }
 
+    /// <summary>
+    /// Tests that registering the signer with no environment guard reports the ASIB003 diagnostic.
+    /// </summary>
+    /// <remarks>
+    /// ASIB002 only sees a call inside a production branch, so the unconditional registration that actually reaches
+    /// production went unreported.
+    /// </remarks>
+    /// <returns>A task representing the asynchronous operation.</returns>
+    [Fact]
+    public async Task LocalDevelopmentSignerRegisteredWithoutAnEnvironmentGuardReportsASIB003()
+    {
+        string source = SourceWithBody("services.AddSingleton<LocalDevelopmentSigningService>();");
+
+        ImmutableArray<Diagnostic> diagnostics = await GetAnalyzerDiagnosticsAsync(source);
+
+        Diagnostic diagnostic = Assert.Single(diagnostics);
+        Assert.Equal(LocalDevelopmentSigningProductionAnalyzer.UnguardedDiagnosticId, diagnostic.Id);
+    }
+
+    /// <summary>
+    /// Tests that a registration guarded by a non-production environment check reports nothing.
+    /// </summary>
+    /// <returns>A task representing the asynchronous operation.</returns>
+    [Fact]
+    public async Task LocalDevelopmentSignerRegisteredInsideDevelopmentBranchReportsNothing()
+    {
+        string source = SourceWithBody("""
+            if (environment.IsDevelopment())
+                    {
+                        services.AddSingleton<LocalDevelopmentSigningService>();
+                    }
+            """);
+
+        ImmutableArray<Diagnostic> diagnostics = await GetAnalyzerDiagnosticsAsync(source);
+
+        Assert.Empty(diagnostics);
+    }
+
     private static string SourceWithProductionBody(string body)
     {
         return SourceWithBody($$"""

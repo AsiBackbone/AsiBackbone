@@ -39,13 +39,17 @@ public sealed class AuditIntegritySequencePrecedenceTests
     [Fact]
     public void VerifyClassifiesUniqueBackwardSequenceAsReorderedRecord()
     {
-        AuditIntegrityLink sequenceFive = CreateComputedLink(5, string.Empty, "record-5");
-        AuditIntegrityLink sequenceFour = CreateComputedLink(4, sequenceFive.LinkHash, "record-4");
+        var first = AuditIntegrityLink.CreateGenesis("audit-ledger", CreateRecordHash("record-1"), Now);
+        var second = AuditIntegrityLink.Append(first, CreateRecordHash("record-2"), Now.AddSeconds(1));
+        var third = AuditIntegrityLink.Append(second, CreateRecordHash("record-3"), Now.AddSeconds(2));
+        var sequenceFour = AuditIntegrityLink.Append(third, CreateRecordHash("record-4"), Now.AddSeconds(3));
+        var sequenceFive = AuditIntegrityLink.Append(sequenceFour, CreateRecordHash("record-5"), Now.AddSeconds(4));
 
         AuditIntegrityVerificationResult result = AuditIntegrityVerifier.Verify(
             [sequenceFive, sequenceFour],
             "audit-ledger",
-            requireGenesis: false);
+            requireGenesis: false,
+            expectedPreviousLinkHash: sequenceFour.LinkHash);
 
         AssertFailure(result, AuditIntegrityVerificationCategory.ReorderedRecord, "integrity.sequence-reordered");
         Assert.Equal("6", result.SafeMetadata["expected_sequence"]);

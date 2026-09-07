@@ -232,18 +232,127 @@ public sealed class AuditIntegrityVerifierTests
     }
 
     /// <summary>
-    /// Tests that the <see cref="AuditIntegrityVerifier.Verify"/> method correctly accepts a partial chain when the genesis link is not required.
+    /// Tests that a genuine chain suffix verifies when anchored by the hash of the link preceding it.
     /// </summary>
     [Fact]
-    public void VerifyAcceptsPartialChainWhenGenesisIsNotRequired()
+    public void VerifyAcceptsGenuinePartialChainAnchoredByPreviousLinkHash()
     {
-        AuditIntegrityLink partial = CreateComputedLink(5, CreateRecordHash("record-5"));
+        var first = AuditIntegrityLink.CreateGenesis("audit-ledger", CreateRecordHash("record-1"), Now);
+        var second = AuditIntegrityLink.Append(first, CreateRecordHash("record-2"), Now.AddSeconds(1));
+        var third = AuditIntegrityLink.Append(second, CreateRecordHash("record-3"), Now.AddSeconds(2));
 
-        AuditIntegrityVerificationResult result = AuditIntegrityVerifier.Verify([partial], "audit-ledger", requireGenesis: false);
+        AuditIntegrityVerificationResult result = AuditIntegrityVerifier.Verify(
+            [second, third],
+            "audit-ledger",
+            requireGenesis: false,
+            expectedPreviousLinkHash: first.LinkHash);
 
         Assert.True(result.IsValid);
-        Assert.Equal("1", result.SafeMetadata["link_count"]);
-        Assert.Equal(partial.LinkHash, result.SafeMetadata["tip_hash"]);
+        Assert.Equal("2", result.SafeMetadata["link_count"]);
+        Assert.Equal(third.LinkHash, result.SafeMetadata["tip_hash"]);
+    }
+
+    /// <summary>
+    /// Tests that a partial chain is rejected when the caller supplies no anchoring previous link hash.
+    /// </summary>
+    /// <remarks>
+    /// Without an anchor there is nothing to distinguish a genuine suffix from a rewritten one, so the verifier fails closed
+    /// rather than assuming the suffix begins the chain.
+    /// </remarks>
+    [Fact]
+    public void VerifyRejectsPartialChainWithoutAnAnchor()
+    {
+        var first = AuditIntegrityLink.CreateGenesis("audit-ledger", CreateRecordHash("record-1"), Now);
+        var second = AuditIntegrityLink.Append(first, CreateRecordHash("record-2"), Now.AddSeconds(1));
+
+        AuditIntegrityVerificationResult result = AuditIntegrityVerifier.Verify(
+            [second],
+            "audit-ledger",
+            requireGenesis: false);
+
+        Assert.False(result.IsValid);
+        Assert.Equal(AuditIntegrityVerificationCategory.MissingAnchor, result.Category);
+        Assert.Equal("integrity.expected-previous-hash-required", result.FailureCode);
+    }
+
+    /// <summary>
+    /// Tests that a forged restart claiming no predecessor is rejected.
+    /// </summary>
+    /// <remarks>
+    /// An attacker who rewrote links from sequence N onward with an empty previous hash, recomputing each link hash, used to
+    /// produce a chain the verifier accepted while it rejected the genuine one.
+    /// </remarks>
+    [Fact]
+    public void VerifyRejectsForgedRestartThatClaimsNoPredecessor()
+    {
+        AuditIntegrityLink forged = CreateComputedLink(5, CreateRecordHash("record-5"));
+
+        AuditIntegrityVerificationResult result = AuditIntegrityVerifier.Verify(
+            [forged],
+            "audit-ledger",
+            requireGenesis: false,
+            expectedPreviousLinkHash: CreateRecordHash("record-4").HashValue);
+
+        Assert.False(result.IsValid);
+        Assert.Equal(AuditIntegrityVerificationCategory.HashMismatch, result.Category);
+        Assert.Equal("integrity.previous-link-hash-missing", result.FailureCode);
+    }
+
+    /// <summary>
+    /// Tests that a truncated chain is rejected when the caller states the tip link hash it expects.
+    /// </summary>
+    [Fact]
+    public void VerifyRejectsTruncatedChainAgainstExpectedTip()
+    {
+        var first = AuditIntegrityLink.CreateGenesis("audit-ledger", CreateRecordHash("record-1"), Now);
+        var second = AuditIntegrityLink.Append(first, CreateRecordHash("record-2"), Now.AddSeconds(1));
+        var third = AuditIntegrityLink.Append(second, CreateRecordHash("record-3"), Now.AddSeconds(2));
+
+        AuditIntegrityVerificationResult result = AuditIntegrityVerifier.Verify(
+            [first, second],
+            "audit-ledger",
+            expectedTipLinkHash: third.LinkHash);
+
+        Assert.False(result.IsValid);
+        Assert.Equal(AuditIntegrityVerificationCategory.TruncatedChain, result.Category);
+        Assert.Equal("integrity.chain-truncated", result.FailureCode);
+    }
+
+    /// <summary>
+    /// Tests that a truncated chain is rejected when the caller states the tip sequence it expects.
+    /// </summary>
+    [Fact]
+    public void VerifyRejectsTruncatedChainAgainstExpectedTipSequence()
+    {
+        var first = AuditIntegrityLink.CreateGenesis("audit-ledger", CreateRecordHash("record-1"), Now);
+        var second = AuditIntegrityLink.Append(first, CreateRecordHash("record-2"), Now.AddSeconds(1));
+
+        AuditIntegrityVerificationResult result = AuditIntegrityVerifier.Verify(
+            [first, second],
+            "audit-ledger",
+            expectedTipSequence: 3);
+
+        Assert.False(result.IsValid);
+        Assert.Equal(AuditIntegrityVerificationCategory.TruncatedChain, result.Category);
+        Assert.Equal("integrity.chain-truncated", result.FailureCode);
+    }
+
+    /// <summary>
+    /// Tests that a complete chain verifying against its own tip is accepted.
+    /// </summary>
+    [Fact]
+    public void VerifyAcceptsCompleteChainAgainstExpectedTip()
+    {
+        var first = AuditIntegrityLink.CreateGenesis("audit-ledger", CreateRecordHash("record-1"), Now);
+        var second = AuditIntegrityLink.Append(first, CreateRecordHash("record-2"), Now.AddSeconds(1));
+
+        AuditIntegrityVerificationResult result = AuditIntegrityVerifier.Verify(
+            [first, second],
+            "audit-ledger",
+            expectedTipLinkHash: second.LinkHash,
+            expectedTipSequence: 2);
+
+        Assert.True(result.IsValid);
     }
 
     /// <summary>

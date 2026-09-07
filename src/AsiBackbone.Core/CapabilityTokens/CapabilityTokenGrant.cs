@@ -36,6 +36,7 @@ public sealed class CapabilityTokenGrant
         string? gatewayBinding,
         string? resourceBinding,
         IReadOnlyDictionary<string, string> metadata,
+        int? maxUseCount,
         string? schemaVersion)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(tokenId);
@@ -78,8 +79,19 @@ public sealed class CapabilityTokenGrant
         GatewayBinding = NormalizeOptional(gatewayBinding);
         ResourceBinding = NormalizeOptional(resourceBinding);
         Metadata = metadata;
+        MaxUseCount = maxUseCount;
         SchemaVersion = AsiBackboneSchemaVersions.Normalize(schemaVersion);
     }
+
+    /// <summary>
+    /// Gets the maximum number of times the issuer permits this grant to be used, when the issuer bound one.
+    /// </summary>
+    /// <remarks>
+    /// A use limit supplied only at the validation call site is a local policy choice that the issuer never authorized and
+    /// that nothing in the signature covers. When this value is present it is part of the signed payload, so a relying
+    /// party cannot widen it. Validation uses the narrower of this value and any limit the caller supplies.
+    /// </remarks>
+    public int? MaxUseCount { get; }
 
     /// <summary>
     /// Gets the stable grant identifier used for validation and replay checks.
@@ -201,9 +213,12 @@ public sealed class CapabilityTokenGrant
         string? gatewayBinding = null,
         string? resourceBinding = null,
         IReadOnlyDictionary<string, string>? metadata = null,
+        int? maxUseCount = null,
         string? schemaVersion = null)
     {
-        return new CapabilityTokenGrant(
+        return maxUseCount is < 1
+            ? throw new ArgumentOutOfRangeException(nameof(maxUseCount), maxUseCount, "A bound use limit must be greater than zero.")
+            : new CapabilityTokenGrant(
             tokenId,
             issuer,
             audience,
@@ -220,6 +235,7 @@ public sealed class CapabilityTokenGrant
             gatewayBinding,
             resourceBinding,
             NormalizeMetadata(metadata),
+            maxUseCount,
             schemaVersion);
     }
 

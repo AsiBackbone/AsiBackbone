@@ -47,6 +47,7 @@ public static class GovernanceArtifactSigner
         string? keyId = null,
         string? keyVersion = null,
         IReadOnlyDictionary<string, string>? metadata = null,
+        bool requireSignature = true,
         CancellationToken cancellationToken = default)
     {
         return SignAsync(
@@ -57,6 +58,7 @@ public static class GovernanceArtifactSigner
             keyId,
             keyVersion,
             metadata,
+            requireSignature,
             cancellationToken);
     }
 
@@ -94,6 +96,7 @@ public static class GovernanceArtifactSigner
         string? keyId = null,
         string? keyVersion = null,
         IReadOnlyDictionary<string, string>? metadata = null,
+        bool requireSignature = true,
         CancellationToken cancellationToken = default)
     {
         return SignAsync(
@@ -104,6 +107,7 @@ public static class GovernanceArtifactSigner
             keyId,
             keyVersion,
             metadata,
+            requireSignature,
             cancellationToken);
     }
 
@@ -141,6 +145,7 @@ public static class GovernanceArtifactSigner
         string? keyId = null,
         string? keyVersion = null,
         IReadOnlyDictionary<string, string>? metadata = null,
+        bool requireSignature = true,
         CancellationToken cancellationToken = default)
     {
         return SignAsync(
@@ -151,6 +156,7 @@ public static class GovernanceArtifactSigner
             keyId,
             keyVersion,
             metadata,
+            requireSignature,
             cancellationToken);
     }
 
@@ -188,6 +194,7 @@ public static class GovernanceArtifactSigner
         string? keyId = null,
         string? keyVersion = null,
         IReadOnlyDictionary<string, string>? metadata = null,
+        bool requireSignature = true,
         CancellationToken cancellationToken = default)
     {
         return SignAsync(
@@ -198,6 +205,7 @@ public static class GovernanceArtifactSigner
             keyId,
             keyVersion,
             metadata,
+            requireSignature,
             cancellationToken);
     }
 
@@ -235,6 +243,7 @@ public static class GovernanceArtifactSigner
         string? keyId = null,
         string? keyVersion = null,
         IReadOnlyDictionary<string, string>? metadata = null,
+        bool requireSignature = true,
         CancellationToken cancellationToken = default)
     {
         return SignAsync(
@@ -245,6 +254,7 @@ public static class GovernanceArtifactSigner
             keyId,
             keyVersion,
             metadata,
+            requireSignature,
             cancellationToken);
     }
 
@@ -302,6 +312,7 @@ public static class GovernanceArtifactSigner
         string? keyId,
         string? keyVersion,
         IReadOnlyDictionary<string, string>? metadata,
+        bool requireSignature,
         CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(signingService);
@@ -312,10 +323,16 @@ public static class GovernanceArtifactSigner
             .SignAsync(CreateSigningRequest(hash, keyId, keyVersion, metadata), cancellationToken)
             .ConfigureAwait(false);
 
-        return SignedGovernanceArtifacts.FromSigningMetadata(
-            artifact,
-            payload,
-            hash,
-            signingResult.Metadata);
+        // A provider returning a failure or no-signature result previously produced an artifact with IsSigned false and
+        // no exception, so a caller that asked to sign could carry on holding an unsigned artifact. Callers that want the
+        // unsigned result back pass requireSignature: false and inspect IsSigned themselves.
+        return requireSignature && !signingResult.Metadata.IsSigned
+            ? throw new InvalidOperationException(
+                $"The signing provider returned no signature for artifact type '{payload.ArtifactType}'. Pass requireSignature: false to accept and inspect an unsigned result.")
+            : SignedGovernanceArtifacts.FromSigningMetadata(
+                artifact,
+                payload,
+                hash,
+                signingResult.Metadata);
     }
 }

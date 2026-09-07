@@ -74,7 +74,17 @@ public sealed class ManagedKeySigningService : IAsiBackboneSigningService
                     .SignAsync(CreateManagedKeyRequest(request), cancellationToken)
                     .ConfigureAwait(false);
 
-                return CreateSignedResult(request, managedResult, attempt, diagnostics);
+                ManagedKeyResponseMismatch? mismatch = ValidateSigningResponse(request, managedResult);
+
+                return mismatch is not null
+                    ? HandleFailure(
+                        request,
+                        mismatch.FailureCode,
+                        mismatch.Message,
+                        attempt,
+                        diagnostics,
+                        new ManagedKeySigningException(mismatch.FailureCode, mismatch.Message, isRetryable: false))
+                    : CreateSignedResult(request, managedResult, attempt, diagnostics);
             }
             catch (ManagedKeySigningException exception) when (exception.IsRetryable && attempt < options.MaxRetryAttempts)
             {
@@ -142,6 +152,52 @@ public sealed class ManagedKeySigningService : IAsiBackboneSigningService
             request.Purpose,
             request.Metadata);
     }
+
+    /// <summary>
+    /// Rejects a provider response whose key identity or signature algorithm differs from what was requested.
+    /// </summary>
+    /// <remarks>
+    /// The signed result copies the provider's key identifier, key version, and signature algorithm into signing metadata.
+    /// Without this comparison a provider that signed under a different key, a different key version, or a different
+    /// algorithm produced an artifact that recorded the substitution as though it had been requested, and the artifact
+    /// could also carry two disagreeing algorithm descriptors because the configured value is written separately.
+    /// A key version is only compared when the request or configuration pinned one, so ordinary version resolution by the
+    /// provider is still accepted.
+    /// </remarks>
+    private ManagedKeyResponseMismatch? ValidateSigningResponse(SigningRequest request, ManagedKeySignResult managedResult)
+    {
+        string requestedKeyId = ResolveKeyId(request);
+
+        if (!string.IsNullOrWhiteSpace(managedResult.KeyId)
+            && !string.Equals(managedResult.KeyId, requestedKeyId, StringComparison.Ordinal))
+        {
+            return new ManagedKeyResponseMismatch(
+                "managedkey.signing.key-mismatch",
+                "The managed key provider signed with a different key identifier than the one requested.");
+        }
+
+        string? requestedKeyVersion = ResolveKeyVersion(request);
+
+        if (requestedKeyVersion is not null
+            && !string.IsNullOrWhiteSpace(managedResult.KeyVersion)
+            && !string.Equals(managedResult.KeyVersion, requestedKeyVersion, StringComparison.Ordinal))
+        {
+            return new ManagedKeyResponseMismatch(
+                "managedkey.signing.key-version-mismatch",
+                "The managed key provider signed with a different key version than the one requested.");
+        }
+
+        string configuredAlgorithm = NormalizeRequired(options.SignatureAlgorithm, ManagedKeySigningOptions.DefaultSignatureAlgorithm);
+
+        return !string.IsNullOrWhiteSpace(managedResult.SignatureAlgorithm)
+            && !string.Equals(managedResult.SignatureAlgorithm, configuredAlgorithm, StringComparison.Ordinal)
+            ? new ManagedKeyResponseMismatch(
+                "managedkey.signing.algorithm-mismatch",
+                "The managed key provider signed with a different signature algorithm than the configured one.")
+            : null;
+    }
+
+    private sealed record ManagedKeyResponseMismatch(string FailureCode, string Message);
 
     private SigningResult CreateSignedResult(
         SigningRequest request,

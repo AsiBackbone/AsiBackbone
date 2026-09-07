@@ -22,7 +22,7 @@ public sealed class VerificationPolicyHandlingTests
         { "canonical-artifact-type-mismatch", SignatureVerificationCategory.CanonicalizationMismatch, VerificationPolicyAction.Escalate, "signature.canonicalization-mismatch" },
         { "canonicalization-version-mismatch", SignatureVerificationCategory.CanonicalizationMismatch, VerificationPolicyAction.Escalate, "signature.canonicalization-mismatch" },
         { "payload-schema-version-mismatch", SignatureVerificationCategory.CanonicalizationMismatch, VerificationPolicyAction.Escalate, "signature.canonicalization-mismatch" },
-        { "expected-key-id-mismatch", SignatureVerificationCategory.UnknownKeyVersion, VerificationPolicyAction.Escalate, "signature.key-version-unknown" },
+        { "expected-key-id-mismatch", SignatureVerificationCategory.UntrustedKey, VerificationPolicyAction.Deny, "signature.key-not-trusted" },
         { "required-provider-mismatch", SignatureVerificationCategory.ProviderUnavailable, VerificationPolicyAction.Defer, "signature.provider-unavailable" },
         { "expected-policy-version-mismatch", SignatureVerificationCategory.CanonicalizationMismatch, VerificationPolicyAction.Escalate, "signature.canonicalization-mismatch" },
         { "expected-policy-hash-mismatch", SignatureVerificationCategory.CanonicalizationMismatch, VerificationPolicyAction.Escalate, "signature.canonicalization-mismatch" }
@@ -45,8 +45,8 @@ public sealed class VerificationPolicyHandlingTests
         { "disabled-key", SignatureVerificationCategory.RevokedKey },
         { "unknown-key", SignatureVerificationCategory.UnknownKeyVersion },
         { "key-version-unknown", SignatureVerificationCategory.UnknownKeyVersion },
-        { "key-dot-mismatch", SignatureVerificationCategory.UnknownKeyVersion },
-        { "key-dash-mismatch", SignatureVerificationCategory.UnknownKeyVersion },
+        { "key-dot-mismatch", SignatureVerificationCategory.UntrustedKey },
+        { "key-dash-mismatch", SignatureVerificationCategory.UntrustedKey },
         { "provider-unavailable", SignatureVerificationCategory.ProviderUnavailable },
         { "unavailable", SignatureVerificationCategory.ProviderUnavailable },
         { "timeout", SignatureVerificationCategory.ProviderUnavailable },
@@ -142,10 +142,10 @@ public sealed class VerificationPolicyHandlingTests
     /// Verifies that the VerifyAsync method correctly maps an unknown key version to the expected SignatureVerificationCategory and VerificationPolicyAction, resulting in an escalated outcome.
     /// </summary>
     /// <returns>
-    /// A task that represents the asynchronous operation of verifying the artifact and asserting the expected outcome for an unknown key version scenario.
+    /// A task that represents the asynchronous operation of verifying the artifact and asserting that a key outside the pinned version denies.
     /// </returns>
     [Fact]
-    public async Task VerifyAsyncMapsUnknownKeyVersionToEscalate()
+    public async Task VerifyAsyncMapsUnpinnedKeyVersionToDeny()
     {
         SignedGovernanceArtifact<string> artifact = CreateSignedArtifact(keyVersion: "retired");
         var verifier = new StubVerificationService(SignatureVerificationResult.Verified());
@@ -158,9 +158,9 @@ public sealed class VerificationPolicyHandlingTests
             cancellationToken: TestContext.Current.CancellationToken);
 
         Assert.False(outcome.IsVerified);
-        Assert.Equal(SignatureVerificationCategory.UnknownKeyVersion, outcome.Category);
-        Assert.Equal(VerificationPolicyAction.Escalate, outcome.Action);
-        Assert.Equal("signature.key-version-unknown", outcome.FailureCode);
+        Assert.Equal(SignatureVerificationCategory.UntrustedKey, outcome.Category);
+        Assert.Equal(VerificationPolicyAction.Deny, outcome.Action);
+        Assert.Equal("signature.key-not-trusted", outcome.FailureCode);
         Assert.False(verifier.WasCalled);
     }
 

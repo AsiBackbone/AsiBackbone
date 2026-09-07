@@ -14,8 +14,22 @@ public static class CapabilityGrantValidator
         ArgumentNullException.ThrowIfNull(signedGrant);
         cancellationToken.ThrowIfCancellationRequested();
 
-        CapabilityGrantValidationOptions effectiveOptions = options ?? CapabilityGrantValidationOptions.Create();
         CapabilityTokenGrant grant = signedGrant.Artifact;
+
+        // The previous default built permissive options: no proof, no use check, and no issuer, audience, or scope
+        // expectations, so the simplest call was the least safe one and returned Valid for anything unexpired. Validation
+        // now requires the caller to state what it is validating against.
+        if (options is null)
+        {
+            return CapabilityGrantValidationResult.Failed(
+                grant,
+                CapabilityTokenValidationCategory.Failed,
+                VerificationPolicyAction.Deny,
+                "capability.validation-options-required",
+                "Capability grant validation requires explicit options describing what the grant is validated against.");
+        }
+
+        CapabilityGrantValidationOptions effectiveOptions = options;
         DateTimeOffset validationUtc = (effectiveOptions.ValidationUtc ?? DateTimeOffset.UtcNow).ToUniversalTime();
 
         if (effectiveOptions.RequireProof)
@@ -75,6 +89,13 @@ public static class CapabilityGrantValidator
                 "A proof verifier is required for this validation context.");
         }
 
+        CapabilityGrantValidationResult? bindingResult = ValidateProofBinding(signedGrant, grant, options);
+
+        if (bindingResult is not null)
+        {
+            return bindingResult;
+        }
+
         var verificationContext = VerificationPolicyContext.Create(
             purpose: CanonicalArtifactTypes.CapabilityTokenGrant,
             expectedKeyId: options.ExpectedProofKeyId,
@@ -90,14 +111,86 @@ public static class CapabilityGrantValidator
             context: verificationContext,
             cancellationToken: cancellationToken).ConfigureAwait(false);
 
-        return verificationOutcome.ShouldAllow
+        if (verificationOutcome.ShouldAllow)
+        {
+            return null;
+        }
+
+        // A grant whose signature was stripped is not a grant awaiting acknowledgment. Where proof is required, absent
+        // proof denies, rather than inviting a host that treats RequireAcknowledgment as "proceed after a click" to
+        // continue on a grant carrying no proof at all.
+        VerificationPolicyAction action = verificationOutcome.Category is SignatureVerificationCategory.MissingSignature
+            ? VerificationPolicyAction.Deny
+            : verificationOutcome.Action;
+
+        return CapabilityGrantValidationResult.Failed(
+            grant,
+            MapVerificationCategory(verificationOutcome.Category),
+            action,
+            verificationOutcome.FailureCode ?? "capability.proof-invalid",
+            verificationOutcome.FailureMessage);
+    }
+
+    /// <summary>
+    /// Binds the signed proof to the grant being validated by rebuilding the canonical payload from the grant itself.
+    /// </summary>
+    /// <remarks>
+    /// Signature verification establishes that a signature covers a hash. It does not establish that the hash describes the
+    /// grant whose fields are about to be evaluated. Rebuilding the payload from <see cref="SignedGovernanceArtifact{TArtifact}.Artifact" />
+    /// and comparing hashes closes that gap, and the artifact descriptors are asserted so a proof issued for another artifact
+    /// type or token identifier cannot be presented alongside this grant.
+    /// </remarks>
+    private static CapabilityGrantValidationResult? ValidateProofBinding(
+        SignedGovernanceArtifact<CapabilityTokenGrant> signedGrant,
+        CapabilityTokenGrant grant,
+        CapabilityGrantValidationOptions options)
+    {
+        if (!string.Equals(signedGrant.ArtifactType, CanonicalArtifactTypes.CapabilityTokenGrant, StringComparison.Ordinal))
+        {
+            return CapabilityGrantValidationResult.Failed(
+                grant,
+                CapabilityTokenValidationCategory.InvalidProof,
+                VerificationPolicyAction.Deny,
+                "capability.proof-artifact-type-mismatch",
+                "The signed artifact type is not a capability token grant.");
+        }
+
+        if (!string.Equals(signedGrant.ArtifactId, grant.TokenId, StringComparison.Ordinal))
+        {
+            return CapabilityGrantValidationResult.Failed(
+                grant,
+                CapabilityTokenValidationCategory.InvalidProof,
+                VerificationPolicyAction.Deny,
+                "capability.proof-artifact-id-mismatch",
+                "The signed artifact identifier does not match the grant token identifier.");
+        }
+
+        CanonicalPayloadHash recomputedHash;
+
+        try
+        {
+            recomputedHash = CanonicalPayloadHasher.ComputeHash(
+                CanonicalPayloadBuilder.ForCapabilityTokenGrant(grant, options.ProofPayloadOptions),
+                signedGrant.HashAlgorithm);
+        }
+        catch (NotSupportedException)
+        {
+            return CapabilityGrantValidationResult.Failed(
+                grant,
+                CapabilityTokenValidationCategory.InvalidProof,
+                VerificationPolicyAction.Deny,
+                "capability.proof-hash-algorithm-unsupported",
+                "The grant canonical payload cannot be rebuilt with the built-in hasher, so the proof is not bound to the grant content.");
+        }
+
+        return string.Equals(recomputedHash.HashValue, signedGrant.CanonicalHash.HashValue, StringComparison.Ordinal)
             ? null
             : CapabilityGrantValidationResult.Failed(
                 grant,
-                MapVerificationCategory(verificationOutcome.Category),
-                verificationOutcome.Action,
-                verificationOutcome.FailureCode ?? "capability.proof-invalid",
-                verificationOutcome.FailureMessage);
+                CapabilityTokenValidationCategory.InvalidProof,
+                VerificationPolicyAction.Deny,
+                "capability.proof-content-mismatch",
+                "The grant does not hash to the signed canonical hash value.");
     }
 
     private static CapabilityGrantValidationResult? ValidateMetadata(
@@ -156,12 +249,19 @@ public static class CapabilityGrantValidator
             return CapabilityGrantValidationResult.Failed(grant, CapabilityTokenValidationCategory.ReplayStoreUnavailable, VerificationPolicyAction.Defer, "capability.use-store-missing");
         }
 
+        // A limit the caller supplies is local policy; a limit the issuer bound into the signed payload is authority.
+        // Taking the narrower of the two lets a relying party tighten the limit but never widen what was issued.
+        int effectiveMaxUseCount = grant.MaxUseCount.HasValue
+            ? Math.Min(grant.MaxUseCount.Value, options.MaxUseCount)
+            : options.MaxUseCount;
+
         CapabilityGrantUseResult result = await useStore
-            .TryConsumeAsync(grant, options.MaxUseCount, validationUtc, cancellationToken)
+            .TryConsumeAsync(grant, effectiveMaxUseCount, validationUtc, cancellationToken)
             .ConfigureAwait(false);
 
         return result.State switch
         {
+            GrantUseState.Unspecified => CapabilityGrantValidationResult.Failed(grant, CapabilityTokenValidationCategory.Failed, VerificationPolicyAction.Escalate, "capability.use-state-unspecified", "The capability grant use store returned no use state."),
             GrantUseState.Accepted => null,
             GrantUseState.UseLimitExceeded => CapabilityGrantValidationResult.Failed(grant, CapabilityTokenValidationCategory.ReuseLimitExceeded, VerificationPolicyAction.Deny, result.FailureCode ?? "capability.use-limit-exceeded", result.FailureMessage),
             GrantUseState.Stopped => CapabilityGrantValidationResult.Failed(grant, CapabilityTokenValidationCategory.Revoked, VerificationPolicyAction.Deny, result.FailureCode ?? "capability.grant-stopped", result.FailureMessage),
@@ -190,11 +290,13 @@ public static class CapabilityGrantValidator
     {
         return category switch
         {
+            SignatureVerificationCategory.Unspecified => CapabilityTokenValidationCategory.Failed,
             SignatureVerificationCategory.MissingSignature => CapabilityTokenValidationCategory.MissingProof,
             SignatureVerificationCategory.Valid => CapabilityTokenValidationCategory.Valid,
             SignatureVerificationCategory.InvalidSignature => CapabilityTokenValidationCategory.InvalidProof,
             SignatureVerificationCategory.HashMismatch => CapabilityTokenValidationCategory.InvalidProof,
             SignatureVerificationCategory.RevokedKey => CapabilityTokenValidationCategory.Revoked,
+            SignatureVerificationCategory.UntrustedKey => CapabilityTokenValidationCategory.InvalidProof,
             SignatureVerificationCategory.ProviderUnavailable => CapabilityTokenValidationCategory.Failed,
             SignatureVerificationCategory.UnknownKeyVersion => CapabilityTokenValidationCategory.Failed,
             SignatureVerificationCategory.CanonicalizationMismatch => CapabilityTokenValidationCategory.Failed,

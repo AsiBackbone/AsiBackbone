@@ -6,6 +6,88 @@ This project follows the spirit of [Keep a Changelog](https://keepachangelog.com
 
 ## [Unreleased]
 
+## [5.0.0] - 2026-09-07
+
+### Release summary
+
+`5.0.0` starts the stable `5.x` AsiBackbone package family and advances the
+binary assembly identity to `5.0.0.0`. Package IDs, public namespaces, and the
+`net10.0` target remain unchanged.
+
+This is a security release resolving twelve findings from the September 2026
+cross-repository review, including one critical and one high. Every behavior
+change makes a governance path fail closed where it previously returned a
+permissive result, which is why the work takes a major-version boundary. See the
+[5.0.0 Migration Guide](docs/articles/upgrade-400-to-500.md); hosts that persist
+the affected enums as integers need a data migration.
+
+### Security
+
+* `GovernanceArtifactVerifier.VerifyAsync` now recomputes the canonical payload hash and denies the artifact when the payload does not hash to the signed canonical hash value. Verification previously compared two values the artifact carried about itself — `SigningMetadata.SigningHash` against `CanonicalHash.HashValue` — and forwarded that self-reported hash to the provider, so a signature was checked against a stored hash rather than against the artifact content. A caller that rehydrated a signed artifact from storage or a queue could present modified content beside an authentic hash and signature pair and receive a valid, allowed outcome. The check runs before the provider is called and fails closed with `signature.hash-mismatch`; an artifact whose hash algorithm the built-in hasher cannot recompute fails closed with `signature.hash-algorithm-unsupported`, because Core cannot bind content it cannot hash.
+
+* `CapabilityGrantValidator.ValidateAsync` now rebuilds the canonical payload from the grant it is about to evaluate, compares that hash to the signed hash, and asserts that the signed artifact type is `CanonicalArtifactTypes.CapabilityTokenGrant` and that the signed artifact identifier is the grant's `TokenId`. The validator evaluates issuer, audience, scopes, expiry, and bindings against `SignedGovernanceArtifact<CapabilityTokenGrant>.Artifact`, so without these checks a proof covering a narrower grant — or a validly signed hash from a different artifact type — could be attached to an attacker-supplied grant. Failures deny with `capability.proof-content-mismatch`, `capability.proof-artifact-type-mismatch`, and `capability.proof-artifact-id-mismatch`.
+
+* A canonical descriptor that is absent from signing metadata is no longer treated as a match. `artifact_id`, `artifact_type`, `canonicalization_version`, and `payload_schema_version` must now be present and equal to the artifact being verified. The shipped factories always write all four, so an artifact missing one did not come from a canonical signing path.
+
+* `AuditIntegrityVerifier.Verify` seeded the expected previous link hash with an empty string regardless of `requireGenesis`, so genuine partial chains were rejected while a forged restart — links rewritten from sequence N onward to claim no predecessor, with recomputed link hashes — verified. `Verify` now takes `expectedPreviousLinkHash` and fails closed with `integrity.expected-previous-hash-required` when a non-genesis partial chain supplies no anchor, and rejects any post-genesis link claiming an empty previous hash with `integrity.previous-link-hash-missing`.
+
+* Key-pin mismatch against `ExpectedKeyId` or `ExpectedKeyVersion` returned `signature.key-version-unknown` under `UnknownKeyVersion`, whose default action is `Escalate`, so a grant signed under the wrong key received a softer outcome than a bad signature. It now emits `signature.key-not-trusted` under the new `UntrustedKey` category, defaulting to `Deny`.
+
+* `CapabilityGrantValidator` forces `Deny` for a missing signature when proof is required. A stripped signature previously mapped to `RequireAcknowledgment`, which a host treating that action as "proceed after a click" would follow on a grant carrying no proof at all.
+
+* `CapabilityGrantValidator.ValidateAsync` denies with `capability.validation-options-required` when options are omitted. The omitted-options path previously built permissive defaults and returned `Valid` for any unexpired grant, making the simplest call the least safe one. `CapabilityGrantValidationOptions` additionally rejects requiring proof or a use check without an audience expectation.
+
+* `VerificationPolicyOptions.Create` refuses to map a failure category to `Allow` unless `allowUnsafeAllowOverrides` is set, since that mapping makes a failed verification indistinguishable from a valid one.
+
+* `ManagedKeySigningService` rejects a provider response whose key identifier, key version, or signature algorithm differs from the request, with `managedkey.signing.key-mismatch`, `key-version-mismatch`, or the new `algorithm-mismatch`. The returned values were previously copied into signing metadata unchecked, recording a substitution as though it had been requested. A key version is compared only when the request or configuration pinned one, so provider-side version resolution still works.
+
+* `UseLocalDevelopmentSigning` throws when the environment is Production unless `LocalDevelopmentSigningOptions.AllowInProduction` is set. The provider's key is generated per process and never persisted, so its signatures stop verifying after a restart, and the analyzer only reports calls it can read inside an environment branch. Local-development request-validation failures now also honor `ReturnUnsignedOnFailure = false` by throwing rather than returning unsigned metadata.
+
+* `GovernanceArtifactSigner.Sign*Async` takes `requireSignature`, defaulting to `true`, and throws when the provider returns no signature. A failure or no-signature result previously produced an artifact with `IsSigned` false and raised nothing, so a caller that asked to sign could carry on holding an unsigned artifact.
+
+* Email claims are no longer in `AsiBackboneHttpActorContextOptions.DefaultActorIdClaimTypes` or `DefaultDisplayNameClaimTypes`. Actor identifiers and display names are persisted verbatim and indexed in durable audit rows, so the framework's own defaults placed personal data there while the security guidance told hosts to keep it out.
+
+* `CanonicalPayloadBuilder` throws when metadata keys collide after trimming. `"k"` and `" k"` both normalized to `"k"` and the last enumerated value won, so the hashed payload depended on enumeration order and one key's value could displace another's inside the signed payload.
+
+* The web API template's sample capability validator checked whether the endpoint's own declared scopes contained the scope the endpoint declared, which is always true, so every caller passed. It now requires an authenticated caller and compares the scopes the caller presented against the scopes the endpoint requires, denying by default. The template registers no authentication scheme, so the scaffold denies until its owner adds one. The audit-residue endpoint is no longer an unauthenticated open lookup; it carries its own `sample.audit.read` capability requirement and emits governance audit.
+
+* `InMemoryCapabilityGrantUseStore` keys use records by issuer and token identifier rather than token identifier alone, so two issuers sharing an identifier no longer share one use budget, and evicts records for grants that expired longer ago than `EvictionGracePeriod` instead of retaining every identifier for the process lifetime.
+
+* **Breaking:** `VerificationPolicyAction`, `SignatureVerificationCategory`, `GrantUseState`, and `AuditIntegrityVerificationCategory` now reserve zero as an `Unspecified` sentinel that is rejected wherever the value is consumed. `Allow`, `Valid`, `Accepted`, and `Valid` respectively moved off zero, so `default(T)` — and a persisted column that yields zero for unrecognized input — no longer means "allow", "valid", or "accepted". Hosts persisting these values as integers must migrate rows holding zero, and hosts compiled against `4.x` must rebuild, because enum constants are inlined at compile time.
+
+* Added `ASIB003`, reporting local-development signing registered with no environment guard at all. `ASIB002` only reports a call the analyzer can see inside a production branch, so the unconditional registration that actually reaches production went unreported.
+
+* **Host mitigation for released versions:** hosts on `4.0.0` and earlier that verify rehydrated artifacts should reconstruct the canonical payload with `CanonicalPayloadBuilder`, recompute the hash with `CanonicalPayloadHasher.ComputeHash`, and compare it to the stored signing hash before treating a verification outcome as authoritative, as the [regulated storage and signing verification checklist](docs/articles/regulated-storage-and-signing-verification-checklist.md) describes. Hosts verifying partial audit chains should supply the hash of the link preceding the range, and hosts needing to establish they hold a complete chain should compare against a retained tip hash.
+
+### Added
+
+* Added `SignedGovernanceArtifacts.Rehydrate`, which recomputes the canonical payload hash and rejects a stored payload and hash that disagree. `FromSigningMetadata` accepts the hash a caller supplies, which is correct immediately after signing but establishes nothing about a triple read back from storage or received over a wire.
+
+* Added `CapabilityGrantValidationOptions.ProofPayloadOptions` so a host that signed grants with non-default canonical payload options can supply the same options when proof binding rebuilds the payload.
+
+* Added `expectedTipLinkHash` and `expectedTipSequence` to `AuditIntegrityVerifier.Verify`, with an `AuditIntegrityVerificationCategory.TruncatedChain` result. Any prefix of a valid chain is internally consistent, so without a stated tip a caller cannot establish it holds the whole chain. `MissingAnchor` reports a partial chain supplied without the hash that anchors it. The XML documentation now states that link metadata is outside the link hash and is therefore not authenticated by chain verification.
+
+* Added `SignatureVerificationCategory.UntrustedKey`, `LocalDevelopmentSigningOptions.AllowInProduction` and `EnvironmentName`, `InMemoryCapabilityGrantUseStore.EvictionGracePeriod`, and an issuer-scoped `InMemoryCapabilityGrantUseStore.GetUseCount(string, string)` overload.
+
+* Added `CapabilityTokenGrant.MaxUseCount` and `AsiBackboneSchemaVersions.StableArtifactsV2`, so an issuer can bind the use limit it authorized into the signed payload. Validation uses the narrower of the bound limit and any limit the caller supplies, so a relying party can tighten but never widen what was issued. The field is opt-in: a grant recording `StableArtifactsV1` canonicalizes exactly as it did in `4.x`, so grants signed before this release keep verifying.
+
+### Migration
+
+* Update all `AsiBackbone.*` package references from `4.0.0` to `5.0.0` and rebuild applications against `AssemblyVersion` `5.0.0.0`.
+* Migrate persisted enum columns holding zero for `VerificationPolicyAction`, `SignatureVerificationCategory`, `GrantUseState`, and `AuditIntegrityVerificationCategory`.
+* Supply explicit `CapabilityGrantValidationOptions`, including an audience expectation wherever proof or bounded-use checking is required.
+* Supply `expectedPreviousLinkHash` when verifying a partial audit chain, and an expected tip when completeness matters.
+* Replace local-development signing on production configuration paths, or set `AllowInProduction` deliberately.
+* Review the [5.0.0 Migration Guide](docs/articles/upgrade-400-to-500.md) before upgrading.
+
+### Changed
+
+* Replaced the four-field capability grant payloads in the proof trust pin, clock skew, validation profile, and in-memory use store tests with `CanonicalPayloadBuilder.ForCapabilityTokenGrant`. Those reference implementations hashed `audience`, `expiresUtc`, `issuer`, and `scopes` only, which the new content binding correctly rejects.
+
+### Compatibility
+
+* Verification and capability proof validation now fail closed in cases that previously returned a valid outcome. A host whose artifacts are produced and verified through the shipped factories is unaffected. A host that hand-builds canonical payloads, stores a hash that was not computed from the payload it retains, or relies on a hash algorithm the built-in hasher does not implement will see denials where it previously saw allowances; those denials indicate the signature was not bound to the content being evaluated.
+
 ## [4.0.0] - 2026-09-06
 
 ### Release summary

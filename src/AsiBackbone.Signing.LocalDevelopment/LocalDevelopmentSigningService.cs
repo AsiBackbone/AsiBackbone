@@ -57,7 +57,13 @@ public sealed class LocalDevelopmentSigningService : IAsiBackboneSigningService,
         string? validationFailure = ValidateSigningRequest(request);
         if (validationFailure is not null)
         {
-            return ValueTask.FromResult(CreateUnsignedFailureResult(request, validationFailure, validationFailure));
+            // A host that set ReturnUnsignedOnFailure to false asked to be told when signing did not happen. Returning
+            // unsigned metadata regardless meant a request-validation failure still produced an artifact whose IsSigned
+            // was false and that no exception announced.
+            return options.ReturnUnsignedOnFailure
+                ? ValueTask.FromResult(CreateUnsignedFailureResult(request, validationFailure, validationFailure))
+                : throw new InvalidOperationException(
+                    $"Local-development signing rejected the signing request: {validationFailure}.");
         }
 
         try

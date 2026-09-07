@@ -2,7 +2,7 @@
 
 ASP.NET Core host adapters for Accountable Systems Infrastructure governance primitives.
 
-Stable `4.x` package family. `4.0.0` is the current major release for this package.
+Stable `5.x` package family. `5.0.0` is the current major release for this package.
 
 This package acts as a thin web-host adapter around `AsiBackbone.Core`.
 

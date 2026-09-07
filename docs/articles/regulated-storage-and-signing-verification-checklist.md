@@ -83,6 +83,12 @@ Do not overwrite original signing metadata during key rotation, re-verification,
 - [ ] Reconstruct the canonical payload using the recorded schema and canonicalization versions.
 - [ ] Recompute the canonical hash from the retained artifact.
 - [ ] Compare the recomputed hash with the signing hash before cryptographic verification.
+
+`GovernanceArtifactVerifier.VerifyAsync` performs that recompute-and-compare step itself and fails closed before calling the
+provider, so the three boxes above are satisfied for artifacts verified through it. A host still owns them when it reconstructs
+a payload outside that call. Use `SignedGovernanceArtifacts.Rehydrate` rather than `FromSigningMetadata` when rebuilding a
+signed artifact from storage or a queue, so a stored payload and stored hash that disagree are rejected at construction.
+
 - [ ] Resolve the exact provider, key ID, and key version recorded at signing time.
 - [ ] Check active, retired, revoked, disabled, expired, and unknown key states according to host policy.
 - [ ] Verify the signature through `IAsiBackboneSignatureVerificationService` or the host's provider-specific implementation.

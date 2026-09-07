@@ -6,9 +6,18 @@ namespace AsiBackbone.Core.Integrity;
 public enum AuditIntegrityVerificationCategory
 {
     /// <summary>
+    /// No verification category was assigned.
+    /// </summary>
+    /// <remarks>
+    /// Zero is a rejected sentinel so that a default-constructed value, or a persisted column that yields zero for
+    /// unrecognized input, cannot mean "valid".
+    /// </remarks>
+    Unspecified = 0,
+
+    /// <summary>
     /// The chain verified successfully.
     /// </summary>
-    Valid = 0,
+    Valid = 12,
 
     /// <summary>
     /// No chain links were supplied.
@@ -53,5 +62,19 @@ public enum AuditIntegrityVerificationCategory
     /// <summary>
     /// Verification failed but no more specific category could be assigned safely.
     /// </summary>
-    Failed = 9
+    Failed = 9,
+
+    /// <summary>
+    /// The supplied links form a consistent chain that does not reach the expected tip.
+    /// </summary>
+    /// <remarks>
+    /// Any prefix of a valid chain is itself internally consistent, so a caller that needs to establish it holds the whole
+    /// chain must supply the expected tip link hash or sequence. Without one of those inputs, truncation is undetectable.
+    /// </remarks>
+    TruncatedChain = 10,
+
+    /// <summary>
+    /// A required verification input was not supplied, so the chain could not be anchored to anything.
+    /// </summary>
+    MissingAnchor = 11
 }

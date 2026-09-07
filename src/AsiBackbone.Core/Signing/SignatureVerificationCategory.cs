@@ -6,9 +6,18 @@ namespace AsiBackbone.Core.Signing;
 public enum SignatureVerificationCategory
 {
     /// <summary>
+    /// No verification category was assigned.
+    /// </summary>
+    /// <remarks>
+    /// Zero is a rejected sentinel so that a default-constructed value, or a persisted column that yields zero for
+    /// unrecognized input, cannot mean "valid".
+    /// </remarks>
+    Unspecified = 0,
+
+    /// <summary>
     /// The signature verified against the expected artifact hash and metadata.
     /// </summary>
-    Valid = 0,
+    Valid = 11,
 
     /// <summary>
     /// The signature value was present but did not verify.
@@ -53,5 +62,15 @@ public enum SignatureVerificationCategory
     /// <summary>
     /// Verification failed but no more specific category could be inferred safely.
     /// </summary>
-    Failed = 9
+    Failed = 9,
+
+    /// <summary>
+    /// The signature was produced under a key the verification policy does not trust for this purpose.
+    /// </summary>
+    /// <remarks>
+    /// This is distinct from <see cref="UnknownKeyVersion" />, which describes a key the verifier could not resolve. An
+    /// artifact signed under a resolvable but unpinned key is a trust decision rather than a lookup failure, and defaults
+    /// to <see cref="VerificationPolicyAction.Deny" />.
+    /// </remarks>
+    UntrustedKey = 10
 }
