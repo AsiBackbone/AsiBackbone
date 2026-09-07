@@ -151,14 +151,14 @@ public static class GovernanceArtifactVerifier
             : context.ExpectedKeyId is not null
             && !string.Equals(context.ExpectedKeyId, metadata.KeyId, StringComparison.Ordinal)
             ? SignatureVerificationResult.Failed(
-                "signature.key-version-unknown",
-                SignatureVerificationCategory.UnknownKeyVersion,
+                "signature.key-not-trusted",
+                SignatureVerificationCategory.UntrustedKey,
                 "The signing key identifier does not match the verification policy expectation.")
             : context.ExpectedKeyVersion is not null
             && !string.Equals(context.ExpectedKeyVersion, metadata.KeyVersion, StringComparison.Ordinal)
             ? SignatureVerificationResult.Failed(
-                "signature.key-version-unknown",
-                SignatureVerificationCategory.UnknownKeyVersion,
+                "signature.key-not-trusted",
+                SignatureVerificationCategory.UntrustedKey,
                 "The signing key version does not match the verification policy expectation.")
             : context.RequiredProvider is not null
             && !string.Equals(context.RequiredProvider, metadata.Provider, StringComparison.Ordinal)

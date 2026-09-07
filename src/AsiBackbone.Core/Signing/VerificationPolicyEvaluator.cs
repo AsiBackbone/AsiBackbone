@@ -12,9 +12,10 @@ public static class VerificationPolicyEvaluator
         new(SignatureVerificationCategory.CanonicalizationMismatch, ["canonicalization", "payload-schema", "artifact"]),
         new(SignatureVerificationCategory.UnsupportedAlgorithm, ["unsupported", "algorithm"]),
         new(SignatureVerificationCategory.RevokedKey, ["revoked", "disabled"]),
+        new(SignatureVerificationCategory.UntrustedKey, ["key-not-trusted", "key.mismatch", "key-mismatch"]),
         new(
             SignatureVerificationCategory.UnknownKeyVersion,
-            ["key-version", "key.mismatch", "key-mismatch"],
+            ["key-version"],
             ["unknown", "key"]),
         new(SignatureVerificationCategory.ProviderUnavailable, ["provider-unavailable", "unavailable", "timeout", "network"]),
         new(SignatureVerificationCategory.InvalidSignature, ["invalid", "malformed", "signature"])

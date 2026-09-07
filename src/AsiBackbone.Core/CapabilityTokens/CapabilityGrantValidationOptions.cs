@@ -43,6 +43,16 @@ public sealed class CapabilityGrantValidationOptions
             throw new ArgumentOutOfRangeException(nameof(maxUseCount), maxUseCount, "Maximum use count must be greater than zero.");
         }
 
+        // A grant can be proof-verified and still be the wrong grant for this caller. Without an audience expectation a
+        // grant issued for one gateway validates at another, so requiring proof or a use check without stating the
+        // audience is a configuration that cannot deliver what it appears to promise.
+        if ((requireProof || requireUseCheck) && string.IsNullOrWhiteSpace(audience))
+        {
+            throw new ArgumentException(
+                "An audience expectation is required when proof or use checking is required, because proof alone does not establish that the grant was issued for this audience.",
+                nameof(audience));
+        }
+
         Issuer = NormalizeOptional(issuer);
         Audience = NormalizeOptional(audience);
         Scopes = scopes;

@@ -53,5 +53,15 @@ public enum SignatureVerificationCategory
     /// <summary>
     /// Verification failed but no more specific category could be inferred safely.
     /// </summary>
-    Failed = 9
+    Failed = 9,
+
+    /// <summary>
+    /// The signature was produced under a key the verification policy does not trust for this purpose.
+    /// </summary>
+    /// <remarks>
+    /// This is distinct from <see cref="UnknownKeyVersion" />, which describes a key the verifier could not resolve. An
+    /// artifact signed under a resolvable but unpinned key is a trust decision rather than a lookup failure, and defaults
+    /// to <see cref="VerificationPolicyAction.Deny" />.
+    /// </remarks>
+    UntrustedKey = 10
 }

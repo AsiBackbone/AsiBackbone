@@ -32,9 +32,9 @@ public sealed class CapabilityGrantProofTrustPinTests
         Assert.False(verifier.WasCalled);
         AssertFailure(
             result,
-            CapabilityTokenValidationCategory.Failed,
-            VerificationPolicyAction.Escalate,
-            "signature.key-version-unknown");
+            CapabilityTokenValidationCategory.InvalidProof,
+            VerificationPolicyAction.Deny,
+            "signature.key-not-trusted");
     }
 
     /// <summary>

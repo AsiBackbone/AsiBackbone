@@ -33,7 +33,7 @@ public sealed class CapabilityGrantValidatorTests
     /// </summary>
     public static TheoryData<string, CapabilityTokenValidationCategory, VerificationPolicyAction, string> ProofFailureCases => new()
     {
-        { "missing-signature", CapabilityTokenValidationCategory.MissingProof, VerificationPolicyAction.RequireAcknowledgment, "signature.missing" },
+        { "missing-signature", CapabilityTokenValidationCategory.MissingProof, VerificationPolicyAction.Deny, "signature.missing" },
         { "invalid-signature", CapabilityTokenValidationCategory.InvalidProof, VerificationPolicyAction.Deny, "signature.invalid" },
         { "hash-mismatch", CapabilityTokenValidationCategory.InvalidProof, VerificationPolicyAction.Deny, "signature.hash-mismatch" },
         { "revoked-key", CapabilityTokenValidationCategory.Revoked, VerificationPolicyAction.Deny, "signature.revoked" },

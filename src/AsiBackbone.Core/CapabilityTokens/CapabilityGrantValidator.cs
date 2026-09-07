@@ -14,8 +14,22 @@ public static class CapabilityGrantValidator
         ArgumentNullException.ThrowIfNull(signedGrant);
         cancellationToken.ThrowIfCancellationRequested();
 
-        CapabilityGrantValidationOptions effectiveOptions = options ?? CapabilityGrantValidationOptions.Create();
         CapabilityTokenGrant grant = signedGrant.Artifact;
+
+        // The previous default built permissive options: no proof, no use check, and no issuer, audience, or scope
+        // expectations, so the simplest call was the least safe one and returned Valid for anything unexpired. Validation
+        // now requires the caller to state what it is validating against.
+        if (options is null)
+        {
+            return CapabilityGrantValidationResult.Failed(
+                grant,
+                CapabilityTokenValidationCategory.Failed,
+                VerificationPolicyAction.Deny,
+                "capability.validation-options-required",
+                "Capability grant validation requires explicit options describing what the grant is validated against.");
+        }
+
+        CapabilityGrantValidationOptions effectiveOptions = options;
         DateTimeOffset validationUtc = (effectiveOptions.ValidationUtc ?? DateTimeOffset.UtcNow).ToUniversalTime();
 
         if (effectiveOptions.RequireProof)
@@ -97,14 +111,24 @@ public static class CapabilityGrantValidator
             context: verificationContext,
             cancellationToken: cancellationToken).ConfigureAwait(false);
 
-        return verificationOutcome.ShouldAllow
-            ? null
-            : CapabilityGrantValidationResult.Failed(
-                grant,
-                MapVerificationCategory(verificationOutcome.Category),
-                verificationOutcome.Action,
-                verificationOutcome.FailureCode ?? "capability.proof-invalid",
-                verificationOutcome.FailureMessage);
+        if (verificationOutcome.ShouldAllow)
+        {
+            return null;
+        }
+
+        // A grant whose signature was stripped is not a grant awaiting acknowledgment. Where proof is required, absent
+        // proof denies, rather than inviting a host that treats RequireAcknowledgment as "proceed after a click" to
+        // continue on a grant carrying no proof at all.
+        VerificationPolicyAction action = verificationOutcome.Category is SignatureVerificationCategory.MissingSignature
+            ? VerificationPolicyAction.Deny
+            : verificationOutcome.Action;
+
+        return CapabilityGrantValidationResult.Failed(
+            grant,
+            MapVerificationCategory(verificationOutcome.Category),
+            action,
+            verificationOutcome.FailureCode ?? "capability.proof-invalid",
+            verificationOutcome.FailureMessage);
     }
 
     /// <summary>
@@ -264,6 +288,7 @@ public static class CapabilityGrantValidator
             SignatureVerificationCategory.InvalidSignature => CapabilityTokenValidationCategory.InvalidProof,
             SignatureVerificationCategory.HashMismatch => CapabilityTokenValidationCategory.InvalidProof,
             SignatureVerificationCategory.RevokedKey => CapabilityTokenValidationCategory.Revoked,
+            SignatureVerificationCategory.UntrustedKey => CapabilityTokenValidationCategory.InvalidProof,
             SignatureVerificationCategory.ProviderUnavailable => CapabilityTokenValidationCategory.Failed,
             SignatureVerificationCategory.UnknownKeyVersion => CapabilityTokenValidationCategory.Failed,
             SignatureVerificationCategory.CanonicalizationMismatch => CapabilityTokenValidationCategory.Failed,

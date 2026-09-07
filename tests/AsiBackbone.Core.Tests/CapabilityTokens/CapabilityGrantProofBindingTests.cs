@@ -25,7 +25,7 @@ public sealed class CapabilityGrantProofBindingTests
 
         CapabilityGrantValidationResult result = await CapabilityGrantValidator.ValidateAsync(
             CreateSignedGrant(grant),
-            CapabilityGrantValidationOptions.Create(requireProof: true, validationUtc: IssuedUtc.AddMinutes(1)),
+            CapabilityGrantValidationOptions.Create(audience: "gateway-1", requireProof: true, validationUtc: IssuedUtc.AddMinutes(1)),
             new AlwaysValidVerificationService(),
             cancellationToken: TestContext.Current.CancellationToken);
 
@@ -55,7 +55,7 @@ public sealed class CapabilityGrantProofBindingTests
 
         CapabilityGrantValidationResult result = await CapabilityGrantValidator.ValidateAsync(
             tampered,
-            CapabilityGrantValidationOptions.Create(requireProof: true, validationUtc: IssuedUtc.AddMinutes(1)),
+            CapabilityGrantValidationOptions.Create(audience: "gateway-1", requireProof: true, validationUtc: IssuedUtc.AddMinutes(1)),
             verifier,
             cancellationToken: TestContext.Current.CancellationToken);
 
@@ -83,7 +83,7 @@ public sealed class CapabilityGrantProofBindingTests
 
         CapabilityGrantValidationResult result = await CapabilityGrantValidator.ValidateAsync(
             tampered,
-            CapabilityGrantValidationOptions.Create(requireProof: true, validationUtc: IssuedUtc.AddMinutes(1)),
+            CapabilityGrantValidationOptions.Create(audience: "gateway-1", requireProof: true, validationUtc: IssuedUtc.AddMinutes(1)),
             new AlwaysValidVerificationService(),
             cancellationToken: TestContext.Current.CancellationToken);
 
@@ -117,7 +117,7 @@ public sealed class CapabilityGrantProofBindingTests
 
         CapabilityGrantValidationResult result = await CapabilityGrantValidator.ValidateAsync(
             artifact,
-            CapabilityGrantValidationOptions.Create(requireProof: true, validationUtc: IssuedUtc.AddMinutes(1)),
+            CapabilityGrantValidationOptions.Create(audience: "gateway-1", requireProof: true, validationUtc: IssuedUtc.AddMinutes(1)),
             verifier,
             cancellationToken: TestContext.Current.CancellationToken);
 
@@ -147,7 +147,7 @@ public sealed class CapabilityGrantProofBindingTests
 
         CapabilityGrantValidationResult result = await CapabilityGrantValidator.ValidateAsync(
             artifact,
-            CapabilityGrantValidationOptions.Create(requireProof: true, validationUtc: IssuedUtc.AddMinutes(1)),
+            CapabilityGrantValidationOptions.Create(audience: "gateway-1", requireProof: true, validationUtc: IssuedUtc.AddMinutes(1)),
             new AlwaysValidVerificationService(),
             cancellationToken: TestContext.Current.CancellationToken);
 

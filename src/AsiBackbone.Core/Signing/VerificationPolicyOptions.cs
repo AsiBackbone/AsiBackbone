@@ -20,6 +20,7 @@ public sealed class VerificationPolicyOptions
                 [SignatureVerificationCategory.ProviderUnavailable] = VerificationPolicyAction.Defer,
                 [SignatureVerificationCategory.CanonicalizationMismatch] = VerificationPolicyAction.Escalate,
                 [SignatureVerificationCategory.UnsupportedAlgorithm] = VerificationPolicyAction.Deny,
+                [SignatureVerificationCategory.UntrustedKey] = VerificationPolicyAction.Deny,
                 [SignatureVerificationCategory.Failed] = VerificationPolicyAction.Escalate
             });
 
@@ -41,8 +42,16 @@ public sealed class VerificationPolicyOptions
     /// <summary>
     /// Creates verification policy options with optional host overrides.
     /// </summary>
+    /// <param name="actionOverrides">Category to action overrides applied over the defaults.</param>
+    /// <param name="allowUnsafeAllowOverrides">
+    /// When <see langword="true" />, permits mapping a failure category to <see cref="VerificationPolicyAction.Allow" />.
+    /// Such a mapping makes a failed verification indistinguishable from a successful one, so it must be opted into
+    /// deliberately rather than reached by configuration drift.
+    /// </param>
+    /// <exception cref="ArgumentOutOfRangeException">A category or action is undefined, or a failure category was mapped to <see cref="VerificationPolicyAction.Allow" /> without the opt-in.</exception>
     public static VerificationPolicyOptions Create(
-        IReadOnlyDictionary<SignatureVerificationCategory, VerificationPolicyAction>? actionOverrides = null)
+        IReadOnlyDictionary<SignatureVerificationCategory, VerificationPolicyAction>? actionOverrides = null,
+        bool allowUnsafeAllowOverrides = false)
     {
         Dictionary<SignatureVerificationCategory, VerificationPolicyAction> actions = new(DefaultActionMap);
 
@@ -58,6 +67,16 @@ public sealed class VerificationPolicyOptions
                 if (!Enum.IsDefined(item.Value))
                 {
                     throw new ArgumentOutOfRangeException(nameof(actionOverrides), item.Value, "Verification policy action must be defined.");
+                }
+
+                if (!allowUnsafeAllowOverrides
+                    && item.Value is VerificationPolicyAction.Allow
+                    && item.Key is not SignatureVerificationCategory.Valid)
+                {
+                    throw new ArgumentOutOfRangeException(
+                        nameof(actionOverrides),
+                        item.Key,
+                        "Mapping a failure category to Allow requires allowUnsafeAllowOverrides, because it makes a failed verification indistinguishable from a valid one.");
                 }
 
                 actions[item.Key] = item.Value;
