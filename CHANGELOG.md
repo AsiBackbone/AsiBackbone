@@ -6,6 +6,30 @@ This project follows the spirit of [Keep a Changelog](https://keepachangelog.com
 
 ## [Unreleased]
 
+### Security
+
+* `GovernanceArtifactVerifier.VerifyAsync` now recomputes the canonical payload hash and denies the artifact when the payload does not hash to the signed canonical hash value. Verification previously compared two values the artifact carried about itself — `SigningMetadata.SigningHash` against `CanonicalHash.HashValue` — and forwarded that self-reported hash to the provider, so a signature was checked against a stored hash rather than against the artifact content. A caller that rehydrated a signed artifact from storage or a queue could present modified content beside an authentic hash and signature pair and receive a valid, allowed outcome. The check runs before the provider is called and fails closed with `signature.hash-mismatch`; an artifact whose hash algorithm the built-in hasher cannot recompute fails closed with `signature.hash-algorithm-unsupported`, because Core cannot bind content it cannot hash.
+
+* `CapabilityGrantValidator.ValidateAsync` now rebuilds the canonical payload from the grant it is about to evaluate, compares that hash to the signed hash, and asserts that the signed artifact type is `CanonicalArtifactTypes.CapabilityTokenGrant` and that the signed artifact identifier is the grant's `TokenId`. The validator evaluates issuer, audience, scopes, expiry, and bindings against `SignedGovernanceArtifact<CapabilityTokenGrant>.Artifact`, so without these checks a proof covering a narrower grant — or a validly signed hash from a different artifact type — could be attached to an attacker-supplied grant. Failures deny with `capability.proof-content-mismatch`, `capability.proof-artifact-type-mismatch`, and `capability.proof-artifact-id-mismatch`.
+
+* A canonical descriptor that is absent from signing metadata is no longer treated as a match. `artifact_id`, `artifact_type`, `canonicalization_version`, and `payload_schema_version` must now be present and equal to the artifact being verified. The shipped factories always write all four, so an artifact missing one did not come from a canonical signing path.
+
+* **Host mitigation for released versions:** hosts on `4.0.0` and earlier that verify rehydrated artifacts should reconstruct the canonical payload with `CanonicalPayloadBuilder`, recompute the hash with `CanonicalPayloadHasher.ComputeHash`, and compare it to the stored signing hash before treating a verification outcome as authoritative, as the [regulated storage and signing verification checklist](docs/articles/regulated-storage-and-signing-verification-checklist.md) describes.
+
+### Added
+
+* Added `SignedGovernanceArtifacts.Rehydrate`, which recomputes the canonical payload hash and rejects a stored payload and hash that disagree. `FromSigningMetadata` accepts the hash a caller supplies, which is correct immediately after signing but establishes nothing about a triple read back from storage or received over a wire.
+
+* Added `CapabilityGrantValidationOptions.ProofPayloadOptions` so a host that signed grants with non-default canonical payload options can supply the same options when proof binding rebuilds the payload.
+
+### Changed
+
+* Replaced the four-field capability grant payloads in the proof trust pin, clock skew, validation profile, and in-memory use store tests with `CanonicalPayloadBuilder.ForCapabilityTokenGrant`. Those reference implementations hashed `audience`, `expiresUtc`, `issuer`, and `scopes` only, which the new content binding correctly rejects.
+
+### Compatibility
+
+* Verification and capability proof validation now fail closed in cases that previously returned a valid outcome. A host whose artifacts are produced and verified through the shipped factories is unaffected. A host that hand-builds canonical payloads, stores a hash that was not computed from the payload it retains, or relies on a hash algorithm the built-in hasher does not implement will see denials where it previously saw allowances; those denials indicate the signature was not bound to the content being evaluated.
+
 ## [4.0.0] - 2026-09-06
 
 ### Release summary

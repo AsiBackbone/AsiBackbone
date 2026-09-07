@@ -168,18 +168,7 @@ public sealed class CapabilityGrantValidationProfileTests
 
     private static SignedGovernanceArtifact<CapabilityTokenGrant> CreateSignedGrant(CapabilityTokenGrant grant)
     {
-        var payload = CanonicalPayload.Create(
-            CanonicalArtifactTypes.CapabilityTokenGrant,
-            grant.TokenId,
-            grant.SchemaVersion,
-            CanonicalPayloadOptions.DefaultCanonicalizationVersion,
-            new Dictionary<string, object?>
-            {
-                ["audience"] = grant.Audience,
-                ["expiresUtc"] = grant.ExpiresUtc.ToString("O", System.Globalization.CultureInfo.InvariantCulture),
-                ["issuer"] = grant.Issuer,
-                ["scopes"] = grant.Scopes.ToArray()
-            });
+        CanonicalPayload payload = CanonicalPayloadBuilder.ForCapabilityTokenGrant(grant);
         CanonicalPayloadHash hash = CanonicalPayloadHasher.ComputeHash(payload);
         var signingMetadata = SigningMetadata.Create(
             signingHash: hash.HashValue,

@@ -1,3 +1,5 @@
+using AsiBackbone.Core.Signing;
+
 namespace AsiBackbone.Core.CapabilityTokens;
 
 public sealed class CapabilityGrantValidationOptions
@@ -25,7 +27,8 @@ public sealed class CapabilityGrantValidationOptions
         string? expectedProofPolicyVersion,
         string? expectedProofPolicyHash,
         string? requiredProofProvider,
-        string? requiredProofHashAlgorithm)
+        string? requiredProofHashAlgorithm,
+        CanonicalPayloadOptions? proofPayloadOptions)
     {
         if (allowedClockSkew < TimeSpan.Zero)
         {
@@ -61,6 +64,7 @@ public sealed class CapabilityGrantValidationOptions
         ExpectedProofPolicyHash = NormalizeOptional(expectedProofPolicyHash);
         RequiredProofProvider = NormalizeOptional(requiredProofProvider);
         RequiredProofHashAlgorithm = NormalizeOptional(requiredProofHashAlgorithm);
+        ProofPayloadOptions = proofPayloadOptions;
     }
 
     public string? Issuer { get; }
@@ -85,6 +89,16 @@ public sealed class CapabilityGrantValidationOptions
     public string? RequiredProofProvider { get; }
     public string? RequiredProofHashAlgorithm { get; }
 
+    /// <summary>
+    /// Gets the canonical payload options used to rebuild the grant payload when proof is required.
+    /// </summary>
+    /// <remarks>
+    /// Proof validation recomputes the canonical payload from the grant and compares its hash to the signed hash, so these
+    /// options must match the options the issuer signed with. The default options bind every grant field except metadata,
+    /// whose allow-list is empty until a host opts a key in.
+    /// </remarks>
+    public CanonicalPayloadOptions? ProofPayloadOptions { get; }
+
     public static CapabilityGrantValidationOptions Create(
         string? issuer = null,
         string? audience = null,
@@ -106,7 +120,8 @@ public sealed class CapabilityGrantValidationOptions
         string? expectedProofPolicyVersion = null,
         string? expectedProofPolicyHash = null,
         string? requiredProofProvider = null,
-        string? requiredProofHashAlgorithm = null)
+        string? requiredProofHashAlgorithm = null,
+        CanonicalPayloadOptions? proofPayloadOptions = null)
     {
         return new CapabilityGrantValidationOptions(
             issuer,
@@ -129,7 +144,8 @@ public sealed class CapabilityGrantValidationOptions
             expectedProofPolicyVersion,
             expectedProofPolicyHash,
             requiredProofProvider,
-            requiredProofHashAlgorithm);
+            requiredProofHashAlgorithm,
+            proofPayloadOptions);
     }
 
     public static CapabilityGrantValidationOptions CreateExecutionBoundary(
@@ -152,7 +168,8 @@ public sealed class CapabilityGrantValidationOptions
         string? expectedProofPolicyVersion = null,
         string? expectedProofPolicyHash = null,
         string? requiredProofProvider = null,
-        string? requiredProofHashAlgorithm = null)
+        string? requiredProofHashAlgorithm = null,
+        CanonicalPayloadOptions? proofPayloadOptions = null)
     {
         return Create(
             issuer: issuer,
@@ -175,7 +192,8 @@ public sealed class CapabilityGrantValidationOptions
             expectedProofPolicyVersion: expectedProofPolicyVersion,
             expectedProofPolicyHash: expectedProofPolicyHash,
             requiredProofProvider: requiredProofProvider,
-            requiredProofHashAlgorithm: requiredProofHashAlgorithm);
+            requiredProofHashAlgorithm: requiredProofHashAlgorithm,
+            proofPayloadOptions: proofPayloadOptions);
     }
 
     public static CapabilityGrantValidationOptions CreateMetadataValidation(

@@ -75,6 +75,13 @@ public static class CapabilityGrantValidator
                 "A proof verifier is required for this validation context.");
         }
 
+        CapabilityGrantValidationResult? bindingResult = ValidateProofBinding(signedGrant, grant, options);
+
+        if (bindingResult is not null)
+        {
+            return bindingResult;
+        }
+
         var verificationContext = VerificationPolicyContext.Create(
             purpose: CanonicalArtifactTypes.CapabilityTokenGrant,
             expectedKeyId: options.ExpectedProofKeyId,
@@ -98,6 +105,68 @@ public static class CapabilityGrantValidator
                 verificationOutcome.Action,
                 verificationOutcome.FailureCode ?? "capability.proof-invalid",
                 verificationOutcome.FailureMessage);
+    }
+
+    /// <summary>
+    /// Binds the signed proof to the grant being validated by rebuilding the canonical payload from the grant itself.
+    /// </summary>
+    /// <remarks>
+    /// Signature verification establishes that a signature covers a hash. It does not establish that the hash describes the
+    /// grant whose fields are about to be evaluated. Rebuilding the payload from <see cref="SignedGovernanceArtifact{TArtifact}.Artifact" />
+    /// and comparing hashes closes that gap, and the artifact descriptors are asserted so a proof issued for another artifact
+    /// type or token identifier cannot be presented alongside this grant.
+    /// </remarks>
+    private static CapabilityGrantValidationResult? ValidateProofBinding(
+        SignedGovernanceArtifact<CapabilityTokenGrant> signedGrant,
+        CapabilityTokenGrant grant,
+        CapabilityGrantValidationOptions options)
+    {
+        if (!string.Equals(signedGrant.ArtifactType, CanonicalArtifactTypes.CapabilityTokenGrant, StringComparison.Ordinal))
+        {
+            return CapabilityGrantValidationResult.Failed(
+                grant,
+                CapabilityTokenValidationCategory.InvalidProof,
+                VerificationPolicyAction.Deny,
+                "capability.proof-artifact-type-mismatch",
+                "The signed artifact type is not a capability token grant.");
+        }
+
+        if (!string.Equals(signedGrant.ArtifactId, grant.TokenId, StringComparison.Ordinal))
+        {
+            return CapabilityGrantValidationResult.Failed(
+                grant,
+                CapabilityTokenValidationCategory.InvalidProof,
+                VerificationPolicyAction.Deny,
+                "capability.proof-artifact-id-mismatch",
+                "The signed artifact identifier does not match the grant token identifier.");
+        }
+
+        CanonicalPayloadHash recomputedHash;
+
+        try
+        {
+            recomputedHash = CanonicalPayloadHasher.ComputeHash(
+                CanonicalPayloadBuilder.ForCapabilityTokenGrant(grant, options.ProofPayloadOptions),
+                signedGrant.HashAlgorithm);
+        }
+        catch (NotSupportedException)
+        {
+            return CapabilityGrantValidationResult.Failed(
+                grant,
+                CapabilityTokenValidationCategory.InvalidProof,
+                VerificationPolicyAction.Deny,
+                "capability.proof-hash-algorithm-unsupported",
+                "The grant canonical payload cannot be rebuilt with the built-in hasher, so the proof is not bound to the grant content.");
+        }
+
+        return string.Equals(recomputedHash.HashValue, signedGrant.CanonicalHash.HashValue, StringComparison.Ordinal)
+            ? null
+            : CapabilityGrantValidationResult.Failed(
+                grant,
+                CapabilityTokenValidationCategory.InvalidProof,
+                VerificationPolicyAction.Deny,
+                "capability.proof-content-mismatch",
+                "The grant does not hash to the signed canonical hash value.");
     }
 
     private static CapabilityGrantValidationResult? ValidateMetadata(

@@ -130,8 +130,42 @@ public static class SignedGovernanceArtifacts
     }
 
     /// <summary>
+    /// Creates an artifact wrapper from a stored canonical payload, hash, and signing metadata, verifying that the payload hashes to the stored hash.
+    /// </summary>
+    /// <remarks>
+    /// Use this factory when rehydrating a previously signed artifact from storage, a queue, or any other channel outside the
+    /// signing call itself. <see cref="FromSigningMetadata{TArtifact}" /> accepts the hash a caller supplies, which is correct
+    /// immediately after signing but does not establish that a stored payload still hashes to a stored hash. Rehydration
+    /// recomputes the hash and rejects the triple when payload and hash disagree.
+    /// </remarks>
+    /// <exception cref="ArgumentException">The canonical payload does not hash to <paramref name="canonicalHash" />.</exception>
+    /// <exception cref="NotSupportedException">The canonical hash algorithm is not supported by the built-in hasher.</exception>
+    public static SignedGovernanceArtifact<TArtifact> Rehydrate<TArtifact>(
+        TArtifact artifact,
+        CanonicalPayload canonicalPayload,
+        CanonicalPayloadHash canonicalHash,
+        SigningMetadata signingMetadata)
+    {
+        ArgumentNullException.ThrowIfNull(canonicalPayload);
+        ArgumentNullException.ThrowIfNull(canonicalHash);
+
+        CanonicalPayloadHash recomputedHash = CanonicalPayloadHasher.ComputeHash(canonicalPayload, canonicalHash.HashAlgorithm);
+
+        return string.Equals(recomputedHash.HashValue, canonicalHash.HashValue, StringComparison.Ordinal)
+            ? FromSigningMetadata(artifact, canonicalPayload, canonicalHash, signingMetadata)
+            : throw new ArgumentException(
+                "The canonical payload does not hash to the supplied canonical hash value.",
+                nameof(canonicalHash));
+    }
+
+    /// <summary>
     /// Creates an artifact wrapper from signing metadata returned by a host or provider package.
     /// </summary>
+    /// <remarks>
+    /// The supplied <paramref name="canonicalHash" /> is trusted as given, which is appropriate immediately after a signing
+    /// call produced it from <paramref name="canonicalPayload" />. Use <see cref="Rehydrate{TArtifact}" /> when the payload and
+    /// hash were read back from storage or received over a wire, so the pair is checked rather than assumed.
+    /// </remarks>
     public static SignedGovernanceArtifact<TArtifact> FromSigningMetadata<TArtifact>(
         TArtifact artifact,
         CanonicalPayload canonicalPayload,
