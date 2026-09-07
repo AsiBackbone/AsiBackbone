@@ -18,7 +18,7 @@ separate post-merge actions.
 ## Security disclosure coordination
 
 `5.0.0` is the fixed version for twelve draft security advisories, including
-`GHSA-q63q-xcvp-chv8` (critical) and `GHSA-p6pw-5gr3-xrr7` (high). Because
+[`GHSA-q63q-xcvp-chv8`](https://github.com/AsiBackbone/AsiBackbone/security/advisories/GHSA-q63q-xcvp-chv8) (critical) and [`GHSA-p6pw-5gr3-xrr7`](https://github.com/AsiBackbone/AsiBackbone/security/advisories/GHSA-p6pw-5gr3-xrr7) (high). Because
 `4.0.0` is published and affected, disclosure and release must be sequenced
 together.
 
