@@ -30,6 +30,7 @@ public static class LocalDevelopmentSigningBuilderExtensions
         ArgumentNullException.ThrowIfNull(builder);
         ArgumentNullException.ThrowIfNull(options);
         options.Validate();
+        ThrowIfProduction(options);
 
         _ = builder.Services.AddSingleton(options);
         _ = builder.Services.AddSingleton<LocalDevelopmentSigningService>();
@@ -39,5 +40,31 @@ public static class LocalDevelopmentSigningBuilderExtensions
             serviceProvider.GetRequiredService<LocalDevelopmentSigningService>());
 
         return builder;
+    }
+
+    /// <summary>
+    /// Rejects registration of the local-development signing provider in a production environment.
+    /// </summary>
+    /// <remarks>
+    /// The provider generates its key per process, so artifacts it signs stop verifying after a restart. An analyzer can
+    /// only see a call it can read; this guard covers the unconditional registration that reaches production at runtime.
+    /// </remarks>
+    /// <exception cref="InvalidOperationException">The environment is production and the options do not allow it.</exception>
+    private static void ThrowIfProduction(LocalDevelopmentSigningOptions options)
+    {
+        if (options.AllowInProduction)
+        {
+            return;
+        }
+
+        string? environmentName = options.EnvironmentName
+            ?? Environment.GetEnvironmentVariable("DOTNET_ENVIRONMENT")
+            ?? Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
+
+        if (string.Equals(environmentName, "Production", StringComparison.OrdinalIgnoreCase))
+        {
+            throw new InvalidOperationException(
+                "Local-development signing cannot be registered in the Production environment. Its key is generated per process and is never persisted, so signatures stop verifying after a restart. Register a managed key provider instead, or set LocalDevelopmentSigningOptions.AllowInProduction when this is deliberate.");
+        }
     }
 }

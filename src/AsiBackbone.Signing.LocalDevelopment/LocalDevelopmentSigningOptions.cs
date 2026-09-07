@@ -73,6 +73,25 @@ public sealed class LocalDevelopmentSigningOptions
     public bool ReturnUnsignedOnFailure { get; set; } = true;
 
     /// <summary>
+    /// Gets or sets a value indicating whether this provider may be registered while the host reports a production environment.
+    /// </summary>
+    /// <remarks>
+    /// The signing key is generated per process and never persisted, so signatures produced by this provider stop
+    /// verifying after a restart and carry no key custody story. Registration therefore fails in production unless a host
+    /// states this intent explicitly.
+    /// </remarks>
+    public bool AllowInProduction { get; set; }
+
+    /// <summary>
+    /// Gets or sets the environment name used by the production guard, overriding the ambient environment variables.
+    /// </summary>
+    /// <remarks>
+    /// When null, the guard reads <c>DOTNET_ENVIRONMENT</c> and then <c>ASPNETCORE_ENVIRONMENT</c>. This package does not
+    /// depend on the hosting abstractions, so a host that determines its environment another way supplies the name here.
+    /// </remarks>
+    public string? EnvironmentName { get; set; }
+
+    /// <summary>
     /// Validates the configured local-development signing options.
     /// </summary>
     /// <exception cref="InvalidOperationException">
@@ -96,10 +115,14 @@ public sealed class LocalDevelopmentSigningOptions
         string? keyVersion = null,
         string? signatureAlgorithm = null,
         int keySizeBits = DefaultKeySizeBits,
-        bool returnUnsignedOnFailure = true)
+        bool returnUnsignedOnFailure = true,
+        bool allowInProduction = false,
+        string? environmentName = null)
     {
         return new LocalDevelopmentSigningOptions
         {
+            AllowInProduction = allowInProduction,
+            EnvironmentName = string.IsNullOrWhiteSpace(environmentName) ? null : environmentName.Trim(),
             ProviderName = string.IsNullOrWhiteSpace(providerName)
                 ? DefaultProviderName
                 : providerName.Trim(),

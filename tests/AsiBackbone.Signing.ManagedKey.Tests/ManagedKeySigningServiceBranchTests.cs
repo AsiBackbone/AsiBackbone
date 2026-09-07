@@ -191,10 +191,12 @@ public sealed class ManagedKeySigningServiceBranchTests
             SignedUtc,
             providerOperationId: " operation-42 ",
             metadata: providerMetadata);
-        var service = new ManagedKeySigningService(CreateOptions(), new RecordingClient(managedResult));
+        var service = new ManagedKeySigningService(
+            CreateOptions(keyVersion: null, requireKeyVersion: false),
+            new RecordingClient(managedResult));
 
         SigningResult result = await service.SignAsync(
-            CreateRequest(purpose: " audit-purpose ", keyVersion: "v1"),
+            CreateRequest(purpose: " audit-purpose ", keyVersion: null),
             TestContext.Current.CancellationToken);
 
         Assert.True(result.IsSigned);

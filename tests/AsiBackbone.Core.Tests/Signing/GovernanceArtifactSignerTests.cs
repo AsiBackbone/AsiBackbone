@@ -113,6 +113,7 @@ public sealed class GovernanceArtifactSignerTests
         SignedGovernanceArtifact<AuditLedgerRecord> artifact = await GovernanceArtifactSigner.SignAuditLedgerRecordAsync(
             record,
             signer,
+            requireSignature: false,
             cancellationToken: TestContext.Current.CancellationToken);
 
         Assert.False(artifact.IsSigned);
@@ -122,6 +123,23 @@ public sealed class GovernanceArtifactSignerTests
         Assert.Equal("fake.signing.failed", artifact.SigningMetadata.Metadata["failure_code"]);
         Assert.Equal(CanonicalArtifactTypes.AuditLedgerRecord, artifact.SigningMetadata.Metadata["artifact_type"]);
         Assert.Equal("record-1", artifact.SigningMetadata.Metadata["artifact_id"]);
+    }
+
+    /// <summary>
+    /// Verifies that a provider returning no signature throws by default rather than yielding an unsigned artifact silently.
+    /// </summary>
+    /// <returns>A task representing the asynchronous test operation.</returns>
+    [Fact]
+    public async Task SignAuditLedgerRecordAsyncThrowsWhenTheProviderReturnsNoSignature()
+    {
+        AuditLedgerRecord record = CreateAuditLedgerRecord();
+        IAsiBackboneSigningService signer = new FailingSigningService();
+
+        _ = await Assert.ThrowsAsync<InvalidOperationException>(
+            async () => await GovernanceArtifactSigner.SignAuditLedgerRecordAsync(
+                record,
+                signer,
+                cancellationToken: TestContext.Current.CancellationToken));
     }
 
     private static AuditLedgerRecord CreateAuditLedgerRecord()
