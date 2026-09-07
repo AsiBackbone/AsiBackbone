@@ -59,14 +59,14 @@ public sealed class VerificationPolicyOptions
         {
             foreach (KeyValuePair<SignatureVerificationCategory, VerificationPolicyAction> item in actionOverrides)
             {
-                if (!Enum.IsDefined(item.Key))
+                if (!Enum.IsDefined(item.Key) || item.Key is SignatureVerificationCategory.Unspecified)
                 {
-                    throw new ArgumentOutOfRangeException(nameof(actionOverrides), item.Key, "Verification category must be defined.");
+                    throw new ArgumentOutOfRangeException(nameof(actionOverrides), item.Key, "Verification category must be a specific defined category.");
                 }
 
-                if (!Enum.IsDefined(item.Value))
+                if (!Enum.IsDefined(item.Value) || item.Value is VerificationPolicyAction.Unspecified)
                 {
-                    throw new ArgumentOutOfRangeException(nameof(actionOverrides), item.Value, "Verification policy action must be defined.");
+                    throw new ArgumentOutOfRangeException(nameof(actionOverrides), item.Value, "Verification policy action must be a specific defined action.");
                 }
 
                 if (!allowUnsafeAllowOverrides
@@ -91,9 +91,10 @@ public sealed class VerificationPolicyOptions
     /// </summary>
     public VerificationPolicyAction GetAction(SignatureVerificationCategory category)
     {
-        return !Enum.IsDefined(category)
-            ? throw new ArgumentOutOfRangeException(nameof(category), category, "Verification category must be defined.")
+        return !Enum.IsDefined(category) || category is SignatureVerificationCategory.Unspecified
+            ? throw new ArgumentOutOfRangeException(nameof(category), category, "Verification category must be a specific defined category.")
             : Actions.TryGetValue(category, out VerificationPolicyAction action)
+            && action is not VerificationPolicyAction.Unspecified
             ? action
             : VerificationPolicyAction.Escalate;
     }

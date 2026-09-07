@@ -6,6 +6,21 @@ This project follows the spirit of [Keep a Changelog](https://keepachangelog.com
 
 ## [Unreleased]
 
+## [5.0.0] - 2026-09-07
+
+### Release summary
+
+`5.0.0` starts the stable `5.x` AsiBackbone package family and advances the
+binary assembly identity to `5.0.0.0`. Package IDs, public namespaces, and the
+`net10.0` target remain unchanged.
+
+This is a security release resolving twelve findings from the September 2026
+cross-repository review, including one critical and one high. Every behavior
+change makes a governance path fail closed where it previously returned a
+permissive result, which is why the work takes a major-version boundary. See the
+[5.0.0 Migration Guide](docs/articles/upgrade-400-to-500.md); hosts that persist
+the affected enums as integers need a data migration.
+
 ### Security
 
 * `GovernanceArtifactVerifier.VerifyAsync` now recomputes the canonical payload hash and denies the artifact when the payload does not hash to the signed canonical hash value. Verification previously compared two values the artifact carried about itself — `SigningMetadata.SigningHash` against `CanonicalHash.HashValue` — and forwarded that self-reported hash to the provider, so a signature was checked against a stored hash rather than against the artifact content. A caller that rehydrated a signed artifact from storage or a queue could present modified content beside an authentic hash and signature pair and receive a valid, allowed outcome. The check runs before the provider is called and fails closed with `signature.hash-mismatch`; an artifact whose hash algorithm the built-in hasher cannot recompute fails closed with `signature.hash-algorithm-unsupported`, because Core cannot bind content it cannot hash.
@@ -38,6 +53,10 @@ This project follows the spirit of [Keep a Changelog](https://keepachangelog.com
 
 * `InMemoryCapabilityGrantUseStore` keys use records by issuer and token identifier rather than token identifier alone, so two issuers sharing an identifier no longer share one use budget, and evicts records for grants that expired longer ago than `EvictionGracePeriod` instead of retaining every identifier for the process lifetime.
 
+* **Breaking:** `VerificationPolicyAction`, `SignatureVerificationCategory`, `GrantUseState`, and `AuditIntegrityVerificationCategory` now reserve zero as an `Unspecified` sentinel that is rejected wherever the value is consumed. `Allow`, `Valid`, `Accepted`, and `Valid` respectively moved off zero, so `default(T)` — and a persisted column that yields zero for unrecognized input — no longer means "allow", "valid", or "accepted". Hosts persisting these values as integers must migrate rows holding zero, and hosts compiled against `4.x` must rebuild, because enum constants are inlined at compile time.
+
+* Added `ASIB003`, reporting local-development signing registered with no environment guard at all. `ASIB002` only reports a call the analyzer can see inside a production branch, so the unconditional registration that actually reaches production went unreported.
+
 * **Host mitigation for released versions:** hosts on `4.0.0` and earlier that verify rehydrated artifacts should reconstruct the canonical payload with `CanonicalPayloadBuilder`, recompute the hash with `CanonicalPayloadHasher.ComputeHash`, and compare it to the stored signing hash before treating a verification outcome as authoritative, as the [regulated storage and signing verification checklist](docs/articles/regulated-storage-and-signing-verification-checklist.md) describes. Hosts verifying partial audit chains should supply the hash of the link preceding the range, and hosts needing to establish they hold a complete chain should compare against a retained tip hash.
 
 ### Added
@@ -49,6 +68,17 @@ This project follows the spirit of [Keep a Changelog](https://keepachangelog.com
 * Added `expectedTipLinkHash` and `expectedTipSequence` to `AuditIntegrityVerifier.Verify`, with an `AuditIntegrityVerificationCategory.TruncatedChain` result. Any prefix of a valid chain is internally consistent, so without a stated tip a caller cannot establish it holds the whole chain. `MissingAnchor` reports a partial chain supplied without the hash that anchors it. The XML documentation now states that link metadata is outside the link hash and is therefore not authenticated by chain verification.
 
 * Added `SignatureVerificationCategory.UntrustedKey`, `LocalDevelopmentSigningOptions.AllowInProduction` and `EnvironmentName`, `InMemoryCapabilityGrantUseStore.EvictionGracePeriod`, and an issuer-scoped `InMemoryCapabilityGrantUseStore.GetUseCount(string, string)` overload.
+
+* Added `CapabilityTokenGrant.MaxUseCount` and `AsiBackboneSchemaVersions.StableArtifactsV2`, so an issuer can bind the use limit it authorized into the signed payload. Validation uses the narrower of the bound limit and any limit the caller supplies, so a relying party can tighten but never widen what was issued. The field is opt-in: a grant recording `StableArtifactsV1` canonicalizes exactly as it did in `4.x`, so grants signed before this release keep verifying.
+
+### Migration
+
+* Update all `AsiBackbone.*` package references from `4.0.0` to `5.0.0` and rebuild applications against `AssemblyVersion` `5.0.0.0`.
+* Migrate persisted enum columns holding zero for `VerificationPolicyAction`, `SignatureVerificationCategory`, `GrantUseState`, and `AuditIntegrityVerificationCategory`.
+* Supply explicit `CapabilityGrantValidationOptions`, including an audience expectation wherever proof or bounded-use checking is required.
+* Supply `expectedPreviousLinkHash` when verifying a partial audit chain, and an expected tip when completeness matters.
+* Replace local-development signing on production configuration paths, or set `AllowInProduction` deliberately.
+* Review the [5.0.0 Migration Guide](docs/articles/upgrade-400-to-500.md) before upgrading.
 
 ### Changed
 

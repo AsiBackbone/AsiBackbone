@@ -6,9 +6,18 @@ namespace AsiBackbone.Core.Signing;
 public enum SignatureVerificationCategory
 {
     /// <summary>
+    /// No verification category was assigned.
+    /// </summary>
+    /// <remarks>
+    /// Zero is a rejected sentinel so that a default-constructed value, or a persisted column that yields zero for
+    /// unrecognized input, cannot mean "valid".
+    /// </remarks>
+    Unspecified = 0,
+
+    /// <summary>
     /// The signature verified against the expected artifact hash and metadata.
     /// </summary>
-    Valid = 0,
+    Valid = 11,
 
     /// <summary>
     /// The signature value was present but did not verify.

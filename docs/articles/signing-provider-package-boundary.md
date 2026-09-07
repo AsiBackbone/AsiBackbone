@@ -1,6 +1,6 @@
 # Signing Provider Package Boundary
 
-This article documents the stable signing-provider package boundary carried forward into the current AsiBackbone `4.x` package family.
+This article documents the stable signing-provider package boundary carried forward into the current AsiBackbone `5.x` package family.
 
 Issue: #253, updated for #512.
 

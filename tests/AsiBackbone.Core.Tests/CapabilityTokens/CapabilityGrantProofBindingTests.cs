@@ -45,7 +45,7 @@ public sealed class CapabilityGrantProofBindingTests
         SignedGovernanceArtifact<CapabilityTokenGrant> signed = CreateSignedGrant(CreateGrant());
         CapabilityTokenGrant widenedGrant = CreateGrant(scopes: ["robotics.execute", "robotics.admin"]);
 
-        var tampered = SignedGovernanceArtifacts.FromSigningMetadata(
+        SignedGovernanceArtifact<CapabilityTokenGrant> tampered = SignedGovernanceArtifacts.FromSigningMetadata(
             widenedGrant,
             CanonicalPayloadBuilder.ForCapabilityTokenGrant(widenedGrant),
             signed.CanonicalHash,
@@ -75,7 +75,7 @@ public sealed class CapabilityGrantProofBindingTests
         SignedGovernanceArtifact<CapabilityTokenGrant> signed = CreateSignedGrant(CreateGrant());
         CapabilityTokenGrant extendedGrant = CreateGrant(expiresUtc: IssuedUtc.AddDays(30));
 
-        var tampered = SignedGovernanceArtifacts.FromSigningMetadata(
+        SignedGovernanceArtifact<CapabilityTokenGrant> tampered = SignedGovernanceArtifacts.FromSigningMetadata(
             extendedGrant,
             CanonicalPayloadBuilder.ForCapabilityTokenGrant(extendedGrant),
             signed.CanonicalHash,
@@ -98,7 +98,7 @@ public sealed class CapabilityGrantProofBindingTests
     public async Task ValidateAsyncDeniesProofIssuedForADifferentArtifactType()
     {
         CapabilityTokenGrant grant = CreateGrant();
-        CanonicalPayload foreignPayload = CanonicalPayload.Create(
+        var foreignPayload = CanonicalPayload.Create(
             CanonicalArtifactTypes.AuditResidue,
             grant.TokenId,
             grant.SchemaVersion,
@@ -107,7 +107,7 @@ public sealed class CapabilityGrantProofBindingTests
 
         CanonicalPayloadHash foreignHash = CanonicalPayloadHasher.ComputeHash(foreignPayload);
 
-        var artifact = SignedGovernanceArtifacts.FromSigningMetadata(
+        SignedGovernanceArtifact<CapabilityTokenGrant> artifact = SignedGovernanceArtifacts.FromSigningMetadata(
             grant,
             foreignPayload,
             foreignHash,
@@ -139,7 +139,7 @@ public sealed class CapabilityGrantProofBindingTests
         CanonicalPayload otherPayload = CanonicalPayloadBuilder.ForCapabilityTokenGrant(otherGrant);
         CanonicalPayloadHash otherHash = CanonicalPayloadHasher.ComputeHash(otherPayload);
 
-        var artifact = SignedGovernanceArtifacts.FromSigningMetadata(
+        SignedGovernanceArtifact<CapabilityTokenGrant> artifact = SignedGovernanceArtifacts.FromSigningMetadata(
             grant,
             otherPayload,
             otherHash,

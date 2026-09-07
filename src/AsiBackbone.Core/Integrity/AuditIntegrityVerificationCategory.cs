@@ -6,9 +6,18 @@ namespace AsiBackbone.Core.Integrity;
 public enum AuditIntegrityVerificationCategory
 {
     /// <summary>
+    /// No verification category was assigned.
+    /// </summary>
+    /// <remarks>
+    /// Zero is a rejected sentinel so that a default-constructed value, or a persisted column that yields zero for
+    /// unrecognized input, cannot mean "valid".
+    /// </remarks>
+    Unspecified = 0,
+
+    /// <summary>
     /// The chain verified successfully.
     /// </summary>
-    Valid = 0,
+    Valid = 12,
 
     /// <summary>
     /// No chain links were supplied.

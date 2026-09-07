@@ -175,8 +175,8 @@
       "asibackbone.aspnetcore": {
         "type": "Project",
         "dependencies": {
-          "AsiBackbone.Core": "[4.0.0, )",
-          "AsiBackbone.DependencyInjection": "[4.0.0, )"
+          "AsiBackbone.Core": "[5.0.0, )",
+          "AsiBackbone.DependencyInjection": "[5.0.0, )"
         }
       },
       "asibackbone.core": {
@@ -188,16 +188,16 @@
       "asibackbone.storage.inmemory": {
         "type": "Project",
         "dependencies": {
-          "AsiBackbone.Core": "[4.0.0, )",
-          "AsiBackbone.DependencyInjection": "[4.0.0, )"
+          "AsiBackbone.Core": "[5.0.0, )",
+          "AsiBackbone.DependencyInjection": "[5.0.0, )"
         }
       },
       "asibackbone.testing": {
         "type": "Project",
         "dependencies": {
-          "AsiBackbone.AspNetCore": "[4.0.0, )",
-          "AsiBackbone.Core": "[4.0.0, )",
-          "AsiBackbone.Storage.InMemory": "[4.0.0, )"
+          "AsiBackbone.AspNetCore": "[5.0.0, )",
+          "AsiBackbone.Core": "[5.0.0, )",
+          "AsiBackbone.Storage.InMemory": "[5.0.0, )"
         }
       }
     }

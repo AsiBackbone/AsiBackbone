@@ -6,9 +6,18 @@ namespace AsiBackbone.Core.Signing;
 public enum VerificationPolicyAction
 {
     /// <summary>
+    /// No action was assigned.
+    /// </summary>
+    /// <remarks>
+    /// Zero is a rejected sentinel so that a default-constructed value, or a persisted column that yields zero for
+    /// unrecognized input, cannot mean "allow".
+    /// </remarks>
+    Unspecified = 0,
+
+    /// <summary>
     /// Allow the governed operation or high-assurance emission to proceed.
     /// </summary>
-    Allow = 0,
+    Allow = 7,
 
     /// <summary>
     /// Deny the governed operation or high-assurance emission.

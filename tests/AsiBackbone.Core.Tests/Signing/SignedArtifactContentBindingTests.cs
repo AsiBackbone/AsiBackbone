@@ -45,7 +45,7 @@ public sealed class SignedArtifactContentBindingTests
         SignedGovernanceArtifact<CapabilityTokenGrant> signed = CreateSignedGrant(CreateGrant());
 
         CapabilityTokenGrant tamperedGrant = CreateGrant(scopes: ["robotics.execute", "robotics.admin"]);
-        var tampered = SignedGovernanceArtifacts.FromSigningMetadata(
+        SignedGovernanceArtifact<CapabilityTokenGrant> tampered = SignedGovernanceArtifacts.FromSigningMetadata(
             tamperedGrant,
             CanonicalPayloadBuilder.ForCapabilityTokenGrant(tamperedGrant),
             signed.CanonicalHash,

@@ -49,6 +49,7 @@ public sealed class CapabilityGrantResultBranchTests
     {
         CapabilityGrantUseResult result = expectedState switch
         {
+            GrantUseState.Unspecified => throw new ArgumentException("Unspecified is not a producible result state.", nameof(expectedState)),
             GrantUseState.Accepted => throw new ArgumentException("Accepted is covered by the success-result test.", nameof(expectedState)),
             GrantUseState.UseLimitExceeded => CapabilityGrantUseResult.UseLimitExceeded(expectedUseCount, failureMessage),
             GrantUseState.Stopped => CapabilityGrantUseResult.Stopped(failureMessage),

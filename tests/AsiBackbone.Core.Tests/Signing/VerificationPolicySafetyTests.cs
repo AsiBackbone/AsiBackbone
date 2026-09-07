@@ -49,7 +49,7 @@ public sealed class VerificationPolicySafetyTests
             [SignatureVerificationCategory.InvalidSignature] = VerificationPolicyAction.Allow
         };
 
-        VerificationPolicyOptions options = VerificationPolicyOptions.Create(overrides, allowUnsafeAllowOverrides: true);
+        var options = VerificationPolicyOptions.Create(overrides, allowUnsafeAllowOverrides: true);
 
         Assert.Equal(
             VerificationPolicyAction.Allow,
@@ -67,7 +67,7 @@ public sealed class VerificationPolicySafetyTests
             [SignatureVerificationCategory.ProviderUnavailable] = VerificationPolicyAction.Deny
         };
 
-        VerificationPolicyOptions options = VerificationPolicyOptions.Create(overrides);
+        var options = VerificationPolicyOptions.Create(overrides);
 
         Assert.Equal(
             VerificationPolicyAction.Deny,
@@ -101,7 +101,7 @@ public sealed class VerificationPolicySafetyTests
     [Fact]
     public void CapabilityOptionsAllowNoAudienceForMetadataOnlyValidation()
     {
-        CapabilityGrantValidationOptions options = CapabilityGrantValidationOptions.CreateMetadataValidation();
+        var options = CapabilityGrantValidationOptions.CreateMetadataValidation();
 
         Assert.False(options.RequireProof);
         Assert.False(options.RequireUseCheck);

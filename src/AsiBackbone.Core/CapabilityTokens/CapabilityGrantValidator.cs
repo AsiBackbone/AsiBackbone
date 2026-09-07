@@ -249,12 +249,19 @@ public static class CapabilityGrantValidator
             return CapabilityGrantValidationResult.Failed(grant, CapabilityTokenValidationCategory.ReplayStoreUnavailable, VerificationPolicyAction.Defer, "capability.use-store-missing");
         }
 
+        // A limit the caller supplies is local policy; a limit the issuer bound into the signed payload is authority.
+        // Taking the narrower of the two lets a relying party tighten the limit but never widen what was issued.
+        int effectiveMaxUseCount = grant.MaxUseCount.HasValue
+            ? Math.Min(grant.MaxUseCount.Value, options.MaxUseCount)
+            : options.MaxUseCount;
+
         CapabilityGrantUseResult result = await useStore
-            .TryConsumeAsync(grant, options.MaxUseCount, validationUtc, cancellationToken)
+            .TryConsumeAsync(grant, effectiveMaxUseCount, validationUtc, cancellationToken)
             .ConfigureAwait(false);
 
         return result.State switch
         {
+            GrantUseState.Unspecified => CapabilityGrantValidationResult.Failed(grant, CapabilityTokenValidationCategory.Failed, VerificationPolicyAction.Escalate, "capability.use-state-unspecified", "The capability grant use store returned no use state."),
             GrantUseState.Accepted => null,
             GrantUseState.UseLimitExceeded => CapabilityGrantValidationResult.Failed(grant, CapabilityTokenValidationCategory.ReuseLimitExceeded, VerificationPolicyAction.Deny, result.FailureCode ?? "capability.use-limit-exceeded", result.FailureMessage),
             GrantUseState.Stopped => CapabilityGrantValidationResult.Failed(grant, CapabilityTokenValidationCategory.Revoked, VerificationPolicyAction.Deny, result.FailureCode ?? "capability.grant-stopped", result.FailureMessage),
@@ -283,6 +290,7 @@ public static class CapabilityGrantValidator
     {
         return category switch
         {
+            SignatureVerificationCategory.Unspecified => CapabilityTokenValidationCategory.Failed,
             SignatureVerificationCategory.MissingSignature => CapabilityTokenValidationCategory.MissingProof,
             SignatureVerificationCategory.Valid => CapabilityTokenValidationCategory.Valid,
             SignatureVerificationCategory.InvalidSignature => CapabilityTokenValidationCategory.InvalidProof,

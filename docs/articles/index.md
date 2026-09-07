@@ -1,6 +1,6 @@
 # AsiBackbone Product Documentation
 
-This section organizes the stable `4.x` Accountable Systems Infrastructure documentation around product implementation, API use, operations, compatibility, and release evidence.
+This section organizes the stable `5.x` Accountable Systems Infrastructure documentation around product implementation, API use, operations, compatibility, and release evidence.
 
 > [!IMPORTANT]
 > In this software project, **ASI** means **Accountable Systems Infrastructure**. AsiBackbone is governance infrastructure for accountable software decision flow, not an artificial superintelligence implementation. See [Project Boundaries and Non-Claims](project-boundaries.md) for the canonical boundary reference.
@@ -13,26 +13,30 @@ General architectural education belongs in [ASI Backbone Learning](https://asiba
 
 ## Current stable package posture
 
-Stable `4.x` package family. `4.0.0` is the current major release. It enables
-governance outbox claim leasing by default, bounds abandoned-claim recovery,
-hardens endpoint metadata and correlation handling, and expands canonical
-payload and verification APIs. Package IDs and public namespaces remain
-unchanged; the binary assembly identity advances to `4.0.0.0`.
+Stable `5.x` package family. `5.0.0` is the current major release. It is a
+security release that makes governance verification fail closed: signed artifact
+content is bound to its signature, capability proofs are bound to the grant being
+evaluated, partial audit chains require an anchor and can detect truncation, and
+enum zero values are rejected sentinels rather than permissive defaults. Package
+IDs and public namespaces remain unchanged; the binary assembly identity
+advances to `5.0.0.0`.
 
 Released stable package surfaces include Core, DependencyInjection,
 Storage.InMemory, EntityFrameworkCore, AspNetCore, Testing, Templates,
 Analyzers, OpenTelemetry, Signing.LocalDevelopment, and Signing.ManagedKey.
 
-Consumers upgrading from `3.2.3` must review the outbox claim-store boundary.
-The shipped stores support claim leasing; custom stores must implement
-`IAsiBackboneGovernanceOutboxClaimStore` or explicitly disable claim leases.
+Consumers upgrading from `4.0.0` must review the
+[5.0.0 Migration Guide](upgrade-400-to-500.md). Hosts that persist the affected
+enums as integers need a data migration, and call sites that relied on
+permissive validation defaults now have to state what they are validating
+against.
 
 Event Hubs, Purview, Azure-specific non-signing SDK adapters, Aspire runtime
 packages, robotics, immutable storage, and additional non-signing provider
 packages remain design-only, strategy-only, sample-only, host-owned, or
 future-provider work unless a later stable release explicitly ships them.
 
-The release process includes explicit [Release Cadence and Readiness](release-cadence-and-readiness.md) guidance for patch, minor, and major release selection, package metadata, Source Link, SBOM/provenance, documentation links, and future package identity or namespace changes. The [4.0.0 Migration Guide](upgrade-323-to-400.md) covers the breaking default, and the [4.0.0 Consumer Verification Guide](consumer-verification-400.md) gives consumers a conservative package-source, migration, Source Link, SBOM/provenance, and deferred-signing verification path.
+The release process includes explicit [Release Cadence and Readiness](release-cadence-and-readiness.md) guidance for patch, minor, and major release selection, package metadata, Source Link, SBOM/provenance, documentation links, and future package identity or namespace changes. The [5.0.0 Migration Guide](upgrade-400-to-500.md) covers the breaking changes, and the [4.0.0 Consumer Verification Guide](consumer-verification-400.md) gives consumers a conservative package-source, migration, Source Link, SBOM/provenance, and deferred-signing verification path.
 
 ## Search and navigation
 
@@ -141,6 +145,9 @@ These pages cover production hardening, durable audit/outbox behavior, observabi
 
 Start with the current release and compatibility rules. Older release notes, consumer-verification guides, and upgrade records are preserved under [Releases & Compatibility](../releases/) so they remain easy to find without dominating the implementation navigation.
 
+* [5.0.0 Release Notes](release-notes-500.md)
+* [5.0.0 Release Readiness Record](release-readiness-500.md)
+* [5.0.0 Migration Guide](upgrade-400-to-500.md)
 * [4.0.0 Release Notes](release-notes-400.md)
 * [4.0.0 Migration Guide](upgrade-323-to-400.md)
 * [4.0.0 Consumer Verification Guide](consumer-verification-400.md)

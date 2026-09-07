@@ -33,11 +33,13 @@ The DocFX header search is available for package names, API concepts, and articl
 
 ## Current stable package family
 
-Stable `4.x` package family. `4.0.0` is the current major release. It enables
-governance outbox claim leasing by default, adds bounded reclaim and
-dead-letter behavior, hardens endpoint metadata and correlation handling, and
-expands canonical payload and verification APIs. Package IDs and public
-namespaces remain unchanged; the binary assembly identity is `4.0.0.0`.
+Stable `5.x` package family. `5.0.0` is the current major release. It is a
+security release that makes governance verification fail closed: signed artifact
+content is bound to its signature, capability proofs are bound to the grant being
+evaluated, partial audit chains require an anchor and can detect truncation, and
+enum zero values are rejected sentinels rather than permissive defaults. Package
+IDs and public namespaces remain unchanged; the binary assembly identity is
+`5.0.0.0`.
 
 ```text
 AsiBackbone.Core
@@ -107,6 +109,8 @@ Package-specific READMEs and release notes define which surfaces are stable, opt
 
 ### Releases and compatibility
 
+* [5.0.0 Release Notes](articles/release-notes-500.md)
+* [5.0.0 Migration Guide](articles/upgrade-400-to-500.md)
 * [4.0.0 Release Notes](articles/release-notes-400.md)
 * [4.0.0 Migration Guide](articles/upgrade-323-to-400.md)
 * [4.0.0 Consumer Verification Guide](articles/consumer-verification-400.md)
@@ -123,6 +127,7 @@ Historical release notes and verification records remain available under [Releas
 * [Performance Benchmark Baseline](articles/performance-benchmark-baseline.md)
 * [API Baseline and Boundary Checks](articles/api-baseline-and-boundary-checks.md)
 * [Release Cadence and Readiness](articles/release-cadence-and-readiness.md)
+* [5.0.0 Release Readiness Record](articles/release-readiness-500.md)
 * [4.0.0 Release Readiness Record](articles/release-readiness-400.md)
 
 

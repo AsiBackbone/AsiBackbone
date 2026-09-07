@@ -184,6 +184,14 @@ public static class CanonicalPayloadBuilder
             ["tokenId"] = grant.TokenId
         };
 
+        // A use limit supplied only at the validation call site is unsigned local policy that the issuer never
+        // authorized. Binding it requires the grant to record the schema version that carries it, so grants signed under
+        // the earlier version continue to hash exactly as they did and keep verifying.
+        if (!string.Equals(grant.SchemaVersion, AsiBackboneSchemaVersions.StableArtifactsV1, StringComparison.Ordinal))
+        {
+            content["maxUseCount"] = grant.MaxUseCount;
+        }
+
         return CanonicalPayload.Create(
             CanonicalArtifactTypes.CapabilityTokenGrant,
             grant.TokenId,
