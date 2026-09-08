@@ -1,0 +1,59 @@
+# AsiBackbone stable public API baseline
+# Baseline release: 5.0.0
+# Assembly: AsiBackbone.Signing.ManagedKey.dll
+# Format: KIND | UID | C# declaration (or enum field display)
+# Update only after explicit API/SemVer review.
+
+MEMBER | AsiBackbone.Signing.ManagedKey.IManagedKeySigningClient.SignAsync(AsiBackbone.Signing.ManagedKey.ManagedKeySignRequest,System.Threading.CancellationToken) | ValueTask<ManagedKeySignResult> SignAsync(ManagedKeySignRequest request, CancellationToken cancellationToken = default)
+MEMBER | AsiBackbone.Signing.ManagedKey.ManagedKeySignRequest.#ctor(System.String,System.String,System.String,System.String,System.String,System.String,System.Collections.Generic.IReadOnlyDictionary{System.String,System.String}) | public ManagedKeySignRequest(string signingHash, string hashAlgorithm, string signatureAlgorithm, string keyId, string? keyVersion = null, string? purpose = null, IReadOnlyDictionary<string, string>? metadata = null)
+MEMBER | AsiBackbone.Signing.ManagedKey.ManagedKeySignRequest.HashAlgorithm | public string HashAlgorithm { get; }
+MEMBER | AsiBackbone.Signing.ManagedKey.ManagedKeySignRequest.KeyId | public string KeyId { get; }
+MEMBER | AsiBackbone.Signing.ManagedKey.ManagedKeySignRequest.KeyVersion | public string? KeyVersion { get; }
+MEMBER | AsiBackbone.Signing.ManagedKey.ManagedKeySignRequest.Metadata | public IReadOnlyDictionary<string, string> Metadata { get; }
+MEMBER | AsiBackbone.Signing.ManagedKey.ManagedKeySignRequest.Purpose | public string? Purpose { get; }
+MEMBER | AsiBackbone.Signing.ManagedKey.ManagedKeySignRequest.SignatureAlgorithm | public string SignatureAlgorithm { get; }
+MEMBER | AsiBackbone.Signing.ManagedKey.ManagedKeySignRequest.SigningHash | public string SigningHash { get; }
+MEMBER | AsiBackbone.Signing.ManagedKey.ManagedKeySignResult.Create(System.String,System.String,System.String,System.String,System.DateTimeOffset,System.String,System.Collections.Generic.IReadOnlyDictionary{System.String,System.String}) | public static ManagedKeySignResult Create(string signature, string signatureAlgorithm, string keyId, string? keyVersion, DateTimeOffset signedUtc, string? providerOperationId = null, IReadOnlyDictionary<string, string>? metadata = null)
+MEMBER | AsiBackbone.Signing.ManagedKey.ManagedKeySignResult.KeyId | public string KeyId { get; }
+MEMBER | AsiBackbone.Signing.ManagedKey.ManagedKeySignResult.KeyVersion | public string? KeyVersion { get; }
+MEMBER | AsiBackbone.Signing.ManagedKey.ManagedKeySignResult.Metadata | public IReadOnlyDictionary<string, string> Metadata { get; }
+MEMBER | AsiBackbone.Signing.ManagedKey.ManagedKeySignResult.ProviderOperationId | public string? ProviderOperationId { get; }
+MEMBER | AsiBackbone.Signing.ManagedKey.ManagedKeySignResult.Signature | public string Signature { get; }
+MEMBER | AsiBackbone.Signing.ManagedKey.ManagedKeySignResult.SignatureAlgorithm | public string SignatureAlgorithm { get; }
+MEMBER | AsiBackbone.Signing.ManagedKey.ManagedKeySignResult.SignedUtc | public DateTimeOffset SignedUtc { get; }
+MEMBER | AsiBackbone.Signing.ManagedKey.ManagedKeySigningBuilderExtensions.UseManagedKeySigning(AsiBackbone.DependencyInjection.IAsiBackboneBuilder,System.Action{AsiBackbone.Signing.ManagedKey.ManagedKeySigningOptions}) | public static IAsiBackboneBuilder UseManagedKeySigning(this IAsiBackboneBuilder builder, Action<ManagedKeySigningOptions> configure)
+MEMBER | AsiBackbone.Signing.ManagedKey.ManagedKeySigningBuilderExtensions.UseManagedKeySigning(AsiBackbone.DependencyInjection.IAsiBackboneBuilder,System.Action{AsiBackbone.Signing.ManagedKey.ManagedKeySigningOptions},System.Func{System.IServiceProvider,AsiBackbone.Signing.ManagedKey.IManagedKeySigningClient}) | public static IAsiBackboneBuilder UseManagedKeySigning(this IAsiBackboneBuilder builder, Action<ManagedKeySigningOptions> configure, Func<IServiceProvider, IManagedKeySigningClient> clientFactory)
+MEMBER | AsiBackbone.Signing.ManagedKey.ManagedKeySigningException.#ctor(System.String,System.String,System.Boolean,System.Exception) | public ManagedKeySigningException(string failureCode, string? message = null, bool isRetryable = false, Exception? innerException = null)
+MEMBER | AsiBackbone.Signing.ManagedKey.ManagedKeySigningException.FailureCode | public string FailureCode { get; }
+MEMBER | AsiBackbone.Signing.ManagedKey.ManagedKeySigningException.IsRetryable | public bool IsRetryable { get; }
+MEMBER | AsiBackbone.Signing.ManagedKey.ManagedKeySigningOptions.Create(System.String,System.String,System.String,System.String,System.String,System.Boolean,System.Boolean,System.Int32,System.Nullable{System.TimeSpan}) | public static ManagedKeySigningOptions Create(string keyId, string? keyVersion = null, string? providerName = null, string? signatureAlgorithm = null, string? hashAlgorithm = null, bool requireKeyVersion = true, bool returnUnsignedOnFailure = false, int maxRetryAttempts = 2, TimeSpan? retryDelay = null)
+MEMBER | AsiBackbone.Signing.ManagedKey.ManagedKeySigningOptions.CreateLocalValidation(System.String,System.String,System.String,System.String,System.String,System.Boolean,System.Int32,System.Nullable{System.TimeSpan}) | public static ManagedKeySigningOptions CreateLocalValidation(string keyId, string? keyVersion = null, string? providerName = null, string? signatureAlgorithm = null, string? hashAlgorithm = null, bool requireKeyVersion = true, int maxRetryAttempts = 2, TimeSpan? retryDelay = null)
+MEMBER | AsiBackbone.Signing.ManagedKey.ManagedKeySigningOptions.DefaultHashAlgorithm | public const string DefaultHashAlgorithm = "SHA-256"
+MEMBER | AsiBackbone.Signing.ManagedKey.ManagedKeySigningOptions.DefaultMaxRetryDelay | public static TimeSpan DefaultMaxRetryDelay { get; }
+MEMBER | AsiBackbone.Signing.ManagedKey.ManagedKeySigningOptions.DefaultProviderName | public const string DefaultProviderName = "managed-key"
+MEMBER | AsiBackbone.Signing.ManagedKey.ManagedKeySigningOptions.DefaultSignatureAlgorithm | public const string DefaultSignatureAlgorithm = "RSASSA-PSS-SHA256-MANAGED-KEY"
+MEMBER | AsiBackbone.Signing.ManagedKey.ManagedKeySigningOptions.HashAlgorithm | public string HashAlgorithm { get; set; }
+MEMBER | AsiBackbone.Signing.ManagedKey.ManagedKeySigningOptions.KeyId | public string KeyId { get; set; }
+MEMBER | AsiBackbone.Signing.ManagedKey.ManagedKeySigningOptions.KeyVersion | public string? KeyVersion { get; set; }
+MEMBER | AsiBackbone.Signing.ManagedKey.ManagedKeySigningOptions.MaxRetryAttempts | public int MaxRetryAttempts { get; set; }
+MEMBER | AsiBackbone.Signing.ManagedKey.ManagedKeySigningOptions.MaxRetryDelay | public TimeSpan MaxRetryDelay { get; set; }
+MEMBER | AsiBackbone.Signing.ManagedKey.ManagedKeySigningOptions.ProviderName | public string ProviderName { get; set; }
+MEMBER | AsiBackbone.Signing.ManagedKey.ManagedKeySigningOptions.RequireKeyVersion | public bool RequireKeyVersion { get; set; }
+MEMBER | AsiBackbone.Signing.ManagedKey.ManagedKeySigningOptions.RetryDelay | public TimeSpan RetryDelay { get; set; }
+MEMBER | AsiBackbone.Signing.ManagedKey.ManagedKeySigningOptions.ReturnUnsignedOnFailure | public bool ReturnUnsignedOnFailure { get; set; }
+MEMBER | AsiBackbone.Signing.ManagedKey.ManagedKeySigningOptions.SignatureAlgorithm | public string SignatureAlgorithm { get; set; }
+MEMBER | AsiBackbone.Signing.ManagedKey.ManagedKeySigningOptions.Validate | public void Validate()
+MEMBER | AsiBackbone.Signing.ManagedKey.ManagedKeySigningService.#ctor(AsiBackbone.Signing.ManagedKey.ManagedKeySigningOptions,AsiBackbone.Signing.ManagedKey.IManagedKeySigningClient) | public ManagedKeySigningService(ManagedKeySigningOptions options, IManagedKeySigningClient client)
+MEMBER | AsiBackbone.Signing.ManagedKey.ManagedKeySigningService.SignAsync(AsiBackbone.Core.Signing.SigningRequest,System.Threading.CancellationToken) | public ValueTask<SigningResult> SignAsync(SigningRequest request, CancellationToken cancellationToken = default)
+MEMBER | AsiBackbone.Signing.ManagedKey.ManagedKeySigningServiceCollectionExtensions.AddAsiBackboneManagedKeySigning(Microsoft.Extensions.DependencyInjection.IServiceCollection,System.Action{AsiBackbone.Signing.ManagedKey.ManagedKeySigningOptions}) | public static IServiceCollection AddAsiBackboneManagedKeySigning(this IServiceCollection services, Action<ManagedKeySigningOptions> configure)
+MEMBER | AsiBackbone.Signing.ManagedKey.ManagedKeySigningServiceCollectionExtensions.AddAsiBackboneManagedKeySigning(Microsoft.Extensions.DependencyInjection.IServiceCollection,System.Action{AsiBackbone.Signing.ManagedKey.ManagedKeySigningOptions},System.Func{System.IServiceProvider,AsiBackbone.Signing.ManagedKey.IManagedKeySigningClient}) | public static IServiceCollection AddAsiBackboneManagedKeySigning(this IServiceCollection services, Action<ManagedKeySigningOptions> configure, Func<IServiceProvider, IManagedKeySigningClient> clientFactory)
+MEMBER | AsiBackbone.Signing.ManagedKey.ManagedKeySigningServiceCollectionExtensions.AddAsiBackboneManagedKeySigningForLocalValidation(Microsoft.Extensions.DependencyInjection.IServiceCollection,System.Action{AsiBackbone.Signing.ManagedKey.ManagedKeySigningOptions}) | public static IServiceCollection AddAsiBackboneManagedKeySigningForLocalValidation(this IServiceCollection services, Action<ManagedKeySigningOptions> configure)
+MEMBER | AsiBackbone.Signing.ManagedKey.ManagedKeySigningServiceCollectionExtensions.AddAsiBackboneManagedKeySigningForLocalValidation(Microsoft.Extensions.DependencyInjection.IServiceCollection,System.Action{AsiBackbone.Signing.ManagedKey.ManagedKeySigningOptions},System.Func{System.IServiceProvider,AsiBackbone.Signing.ManagedKey.IManagedKeySigningClient}) | public static IServiceCollection AddAsiBackboneManagedKeySigningForLocalValidation(this IServiceCollection services, Action<ManagedKeySigningOptions> configure, Func<IServiceProvider, IManagedKeySigningClient> clientFactory)
+TYPE | AsiBackbone.Signing.ManagedKey.IManagedKeySigningClient | public interface IManagedKeySigningClient
+TYPE | AsiBackbone.Signing.ManagedKey.ManagedKeySignRequest | public sealed class ManagedKeySignRequest
+TYPE | AsiBackbone.Signing.ManagedKey.ManagedKeySignResult | public sealed class ManagedKeySignResult
+TYPE | AsiBackbone.Signing.ManagedKey.ManagedKeySigningBuilderExtensions | public static class ManagedKeySigningBuilderExtensions
+TYPE | AsiBackbone.Signing.ManagedKey.ManagedKeySigningException | public sealed class ManagedKeySigningException : Exception, ISerializable
+TYPE | AsiBackbone.Signing.ManagedKey.ManagedKeySigningOptions | public sealed class ManagedKeySigningOptions
+TYPE | AsiBackbone.Signing.ManagedKey.ManagedKeySigningService | public sealed class ManagedKeySigningService : IAsiBackboneSigningService
+TYPE | AsiBackbone.Signing.ManagedKey.ManagedKeySigningServiceCollectionExtensions | public static class ManagedKeySigningServiceCollectionExtensions

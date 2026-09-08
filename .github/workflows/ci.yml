@@ -103,6 +103,13 @@ jobs:
       - name: Restore .NET tools
         run: dotnet tool restore
 
+      - name: Build DocFX site for public API baseline
+        run: dotnet tool run docfx -- docs/docfx.json
+
+      - name: Validate stable public API baseline
+        shell: pwsh
+        run: ./scripts/Validate-PublicApiBaseline.ps1
+
       - name: Test with coverage gate
         shell: pwsh
         run: >

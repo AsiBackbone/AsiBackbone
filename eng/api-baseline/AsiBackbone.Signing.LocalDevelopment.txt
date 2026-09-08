@@ -1,0 +1,32 @@
+# AsiBackbone stable public API baseline
+# Baseline release: 5.0.0
+# Assembly: AsiBackbone.Signing.LocalDevelopment.dll
+# Format: KIND | UID | C# declaration (or enum field display)
+# Update only after explicit API/SemVer review.
+
+MEMBER | AsiBackbone.Signing.LocalDevelopment.LocalDevelopmentSigningBuilderExtensions.UseLocalDevelopmentSigning(AsiBackbone.DependencyInjection.IAsiBackboneBuilder) | public static IAsiBackboneBuilder UseLocalDevelopmentSigning(this IAsiBackboneBuilder builder)
+MEMBER | AsiBackbone.Signing.LocalDevelopment.LocalDevelopmentSigningBuilderExtensions.UseLocalDevelopmentSigning(AsiBackbone.DependencyInjection.IAsiBackboneBuilder,AsiBackbone.Signing.LocalDevelopment.LocalDevelopmentSigningOptions) | public static IAsiBackboneBuilder UseLocalDevelopmentSigning(this IAsiBackboneBuilder builder, LocalDevelopmentSigningOptions options)
+MEMBER | AsiBackbone.Signing.LocalDevelopment.LocalDevelopmentSigningOptions.AllowInProduction | public bool AllowInProduction { get; set; }
+MEMBER | AsiBackbone.Signing.LocalDevelopment.LocalDevelopmentSigningOptions.Create(System.String,System.String,System.String,System.String,System.Int32,System.Boolean,System.Boolean,System.String) | public static LocalDevelopmentSigningOptions Create(string? providerName = null, string? keyId = null, string? keyVersion = null, string? signatureAlgorithm = null, int keySizeBits = 2048, bool returnUnsignedOnFailure = true, bool allowInProduction = false, string? environmentName = null)
+MEMBER | AsiBackbone.Signing.LocalDevelopment.LocalDevelopmentSigningOptions.DefaultKeyId | public const string DefaultKeyId = "local-dev-key"
+MEMBER | AsiBackbone.Signing.LocalDevelopment.LocalDevelopmentSigningOptions.DefaultKeySizeBits | public const int DefaultKeySizeBits = 2048
+MEMBER | AsiBackbone.Signing.LocalDevelopment.LocalDevelopmentSigningOptions.DefaultKeyVersion | public const string DefaultKeyVersion = "dev"
+MEMBER | AsiBackbone.Signing.LocalDevelopment.LocalDevelopmentSigningOptions.DefaultProviderName | public const string DefaultProviderName = "local-development"
+MEMBER | AsiBackbone.Signing.LocalDevelopment.LocalDevelopmentSigningOptions.DefaultSignatureAlgorithm | public const string DefaultSignatureAlgorithm = "RSASSA-PSS-SHA256-LOCAL-DEV"
+MEMBER | AsiBackbone.Signing.LocalDevelopment.LocalDevelopmentSigningOptions.EnvironmentName | public string? EnvironmentName { get; set; }
+MEMBER | AsiBackbone.Signing.LocalDevelopment.LocalDevelopmentSigningOptions.KeyId | public string KeyId { get; set; }
+MEMBER | AsiBackbone.Signing.LocalDevelopment.LocalDevelopmentSigningOptions.KeySizeBits | public int KeySizeBits { get; set; }
+MEMBER | AsiBackbone.Signing.LocalDevelopment.LocalDevelopmentSigningOptions.KeyVersion | public string KeyVersion { get; set; }
+MEMBER | AsiBackbone.Signing.LocalDevelopment.LocalDevelopmentSigningOptions.MinimumKeySizeBits | public const int MinimumKeySizeBits = 2048
+MEMBER | AsiBackbone.Signing.LocalDevelopment.LocalDevelopmentSigningOptions.ProviderName | public string ProviderName { get; set; }
+MEMBER | AsiBackbone.Signing.LocalDevelopment.LocalDevelopmentSigningOptions.ReturnUnsignedOnFailure | public bool ReturnUnsignedOnFailure { get; set; }
+MEMBER | AsiBackbone.Signing.LocalDevelopment.LocalDevelopmentSigningOptions.SignatureAlgorithm | public string SignatureAlgorithm { get; set; }
+MEMBER | AsiBackbone.Signing.LocalDevelopment.LocalDevelopmentSigningOptions.Validate | public void Validate()
+MEMBER | AsiBackbone.Signing.LocalDevelopment.LocalDevelopmentSigningService.#ctor | public LocalDevelopmentSigningService()
+MEMBER | AsiBackbone.Signing.LocalDevelopment.LocalDevelopmentSigningService.#ctor(AsiBackbone.Signing.LocalDevelopment.LocalDevelopmentSigningOptions) | public LocalDevelopmentSigningService(LocalDevelopmentSigningOptions options)
+MEMBER | AsiBackbone.Signing.LocalDevelopment.LocalDevelopmentSigningService.Dispose | public void Dispose()
+MEMBER | AsiBackbone.Signing.LocalDevelopment.LocalDevelopmentSigningService.SignAsync(AsiBackbone.Core.Signing.SigningRequest,System.Threading.CancellationToken) | public ValueTask<SigningResult> SignAsync(SigningRequest request, CancellationToken cancellationToken = default)
+MEMBER | AsiBackbone.Signing.LocalDevelopment.LocalDevelopmentSigningService.VerifyAsync(AsiBackbone.Core.Signing.SignatureVerificationRequest,System.Threading.CancellationToken) | public ValueTask<SignatureVerificationResult> VerifyAsync(SignatureVerificationRequest request, CancellationToken cancellationToken = default)
+TYPE | AsiBackbone.Signing.LocalDevelopment.LocalDevelopmentSigningBuilderExtensions | public static class LocalDevelopmentSigningBuilderExtensions
+TYPE | AsiBackbone.Signing.LocalDevelopment.LocalDevelopmentSigningOptions | public sealed class LocalDevelopmentSigningOptions
+TYPE | AsiBackbone.Signing.LocalDevelopment.LocalDevelopmentSigningService | public sealed class LocalDevelopmentSigningService : IAsiBackboneSigningService, IAsiBackboneSignatureVerificationService, IDisposable

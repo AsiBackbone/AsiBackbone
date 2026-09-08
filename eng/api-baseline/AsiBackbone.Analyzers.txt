@@ -1,0 +1,15 @@
+# AsiBackbone stable public API baseline
+# Baseline release: 5.0.0
+# Assembly: AsiBackbone.Analyzers.dll
+# Format: KIND | UID | C# declaration (or enum field display)
+# Update only after explicit API/SemVer review.
+
+MEMBER | AsiBackbone.Analyzers.GovernanceArtifactPersistenceAnalyzer.DiagnosticId | public const string DiagnosticId = "ASIB001"
+MEMBER | AsiBackbone.Analyzers.GovernanceArtifactPersistenceAnalyzer.Initialize(Microsoft.CodeAnalysis.Diagnostics.AnalysisContext) | public override void Initialize(AnalysisContext context)
+MEMBER | AsiBackbone.Analyzers.GovernanceArtifactPersistenceAnalyzer.SupportedDiagnostics | public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; }
+MEMBER | AsiBackbone.Analyzers.LocalDevelopmentSigningProductionAnalyzer.DiagnosticId | public const string DiagnosticId = "ASIB002"
+MEMBER | AsiBackbone.Analyzers.LocalDevelopmentSigningProductionAnalyzer.Initialize(Microsoft.CodeAnalysis.Diagnostics.AnalysisContext) | public override void Initialize(AnalysisContext context)
+MEMBER | AsiBackbone.Analyzers.LocalDevelopmentSigningProductionAnalyzer.SupportedDiagnostics | public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; }
+MEMBER | AsiBackbone.Analyzers.LocalDevelopmentSigningProductionAnalyzer.UnguardedDiagnosticId | public const string UnguardedDiagnosticId = "ASIB003"
+TYPE | AsiBackbone.Analyzers.GovernanceArtifactPersistenceAnalyzer | [DiagnosticAnalyzer("C#", new string[] { })] public sealed class GovernanceArtifactPersistenceAnalyzer : DiagnosticAnalyzer
+TYPE | AsiBackbone.Analyzers.LocalDevelopmentSigningProductionAnalyzer | [DiagnosticAnalyzer("C#", new string[] { })] public sealed class LocalDevelopmentSigningProductionAnalyzer : DiagnosticAnalyzer

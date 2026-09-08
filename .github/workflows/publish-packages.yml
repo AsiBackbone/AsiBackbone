@@ -92,6 +92,10 @@ jobs:
       - name: Build DocFX site
         run: dotnet tool run docfx -- docs/docfx.json
 
+      - name: Validate stable public API baseline
+        shell: pwsh
+        run: ./scripts/Validate-PublicApiBaseline.ps1
+
       - name: Pack packages
         shell: bash
         run: |

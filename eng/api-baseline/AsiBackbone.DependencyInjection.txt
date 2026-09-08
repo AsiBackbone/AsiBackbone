@@ -1,0 +1,13 @@
+# AsiBackbone stable public API baseline
+# Baseline release: 5.0.0
+# Assembly: AsiBackbone.DependencyInjection.dll
+# Format: KIND | UID | C# declaration (or enum field display)
+# Update only after explicit API/SemVer review.
+
+MEMBER | AsiBackbone.DependencyInjection.AsiBackboneBuilder.#ctor(Microsoft.Extensions.DependencyInjection.IServiceCollection) | public AsiBackboneBuilder(IServiceCollection services)
+MEMBER | AsiBackbone.DependencyInjection.AsiBackboneBuilder.Services | public IServiceCollection Services { get; }
+MEMBER | AsiBackbone.DependencyInjection.AsiBackboneServiceCollectionExtensions.AddAsiBackbone(Microsoft.Extensions.DependencyInjection.IServiceCollection,System.Action{AsiBackbone.DependencyInjection.IAsiBackboneBuilder}) | public static IServiceCollection AddAsiBackbone(this IServiceCollection services, Action<IAsiBackboneBuilder> configure)
+MEMBER | AsiBackbone.DependencyInjection.IAsiBackboneBuilder.Services | IServiceCollection Services { get; }
+TYPE | AsiBackbone.DependencyInjection.AsiBackboneBuilder | public sealed class AsiBackboneBuilder : IAsiBackboneBuilder
+TYPE | AsiBackbone.DependencyInjection.AsiBackboneServiceCollectionExtensions | public static class AsiBackboneServiceCollectionExtensions
+TYPE | AsiBackbone.DependencyInjection.IAsiBackboneBuilder | public interface IAsiBackboneBuilder

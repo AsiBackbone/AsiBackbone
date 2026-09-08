@@ -22,6 +22,14 @@ The compatibility promise applies to:
 
 The promise does not mean implementation internals will never change. Internal code, private members, tests, documentation wording, samples, and non-public implementation details may change in minor or patch releases when the public contract remains compatible.
 
+## Automated public API baseline gate
+
+Stable managed package APIs are protected by committed baselines under `eng/api-baseline/`. CI builds the DocFX managed-reference surface and runs `./scripts/Validate-PublicApiBaseline.ps1`; an unreviewed public addition, removal, enum-value change, or signature/declaration change fails the gate.
+
+The baseline update is intentionally reviewable in source control. For an approved API change, classify the SemVer impact first, inspect the failing baseline diff, then run `./scripts/Validate-PublicApiBaseline.ps1 -Update` and commit the resulting `eng/api-baseline` changes in the same pull request. Updating the baseline does not waive the versioning rules: additive stable API requires at least a minor release, while a breaking stable API change requires a major release and migration guidance.
+
+`AsiBackbone.Templates` is excluded from the managed-assembly baseline because it is a content-only `dotnet new` package; its released contract remains protected by template smoke validation. The complete included/excluded surface and local workflow are documented in [API Baseline and Architecture Boundary Checks](api-baseline-and-boundary-checks.md).
+
 ## Stable package scope by release
 
 Stable compatibility is package-specific. A package becomes part of the stable contract when it is released as a stable package and documented as part of the stable package family.
@@ -126,6 +134,7 @@ Expected stable-line behavior:
 | `3.2.2` | `3.2.2` | `3.0.0.0` | `3.2.2.0` | `3.2.2+...` |
 | `3.2.3` | `3.2.3` | `3.0.0.0` | `3.2.3.0` | `3.2.3+...` |
 | `4.0.0` | `4.0.0` | `4.0.0.0` | `4.0.0.0` | `4.0.0+...` |
+| `5.0.0` | `5.0.0` | `5.0.0.0` | `5.0.0.0` | `5.0.0+...` |
 
 Before cutting stable releases, release validation should verify that `AssemblyVersion`, `FileVersion`, `InformationalVersion`, package metadata, release notes, and repository tags match this policy.
 
@@ -139,7 +148,7 @@ Additive artifact fields are normally acceptable in a compatible minor release w
 
 ## Provider and future package guidance
 
-Released provider packages have their own stable contract within the compatible `4.x` line once they are published as stable packages. Documentation should state whether each package is stable, preview, experimental, design-only, strategy-only, sample-only, or host-owned integration guidance.
+Released provider packages have their own stable contract within the compatible `5.x` line once they are published as stable packages. Documentation should state whether each package is stable, preview, experimental, design-only, strategy-only, sample-only, or host-owned integration guidance.
 
 ## Release readiness checklist reference
 
@@ -147,6 +156,7 @@ Before cutting a stable release or stable package-family expansion, the release 
 
 - the stable package list is identified;
 - public APIs for stable packages are reviewed for naming, namespace, dependency direction, and extension-point clarity;
+- the committed public API baseline matches generated DocFX output, and any intentional baseline update is accompanied by an explicit SemVer classification;
 - breaking changes found during review are resolved before release or captured for a future major version;
 - stable serialized artifacts have documented schema-version behavior;
 - the `AssemblyVersion` strategy is resolved and reflected in build metadata;
@@ -156,6 +166,7 @@ Before cutting a stable release or stable package-family expansion, the release 
 
 ## Related documentation
 
+- [API Baseline and Architecture Boundary Checks](api-baseline-and-boundary-checks.md)
 - [4.0.0 Release Notes](release-notes-400.md)
 - [5.0.0 Release Readiness Record](release-readiness-500.md)
 - [5.0.0 Consumer Verification Guide](consumer-verification-500.md)
