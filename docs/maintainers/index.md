@@ -13,6 +13,7 @@ These records are public for traceability, but they are not part of the normal c
 
 ## Quality and engineering evidence
 
+- [Repository Host Security Controls](../articles/repository-host-security-controls.md)
 - [Performance Benchmark Baseline](../articles/performance-benchmark-baseline.md)
 - [Policy Evaluator Allocation Review](../articles/policy-evaluator-allocation-review.md)
 - [EF Core Outbox Bulk-Claim Performance Evaluation](../articles/efcore-outbox-bulk-claim-evaluation.md)

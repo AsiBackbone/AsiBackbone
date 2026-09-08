@@ -107,6 +107,8 @@
 
 - name: Security & Operations
   items:
+    - name: Repository Host Security Controls
+      href: repository-host-security-controls.md
     - name: "Production Hardening: Evaluator and Outbox"
       href: production-hardening-evaluator-and-outbox.md
     - name: Production Wording and Stable Signing Boundaries
