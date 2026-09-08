@@ -48,6 +48,22 @@ The expected best-effort posture is:
 
 Please avoid sending repeated public comments while a sensitive report is being reviewed.
 
+## Advisory distribution and downstream notification
+
+Publishing a repository security advisory is the public disclosure step, but it is not by itself proof that downstream package-consumer signals are active. GitHub reviews published repository advisories for inclusion in the global GitHub Advisory Database, and [GitHub documents that this review can take up to 72 hours](https://docs.github.com/en/code-security/concepts/vulnerability-reporting-and-management/repository-security-advisories).
+
+For a security release, the maintainer should:
+
+1. Publish fixed packages before publishing the corresponding repository advisories.
+2. Confirm each advisory identifies the supported ecosystem/package, affected range, and fixed version accurately.
+3. Run `./scripts/Manage-SecurityAdvisoryDistribution.ps1` after publication and again after the documented review window.
+4. Treat a missing global entry inside the review window as pending curation rather than as proof of failed submission.
+5. If a published advisory remains absent after the review window, review the advisory metadata and use the script's explicit `-RequestMissingCves` path when a GitHub-issued CVE is appropriate. Use `-WhatIf` before requesting CVEs.
+6. Continue checking until each published advisory resolves from the global advisory endpoint. Dependabot, NuGet vulnerability metadata, and `dotnet list package --vulnerable` should not be described as carrying the advisory until that downstream state is observed.
+7. Use NuGet package deprecation independently when affected package versions need a direct package-registry warning; deprecation does not replace advisory distribution and advisory distribution does not replace deprecation.
+
+The CVE-request path requires an authenticated repository administrator or security manager, or a token with "Repository security advisories" write permission. The script uses the existing `gh` authentication context and does not store a publishing or advisory-management credential in the repository.
+
 ## Project security boundaries
 
 AsiBackbone provides governance-oriented building blocks and host integration seams. It does **not** provide end-to-end production security, compliance, or legal assurance by itself.

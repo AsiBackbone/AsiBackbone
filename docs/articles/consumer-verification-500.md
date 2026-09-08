@@ -86,6 +86,21 @@ scheme, so the scaffold refuses callers until its owner adds one.
 repository, including `GHSA-q63q-xcvp-chv8` (critical) and
 `GHSA-p6pw-5gr3-xrr7` (high). Each records an affected range of `<= 4.0.0`.
 
+As of 2026-09-08, those repository advisories had not yet appeared in the
+global GitHub Advisory Database. GitHub documents that repository-advisory
+review for global inclusion can take up to 72 hours. Until a global entry is
+observable, the absence of a Dependabot alert, NuGet vulnerability banner, or
+`dotnet list package --vulnerable` result must not be interpreted as evidence
+that `4.0.0` or an earlier affected version is safe. Repository advisories and
+the `5.0.0` security-release guidance remain the authoritative project notice
+during that curation window.
+
+Maintainers can audit the distribution state with:
+
+```powershell
+./scripts/Manage-SecurityAdvisoryDistribution.ps1
+```
+
 Consumers who cannot upgrade immediately should apply the host mitigation each
 advisory describes: reconstruct the canonical payload with
 `CanonicalPayloadBuilder`, recompute the hash with
