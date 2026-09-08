@@ -45,8 +45,21 @@ function Invoke-GitHubApi {
             'X-GitHub-Api-Version: 2022-11-28'
         ) + $Arguments
 
-        $output = @(& gh api @apiArguments 2> $stderrPath)
-        $exitCode = $LASTEXITCODE
+        # Windows PowerShell can promote native stderr to a NativeCommandError
+        # when ErrorActionPreference is Stop. That would terminate here before
+        # AllowNotFound can inspect gh's exit code and captured 404 response.
+        # Keep the strict preference for the rest of the script, but allow this
+        # native command to return normally so its result can be classified.
+        $previousErrorActionPreference = $ErrorActionPreference
+        try {
+            $ErrorActionPreference = 'Continue'
+            $output = @(& gh api @apiArguments 2> $stderrPath)
+            $exitCode = $LASTEXITCODE
+        }
+        finally {
+            $ErrorActionPreference = $previousErrorActionPreference
+        }
+
         $stderr = if (Test-Path -LiteralPath $stderrPath) {
             Get-Content -LiteralPath $stderrPath -Raw
         }
