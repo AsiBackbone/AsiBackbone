@@ -17,8 +17,9 @@ separate post-merge actions.
 
 ## Security disclosure coordination
 
-`5.0.0` is the fixed version for twelve draft security advisories, including
-`GHSA-q63q-xcvp-chv8` (critical) and `GHSA-p6pw-5gr3-xrr7` (high). Because
+At release-candidate time, `5.0.0` was the fixed version for twelve draft
+security advisories, including
+[`GHSA-q63q-xcvp-chv8`](https://github.com/AsiBackbone/AsiBackbone/security/advisories/GHSA-q63q-xcvp-chv8) (critical) and [`GHSA-p6pw-5gr3-xrr7`](https://github.com/AsiBackbone/AsiBackbone/security/advisories/GHSA-p6pw-5gr3-xrr7) (high). Because
 `4.0.0` is published and affected, disclosure and release must be sequenced
 together.
 
@@ -28,6 +29,30 @@ together.
 - [ ] The host mitigation for `4.0.0` and earlier is stated in each advisory.
 - [ ] The repository does not publicly describe an unfixed defect before the
       fixed packages are available.
+
+### Post-release advisory distribution follow-up
+
+The twelve advisories were published on 2026-09-07. On 2026-09-08 they were
+still repository-level advisories and did not yet resolve through the global
+GitHub Advisory Database endpoint. GitHub documents that global-database review
+can take up to 72 hours, so the first-day result is recorded as pending curation
+rather than treated as proof that the submission path has permanently failed.
+
+- [x] Publish the twelve repository advisories after `5.0.0` package availability.
+- [ ] Re-run `./scripts/Manage-SecurityAdvisoryDistribution.ps1` after the
+      documented review window.
+- [ ] For any advisory still absent after the review window, review its package
+      metadata and request a CVE where appropriate using the explicit
+      `-RequestMissingCves` path.
+- [ ] Continue verification until every published GHSA resolves through the
+      global advisory endpoint.
+- [ ] Track NuGet deprecation separately because it is an independent consumer
+      notification path.
+
+Global-advisory distribution is tracked in
+[issue #741](https://github.com/AsiBackbone/AsiBackbone/issues/741). Direct
+NuGet deprecation of affected package versions is tracked independently in
+[issue #742](https://github.com/AsiBackbone/AsiBackbone/issues/742).
 
 ## Version and compatibility
 
@@ -108,6 +133,9 @@ tests detect the defect rather than only exercising the new code paths.
 6. Publish the twelve security advisories with `5.0.0` as the fixed version.
 7. Confirm documentation deployment.
 8. Run post-publication Source Link validation.
+9. Audit repository-advisory distribution after publication and after GitHub's
+   documented review window; request CVEs for still-unindexed advisories where
+   appropriate and continue verification until global entries are observable.
 
 ## Related documentation
 

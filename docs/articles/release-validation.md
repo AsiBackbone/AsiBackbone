@@ -36,6 +36,7 @@ Before cutting a stable release tag, confirm the following checks have passed on
 | Documentation link review | release readiness record, manual docs review | Confirms README links, DocFX navigation, release notes, migration guides, package documentation links, and GitHub Pages links point to current pages. |
 | External consumer smoke tests | external consumer smoke workflow, stable release validation | Confirms clean consumer-style projects can reference and wire the package family. |
 | Source Link metadata validation | manual post-publish validation | Confirms published NuGet packages include expected repository type, repository URL, and non-empty repository commit metadata. |
+| Security advisory distribution | manual post-publish validation | Confirms published repository advisories reach the global GitHub Advisory Database or remain explicitly tracked during GitHub's documented review window. |
 
 ## Canonical local release-hardening commands
 
@@ -106,6 +107,7 @@ For every stable release, the release readiness record should explicitly confirm
 - packaged README files are present and render acceptably in generated packages;
 - NuGet metadata is correct for package ID, version, description, tags, license, project URL, repository URL, repository type, and repository commit where available;
 - Source Link repository commit metadata is generated and has a post-publish validation plan when NuGet download is required to confirm it;
+- security releases include a post-publication plan to verify repository-advisory ingestion into the global GitHub Advisory Database and to track any advisories still pending curation;
 - package SBOM files and `sbom-manifest.json` are generated for produced `.nupkg` artifacts;
 - package and SBOM provenance artifacts are uploaded and attested where the workflow event supports attestation;
 - consumer verification guidance explains package-source, package ID, version, repository metadata, Source Link, SBOM/provenance, and deferred-signing checks without overstating signing or tamper-evidence;
@@ -126,6 +128,51 @@ To validate a version by hand — for example when re-checking an older release 
 ```
 
 This post-publish check downloads the published packages and confirms the expected repository type, repository URL, and non-empty repository commit metadata are present. Omitting `-Version` validates the version declared by `Directory.Build.props`. The same workflow can be dispatched manually with a `package_version` input to re-run the check against any published version; leaving that input empty skips it.
+
+## Security advisory distribution validation
+
+For a security release, repository-advisory publication is followed by a separate
+post-publication distribution check. GitHub reviews published repository
+advisories for the global GitHub Advisory Database and documents that curation
+can take up to 72 hours.
+
+Use the read-only audit first:
+
+```powershell
+./scripts/Manage-SecurityAdvisoryDistribution.ps1
+```
+
+The script enumerates every published repository advisory, checks whether each
+GHSA resolves through the global advisory endpoint, and reports whether a CVE
+request has already been submitted. Missing entries inside the default 72-hour
+window are warnings. Missing entries after that window fail the audit so the
+release has a durable follow-up signal instead of silently losing downstream
+Dependabot or package-feed notification.
+
+If an advisory is still absent after the review window, preview the CVE request
+path before making a mutation:
+
+```powershell
+./scripts/Manage-SecurityAdvisoryDistribution.ps1 -RequestMissingCves -WhatIf
+```
+
+Then, when a CVE request is appropriate:
+
+```powershell
+./scripts/Manage-SecurityAdvisoryDistribution.ps1 -RequestMissingCves
+```
+
+Requesting a CVE requires an authenticated repository administrator or security
+manager, or a token with "Repository security advisories" write permission. The
+script intentionally uses the maintainer's existing `gh` authentication context
+instead of introducing a privileged advisory-management token into GitHub
+Actions. A submitted CVE request is not treated as completed global
+distribution; rerun the audit until the global advisory endpoint resolves every
+published GHSA.
+
+NuGet deprecation is a separate notification control. When affected versions
+need a direct package-registry warning, track and perform that work independently
+rather than treating global advisory ingestion as a substitute.
 
 ## Deferred checks
 
