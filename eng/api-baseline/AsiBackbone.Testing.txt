@@ -60,8 +60,8 @@ TYPE | AsiBackbone.Testing.AsiBackboneTestHarnessEndpointCapabilityGrantValidato
 TYPE | AsiBackbone.Testing.AsiBackboneTestHarnessOptions | public sealed class AsiBackboneTestHarnessOptions
 TYPE | AsiBackbone.Testing.AsiBackboneTestHarnessPolicyEvaluator | public sealed class AsiBackboneTestHarnessPolicyEvaluator : IAsiBackbonePolicyEvaluator<AsiBackboneConstraintEvaluationContext>
 TYPE | AsiBackbone.Testing.AsiBackboneTestHarnessServiceCollectionExtensions | public static class AsiBackboneTestHarnessServiceCollectionExtensions
-TYPE | AsiBackbone.Testing.AsiBackboneTestingAssemblyMarker | public sealed class AsiBackboneTestingAssemblyMarker
 TYPE | AsiBackbone.Testing.AsiBackboneTestSigningService | public sealed class AsiBackboneTestSigningService : IAsiBackboneSigningService
+TYPE | AsiBackbone.Testing.AsiBackboneTestingAssemblyMarker | public sealed class AsiBackboneTestingAssemblyMarker
 TYPE | AsiBackbone.Testing.Contracts.AsiBackboneAuditSinkContract | public abstract class AsiBackboneAuditSinkContract
 TYPE | AsiBackbone.Testing.Contracts.AsiBackboneConstraintContract`1 | public abstract class AsiBackboneConstraintContract<TContext>
 TYPE | AsiBackbone.Testing.Contracts.AsiBackboneContractViolationException | public sealed class AsiBackboneContractViolationException : InvalidOperationException, ISerializable

@@ -155,7 +155,10 @@ function New-BaselineContent {
         ''
     )
 
-    $orderedRows = @($Rows) | Sort-Object -CaseSensitive
+    # API identifiers are machine-generated strings. Use ordinal sorting so
+    # baseline output is deterministic across Windows and Linux runners.
+    $orderedRows = [string[]]@($Rows)
+    [Array]::Sort($orderedRows, [System.StringComparer]::Ordinal)
     return (($header + $orderedRows) -join "`n") + "`n"
 }
 
@@ -180,22 +183,33 @@ foreach ($assembly in $stableAssemblies.Keys) {
     }
 
     if (-not (Test-Path -LiteralPath $baselinePath -PathType Leaf)) {
-        Write-Error "Public API baseline is missing: $baselinePath"
+        Write-Error "Public API baseline is missing: $baselinePath" -ErrorAction Continue
         $failed = $true
         continue
     }
 
     $expectedContent = [System.IO.File]::ReadAllText($baselinePath).Replace("`r`n", "`n")
-    if ($expectedContent -eq $actualContent) {
+    $expectedLines = [string[]]@($expectedContent -split "`n" | Where-Object { $_ -ne '' -and -not $_.StartsWith('#') })
+    $actualLines = [string[]]@($rowsByAssembly[$assembly])
+
+    # Baseline row order is presentation only. Compare the API surface as an
+    # ordinal set so a baseline generated on Windows validates identically on
+    # Linux. -Update still writes a deterministic ordinal ordering.
+    $expectedRows = [System.Collections.Generic.HashSet[string]]::new([System.StringComparer]::Ordinal)
+    foreach ($line in $expectedLines) {
+        [void]$expectedRows.Add($line)
+    }
+
+    if ($expectedRows.SetEquals($rowsByAssembly[$assembly])) {
         Write-Host "Public API baseline matched for $assembly ($($rowsByAssembly[$assembly].Count) API entries)."
         continue
     }
 
     $failed = $true
-    Write-Error "Unreviewed public API drift detected for $assembly."
+    Write-Error "Unreviewed public API drift detected for $assembly." -ErrorAction Continue
 
-    $expectedLines = $expectedContent -split "`n" | Where-Object { $_ -ne '' -and -not $_.StartsWith('#') }
-    $actualLines = $actualContent -split "`n" | Where-Object { $_ -ne '' -and -not $_.StartsWith('#') }
+    [Array]::Sort($expectedLines, [System.StringComparer]::Ordinal)
+    [Array]::Sort($actualLines, [System.StringComparer]::Ordinal)
     $differences = Compare-Object -ReferenceObject $expectedLines -DifferenceObject $actualLines
 
     foreach ($difference in ($differences | Select-Object -First 40)) {

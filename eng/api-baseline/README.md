@@ -41,7 +41,9 @@ dotnet tool run docfx -- docs/docfx.json
 
 Any public addition, removal, enum-value change, or signature/declaration change
 in an included assembly fails validation until the change is explicitly
-reviewed.
+reviewed. Baseline row order is not semantically significant during validation;
+`-Update` writes rows using ordinal ordering so generated files are deterministic
+across Windows and Linux runners.
 
 ## Intentional API changes
 

@@ -12,8 +12,8 @@ MEMBER | AsiBackbone.EntityFrameworkCore.Audit.EfCoreAuditLedgerStore.#ctor(Micr
 MEMBER | AsiBackbone.EntityFrameworkCore.Audit.EfCoreAuditLedgerStore.AppendAsync(AsiBackbone.Core.Audit.AuditLedgerRecord,System.Threading.CancellationToken) | public ValueTask<OperationResult<AuditLedgerRecord>> AppendAsync(AuditLedgerRecord record, CancellationToken cancellationToken = default)
 MEMBER | AsiBackbone.EntityFrameworkCore.Audit.EfCoreAuditLedgerStore.FindByActorIdAsync(System.String,System.Threading.CancellationToken) | public ValueTask<IReadOnlyList<AuditLedgerRecord>> FindByActorIdAsync(string actorId, CancellationToken cancellationToken = default)
 MEMBER | AsiBackbone.EntityFrameworkCore.Audit.EfCoreAuditLedgerStore.FindByCorrelationIdAsync(System.String,System.Threading.CancellationToken) | public ValueTask<IReadOnlyList<AuditLedgerRecord>> FindByCorrelationIdAsync(string correlationId, CancellationToken cancellationToken = default)
-MEMBER | AsiBackbone.EntityFrameworkCore.Audit.EfCoreAuditLedgerStore.FindByRecordedUtcRangeAsync(System.DateTimeOffset,System.DateTimeOffset,System.Threading.CancellationToken) | public ValueTask<IReadOnlyList<AuditLedgerRecord>> FindByRecordedUtcRangeAsync(DateTimeOffset recordedFromUtc, DateTimeOffset recordedToUtc, CancellationToken cancellationToken = default)
 MEMBER | AsiBackbone.EntityFrameworkCore.Audit.EfCoreAuditLedgerStore.FindByRecordIdAsync(System.String,System.Threading.CancellationToken) | public ValueTask<AuditLedgerRecord?> FindByRecordIdAsync(string recordId, CancellationToken cancellationToken = default)
+MEMBER | AsiBackbone.EntityFrameworkCore.Audit.EfCoreAuditLedgerStore.FindByRecordedUtcRangeAsync(System.DateTimeOffset,System.DateTimeOffset,System.Threading.CancellationToken) | public ValueTask<IReadOnlyList<AuditLedgerRecord>> FindByRecordedUtcRangeAsync(DateTimeOffset recordedFromUtc, DateTimeOffset recordedToUtc, CancellationToken cancellationToken = default)
 MEMBER | AsiBackbone.EntityFrameworkCore.Audit.EfCoreAuditLedgerStore.FindByTraceIdAsync(System.String,System.Threading.CancellationToken) | public ValueTask<IReadOnlyList<AuditLedgerRecord>> FindByTraceIdAsync(string traceId, CancellationToken cancellationToken = default)
 MEMBER | AsiBackbone.EntityFrameworkCore.Audit.EfCoreAuditResidueLifecycleStore.#ctor(Microsoft.EntityFrameworkCore.DbContext) | public EfCoreAuditResidueLifecycleStore(DbContext dbContext)
 MEMBER | AsiBackbone.EntityFrameworkCore.Audit.EfCoreAuditResidueLifecycleStore.AppendAsync(AsiBackbone.Core.Audit.AuditResidueLifecycleEvent,System.Threading.CancellationToken) | public ValueTask<AuditResidueLifecycleEvent> AppendAsync(AuditResidueLifecycleEvent lifecycleEvent, CancellationToken cancellationToken = default)
@@ -101,9 +101,9 @@ MEMBER | AsiBackbone.EntityFrameworkCore.Persistence.AsiBackboneAuditLedgerRecor
 MEMBER | AsiBackbone.EntityFrameworkCore.Persistence.AsiBackboneAuditLedgerRecordEntity.PolicyVersion | public string? PolicyVersion { get; set; }
 MEMBER | AsiBackbone.EntityFrameworkCore.Persistence.AsiBackboneAuditLedgerRecordEntity.PreviousRecordHash | public string? PreviousRecordHash { get; set; }
 MEMBER | AsiBackbone.EntityFrameworkCore.Persistence.AsiBackboneAuditLedgerRecordEntity.ReasonCodesJson | public string ReasonCodesJson { get; set; }
-MEMBER | AsiBackbone.EntityFrameworkCore.Persistence.AsiBackboneAuditLedgerRecordEntity.RecordedUtc | public DateTimeOffset RecordedUtc { get; set; }
 MEMBER | AsiBackbone.EntityFrameworkCore.Persistence.AsiBackboneAuditLedgerRecordEntity.RecordHash | public string? RecordHash { get; set; }
 MEMBER | AsiBackbone.EntityFrameworkCore.Persistence.AsiBackboneAuditLedgerRecordEntity.RecordId | public string RecordId { get; set; }
+MEMBER | AsiBackbone.EntityFrameworkCore.Persistence.AsiBackboneAuditLedgerRecordEntity.RecordedUtc | public DateTimeOffset RecordedUtc { get; set; }
 MEMBER | AsiBackbone.EntityFrameworkCore.Persistence.AsiBackboneAuditLedgerRecordEntity.RiskScore | public double? RiskScore { get; set; }
 MEMBER | AsiBackbone.EntityFrameworkCore.Persistence.AsiBackboneAuditLedgerRecordEntity.SchemaVersion | public string SchemaVersion { get; set; }
 MEMBER | AsiBackbone.EntityFrameworkCore.Persistence.AsiBackboneAuditLedgerRecordEntity.SignatureAlgorithm | public string? SignatureAlgorithm { get; set; }
@@ -127,10 +127,10 @@ MEMBER | AsiBackbone.EntityFrameworkCore.Persistence.AsiBackboneAuditResidueLife
 MEMBER | AsiBackbone.EntityFrameworkCore.Persistence.AsiBackboneAuditResidueLifecycleEventEntity.StageSequence | public int StageSequence { get; set; }
 MEMBER | AsiBackbone.EntityFrameworkCore.Persistence.AsiBackboneAuditResidueLifecycleEventEntity.TraceId | public string? TraceId { get; set; }
 MEMBER | AsiBackbone.EntityFrameworkCore.Persistence.AsiBackboneGovernanceOutboxEntryEntity.ClaimAttemptCount | public int ClaimAttemptCount { get; set; }
-MEMBER | AsiBackbone.EntityFrameworkCore.Persistence.AsiBackboneGovernanceOutboxEntryEntity.ClaimedUtc | public DateTimeOffset? ClaimedUtc { get; set; }
 MEMBER | AsiBackbone.EntityFrameworkCore.Persistence.AsiBackboneGovernanceOutboxEntryEntity.ClaimExpiresUtc | public DateTimeOffset? ClaimExpiresUtc { get; set; }
 MEMBER | AsiBackbone.EntityFrameworkCore.Persistence.AsiBackboneGovernanceOutboxEntryEntity.ClaimOwner | public string? ClaimOwner { get; set; }
 MEMBER | AsiBackbone.EntityFrameworkCore.Persistence.AsiBackboneGovernanceOutboxEntryEntity.ClaimToken | public string? ClaimToken { get; set; }
+MEMBER | AsiBackbone.EntityFrameworkCore.Persistence.AsiBackboneGovernanceOutboxEntryEntity.ClaimedUtc | public DateTimeOffset? ClaimedUtc { get; set; }
 MEMBER | AsiBackbone.EntityFrameworkCore.Persistence.AsiBackboneGovernanceOutboxEntryEntity.CreatedUtc | public DateTimeOffset CreatedUtc { get; set; }
 MEMBER | AsiBackbone.EntityFrameworkCore.Persistence.AsiBackboneGovernanceOutboxEntryEntity.DeadLetterReason | public string? DeadLetterReason { get; set; }
 MEMBER | AsiBackbone.EntityFrameworkCore.Persistence.AsiBackboneGovernanceOutboxEntryEntity.DeliveredUtc | public DateTimeOffset? DeliveredUtc { get; set; }

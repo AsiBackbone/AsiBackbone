@@ -190,9 +190,9 @@ MEMBER | AsiBackbone.Core.Audit.AuditLedgerRecord.PolicyScope | public string? P
 MEMBER | AsiBackbone.Core.Audit.AuditLedgerRecord.PolicyVersion | public string? PolicyVersion { get; }
 MEMBER | AsiBackbone.Core.Audit.AuditLedgerRecord.PreviousRecordHash | public string? PreviousRecordHash { get; }
 MEMBER | AsiBackbone.Core.Audit.AuditLedgerRecord.ReasonCodes | public IReadOnlyList<string> ReasonCodes { get; }
-MEMBER | AsiBackbone.Core.Audit.AuditLedgerRecord.RecordedUtc | public DateTimeOffset RecordedUtc { get; }
 MEMBER | AsiBackbone.Core.Audit.AuditLedgerRecord.RecordHash | public string? RecordHash { get; }
 MEMBER | AsiBackbone.Core.Audit.AuditLedgerRecord.RecordId | public string RecordId { get; }
+MEMBER | AsiBackbone.Core.Audit.AuditLedgerRecord.RecordedUtc | public DateTimeOffset RecordedUtc { get; }
 MEMBER | AsiBackbone.Core.Audit.AuditLedgerRecord.RiskScore | public double? RiskScore { get; }
 MEMBER | AsiBackbone.Core.Audit.AuditLedgerRecord.SchemaVersion | public string SchemaVersion { get; }
 MEMBER | AsiBackbone.Core.Audit.AuditLedgerRecord.SignatureAlgorithm | public string? SignatureAlgorithm { get; }
@@ -287,8 +287,8 @@ MEMBER | AsiBackbone.Core.Audit.AuditResidueLifecycleEvent.TraceId | public stri
 MEMBER | AsiBackbone.Core.Audit.IAsiBackboneAuditLedgerStore.AppendAsync(AsiBackbone.Core.Audit.AuditLedgerRecord,System.Threading.CancellationToken) | ValueTask<OperationResult<AuditLedgerRecord>> AppendAsync(AuditLedgerRecord record, CancellationToken cancellationToken = default)
 MEMBER | AsiBackbone.Core.Audit.IAsiBackboneAuditLedgerStore.FindByActorIdAsync(System.String,System.Threading.CancellationToken) | ValueTask<IReadOnlyList<AuditLedgerRecord>> FindByActorIdAsync(string actorId, CancellationToken cancellationToken = default)
 MEMBER | AsiBackbone.Core.Audit.IAsiBackboneAuditLedgerStore.FindByCorrelationIdAsync(System.String,System.Threading.CancellationToken) | ValueTask<IReadOnlyList<AuditLedgerRecord>> FindByCorrelationIdAsync(string correlationId, CancellationToken cancellationToken = default)
-MEMBER | AsiBackbone.Core.Audit.IAsiBackboneAuditLedgerStore.FindByRecordedUtcRangeAsync(System.DateTimeOffset,System.DateTimeOffset,System.Threading.CancellationToken) | ValueTask<IReadOnlyList<AuditLedgerRecord>> FindByRecordedUtcRangeAsync(DateTimeOffset recordedFromUtc, DateTimeOffset recordedToUtc, CancellationToken cancellationToken = default)
 MEMBER | AsiBackbone.Core.Audit.IAsiBackboneAuditLedgerStore.FindByRecordIdAsync(System.String,System.Threading.CancellationToken) | ValueTask<AuditLedgerRecord?> FindByRecordIdAsync(string recordId, CancellationToken cancellationToken = default)
+MEMBER | AsiBackbone.Core.Audit.IAsiBackboneAuditLedgerStore.FindByRecordedUtcRangeAsync(System.DateTimeOffset,System.DateTimeOffset,System.Threading.CancellationToken) | ValueTask<IReadOnlyList<AuditLedgerRecord>> FindByRecordedUtcRangeAsync(DateTimeOffset recordedFromUtc, DateTimeOffset recordedToUtc, CancellationToken cancellationToken = default)
 MEMBER | AsiBackbone.Core.Audit.IAsiBackboneAuditLedgerStore.FindByTraceIdAsync(System.String,System.Threading.CancellationToken) | ValueTask<IReadOnlyList<AuditLedgerRecord>> FindByTraceIdAsync(string traceId, CancellationToken cancellationToken = default)
 MEMBER | AsiBackbone.Core.Audit.IAsiBackboneAuditResidue.ActorDisplayName | string? ActorDisplayName { get; }
 MEMBER | AsiBackbone.Core.Audit.IAsiBackboneAuditResidue.ActorId | string ActorId { get; }
@@ -352,10 +352,10 @@ MEMBER | AsiBackbone.Core.CapabilityTokens.CapabilityGrantValidationOptions.Poli
 MEMBER | AsiBackbone.Core.CapabilityTokens.CapabilityGrantValidationOptions.PolicyVersion | public string? PolicyVersion { get; }
 MEMBER | AsiBackbone.Core.CapabilityTokens.CapabilityGrantValidationOptions.ProofPayloadOptions | public CanonicalPayloadOptions? ProofPayloadOptions { get; }
 MEMBER | AsiBackbone.Core.CapabilityTokens.CapabilityGrantValidationOptions.RequireAcknowledgmentReference | public bool RequireAcknowledgmentReference { get; }
-MEMBER | AsiBackbone.Core.CapabilityTokens.CapabilityGrantValidationOptions.RequiredProofHashAlgorithm | public string? RequiredProofHashAlgorithm { get; }
-MEMBER | AsiBackbone.Core.CapabilityTokens.CapabilityGrantValidationOptions.RequiredProofProvider | public string? RequiredProofProvider { get; }
 MEMBER | AsiBackbone.Core.CapabilityTokens.CapabilityGrantValidationOptions.RequireProof | public bool RequireProof { get; }
 MEMBER | AsiBackbone.Core.CapabilityTokens.CapabilityGrantValidationOptions.RequireUseCheck | public bool RequireUseCheck { get; }
+MEMBER | AsiBackbone.Core.CapabilityTokens.CapabilityGrantValidationOptions.RequiredProofHashAlgorithm | public string? RequiredProofHashAlgorithm { get; }
+MEMBER | AsiBackbone.Core.CapabilityTokens.CapabilityGrantValidationOptions.RequiredProofProvider | public string? RequiredProofProvider { get; }
 MEMBER | AsiBackbone.Core.CapabilityTokens.CapabilityGrantValidationOptions.ResourceBinding | public string? ResourceBinding { get; }
 MEMBER | AsiBackbone.Core.CapabilityTokens.CapabilityGrantValidationOptions.Scopes | public IReadOnlyList<string> Scopes { get; }
 MEMBER | AsiBackbone.Core.CapabilityTokens.CapabilityGrantValidationOptions.ValidationUtc | public DateTimeOffset? ValidationUtc { get; }
@@ -455,12 +455,12 @@ MEMBER | AsiBackbone.Core.Constraints.ConstraintEvaluationResult.Reasons | publi
 MEMBER | AsiBackbone.Core.Constraints.ConstraintEvaluationResult.Warning(AsiBackbone.Core.Results.OperationReason) | public static ConstraintEvaluationResult Warning(OperationReason reason)
 MEMBER | AsiBackbone.Core.Constraints.ConstraintEvaluationResult.Warning(System.Collections.Generic.IEnumerable{AsiBackbone.Core.Results.OperationReason}) | public static ConstraintEvaluationResult Warning(IEnumerable<OperationReason> reasons)
 MEMBER | AsiBackbone.Core.Constraints.ConstraintEvaluationResult.Warning(System.String,System.String) | public static ConstraintEvaluationResult Warning(string code, string message)
-MEMBER | AsiBackbone.Core.Constraints.IAsiBackboneConstraint`1.EvaluateAsync(`0,System.Threading.CancellationToken) | ValueTask<ConstraintEvaluationResult> EvaluateAsync(TContext context, CancellationToken cancellationToken = default)
-MEMBER | AsiBackbone.Core.Constraints.IAsiBackboneConstraint`1.Name | string Name { get; }
 MEMBER | AsiBackbone.Core.Constraints.IAsiBackboneConstraintEvaluationContext.CorrelationId | string? CorrelationId { get; }
 MEMBER | AsiBackbone.Core.Constraints.IAsiBackboneConstraintEvaluationContext.Metadata | IReadOnlyDictionary<string, string> Metadata { get; }
 MEMBER | AsiBackbone.Core.Constraints.IAsiBackboneConstraintEvaluationContext.PolicyHash | string? PolicyHash { get; }
 MEMBER | AsiBackbone.Core.Constraints.IAsiBackboneConstraintEvaluationContext.PolicyVersion | string? PolicyVersion { get; }
+MEMBER | AsiBackbone.Core.Constraints.IAsiBackboneConstraint`1.EvaluateAsync(`0,System.Threading.CancellationToken) | ValueTask<ConstraintEvaluationResult> EvaluateAsync(TContext context, CancellationToken cancellationToken = default)
+MEMBER | AsiBackbone.Core.Constraints.IAsiBackboneConstraint`1.Name | string Name { get; }
 MEMBER | AsiBackbone.Core.Decisions.GovernanceDecision.Allow(System.String,System.String,System.String,System.String) | public static GovernanceDecision Allow(string? correlationId = null, string? traceId = null, string? policyVersion = null, string? policyHash = null)
 MEMBER | AsiBackbone.Core.Decisions.GovernanceDecision.CanProceed | public bool CanProceed { get; }
 MEMBER | AsiBackbone.Core.Decisions.GovernanceDecision.CorrelationId | public string? CorrelationId { get; }
@@ -544,8 +544,8 @@ MEMBER | AsiBackbone.Core.Emissions.GovernanceEmissionResult.Metadata | public I
 MEMBER | AsiBackbone.Core.Emissions.GovernanceEmissionResult.Pending(System.String,System.Collections.Generic.IReadOnlyDictionary{System.String,System.String}) | public static GovernanceEmissionResult Pending(string? providerName = null, IReadOnlyDictionary<string, string>? metadata = null)
 MEMBER | AsiBackbone.Core.Emissions.GovernanceEmissionResult.ProviderName | public string? ProviderName { get; }
 MEMBER | AsiBackbone.Core.Emissions.GovernanceEmissionResult.ProviderRecordId | public string? ProviderRecordId { get; }
-MEMBER | AsiBackbone.Core.Emissions.GovernanceEmissionResult.RetryableFailure(AsiBackbone.Core.Emissions.GovernanceEmissionError,System.Nullable{System.DateTimeOffset},System.String,System.Collections.Generic.IReadOnlyDictionary{System.String,System.String}) | public static GovernanceEmissionResult RetryableFailure(GovernanceEmissionError error, DateTimeOffset? retryAfterUtc = null, string? providerName = null, IReadOnlyDictionary<string, string>? metadata = null)
 MEMBER | AsiBackbone.Core.Emissions.GovernanceEmissionResult.RetryAfterUtc | public DateTimeOffset? RetryAfterUtc { get; }
+MEMBER | AsiBackbone.Core.Emissions.GovernanceEmissionResult.RetryableFailure(AsiBackbone.Core.Emissions.GovernanceEmissionError,System.Nullable{System.DateTimeOffset},System.String,System.Collections.Generic.IReadOnlyDictionary{System.String,System.String}) | public static GovernanceEmissionResult RetryableFailure(GovernanceEmissionError error, DateTimeOffset? retryAfterUtc = null, string? providerName = null, IReadOnlyDictionary<string, string>? metadata = null)
 MEMBER | AsiBackbone.Core.Emissions.GovernanceEmissionResult.ShouldRetry | public bool ShouldRetry { get; }
 MEMBER | AsiBackbone.Core.Emissions.GovernanceEmissionResult.Status | public GovernanceEmissionStatus Status { get; }
 MEMBER | AsiBackbone.Core.Emissions.IAsiBackboneGovernanceEmitter.EmitAsync(AsiBackbone.Core.Emissions.GovernanceEmissionEnvelope,System.Threading.CancellationToken) | ValueTask<GovernanceEmissionResult> EmitAsync(GovernanceEmissionEnvelope envelope, CancellationToken cancellationToken = default)
@@ -650,8 +650,8 @@ MEMBER | AsiBackbone.Core.Integrity.AuditIntegrityLink.Append(AsiBackbone.Core.I
 MEMBER | AsiBackbone.Core.Integrity.AuditIntegrityLink.CanonicalizationVersion | public string CanonicalizationVersion { get; }
 MEMBER | AsiBackbone.Core.Integrity.AuditIntegrityLink.ChainId | public string ChainId { get; }
 MEMBER | AsiBackbone.Core.Integrity.AuditIntegrityLink.ComputeExpectedLinkHash | public string ComputeExpectedLinkHash()
-MEMBER | AsiBackbone.Core.Integrity.AuditIntegrityLink.CreatedUtc | public DateTimeOffset CreatedUtc { get; }
 MEMBER | AsiBackbone.Core.Integrity.AuditIntegrityLink.CreateGenesis(System.String,AsiBackbone.Core.Signing.CanonicalPayloadHash,System.DateTimeOffset,System.Collections.Generic.IReadOnlyDictionary{System.String,System.String}) | public static AuditIntegrityLink CreateGenesis(string chainId, CanonicalPayloadHash recordHash, DateTimeOffset createdUtc, IReadOnlyDictionary<string, string>? metadata = null)
+MEMBER | AsiBackbone.Core.Integrity.AuditIntegrityLink.CreatedUtc | public DateTimeOffset CreatedUtc { get; }
 MEMBER | AsiBackbone.Core.Integrity.AuditIntegrityLink.HashAlgorithm | public string HashAlgorithm { get; }
 MEMBER | AsiBackbone.Core.Integrity.AuditIntegrityLink.IsGenesis | public bool IsGenesis { get; }
 MEMBER | AsiBackbone.Core.Integrity.AuditIntegrityLink.LinkHash | public string LinkHash { get; }
@@ -746,9 +746,9 @@ MEMBER | AsiBackbone.Core.Outbox.AsiBackboneGovernanceOutboxOptions.MaxRetryAtte
 MEMBER | AsiBackbone.Core.Outbox.AsiBackboneGovernanceOutboxOptions.RetryDelay | public TimeSpan RetryDelay { get; set; }
 MEMBER | AsiBackbone.Core.Outbox.AsiBackboneGovernanceOutboxOptions.UseClaimLeases | public bool UseClaimLeases { get; set; }
 MEMBER | AsiBackbone.Core.Outbox.AsiBackboneGovernanceOutboxOptions.Validate | public void Validate()
-MEMBER | AsiBackbone.Core.Outbox.GovernanceOutboxClaim.ClaimedUtc | public DateTimeOffset ClaimedUtc { get; }
 MEMBER | AsiBackbone.Core.Outbox.GovernanceOutboxClaim.ClaimExpiresUtc | public DateTimeOffset ClaimExpiresUtc { get; }
 MEMBER | AsiBackbone.Core.Outbox.GovernanceOutboxClaim.ClaimToken | public string ClaimToken { get; }
+MEMBER | AsiBackbone.Core.Outbox.GovernanceOutboxClaim.ClaimedUtc | public DateTimeOffset ClaimedUtc { get; }
 MEMBER | AsiBackbone.Core.Outbox.GovernanceOutboxClaim.Create(AsiBackbone.Core.Outbox.GovernanceOutboxEntry,System.String,System.String,System.DateTimeOffset,System.DateTimeOffset) | public static GovernanceOutboxClaim Create(GovernanceOutboxEntry entry, string workerId, string claimToken, DateTimeOffset claimedUtc, DateTimeOffset claimExpiresUtc)
 MEMBER | AsiBackbone.Core.Outbox.GovernanceOutboxClaim.Entry | public GovernanceOutboxEntry Entry { get; }
 MEMBER | AsiBackbone.Core.Outbox.GovernanceOutboxClaim.IsExpired(System.DateTimeOffset) | public bool IsExpired(DateTimeOffset utcNow)
@@ -767,10 +767,10 @@ MEMBER | AsiBackbone.Core.Outbox.GovernanceOutboxClaimTransitionResult.IsApplied
 MEMBER | AsiBackbone.Core.Outbox.GovernanceOutboxClaimTransitionResult.Outcome | public GovernanceOutboxClaimTransitionOutcome Outcome { get; }
 MEMBER | AsiBackbone.Core.Outbox.GovernanceOutboxEntry.CanBeClaimed(System.DateTimeOffset) | public bool CanBeClaimed(DateTimeOffset utcNow)
 MEMBER | AsiBackbone.Core.Outbox.GovernanceOutboxEntry.ClaimAttemptCount | public int ClaimAttemptCount { get; }
-MEMBER | AsiBackbone.Core.Outbox.GovernanceOutboxEntry.ClaimedUtc | public DateTimeOffset? ClaimedUtc { get; }
 MEMBER | AsiBackbone.Core.Outbox.GovernanceOutboxEntry.ClaimExpiresUtc | public DateTimeOffset? ClaimExpiresUtc { get; }
 MEMBER | AsiBackbone.Core.Outbox.GovernanceOutboxEntry.ClaimOwner | public string? ClaimOwner { get; }
 MEMBER | AsiBackbone.Core.Outbox.GovernanceOutboxEntry.ClaimToken | public string? ClaimToken { get; }
+MEMBER | AsiBackbone.Core.Outbox.GovernanceOutboxEntry.ClaimedUtc | public DateTimeOffset? ClaimedUtc { get; }
 MEMBER | AsiBackbone.Core.Outbox.GovernanceOutboxEntry.Create(AsiBackbone.Core.Emissions.GovernanceEmissionEnvelope,System.String,System.Nullable{System.DateTimeOffset},System.Int32,System.Collections.Generic.IReadOnlyDictionary{System.String,System.String}) | public static GovernanceOutboxEntry Create(GovernanceEmissionEnvelope envelope, string? outboxEntryId = null, DateTimeOffset? createdUtc = null, int maxRetryCount = 5, IReadOnlyDictionary<string, string>? metadata = null)
 MEMBER | AsiBackbone.Core.Outbox.GovernanceOutboxEntry.CreatedUtc | public DateTimeOffset CreatedUtc { get; }
 MEMBER | AsiBackbone.Core.Outbox.GovernanceOutboxEntry.DeadLetterReason | public string? DeadLetterReason { get; }
@@ -873,8 +873,8 @@ MEMBER | AsiBackbone.Core.Signing.CanonicalArtifactTypes.GovernanceOutboxEntry |
 MEMBER | AsiBackbone.Core.Signing.CanonicalArtifactTypes.GovernedOperationExecutionReceipt | public const string GovernedOperationExecutionReceipt = "asibackbone.governed-operation-execution-receipt"
 MEMBER | AsiBackbone.Core.Signing.CanonicalPayload.ArtifactId | public string ArtifactId { get; }
 MEMBER | AsiBackbone.Core.Signing.CanonicalPayload.ArtifactType | public string ArtifactType { get; }
-MEMBER | AsiBackbone.Core.Signing.CanonicalPayload.CanonicalizationVersion | public string CanonicalizationVersion { get; }
 MEMBER | AsiBackbone.Core.Signing.CanonicalPayload.CanonicalJson | public string CanonicalJson { get; }
+MEMBER | AsiBackbone.Core.Signing.CanonicalPayload.CanonicalizationVersion | public string CanonicalizationVersion { get; }
 MEMBER | AsiBackbone.Core.Signing.CanonicalPayload.Create(System.String,System.String,System.String,System.String,System.Collections.Generic.IReadOnlyDictionary{System.String,System.Object}) | public static CanonicalPayload Create(string artifactType, string artifactId, string payloadSchemaVersion, string canonicalizationVersion, IReadOnlyDictionary<string, object?> content)
 MEMBER | AsiBackbone.Core.Signing.CanonicalPayload.Create(System.String,System.String,System.String,System.String,System.String,System.Collections.Generic.IReadOnlyDictionary{System.String,System.Object}) | public static CanonicalPayload Create(string artifactType, string artifactId, string payloadSchemaVersion, string canonicalizationVersion, string hashAlgorithm, IReadOnlyDictionary<string, object?> content)
 MEMBER | AsiBackbone.Core.Signing.CanonicalPayload.HashAlgorithm | public string HashAlgorithm { get; }
@@ -942,8 +942,8 @@ MEMBER | AsiBackbone.Core.Signing.SignedGovernanceArtifact`1.ArtifactId | public
 MEMBER | AsiBackbone.Core.Signing.SignedGovernanceArtifact`1.ArtifactType | public string ArtifactType { get; }
 MEMBER | AsiBackbone.Core.Signing.SignedGovernanceArtifact`1.CanonicalHash | public CanonicalPayloadHash CanonicalHash { get; }
 MEMBER | AsiBackbone.Core.Signing.SignedGovernanceArtifact`1.CanonicalPayload | public CanonicalPayload CanonicalPayload { get; }
-MEMBER | AsiBackbone.Core.Signing.SignedGovernanceArtifact`1.HashAlgorithm | public string HashAlgorithm { get; }
 MEMBER | AsiBackbone.Core.Signing.SignedGovernanceArtifact`1.HasNoSignature | public bool HasNoSignature { get; }
+MEMBER | AsiBackbone.Core.Signing.SignedGovernanceArtifact`1.HashAlgorithm | public string HashAlgorithm { get; }
 MEMBER | AsiBackbone.Core.Signing.SignedGovernanceArtifact`1.IsSigned | public bool IsSigned { get; }
 MEMBER | AsiBackbone.Core.Signing.SignedGovernanceArtifact`1.IsSigningReady | public bool IsSigningReady { get; }
 MEMBER | AsiBackbone.Core.Signing.SignedGovernanceArtifact`1.SigningHash | public string SigningHash { get; }
@@ -953,10 +953,10 @@ MEMBER | AsiBackbone.Core.Signing.SignedGovernanceArtifacts.Rehydrate``1(``0,Asi
 MEMBER | AsiBackbone.Core.Signing.SignedGovernanceArtifacts.SigningReady``1(``0,AsiBackbone.Core.Signing.CanonicalPayload,AsiBackbone.Core.Signing.CanonicalPayloadHash,System.Collections.Generic.IReadOnlyDictionary{System.String,System.String}) | public static SignedGovernanceArtifact<TArtifact> SigningReady<TArtifact>(TArtifact artifact, CanonicalPayload canonicalPayload, CanonicalPayloadHash canonicalHash, IReadOnlyDictionary<string, string>? metadata = null)
 MEMBER | AsiBackbone.Core.Signing.SignedGovernanceArtifacts.WithoutSignature``1(``0,AsiBackbone.Core.Signing.CanonicalPayload,AsiBackbone.Core.Signing.CanonicalPayloadHash) | public static SignedGovernanceArtifact<TArtifact> WithoutSignature<TArtifact>(TArtifact artifact, CanonicalPayload canonicalPayload, CanonicalPayloadHash canonicalHash)
 MEMBER | AsiBackbone.Core.Signing.SigningMetadata.Create(System.String,System.String,System.String,System.String,System.String,System.String,System.String,System.Nullable{System.DateTimeOffset},System.Collections.Generic.IReadOnlyDictionary{System.String,System.String}) | public static SigningMetadata Create(string? signingHash = null, string? hashAlgorithm = null, string? signature = null, string? signatureAlgorithm = null, string? keyId = null, string? keyVersion = null, string? provider = null, DateTimeOffset? signedUtc = null, IReadOnlyDictionary<string, string>? metadata = null)
-MEMBER | AsiBackbone.Core.Signing.SigningMetadata.HashAlgorithm | public string? HashAlgorithm { get; }
 MEMBER | AsiBackbone.Core.Signing.SigningMetadata.HasKeyReference | public bool HasKeyReference { get; }
 MEMBER | AsiBackbone.Core.Signing.SigningMetadata.HasMetadata | public bool HasMetadata { get; }
 MEMBER | AsiBackbone.Core.Signing.SigningMetadata.HasSignature | public bool HasSignature { get; }
+MEMBER | AsiBackbone.Core.Signing.SigningMetadata.HashAlgorithm | public string? HashAlgorithm { get; }
 MEMBER | AsiBackbone.Core.Signing.SigningMetadata.IsSigned | public bool IsSigned { get; }
 MEMBER | AsiBackbone.Core.Signing.SigningMetadata.KeyId | public string? KeyId { get; }
 MEMBER | AsiBackbone.Core.Signing.SigningMetadata.KeyVersion | public string? KeyVersion { get; }
@@ -968,8 +968,8 @@ MEMBER | AsiBackbone.Core.Signing.SigningMetadata.SignatureAlgorithm | public st
 MEMBER | AsiBackbone.Core.Signing.SigningMetadata.SignedUtc | public DateTimeOffset? SignedUtc { get; }
 MEMBER | AsiBackbone.Core.Signing.SigningMetadata.SigningHash | public string? SigningHash { get; }
 MEMBER | AsiBackbone.Core.Signing.SigningRequest.#ctor(System.String,System.String,System.String,System.String,System.String,System.Collections.Generic.IReadOnlyDictionary{System.String,System.String}) | public SigningRequest(string signingHash, string? hashAlgorithm = null, string? purpose = null, string? keyId = null, string? keyVersion = null, IReadOnlyDictionary<string, string>? metadata = null)
-MEMBER | AsiBackbone.Core.Signing.SigningRequest.HashAlgorithm | public string? HashAlgorithm { get; }
 MEMBER | AsiBackbone.Core.Signing.SigningRequest.HasMetadata | public bool HasMetadata { get; }
+MEMBER | AsiBackbone.Core.Signing.SigningRequest.HashAlgorithm | public string? HashAlgorithm { get; }
 MEMBER | AsiBackbone.Core.Signing.SigningRequest.KeyId | public string? KeyId { get; }
 MEMBER | AsiBackbone.Core.Signing.SigningRequest.KeyVersion | public string? KeyVersion { get; }
 MEMBER | AsiBackbone.Core.Signing.SigningRequest.Metadata | public IReadOnlyDictionary<string, string> Metadata { get; }
@@ -1074,8 +1074,8 @@ TYPE | AsiBackbone.Core.Classification.IAsiBackboneDlpFailurePolicyResolver | pu
 TYPE | AsiBackbone.Core.Constraints.AsiBackboneConstraintEvaluationContext | public sealed class AsiBackboneConstraintEvaluationContext : IAsiBackboneConstraintEvaluationContext
 TYPE | AsiBackbone.Core.Constraints.ConstraintEvaluationOutcome | public enum ConstraintEvaluationOutcome
 TYPE | AsiBackbone.Core.Constraints.ConstraintEvaluationResult | public sealed class ConstraintEvaluationResult
-TYPE | AsiBackbone.Core.Constraints.IAsiBackboneConstraint`1 | public interface IAsiBackboneConstraint<in TContext>
 TYPE | AsiBackbone.Core.Constraints.IAsiBackboneConstraintEvaluationContext | public interface IAsiBackboneConstraintEvaluationContext
+TYPE | AsiBackbone.Core.Constraints.IAsiBackboneConstraint`1 | public interface IAsiBackboneConstraint<in TContext>
 TYPE | AsiBackbone.Core.Decisions.GovernanceDecision | public sealed class GovernanceDecision
 TYPE | AsiBackbone.Core.Decisions.GovernanceDecisionOutcome | public enum GovernanceDecisionOutcome
 TYPE | AsiBackbone.Core.Emissions.GovernanceEmissionEnvelope | public sealed class GovernanceEmissionEnvelope
