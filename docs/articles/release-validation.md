@@ -2,7 +2,7 @@
 
 This article documents the reusable release-blocking validation path for stable release lines. The current released stable package family is `5.x`, with `5.0.0` as the current major release.
 
-The binary assembly identity for the `5.x` line is `4.0.0.0`.
+The binary assembly identity for the `5.x` line is `5.0.0.0`.
 
 In this software project, **ASI** means **Accountable Systems Infrastructure**. Release validation should confirm that the package family remains practical governance infrastructure and that implementation claims stay within the documented software boundary. See [Release Cadence and Readiness](release-cadence-and-readiness.md) for the release-stream and stabilization guidance that complements this checklist.
 
@@ -20,6 +20,7 @@ Before cutting a stable release tag, confirm the following checks have passed on
 | Locked restore | CI, stable release validation, package publish | Confirms committed lock files match the current package and project dependency graph. |
 | Build | CI, stable release validation, package publish | Confirms release projects compile in Release configuration. |
 | Public API XML documentation inventory | CI, release readiness record | Inventories `CS1591` gaps for selected public package projects while staged enforcement is phased in. |
+| Stable public API baseline | CI, stable release validation, package publish | Compares DocFX-derived stable managed package APIs with committed `eng/api-baseline` files and fails on unreviewed additions, removals, enum-value changes, or signature changes. |
 | Formatting | CI, stable release validation, package publish | Confirms source formatting is stable before release. |
 | Tests | CI, stable release validation, package publish | Confirms the solution test suite passes before packaging or publishing. |
 | Dependency vulnerability analysis | dependency review, OWASP Dependency-Check | Blocks newly introduced dependencies at moderate severity or higher and fails OWASP scans for findings with CVSS 7 or higher unless a reviewed suppression applies. |
@@ -60,16 +61,24 @@ The reviewed Debug exclusion allowlist is enforced by:
 ./scripts/Validate-DebugSolutionBuildCoverage.ps1
 ```
 
+The stable managed public API baseline is validated from DocFX output:
+
+```powershell
+dotnet tool restore
+dotnet tool run docfx -- docs/docfx.json
+./scripts/Validate-PublicApiBaseline.ps1
+```
+
 ## Release-blocking workflows
 
 The following workflows form the reusable gate for stable release candidates:
 
-- `CI` validates dependency review for pull requests, Debug solution build coverage, solution restore/build/test, public API XML documentation inventory, formatting, package creation, package SBOM generation, template package smoke validation, coverage output, and CodeQL analysis.
+- `CI` validates dependency review for pull requests, Debug solution build coverage, solution restore/build/test, public API XML documentation inventory, the stable public API baseline, formatting, package creation, package SBOM generation, template package smoke validation, coverage output, and CodeQL analysis.
 - `External Consumer Smoke Test` validates package-consumer wiring through the external consumer and stable package integration smoke scripts.
 - `OWASP Dependency-Check software composition analysis` restores with the SDK selected by `global.json`, publishes its reports, and fails when an unsuppressed dependency finding has CVSS 7 or higher.
 - `Publish Documentation` validates the DocFX build used for the documentation site.
-- `Stable Release Validation` provides a single release-candidate gate for version metadata, Debug solution build coverage, locked restore, build, formatting, tests, DocFX, package creation, generated package version validation, generated NuGet metadata validation, SBOM generation, template package smoke validation, smoke checks, and provenance handling where supported.
-- `Publish AsiBackbone Packages` repeats release-critical validation before package publish.
+- `Stable Release Validation` provides a single release-candidate gate for version metadata, Debug solution build coverage, locked restore, build, formatting, tests, DocFX, stable public API baseline validation, package creation, generated package version validation, generated NuGet metadata validation, SBOM generation, template package smoke validation, smoke checks, and provenance handling where supported.
+- `Publish AsiBackbone Packages` repeats release-critical validation, including the public API baseline, before package publish.
 
 ## Tagging rule
 
@@ -99,6 +108,14 @@ This check catches release-blocking NuGet metadata mistakes before package publi
 
 The staged policy is documented in [Public API XML Documentation](public-api-xml-documentation.md). Existing package projects may carry `AsiBackboneSuppressMissingXmlDocs=true` as a transitional, project-scoped baseline. New projects should not add that property unless the exception is documented.
 
+## Stable public API baseline validation
+
+`Validate-PublicApiBaseline.ps1` compares the DocFX-managed reference surface for the stable managed package assemblies with committed baselines under `eng/api-baseline/`. The gate runs in normal CI, Stable Release Validation, and the package-publish validation path.
+
+The `v5.0.0` managed-reference output is the initial `5.x` baseline. `AsiBackbone.Templates` is excluded because it is a content-only `dotnet new` package without a managed consumer assembly; template smoke tests remain its compatibility guard.
+
+An intentional baseline change must be classified under [API Compatibility and SemVer](api-compatibility-and-semver.md) before the baseline is regenerated. After reviewing the failed diff, maintainers may run `./scripts/Validate-PublicApiBaseline.ps1 -Update`, inspect `git diff -- eng/api-baseline`, and commit that reviewable baseline update in the same pull request as the API change. Baseline regeneration by itself does not authorize an additive change in a patch release or a breaking change in a minor release.
+
 ## Pre-release metadata and asset checklist
 
 For every stable release, the release readiness record should explicitly confirm:
@@ -112,6 +129,7 @@ For every stable release, the release readiness record should explicitly confirm
 - package and SBOM provenance artifacts are uploaded and attested where the workflow event supports attestation;
 - consumer verification guidance explains package-source, package ID, version, repository metadata, Source Link, SBOM/provenance, and deferred-signing checks without overstating signing or tamper-evidence;
 - public API XML documentation inventory is reviewed, and staged enforcement changes or intentional exceptions are documented;
+- the stable public API baseline matches, or an intentional baseline change is reviewed and classified for its SemVer impact;
 - Debug solution build coverage is reviewed so first-party package/test projects stay enabled for default local solution builds;
 - NuGet package signing status is checked against `SECURITY.md`, and release notes/readiness records state whether signing remains deferred or has an adopted signing and verification process;
 - README, DocFX navigation, release notes, migration notes, package README links, and GitHub Pages links are current;
@@ -185,6 +203,7 @@ NuGet package signing is currently a known open supply-chain readiness item. Unt
 ## Related documentation
 
 - [Release Cadence and Readiness](release-cadence-and-readiness.md)
+- [API Baseline and Architecture Boundary Checks](api-baseline-and-boundary-checks.md)
 - [Public API XML Documentation](public-api-xml-documentation.md)
 - [Supply-Chain Provenance and Package SBOMs](supply-chain-provenance.md)
 - [4.0.0 Consumer Verification Guide](consumer-verification-400.md)

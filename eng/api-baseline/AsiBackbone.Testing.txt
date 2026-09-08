@@ -1,0 +1,71 @@
+# AsiBackbone stable public API baseline
+# Baseline release: 5.0.0
+# Assembly: AsiBackbone.Testing.dll
+# Format: KIND | UID | C# declaration (or enum field display)
+# Update only after explicit API/SemVer review.
+
+MEMBER | AsiBackbone.Testing.AsiBackboneTestAuditSink.Clear | public void Clear()
+MEMBER | AsiBackbone.Testing.AsiBackboneTestAuditSink.Entries | public IReadOnlyList<IAsiBackboneAuditResidue> Entries { get; }
+MEMBER | AsiBackbone.Testing.AsiBackboneTestAuditSink.WriteAsync(AsiBackbone.Core.Audit.IAsiBackboneAuditResidue,System.Threading.CancellationToken) | public ValueTask WriteAsync(IAsiBackboneAuditResidue residue, CancellationToken cancellationToken = default)
+MEMBER | AsiBackbone.Testing.AsiBackboneTestHarnessEndpointCapabilityGrantValidator.#ctor(AsiBackbone.Testing.AsiBackboneTestHarnessOptions) | public AsiBackboneTestHarnessEndpointCapabilityGrantValidator(AsiBackboneTestHarnessOptions options)
+MEMBER | AsiBackbone.Testing.AsiBackboneTestHarnessEndpointCapabilityGrantValidator.ValidateAsync(Microsoft.AspNetCore.Http.HttpContext,AsiBackbone.AspNetCore.Endpoints.AsiBackboneEndpointGovernanceDescriptor,AsiBackbone.Core.Decisions.GovernanceDecision,System.Threading.CancellationToken) | public ValueTask<GovernanceDecision> ValidateAsync(HttpContext httpContext, AsiBackboneEndpointGovernanceDescriptor descriptor, GovernanceDecision currentDecision, CancellationToken cancellationToken = default)
+MEMBER | AsiBackbone.Testing.AsiBackboneTestHarnessOptions.AllowAllPolicies | public AsiBackboneTestHarnessOptions AllowAllPolicies()
+MEMBER | AsiBackbone.Testing.AsiBackboneTestHarnessOptions.AllowCapabilityGrants | public AsiBackboneTestHarnessOptions AllowCapabilityGrants()
+MEMBER | AsiBackbone.Testing.AsiBackboneTestHarnessOptions.DefaultCapabilityGrantDecision | public GovernanceDecision DefaultCapabilityGrantDecision { get; }
+MEMBER | AsiBackbone.Testing.AsiBackboneTestHarnessOptions.DefaultPolicyDecision | public GovernanceDecision DefaultPolicyDecision { get; }
+MEMBER | AsiBackbone.Testing.AsiBackboneTestHarnessOptions.DenyAllPolicies(System.String,System.String) | public AsiBackboneTestHarnessOptions DenyAllPolicies(string code = "test_harness.policy_denied", string message = "Denied by the AsiBackbone test harness.")
+MEMBER | AsiBackbone.Testing.AsiBackboneTestHarnessOptions.DenyCapabilityGrants(System.String,System.String) | public AsiBackboneTestHarnessOptions DenyCapabilityGrants(string code = "test_harness.capability_denied", string message = "Capability grant denied by the AsiBackbone test harness.")
+MEMBER | AsiBackbone.Testing.AsiBackboneTestHarnessOptions.PolicyResults | public IReadOnlyDictionary<string, GovernanceDecision> PolicyResults { get; }
+MEMBER | AsiBackbone.Testing.AsiBackboneTestHarnessOptions.RegisterDeterministicSigningService | public bool RegisterDeterministicSigningService { get; set; }
+MEMBER | AsiBackbone.Testing.AsiBackboneTestHarnessOptions.RegisterInMemoryAuditSink | public bool RegisterInMemoryAuditSink { get; set; }
+MEMBER | AsiBackbone.Testing.AsiBackboneTestHarnessOptions.RegisterInMemoryOutboxStore | public bool RegisterInMemoryOutboxStore { get; set; }
+MEMBER | AsiBackbone.Testing.AsiBackboneTestHarnessOptions.RequireExplicitPolicyResults | public bool RequireExplicitPolicyResults { get; }
+MEMBER | AsiBackbone.Testing.AsiBackboneTestHarnessOptions.RequirePolicyResult(System.Type,AsiBackbone.Core.Decisions.GovernanceDecision) | public AsiBackboneTestHarnessOptions RequirePolicyResult(Type policyType, GovernanceDecision decision)
+MEMBER | AsiBackbone.Testing.AsiBackboneTestHarnessOptions.RequirePolicyResult``1(AsiBackbone.Core.Decisions.GovernanceDecision) | public AsiBackboneTestHarnessOptions RequirePolicyResult<TPolicy>(GovernanceDecision decision)
+MEMBER | AsiBackbone.Testing.AsiBackboneTestHarnessOptions.SetPolicyResult(System.Type,AsiBackbone.Core.Decisions.GovernanceDecision) | public AsiBackboneTestHarnessOptions SetPolicyResult(Type policyType, GovernanceDecision decision)
+MEMBER | AsiBackbone.Testing.AsiBackboneTestHarnessOptions.SetPolicyResult``1(AsiBackbone.Core.Decisions.GovernanceDecision) | public AsiBackboneTestHarnessOptions SetPolicyResult<TPolicy>(GovernanceDecision decision)
+MEMBER | AsiBackbone.Testing.AsiBackboneTestHarnessPolicyEvaluator.#ctor(AsiBackbone.Testing.AsiBackboneTestHarnessOptions) | public AsiBackboneTestHarnessPolicyEvaluator(AsiBackboneTestHarnessOptions options)
+MEMBER | AsiBackbone.Testing.AsiBackboneTestHarnessPolicyEvaluator.EvaluateAsync(AsiBackbone.Core.Constraints.AsiBackboneConstraintEvaluationContext,System.Threading.CancellationToken) | public ValueTask<GovernanceDecision> EvaluateAsync(AsiBackboneConstraintEvaluationContext context, CancellationToken cancellationToken = default)
+MEMBER | AsiBackbone.Testing.AsiBackboneTestHarnessServiceCollectionExtensions.AddAsiBackboneTestHarness(Microsoft.Extensions.DependencyInjection.IServiceCollection) | public static IServiceCollection AddAsiBackboneTestHarness(this IServiceCollection services)
+MEMBER | AsiBackbone.Testing.AsiBackboneTestHarnessServiceCollectionExtensions.AddAsiBackboneTestHarness(Microsoft.Extensions.DependencyInjection.IServiceCollection,System.Action{AsiBackbone.Testing.AsiBackboneTestHarnessOptions}) | public static IServiceCollection AddAsiBackboneTestHarness(this IServiceCollection services, Action<AsiBackboneTestHarnessOptions> configure)
+MEMBER | AsiBackbone.Testing.AsiBackboneTestSigningService.SignAsync(AsiBackbone.Core.Signing.SigningRequest,System.Threading.CancellationToken) | public ValueTask<SigningResult> SignAsync(SigningRequest request, CancellationToken cancellationToken = default)
+MEMBER | AsiBackbone.Testing.Contracts.AsiBackboneAuditSinkContract.CreateAuditResidue | protected abstract IAsiBackboneAuditResidue CreateAuditResidue()
+MEMBER | AsiBackbone.Testing.Contracts.AsiBackboneAuditSinkContract.CreateAuditSink | protected abstract IAsiBackboneAuditSink CreateAuditSink()
+MEMBER | AsiBackbone.Testing.Contracts.AsiBackboneAuditSinkContract.VerifyAuditSinkAcceptsValidResidueAsync(System.Threading.CancellationToken) | public ValueTask VerifyAuditSinkAcceptsValidResidueAsync(CancellationToken cancellationToken = default)
+MEMBER | AsiBackbone.Testing.Contracts.AsiBackboneConstraintContract`1.CreateConstraint | protected abstract IAsiBackboneConstraint<TContext> CreateConstraint()
+MEMBER | AsiBackbone.Testing.Contracts.AsiBackboneConstraintContract`1.CreateEvaluationContext | protected abstract TContext CreateEvaluationContext()
+MEMBER | AsiBackbone.Testing.Contracts.AsiBackboneConstraintContract`1.VerifyConstraintReturnsSafeResultAsync(System.Threading.CancellationToken) | public ValueTask<ConstraintEvaluationResult> VerifyConstraintReturnsSafeResultAsync(CancellationToken cancellationToken = default)
+MEMBER | AsiBackbone.Testing.Contracts.AsiBackboneContractViolationException.#ctor(System.String) | public AsiBackboneContractViolationException(string message)
+MEMBER | AsiBackbone.Testing.Contracts.AsiBackboneContractViolationException.#ctor(System.String,System.Exception) | public AsiBackboneContractViolationException(string message, Exception innerException)
+MEMBER | AsiBackbone.Testing.Contracts.AsiBackboneDecisionContract.VerifyAuditResidue(AsiBackbone.Core.Audit.IAsiBackboneAuditResidue,System.String) | public static IAsiBackboneAuditResidue VerifyAuditResidue(IAsiBackboneAuditResidue? residue, string contractName = "Audit residue")
+MEMBER | AsiBackbone.Testing.Contracts.AsiBackboneDecisionContract.VerifyInvalidCapabilityGrantDoesNotAllow(AsiBackbone.Core.Decisions.GovernanceDecision,System.String) | public static GovernanceDecision VerifyInvalidCapabilityGrantDoesNotAllow(GovernanceDecision? decision, string contractName = "Invalid capability grant")
+MEMBER | AsiBackbone.Testing.Contracts.AsiBackboneDecisionContract.VerifySafeDecision(AsiBackbone.Core.Decisions.GovernanceDecision,System.String) | public static GovernanceDecision VerifySafeDecision(GovernanceDecision? decision, string contractName = "Governance decision")
+MEMBER | AsiBackbone.Testing.Contracts.AsiBackboneDecisionContract.VerifyTelemetryFromContext``1(AsiBackbone.Core.Decisions.GovernanceDecision,``0,System.String) | public static GovernanceDecision VerifyTelemetryFromContext<TContext>(GovernanceDecision? decision, TContext context, string contractName = "Governance decision") where TContext : IAsiBackboneConstraintEvaluationContext
+MEMBER | AsiBackbone.Testing.Contracts.AsiBackboneDecisionPolicyContract`1.CreateComposedDecision(`0) | protected virtual GovernanceDecision CreateComposedDecision(TContext context)
+MEMBER | AsiBackbone.Testing.Contracts.AsiBackboneDecisionPolicyContract`1.CreateConstraintResults | protected virtual IReadOnlyList<ConstraintEvaluationResult> CreateConstraintResults()
+MEMBER | AsiBackbone.Testing.Contracts.AsiBackboneDecisionPolicyContract`1.CreateDecisionPolicy | protected abstract IAsiBackboneDecisionPolicy<TContext> CreateDecisionPolicy()
+MEMBER | AsiBackbone.Testing.Contracts.AsiBackboneDecisionPolicyContract`1.CreateEvaluationContext | protected abstract TContext CreateEvaluationContext()
+MEMBER | AsiBackbone.Testing.Contracts.AsiBackboneDecisionPolicyContract`1.VerifyDecisionPolicyReturnsSafeDecisionAsync(System.Threading.CancellationToken) | public ValueTask<GovernanceDecision> VerifyDecisionPolicyReturnsSafeDecisionAsync(CancellationToken cancellationToken = default)
+MEMBER | AsiBackbone.Testing.Contracts.AsiBackboneEndpointCapabilityGrantValidatorContract.ConfigureKnownInvalidCapabilityGrant(Microsoft.AspNetCore.Http.HttpContext,AsiBackbone.AspNetCore.Endpoints.AsiBackboneEndpointGovernanceDescriptor) | protected virtual void ConfigureKnownInvalidCapabilityGrant(HttpContext httpContext, AsiBackboneEndpointGovernanceDescriptor descriptor)
+MEMBER | AsiBackbone.Testing.Contracts.AsiBackboneEndpointCapabilityGrantValidatorContract.CreateCapabilityDescriptor | protected virtual AsiBackboneEndpointGovernanceDescriptor CreateCapabilityDescriptor()
+MEMBER | AsiBackbone.Testing.Contracts.AsiBackboneEndpointCapabilityGrantValidatorContract.CreateCurrentDecision | protected virtual GovernanceDecision CreateCurrentDecision()
+MEMBER | AsiBackbone.Testing.Contracts.AsiBackboneEndpointCapabilityGrantValidatorContract.CreateHttpContext | protected virtual HttpContext CreateHttpContext()
+MEMBER | AsiBackbone.Testing.Contracts.AsiBackboneEndpointCapabilityGrantValidatorContract.CreateValidator | protected abstract IAsiBackboneEndpointCapabilityGrantValidator CreateValidator()
+MEMBER | AsiBackbone.Testing.Contracts.AsiBackboneEndpointCapabilityGrantValidatorContract.VerifyKnownInvalidCapabilityGrantDoesNotAllowAsync(System.Threading.CancellationToken) | public ValueTask<GovernanceDecision> VerifyKnownInvalidCapabilityGrantDoesNotAllowAsync(CancellationToken cancellationToken = default)
+MEMBER | AsiBackbone.Testing.Contracts.AsiBackbonePolicyEvaluatorContract`1.CreateEvaluationContext | protected abstract TContext CreateEvaluationContext()
+MEMBER | AsiBackbone.Testing.Contracts.AsiBackbonePolicyEvaluatorContract`1.CreateEvaluator | protected abstract IAsiBackbonePolicyEvaluator<TContext> CreateEvaluator()
+MEMBER | AsiBackbone.Testing.Contracts.AsiBackbonePolicyEvaluatorContract`1.VerifyEvaluatorReturnsSafeDecisionAsync(System.Threading.CancellationToken) | public ValueTask<GovernanceDecision> VerifyEvaluatorReturnsSafeDecisionAsync(CancellationToken cancellationToken = default)
+TYPE | AsiBackbone.Testing.AsiBackboneTestAuditSink | public sealed class AsiBackboneTestAuditSink : IAsiBackboneAuditSink
+TYPE | AsiBackbone.Testing.AsiBackboneTestHarnessEndpointCapabilityGrantValidator | public sealed class AsiBackboneTestHarnessEndpointCapabilityGrantValidator : IAsiBackboneEndpointCapabilityGrantValidator
+TYPE | AsiBackbone.Testing.AsiBackboneTestHarnessOptions | public sealed class AsiBackboneTestHarnessOptions
+TYPE | AsiBackbone.Testing.AsiBackboneTestHarnessPolicyEvaluator | public sealed class AsiBackboneTestHarnessPolicyEvaluator : IAsiBackbonePolicyEvaluator<AsiBackboneConstraintEvaluationContext>
+TYPE | AsiBackbone.Testing.AsiBackboneTestHarnessServiceCollectionExtensions | public static class AsiBackboneTestHarnessServiceCollectionExtensions
+TYPE | AsiBackbone.Testing.AsiBackboneTestingAssemblyMarker | public sealed class AsiBackboneTestingAssemblyMarker
+TYPE | AsiBackbone.Testing.AsiBackboneTestSigningService | public sealed class AsiBackboneTestSigningService : IAsiBackboneSigningService
+TYPE | AsiBackbone.Testing.Contracts.AsiBackboneAuditSinkContract | public abstract class AsiBackboneAuditSinkContract
+TYPE | AsiBackbone.Testing.Contracts.AsiBackboneConstraintContract`1 | public abstract class AsiBackboneConstraintContract<TContext>
+TYPE | AsiBackbone.Testing.Contracts.AsiBackboneContractViolationException | public sealed class AsiBackboneContractViolationException : InvalidOperationException, ISerializable
+TYPE | AsiBackbone.Testing.Contracts.AsiBackboneDecisionContract | public static class AsiBackboneDecisionContract
+TYPE | AsiBackbone.Testing.Contracts.AsiBackboneDecisionPolicyContract`1 | public abstract class AsiBackboneDecisionPolicyContract<TContext> where TContext : IAsiBackboneConstraintEvaluationContext
+TYPE | AsiBackbone.Testing.Contracts.AsiBackboneEndpointCapabilityGrantValidatorContract | public abstract class AsiBackboneEndpointCapabilityGrantValidatorContract
+TYPE | AsiBackbone.Testing.Contracts.AsiBackbonePolicyEvaluatorContract`1 | public abstract class AsiBackbonePolicyEvaluatorContract<TContext> where TContext : IAsiBackboneConstraintEvaluationContext

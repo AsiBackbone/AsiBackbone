@@ -1,0 +1,73 @@
+# AsiBackbone stable public API baseline
+# Baseline release: 5.0.0
+# Assembly: AsiBackbone.OpenTelemetry.dll
+# Format: KIND | UID | C# declaration (or enum field display)
+# Update only after explicit API/SemVer review.
+
+MEMBER | AsiBackbone.OpenTelemetry.OpenTelemetryGovernanceAttributes.AuditResidueId | public const string AuditResidueId = "asibackbone.audit_residue_id"
+MEMBER | AsiBackbone.OpenTelemetry.OpenTelemetryGovernanceAttributes.CorrelationId | public const string CorrelationId = "asibackbone.correlation_id"
+MEMBER | AsiBackbone.OpenTelemetry.OpenTelemetryGovernanceAttributes.DecisionOutcome | public const string DecisionOutcome = "asibackbone.decision.outcome"
+MEMBER | AsiBackbone.OpenTelemetry.OpenTelemetryGovernanceAttributes.DecisionStage | public const string DecisionStage = "asibackbone.decision.stage"
+MEMBER | AsiBackbone.OpenTelemetry.OpenTelemetryGovernanceAttributes.EmissionLatencyMs | public const string EmissionLatencyMs = "asibackbone.emission.latency_ms"
+MEMBER | AsiBackbone.OpenTelemetry.OpenTelemetryGovernanceAttributes.EmitterFailureCode | public const string EmitterFailureCode = "asibackbone.emitter.failure.code"
+MEMBER | AsiBackbone.OpenTelemetry.OpenTelemetryGovernanceAttributes.EmitterFailureProviderCode | public const string EmitterFailureProviderCode = "asibackbone.emitter.failure.provider_code"
+MEMBER | AsiBackbone.OpenTelemetry.OpenTelemetryGovernanceAttributes.EmitterFailureRetryable | public const string EmitterFailureRetryable = "asibackbone.emitter.failure.retryable"
+MEMBER | AsiBackbone.OpenTelemetry.OpenTelemetryGovernanceAttributes.EmitterProvider | public const string EmitterProvider = "asibackbone.emitter.provider"
+MEMBER | AsiBackbone.OpenTelemetry.OpenTelemetryGovernanceAttributes.EmitterResult | public const string EmitterResult = "asibackbone.emitter.result"
+MEMBER | AsiBackbone.OpenTelemetry.OpenTelemetryGovernanceAttributes.EmitterStatus | public const string EmitterStatus = "asibackbone.emitter.status"
+MEMBER | AsiBackbone.OpenTelemetry.OpenTelemetryGovernanceAttributes.EnvelopeId | public const string EnvelopeId = "asibackbone.envelope_id"
+MEMBER | AsiBackbone.OpenTelemetry.OpenTelemetryGovernanceAttributes.EventId | public const string EventId = "asibackbone.event_id"
+MEMBER | AsiBackbone.OpenTelemetry.OpenTelemetryGovernanceAttributes.EventType | public const string EventType = "asibackbone.event_type"
+MEMBER | AsiBackbone.OpenTelemetry.OpenTelemetryGovernanceAttributes.GatewayExecutionId | public const string GatewayExecutionId = "asibackbone.gateway.execution_id"
+MEMBER | AsiBackbone.OpenTelemetry.OpenTelemetryGovernanceAttributes.LifecycleStage | public const string LifecycleStage = "asibackbone.lifecycle.stage"
+MEMBER | AsiBackbone.OpenTelemetry.OpenTelemetryGovernanceAttributes.LifecycleStageSequence | public const string LifecycleStageSequence = "asibackbone.lifecycle.stage_sequence"
+MEMBER | AsiBackbone.OpenTelemetry.OpenTelemetryGovernanceAttributes.MetricEventType | public const string MetricEventType = "event_type"
+MEMBER | AsiBackbone.OpenTelemetry.OpenTelemetryGovernanceAttributes.MetricFailureCode | public const string MetricFailureCode = "failure_code"
+MEMBER | AsiBackbone.OpenTelemetry.OpenTelemetryGovernanceAttributes.MetricProvider | public const string MetricProvider = "provider"
+MEMBER | AsiBackbone.OpenTelemetry.OpenTelemetryGovernanceAttributes.MetricResult | public const string MetricResult = "result"
+MEMBER | AsiBackbone.OpenTelemetry.OpenTelemetryGovernanceAttributes.MetricRetryable | public const string MetricRetryable = "retryable"
+MEMBER | AsiBackbone.OpenTelemetry.OpenTelemetryGovernanceAttributes.OutboxSequence | public const string OutboxSequence = "asibackbone.outbox.sequence"
+MEMBER | AsiBackbone.OpenTelemetry.OpenTelemetryGovernanceAttributes.ParentSpanId | public const string ParentSpanId = "asibackbone.parent_span_id"
+MEMBER | AsiBackbone.OpenTelemetry.OpenTelemetryGovernanceAttributes.PayloadContentHash | public const string PayloadContentHash = "asibackbone.payload.content_hash"
+MEMBER | AsiBackbone.OpenTelemetry.OpenTelemetryGovernanceAttributes.PayloadContentType | public const string PayloadContentType = "asibackbone.payload.content_type"
+MEMBER | AsiBackbone.OpenTelemetry.OpenTelemetryGovernanceAttributes.PayloadSchemaVersion | public const string PayloadSchemaVersion = "asibackbone.payload.schema_version"
+MEMBER | AsiBackbone.OpenTelemetry.OpenTelemetryGovernanceAttributes.PayloadSizeBytes | public const string PayloadSizeBytes = "asibackbone.payload.size_bytes"
+MEMBER | AsiBackbone.OpenTelemetry.OpenTelemetryGovernanceAttributes.PayloadType | public const string PayloadType = "asibackbone.payload.type"
+MEMBER | AsiBackbone.OpenTelemetry.OpenTelemetryGovernanceAttributes.PolicyHash | public const string PolicyHash = "asibackbone.policy.hash"
+MEMBER | AsiBackbone.OpenTelemetry.OpenTelemetryGovernanceAttributes.PolicyVersion | public const string PolicyVersion = "asibackbone.policy.version"
+MEMBER | AsiBackbone.OpenTelemetry.OpenTelemetryGovernanceAttributes.SchemaVersion | public const string SchemaVersion = "asibackbone.schema_version"
+MEMBER | AsiBackbone.OpenTelemetry.OpenTelemetryGovernanceAttributes.SpanId | public const string SpanId = "asibackbone.span_id"
+MEMBER | AsiBackbone.OpenTelemetry.OpenTelemetryGovernanceAttributes.TraceId | public const string TraceId = "asibackbone.trace_id"
+MEMBER | AsiBackbone.OpenTelemetry.OpenTelemetryGovernanceBuilderExtensions.UseOpenTelemetryEmission(AsiBackbone.DependencyInjection.IAsiBackboneBuilder) | public static IAsiBackboneBuilder UseOpenTelemetryEmission(this IAsiBackboneBuilder builder)
+MEMBER | AsiBackbone.OpenTelemetry.OpenTelemetryGovernanceBuilderExtensions.UseOpenTelemetryEmission(AsiBackbone.DependencyInjection.IAsiBackboneBuilder,System.Action{AsiBackbone.OpenTelemetry.OpenTelemetryGovernanceEmitterOptions}) | public static IAsiBackboneBuilder UseOpenTelemetryEmission(this IAsiBackboneBuilder builder, Action<OpenTelemetryGovernanceEmitterOptions> configure)
+MEMBER | AsiBackbone.OpenTelemetry.OpenTelemetryGovernanceEmitter.#ctor | public OpenTelemetryGovernanceEmitter()
+MEMBER | AsiBackbone.OpenTelemetry.OpenTelemetryGovernanceEmitter.#ctor(AsiBackbone.OpenTelemetry.OpenTelemetryGovernanceEmitterOptions) | public OpenTelemetryGovernanceEmitter(OpenTelemetryGovernanceEmitterOptions options)
+MEMBER | AsiBackbone.OpenTelemetry.OpenTelemetryGovernanceEmitter.EmitAsync(AsiBackbone.Core.Emissions.GovernanceEmissionEnvelope,System.Threading.CancellationToken) | public ValueTask<GovernanceEmissionResult> EmitAsync(GovernanceEmissionEnvelope envelope, CancellationToken cancellationToken = default)
+MEMBER | AsiBackbone.OpenTelemetry.OpenTelemetryGovernanceEmitterOptions.BeforeEmitAsync | public Func<GovernanceEmissionEnvelope, CancellationToken, ValueTask>? BeforeEmitAsync { get; set; }
+MEMBER | AsiBackbone.OpenTelemetry.OpenTelemetryGovernanceEmitterOptions.DefaultActivityName | public string DefaultActivityName { get; set; }
+MEMBER | AsiBackbone.OpenTelemetry.OpenTelemetryGovernanceEmitterOptions.EmitActivityEvents | public bool EmitActivityEvents { get; set; }
+MEMBER | AsiBackbone.OpenTelemetry.OpenTelemetryGovernanceEmitterOptions.EmitMetrics | public bool EmitMetrics { get; set; }
+MEMBER | AsiBackbone.OpenTelemetry.OpenTelemetryGovernanceEmitterOptions.ProviderName | public string ProviderName { get; set; }
+MEMBER | AsiBackbone.OpenTelemetry.OpenTelemetryGovernanceEmitterOptions.Validate | public void Validate()
+MEMBER | AsiBackbone.OpenTelemetry.OpenTelemetryGovernanceInstrumentation.AcknowledgmentRecordedEventName | public const string AcknowledgmentRecordedEventName = "asibackbone.acknowledgment.recorded"
+MEMBER | AsiBackbone.OpenTelemetry.OpenTelemetryGovernanceInstrumentation.ActivitySourceName | public const string ActivitySourceName = "AsiBackbone.OpenTelemetry"
+MEMBER | AsiBackbone.OpenTelemetry.OpenTelemetryGovernanceInstrumentation.AuditResidueCreatedEventName | public const string AuditResidueCreatedEventName = "asibackbone.audit_residue.created"
+MEMBER | AsiBackbone.OpenTelemetry.OpenTelemetryGovernanceInstrumentation.CapabilityTokenIssuedEventName | public const string CapabilityTokenIssuedEventName = "asibackbone.capability_token.issued"
+MEMBER | AsiBackbone.OpenTelemetry.OpenTelemetryGovernanceInstrumentation.DecisionEvaluatedEventName | public const string DecisionEvaluatedEventName = "asibackbone.decision.evaluated"
+MEMBER | AsiBackbone.OpenTelemetry.OpenTelemetryGovernanceInstrumentation.DefaultActivityName | public const string DefaultActivityName = "asibackbone.governance.emit"
+MEMBER | AsiBackbone.OpenTelemetry.OpenTelemetryGovernanceInstrumentation.EmissionDeliveredEventName | public const string EmissionDeliveredEventName = "asibackbone.emission.delivered"
+MEMBER | AsiBackbone.OpenTelemetry.OpenTelemetryGovernanceInstrumentation.EmissionFailedEventName | public const string EmissionFailedEventName = "asibackbone.emission.failed"
+MEMBER | AsiBackbone.OpenTelemetry.OpenTelemetryGovernanceInstrumentation.EmissionFailuresCounterName | public const string EmissionFailuresCounterName = "asibackbone.governance.emission_failures"
+MEMBER | AsiBackbone.OpenTelemetry.OpenTelemetryGovernanceInstrumentation.EmissionLatencyHistogramName | public const string EmissionLatencyHistogramName = "asibackbone.governance.emission_latency_ms"
+MEMBER | AsiBackbone.OpenTelemetry.OpenTelemetryGovernanceInstrumentation.EmissionsCounterName | public const string EmissionsCounterName = "asibackbone.governance.emissions"
+MEMBER | AsiBackbone.OpenTelemetry.OpenTelemetryGovernanceInstrumentation.GatewayCompletedEventName | public const string GatewayCompletedEventName = "asibackbone.gateway.completed"
+MEMBER | AsiBackbone.OpenTelemetry.OpenTelemetryGovernanceInstrumentation.GenericGovernanceEventName | public const string GenericGovernanceEventName = "asibackbone.governance.event"
+MEMBER | AsiBackbone.OpenTelemetry.OpenTelemetryGovernanceInstrumentation.LifecycleRecordedEventName | public const string LifecycleRecordedEventName = "asibackbone.lifecycle.recorded"
+MEMBER | AsiBackbone.OpenTelemetry.OpenTelemetryGovernanceInstrumentation.MeterName | public const string MeterName = "AsiBackbone.OpenTelemetry"
+MEMBER | AsiBackbone.OpenTelemetry.OpenTelemetryGovernanceInstrumentation.OutboxUpdatedEventName | public const string OutboxUpdatedEventName = "asibackbone.outbox.updated"
+MEMBER | AsiBackbone.OpenTelemetry.OpenTelemetryGovernanceInstrumentation.ProviderName | public const string ProviderName = "open-telemetry"
+TYPE | AsiBackbone.OpenTelemetry.OpenTelemetryGovernanceAttributes | public static class OpenTelemetryGovernanceAttributes
+TYPE | AsiBackbone.OpenTelemetry.OpenTelemetryGovernanceBuilderExtensions | public static class OpenTelemetryGovernanceBuilderExtensions
+TYPE | AsiBackbone.OpenTelemetry.OpenTelemetryGovernanceEmitter | public sealed class OpenTelemetryGovernanceEmitter : IAsiBackboneGovernanceEmitter
+TYPE | AsiBackbone.OpenTelemetry.OpenTelemetryGovernanceEmitterOptions | public sealed class OpenTelemetryGovernanceEmitterOptions
+TYPE | AsiBackbone.OpenTelemetry.OpenTelemetryGovernanceInstrumentation | public static class OpenTelemetryGovernanceInstrumentation
