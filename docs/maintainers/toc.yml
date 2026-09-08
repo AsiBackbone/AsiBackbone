@@ -14,6 +14,8 @@
 
 - name: Quality & Engineering Evidence
   items:
+    - name: Repository Host Security Controls
+      href: ../articles/repository-host-security-controls.md
     - name: Performance Benchmark Baseline
       href: ../articles/performance-benchmark-baseline.md
     - name: Policy Evaluator Allocation Review

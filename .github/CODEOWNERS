@@ -5,8 +5,12 @@
 # and security/governance files owned by the repository maintainer until a
 # broader maintainer group is intentionally documented.
 #
-# Code Owner review is required by branch protection for pull requests targeting main.
-# Approvals are dismissed when new reviewable commits are pushed.
+# CODEOWNERS records ownership and review routing. While the bootstrap
+# solo-maintainer governance posture applies, the canonical main-branch ruleset
+# requires a pull request and release-blocking status checks but does not require
+# self-approval, Code Owner approval, or last-push approval. Revisit those review
+# requirements before removing the bootstrap exception or after a second active
+# Core Maintainer is appointed.
 
 * @cdcavell
 

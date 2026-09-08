@@ -64,6 +64,31 @@ For a security release, the maintainer should:
 
 The CVE-request path requires an authenticated repository administrator or security manager, or a token with "Repository security advisories" write permission. The script uses the existing `gh` authentication context and does not store a publishing or advisory-management credential in the repository.
 
+## Repository-host security controls
+
+Repository-host protections are treated as part of the project's supply-chain
+boundary rather than as an implicit GitHub administrator default. The canonical
+desired state is documented in
+[Repository Host Security Controls](docs/articles/repository-host-security-controls.md)
+and represented by `eng/repository-controls/main-branch-ruleset.json`.
+
+The maintained posture requires secret scanning and secret-scanning push
+protection, an explicit ruleset for `main`, the existing release-blocking status
+checks, pull-request-only changes, squash-only merge into `main`, linear history,
+and protection against branch deletion and force pushes. The sole emergency
+bypass actor is repository-specific and may bypass the ruleset only through a
+pull request so the reason and resulting change remain reviewable and auditable.
+
+Audit the live GitHub settings with:
+
+```powershell
+./scripts/Manage-RepositorySecurityControls.ps1
+```
+
+The script also exposes an explicit `-Apply` path for an authenticated repository
+administrator. Use `-WhatIf` first. Repository-host controls are not changed by a
+normal build or package release workflow.
+
 ## Project security boundaries
 
 AsiBackbone provides governance-oriented building blocks and host integration seams. It does **not** provide end-to-end production security, compliance, or legal assurance by itself.
