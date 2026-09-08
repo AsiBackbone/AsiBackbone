@@ -36,7 +36,7 @@ packages, robotics, immutable storage, and additional non-signing provider
 packages remain design-only, strategy-only, sample-only, host-owned, or
 future-provider work unless a later stable release explicitly ships them.
 
-The release process includes explicit [Release Cadence and Readiness](release-cadence-and-readiness.md) guidance for patch, minor, and major release selection, package metadata, Source Link, SBOM/provenance, documentation links, and future package identity or namespace changes. The [5.0.0 Migration Guide](upgrade-400-to-500.md) covers the breaking changes, and the [4.0.0 Consumer Verification Guide](consumer-verification-400.md) gives consumers a conservative package-source, migration, Source Link, SBOM/provenance, and deferred-signing verification path.
+The release process includes explicit [Release Cadence and Readiness](release-cadence-and-readiness.md) guidance for patch, minor, and major release selection, package metadata, Source Link, SBOM/provenance, documentation links, and future package identity or namespace changes. The [5.0.0 Migration Guide](upgrade-400-to-500.md) covers the breaking changes, and the [5.0.0 Consumer Verification Guide](consumer-verification-500.md) gives consumers a conservative package-source, migration, Source Link, SBOM/provenance, and deferred-signing verification path.
 
 ## Search and navigation
 
