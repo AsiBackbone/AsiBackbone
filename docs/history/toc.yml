@@ -1,10 +1,14 @@
 - name: Historical Records
   href: index.md
 
-- name: Superseded Design Records
+- name: Design-Only & Superseded Records
   items:
     - name: OpenTelemetry Provider Design (Superseded)
       href: ../articles/opentelemetry-governance-emission-provider-design.md
+    - name: Event Hubs Provider Design (Unshipped)
+      href: ../articles/event-hubs-governance-emission-provider-design.md
+    - name: Purview Enrichment Strategy (Unshipped)
+      href: ../articles/purview-governance-lineage-enrichment-strategy.md
 
 - name: Alpha & Early Package Records
   items:
@@ -14,6 +18,11 @@
       href: ../articles/core-alpha-readiness-review.md
     - name: Historical Stable API Review
       href: ../articles/stable-api-review.md
+
+- name: Historical Documentation Reviews
+  items:
+    - name: Post-2.0.0 Documentation Currency Review
+      href: ../articles/post-200-documentation-currency-review.md
 
 - name: Early Readiness Records
   items:

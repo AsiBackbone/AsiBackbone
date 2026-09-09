@@ -213,12 +213,6 @@
       href: release-readiness-500.md
     - name: 5.0.0 Consumer Verification Guide
       href: consumer-verification-500.md
-    - name: 4.0.0 Release Notes
-      href: release-notes-400.md
-    - name: 4.0.0 Migration Guide
-      href: upgrade-323-to-400.md
-    - name: 4.0.0 Consumer Verification Guide
-      href: consumer-verification-400.md
     - name: API Compatibility and SemVer
       href: api-compatibility-and-semver.md
     - name: Schema Versioning
@@ -232,15 +226,6 @@
   items:
     - name: Maintainer and Quality Evidence Home
       href: ../maintainers/
-
-- name: Design-Only / Future Work
-  items:
-    - name: Cryptographic Security Hardening Roadmap
-      href: cryptographic-security-hardening-roadmap.md
-    - name: Event Hubs Governance Emission Provider Design
-      href: event-hubs-governance-emission-provider-design.md
-    - name: Purview Governance and Lineage Enrichment Strategy
-      href: purview-governance-lineage-enrichment-strategy.md
 
 - name: Learn the Architecture
   items:
