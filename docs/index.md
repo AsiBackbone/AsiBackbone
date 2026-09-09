@@ -112,9 +112,6 @@ Package-specific READMEs and release notes define which surfaces are stable, opt
 * [5.0.0 Release Notes](articles/release-notes-500.md)
 * [5.0.0 Migration Guide](articles/upgrade-400-to-500.md)
 * [5.0.0 Consumer Verification Guide](articles/consumer-verification-500.md)
-* [4.0.0 Release Notes](articles/release-notes-400.md)
-* [4.0.0 Migration Guide](articles/upgrade-323-to-400.md)
-* [4.0.0 Consumer Verification Guide](articles/consumer-verification-400.md)
 * [API Compatibility and SemVer](articles/api-compatibility-and-semver.md)
 * [Schema Versioning](articles/schema-versioning.md)
 * [Release Validation](articles/release-validation.md)
@@ -129,7 +126,6 @@ Historical release notes and verification records remain available under [Releas
 * [API Baseline and Boundary Checks](articles/api-baseline-and-boundary-checks.md)
 * [Release Cadence and Readiness](articles/release-cadence-and-readiness.md)
 * [5.0.0 Release Readiness Record](articles/release-readiness-500.md)
-* [4.0.0 Release Readiness Record](articles/release-readiness-400.md)
 
 
 ### Historical records
