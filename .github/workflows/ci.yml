@@ -110,6 +110,10 @@ jobs:
         shell: pwsh
         run: ./scripts/Validate-PublicApiBaseline.ps1
 
+      - name: Test branch retention validator
+        shell: pwsh
+        run: ./scripts/Test-BranchRetention.ps1
+
       - name: Test with coverage gate
         shell: pwsh
         run: >

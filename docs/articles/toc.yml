@@ -109,6 +109,8 @@
   items:
     - name: Repository Host Security Controls
       href: repository-host-security-controls.md
+    - name: Branch Retention Policy
+      href: branch-retention-policy.md
     - name: "Production Hardening: Evaluator and Outbox"
       href: production-hardening-evaluator-and-outbox.md
     - name: Production Wording and Stable Signing Boundaries

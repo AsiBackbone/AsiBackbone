@@ -1,0 +1,36 @@
+{
+  "repos/AsiBackbone/AsiBackbone": {
+    "delete_branch_on_merge": true
+  },
+  "repos/AsiBackbone/AsiBackbone/branches": [
+    { "name": "main" },
+    { "name": "issue_work" },
+    { "name": "release/5.0.0" },
+    { "name": "release/4.0.0" },
+    { "name": "release/3.0.0" },
+    { "name": "release/9.9.9" },
+    { "name": "experiment" }
+  ],
+  "repos/AsiBackbone/AsiBackbone/tags": [
+    { "name": "v5.0.0" },
+    { "name": "v4.0.0" },
+    { "name": "v3.0.0" }
+  ],
+  "repos/AsiBackbone/AsiBackbone/releases": [
+    { "tag_name": "v5.0.0" },
+    { "tag_name": "v4.0.0" }
+  ],
+
+  "repos/AsiBackbone/AsiBackbone/compare/main...release/5.0.0": { "ahead_by": 0 },
+
+  "repos/AsiBackbone/AsiBackbone/compare/main...release/4.0.0": { "ahead_by": 2 },
+  "repos/AsiBackbone/AsiBackbone/compare/v4.0.0...release/4.0.0": { "ahead_by": 0 },
+
+  "repos/AsiBackbone/AsiBackbone/compare/main...release/3.0.0": { "ahead_by": 1 },
+  "repos/AsiBackbone/AsiBackbone/compare/v3.0.0...release/3.0.0": { "ahead_by": 0 },
+
+  "repos/AsiBackbone/AsiBackbone/compare/main...release/9.9.9": { "ahead_by": 4 },
+  "repos/AsiBackbone/AsiBackbone/compare/v5.0.0...release/9.9.9": { "ahead_by": 4 },
+  "repos/AsiBackbone/AsiBackbone/compare/v4.0.0...release/9.9.9": { "ahead_by": 4 },
+  "repos/AsiBackbone/AsiBackbone/compare/v3.0.0...release/9.9.9": { "ahead_by": 4 }
+}
