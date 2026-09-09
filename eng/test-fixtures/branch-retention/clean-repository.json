@@ -1,0 +1,17 @@
+{
+  "repos/AsiBackbone/AsiBackbone": {
+    "delete_branch_on_merge": true
+  },
+  "repos/AsiBackbone/AsiBackbone/branches": [
+    { "name": "main" },
+    { "name": "issue_work" }
+  ],
+  "repos/AsiBackbone/AsiBackbone/tags": [
+    { "name": "v5.0.0" },
+    { "name": "v4.0.0" }
+  ],
+  "repos/AsiBackbone/AsiBackbone/releases": [
+    { "tag_name": "v5.0.0" },
+    { "tag_name": "v4.0.0" }
+  ]
+}

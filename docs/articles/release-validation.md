@@ -192,6 +192,27 @@ NuGet deprecation is a separate notification control. When affected versions
 need a direct package-registry warning, track and perform that work independently
 rather than treating global advisory ingestion as a substitute.
 
+## Branch retention audit
+
+After a release is tagged and published, confirm that the branch list still
+matches the committed retention policy:
+
+```powershell
+./scripts/Manage-BranchRetention.ps1
+```
+
+The audit is read-only. It classifies every branch as active, disposable, or
+unclassified, and it will not report a branch as removable unless the branch is
+reachable from `main` or from a release tag that has a published release. A
+branch holding unique commits is reported as retained with its commit count, so
+release cleanup cannot silently discard work.
+
+Automatic deletion on merge covers branches that reach `main` through a pull
+request, so this audit exists for the remainder: abandoned branches and anything
+created outside the pull-request path. See
+[Branch Retention Policy](branch-retention-policy.md) for the retention classes,
+the deletion preconditions, and the apply path.
+
 ## Deferred checks
 
 If a release-critical check is intentionally deferred, document the deferred check, the reason, the accepted risk, the follow-up issue or milestone, and whether release notes need to mention it.
