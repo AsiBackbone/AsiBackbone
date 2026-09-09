@@ -12,9 +12,6 @@ Stable package family: `5.x`. Current major release: `5.0.0`.
 - [5.0.0 Migration Guide](../articles/upgrade-400-to-500.md)
 - [5.0.0 Release Readiness Record](../articles/release-readiness-500.md)
 - [5.0.0 Consumer Verification Guide](../articles/consumer-verification-500.md)
-- [4.0.0 Release Notes](../articles/release-notes-400.md)
-- [4.0.0 Migration Guide](../articles/upgrade-323-to-400.md)
-- [4.0.0 Consumer Verification Guide](../articles/consumer-verification-400.md)
 - [API Compatibility and Semantic Versioning](../articles/api-compatibility-and-semver.md)
 - [Schema Versioning](../articles/schema-versioning.md)
 - [Target Framework Support](../articles/target-framework-support.md)
@@ -27,6 +24,12 @@ Stable package family: `5.x`. Current major release: `5.0.0`.
 The upgrade guide is a historical version-to-version record. Use current compatibility, target-framework, and release notes for present-day package decisions.
 
 ## Release archive
+
+### 4.x
+
+- [4.0.0 Release Notes](../articles/release-notes-400.md)
+- [4.0.0 Migration Guide](../articles/upgrade-323-to-400.md)
+- [4.0.0 Consumer Verification Guide](../articles/consumer-verification-400.md)
 
 ### 3.x
 

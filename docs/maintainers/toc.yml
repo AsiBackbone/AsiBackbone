@@ -3,8 +3,8 @@
 
 - name: Current Release Evidence
   items:
-    - name: 4.0.0 Release Readiness Record
-      href: ../articles/release-readiness-400.md
+    - name: 5.0.0 Release Readiness Record
+      href: ../articles/release-readiness-500.md
     - name: Release Cadence and Readiness
       href: ../articles/release-cadence-and-readiness.md
     - name: Stable Release Validation
@@ -16,6 +16,8 @@
   items:
     - name: Repository Host Security Controls
       href: ../articles/repository-host-security-controls.md
+    - name: Branch Retention Policy
+      href: ../articles/branch-retention-policy.md
     - name: Performance Benchmark Baseline
       href: ../articles/performance-benchmark-baseline.md
     - name: Policy Evaluator Allocation Review
@@ -39,6 +41,8 @@
 
 - name: Historical Readiness Archive
   items:
+    - name: 4.0.0 Release Readiness Record
+      href: ../articles/release-readiness-400.md
     - name: 3.2.3 Release Readiness Record
       href: ../articles/release-readiness-323.md
     - name: 3.2.2 Release Readiness Record
