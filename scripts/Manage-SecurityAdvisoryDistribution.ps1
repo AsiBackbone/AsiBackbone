@@ -50,14 +50,23 @@ function Invoke-GitHubApi {
         # AllowNotFound can inspect gh's exit code and captured 404 response.
         # Keep the strict preference for the rest of the script, but allow this
         # native command to return normally so its result can be classified.
-        $previousErrorActionPreference = $ErrorActionPreference
+        $previousWhatIfPreference = $WhatIfPreference
+
         try {
-            $ErrorActionPreference = 'Continue'
-            $output = @(& gh api @apiArguments 2> $stderrPath)
-            $exitCode = $LASTEXITCODE
+            $WhatIfPreference = $false
+
+            $previousErrorActionPreference = $ErrorActionPreference
+            try {
+                $ErrorActionPreference = 'Continue'
+                $output = @(& gh api @apiArguments 2> $stderrPath)
+                $exitCode = $LASTEXITCODE
+            }
+            finally {
+                $ErrorActionPreference = $previousErrorActionPreference
+            }
         }
         finally {
-            $ErrorActionPreference = $previousErrorActionPreference
+            $WhatIfPreference = $previousWhatIfPreference
         }
 
         $stderr = if (Test-Path -LiteralPath $stderrPath) {
@@ -94,7 +103,7 @@ function Invoke-GitHubApi {
         return ($json | ConvertFrom-Json)
     }
     finally {
-        Remove-Item -LiteralPath $stderrPath -Force -ErrorAction SilentlyContinue
+        Remove-Item -LiteralPath $stderrPath -Force -ErrorAction SilentlyContinue -WhatIf:$false
     }
 }
 
