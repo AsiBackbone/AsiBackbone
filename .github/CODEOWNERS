@@ -37,6 +37,11 @@ global.json @cdcavell
 nuget.config @cdcavell
 
 # Governance, security, release, citation, and archival metadata
+CONTRIBUTING.md @cdcavell
+GOVERNANCE.md @cdcavell
+MAINTAINERS.md @cdcavell
+SECURITY.md @cdcavell
+SUPPORT.md @cdcavell
 CITATION.cff @cdcavell
 .zenodo.json @cdcavell
 LICENSE.txt @cdcavell

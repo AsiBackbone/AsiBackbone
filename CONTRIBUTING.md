@@ -168,6 +168,8 @@ Do not include secrets, credentials, tokens, private keys, passwords, confidenti
 
 Use synthetic examples and opaque identifiers in documentation and tests.
 
+For help choosing the right channel, see the [Support Policy](SUPPORT.md). Current project ownership is recorded in [Maintainers](MAINTAINERS.md), and the authoritative decision model is defined in [GOVERNANCE.md](GOVERNANCE.md).
+
 ## Contributor License Agreement
 
 By submitting a contribution (including but not limited to code, documentation, tests, or configuration files) to AsiBackbone via pull request, patch, or any other means, you ("Contributor") agree to the following terms:
