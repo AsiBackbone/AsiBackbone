@@ -2,7 +2,7 @@ cff-version: 1.2.0
 message: "If you use this software, please cite it using the metadata below."
 title: "ASI Backbone"
 version: "5.0.0"
-date-released: "2026-09-06"
+date-released: "2026-09-07"
 repository-code: "https://github.com/AsiBackbone/AsiBackbone"
 url: "https://asibackbone.github.io/AsiBackbone/"
 type: software
@@ -15,7 +15,7 @@ authors:
   - family-names: "Cavell"
     given-names: "Christopher D."
     orcid: "https://orcid.org/0009-0002-2113-0245"
-abstract: "AsiBackbone 4.0.0 starts the stable 4.x line with claim leasing enabled by default for governance outbox safety, bounded reclaim and dead-letter behavior, hardened endpoint metadata and correlation handling, canonical capability-grant payload construction, explicit signature failure categories, and corrected EF Core store binding and terminal-state persistence. Package IDs, public namespaces, and the net10.0 target remain unchanged; AssemblyVersion advances to 4.0.0.0."
+abstract: "AsiBackbone 5.0.0 starts the stable 5.x line with a set of security fixes that make governance verification fail closed: signed artifact content is bound to its signature, capability proofs are bound to the grant being evaluated, audit chains require an anchor for partial verification and can detect truncation, untrusted keys and stripped proofs deny, provider signing responses are checked against the request, local-development signing is refused in production, and enum zero values are rejected sentinels rather than permissive defaults. Package IDs, public namespaces, and the net10.0 target remain unchanged; AssemblyVersion advances to 5.0.0.0."
 keywords:
   - asi-backbone
   - dotnet
