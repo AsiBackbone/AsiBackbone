@@ -182,7 +182,9 @@ public sealed class StablePackageIntegrationSmokeTests
                 ["risk"] = "routine"
             });
 
-        GovernanceDecision decision = await evaluator.EvaluateAsync(context);
+        GovernanceDecision decision = await evaluator.EvaluateAsync(
+            context,
+            TestContext.Current.CancellationToken);
 
         Assert.Equal(GovernanceDecisionOutcome.Allowed, decision.Outcome);
         Assert.True(decision.CanProceed);
@@ -197,7 +199,9 @@ public sealed class StablePackageIntegrationSmokeTests
 
         var ledger = new InMemoryAuditLedger();
 
-        await ledger.WriteAsync(residue);
+        await ledger.WriteAsync(
+            residue,
+            TestContext.Current.CancellationToken);
 
         IAsiBackboneAuditResidue stored = Assert.Single(ledger.Records);
         Assert.Equal(residue.EventId, stored.EventId);
@@ -224,11 +228,13 @@ public sealed class StablePackageIntegrationSmokeTests
         CapabilityGrantValidationResult first = await CapabilityGrantValidator.ValidateAsync(
             signedGrant,
             options,
-            useStore: useStore);
+            useStore: useStore,
+            cancellationToken: TestContext.Current.CancellationToken);
         CapabilityGrantValidationResult second = await CapabilityGrantValidator.ValidateAsync(
             signedGrant,
             options,
-            useStore: useStore);
+            useStore: useStore,
+            cancellationToken: TestContext.Current.CancellationToken);
 
         Assert.True(first.IsValid);
         Assert.True(first.ShouldAllow);
@@ -263,7 +269,9 @@ public sealed class StablePackageIntegrationSmokeTests
                 ["release"] = "stable-package-smoke"
             });
 
-        await auditSink.WriteAsync(residue);
+        await auditSink.WriteAsync(
+            residue,
+            TestContext.Current.CancellationToken);
 
         IAsiBackboneAuditResidue captured = Assert.Single(sink.Records);
         Assert.Equal(residue.EventId, captured.EventId);
@@ -278,7 +286,7 @@ public sealed class StablePackageIntegrationSmokeTests
     {
         await using WebApplication app = await StableSmokeHost.BuildAsync();
 
-        await app.StartAsync();
+        await app.StartAsync(TestContext.Current.CancellationToken);
         using HttpClient client = app.GetTestClient();
 
         StableHostResponse response = await GetAsync<StableHostResponse>(client, "/stable-smoke");
