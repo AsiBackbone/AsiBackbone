@@ -159,7 +159,7 @@ public sealed class ExternalConsumerSmokeTests
     public async Task FreshHostWiresPackagesAndExercisesHttpDecisionFlows()
     {
         await using WebApplication app = await SmokeHost.BuildAsync();
-        await app.StartAsync();
+        await app.StartAsync(TestContext.Current.CancellationToken);
 
         using HttpClient client = app.GetTestClient();
 
