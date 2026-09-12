@@ -20,33 +20,49 @@ Security review and vulnerability handling focus on the current stable `5.x` rel
 
 A report that affects supported `5.x` packages may still result in documentation, sample, analyzer, package, or release-process changes depending on where the actual risk lives.
 
-## How to report a vulnerability or sensitive concern
+## Reporting a Vulnerability or Sensitive Concern
 
-Please do **not** place exploit details, secrets, proof-of-concept payloads, private keys, customer data, or sensitive operational information in a public issue, discussion, pull request, or comment.
+Please do **not** place exploit details, secrets, proof-of-concept payloads, private keys, tokens, personal data, or sensitive operational information in a public Issue, pull request, Discussion, commit message, screenshot, or comment.
 
 Preferred reporting path:
 
-1. Use [GitHub private vulnerability reporting](https://github.com/AsiBackbone/AsiBackbone/security/advisories/new) for this repository.
-2. Include a concise title, affected package or documentation area, affected version, reproduction steps, expected behavior, actual behavior, and any safe proof material.
-3. Describe the practical impact in host-application terms: for example, policy bypass, acknowledgment bypass, capability-token misuse, unsafe sample guidance, signing or verification confusion, audit-residue integrity concern, data exposure, or denial-of-service risk.
-4. Keep public disclosure deferred until the maintainer has had reasonable time to triage and respond.
+1. Open this repository's **Security** tab and select **Report a vulnerability** to use GitHub private vulnerability reporting when it is available.
+2. Include a concise title and identify the affected repository area, version, branch, or commit when known.
+3. Provide reproduction steps, expected behavior, actual behavior, and the practical security impact.
+4. Use synthetic data and redact secrets or identifying information.
+5. Allow reasonable time for review before public disclosure.
 
-If the private vulnerability reporting link is unavailable to you, open a minimal public issue that only states that you have a sensitive security report to share. Do not include technical details in the public issue.
+If private vulnerability reporting is unavailable, open a minimal public Issue stating only that you have a sensitive security report to share. Do not include technical details or sensitive material in that Issue.
 
-For non-sensitive hardening suggestions, documentation wording concerns, or defense-in-depth improvements, a normal GitHub issue is appropriate.
+For non-sensitive hardening suggestions, documentation corrections, or defense-in-depth improvements, a normal GitHub Issue or pull request is appropriate.
 
-## Expected response posture
+## Expected Response Posture
 
-This project is maintained as an open-source package family and does not promise a formal SLA.
+This is a community-maintained open-source project and does not promise a formal security-response SLA or fixed acknowledgment or remediation timelines.
 
-The expected best-effort posture is:
+The expected best-effort process is:
 
-1. A maintainer reviews the report and determines whether it is a vulnerability, documentation issue, sample issue, hardening opportunity, duplicate, or out-of-scope concern.
-2. The maintainer may ask for clarification, version details, logs with sensitive data removed, or a reduced reproduction.
-3. Confirmed concerns are handled through a fix, documentation correction, package update, advisory, or issue/PR trail as appropriate to the risk.
-4. Public wording will avoid overstating the package's security guarantees, legal effect, compliance status, or production tamper-evidence posture.
+1. A maintainer reviews the report and determines whether it is a vulnerability, documentation issue, sample or template issue, workflow or dependency concern, hardening opportunity, duplicate, or out-of-scope report.
+2. The maintainer may request clarification, affected-version or commit information, sanitized logs, or a reduced reproduction.
+3. Confirmed concerns are addressed through code, documentation, dependency, workflow, repository-configuration, release, or advisory changes appropriate to the risk.
+4. Public communication distinguishes confirmed behavior from suspected risk and avoids overstating security, compliance, legal, or operational guarantees.
 
-Please avoid sending repeated public comments while a sensitive report is being reviewed.
+Please avoid repeated public disclosure while a sensitive report is being reviewed.
+
+## Sensitive Data Guidance for Reports
+
+When reporting a concern:
+
+- redact passwords, secrets, tokens, private keys, certificates, connection strings, user identifiers, personal information, customer data, and regulated data;
+- use synthetic examples whenever possible;
+- share only the minimum information required to reproduce or understand the concern;
+- clearly identify any material that remains sensitive.
+
+## Safe Public Language Expectations
+
+Public communication should distinguish implemented controls from intended architecture, repository behavior from downstream or consuming-system behavior, and verified evidence from assumptions.
+
+Do not describe a repository, package, template, sample, workflow, or generated application as vulnerability-free, automatically compliant, legally sufficient, tamper-proof, or production-ready solely because a documented control exists or automated checks pass.
 
 ## Advisory distribution and downstream notification
 
@@ -151,15 +167,6 @@ NuGet.org repository-signs packages during ingestion, so a package downloaded
 from NuGet.org has a different digest from the attested build package. Verify
 that distribution separately with `dotnet nuget verify --all <package-path>`.
 
-## Sensitive data guidance for reports
-
-When reporting a concern:
-
-- redact secrets, tokens, private keys, connection strings, user identifiers, customer data, and regulated data;
-- use synthetic examples when possible;
-- share only the minimum details necessary to reproduce or understand the issue;
-- clearly mark whether the report includes sensitive operational information.
-
 ## Scope examples
 
 Examples that are generally in scope:
@@ -175,12 +182,6 @@ Examples that are generally out of scope:
 - vulnerabilities caused solely by a consuming host application's custom execution logic, deployment configuration, key management, database security, cloud policy, or network controls;
 - reports against unsupported historical package lines unless the same behavior affects the supported stable `3.x` line;
 - claims that AsiBackbone should prevent all misuse of AI, agents, robotics, or host-side tools without a specific package-level or documentation-level vulnerability.
-
-## Safe public language
-
-It is accurate to say that AsiBackbone provides governance infrastructure and host-owned integration seams for accountable decision flow.
-
-It is not accurate to say that AsiBackbone is a complete security platform, compliance certification system, tamper-proof ledger, legal evidence system, or artificial superintelligence implementation.
 
 ## Related Project Policies
 
