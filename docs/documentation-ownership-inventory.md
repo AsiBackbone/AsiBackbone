@@ -8,8 +8,8 @@
 
 This inventory was produced after the implementation-first DocFX navigation refactor and reconciled after the Learning split, stable-URL continuity work, and historical navigation were completed. The DocFX build publishes `articles/**/*.md`, so every Markdown file under `docs/articles/` remains in scope even when it is intentionally absent from current-consumer navigation.
 
-- Published articles inventoried: **155**
-- **KEEP:** 118
+- Published articles inventoried: **156**
+- **KEEP:** 119
 - **ACCEPTED-REFACTORED:** 7
 - **ACCEPTED-POINTER:** 7
 - **ACCEPTED-HISTORICAL:** 23
@@ -190,6 +190,7 @@ The main duplication risk is not implementation documentation; it is pages that 
 | `signed-audit-and-outbox-records.md` | Durable outbox implementation and operations | **KEEP** | AsiBackbone `docs/articles/` | No URL change. Retain current article and update normally with product releases. | Concrete product, API, runtime, integration, release, security, sample, or maintainer material remains authoritative in this repository. |
 | `signing-provider-package-boundary.md` | Security, signing, verification, or integrity guidance | **KEEP** | AsiBackbone `docs/articles/` | No URL change. Retain current article and update normally with product releases. | Concrete product security or data-handling posture remains authoritative here; avoid general security education. |
 | `signing-ready-receipts-and-key-handling.md` | Security, signing, verification, or integrity guidance | **KEEP** | AsiBackbone `docs/articles/` | No URL change. Retain current article and update normally with product releases. | Concrete product security or data-handling posture remains authoritative here; avoid general security education. |
+| `nuget-package-signing-decision.md` | Release signing governance decision | **KEEP** | AsiBackbone `docs/articles/` | No URL change. Review by its recorded date or trigger criteria. | Concrete package-release security posture and accepted residual risk remain product-owned. |
 | `stable-api-review.md` | Public API compatibility and quality evidence | **ACCEPTED-HISTORICAL** | Stable article URL; archive navigation | Move to a repository archive only after inbound links are mapped; leave a stable current-path pointer to the archive or replacement article. | Historical API-stabilization record. Archive; current API Compatibility and SemVer plus API baseline checks are canonical. |
 | `strict-governance-profile.md` | Policy/evaluator implementation guidance | **KEEP** | AsiBackbone `docs/articles/` | No URL change. Retain current article and update normally with product releases. | Concrete product, API, runtime, integration, release, security, sample, or maintainer material remains authoritative in this repository. |
 | `supply-chain-provenance.md` | Product implementation or maintainer documentation | **KEEP** | AsiBackbone `docs/articles/` | No URL change. Retain current article and update normally with product releases. | Concrete product, API, runtime, integration, release, security, sample, or maintainer material remains authoritative in this repository. |

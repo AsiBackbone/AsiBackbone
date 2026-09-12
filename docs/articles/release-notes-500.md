@@ -99,6 +99,18 @@ exactly as it did in `4.x`, so grants signed before this release keep verifying.
 * `InMemoryCapabilityGrantUseStore` keys use records by issuer and token
   identifier and evicts records for long-expired grants.
 
+## Durable release evidence
+
+The `v5.0.0` GitHub release retains its package SBOMs,
+`sbom-manifest.json`, `release-evidence-manifest.json`, and a Markdown copy of
+these release notes as durable public assets. See the
+[release asset list](https://github.com/AsiBackbone/AsiBackbone/releases/tag/v5.0.0)
+and the [5.0.0 Consumer Verification Guide](consumer-verification-500.md) for
+subject-digest provenance verification commands.
+
+NuGet package signing remains deferred under the dated
+[NuGet Package Signing Decision Record](nuget-package-signing-decision.md).
+
 ## Related documentation
 
 * [4.0.0 to 5.0.0 Migration Guide](upgrade-400-to-500.md)
