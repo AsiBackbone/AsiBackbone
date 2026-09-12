@@ -27,6 +27,7 @@ env:
   CONFIGURATION: Release
   PACKAGE_OUTPUT: ./artifacts/packages
   SBOM_OUTPUT: ./artifacts/package-sbom
+  RELEASE_EVIDENCE_OUTPUT: ./artifacts/release-evidence
 
 concurrency:
   group: publish-asi-backbone-packages-${{ github.ref }}
@@ -262,3 +263,97 @@ jobs:
               --source "$PACKAGE_SOURCE" \
               --skip-duplicate
           done
+
+  publish-release-evidence:
+    name: Publish durable release evidence
+    needs:
+      - pack-packages
+      - publish-packages
+    if: github.event_name == 'push' && github.ref_type == 'tag'
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Download package SBOM artifacts
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          name: asi-backbone-package-sboms
+          path: ${{ env.SBOM_OUTPUT }}
+
+      - name: Prepare durable release evidence
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          RELEASE_TAG: ${{ github.ref_name }}
+          REPOSITORY: ${{ github.repository }}
+          SOURCE_COMMIT: ${{ github.sha }}
+        run: |
+          $release = $null
+
+          for ($attempt = 1; $attempt -le 6; $attempt++) {
+              $releaseJson = gh release view $env:RELEASE_TAG --repo $env:REPOSITORY --json body 2>$null
+
+              if ($LASTEXITCODE -eq 0) {
+                  $release = $releaseJson | ConvertFrom-Json
+                  break
+              }
+
+              Write-Host "Release $($env:RELEASE_TAG) is not visible yet; retrying ($attempt/6)."
+              Start-Sleep -Seconds 10
+          }
+
+          if ($null -eq $release -or [string]::IsNullOrWhiteSpace([string]$release.body)) {
+              throw "Published release $($env:RELEASE_TAG) and its release notes could not be loaded."
+          }
+
+          $notesDirectory = Join-Path $env:RUNNER_TEMP 'asibackbone-release-notes'
+          New-Item -ItemType Directory -Path $notesDirectory -Force | Out-Null
+          $notesPath = Join-Path $notesDirectory 'release-notes.md'
+          Set-Content -LiteralPath $notesPath -Value ([string]$release.body) -Encoding utf8 -NoNewline
+
+          ./scripts/New-GitHubReleaseEvidence.ps1 `
+            -SbomDirectory $env:SBOM_OUTPUT `
+            -ReleaseNotesPath $notesPath `
+            -OutputDirectory $env:RELEASE_EVIDENCE_OUTPUT `
+            -TagName $env:RELEASE_TAG `
+            -SourceCommit $env:SOURCE_COMMIT `
+            -Repository $env:REPOSITORY
+
+      - name: Upload durable evidence to GitHub release
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          RELEASE_TAG: ${{ github.ref_name }}
+          REPOSITORY: ${{ github.repository }}
+        run: |
+          $assetPaths = @(Get-ChildItem -LiteralPath $env:RELEASE_EVIDENCE_OUTPUT -File | Sort-Object Name | Select-Object -ExpandProperty FullName)
+
+          if ($assetPaths.Count -eq 0) {
+              throw 'No durable release evidence files were prepared.'
+          }
+
+          gh release upload $env:RELEASE_TAG @assetPaths --clobber --repo $env:REPOSITORY
+
+          if ($LASTEXITCODE -ne 0) {
+              exit $LASTEXITCODE
+          }
+
+      - name: Verify durable GitHub release assets
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          RELEASE_TAG: ${{ github.ref_name }}
+          REPOSITORY: ${{ github.repository }}
+        run: >
+          ./scripts/Assert-GitHubReleaseAssets.ps1
+          -TagName $env:RELEASE_TAG
+          -EvidenceDirectory $env:RELEASE_EVIDENCE_OUTPUT
+          -Repository $env:REPOSITORY

@@ -74,6 +74,19 @@ review.
 - The `5.0.0` migration guide remains the required guidance for consumers moving
   from `4.x`; consumers already on `5.0.0` need no additional migration.
 
+## Durable release evidence
+
+The `v5.1.0` GitHub release retains all eleven package SBOMs,
+`sbom-manifest.json`, `release-evidence-manifest.json`, and a Markdown copy of
+these release notes as durable public assets. Consumers can begin with the
+[release asset list](https://github.com/AsiBackbone/AsiBackbone/releases/tag/v5.1.0)
+and use the commands in the
+[5.1.0 Consumer Verification Guide](consumer-verification-510.md) to verify
+package and SBOM provenance by subject digest.
+
+GitHub Actions artifacts remain useful workflow evidence but are not the
+archival distribution channel because their retention expires.
+
 ## Package signing posture
 
 NuGet package signing remains intentionally deferred while AsiBackbone is
@@ -81,6 +94,10 @@ independently maintained. Consumers should use the official NuGet source, public
 repository, release tag, Source Link repository metadata, SBOMs, provenance
 artifacts where available, and their own retained package hashes as distinct
 trust signals.
+
+The dated [NuGet Package Signing Decision Record](nuget-package-signing-decision.md)
+requires review by 2027-03-31 or before the first `6.0.0` release candidate,
+whichever occurs first, and defines earlier event-driven review criteria.
 
 ## Validation
 

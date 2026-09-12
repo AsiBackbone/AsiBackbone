@@ -30,8 +30,9 @@ Before cutting a stable release tag, confirm the following checks have passed on
 | Package metadata asset checklist | release readiness record, generated package inspection | Confirms package icons, packaged README rendering, NuGet metadata, Source Link metadata, SBOM/provenance artifacts, and documentation links are reviewed. |
 | Package SBOM generation | CI, stable release validation, package publish | Generates SPDX JSON SBOM files and an SBOM manifest for generated `.nupkg` artifacts. |
 | Package provenance attestation | CI on non-PR events, stable release validation on non-PR events, package publish | Attests generated package and SBOM artifacts where supported. |
+| Durable release evidence | package publish on stable tags | Attaches package SBOMs, package/hash mappings, exact release notes, and the release-evidence manifest to the public GitHub release, then fails if any required asset is absent. |
 | Consumer verification guide | README, release notes, release readiness record, docs navigation | Confirms consumers have a copy/paste verification path for package source, package IDs, package version, repository metadata, Source Link, SBOM/provenance, and deferred package signing. |
-| NuGet package signing readiness | release readiness record, `SECURITY.md`, release notes | Confirms package signing is either explicitly deferred as an open supply-chain item or, when available, documented with signing process, verification guidance, and updated public wording before release. |
+| NuGet package signing readiness | signing decision record, release readiness record, `SECURITY.md`, release notes | Confirms package signing is either governed by a current dated deferral with review criteria or, when available, documented with signing process, verification guidance, and updated public wording before release. |
 | Template package smoke validation | CI, stable release validation | Confirms the packed `AsiBackbone.Templates` package can be installed, generate supported host styles, restore, and build. |
 | Documentation build | publish docs, stable release validation, package publish | Confirms DocFX can build the documentation included in the release posture. |
 | Documentation link review | release readiness record, manual docs review | Confirms README links, DocFX navigation, release notes, migration guides, package documentation links, and GitHub Pages links point to current pages. |
@@ -78,7 +79,7 @@ The following workflows form the reusable gate for stable release candidates:
 - `OWASP Dependency-Check software composition analysis` restores with the SDK selected by `global.json`, publishes its reports, and fails when an unsuppressed dependency finding has CVSS 7 or higher.
 - `Publish Documentation` validates the DocFX build used for the documentation site.
 - `Stable Release Validation` provides a single release-candidate gate for version metadata, Debug solution build coverage, locked restore, build, formatting, tests, DocFX, stable public API baseline validation, package creation, generated package version validation, generated NuGet metadata validation, SBOM generation, template package smoke validation, smoke checks, and provenance handling where supported.
-- `Publish AsiBackbone Packages` repeats release-critical validation, including the public API baseline, before package publish.
+- `Publish AsiBackbone Packages` repeats release-critical validation, including the public API baseline, before package publish. For stable tags it then attaches durable release evidence and verifies every required GitHub release asset.
 
 ## Tagging rule
 
@@ -94,7 +95,7 @@ The workflow validates .NET SDK setup, version metadata, Debug solution build co
 
 ## Package publish validation
 
-The package publish workflow performs release-critical validation before publishing packages. It validates version metadata, restores dependencies in locked mode, builds the solution, verifies formatting, runs tests, restores .NET tools, builds DocFX documentation, packs package projects, validates generated package versions and NuGet metadata, generates SBOMs, handles provenance where supported, uploads artifacts, and publishes only after validation succeeds.
+The package publish workflow performs release-critical validation before publishing packages. It validates version metadata, restores dependencies in locked mode, builds the solution, verifies formatting, runs tests, restores .NET tools, builds DocFX documentation, packs package projects, validates generated package versions and NuGet metadata, generates SBOMs, handles provenance where supported, uploads temporary workflow artifacts, and publishes packages only after validation succeeds. For a stable tag, a dependent least-privilege job downloads the exact SBOM output, copies the published release notes, creates `release-evidence-manifest.json`, uploads the evidence to the GitHub release, and fails if any expected asset is missing.
 
 ## NuGet metadata validation
 
@@ -127,11 +128,12 @@ For every stable release, the release readiness record should explicitly confirm
 - security releases include a post-publication plan to verify repository-advisory ingestion into the global GitHub Advisory Database and to track any advisories still pending curation;
 - package SBOM files and `sbom-manifest.json` are generated for produced `.nupkg` artifacts;
 - package and SBOM provenance artifacts are uploaded and attested where the workflow event supports attestation;
+- stable tags expose the package SBOMs, SBOM manifest, release notes, and release-evidence manifest as durable public GitHub release assets rather than only retention-limited workflow artifacts;
 - consumer verification guidance explains package-source, package ID, version, repository metadata, Source Link, SBOM/provenance, and deferred-signing checks without overstating signing or tamper-evidence;
 - public API XML documentation inventory is reviewed, and staged enforcement changes or intentional exceptions are documented;
 - the stable public API baseline matches, or an intentional baseline change is reviewed and classified for its SemVer impact;
 - Debug solution build coverage is reviewed so first-party package/test projects stay enabled for default local solution builds;
-- NuGet package signing status is checked against `SECURITY.md`, and release notes/readiness records state whether signing remains deferred or has an adopted signing and verification process;
+- NuGet package signing status is checked against `SECURITY.md` and the [NuGet Package Signing Decision Record](nuget-package-signing-decision.md), and release notes/readiness records state whether the dated decision remains current or signing has an adopted process;
 - README, DocFX navigation, release notes, migration notes, package README links, and GitHub Pages links are current;
 - any intentionally deferred metadata, asset, Source Link, SBOM, provenance, package-signing, public API XML documentation, Debug solution build coverage, or documentation-link check is recorded with risk and follow-up.
 

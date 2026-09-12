@@ -125,6 +125,7 @@ These pages cover production hardening, durable audit/outbox behavior, observabi
 * [Cryptographic Security Posture and Production Guidance](cryptographic-security-posture.md)
 * [Production Managed-Key Integration Guide](production-managed-key-integration.md)
 * [Regulated Storage and Signing Verification Checklist](regulated-storage-and-signing-verification-checklist.md)
+* [NuGet Package Signing Decision Record](nuget-package-signing-decision.md)
 
 ## Samples & scenarios
 

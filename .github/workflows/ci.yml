@@ -114,6 +114,10 @@ jobs:
         shell: pwsh
         run: ./scripts/Test-BranchRetention.ps1
 
+      - name: Test durable release evidence generation
+        shell: pwsh
+        run: ./scripts/Test-GitHubReleaseEvidence.ps1
+
       - name: Test with coverage gate
         shell: pwsh
         run: >
