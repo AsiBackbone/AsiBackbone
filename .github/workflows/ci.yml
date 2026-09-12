@@ -116,7 +116,7 @@ jobs:
 
       - name: Test durable release evidence generation
         shell: pwsh
-        run: ./scripts/Test-GitHubReleaseEvidence.ps1
+        run: ./scripts/Test-ReleaseEvidence.ps1
 
       - name: Test with coverage gate
         shell: pwsh
