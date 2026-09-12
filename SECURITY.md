@@ -115,7 +115,9 @@ Signing-ready metadata, signed records, verification results, hash chains, and e
 
 ## Package signing status
 
-AsiBackbone NuGet packages are intentionally published without Authenticode or repository signing.
+AsiBackbone packages are intentionally published without author signing. NuGet.org
+adds its own repository signature to the package bytes it serves; that repository
+signature is distinct from an AsiBackbone maintainer or author signature.
 
 This is a deliberate governance decision while the project is independently maintained, balancing operational complexity against practical value. At this stage, the project prioritizes transparent source code, deterministic build and release practices, GitHub releases, Source Link, SBOM generation, and package provenance over maintaining signing certificates and supporting release-signing infrastructure.
 
@@ -136,6 +138,18 @@ Current package trust is established through:
 - Release evidence and package SHA-256 mappings
 
 These mechanisms provide transparency and traceability while package signing remains deferred.
+
+Download the attested build package from the matching GitHub release and verify
+its workflow provenance by subject digest:
+
+```powershell
+gh release download v5.1.0 --repo AsiBackbone/AsiBackbone --pattern 'AsiBackbone.Core.5.1.0.nupkg'
+gh attestation verify ./AsiBackbone.Core.5.1.0.nupkg --repo AsiBackbone/AsiBackbone
+```
+
+NuGet.org repository-signs packages during ingestion, so a package downloaded
+from NuGet.org has a different digest from the attested build package. Verify
+that distribution separately with `dotnet nuget verify --all <package-path>`.
 
 ## Sensitive data guidance for reports
 

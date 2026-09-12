@@ -20,8 +20,8 @@ Restore, build, test, docs
   -> attest package and SBOM provenance where supported
   -> upload packages and SBOMs as workflow artifacts
   -> publish packages only after validation succeeds
-  -> attach SBOMs, release notes, and checksums to the GitHub release
-  -> verify every required release asset is present
+  -> attach attested build packages, SBOMs, release notes, and checksums to the GitHub release
+  -> verify every required release asset and package attestation
 ```
 
 ## SBOM artifacts
@@ -52,6 +52,7 @@ These artifacts are generated from the same workflow run that builds and validat
 
 Every stable release contains:
 
+- one attested `<package-id>.<version>.nupkg` build package for every shipped package;
 - one `<package-id>.<version>.spdx.json` file for every shipped package;
 - `sbom-manifest.json`, including package and SBOM SHA-256 values;
 - `asibackbone-<version>-release-notes.md`, copied from the published release body; and
@@ -72,14 +73,21 @@ The attested subjects are intentionally narrow:
 
 The workflows do not attest broad repository outputs, coverage reports, documentation output, or unrelated artifacts. This keeps the provenance boundary focused on package-release artifacts.
 
-GitHub attestations are verified against a downloaded subject digest; the repository API is not a collection listing of every attestation. After downloading a package from NuGet or an SBOM from the GitHub release, verify it with:
+GitHub attestations are verified against a downloaded subject digest; the repository API is not a collection listing of every attestation. After downloading a build package and SBOM from the GitHub release, verify them with:
 
 ```powershell
+gh release download v5.1.0 --repo AsiBackbone/AsiBackbone --pattern 'AsiBackbone.Core.5.1.0.nupkg'
 gh attestation verify ./AsiBackbone.Core.5.1.0.nupkg --repo AsiBackbone/AsiBackbone
 gh attestation verify ./AsiBackbone.Core.5.1.0.spdx.json --repo AsiBackbone/AsiBackbone
 ```
 
 Repeat the command for each package or SBOM being admitted. A successful provenance verification identifies the workflow and source repository that produced the subject; it is not a NuGet author or repository signature.
+
+NuGet.org adds a repository signature during package ingestion, changing the
+digest of the `.nupkg` it serves. The GitHub build attestation therefore applies
+to the exact build package retained on the GitHub release. Verify a package
+downloaded from NuGet.org separately with
+`dotnet nuget verify --all <package-path>`.
 
 ## NuGet package signing posture
 
