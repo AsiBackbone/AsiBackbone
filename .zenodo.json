@@ -1,8 +1,8 @@
 {
   "title": "ASI Backbone",
-  "version": "5.0.0",
+  "version": "5.1.0",
   "upload_type": "software",
-  "description": "AsiBackbone 5.0.0 starts the stable 5.x line with a set of security fixes that make governance verification fail closed: signed artifact content is bound to its signature, capability proofs are bound to the grant being evaluated, audit chains require an anchor for partial verification and can detect truncation, untrusted keys and stripped proofs deny, provider signing responses are checked against the request, local-development signing is refused in production, and enum zero values are rejected sentinels rather than permissive defaults. Package IDs, public namespaces, and the net10.0 target remain unchanged; AssemblyVersion advances to 5.0.0.0.",
+  "description": "AsiBackbone 5.1.0 is a backward-compatible stabilization release for the stable 5.x line. It adds automated public API compatibility baselines, documented repository security and branch-retention controls, security-advisory distribution tooling, and public support and maintainer policies. Package IDs, public namespaces, runtime behavior, the net10.0 target, and AssemblyVersion 5.0.0.0 remain unchanged.",
   "creators": [
     {
       "name": "Cavell, Christopher D.",

@@ -33,13 +33,11 @@ The DocFX header search is available for package names, API concepts, and articl
 
 ## Current stable package family
 
-Stable `5.x` package family. `5.0.0` is the current major release. It is a
-security release that makes governance verification fail closed: signed artifact
-content is bound to its signature, capability proofs are bound to the grant being
-evaluated, partial audit chains require an anchor and can detect truncation, and
-enum zero values are rejected sentinels rather than permissive defaults. Package
-IDs and public namespaces remain unchanged; the binary assembly identity is
-`5.0.0.0`.
+Stable `5.x` package family. `5.1.0` is the current release. It is a
+backward-compatible stabilization release that adds public API compatibility
+baselines, auditable repository controls, release operations tooling, and public
+support and maintainer policies. Package IDs, public namespaces, runtime
+behavior, and the binary assembly identity `5.0.0.0` remain unchanged.
 
 ```text
 AsiBackbone.Core
@@ -109,9 +107,9 @@ Package-specific READMEs and release notes define which surfaces are stable, opt
 
 ### Releases and compatibility
 
-* [5.0.0 Release Notes](articles/release-notes-500.md)
+* [5.1.0 Release Notes](articles/release-notes-510.md)
+* [5.1.0 Consumer Verification Guide](articles/consumer-verification-510.md)
 * [5.0.0 Migration Guide](articles/upgrade-400-to-500.md)
-* [5.0.0 Consumer Verification Guide](articles/consumer-verification-500.md)
 * [API Compatibility and SemVer](articles/api-compatibility-and-semver.md)
 * [Schema Versioning](articles/schema-versioning.md)
 * [Release Validation](articles/release-validation.md)
@@ -125,7 +123,7 @@ Historical release notes and verification records remain available under [Releas
 * [Performance Benchmark Baseline](articles/performance-benchmark-baseline.md)
 * [API Baseline and Boundary Checks](articles/api-baseline-and-boundary-checks.md)
 * [Release Cadence and Readiness](articles/release-cadence-and-readiness.md)
-* [5.0.0 Release Readiness Record](articles/release-readiness-500.md)
+* [5.1.0 Release Readiness Record](articles/release-readiness-510.md)
 
 
 ### Historical records
