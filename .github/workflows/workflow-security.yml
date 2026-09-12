@@ -13,10 +13,8 @@ on:
     - cron: '15 9 * * 0'
 
   pull_request:
-    paths:
-      - '.github/workflows/**'
-      - '.github/actions/**'
-      - '.github/dependabot.yml'
+    branches:
+      - main
 
 # Deny all token permissions unless granted by a job.
 permissions: {}

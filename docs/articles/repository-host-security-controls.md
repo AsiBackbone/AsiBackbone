@@ -36,7 +36,7 @@ is expected to match it.
 
 ### Required status checks
 
-The ruleset carries forward the existing release-blocking GitHub Actions checks:
+The ruleset requires these release-blocking GitHub Actions checks:
 
 - `Dependency review`
 - `Build, test, and pack`
@@ -44,9 +44,21 @@ The ruleset carries forward the existing release-blocking GitHub Actions checks:
 - `Validate version consistency`
 - `External consumer package smoke test`
 - `Restore, build, test, docs, pack, and smoke`
+- `Validate workflows with actionlint`
+- `Analyze workflows with zizmor`
+- `Analyze dependencies with OWASP Dependency-Check`
 
 The checks are bound to the GitHub Actions integration and use strict status-check
 policy so the pull request must be validated against the current target branch.
+Each required workflow reports for every pull request targeting `main`; required
+workflows must not use path filters because a skipped workflow cannot satisfy its
+required context.
+
+Public API baseline validation is also pull-request blocking. It runs inside both
+the required `Build, test, and pack` and `Restore, build, test, docs, pack, and
+smoke` jobs. The repository intentionally does not expose a separate public API
+status context because doing so would duplicate the same validation rather than
+strengthen the gate.
 
 ## Signed-commit decision and compensating controls
 
@@ -61,7 +73,7 @@ are:
 
 - every ordinary change reaches `main` through a pull request;
 - only squash merge is allowed by the ruleset;
-- all six release-blocking checks must pass unless the documented emergency
+- all nine release-blocking checks must pass unless the documented emergency
   bypass is explicitly used;
 - force pushes and deletion are blocked;
 - the emergency bypass is limited to one user and to pull requests only;
@@ -133,8 +145,8 @@ review, and last-push approval before the bootstrap exception is retired.
 
 The ruleset targets `refs/heads/main`; release tags are not targeted. Package
 publishing, provenance/attestation, and release workflows triggered by version
-tags therefore keep their existing tag path. Normal pull requests continue to
-run the same six required checks already used by branch protection.
+tags therefore keep their existing tag path. Normal pull requests run all nine
+required checks recorded in the canonical ruleset.
 
 After first applying or materially changing the live controls:
 

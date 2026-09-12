@@ -27,7 +27,7 @@ Administration permission.
 - merge method: squash only;
 - linear history: required;
 - force pushes and deletion: blocked;
-- six existing release-blocking GitHub Actions checks: required and strict;
+- nine release-blocking GitHub Actions checks: required and strict;
 - required review-thread resolution: enabled;
 - required approvals / Code Owner approval / last-push approval: disabled while
   bootstrap solo-maintainer governance applies;
@@ -44,8 +44,7 @@ path to `main`.
 
 ## Required checks captured by the manifest
 
-The current branch-protection rule requires these GitHub Actions checks, and the
-ruleset deliberately carries the same set forward:
+The canonical branch ruleset requires these GitHub Actions checks:
 
 - `Dependency review`
 - `Build, test, and pack`
@@ -53,6 +52,17 @@ ruleset deliberately carries the same set forward:
 - `Validate version consistency`
 - `External consumer package smoke test`
 - `Restore, build, test, docs, pack, and smoke`
+- `Validate workflows with actionlint`
+- `Analyze workflows with zizmor`
+- `Analyze dependencies with OWASP Dependency-Check`
+
+Required workflows run for every pull request targeting `main`. Do not add path
+filters to a required workflow: when its paths do not match, GitHub has no check
+run to evaluate and the pull request remains blocked with a pending requirement.
+
+Stable public API baseline validation remains part of the required `Build, test,
+and pack` and `Restore, build, test, docs, pack, and smoke` jobs. It therefore
+gates pull requests without introducing a separate, duplicate required context.
 
 The GitHub Actions integration id currently associated with those required checks
 is `15368`. If a check is renamed, added, removed, or moves to a different trusted

@@ -68,6 +68,18 @@
           {
             "context": "Restore, build, test, docs, pack, and smoke",
             "integration_id": 15368
+          },
+          {
+            "context": "Validate workflows with actionlint",
+            "integration_id": 15368
+          },
+          {
+            "context": "Analyze workflows with zizmor",
+            "integration_id": 15368
+          },
+          {
+            "context": "Analyze dependencies with OWASP Dependency-Check",
+            "integration_id": 15368
           }
         ],
         "strict_required_status_checks_policy": true
