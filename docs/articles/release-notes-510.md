@@ -76,13 +76,26 @@ review.
 
 ## Durable release evidence
 
-The `v5.1.0` GitHub release retains all eleven package SBOMs,
-`sbom-manifest.json`, `release-evidence-manifest.json`, and a Markdown copy of
-these release notes as durable public assets. Consumers can begin with the
+The `v5.1.0` GitHub release retains all eleven attested build packages, all
+eleven package SBOMs, `sbom-manifest.json`, `release-evidence-manifest.json`,
+and a Markdown copy of these release notes as durable public assets. Consumers
+can begin with the
 [release asset list](https://github.com/AsiBackbone/AsiBackbone/releases/tag/v5.1.0)
 and use the commands in the
 [5.1.0 Consumer Verification Guide](consumer-verification-510.md) to verify
 package and SBOM provenance by subject digest.
+
+For example:
+
+```powershell
+gh release download v5.1.0 --repo AsiBackbone/AsiBackbone --pattern 'AsiBackbone.Core.5.1.0.nupkg'
+gh attestation verify ./AsiBackbone.Core.5.1.0.nupkg --repo AsiBackbone/AsiBackbone
+```
+
+NuGet.org adds a repository signature during ingestion, which changes the
+downloaded package digest. Use `dotnet nuget verify --all <package-path>` for
+that NuGet-served distribution; use the command above for the exact attested
+build package retained on the GitHub release.
 
 GitHub Actions artifacts remain useful workflow evidence but are not the
 archival distribution channel because their retention expires.

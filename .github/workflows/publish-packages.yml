@@ -273,6 +273,7 @@ jobs:
     runs-on: ubuntu-latest
 
     permissions:
+      attestations: read
       contents: write
 
     steps:
@@ -287,6 +288,12 @@ jobs:
         with:
           name: asi-backbone-package-sboms
           path: ${{ env.SBOM_OUTPUT }}
+
+      - name: Download attested package artifacts
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          name: asi-backbone-packages
+          path: ${{ env.PACKAGE_OUTPUT }}
 
       - name: Prepare durable release evidence
         shell: pwsh
@@ -320,6 +327,7 @@ jobs:
           Set-Content -LiteralPath $notesPath -Value ([string]$release.body) -Encoding utf8 -NoNewline
 
           ./scripts/New-GitHubReleaseEvidence.ps1 `
+            -PackageDirectory $env:PACKAGE_OUTPUT `
             -SbomDirectory $env:SBOM_OUTPUT `
             -ReleaseNotesPath $notesPath `
             -OutputDirectory $env:RELEASE_EVIDENCE_OUTPUT `
@@ -357,3 +365,36 @@ jobs:
           -TagName $env:RELEASE_TAG
           -EvidenceDirectory $env:RELEASE_EVIDENCE_OUTPUT
           -Repository $env:REPOSITORY
+
+      - name: Verify released package provenance
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          RELEASE_TAG: ${{ github.ref_name }}
+          REPOSITORY: ${{ github.repository }}
+        run: |
+          $verificationDirectory = Join-Path $env:RUNNER_TEMP 'asibackbone-attestation-verification'
+          New-Item -ItemType Directory -Path $verificationDirectory -Force | Out-Null
+
+          gh release download $env:RELEASE_TAG `
+            --repo $env:REPOSITORY `
+            --pattern '*.nupkg' `
+            --dir $verificationDirectory
+
+          if ($LASTEXITCODE -ne 0) {
+              exit $LASTEXITCODE
+          }
+
+          $packages = @(Get-ChildItem -LiteralPath $verificationDirectory -Filter '*.nupkg' -File)
+
+          if ($packages.Count -ne 11) {
+              throw "Expected 11 released packages for provenance verification but found $($packages.Count)."
+          }
+
+          foreach ($package in $packages) {
+              gh attestation verify $package.FullName --repo $env:REPOSITORY
+
+              if ($LASTEXITCODE -ne 0) {
+                  throw "Provenance verification failed for released package '$($package.Name)'."
+              }
+          }
