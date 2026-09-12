@@ -23,10 +23,10 @@
   </ItemGroup>
 
   <ItemGroup Condition="'$(UseRepositoryAsiBackboneProjects)' != 'true'">
-    <PackageReference Include="AsiBackbone.AspNetCore" Version="5.0.0" />
-    <PackageReference Include="AsiBackbone.Core" Version="5.0.0" />
-    <PackageReference Include="AsiBackbone.Storage.InMemory" Version="5.0.0" />
-    <PackageReference Include="AsiBackbone.Analyzers" Version="5.0.0" PrivateAssets="all" />
+    <PackageReference Include="AsiBackbone.AspNetCore" Version="5.1.0" />
+    <PackageReference Include="AsiBackbone.Core" Version="5.1.0" />
+    <PackageReference Include="AsiBackbone.Storage.InMemory" Version="5.1.0" />
+    <PackageReference Include="AsiBackbone.Analyzers" Version="5.1.0" PrivateAssets="all" />
   </ItemGroup>
 
 </Project>
