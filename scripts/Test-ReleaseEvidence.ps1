@@ -4,7 +4,7 @@ param()
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 
-$generatorPath = Join-Path $PSScriptRoot 'New-GitHubReleaseEvidence.ps1'
+$generatorPath = Join-Path $PSScriptRoot 'New-ReleaseEvidence.ps1'
 $testRoot = Join-Path ([System.IO.Path]::GetTempPath()) ("asibackbone-release-evidence-{0}" -f [guid]::NewGuid().ToString('N'))
 $packageDirectory = Join-Path $testRoot 'packages'
 $sbomDirectory = Join-Path $testRoot 'sbom'
@@ -113,7 +113,7 @@ try {
         throw 'Tampered SBOM input was not rejected.'
     }
 
-    Write-Host 'GitHub release evidence tests passed.'
+    Write-Host 'Release evidence tests passed.'
 }
 finally {
     if (Test-Path -LiteralPath $testRoot) {
