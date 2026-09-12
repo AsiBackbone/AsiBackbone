@@ -166,3 +166,10 @@ Examples that are generally out of scope:
 It is accurate to say that AsiBackbone provides governance infrastructure and host-owned integration seams for accountable decision flow.
 
 It is not accurate to say that AsiBackbone is a complete security platform, compliance certification system, tamper-proof ledger, legal evidence system, or artificial superintelligence implementation.
+
+## Related Project Policies
+
+- [Support Policy](SUPPORT.md)
+- [Maintainers](MAINTAINERS.md)
+- [Governance](GOVERNANCE.md)
+- [Contributing](CONTRIBUTING.md)

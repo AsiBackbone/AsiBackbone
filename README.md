@@ -203,9 +203,12 @@ Stable `5.x` is the current released line, with `5.0.0` as the current major rel
 
 The stable API contract is documented in [API Compatibility and SemVer](https://github.com/AsiBackbone/AsiBackbone/blob/main/docs/articles/api-compatibility-and-semver.md). The current release is recorded in [5.0.0 Release Notes](https://github.com/AsiBackbone/AsiBackbone/blob/main/docs/articles/release-notes-500.md), with the [5.0.0 Migration Guide](https://github.com/AsiBackbone/AsiBackbone/blob/main/docs/articles/upgrade-400-to-500.md) covering the breaking changes. Consumers can use the [5.0.0 Consumer Verification Guide](https://github.com/AsiBackbone/AsiBackbone/blob/main/docs/articles/consumer-verification-500.md) for package-source, migration, Source Link, SBOM, provenance, and deferred-signing checks. Earlier release records remain available for historical traceability.
 
-## Security and vulnerability reporting
+## Support and project stewardship
 
-Please report sensitive concerns through the repository [Security Policy](SECURITY.md).
+- Use the [Support Policy](SUPPORT.md) to choose between discussions, issues, and private vulnerability reporting and to review the version-support lifecycle.
+- Report sensitive concerns through the repository [Security Policy](SECURITY.md).
+- See [Maintainers](MAINTAINERS.md) for current operational and publishing ownership.
+- See [Governance](GOVERNANCE.md) for authoritative roles, decisions, triage, and release policy.
 
 ## Relationship to NetCoreApplicationTemplate
 
