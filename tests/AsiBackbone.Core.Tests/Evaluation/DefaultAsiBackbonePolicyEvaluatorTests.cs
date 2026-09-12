@@ -637,7 +637,7 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorTests
         Assert.DoesNotContain("constraint.later_denied", decision.ReasonCodes);
     }
 
-    private static readonly string[] expected = ["first", "second"];
+    private static readonly string[] Expected = ["first", "second"];
 
     /// <summary>
     /// Verifies that the <see cref="DefaultAsiBackbonePolicyEvaluator{TContext}.EvaluateAsync"/> method runs constraints in the order they were supplied after materializing an array of constraints.
@@ -671,7 +671,7 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorTests
 
         GovernanceDecision decision = await evaluator.EvaluateAsync(context, TestContext.Current.CancellationToken);
 
-        Assert.Equal(expected, observedOrder);
+        Assert.Equal(Expected, observedOrder);
         Assert.True(decision.IsWarning);
         Assert.True(decision.CanProceed);
         Assert.Contains("constraint.warning", decision.ReasonCodes);

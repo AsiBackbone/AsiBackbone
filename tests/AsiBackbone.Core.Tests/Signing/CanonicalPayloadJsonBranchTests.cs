@@ -9,7 +9,7 @@ namespace AsiBackbone.Core.Tests.Signing;
 /// </summary>
 public sealed class CanonicalPayloadJsonBranchTests
 {
-    private static readonly string[] content = ["beta", "alpha"];
+    private static readonly string[] Content = ["beta", "alpha"];
 
     /// <summary>
     /// Locks the canonical JSON v1 bytes used by non-.NET verifiers, including ordinal property ordering and the
@@ -65,7 +65,7 @@ public sealed class CanonicalPayloadJsonBranchTests
                     ["beta"] = "2",
                     ["alpha"] = "1"
                 },
-                ["stringArray"] = content,
+                ["stringArray"] = Content,
                 ["objectArray"] = new object?[] { "gamma", 9, false, null },
                 ["nested"] = new Dictionary<string, object?>
                 {
