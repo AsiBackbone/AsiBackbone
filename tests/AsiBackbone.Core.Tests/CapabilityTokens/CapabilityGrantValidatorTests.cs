@@ -642,13 +642,13 @@ public sealed class CapabilityGrantValidatorTests
         IEnumerable<string>? stoppedGrantIds = null,
         IEnumerable<string>? cancelledGrantIds = null) : ICapabilityGrantUseStore
     {
-        private readonly HashSet<string> _stoppedGrantIds = new(stoppedGrantIds ?? [], StringComparer.Ordinal);
-        private readonly HashSet<string> _cancelledGrantIds = new(cancelledGrantIds ?? [], StringComparer.Ordinal);
-        private readonly Dictionary<string, int> _useCounts = new(StringComparer.Ordinal);
+        private readonly HashSet<string> stoppedGrantIds = new(stoppedGrantIds ?? [], StringComparer.Ordinal);
+        private readonly HashSet<string> cancelledGrantIds = new(cancelledGrantIds ?? [], StringComparer.Ordinal);
+        private readonly Dictionary<string, int> useCounts = new(StringComparer.Ordinal);
 
         public int GetUseCount(string grantId)
         {
-            return _useCounts.TryGetValue(grantId, out int useCount) ? useCount : 0;
+            return useCounts.TryGetValue(grantId, out int useCount) ? useCount : 0;
         }
 
         public ValueTask<CapabilityGrantUseResult> TryConsumeAsync(
@@ -660,12 +660,12 @@ public sealed class CapabilityGrantValidatorTests
             ArgumentNullException.ThrowIfNull(grant);
             cancellationToken.ThrowIfCancellationRequested();
 
-            if (_stoppedGrantIds.Contains(grant.TokenId))
+            if (stoppedGrantIds.Contains(grant.TokenId))
             {
                 return ValueTask.FromResult(CapabilityGrantUseResult.Stopped());
             }
 
-            if (_cancelledGrantIds.Contains(grant.TokenId))
+            if (cancelledGrantIds.Contains(grant.TokenId))
             {
                 return ValueTask.FromResult(CapabilityGrantUseResult.Cancelled());
             }
@@ -677,7 +677,7 @@ public sealed class CapabilityGrantValidatorTests
             }
 
             int nextCount = currentCount + 1;
-            _useCounts[grant.TokenId] = nextCount;
+            useCounts[grant.TokenId] = nextCount;
             return ValueTask.FromResult(CapabilityGrantUseResult.Accepted(nextCount));
         }
     }

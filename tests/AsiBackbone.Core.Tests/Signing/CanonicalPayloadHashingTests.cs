@@ -95,7 +95,7 @@ public sealed class CanonicalPayloadHashingTests
         Assert.NotEqual(firstHash, allowedChangeHash);
     }
 
-    private static readonly string[] expected = ["alpha", "beta"];
+    private static readonly string[] Expected = ["alpha", "beta"];
 
     /// <summary>
     /// This test verifies that when an AuditResidue has a blank AuditResidueId, the canonical payload uses the EventId as the artifact identifier. It also checks that reason codes are normalized (trimmed and deduplicated) and that metadata is filtered according to the allow-list specified in the CanonicalPayloadOptions. The test ensures that the canonical payload correctly reflects these transformations and produces the expected artifact type and identifier.
@@ -130,7 +130,7 @@ public sealed class CanonicalPayloadHashingTests
         Assert.Equal("event-fallback", document.RootElement.GetProperty("artifactId").GetString());
         Assert.Equal("event-fallback", content.GetProperty("auditResidueId").GetString());
         Assert.Equal("2026-06-16T13:00:00.0000000Z", content.GetProperty("occurredUtc").GetString());
-        Assert.Equal(expected, ReadStringArray(content.GetProperty("reasonCodes")));
+        Assert.Equal(Expected, ReadStringArray(content.GetProperty("reasonCodes")));
         Assert.Equal("included", metadata.GetProperty("safe").GetString());
         Assert.Equal("second", metadata.GetProperty("allowed").GetString());
         Assert.False(metadata.TryGetProperty("unsafe", out _));
