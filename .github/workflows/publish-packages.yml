@@ -326,7 +326,7 @@ jobs:
           $notesPath = Join-Path $notesDirectory 'release-notes.md'
           Set-Content -LiteralPath $notesPath -Value ([string]$release.body) -Encoding utf8 -NoNewline
 
-          ./scripts/New-GitHubReleaseEvidence.ps1 `
+          ./scripts/New-ReleaseEvidence.ps1 `
             -PackageDirectory $env:PACKAGE_OUTPUT `
             -SbomDirectory $env:SBOM_OUTPUT `
             -ReleaseNotesPath $notesPath `
