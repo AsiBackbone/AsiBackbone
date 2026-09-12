@@ -1,0 +1,125 @@
+name: Bug report
+description: Report behavior that is not working as expected.
+title: "[Bug]: "
+labels:
+  - bug
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thank you for helping improve AsiBackbone.
+
+        **Security-sensitive reports do not belong in public Issues.**
+        If the report includes exploit details, secrets, private data, or a
+        practical vulnerability, use the repository's private vulnerability
+        reporting path instead.
+
+  - type: dropdown
+    id: package-id
+    attributes:
+      label: Affected package
+      description: Which AsiBackbone package is affected?
+      options:
+        - AsiBackbone.Analyzers
+        - AsiBackbone.AspNetCore
+        - AsiBackbone.Core
+        - AsiBackbone.DependencyInjection
+        - AsiBackbone.EntityFrameworkCore
+        - AsiBackbone.OpenTelemetry
+        - AsiBackbone.Signing.LocalDevelopment
+        - AsiBackbone.Signing.ManagedKey
+        - AsiBackbone.Storage.InMemory
+        - AsiBackbone.Templates
+        - AsiBackbone.Testing
+        - Repository tooling or documentation
+    validations:
+      required: true
+
+  - type: input
+    id: package-version
+    attributes:
+      label: Package version
+      description: Which package version or commit exhibits the problem?
+      placeholder: 5.1.0 or a commit SHA
+    validations:
+      required: true
+
+  - type: input
+    id: target-framework
+    attributes:
+      label: Target framework
+      description: Which target framework does the consuming project use?
+      placeholder: net10.0
+    validations:
+      required: true
+
+  - type: input
+    id: host-os
+    attributes:
+      label: Host operating system
+      placeholder: Windows 11, Ubuntu 24.04, or macOS 15
+    validations:
+      required: true
+
+  - type: input
+    id: dotnet-sdk-version
+    attributes:
+      label: .NET SDK version
+      description: Paste the output of `dotnet --version`.
+      placeholder: 10.0.100
+    validations:
+      required: true
+
+  - type: textarea
+    id: summary
+    attributes:
+      label: Summary
+      description: Describe the problem clearly.
+    validations:
+      required: true
+
+  - type: textarea
+    id: reproduction-steps
+    attributes:
+      label: Steps to reproduce
+      description: Provide the smallest useful reproduction.
+      placeholder: |
+        1. Configure or call ...
+        2. Run ...
+        3. Observe ...
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected-behavior
+    attributes:
+      label: Expected behavior
+      description: What did you expect to happen?
+    validations:
+      required: true
+
+  - type: textarea
+    id: actual-behavior
+    attributes:
+      label: Actual behavior
+      description: What happened instead?
+    validations:
+      required: true
+
+  - type: textarea
+    id: additional-context
+    attributes:
+      label: Additional context
+      description: Add sanitized logs, screenshots, configuration notes, or other useful details.
+    validations:
+      required: false
+
+  - type: checkboxes
+    id: submission-checks
+    attributes:
+      label: Submission checks
+      options:
+        - label: I searched existing Issues to avoid creating a duplicate.
+          required: true
+        - label: I removed secrets, private data, credentials, and other sensitive information.
+          required: true
