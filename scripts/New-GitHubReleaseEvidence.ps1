@@ -1,6 +1,9 @@
 [CmdletBinding()]
 param(
     [Parameter(Mandatory = $true)]
+    [string]$PackageDirectory,
+
+    [Parameter(Mandatory = $true)]
     [string]$SbomDirectory,
 
     [Parameter(Mandatory = $true)]
@@ -41,6 +44,7 @@ if ($Repository -notmatch '^[^/]+/[^/]+$') {
     throw "Repository '$Repository' must use the owner/name form."
 }
 
+$resolvedPackageDirectory = (Resolve-Path -LiteralPath $PackageDirectory).Path
 $resolvedSbomDirectory = (Resolve-Path -LiteralPath $SbomDirectory).Path
 $resolvedReleaseNotesPath = (Resolve-Path -LiteralPath $ReleaseNotesPath).Path
 
@@ -66,9 +70,18 @@ if ($packageEntries.Count -eq 0) {
 }
 
 $declaredSbomNames = @($packageEntries | ForEach-Object { [string]$_.sbomFile } | Sort-Object -Unique)
+$declaredPackageNames = @($packageEntries | ForEach-Object { [string]$_.packageFile } | Sort-Object -Unique)
+$actualPackageFiles = @(Get-ChildItem -LiteralPath $resolvedPackageDirectory -Filter '*.nupkg' -File | Sort-Object Name)
+$actualPackageNames = @($actualPackageFiles.Name)
 $actualSbomFiles = @(Get-ChildItem -LiteralPath $resolvedSbomDirectory -Filter '*.spdx.json' -File | Sort-Object Name)
 $actualSbomNames = @($actualSbomFiles.Name)
+$packageDifference = @(Compare-Object -ReferenceObject $declaredPackageNames -DifferenceObject $actualPackageNames)
 $sbomDifference = @(Compare-Object -ReferenceObject $declaredSbomNames -DifferenceObject $actualSbomNames)
+
+if ($packageDifference.Count -ne 0) {
+    $details = $packageDifference | ForEach-Object { "$($_.SideIndicator) $($_.InputObject)" }
+    throw "Package files do not match sbom-manifest.json:`n$($details -join "`n")"
+}
 
 if ($sbomDifference.Count -ne 0) {
     $details = $sbomDifference | ForEach-Object { "$($_.SideIndicator) $($_.InputObject)" }
@@ -76,6 +89,14 @@ if ($sbomDifference.Count -ne 0) {
 }
 
 foreach ($entry in $packageEntries) {
+    $packagePath = Join-Path $resolvedPackageDirectory ([string]$entry.packageFile)
+    $actualPackageHash = Get-Sha256Hex -Path $packagePath
+    $expectedPackageHash = ([string]$entry.packageSha256).ToLowerInvariant()
+
+    if ($actualPackageHash -ne $expectedPackageHash) {
+        throw "Package hash mismatch for '$($entry.packageFile)'. Expected $expectedPackageHash but found $actualPackageHash."
+    }
+
     $sbomPath = Join-Path $resolvedSbomDirectory ([string]$entry.sbomFile)
     $actualHash = Get-Sha256Hex -Path $sbomPath
     $expectedHash = ([string]$entry.sbomSha256).ToLowerInvariant()
@@ -94,6 +115,17 @@ if ($existingOutput.Count -ne 0) {
 }
 
 $assetRecords = New-Object System.Collections.Generic.List[object]
+
+foreach ($packageFile in $actualPackageFiles) {
+    $destination = Join-Path $resolvedOutputDirectory $packageFile.Name
+    Copy-Item -LiteralPath $packageFile.FullName -Destination $destination
+    $assetRecords.Add([ordered]@{
+        fileName = $packageFile.Name
+        sha256 = Get-Sha256Hex -Path $destination
+        mediaType = 'application/zip'
+        purpose = 'attested-package'
+    })
+}
 
 foreach ($sbomFile in $actualSbomFiles) {
     $destination = Join-Path $resolvedOutputDirectory $sbomFile.Name

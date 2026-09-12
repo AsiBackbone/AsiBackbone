@@ -92,18 +92,28 @@ The `v5.1.0` release exposes durable evidence generated for the shipped package 
 
 - [`sbom-manifest.json`](https://github.com/AsiBackbone/AsiBackbone/releases/download/v5.1.0/sbom-manifest.json), which maps every package to its SPDX SBOM and package/SBOM SHA-256 values;
 - [`release-evidence-manifest.json`](https://github.com/AsiBackbone/AsiBackbone/releases/download/v5.1.0/release-evidence-manifest.json), which binds the durable assets to the release tag and source commit; and
-- the [complete `v5.1.0` release asset list](https://github.com/AsiBackbone/AsiBackbone/releases/tag/v5.1.0), which includes all eleven SPDX JSON files and the retained release notes.
+- the [complete `v5.1.0` release asset list](https://github.com/AsiBackbone/AsiBackbone/releases/tag/v5.1.0), which includes all eleven attested build packages, all eleven SPDX JSON files, and the retained release notes.
 
 These public release assets do not require GitHub Actions API authentication and do not expire with workflow-artifact retention.
 
-After downloading a NuGet package and its corresponding SBOM, verify their workflow provenance:
+Download the build package from the GitHub release and verify it and its
+corresponding SBOM by subject digest:
 
 ```powershell
+gh release download v5.1.0 --repo AsiBackbone/AsiBackbone --pattern 'AsiBackbone.Core.5.1.0.nupkg'
 gh attestation verify ./AsiBackbone.Core.5.1.0.nupkg --repo AsiBackbone/AsiBackbone
 gh attestation verify ./AsiBackbone.Core.5.1.0.spdx.json --repo AsiBackbone/AsiBackbone
 ```
 
 Use the same command for every package or SBOM admitted by the consumer. GitHub resolves attestations from the subject digest; a repository-level attestations collection response is not the verification mechanism.
+
+NuGet.org repository-signs packages during ingestion. That operation changes
+the `.nupkg` digest, so the NuGet-served package does not match the build-package
+attestation. Verify the NuGet.org distribution's repository signature instead:
+
+```powershell
+dotnet nuget verify --all ./AsiBackbone.Core.5.1.0.nupkg
+```
 
 ## Distinguish repository controls from package guarantees
 
@@ -115,8 +125,9 @@ interpreted as a consumer-environment security guarantee.
 
 ## Package-signing status
 
-Current AsiBackbone NuGet packages are intentionally published without NuGet
-package signing while the project is independently maintained.
+Current AsiBackbone packages are intentionally published without author signing
+while the project is independently maintained. NuGet.org's repository signature
+on served packages is not an AsiBackbone maintainer signature.
 
 The [NuGet Package Signing Decision Record](nuget-package-signing-decision.md)
 records the 2026-09-12 decision, accepted residual risk, compensating controls,
