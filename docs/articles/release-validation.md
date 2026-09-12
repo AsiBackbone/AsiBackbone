@@ -1,12 +1,12 @@
 # Stable Release Validation
 
-This article documents the reusable release-blocking validation path for stable release lines. The current released stable package family is `5.x`, with `5.0.0` as the current major release.
+This article documents the reusable release-blocking validation path for stable release lines. The current released stable package family is `5.x`, with `5.1.0` as the current release.
 
 The binary assembly identity for the `5.x` line is `5.0.0.0`.
 
 In this software project, **ASI** means **Accountable Systems Infrastructure**. Release validation should confirm that the package family remains practical governance infrastructure and that implementation claims stay within the documented software boundary. See [Release Cadence and Readiness](release-cadence-and-readiness.md) for the release-stream and stabilization guidance that complements this checklist.
 
-The [5.0.0 Release Readiness Record](release-readiness-500.md) is the current release-candidate control sheet. The [5.0.0 Migration Guide](upgrade-400-to-500.md) documents the breaking changes, and the [5.0.0 Consumer Verification Guide](consumer-verification-500.md) covers package-source, Source Link, SBOM/provenance, and deferred package-signing verification. Earlier readiness records are retained for traceability.
+The [5.1.0 Release Readiness Record](release-readiness-510.md) is the current release-candidate control sheet, and the [5.1.0 Consumer Verification Guide](consumer-verification-510.md) covers package-source, API-baseline, Source Link, SBOM/provenance, and deferred package-signing verification. The [5.0.0 Migration Guide](upgrade-400-to-500.md) remains authoritative for consumers moving from `4.x`. Earlier readiness records are retained for traceability.
 
 ## Required checks before tagging a stable release
 

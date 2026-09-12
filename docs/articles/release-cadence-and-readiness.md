@@ -26,9 +26,9 @@ Major releases should be rare. They should be reserved for identity, namespace, 
 
 ## Current `5.x` stabilization posture
 
-`5.x` is the current stable package line, and `5.0.0` is the current major release.
+`5.x` is the current stable package line, and `5.1.0` is the current release.
 
-The `5.0.0` release advances the major-line binary identity while preserving the existing `AsiBackbone.*` package IDs and namespaces.
+The `5.1.0` release preserves the package IDs, namespaces, runtime contract, and `5.0.0.0` binary identity while adding verifiable API-compatibility and repository-stewardship controls.
 
 Future `5.x` releases should prioritize compatibility, documentation clarity, patch-level release correction, and carefully scoped additive improvements. Additional breaking changes should be avoided unless strongly justified by consumer safety, correctness, maintainability, or a documented architectural boundary that cannot be preserved compatibly.
 
@@ -112,7 +112,9 @@ Avoid:
 
 - [Governance](../../GOVERNANCE.md)
 - [Release Validation](release-validation.md)
-- [5.0.0 Release Readiness Record](release-readiness-500.md)
+- [5.1.0 Release Readiness Record](release-readiness-510.md)
+- [5.1.0 Release Notes](release-notes-510.md)
+- [5.1.0 Consumer Verification Guide](consumer-verification-510.md)
 - [4.0.0 Release Readiness Record](release-readiness-400.md)
 - [4.0.0 Release Notes](release-notes-400.md)
 - [4.0.0 Migration Guide](upgrade-323-to-400.md)

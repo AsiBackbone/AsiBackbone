@@ -6,6 +6,74 @@ This project follows the spirit of [Keep a Changelog](https://keepachangelog.com
 
 ## [Unreleased]
 
+## [5.1.0] - 2026-09-11
+
+### Release summary
+
+`5.1.0` is a backward-compatible stabilization release for the stable `5.x`
+AsiBackbone package family. It makes the package compatibility promise and the
+repository's release, security, documentation, and stewardship controls easier
+to verify and operate without changing runtime APIs or behavior.
+
+Package IDs, public namespaces, and the `net10.0` target remain unchanged.
+`AssemblyVersion` remains `5.0.0.0`; package and file versions advance to
+`5.1.0` and `5.1.0.0` respectively.
+
+### Added
+
+* Added committed public API baselines for every managed package in the stable
+  `5.x` family, plus an automated validator that compares the generated DocFX
+  surface with the baseline and checks package dependency boundaries.
+* Added documented repository-host security controls and an idempotent
+  PowerShell management script for auditing or applying the required main-branch
+  ruleset, secret scanning, push protection, and related controls.
+* Added security-advisory distribution tooling that audits global advisory and
+  CVE-request state, supports explicit apply and retry operations, treats
+  unexpected API responses as failures, and keeps preview mode non-mutating.
+* Added a documented branch-retention policy, dry-run-first maintenance tooling,
+  deterministic fixtures, and tests for identifying merged or superseded stale
+  branches while protecting active release and automation branches.
+* Added `SUPPORT.md` and `MAINTAINERS.md` so support routing, supported release
+  lines, operational ownership, release authority, and succession expectations
+  are visible from the repository root.
+
+### Changed
+
+* Release validation now blocks on the committed public API baseline and stable
+  package-boundary checks.
+* Repository security documentation now records the expected host-side controls,
+  evidence collection path, and explicit limitations of repository-local CI.
+* Documentation ownership and navigation now separate current product guidance,
+  maintainer evidence, release records, and historical material more clearly.
+* Documentation-link validation now covers cross-repository links and release
+  continuity claims, with stale current-release wording rejected by automation.
+* Stable-package and external-consumer smoke tests now use stricter package and
+  cancellation-token handling, reducing warning noise without changing the
+  consumer contract.
+* GitHub Pages workflows now emit scanner-friendly output paths and use the
+  current pinned deployment action.
+* Citation metadata now retains the Zenodo concept DOI while excluding a stale
+  version-specific DOI from evergreen release metadata.
+
+### Fixed
+
+* Fixed security-advisory distribution handling for missing advisory endpoints
+  and PowerShell preview mode so `-WhatIf` reports intended CVE-request actions
+  without issuing mutations.
+* Fixed documentation and quality-report workflow annotations so findings point
+  to repository-relative source paths.
+
+### Compatibility
+
+* No stable public API additions, removals, or signature changes are included.
+* No runtime behavior, durable artifact shape, package ID, public namespace, or
+  target-framework changes are included.
+* The committed API baselines are generated from `v5.0.0`; they establish an
+  automated guard for compatible future `5.x` work rather than a new API surface.
+* NuGet package signing remains intentionally deferred. Source Link, SBOM,
+  provenance, release tags, and published release evidence remain distinct trust
+  signals for consumers.
+
 ## [5.0.0] - 2026-09-07
 
 ### Release summary
