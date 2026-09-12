@@ -8,7 +8,27 @@ param(
 
     [switch]$RequestMissingCves,
 
-    [switch]$Force
+    [switch]$Force,
+
+    # Durable record of CVE requests this script has submitted. GitHub's CVE
+    # request endpoint returns 202 Accepted and populates
+    # cve_request_submitted_at asynchronously, so the API can report null for a
+    # request that was genuinely accepted. Without a local record, every run
+    # would resubmit, and the endpoint returns 422 when it is spammed.
+    [string]$StatePath = (
+        Join-Path -Path $PSScriptRoot -ChildPath '..\eng\security-advisory-cve-requests.json'
+    ),
+
+    # Deliberately resubmit advisories that were recorded locally but that
+    # GitHub has still not reflected. Use only after confirming with GitHub
+    # Support that the original request was lost.
+    [switch]$ResubmitUnconfirmed,
+
+    [ValidateRange(0, 20)]
+    [int]$ConfirmationAttempts = 5,
+
+    [ValidateRange(0, 60)]
+    [int]$ConfirmationDelaySeconds = 3
 )
 
 Set-StrictMode -Version Latest
@@ -124,7 +144,103 @@ function Get-OptionalPropertyValue {
     return $property.Value
 }
 
+function Get-CveRequestLedger {
+    param(
+        [Parameter(Mandatory = $true)]
+        [string]$Path
+    )
+
+    $ledger = [ordered]@{}
+
+    if (-not (Test-Path -LiteralPath $Path)) {
+        return $ledger
+    }
+
+    $raw = Get-Content -LiteralPath $Path -Raw
+    if ([string]::IsNullOrWhiteSpace($raw)) {
+        return $ledger
+    }
+
+    $parsed = $raw | ConvertFrom-Json
+
+    foreach ($property in $parsed.PSObject.Properties) {
+        $ledger[$property.Name] = $property.Value
+    }
+
+    return $ledger
+}
+
+function Save-CveRequestLedger {
+    param(
+        [Parameter(Mandatory = $true)]
+        [string]$Path,
+
+        [Parameter(Mandatory = $true)]
+        [object]$Ledger
+    )
+
+    $directory = Split-Path -Parent -Path $Path
+    if (-not [string]::IsNullOrWhiteSpace($directory) -and -not (Test-Path -LiteralPath $directory)) {
+        New-Item -ItemType Directory -Path $directory -Force -WhatIf:$false | Out-Null
+    }
+
+    $json = $Ledger | ConvertTo-Json -Depth 5
+    Set-Content -LiteralPath $Path -Value $json -Encoding utf8 -WhatIf:$false
+}
+
+function Get-RecordedCveRequestTimestamp {
+    <#
+        .SYNOPSIS
+        Re-reads the advisory from GitHub and returns the server-recorded
+        cve_request_submitted_at value, or $null when GitHub has not reflected
+        the request yet.
+
+        .DESCRIPTION
+        Success is never inferred from the POST itself. The CVE request endpoint
+        returns 202 Accepted with an empty body, which means the request was
+        queued for processing, not that it was recorded. Only a subsequent read
+        of the advisory establishes that GitHub holds the request.
+    #>
+    param(
+        [Parameter(Mandatory = $true)]
+        [string]$Repository,
+
+        [Parameter(Mandatory = $true)]
+        [string]$GhsaId,
+
+        [Parameter(Mandatory = $true)]
+        [int]$Attempts,
+
+        [Parameter(Mandatory = $true)]
+        [int]$DelaySeconds
+    )
+
+    for ($attempt = 1; $attempt -le $Attempts; $attempt++) {
+        if ($DelaySeconds -gt 0) {
+            Start-Sleep -Seconds $DelaySeconds
+        }
+
+        $current = Invoke-GitHubApi -Arguments @(
+            "repos/$Repository/security-advisories/$GhsaId"
+        ) -AllowNotFound
+
+        if ($null -ne $current) {
+            $recorded = [string](
+                Get-OptionalPropertyValue -InputObject $current -Name 'cve_request_submitted_at'
+            )
+
+            if (-not [string]::IsNullOrWhiteSpace($recorded)) {
+                return $recorded
+            }
+        }
+    }
+
+    return $null
+}
+
 Assert-GitHubCli
+
+$ledger = Get-CveRequestLedger -Path $StatePath
 
 $advisories = [System.Collections.Generic.List[object]]::new()
 $page = 1
@@ -195,11 +311,23 @@ foreach ($advisory in $publishedAdvisories) {
         Get-OptionalPropertyValue -InputObject $advisory -Name 'cve_request_submitted_at'
     )
 
+    $ledgerEntry = if ($ledger.Contains($ghsaId)) { $ledger[$ghsaId] } else { $null }
+    $locallySubmitted = $null -ne $ledgerEntry
+    $locallySubmittedAt = if ($locallySubmitted) {
+        [string](Get-OptionalPropertyValue -InputObject $ledgerEntry -Name 'submittedAt')
+    }
+    else {
+        $null
+    }
+
     $action = if ($isGlobal) {
         'No action required'
     }
     elseif (-not [string]::IsNullOrWhiteSpace($cveRequestSubmittedAt)) {
-        'CVE request pending; continue global-database verification'
+        'CVE request recorded by GitHub; continue global-database verification'
+    }
+    elseif ($locallySubmitted) {
+        "CVE request submitted $locallySubmittedAt but not yet recorded by GitHub; do not resubmit"
     }
     elseif (-not $reviewWindowExpired) {
         "Within GitHub review window (< $ReviewWindowHours hours)"
@@ -208,13 +336,22 @@ foreach ($advisory in $publishedAdvisories) {
         'Global entry missing; CVE request is available'
     }
 
-    if (
-        $RequestMissingCves -and
+    $needsRequest = (
         -not $isGlobal -and
         [string]::IsNullOrWhiteSpace($cveId) -and
         [string]::IsNullOrWhiteSpace($cveRequestSubmittedAt)
-    ) {
-        if (-not $reviewWindowExpired -and -not $Force) {
+    )
+
+    if ($RequestMissingCves -and $needsRequest) {
+        if ($locallySubmitted -and -not $ResubmitUnconfirmed) {
+            Write-Warning (
+                "$ghsaId already has a CVE request submitted at $locallySubmittedAt that GitHub has " +
+                'not recorded yet. The request endpoint returns 422 when it is spammed, so this run ' +
+                'is not resubmitting. Use -ResubmitUnconfirmed only after confirming with GitHub ' +
+                'Support that the original request was lost.'
+            )
+        }
+        elseif (-not $reviewWindowExpired -and -not $Force) {
             Write-Warning (
                 "$ghsaId was published $ageHours hours ago. GitHub documents that " +
                 "repository-advisory review for the global database can take up to " +
@@ -227,22 +364,58 @@ foreach ($advisory in $publishedAdvisories) {
                 'Request a CVE from GitHub'
             )
         ) {
+            $submittedAt = [System.DateTimeOffset]::UtcNow.ToString('o')
+
             Invoke-GitHubApi -Arguments @(
                 '--method',
                 'POST',
                 "repos/$Repository/security-advisories/$ghsaId/cve"
             ) | Out-Null
 
-            $cveRequestSubmittedAt = 'submitted during this run'
-            $action = 'CVE request submitted; recheck the global database later'
+            # Record the attempt before verifying it. If verification or the rest
+            # of this run fails, the ledger must still prevent a duplicate
+            # submission on the next run.
+            $ledger[$ghsaId] = [pscustomobject]@{
+                submittedAt = $submittedAt
+                confirmedAt = $null
+                repository  = $Repository
+            }
+            Save-CveRequestLedger -Path $StatePath -Ledger $ledger
+
+            $locallySubmitted = $true
+            $locallySubmittedAt = $submittedAt
+
+            $recorded = Get-RecordedCveRequestTimestamp -Repository $Repository -GhsaId $ghsaId -Attempts $ConfirmationAttempts -DelaySeconds $ConfirmationDelaySeconds
+
+            if (-not [string]::IsNullOrWhiteSpace($recorded)) {
+                $cveRequestSubmittedAt = $recorded
+
+                $ledger[$ghsaId] = [pscustomobject]@{
+                    submittedAt = $submittedAt
+                    confirmedAt = $recorded
+                    repository  = $Repository
+                }
+                Save-CveRequestLedger -Path $StatePath -Ledger $ledger
+
+                $action = 'CVE request confirmed by GitHub; continue global-database verification'
+            }
+            else {
+                $action = 'CVE request accepted (HTTP 202) but GitHub has not recorded it yet; re-check read-only, do not resubmit'
+            }
         }
     }
 
     $status = if ($isGlobal) {
         'Global'
     }
+    elseif (-not [string]::IsNullOrWhiteSpace($cveId)) {
+        'CVE assigned'
+    }
     elseif (-not [string]::IsNullOrWhiteSpace($cveRequestSubmittedAt)) {
-        'CVE request pending'
+        'CVE request recorded'
+    }
+    elseif ($locallySubmitted) {
+        'CVE request unconfirmed'
     }
     elseif ($reviewWindowExpired) {
         'Global entry missing'
@@ -259,7 +432,9 @@ foreach ($advisory in $publishedAdvisories) {
             PublishedAgeHours = $ageHours
             Global = $isGlobal
             ReviewWindowExpired = $reviewWindowExpired
-            CveRequestSubmitted = -not [string]::IsNullOrWhiteSpace($cveRequestSubmittedAt)
+            CveRequestRecorded = -not [string]::IsNullOrWhiteSpace($cveRequestSubmittedAt)
+            CveRequestSubmittedLocally = $locallySubmitted
+            LocalSubmittedAt = $locallySubmittedAt
             Action = $action
         }
     )
@@ -276,49 +451,49 @@ if ($missingGlobal.Count -eq 0) {
     exit 0
 }
 
-if ($RequestMissingCves) {
-    if ($WhatIfPreference) {
-        Write-Host 'WhatIf preview completed. No CVE requests were submitted.'
-        exit 0
-    }
+$unconfirmed = @(
+    $missingGlobal |
+        Where-Object { $_.CveRequestSubmittedLocally -and -not $_.CveRequestRecorded }
+)
 
-    $expiredWithoutRequest = @(
-        $missingGlobal |
-            Where-Object {
-                $_.ReviewWindowExpired -and -not $_.CveRequestSubmitted
-            }
-    )
+$expiredWithoutRequest = @(
+    $missingGlobal |
+        Where-Object {
+            $_.ReviewWindowExpired -and
+            -not $_.CveRequestRecorded -and
+            -not $_.CveRequestSubmittedLocally
+        }
+)
 
-    if ($expiredWithoutRequest.Count -gt 0) {
-        Write-Error (
-            "$($expiredWithoutRequest.Count) published advisories remain outside the global database " +
-            "after the review window and do not have a CVE request recorded."
-        )
-        exit 1
-    }
-
-    Write-Warning (
-        "$($missingGlobal.Count) published advisories are still absent from the global database. " +
-        'CVE requests that were already pending or submitted by this run still require follow-up verification.'
-    )
+if ($RequestMissingCves -and $WhatIfPreference) {
+    Write-Host 'WhatIf preview completed. No CVE requests were submitted.'
     exit 0
 }
 
-$expiredMissingGlobal = @(
-    $missingGlobal | Where-Object { $_.ReviewWindowExpired }
-)
-
-if ($expiredMissingGlobal.Count -gt 0) {
+if ($expiredWithoutRequest.Count -gt 0) {
     Write-Error (
-        "$($expiredMissingGlobal.Count) published advisories remain absent from the global database " +
-        "after the $ReviewWindowHours-hour review window. Re-run with -RequestMissingCves " +
-        '(use -WhatIf first) and continue tracking until the global endpoint resolves each GHSA.'
+        "$($expiredWithoutRequest.Count) published advisories remain outside the global database " +
+        "after the $ReviewWindowHours-hour review window with no CVE request on record, either at " +
+        'GitHub or in the local ledger. Run once with -RequestMissingCves (use -WhatIf first) to ' +
+        'submit them.'
     )
     exit 1
 }
 
+if ($unconfirmed.Count -gt 0) {
+    Write-Warning (
+        "$($unconfirmed.Count) advisories have a CVE request recorded locally that GitHub has not " +
+        'reflected in cve_request_submitted_at. The endpoint returns 202 Accepted and is processed ' +
+        'asynchronously, so this is expected shortly after submission. Re-run this script read-only ' +
+        '(without -RequestMissingCves) to track it. Do not resubmit: repeated requests can trigger ' +
+        'the endpoint 422 spam response. If GitHub has still not recorded the request after 48 ' +
+        'hours, contact GitHub Support with the affected GHSA identifiers.'
+    )
+    exit 0
+}
+
 Write-Warning (
-    "$($missingGlobal.Count) published advisories are not yet in the global database, but all remain " +
-    "inside the documented $ReviewWindowHours-hour review window. Re-run this check after the window expires."
+    "$($missingGlobal.Count) published advisories are not yet in the global database. CVE requests " +
+    'are recorded for them; continue verifying until the global endpoint resolves each GHSA.'
 )
 exit 0
