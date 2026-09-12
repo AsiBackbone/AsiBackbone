@@ -119,6 +119,8 @@
       href: privacy-and-signing-boundaries.md
     - name: Supply-Chain Provenance and Package SBOMs
       href: supply-chain-provenance.md
+    - name: NuGet Package Signing Decision Record
+      href: nuget-package-signing-decision.md
     - name: Governance Metadata Sanitization
       href: governance-metadata-sanitization.md
     - name: Capability Grant Hardening

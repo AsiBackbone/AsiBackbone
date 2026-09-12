@@ -112,8 +112,10 @@ checkout.
 6. Run the stable release workflow against that tag.
 7. Confirm all expected NuGet and symbol packages are published from the official
    source.
-8. Confirm GitHub release assets, SBOMs, and provenance artifacts are attached
-   where supported.
+8. Confirm all package SBOMs, `sbom-manifest.json`,
+   `release-evidence-manifest.json`, and retained release notes are attached to
+   the public GitHub release, and verify package/SBOM attestations by subject
+   digest.
 9. Confirm documentation deployment succeeds.
 10. Run post-publication Source Link validation:
 

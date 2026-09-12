@@ -69,7 +69,7 @@ Before tagging a stable release, the release PR or release-readiness record shou
 | Package assets | Package icon is regenerated when needed, included in generated packages, and inspected at package-list/detail sizes; packaged README files are present and render acceptably. |
 | Documentation links | README links, DocFX navigation, article index, release notes, migration notes, and GitHub Pages links point to current pages. |
 | Source Link | Source Link repository commit metadata is generated, and any required post-publish NuGet validation command is documented. |
-| SBOM and provenance | Package SBOM files and the SBOM manifest are generated; package and SBOM artifacts are uploaded and attested where the workflow event supports attestation. |
+| SBOM and provenance | Package SBOM files and the SBOM manifest are generated; package and SBOM artifacts are attested where supported; stable releases expose SBOMs, hashes, and release notes as durable public assets. |
 | Compatibility | Public API compatibility, stable package boundaries, assembly-version policy, durable schema/version guidance, and provider/package wording are reviewed. |
 | Migration | Breaking changes include migration guidance, old/new package IDs, old/new namespaces, representative `PackageReference` and `using` updates, and previous-line support/deprecation posture. |
 | Deferred checks | Any intentionally deferred release-critical check records the reason, accepted risk, follow-up issue, and whether release notes need to mention it. |

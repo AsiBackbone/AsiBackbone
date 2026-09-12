@@ -86,6 +86,25 @@ cryptographic hashes in the consumer's release record, and inspect:
 - SBOM and provenance artifacts published with the release, where available; and
 - the absence of unexpected executable tooling or package payloads.
 
+## Download durable release evidence
+
+The `v5.1.0` release exposes durable evidence generated for the shipped package subjects. Start with:
+
+- [`sbom-manifest.json`](https://github.com/AsiBackbone/AsiBackbone/releases/download/v5.1.0/sbom-manifest.json), which maps every package to its SPDX SBOM and package/SBOM SHA-256 values;
+- [`release-evidence-manifest.json`](https://github.com/AsiBackbone/AsiBackbone/releases/download/v5.1.0/release-evidence-manifest.json), which binds the durable assets to the release tag and source commit; and
+- the [complete `v5.1.0` release asset list](https://github.com/AsiBackbone/AsiBackbone/releases/tag/v5.1.0), which includes all eleven SPDX JSON files and the retained release notes.
+
+These public release assets do not require GitHub Actions API authentication and do not expire with workflow-artifact retention.
+
+After downloading a NuGet package and its corresponding SBOM, verify their workflow provenance:
+
+```powershell
+gh attestation verify ./AsiBackbone.Core.5.1.0.nupkg --repo AsiBackbone/AsiBackbone
+gh attestation verify ./AsiBackbone.Core.5.1.0.spdx.json --repo AsiBackbone/AsiBackbone
+```
+
+Use the same command for every package or SBOM admitted by the consumer. GitHub resolves attestations from the subject digest; a repository-level attestations collection response is not the verification mechanism.
+
 ## Distinguish repository controls from package guarantees
 
 The `5.1.0` release documents and automates repository rulesets, secret scanning,
@@ -98,6 +117,10 @@ interpreted as a consumer-environment security guarantee.
 
 Current AsiBackbone NuGet packages are intentionally published without NuGet
 package signing while the project is independently maintained.
+
+The [NuGet Package Signing Decision Record](nuget-package-signing-decision.md)
+records the 2026-09-12 decision, accepted residual risk, compensating controls,
+mandatory 2027-03-31/`6.0.0` review boundary, and earlier re-evaluation triggers.
 
 Do not interpret Source Link, SBOMs, provenance statements, GitHub release tags,
 or public source availability as a signed-package guarantee. Consumers that

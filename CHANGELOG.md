@@ -6,6 +6,22 @@ This project follows the spirit of [Keep a Changelog](https://keepachangelog.com
 
 ## [Unreleased]
 
+### Added
+
+* Added durable GitHub release publication for package SBOMs, package/hash
+  mappings, exact release notes, and a release-evidence manifest, with a
+  fail-closed post-upload asset check.
+* Added a dated NuGet package-signing decision record with accepted residual
+  risk, compensating controls, a mandatory review boundary, and event-driven
+  re-evaluation criteria.
+
+### Changed
+
+* Distinguished retention-limited GitHub Actions artifacts from durable public
+  release evidence and documented subject-digest provenance verification.
+* Backfilled the original `v5.0.0` and `v5.1.0` package SBOM evidence onto their
+  GitHub releases without rebuilding either tag.
+
 ## [5.1.0] - 2026-09-11
 
 ### Release summary

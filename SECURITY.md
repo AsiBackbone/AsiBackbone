@@ -121,7 +121,7 @@ This is a deliberate governance decision while the project is independently main
 
 Consumers should validate package identity through the official NuGet package source, package version, repository metadata, Source Link information, GitHub release tags, and available integrity metadata provided by NuGet tooling.
 
-Package signing remains under consideration for the long-term roadmap and will be reconsidered as the project's community, governance, and operational requirements evolve. Until package signing is formally adopted and documented, AsiBackbone should not be described as providing signed release artifacts, repository-signed packages, or Authenticode-signed packages.
+Package signing remains deferred under the dated [NuGet Package Signing Decision Record](docs/articles/nuget-package-signing-decision.md). That record requires review by 2027-03-31 or before the first `6.0.0` release candidate, whichever occurs first, and defines earlier re-evaluation triggers for maintainer capacity, consumer or regulatory requirements, suitable signing infrastructure, and supply-chain incidents. Until package signing is formally adopted and documented, AsiBackbone should not be described as providing signed release artifacts, repository-signed packages, or Authenticode-signed packages.
 
 ### Current trust model
 
@@ -131,8 +131,9 @@ Current package trust is established through:
 - Public GitHub source repository
 - GitHub release tags
 - Source Link integration
-- Software Bill of Materials (SBOM)
-- Package provenance and repository metadata
+- Durable release-attached Software Bills of Materials (SBOMs)
+- Package and SBOM provenance attestations
+- Release evidence and package SHA-256 mappings
 
 These mechanisms provide transparency and traceability while package signing remains deferred.
 

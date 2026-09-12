@@ -111,6 +111,21 @@ describes. That mitigation is a host-side compensating control, not a fix.
 
 ## Verify release evidence
 
+Download the durable `v5.0.0` evidence from the public release:
+
+- [`sbom-manifest.json`](https://github.com/AsiBackbone/AsiBackbone/releases/download/v5.0.0/sbom-manifest.json);
+- [`release-evidence-manifest.json`](https://github.com/AsiBackbone/AsiBackbone/releases/download/v5.0.0/release-evidence-manifest.json); and
+- the [complete `v5.0.0` release asset list](https://github.com/AsiBackbone/AsiBackbone/releases/tag/v5.0.0).
+
+The attached SPDX documents and manifests are publicly downloadable and do not
+expire with GitHub Actions artifact retention. Verify a downloaded package or
+SBOM against its workflow provenance with:
+
+```powershell
+gh attestation verify ./AsiBackbone.Core.5.0.0.nupkg --repo AsiBackbone/AsiBackbone
+gh attestation verify ./AsiBackbone.Core.5.0.0.spdx.json --repo AsiBackbone/AsiBackbone
+```
+
 - package and template versions resolve to `5.0.0`;
 - package IDs, repository metadata, and `net10.0` assets are present;
 - the security-relevant upgrade steps above are complete for the deployed host;
@@ -123,6 +138,10 @@ describes. That mitigation is a host-side compensating control, not a fix.
 SBOM and provenance artifacts are release evidence. They do not by themselves
 prove package signing, vulnerability absence, production tamper evidence,
 legal non-repudiation, or compliance approval.
+
+The dated [NuGet Package Signing Decision Record](nuget-package-signing-decision.md)
+defines the accepted residual risk, compensating controls, next review boundary,
+and mandatory early re-evaluation criteria for that deferral.
 
 Verifying this release does not establish that a host's own governed execution
 paths are correct. The framework failing closed is a precondition for that
