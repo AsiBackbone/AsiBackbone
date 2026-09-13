@@ -1,12 +1,12 @@
 Project,MaxCS1591,Notes
-src/AsiBackbone.Analyzers/AsiBackbone.Analyzers.csproj,500,Initial ceiling for tracked inventory; lower after the first calibrated CI inventory.
-src/AsiBackbone.AspNetCore/AsiBackbone.AspNetCore.csproj,500,Initial ceiling for tracked inventory; lower after adapter documentation cleanup.
-src/AsiBackbone.Core/AsiBackbone.Core.csproj,500,Initial ceiling for tracked inventory; Core remains the first candidate for staged enforcement.
-src/AsiBackbone.DependencyInjection/AsiBackbone.DependencyInjection.csproj,500,Initial ceiling for tracked inventory; lower after DI surface documentation cleanup.
-src/AsiBackbone.EntityFrameworkCore/AsiBackbone.EntityFrameworkCore.csproj,500,Initial ceiling for tracked inventory; lower after provider documentation cleanup.
-src/AsiBackbone.OpenTelemetry/AsiBackbone.OpenTelemetry.csproj,500,Initial ceiling for tracked inventory; lower after telemetry adapter documentation cleanup.
-src/AsiBackbone.Signing.LocalDevelopment/AsiBackbone.Signing.LocalDevelopment.csproj,500,Initial ceiling for tracked inventory; lower after local-development signing documentation cleanup.
-src/AsiBackbone.Signing.ManagedKey/AsiBackbone.Signing.ManagedKey.csproj,500,Initial ceiling for tracked inventory; lower after managed-key signing documentation cleanup.
-src/AsiBackbone.Storage.InMemory/AsiBackbone.Storage.InMemory.csproj,500,Initial ceiling for tracked inventory; lower after in-memory storage documentation cleanup.
-src/AsiBackbone.Templates/AsiBackbone.Templates.csproj,500,Initial ceiling for tracked inventory; template package exclusions should be reviewed separately.
-src/AsiBackbone.Testing/AsiBackbone.Testing.csproj,500,Initial ceiling for tracked inventory; lower after testing helper documentation cleanup.
+src/AsiBackbone.Analyzers/AsiBackbone.Analyzers.csproj,8,Calibrated to observed inventory; lower as analyzer public API documentation is completed.
+src/AsiBackbone.AspNetCore/AsiBackbone.AspNetCore.csproj,0,Calibrated to observed inventory; candidate for staged enforcement.
+src/AsiBackbone.Core/AsiBackbone.Core.csproj,92,Calibrated to observed inventory; Core remains the first candidate for staged enforcement once cleaned.
+src/AsiBackbone.DependencyInjection/AsiBackbone.DependencyInjection.csproj,0,Calibrated to observed inventory; candidate for staged enforcement.
+src/AsiBackbone.EntityFrameworkCore/AsiBackbone.EntityFrameworkCore.csproj,0,Calibrated to observed inventory; candidate for staged enforcement.
+src/AsiBackbone.OpenTelemetry/AsiBackbone.OpenTelemetry.csproj,0,Calibrated to observed inventory; candidate for staged enforcement.
+src/AsiBackbone.Signing.LocalDevelopment/AsiBackbone.Signing.LocalDevelopment.csproj,0,Calibrated to observed inventory; candidate for staged enforcement.
+src/AsiBackbone.Signing.ManagedKey/AsiBackbone.Signing.ManagedKey.csproj,0,Calibrated to observed inventory; candidate for staged enforcement.
+src/AsiBackbone.Storage.InMemory/AsiBackbone.Storage.InMemory.csproj,0,Calibrated to observed inventory; candidate for staged enforcement.
+src/AsiBackbone.Templates/AsiBackbone.Templates.csproj,0,Calibrated to observed inventory; template package exclusions should be reviewed separately.
+src/AsiBackbone.Testing/AsiBackbone.Testing.csproj,0,Calibrated to observed inventory; candidate for staged enforcement.

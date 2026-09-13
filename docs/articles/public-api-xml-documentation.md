@@ -42,10 +42,10 @@ The baseline file uses this shape:
 
 ```csv
 Project,MaxCS1591,Notes
-src/AsiBackbone.Core/AsiBackbone.Core.csproj,500,Initial ceiling for tracked inventory; Core remains the first candidate for staged enforcement.
+src/AsiBackbone.Core/AsiBackbone.Core.csproj,92,Calibrated to observed inventory; Core remains the first candidate for staged enforcement once cleaned.
 ```
 
-The initial ceilings are intentionally conservative because they are a guardrail for regression, not the final documentation target. They should trend downward as the inventory is reviewed and package surfaces are cleaned.
+Ceilings are calibrated to the observed inventory count for each project, so any new public member without XML documentation fails the inventory gate. They are a guardrail for regression, not the final documentation target, and should trend downward to zero as package surfaces are cleaned.
 
 Use this policy for future updates:
 
@@ -78,9 +78,10 @@ The current threshold is:
 - all public package projects remain inventoried;
 - all inventoried projects are compared to tracked `MaxCS1591` ceilings;
 - selected clean projects may be promoted to full enforcement;
+- baseline ceilings are calibrated to observed counts: `AsiBackbone.Core` (92) and `AsiBackbone.Analyzers` (8) carry remaining gaps, and every other public package project is held at 0;
 - Core remains the first candidate for staged enforcement because it is the framework-neutral governance engine.
 
-The next hardening threshold is to replace conservative baseline ceilings with calibrated counts from CI inventory artifacts, then lower those ceilings package by package until the highest-risk packages can move into enforcement mode.
+The next hardening threshold is to promote the zero-gap packages into `eng/xml-docs/staged-enforcement-projects.txt`, then document the remaining Core and Analyzers gaps and lower their ceilings until those packages can move into enforcement mode.
 
 ## Intentional exceptions
 
