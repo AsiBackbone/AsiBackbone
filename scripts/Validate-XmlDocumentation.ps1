@@ -45,10 +45,10 @@ function Get-RepositoryRelativePath {
     )
 
     try {
-        return [System.IO.Path]::GetRelativePath($RepositoryRoot, $Path).Replace('\\', '/')
+        return [System.IO.Path]::GetRelativePath($RepositoryRoot, $Path).Replace('\', '/')
     }
     catch {
-        return $Path.Replace('\\', '/')
+        return $Path.Replace('\', '/')
     }
 }
 
@@ -117,7 +117,7 @@ function Read-Cs1591Baseline {
             throw ('CS1591 baseline MaxCS1591 cannot be negative for ' + $row.Project)
         }
 
-        $projectPath = ([string]$row.Project).Trim().Replace('\\', '/')
+        $projectPath = ([string]$row.Project).Trim().Replace('\', '/')
         $baseline[$projectPath] = [pscustomobject]@{
             Project = $projectPath
             MaxCS1591 = $maximum
@@ -132,11 +132,13 @@ $resolvedRepositoryRoot = Resolve-Path -LiteralPath $RepositoryRoot
 $RepositoryRoot = $resolvedRepositoryRoot.Path
 
 if ($Project.Count -eq 0) {
+    # Wrap in @() because an empty array returned from a function unrolls to
+    # $null, which breaks .Count under strict mode.
     if ($Mode -eq 'Enforce') {
-        $Project = Read-ProjectList -Path $EnforcedProjectListPath
+        $Project = @(Read-ProjectList -Path $EnforcedProjectListPath)
     }
     else {
-        $Project = Read-ProjectList -Path $ProjectListPath
+        $Project = @(Read-ProjectList -Path $ProjectListPath)
     }
 }
 
@@ -166,6 +168,9 @@ foreach ($projectPath in $Project) {
         '--configuration',
         $Configuration,
         '--nologo',
+        # Force recompilation; an up-to-date incremental build emits no CS1591
+        # diagnostics and would report zero gaps.
+        '--no-incremental',
         '/p:ContinuousIntegrationBuild=true',
         '/p:GenerateDocumentationFile=true',
         '/p:AsiBackboneSuppressMissingXmlDocs=false',
@@ -180,11 +185,26 @@ foreach ($projectPath in $Project) {
     $exitCode = $LASTEXITCODE
     $cs1591Count = 0
     $pattern = '^(?<path>.+?\.(?:cs|vb))\((?<line>\d+),(?<column>\d+)\):\s+(?<level>warning|error)\s+CS1591:\s+(?<message>.+?)(?:\s+\[(?<project>.+?\.csproj)\])?$'
+    $seenDiagnostics = [System.Collections.Generic.HashSet[string]]::new([System.StringComparer]::OrdinalIgnoreCase)
 
     foreach ($line in $projectOutput) {
-        $text = [string]$line
+        $text = ([string]$line).Trim()
 
         if ($text -match $pattern) {
+            # Building a project also builds its references; count only
+            # diagnostics that belong to the project under validation.
+            if ($Matches['project'] -and -not [string]::Equals(
+                    [System.IO.Path]::GetFullPath($Matches['project']),
+                    [System.IO.Path]::GetFullPath($absoluteProjectPath),
+                    [System.StringComparison]::OrdinalIgnoreCase)) {
+                continue
+            }
+
+            # MSBuild can repeat diagnostics in its summary; count each once.
+            if (-not $seenDiagnostics.Add($Matches['path'] + '|' + $Matches['line'] + '|' + $Matches['column'] + '|' + $Matches['message'])) {
+                continue
+            }
+
             $cs1591Count++
             $sourcePath = $Matches['path']
 
@@ -192,7 +212,7 @@ foreach ($projectPath in $Project) {
                 $displaySourcePath = Get-RepositoryRelativePath -Path $sourcePath
             }
             else {
-                $displaySourcePath = $sourcePath.Replace('\\', '/')
+                $displaySourcePath = $sourcePath.Replace('\', '/')
             }
 
             $findings += [pscustomobject]@{

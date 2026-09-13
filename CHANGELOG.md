@@ -26,6 +26,14 @@ This project follows the spirit of [Keep a Changelog](https://keepachangelog.com
 * Backfilled the original `v5.0.0` and `v5.1.0` package SBOM evidence onto their
   GitHub releases without rebuilding either tag.
 
+### Fixed
+
+* Fixed `scripts/Validate-XmlDocumentation.ps1` so `-Mode Enforce` no longer
+  fails when no projects are staged, Windows project paths match baseline
+  entries, validation builds always recompile instead of reporting zero gaps
+  from up-to-date output, and `CS1591` findings are counted once and only
+  for the project being validated.
+
 ## [5.1.0] - 2026-09-11
 
 ### Release summary
