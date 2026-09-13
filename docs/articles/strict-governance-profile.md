@@ -61,10 +61,10 @@ builder.Services.AddSingleton<IAsiBackbonePolicyEvaluator<AsiBackboneConstraintE
         .GetRequiredService<IOptions<AsiBackbonePolicyEvaluatorOptions>>()
         .Value;
 
-    return new DefaultAsiBackbonePolicyEvaluator<AsiBackboneConstraintEvaluationContext>(
-        serviceProvider.GetServices<IAsiBackboneConstraint<AsiBackboneConstraintEvaluationContext>>(),
-        decisionPolicy: null,
-        options: options);
+    return DefaultAsiBackbonePolicyEvaluator.CreateBuilder<AsiBackboneConstraintEvaluationContext>()
+        .AddConstraints(serviceProvider.GetServices<IAsiBackboneConstraint<AsiBackboneConstraintEvaluationContext>>())
+        .WithOptions(options)
+        .Build();
 });
 ```
 

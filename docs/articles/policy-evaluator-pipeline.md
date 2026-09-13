@@ -90,14 +90,12 @@ For intentionally permissive local samples, tests, or migration flows, using exp
 ## Minimal usage example
 
 ```csharp
-var evaluator = new DefaultAsiBackbonePolicyEvaluator<MyPolicyContext>(
-    constraints:
-    [
-        new AuthenticatedActorConstraint(),
-        new OwnershipConstraint(),
-        new RiskConstraint()
-    ],
-    decisionPolicy: new HighRiskDecisionPolicy());
+var evaluator = DefaultAsiBackbonePolicyEvaluator.CreateBuilder<MyPolicyContext>()
+    .AddConstraint(new AuthenticatedActorConstraint())
+    .AddConstraint(new OwnershipConstraint())
+    .AddConstraint(new RiskConstraint())
+    .WithDecisionPolicy(new HighRiskDecisionPolicy())
+    .Build();
 
 GovernanceDecision decision = await evaluator.EvaluateAsync(
     context,
@@ -119,13 +117,12 @@ This default exists because an empty collection may mean dependency-injection, c
 Hosts that intentionally run an unconstrained local validation flow can opt out:
 
 ```csharp
-var evaluator = new DefaultAsiBackbonePolicyEvaluator<MyPolicyContext>(
-    constraints: [],
-    decisionPolicy: null,
-    options: new AsiBackbonePolicyEvaluatorOptions
+var evaluator = DefaultAsiBackbonePolicyEvaluator.CreateBuilder<MyPolicyContext>()
+    .WithOptions(new AsiBackbonePolicyEvaluatorOptions
     {
         DenyWhenNoConstraints = false
-    });
+    })
+    .Build();
 ```
 
 If a logger is supplied, the evaluator emits a warning when this permissive empty-policy path is used. Treat that warning as an operational signal, not as a substitute for startup validation.
@@ -166,13 +163,14 @@ Public reason messages intentionally do not include exception messages, stack tr
 Hosts that intentionally require fail-fast exception propagation can opt out:
 
 ```csharp
-var evaluator = new DefaultAsiBackbonePolicyEvaluator<MyPolicyContext>(
-    constraints: constraintsFromConfiguration,
-    decisionPolicy: new HighRiskDecisionPolicy(),
-    options: new AsiBackbonePolicyEvaluatorOptions
+var evaluator = DefaultAsiBackbonePolicyEvaluator.CreateBuilder<MyPolicyContext>()
+    .AddConstraints(constraintsFromConfiguration)
+    .WithDecisionPolicy(new HighRiskDecisionPolicy())
+    .WithOptions(new AsiBackbonePolicyEvaluatorOptions
     {
         TreatConstraintExceptionAsDenial = false
-    });
+    })
+    .Build();
 ```
 
 Use the opt-out only when the host's exception, transaction, retry, telemetry, or incident boundary must observe the original exception directly and still records enough evidence for the governed attempt.
@@ -194,13 +192,14 @@ By default, the evaluator runs every registered constraint so the resulting deci
 Latency-sensitive hosts can opt into first-denial fast-abort behavior:
 
 ```csharp
-var evaluator = new DefaultAsiBackbonePolicyEvaluator<MyPolicyContext>(
-    constraints: constraintsFromConfiguration,
-    decisionPolicy: new HighRiskDecisionPolicy(),
-    options: new AsiBackbonePolicyEvaluatorOptions
+var evaluator = DefaultAsiBackbonePolicyEvaluator.CreateBuilder<MyPolicyContext>()
+    .AddConstraints(constraintsFromConfiguration)
+    .WithDecisionPolicy(new HighRiskDecisionPolicy())
+    .WithOptions(new AsiBackbonePolicyEvaluatorOptions
     {
         ShortCircuitOnFirstDenial = true
-    });
+    })
+    .Build();
 ```
 
 Use this mode only when the host explicitly prefers latency or throughput over complete constraint visibility. Keep the default full-evaluation mode for audit-heavy, diagnostic, or reviewer-facing paths.

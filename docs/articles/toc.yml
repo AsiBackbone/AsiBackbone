@@ -67,6 +67,8 @@
       href: schema-versioning.md
     - name: API Compatibility and SemVer
       href: api-compatibility-and-semver.md
+    - name: "ASIB900: Obsolete Policy Evaluator Constructors"
+      href: asib900-policy-evaluator-constructors.md
 
 - name: Implementation Guides
   items:

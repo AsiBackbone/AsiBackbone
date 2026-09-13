@@ -21,13 +21,15 @@ public class FirstDenialShortCircuitBenchmarks
     private readonly BdnBenchmarkPolicyContext shortCircuitContext = CreateContext("policy_evaluator.first_denial_expensive_tail_short_circuit");
 
     private readonly IAsiBackbonePolicyEvaluator<BdnBenchmarkPolicyContext> fullEvaluationEvaluator =
-        new DefaultAsiBackbonePolicyEvaluator<BdnBenchmarkPolicyContext>(CreateExpensiveTailConstraints());
+        DefaultAsiBackbonePolicyEvaluator.CreateBuilder<BdnBenchmarkPolicyContext>()
+            .AddConstraints(CreateExpensiveTailConstraints())
+            .Build();
 
     private readonly IAsiBackbonePolicyEvaluator<BdnBenchmarkPolicyContext> shortCircuitEvaluator =
-        new DefaultAsiBackbonePolicyEvaluator<BdnBenchmarkPolicyContext>(
-            CreateExpensiveTailConstraints(),
-            decisionPolicy: null,
-            options: new AsiBackbonePolicyEvaluatorOptions { ShortCircuitOnFirstDenial = true });
+        DefaultAsiBackbonePolicyEvaluator.CreateBuilder<BdnBenchmarkPolicyContext>()
+            .AddConstraints(CreateExpensiveTailConstraints())
+            .WithOptions(new AsiBackbonePolicyEvaluatorOptions { ShortCircuitOnFirstDenial = true })
+            .Build();
 
     /// <summary>
     /// Benchmarks full evaluation when expensive tail constraints remain after the first denial.

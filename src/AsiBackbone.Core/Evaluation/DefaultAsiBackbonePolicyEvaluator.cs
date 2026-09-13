@@ -49,6 +49,7 @@ public sealed class DefaultAsiBackbonePolicyEvaluator<TContext> : IAsiBackbonePo
     /// </summary>
     /// <param name="constraints">The constraints that make up the active policy structure.</param>
     /// <param name="decisionPolicy">Optional decision policy applied after constraint composition.</param>
+    [Obsolete(AsiBackboneObsoletions.PolicyEvaluatorConstructorMessage, DiagnosticId = AsiBackboneObsoletions.PolicyEvaluatorConstructorDiagnosticId, UrlFormat = AsiBackboneObsoletions.PolicyEvaluatorConstructorUrl)]
     public DefaultAsiBackbonePolicyEvaluator(
         IEnumerable<IAsiBackboneConstraint<TContext>> constraints,
         IAsiBackboneDecisionPolicy<TContext>? decisionPolicy = null)
@@ -62,6 +63,7 @@ public sealed class DefaultAsiBackbonePolicyEvaluator<TContext> : IAsiBackbonePo
     /// <param name="constraints">The constraints that make up the active policy structure.</param>
     /// <param name="decisionPolicy">Optional decision policy applied after constraint composition.</param>
     /// <param name="options">Evaluator options applied during constraint composition.</param>
+    [Obsolete(AsiBackboneObsoletions.PolicyEvaluatorConstructorMessage, DiagnosticId = AsiBackboneObsoletions.PolicyEvaluatorConstructorDiagnosticId, UrlFormat = AsiBackboneObsoletions.PolicyEvaluatorConstructorUrl)]
     public DefaultAsiBackbonePolicyEvaluator(
         IEnumerable<IAsiBackboneConstraint<TContext>> constraints,
         IAsiBackboneDecisionPolicy<TContext>? decisionPolicy,
@@ -77,6 +79,7 @@ public sealed class DefaultAsiBackbonePolicyEvaluator<TContext> : IAsiBackbonePo
     /// <param name="decisionPolicy">Optional decision policy applied after constraint composition.</param>
     /// <param name="options">Evaluator options applied during constraint composition.</param>
     /// <param name="logger">Optional logger used to emit operational warning signals.</param>
+    [Obsolete(AsiBackboneObsoletions.PolicyEvaluatorConstructorMessage, DiagnosticId = AsiBackboneObsoletions.PolicyEvaluatorConstructorDiagnosticId, UrlFormat = AsiBackboneObsoletions.PolicyEvaluatorConstructorUrl)]
     public DefaultAsiBackbonePolicyEvaluator(
         IEnumerable<IAsiBackboneConstraint<TContext>> constraints,
         IAsiBackboneDecisionPolicy<TContext>? decisionPolicy,
@@ -92,6 +95,7 @@ public sealed class DefaultAsiBackbonePolicyEvaluator<TContext> : IAsiBackbonePo
     /// <param name="constraints">The constraints that make up the active policy structure.</param>
     /// <param name="threatModelContributors">Threat model contributors that inspect the context before constraint composition.</param>
     /// <param name="decisionPolicy">Optional decision policy applied after composition.</param>
+    [Obsolete(AsiBackboneObsoletions.PolicyEvaluatorConstructorMessage, DiagnosticId = AsiBackboneObsoletions.PolicyEvaluatorConstructorDiagnosticId, UrlFormat = AsiBackboneObsoletions.PolicyEvaluatorConstructorUrl)]
     public DefaultAsiBackbonePolicyEvaluator(
         IEnumerable<IAsiBackboneConstraint<TContext>> constraints,
         IEnumerable<IThreatModelContributor<TContext>> threatModelContributors,
@@ -107,6 +111,7 @@ public sealed class DefaultAsiBackbonePolicyEvaluator<TContext> : IAsiBackbonePo
     /// <param name="threatModelContributors">Threat model contributors that inspect the context before constraint composition.</param>
     /// <param name="decisionPolicy">Optional decision policy applied after composition.</param>
     /// <param name="options">Evaluator options applied during composition.</param>
+    [Obsolete(AsiBackboneObsoletions.PolicyEvaluatorConstructorMessage, DiagnosticId = AsiBackboneObsoletions.PolicyEvaluatorConstructorDiagnosticId, UrlFormat = AsiBackboneObsoletions.PolicyEvaluatorConstructorUrl)]
     public DefaultAsiBackbonePolicyEvaluator(
         IEnumerable<IAsiBackboneConstraint<TContext>> constraints,
         IEnumerable<IThreatModelContributor<TContext>> threatModelContributors,

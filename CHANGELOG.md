@@ -18,6 +18,22 @@ This project follows the spirit of [Keep a Changelog](https://keepachangelog.com
 * Added a dated NuGet package-signing decision record with accepted residual
   risk, compensating controls, a mandatory review boundary, and event-driven
   re-evaluation criteria.
+* Added `DefaultAsiBackbonePolicyEvaluator.CreateBuilder<TContext>()` and
+  `AsiBackbonePolicyEvaluatorBuilder<TContext>` for fluent evaluator
+  configuration of constraints, threat model contributors, decision policy,
+  options, and logger.
+
+### Deprecated
+
+* Marked the five partial-argument `DefaultAsiBackbonePolicyEvaluator<TContext>`
+  constructor overloads obsolete with diagnostic `ASIB900`. They will be
+  removed in 6.0. Use the builder, or the constructor that accepts all
+  dependencies, which remains supported for dependency injection. **Upgrade
+  note:** projects with `TreatWarningsAsErrors` that call the obsolete
+  overloads fail to build with `ASIB900` until migrated or suppressed with
+  `<NoWarn>$(NoWarn);ASIB900</NoWarn>`. Type-based DI registrations are not
+  affected. See the
+  [ASIB900 migration guide](docs/articles/asib900-policy-evaluator-constructors.md).
 
 ### Changed
 

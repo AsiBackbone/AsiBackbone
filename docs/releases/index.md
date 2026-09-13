@@ -12,6 +12,7 @@ Stable package family: `5.x`. Current release: `5.1.0`.
 - [5.1.0 Release Readiness Record](../articles/release-readiness-510.md)
 - [5.1.0 Consumer Verification Guide](../articles/consumer-verification-510.md)
 - [5.0.0 Migration Guide](../articles/upgrade-400-to-500.md)
+- [ASIB900 Migration: Obsolete Policy Evaluator Constructors](../articles/asib900-policy-evaluator-constructors.md)
 - [API Compatibility and Semantic Versioning](../articles/api-compatibility-and-semver.md)
 - [Schema Versioning](../articles/schema-versioning.md)
 - [Target Framework Support](../articles/target-framework-support.md)

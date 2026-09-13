@@ -66,13 +66,13 @@ IAsiBackboneConstraint<AsiBackboneConstraintEvaluationContext>[] constraints =
     new AllowedOperationConstraint()
 ];
 
-var evaluator = new DefaultAsiBackbonePolicyEvaluator<AsiBackboneConstraintEvaluationContext>(
-    constraints,
-    decisionPolicy: null,
-    options: new AsiBackbonePolicyEvaluatorOptions
+var evaluator = DefaultAsiBackbonePolicyEvaluator.CreateBuilder<AsiBackboneConstraintEvaluationContext>()
+    .AddConstraints(constraints)
+    .WithOptions(new AsiBackbonePolicyEvaluatorOptions
     {
         DenyWhenNoConstraints = true
-    });
+    })
+    .Build();
 
 var metadata = new Dictionary<string, string>(StringComparer.Ordinal)
 {
