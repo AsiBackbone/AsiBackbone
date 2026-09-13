@@ -21,6 +21,10 @@ This project follows the spirit of [Keep a Changelog](https://keepachangelog.com
   repository-wide so compiler, analyzer, and code-style warnings fail the
   build. `CS1591` remains a warning outside XML documentation enforcement mode
   so inventory reporting continues to work.
+* Calibrated `eng/xml-docs/cs1591-baseline.csv` ceilings from the provisional
+  500 to the observed inventory counts: `AsiBackbone.Core` 92,
+  `AsiBackbone.Analyzers` 8, and 0 for every other public package project, so
+  new undocumented public members fail the inventory gate.
 * Distinguished retention-limited GitHub Actions artifacts from durable public
   release evidence and documented subject-digest provenance verification.
 * Backfilled the original `v5.0.0` and `v5.1.0` package SBOM evidence onto their
