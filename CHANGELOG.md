@@ -17,6 +17,10 @@ This project follows the spirit of [Keep a Changelog](https://keepachangelog.com
 
 ### Changed
 
+* Enabled `TreatWarningsAsErrors` and `CodeAnalysisTreatWarningsAsErrors`
+  repository-wide so compiler, analyzer, and code-style warnings fail the
+  build. `CS1591` remains a warning outside XML documentation enforcement mode
+  so inventory reporting continues to work.
 * Distinguished retention-limited GitHub Actions artifacts from durable public
   release evidence and documented subject-digest provenance verification.
 * Backfilled the original `v5.0.0` and `v5.1.0` package SBOM evidence onto their
