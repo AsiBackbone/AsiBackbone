@@ -20,4 +20,16 @@
   <PropertyGroup Condition="'$(AsiBackboneEnforceMissingXmlDocs)' != 'true'">
     <WarningsNotAsErrors>$(WarningsNotAsErrors);CS1591</WarningsNotAsErrors>
   </PropertyGroup>
+
+  <!--
+    Validate shipped packages against the last released version so public API
+    and binary-compatibility breaks fail pack instead of reaching NuGet. Bump
+    AsiBackbonePackageValidationBaselineVersion after each release; disable only
+    for an intentional major-version break.
+  -->
+  <PropertyGroup Condition="$(MSBuildProjectDirectory.StartsWith('$(MSBuildThisFileDirectory)src'))">
+    <AsiBackbonePackageValidationBaselineVersion Condition="'$(AsiBackbonePackageValidationBaselineVersion)' == ''">5.1.0</AsiBackbonePackageValidationBaselineVersion>
+    <EnablePackageValidation>true</EnablePackageValidation>
+    <PackageValidationBaselineVersion>$(AsiBackbonePackageValidationBaselineVersion)</PackageValidationBaselineVersion>
+  </PropertyGroup>
 </Project>
