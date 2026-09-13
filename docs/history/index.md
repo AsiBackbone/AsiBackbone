@@ -26,4 +26,4 @@ The OpenTelemetry design record predates the released provider. Use [OpenTelemet
 
 - [Historical 1.1.0 Release Readiness Record](../articles/release-readiness-checklist.md)
 
-For versioned release notes and consumer-verification history, use [Releases & Compatibility](../releases/). For stable-version readiness evidence, use [Maintainer & Quality Evidence](../maintainers/).
+For versioned release notes and consumer-verification history, use [Releases & Compatibility](../releases/index.md). For stable-version readiness evidence, use [Maintainer & Quality Evidence](../maintainers/index.md).

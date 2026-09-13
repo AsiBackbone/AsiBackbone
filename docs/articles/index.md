@@ -142,7 +142,7 @@ These pages cover production hardening, durable audit/outbox behavior, observabi
 
 ## Releases & compatibility
 
-Start with the current release and compatibility rules. Older release notes, consumer-verification guides, and upgrade records are preserved under [Releases & Compatibility](../releases/) so they remain easy to find without dominating the implementation navigation.
+Start with the current release and compatibility rules. Older release notes, consumer-verification guides, and upgrade records are preserved under [Releases & Compatibility](../releases/index.md) so they remain easy to find without dominating the implementation navigation.
 
 * [5.1.0 Release Notes](release-notes-510.md)
 * [5.1.0 Release Readiness Record](release-readiness-510.md)
@@ -151,15 +151,15 @@ Start with the current release and compatibility rules. Older release notes, con
 * [API Compatibility and SemVer](api-compatibility-and-semver.md)
 * [Schema Versioning](schema-versioning.md)
 * [Target Framework Support](target-framework-support.md)
-* [Release and Upgrade History](../releases/)
+* [Release and Upgrade History](../releases/index.md)
 
 ## Maintainer / quality evidence
 
-Release-readiness records, benchmark reviews, coverage/mutation/concurrency evidence, documentation-claim validation, and maintainer checklists are published under [Maintainer & Quality Evidence](../maintainers/). They remain searchable and public, but are intentionally outside the normal consumer implementation path.
+Release-readiness records, benchmark reviews, coverage/mutation/concurrency evidence, documentation-claim validation, and maintainer checklists are published under [Maintainer & Quality Evidence](../maintainers/index.md). They remain searchable and public, but are intentionally outside the normal consumer implementation path.
 
 ## Historical records
 
-Superseded design proposals, alpha-era package/readiness records, and historical API reviews are preserved under [Historical and Superseded Records](../history/). These records are retained for traceability and should not be read as current package behavior.
+Superseded design proposals, alpha-era package/readiness records, and historical API reviews are preserved under [Historical and Superseded Records](../history/index.md). These records are retained for traceability and should not be read as current package behavior.
 
 ## Learn the architecture
 

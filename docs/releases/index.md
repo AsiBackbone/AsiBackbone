@@ -72,4 +72,4 @@ The upgrade guide is a historical version-to-version record. Use current compati
 - [1.0.0 Release Notes](../articles/release-notes-100.md)
 - [1.0.0 Quickstart](../articles/quickstart-100.md)
 
-Release-readiness and validation evidence is intentionally maintained separately under [Maintainer & Quality Evidence](../maintainers/).
+Release-readiness and validation evidence is intentionally maintained separately under [Maintainer & Quality Evidence](../maintainers/index.md).

@@ -110,7 +110,7 @@ Avoid:
 
 ## Related documentation
 
-- [Governance](../../GOVERNANCE.md)
+- [Governance](https://github.com/AsiBackbone/AsiBackbone/blob/main/GOVERNANCE.md)
 - [Release Validation](release-validation.md)
 - [5.1.0 Release Readiness Record](release-readiness-510.md)
 - [5.1.0 Release Notes](release-notes-510.md)
