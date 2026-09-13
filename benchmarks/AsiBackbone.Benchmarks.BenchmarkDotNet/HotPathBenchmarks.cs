@@ -56,35 +56,42 @@ public class AsiBackboneHotPathBenchmarks
     };
 
     private readonly IAsiBackbonePolicyEvaluator<BdnBenchmarkPolicyContext> zeroConstraintsEvaluator =
-        new DefaultAsiBackbonePolicyEvaluator<BdnBenchmarkPolicyContext>([]);
+        DefaultAsiBackbonePolicyEvaluator.CreateBuilder<BdnBenchmarkPolicyContext>()
+            .Build();
 
     private readonly IAsiBackbonePolicyEvaluator<BdnBenchmarkPolicyContext> allAllowEvaluator =
-        new DefaultAsiBackbonePolicyEvaluator<BdnBenchmarkPolicyContext>(CreateStaticConstraints(8, ConstraintEvaluationResult.Allow()));
+        DefaultAsiBackbonePolicyEvaluator.CreateBuilder<BdnBenchmarkPolicyContext>()
+            .AddConstraints(CreateStaticConstraints(8, ConstraintEvaluationResult.Allow()))
+            .Build();
 
     private readonly IAsiBackbonePolicyEvaluator<BdnBenchmarkPolicyContext> mixedEvaluator =
-        new DefaultAsiBackbonePolicyEvaluator<BdnBenchmarkPolicyContext>(CreateMixedConstraints());
+        DefaultAsiBackbonePolicyEvaluator.CreateBuilder<BdnBenchmarkPolicyContext>()
+            .AddConstraints(CreateMixedConstraints())
+            .Build();
 
     private readonly IAsiBackbonePolicyEvaluator<BdnBenchmarkPolicyContext> firstDenialEvaluator =
-        new DefaultAsiBackbonePolicyEvaluator<BdnBenchmarkPolicyContext>(
-            CreateMixedConstraints(),
-            decisionPolicy: null,
-            options: new AsiBackbonePolicyEvaluatorOptions { ShortCircuitOnFirstDenial = true });
+        DefaultAsiBackbonePolicyEvaluator.CreateBuilder<BdnBenchmarkPolicyContext>()
+            .AddConstraints(CreateMixedConstraints())
+            .WithOptions(new AsiBackbonePolicyEvaluatorOptions { ShortCircuitOnFirstDenial = true })
+            .Build();
 
     private readonly IAsiBackbonePolicyEvaluator<BdnBenchmarkPolicyContext> acknowledgmentEvaluator =
-        new DefaultAsiBackbonePolicyEvaluator<BdnBenchmarkPolicyContext>(
-            CreateStaticConstraints(4, ConstraintEvaluationResult.Allow()),
-            new BdnRequireAcknowledgmentPolicy());
+        DefaultAsiBackbonePolicyEvaluator.CreateBuilder<BdnBenchmarkPolicyContext>()
+            .AddConstraints(CreateStaticConstraints(4, ConstraintEvaluationResult.Allow()))
+            .WithDecisionPolicy(new BdnRequireAcknowledgmentPolicy())
+            .Build();
 
     private readonly IAsiBackbonePolicyEvaluator<BdnBenchmarkPolicyContext> escalationEvaluator =
-        new DefaultAsiBackbonePolicyEvaluator<BdnBenchmarkPolicyContext>(
-            CreateStaticConstraints(4, ConstraintEvaluationResult.Allow()),
-            new BdnEscalatePolicy());
+        DefaultAsiBackbonePolicyEvaluator.CreateBuilder<BdnBenchmarkPolicyContext>()
+            .AddConstraints(CreateStaticConstraints(4, ConstraintEvaluationResult.Allow()))
+            .WithDecisionPolicy(new BdnEscalatePolicy())
+            .Build();
 
     private readonly IAsiBackbonePolicyEvaluator<BdnBenchmarkPolicyContext> exceptionAsDenialEvaluator =
-        new DefaultAsiBackbonePolicyEvaluator<BdnBenchmarkPolicyContext>(
-            [new BdnThrowingConstraint(new InvalidOperationException("Benchmark constraint failure."))],
-            decisionPolicy: null,
-            options: new AsiBackbonePolicyEvaluatorOptions { TreatConstraintExceptionAsDenial = true });
+        DefaultAsiBackbonePolicyEvaluator.CreateBuilder<BdnBenchmarkPolicyContext>()
+            .AddConstraint(new BdnThrowingConstraint(new InvalidOperationException("Benchmark constraint failure.")))
+            .WithOptions(new AsiBackbonePolicyEvaluatorOptions { TreatConstraintExceptionAsDenial = true })
+            .Build();
 
     private readonly EndpointGovernanceHarness endpointAllow = new("endpoint_governance.policy_allow", EndpointDecisionKind.Allow);
     private readonly EndpointGovernanceHarness endpointWarning = new("endpoint_governance.policy_warning", EndpointDecisionKind.Warning);

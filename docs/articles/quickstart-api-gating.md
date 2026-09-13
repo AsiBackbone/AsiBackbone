@@ -81,10 +81,9 @@ builder.Services.AddSingleton<IAsiBackboneConstraint<AsiBackboneConstraintEvalua
 
 // Register the Core evaluator. It composes constraint results into a GovernanceDecision.
 builder.Services.AddSingleton<IAsiBackbonePolicyEvaluator<AsiBackboneConstraintEvaluationContext>>(serviceProvider =>
-    new DefaultAsiBackbonePolicyEvaluator<AsiBackboneConstraintEvaluationContext>(
-        serviceProvider.GetServices<IAsiBackboneConstraint<AsiBackboneConstraintEvaluationContext>>(),
-        decisionPolicy: null,
-        options: new AsiBackbonePolicyEvaluatorOptions
+    DefaultAsiBackbonePolicyEvaluator.CreateBuilder<AsiBackboneConstraintEvaluationContext>()
+        .AddConstraints(serviceProvider.GetServices<IAsiBackboneConstraint<AsiBackboneConstraintEvaluationContext>>())
+        .WithOptions(new AsiBackbonePolicyEvaluatorOptions
         {
             // For real API gating, fail closed if the host expected constraints but none were registered.
             DenyWhenNoConstraints = true,
@@ -93,7 +92,8 @@ builder.Services.AddSingleton<IAsiBackbonePolicyEvaluator<AsiBackboneConstraintE
             // with stable reason codes. Set false only when the host intentionally wants exceptions
             // to propagate to an existing exception, transaction, retry, telemetry, or incident path.
             TreatConstraintExceptionAsDenial = true
-        }));
+        })
+        .Build());
 
 WebApplication app = builder.Build();
 

@@ -24,26 +24,29 @@ public class PolicyEvaluatorAllocationBenchmarks
     private readonly BdnPolicyContext firstDenialReasonCompositionContext = CreateContext("policy_evaluator.first_denial_reason_composition");
 
     private readonly IAsiBackbonePolicyEvaluator<BdnPolicyContext> allAllowWithDecisionPolicyEvaluator =
-        new DefaultAsiBackbonePolicyEvaluator<BdnPolicyContext>(
-            CreateStaticConstraints(8, ConstraintEvaluationResult.Allow()),
-            new BdnPassThroughDecisionPolicy());
+        DefaultAsiBackbonePolicyEvaluator.CreateBuilder<BdnPolicyContext>()
+            .AddConstraints(CreateStaticConstraints(8, ConstraintEvaluationResult.Allow()))
+            .WithDecisionPolicy(new BdnPassThroughDecisionPolicy())
+            .Build();
 
     private readonly IAsiBackbonePolicyEvaluator<BdnPolicyContext> mixedWithDecisionPolicyEvaluator =
-        new DefaultAsiBackbonePolicyEvaluator<BdnPolicyContext>(
-            CreateMixedConstraints(),
-            new BdnPassThroughDecisionPolicy());
+        DefaultAsiBackbonePolicyEvaluator.CreateBuilder<BdnPolicyContext>()
+            .AddConstraints(CreateMixedConstraints())
+            .WithDecisionPolicy(new BdnPassThroughDecisionPolicy())
+            .Build();
 
     private readonly IAsiBackbonePolicyEvaluator<BdnPolicyContext> firstDenialWithDecisionPolicyEvaluator =
-        new DefaultAsiBackbonePolicyEvaluator<BdnPolicyContext>(
-            CreateMixedConstraints(),
-            new BdnPassThroughDecisionPolicy(),
-            new AsiBackbonePolicyEvaluatorOptions { ShortCircuitOnFirstDenial = true });
+        DefaultAsiBackbonePolicyEvaluator.CreateBuilder<BdnPolicyContext>()
+            .AddConstraints(CreateMixedConstraints())
+            .WithDecisionPolicy(new BdnPassThroughDecisionPolicy())
+            .WithOptions(new AsiBackbonePolicyEvaluatorOptions { ShortCircuitOnFirstDenial = true })
+            .Build();
 
     private readonly IAsiBackbonePolicyEvaluator<BdnPolicyContext> firstDenialReasonCompositionEvaluator =
-        new DefaultAsiBackbonePolicyEvaluator<BdnPolicyContext>(
-            CreateWarningThenDenialConstraints(),
-            decisionPolicy: null,
-            options: new AsiBackbonePolicyEvaluatorOptions { ShortCircuitOnFirstDenial = true });
+        DefaultAsiBackbonePolicyEvaluator.CreateBuilder<BdnPolicyContext>()
+            .AddConstraints(CreateWarningThenDenialConstraints())
+            .WithOptions(new AsiBackbonePolicyEvaluatorOptions { ShortCircuitOnFirstDenial = true })
+            .Build();
 
     /// <summary>
     /// Benchmarks all-allow policy evaluation when a decision policy requires complete constraint-result visibility.

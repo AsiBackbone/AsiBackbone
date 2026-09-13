@@ -73,10 +73,10 @@ builder.Services.AddSingleton<IAsiBackboneAuditSink>(sp =>
     sp.GetRequiredService<InMemoryAuditLedger>());
 builder.Services.AddSingleton<IAsiBackboneConstraint<AsiBackboneConstraintEvaluationContext>, AllowedRegionConstraint>();
 builder.Services.AddSingleton<IAsiBackbonePolicyEvaluator<AsiBackboneConstraintEvaluationContext>>(sp =>
-    new DefaultAsiBackbonePolicyEvaluator<AsiBackboneConstraintEvaluationContext>(
-        sp.GetServices<IAsiBackboneConstraint<AsiBackboneConstraintEvaluationContext>>(),
-        decisionPolicy: null,
-        options: new AsiBackbonePolicyEvaluatorOptions()));
+    DefaultAsiBackbonePolicyEvaluator.CreateBuilder<AsiBackboneConstraintEvaluationContext>()
+        .AddConstraints(sp.GetServices<IAsiBackboneConstraint<AsiBackboneConstraintEvaluationContext>>())
+        .WithOptions(new AsiBackbonePolicyEvaluatorOptions())
+        .Build());
 
 app.MapPost("/api/orders/{region}/approve", async (
     string region,

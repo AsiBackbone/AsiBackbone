@@ -90,15 +90,16 @@ public sealed class ReplayThreatContributor : IThreatModelContributor<MyPolicyCo
 Threat contributors are supplied explicitly to the default evaluator. Multiple contributors run in deterministic order before normal constraint composition.
 
 ```csharp
-var evaluator = new DefaultAsiBackbonePolicyEvaluator<MyPolicyContext>(
-    constraints,
-    threatModelContributors,
-    decisionPolicy,
-    new AsiBackbonePolicyEvaluatorOptions
+var evaluator = DefaultAsiBackbonePolicyEvaluator.CreateBuilder<MyPolicyContext>()
+    .AddConstraints(constraints)
+    .AddThreatModelContributors(threatModelContributors)
+    .WithDecisionPolicy(decisionPolicy)
+    .WithOptions(new AsiBackbonePolicyEvaluatorOptions
     {
         TreatThreatContributorExceptionAsDenial = true,
         PreventThreatAssessmentAllowDowngrade = true
-    });
+    })
+    .Build();
 ```
 
 ## Assessment fields

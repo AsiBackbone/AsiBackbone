@@ -61,8 +61,9 @@ using AsiBackbone.Core.Constraints;
 using AsiBackbone.Core.Decisions;
 using AsiBackbone.Core.Evaluation;
 
-var evaluator = new DefaultAsiBackbonePolicyEvaluator<AsiBackboneConstraintEvaluationContext>(
-    [new RegionRequiredConstraint()]);
+var evaluator = DefaultAsiBackbonePolicyEvaluator.CreateBuilder<AsiBackboneConstraintEvaluationContext>()
+    .AddConstraint(new RegionRequiredConstraint())
+    .Build();
 
 var context = new AsiBackboneConstraintEvaluationContext(
     correlationId: Guid.NewGuid().ToString("N"),

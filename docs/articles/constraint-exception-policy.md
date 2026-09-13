@@ -77,13 +77,14 @@ This distinction lets a host say whether a request was denied by policy or denie
 Hosts that need fail-fast exception propagation can opt out explicitly:
 
 ```csharp
-var evaluator = new DefaultAsiBackbonePolicyEvaluator<MyPolicyContext>(
-    constraints: constraintsFromConfiguration,
-    decisionPolicy: decisionPolicy,
-    options: new AsiBackbonePolicyEvaluatorOptions
+var evaluator = DefaultAsiBackbonePolicyEvaluator.CreateBuilder<MyPolicyContext>()
+    .AddConstraints(constraintsFromConfiguration)
+    .WithDecisionPolicy(decisionPolicy)
+    .WithOptions(new AsiBackbonePolicyEvaluatorOptions
     {
         TreatConstraintExceptionAsDenial = false
-    });
+    })
+    .Build();
 ```
 
 When `TreatConstraintExceptionAsDenial` is `false`, the evaluator does not convert ordinary constraint exceptions into governance denials. The exception propagates to the host application so host exception handling, retry, circuit-breaker, telemetry, transaction, or incident policy can decide what happens next.

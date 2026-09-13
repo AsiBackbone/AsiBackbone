@@ -37,37 +37,44 @@ internal static class Program
             new PolicyEvaluationScenario(
                 "policy.zero_constraints",
                 "Evaluate with no registered constraints.",
-                new DefaultAsiBackbonePolicyEvaluator<BenchmarkPolicyContext>([])),
+                DefaultAsiBackbonePolicyEvaluator.CreateBuilder<BenchmarkPolicyContext>()
+                    .Build()),
             new PolicyEvaluationScenario(
                 "policy.all_allow_8",
                 "Evaluate eight allow constraints.",
-                new DefaultAsiBackbonePolicyEvaluator<BenchmarkPolicyContext>(CreateStaticConstraints(8, ConstraintEvaluationResult.Allow()))),
+                DefaultAsiBackbonePolicyEvaluator.CreateBuilder<BenchmarkPolicyContext>()
+                    .AddConstraints(CreateStaticConstraints(8, ConstraintEvaluationResult.Allow()))
+                    .Build()),
             new PolicyEvaluationScenario(
                 "policy.warning_and_denial_full",
                 "Evaluate mixed allow, warning, and denial constraints with full aggregation.",
-                new DefaultAsiBackbonePolicyEvaluator<BenchmarkPolicyContext>(CreateMixedConstraints())),
+                DefaultAsiBackbonePolicyEvaluator.CreateBuilder<BenchmarkPolicyContext>()
+                    .AddConstraints(CreateMixedConstraints())
+                    .Build()),
             new PolicyEvaluationScenario(
                 "policy.first_denial_short_circuit",
                 "Evaluate mixed constraints with first-denial short-circuit enabled.",
-                new DefaultAsiBackbonePolicyEvaluator<BenchmarkPolicyContext>(
-                    CreateMixedConstraints(),
-                    decisionPolicy: null,
-                    options: new AsiBackbonePolicyEvaluatorOptions
+                DefaultAsiBackbonePolicyEvaluator.CreateBuilder<BenchmarkPolicyContext>()
+                    .AddConstraints(CreateMixedConstraints())
+                    .WithOptions(new AsiBackbonePolicyEvaluatorOptions
                     {
                         ShortCircuitOnFirstDenial = true
-                    })),
+                    })
+                    .Build()),
             new PolicyEvaluationScenario(
                 "policy.acknowledgment_required",
                 "Evaluate allow constraints followed by acknowledgment-required decision policy.",
-                new DefaultAsiBackbonePolicyEvaluator<BenchmarkPolicyContext>(
-                    CreateStaticConstraints(4, ConstraintEvaluationResult.Allow()),
-                    new RequireAcknowledgmentPolicy())),
+                DefaultAsiBackbonePolicyEvaluator.CreateBuilder<BenchmarkPolicyContext>()
+                    .AddConstraints(CreateStaticConstraints(4, ConstraintEvaluationResult.Allow()))
+                    .WithDecisionPolicy(new RequireAcknowledgmentPolicy())
+                    .Build()),
             new PolicyEvaluationScenario(
                 "policy.escalation_recommended",
                 "Evaluate allow constraints followed by escalation-recommended decision policy.",
-                new DefaultAsiBackbonePolicyEvaluator<BenchmarkPolicyContext>(
-                    CreateStaticConstraints(4, ConstraintEvaluationResult.Allow()),
-                    new EscalatePolicy())),
+                DefaultAsiBackbonePolicyEvaluator.CreateBuilder<BenchmarkPolicyContext>()
+                    .AddConstraints(CreateStaticConstraints(4, ConstraintEvaluationResult.Allow()))
+                    .WithDecisionPolicy(new EscalatePolicy())
+                    .Build()),
             new EndpointGovernanceScenario(
                 "endpoint_governance.policy_allow",
                 "Evaluate DefaultAsiBackboneEndpointGovernanceService with a host policy evaluator returning allow.",

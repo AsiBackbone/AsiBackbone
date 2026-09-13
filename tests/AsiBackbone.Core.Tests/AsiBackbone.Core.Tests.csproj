@@ -6,6 +6,8 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <IsPackable>false</IsPackable>
+    <!-- Keep coverage for DefaultAsiBackbonePolicyEvaluator overloads obsoleted in 5.x until their 6.0 removal. -->
+    <NoWarn>$(NoWarn);ASIB900</NoWarn>
     <Include>[AsiBackbone.Core]*</Include>
   </PropertyGroup>
 

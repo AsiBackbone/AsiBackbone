@@ -200,13 +200,14 @@ This policy still does not validate the capability token, sign the receipt, or c
 For high-throughput paths, a host may intentionally prefer first-denial fast-abort behavior over full reason aggregation. That choice belongs in evaluator options, not inside hidden constraint side effects.
 
 ```csharp
-var evaluator = new DefaultAsiBackbonePolicyEvaluator<MyPolicyContext>(
-    constraints: constraintsFromConfiguration,
-    decisionPolicy: new RegionalOverlayDecisionPolicy<MyPolicyContext>(supportedRegions),
-    options: new AsiBackbonePolicyEvaluatorOptions
+var evaluator = DefaultAsiBackbonePolicyEvaluator.CreateBuilder<MyPolicyContext>()
+    .AddConstraints(constraintsFromConfiguration)
+    .WithDecisionPolicy(new RegionalOverlayDecisionPolicy<MyPolicyContext>(supportedRegions))
+    .WithOptions(new AsiBackbonePolicyEvaluatorOptions
     {
         ShortCircuitOnFirstDenial = true
-    });
+    })
+    .Build();
 ```
 
 Use this only when the host accepts the audit tradeoff: constraints after the first blocking result will not run, so their reason codes and telemetry side effects will not exist for that evaluation.
