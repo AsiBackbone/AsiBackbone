@@ -11,4 +11,13 @@
   <PropertyGroup Condition="'$(AsiBackboneEnforceMissingXmlDocs)' == 'true'">
     <WarningsAsErrors>$(WarningsAsErrors);CS1591</WarningsAsErrors>
   </PropertyGroup>
+
+  <!--
+    TreatWarningsAsErrors is enabled repository-wide. Keep CS1591 as a warning
+    unless enforcement is requested so inventory mode can report documentation
+    gaps without failing the build.
+  -->
+  <PropertyGroup Condition="'$(AsiBackboneEnforceMissingXmlDocs)' != 'true'">
+    <WarningsNotAsErrors>$(WarningsNotAsErrors);CS1591</WarningsNotAsErrors>
+  </PropertyGroup>
 </Project>
