@@ -48,4 +48,4 @@ The records below preserve the release gate and audit trail for prior stable ver
 - [1.2.1 Release Readiness Record](../articles/release-readiness-121.md)
 - [1.2.0 Release Readiness Record](../articles/release-readiness-120.md)
 
-For alpha-era and superseded design/readiness records, use [Historical and Superseded Records](../history/).
+For alpha-era and superseded design/readiness records, use [Historical and Superseded Records](../history/index.md).
