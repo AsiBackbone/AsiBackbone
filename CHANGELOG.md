@@ -17,10 +17,26 @@ This project follows the spirit of [Keep a Changelog](https://keepachangelog.com
 
 ### Changed
 
+* Enabled `TreatWarningsAsErrors` and `CodeAnalysisTreatWarningsAsErrors`
+  repository-wide so compiler, analyzer, and code-style warnings fail the
+  build. `CS1591` remains a warning outside XML documentation enforcement mode
+  so inventory reporting continues to work.
+* Calibrated `eng/xml-docs/cs1591-baseline.csv` ceilings from the provisional
+  500 to the observed inventory counts: `AsiBackbone.Core` 92,
+  `AsiBackbone.Analyzers` 8, and 0 for every other public package project, so
+  new undocumented public members fail the inventory gate.
 * Distinguished retention-limited GitHub Actions artifacts from durable public
   release evidence and documented subject-digest provenance verification.
 * Backfilled the original `v5.0.0` and `v5.1.0` package SBOM evidence onto their
   GitHub releases without rebuilding either tag.
+
+### Fixed
+
+* Fixed `scripts/Validate-XmlDocumentation.ps1` so `-Mode Enforce` no longer
+  fails when no projects are staged, Windows project paths match baseline
+  entries, validation builds always recompile instead of reporting zero gaps
+  from up-to-date output, and `CS1591` findings are counted once and only
+  for the project being validated.
 
 ## [5.1.0] - 2026-09-11
 
