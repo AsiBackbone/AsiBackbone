@@ -5,6 +5,8 @@ namespace AsiBackbone.Core;
 /// </summary>
 internal static class AsiBackboneObsoletions
 {
+    internal const string PolicyEvaluatorConstructorUrl = "https://asibackbone.github.io/AsiBackbone/articles/asib900-policy-evaluator-constructors.html";
+
     internal const string PolicyEvaluatorConstructorDiagnosticId = "ASIB900";
 
     internal const string PolicyEvaluatorConstructorMessage =

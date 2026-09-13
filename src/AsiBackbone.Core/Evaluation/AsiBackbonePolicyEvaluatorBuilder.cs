@@ -119,6 +119,8 @@ public sealed class AsiBackbonePolicyEvaluatorBuilder<TContext>
     /// Creates an evaluator from the current builder state.
     /// </summary>
     /// <returns>A new evaluator.</returns>
-    public DefaultAsiBackbonePolicyEvaluator<TContext> Build() =>
-        new(constraints, threatModelContributors, decisionPolicy, options, logger);
+    public DefaultAsiBackbonePolicyEvaluator<TContext> Build()
+    {
+        return new DefaultAsiBackbonePolicyEvaluator<TContext>(constraints, threatModelContributors, decisionPolicy, options, logger);
+    }
 }
