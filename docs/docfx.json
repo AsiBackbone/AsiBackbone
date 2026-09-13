@@ -3,13 +3,12 @@
     {
       "src": [
         {
-          "src": "..",
+          "src": "../src",
           "files": [
-            "**/*.csproj"
+            "*/*.csproj"
           ],
           "exclude": [
-            "**/bin/**",
-            "**/obj/**"
+            "AsiBackbone.Templates/**"
           ]
         }
       ],
