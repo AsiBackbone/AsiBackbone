@@ -21,12 +21,12 @@ See [Documentation Ownership](articles/documentation-ownership.md) for the cross
 | --- | --- |
 | Install and configure AsiBackbone | [Implementation-First Adoption Path](articles/implementation-first-adoption.md) and [First 15 Minutes: Standard API Gating](articles/quickstart-api-gating.md) |
 | Register the package family in a host | [AddAsiBackbone Builder Facade](articles/add-asibackbone-builder-facade.md) and [Getting Started](articles/getting-started.md) |
-| Find a package or public type | [Documentation Articles](articles/) and [API Reference](api-reference.md) |
+| Find a package or public type | [Documentation Articles](articles/index.md) and [API Reference](api-reference.md) |
 | Understand runtime decision behavior | [Policy Evaluator Pipeline](articles/policy-evaluator-pipeline.md) |
 | Persist, observe, sign, verify, or harden a deployment | [Production Hardening: Evaluator and Outbox](articles/production-hardening-evaluator-and-outbox.md) |
-| Run a concrete integration path | [Plain ASP.NET Core Host Sample](articles/plain-aspnetcore-host-sample.md) and [Samples & Scenarios](articles/) |
-| Check compatibility, release changes, or upgrade history | [Releases & Compatibility](releases/) |
-| Review readiness, benchmarks, or quality evidence | [Maintainer & Quality Evidence](maintainers/) |
+| Run a concrete integration path | [Plain ASP.NET Core Host Sample](articles/plain-aspnetcore-host-sample.md) and [Samples & Scenarios](articles/index.md) |
+| Check compatibility, release changes, or upgrade history | [Releases & Compatibility](releases/index.md) |
+| Review readiness, benchmarks, or quality evidence | [Maintainer & Quality Evidence](maintainers/index.md) |
 | Learn the broader architecture | [ASI Backbone Learning](https://asibackbone.github.io/Learning/) |
 
 The DocFX header search is available for package names, API concepts, and article titles. Source for every page lives under `docs/`, and the site header includes a Repository link for source review or edits.
@@ -76,7 +76,7 @@ Package-specific READMEs and release notes define which surfaces are stable, opt
 
 ### Packages and API
 
-* [Documentation Articles](articles/)
+* [Documentation Articles](articles/index.md)
 * [Generated API Reference](api-reference.md)
 * [Core API Domain Model](articles/core-domain-language.md)
 * [ASP.NET Core Integration Boundary](articles/aspnetcore-integration-boundary.md)
@@ -114,12 +114,12 @@ Package-specific READMEs and release notes define which surfaces are stable, opt
 * [Schema Versioning](articles/schema-versioning.md)
 * [Release Validation](articles/release-validation.md)
 
-Historical release notes and verification records remain available under [Releases & Compatibility](releases/) without occupying the primary adoption path.
+Historical release notes and verification records remain available under [Releases & Compatibility](releases/index.md) without occupying the primary adoption path.
 
 ### Maintainer and quality evidence
 
-* [Maintainer & Quality Evidence](maintainers/)
-* [Quality Reports](quality/)
+* [Maintainer & Quality Evidence](maintainers/index.md)
+* [Quality Reports](quality/index.md)
 * [Performance Benchmark Baseline](articles/performance-benchmark-baseline.md)
 * [API Baseline and Boundary Checks](articles/api-baseline-and-boundary-checks.md)
 * [Release Cadence and Readiness](articles/release-cadence-and-readiness.md)
@@ -128,7 +128,7 @@ Historical release notes and verification records remain available under [Releas
 
 ### Historical records
 
-* [Historical and Superseded Records](history/)
+* [Historical and Superseded Records](history/index.md)
 
 Historical and superseded records remain public and searchable for traceability without being presented as current implementation guidance.
 
