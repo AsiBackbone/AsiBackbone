@@ -33,11 +33,12 @@ The DocFX header search is available for package names, API concepts, and articl
 
 ## Current stable package family
 
-Stable `5.x` package family. `5.1.0` is the current release. It is a
-backward-compatible stabilization release that adds public API compatibility
-baselines, auditable repository controls, release operations tooling, and public
-support and maintainer policies. Package IDs, public namespaces, runtime
-behavior, and the binary assembly identity `5.0.0.0` remain unchanged.
+Stable `5.x` package family. `5.2.0` is the current release. It is a
+backward-compatible minor release that adds a fluent policy-evaluator builder,
+begins the `ASIB900` constructor-deprecation window, and strengthens package
+compatibility, durable release evidence, quality gates, and project stewardship.
+Package IDs, public namespaces, the `net10.0` target, and the binary assembly
+identity `5.0.0.0` remain unchanged.
 
 ```text
 AsiBackbone.Core
@@ -107,8 +108,8 @@ Package-specific READMEs and release notes define which surfaces are stable, opt
 
 ### Releases and compatibility
 
-* [5.1.0 Release Notes](articles/release-notes-510.md)
-* [5.1.0 Consumer Verification Guide](articles/consumer-verification-510.md)
+* [5.2.0 Release Notes](articles/release-notes-520.md)
+* [5.2.0 Consumer Verification Guide](articles/consumer-verification-520.md)
 * [5.0.0 Migration Guide](articles/upgrade-400-to-500.md)
 * [API Compatibility and SemVer](articles/api-compatibility-and-semver.md)
 * [Schema Versioning](articles/schema-versioning.md)
@@ -123,7 +124,7 @@ Historical release notes and verification records remain available under [Releas
 * [Performance Benchmark Baseline](articles/performance-benchmark-baseline.md)
 * [API Baseline and Boundary Checks](articles/api-baseline-and-boundary-checks.md)
 * [Release Cadence and Readiness](articles/release-cadence-and-readiness.md)
-* [5.1.0 Release Readiness Record](articles/release-readiness-510.md)
+* [5.2.0 Release Readiness Record](articles/release-readiness-520.md)
 
 
 ### Historical records

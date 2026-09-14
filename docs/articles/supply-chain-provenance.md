@@ -76,9 +76,9 @@ The workflows do not attest broad repository outputs, coverage reports, document
 GitHub attestations are verified against a downloaded subject digest; the repository API is not a collection listing of every attestation. After downloading a build package and SBOM from the GitHub release, verify them with:
 
 ```powershell
-gh release download v5.1.0 --repo AsiBackbone/AsiBackbone --pattern 'AsiBackbone.Core.5.1.0.nupkg'
-gh attestation verify ./AsiBackbone.Core.5.1.0.nupkg --repo AsiBackbone/AsiBackbone
-gh attestation verify ./AsiBackbone.Core.5.1.0.spdx.json --repo AsiBackbone/AsiBackbone
+gh release download v5.2.0 --repo AsiBackbone/AsiBackbone --pattern 'AsiBackbone.Core.5.2.0.nupkg'
+gh attestation verify ./AsiBackbone.Core.5.2.0.nupkg --repo AsiBackbone/AsiBackbone
+gh attestation verify ./AsiBackbone.Core.5.2.0.spdx.json --repo AsiBackbone/AsiBackbone
 ```
 
 Repeat the command for each package or SBOM being admitted. A successful provenance verification identifies the workflow and source repository that produced the subject; it is not a NuGet author or repository signature.
@@ -115,13 +115,13 @@ For a package release or validation run, consumers can review:
 4. GitHub artifact attestations when the workflow event produced them;
 5. NuGet package metadata and Source Link metadata after package publication.
 
-For the current package family, the [5.1.0 Consumer Verification Guide](consumer-verification-510.md) provides durable asset links and copy/paste validation commands for package source, package IDs, package version, repository metadata, Source Link metadata, package SBOMs, provenance attestations, and deferred package-signing wording.
+For the current package family, the [5.2.0 Consumer Verification Guide](consumer-verification-520.md) provides durable asset links and copy/paste validation commands for package source, package IDs, package version, repository metadata, Source Link metadata, package SBOMs, provenance attestations, deprecation status, and deferred package-signing wording.
 
 For released NuGet packages, Source Link metadata validation remains a separate post-publish check. SBOM/provenance metadata complements that check; it does not replace source review, package validation, vulnerability scanning, or organizational approval.
 
 ## Related documentation
 
-- [5.1.0 Consumer Verification Guide](consumer-verification-510.md)
+- [5.2.0 Consumer Verification Guide](consumer-verification-520.md)
 - [Stable Release Validation](release-validation.md)
 - [NuGet Package Signing Decision Record](nuget-package-signing-decision.md)
 - [API Compatibility and SemVer](api-compatibility-and-semver.md)

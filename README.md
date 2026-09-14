@@ -134,12 +134,12 @@ For production-style hosts, add durable audit/outbox persistence, signing or ver
 
 ## Package family
 
-Stable `5.1.x` package family. `5.1.0` is the current release. It is a
-backward-compatible stabilization release that adds automated public API
-compatibility baselines, documented repository security and branch-retention
-controls, security-advisory distribution tooling, and public support and
-maintainer policies. Package IDs, public namespaces, runtime behavior, and the
-binary assembly identity `5.0.0.0` remain unchanged.
+Stable `5.2.x` package family. `5.2.0` is the current release. It is a
+backward-compatible minor release that adds the fluent policy-evaluator builder,
+starts the `ASIB900` deprecation window for partial evaluator constructors, and
+strengthens package compatibility, durable release evidence, quality gates, and
+project stewardship. Package IDs, public namespaces, the `net10.0` target, and
+the binary assembly identity `5.0.0.0` remain unchanged.
 
 Consumers upgrading from `4.0.0` should review the [5.0.0 migration guide](https://github.com/AsiBackbone/AsiBackbone/blob/main/docs/articles/upgrade-400-to-500.md); hosts that persist the affected enums as integers need a data migration.
 
@@ -215,9 +215,9 @@ The full, categorized documentation set lives at the [documentation site](https:
 
 ## Current status
 
-Stable `5.x` is the current released line, with `5.1.0` as the current release. Package IDs and public namespaces remain unchanged, and the binary assembly identity is `5.0.0.0`.
+Stable `5.x` is the current released line, with `5.2.0` as the current release. Package IDs and public namespaces remain unchanged, and the binary assembly identity is `5.0.0.0`.
 
-The stable API contract is documented in [API Compatibility and SemVer](https://github.com/AsiBackbone/AsiBackbone/blob/main/docs/articles/api-compatibility-and-semver.md). The current release is recorded in [5.1.0 Release Notes](https://github.com/AsiBackbone/AsiBackbone/blob/main/docs/articles/release-notes-510.md). Consumers can use the [5.1.0 Consumer Verification Guide](https://github.com/AsiBackbone/AsiBackbone/blob/main/docs/articles/consumer-verification-510.md) for package-source, API-baseline, Source Link, SBOM, provenance, and deferred-signing checks. Consumers moving from `4.x` should also follow the [5.0.0 Migration Guide](https://github.com/AsiBackbone/AsiBackbone/blob/main/docs/articles/upgrade-400-to-500.md). Earlier release records remain available for historical traceability.
+The stable API contract is documented in [API Compatibility and SemVer](https://github.com/AsiBackbone/AsiBackbone/blob/main/docs/articles/api-compatibility-and-semver.md). The current release is recorded in [5.2.0 Release Notes](https://github.com/AsiBackbone/AsiBackbone/blob/main/docs/articles/release-notes-520.md). Consumers can use the [5.2.0 Consumer Verification Guide](https://github.com/AsiBackbone/AsiBackbone/blob/main/docs/articles/consumer-verification-520.md) for package-source, API-compatibility, Source Link, SBOM, provenance, deprecation, and deferred-signing checks. Consumers moving from `4.x` should also follow the [5.0.0 Migration Guide](https://github.com/AsiBackbone/AsiBackbone/blob/main/docs/articles/upgrade-400-to-500.md). Earlier release records remain available for historical traceability.
 
 ## Support and project stewardship
 
@@ -243,7 +243,7 @@ A consumer should be able to use AsiBackbone in an application generated from Ne
 
 AsiBackbone is a governance spine, not an intelligence engine. It implements governance-oriented software primitives for accountable decision flow and keeps execution authority with the host application. See [Project Boundaries and Non-Claims](https://asibackbone.github.io/AsiBackbone/articles/project-boundaries.html) for the full scope statement and safe wording guidance.
 
-> **Current NuGet packages are intentionally published without package signing.** The dated [NuGet Package Signing Decision Record](https://asibackbone.github.io/AsiBackbone/articles/nuget-package-signing-decision.html) records the accepted risk, compensating controls, mandatory review date, and early re-evaluation criteria. The project publishes durable release-attached SBOMs, package/SBOM provenance, Source Link metadata, and package hashes as distinct trust signals; none is presented as a signed-package guarantee. For current verification guidance, see the [**5.1.0 Release Notes**](https://asibackbone.github.io/AsiBackbone/articles/release-notes-510.html) and the [5.1.0 Consumer Verification Guide](https://asibackbone.github.io/AsiBackbone/articles/consumer-verification-510.html).
+> **Current NuGet packages are intentionally published without package signing.** The dated [NuGet Package Signing Decision Record](https://asibackbone.github.io/AsiBackbone/articles/nuget-package-signing-decision.html) records the accepted risk, compensating controls, mandatory review date, and early re-evaluation criteria. The project publishes durable release-attached SBOMs, package/SBOM provenance, Source Link metadata, and package hashes as distinct trust signals; none is presented as a signed-package guarantee. For current verification guidance, see the [**5.2.0 Release Notes**](https://asibackbone.github.io/AsiBackbone/articles/release-notes-520.html) and the [5.2.0 Consumer Verification Guide](https://asibackbone.github.io/AsiBackbone/articles/consumer-verification-520.html).
 
 ## Design principles
 
