@@ -6,6 +6,20 @@ This project follows the spirit of [Keep a Changelog](https://keepachangelog.com
 
 ## [Unreleased]
 
+## [5.2.0] - 2026-09-14
+
+### Release summary
+
+`5.2.0` is a backward-compatible minor release for the stable `5.x`
+AsiBackbone package family. It adds an additive policy-evaluator builder API,
+starts the documented `ASIB900` deprecation window for five partial evaluator
+constructors, and strengthens package compatibility, durable release evidence,
+quality gates, documentation, and project stewardship.
+
+Package IDs, public namespaces, and the `net10.0` target remain unchanged.
+`AssemblyVersion` remains `5.0.0.0`; package and file versions advance to
+`5.2.0` and `5.2.0.0` respectively.
+
 ### Added
 
 * Added an opt-in adopter registry and structured self-report form, plus a
@@ -57,6 +71,21 @@ This project follows the spirit of [Keep a Changelog](https://keepachangelog.com
   entries, validation builds always recompile instead of reporting zero gaps
   from up-to-date output, and `CS1591` findings are counted once and only
   for the project being validated.
+
+### Compatibility
+
+* The policy-evaluator builder is additive; no stable public member is removed.
+* The five partial evaluator constructors remain available in `5.2.0` with
+  diagnostic `ASIB900`; their documented removal target is `6.0`.
+* The all-dependencies evaluator constructor remains supported for dependency
+  injection.
+* Package validation continues to compare `5.2.0` against the published
+  `5.1.0` baseline.
+* Package IDs, public namespaces, the `net10.0` target, and `AssemblyVersion`
+  `5.0.0.0` remain unchanged.
+* NuGet package author signing remains intentionally deferred; Source Link,
+  SBOMs, provenance, release assets, and repository signatures remain distinct
+  trust signals.
 
 ## [5.1.0] - 2026-09-11
 

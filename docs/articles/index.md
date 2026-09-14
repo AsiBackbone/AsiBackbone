@@ -13,11 +13,12 @@ General architectural education belongs in [ASI Backbone Learning](https://asiba
 
 ## Current stable package posture
 
-Stable `5.x` package family. `5.1.0` is the current release. It is a
-backward-compatible stabilization release that adds public API compatibility
-baselines, auditable repository controls, release operations tooling, and public
-support and maintainer policies. Package IDs, public namespaces, runtime
-behavior, and the binary assembly identity `5.0.0.0` remain unchanged.
+Stable `5.x` package family. `5.2.0` is the current release. It is a
+backward-compatible minor release that adds a fluent policy-evaluator builder,
+begins the `ASIB900` constructor-deprecation window, and strengthens package
+compatibility, durable release evidence, quality gates, and project stewardship.
+Package IDs, public namespaces, the `net10.0` target, and the binary assembly
+identity `5.0.0.0` remain unchanged.
 
 Released stable package surfaces include Core, DependencyInjection,
 Storage.InMemory, EntityFrameworkCore, AspNetCore, Testing, Templates,
@@ -34,7 +35,7 @@ packages, robotics, immutable storage, and additional non-signing provider
 packages remain design-only, strategy-only, sample-only, host-owned, or
 future-provider work unless a later stable release explicitly ships them.
 
-The release process includes explicit [Release Cadence and Readiness](release-cadence-and-readiness.md) guidance for patch, minor, and major release selection, package metadata, Source Link, SBOM/provenance, documentation links, and future package identity or namespace changes. The [5.1.0 Consumer Verification Guide](consumer-verification-510.md) gives consumers a conservative package-source, API-baseline, Source Link, SBOM/provenance, and deferred-signing verification path. Consumers moving from `4.x` should also follow the [5.0.0 Migration Guide](upgrade-400-to-500.md).
+The release process includes explicit [Release Cadence and Readiness](release-cadence-and-readiness.md) guidance for patch, minor, and major release selection, package metadata, Source Link, SBOM/provenance, documentation links, and future package identity or namespace changes. The [5.2.0 Consumer Verification Guide](consumer-verification-520.md) gives consumers a conservative package-source, API-compatibility, Source Link, SBOM/provenance, deprecation, and deferred-signing verification path. Consumers moving from `4.x` should also follow the [5.0.0 Migration Guide](upgrade-400-to-500.md).
 
 ## Search and navigation
 
@@ -144,9 +145,9 @@ These pages cover production hardening, durable audit/outbox behavior, observabi
 
 Start with the current release and compatibility rules. Older release notes, consumer-verification guides, and upgrade records are preserved under [Releases & Compatibility](../releases/index.md) so they remain easy to find without dominating the implementation navigation.
 
-* [5.1.0 Release Notes](release-notes-510.md)
-* [5.1.0 Release Readiness Record](release-readiness-510.md)
-* [5.1.0 Consumer Verification Guide](consumer-verification-510.md)
+* [5.2.0 Release Notes](release-notes-520.md)
+* [5.2.0 Release Readiness Record](release-readiness-520.md)
+* [5.2.0 Consumer Verification Guide](consumer-verification-520.md)
 * [5.0.0 Migration Guide](upgrade-400-to-500.md)
 * [API Compatibility and SemVer](api-compatibility-and-semver.md)
 * [Schema Versioning](schema-versioning.md)

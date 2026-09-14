@@ -6,11 +6,11 @@ Current package/runtime behavior is documented in the product articles and gener
 
 ## Current release
 
-Stable package family: `5.x`. Current release: `5.1.0`.
+Stable package family: `5.x`. Current release: `5.2.0`.
 
-- [5.1.0 Release Notes](../articles/release-notes-510.md)
-- [5.1.0 Release Readiness Record](../articles/release-readiness-510.md)
-- [5.1.0 Consumer Verification Guide](../articles/consumer-verification-510.md)
+- [5.2.0 Release Notes](../articles/release-notes-520.md)
+- [5.2.0 Release Readiness Record](../articles/release-readiness-520.md)
+- [5.2.0 Consumer Verification Guide](../articles/consumer-verification-520.md)
 - [5.0.0 Migration Guide](../articles/upgrade-400-to-500.md)
 - [ASIB900 Migration: Obsolete Policy Evaluator Constructors](../articles/asib900-policy-evaluator-constructors.md)
 - [API Compatibility and Semantic Versioning](../articles/api-compatibility-and-semver.md)
@@ -25,6 +25,12 @@ Stable package family: `5.x`. Current release: `5.1.0`.
 The upgrade guide is a historical version-to-version record. Use current compatibility, target-framework, and release notes for present-day package decisions.
 
 ## Release archive
+
+### 5.1.0
+
+- [5.1.0 Release Notes](../articles/release-notes-510.md)
+- [5.1.0 Release Readiness Record](../articles/release-readiness-510.md)
+- [5.1.0 Consumer Verification Guide](../articles/consumer-verification-510.md)
 
 ### 5.0.0
 

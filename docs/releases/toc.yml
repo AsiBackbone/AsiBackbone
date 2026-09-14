@@ -3,10 +3,10 @@
 
 - name: Current Release
   items:
-    - name: 5.1.0 Release Notes
-      href: ../articles/release-notes-510.md
-    - name: 5.1.0 Consumer Verification Guide
-      href: ../articles/consumer-verification-510.md
+    - name: 5.2.0 Release Notes
+      href: ../articles/release-notes-520.md
+    - name: 5.2.0 Consumer Verification Guide
+      href: ../articles/consumer-verification-520.md
     - name: ASIB900 Migration Guide
       href: ../articles/asib900-policy-evaluator-constructors.md
     - name: 5.0.0 Migration Guide
@@ -24,6 +24,13 @@
       href: https://github.com/AsiBackbone/AsiBackbone/blob/main/CHANGELOG.md
     - name: "Upgrade Guide: 1.0.0 to 1.1.0"
       href: ../articles/upgrade-100-to-110.md
+
+- name: 5.1.0 Archive
+  items:
+    - name: 5.1.0 Release Notes
+      href: ../articles/release-notes-510.md
+    - name: 5.1.0 Consumer Verification Guide
+      href: ../articles/consumer-verification-510.md
 
 - name: 5.0.0 Archive
   items:

@@ -59,7 +59,7 @@ The `2.0.0` release established the simplified `AsiBackbone.*` package and names
 
 ### Current `5.x` stable family
 
-`5.1.0` is the current stable release. It preserves the `AsiBackbone.*` package IDs, namespaces, runtime behavior, and binary assembly identity `5.0.0.0`. It adds release-blocking public API baselines and repository stewardship tooling without changing the stable managed surface established by `5.0.0`.
+`5.2.0` is the current stable release. It preserves the `AsiBackbone.*` package IDs, namespaces, the `net10.0` target, and binary assembly identity `5.0.0.0`. It adds a backward-compatible policy-evaluator builder and begins the `ASIB900` deprecation window while preserving the supported stable managed surface for the `5.x` line.
 
 | Package | `5.x` stable role |
 | --- | --- |
@@ -136,6 +136,7 @@ Expected stable-line behavior:
 | `4.0.0` | `4.0.0` | `4.0.0.0` | `4.0.0.0` | `4.0.0+...` |
 | `5.0.0` | `5.0.0` | `5.0.0.0` | `5.0.0.0` | `5.0.0+...` |
 | `5.1.0` | `5.1.0` | `5.0.0.0` | `5.1.0.0` | `5.1.0+...` |
+| `5.2.0` | `5.2.0` | `5.0.0.0` | `5.2.0.0` | `5.2.0+...` |
 
 Before cutting stable releases, release validation should verify that `AssemblyVersion`, `FileVersion`, `InformationalVersion`, package metadata, release notes, and repository tags match this policy.
 
@@ -169,9 +170,9 @@ Before cutting a stable release or stable package-family expansion, the release 
 
 - [API Baseline and Architecture Boundary Checks](api-baseline-and-boundary-checks.md)
 - [4.0.0 Release Notes](release-notes-400.md)
-- [5.1.0 Release Notes](release-notes-510.md)
-- [5.1.0 Release Readiness Record](release-readiness-510.md)
-- [5.1.0 Consumer Verification Guide](consumer-verification-510.md)
+- [5.2.0 Release Notes](release-notes-520.md)
+- [5.2.0 Release Readiness Record](release-readiness-520.md)
+- [5.2.0 Consumer Verification Guide](consumer-verification-520.md)
 - [5.0.0 Migration Guide](upgrade-400-to-500.md)
 - [4.0.0 Release Readiness Record](release-readiness-400.md)
 - [4.0.0 Migration Guide](upgrade-323-to-400.md)
