@@ -330,8 +330,8 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorTests
 
         var evaluator = new DefaultAsiBackbonePolicyEvaluator<TestPolicyContext>(
             [],
-            policy,
-            new AsiBackbonePolicyEvaluatorOptions
+            decisionPolicy: policy,
+            options: new AsiBackbonePolicyEvaluatorOptions
             {
                 DenyWhenNoConstraints = true
             });
@@ -529,8 +529,8 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorTests
                 new StaticConstraint(ConstraintEvaluationResult.Allow()),
                 new ThrowingConstraint(new InvalidOperationException("sensitive failure text"))
             ],
-            policy,
-            new AsiBackbonePolicyEvaluatorOptions
+            decisionPolicy: policy,
+            options: new AsiBackbonePolicyEvaluatorOptions
             {
                 TreatConstraintExceptionAsDenial = true
             });
@@ -760,7 +760,7 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorTests
                         "constraint.warning",
                         "The constraint produced a warning."))
             ],
-            policy);
+            decisionPolicy: policy);
 
         GovernanceDecision decision = await evaluator.EvaluateAsync(
             context,

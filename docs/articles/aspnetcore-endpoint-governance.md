@@ -91,7 +91,7 @@ public sealed class PolicyAwareDecisionPolicy : IAsiBackboneDecisionPolicy<AsiBa
 
 `endpoint.policy_types` is retained under `AsiBackboneEndpointGovernanceMetadataMode.Reduced` for exactly this reason: dropping it would let a metadata setting silently disable a host decision policy that depends on it.
 
-`RequireGovernancePolicy` is the former name of this method and is obsolete. It never resolved the policy type either; the name overstated what it did. It still records the same metadata and can be replaced with `MarkGovernancePolicy` without behavior change.
+`RequireGovernancePolicy` was the former route-builder name and was removed in 6.0 after its 5.x deprecation window. It never resolved the policy type either; the name overstated what it did. Migrate route-builder calls to `MarkGovernancePolicy`; the replacement records the same marker metadata. The `[RequireGovernancePolicy]` controller/action attribute remains supported and is not part of this removal.
 
 Endpoints that intentionally prefer a latency-optimized first-block fast-abort policy path can add endpoint metadata:
 

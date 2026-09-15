@@ -7,6 +7,8 @@
       href: ../articles/release-notes-520.md
     - name: 5.2.0 Consumer Verification Guide
       href: ../articles/consumer-verification-520.md
+    - name: 5.2.x to 6.0.0 Upgrade Guide
+      href: ../articles/upgrade-520-to-600.md
     - name: ASIB900 Migration Guide
       href: ../articles/asib900-policy-evaluator-constructors.md
     - name: 5.0.0 Migration Guide

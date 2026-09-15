@@ -161,7 +161,7 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorHotPathCoverageTests
                 new StaticConstraint(ConstraintEvaluationResult.Allow()),
                 new StaticConstraint(ConstraintEvaluationResult.NotApplicable())
             ],
-            policy);
+            decisionPolicy: policy);
 
         GovernanceDecision decision = await evaluator.EvaluateAsync(context, TestContext.Current.CancellationToken);
 

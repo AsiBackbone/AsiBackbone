@@ -122,7 +122,7 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorMutationTests
                                 "The constraint produced a warning."));
                     })
             ],
-            policy);
+            decisionPolicy: policy);
 
         GovernanceDecision decision = await evaluator.EvaluateAsync(context, TestContext.Current.CancellationToken);
 

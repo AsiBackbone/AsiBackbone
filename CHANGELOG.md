@@ -6,6 +6,21 @@ This project follows the spirit of [Keep a Changelog](https://keepachangelog.com
 
 ## [Unreleased]
 
+### Removed
+
+* Removed the five `ASIB900` partial
+  `DefaultAsiBackbonePolicyEvaluator<TContext>` constructor overloads whose
+  deprecation window completed at the 6.0 major-version boundary.
+* Removed the two obsolete `RequireGovernancePolicy` endpoint route-builder
+  extensions. Use `MarkGovernancePolicy`.
+
+### Changed
+
+* Removed production-only `ASIB900` obsoletion constants and obsolete-test
+  warning suppressions.
+* Added the 5.2.x-to-6.0.0 migration guide and updated current endpoint
+  governance guidance for the 6.0 public surface.
+
 ## [5.2.0] - 2026-09-14
 
 ### Release summary

@@ -26,7 +26,7 @@ public sealed class CustomDecisionPolicyExampleTests
                     "policy.denied",
                     "The request failed a blocking policy rule."))
             ],
-            new StrictDenyWinsDecisionPolicy());
+            decisionPolicy: new StrictDenyWinsDecisionPolicy());
 
         GovernanceDecision decision = await evaluator.EvaluateAsync(
             ExamplePolicyContext.Create("US-LA", "routine"),
@@ -47,7 +47,7 @@ public sealed class CustomDecisionPolicyExampleTests
     {
         var evaluator = new DefaultAsiBackbonePolicyEvaluator<ExamplePolicyContext>(
             [new StaticConstraint(ConstraintEvaluationResult.Allow())],
-            new RegionalOverlayDecisionPolicy(CreateSupportedRegionSet()));
+            decisionPolicy: new RegionalOverlayDecisionPolicy(CreateSupportedRegionSet()));
 
         GovernanceDecision decision = await evaluator.EvaluateAsync(
             ExamplePolicyContext.Create("US-LA", "high"),
@@ -69,7 +69,7 @@ public sealed class CustomDecisionPolicyExampleTests
     {
         var evaluator = new DefaultAsiBackbonePolicyEvaluator<ExamplePolicyContext>(
             [new StaticConstraint(ConstraintEvaluationResult.Allow())],
-            new RegionalOverlayDecisionPolicy(CreateSupportedRegionSet()));
+            decisionPolicy: new RegionalOverlayDecisionPolicy(CreateSupportedRegionSet()));
 
         GovernanceDecision decision = await evaluator.EvaluateAsync(
             ExamplePolicyContext.Create("EU-DE", "routine"),
@@ -90,7 +90,7 @@ public sealed class CustomDecisionPolicyExampleTests
             [new StaticConstraint(ConstraintEvaluationResult.Deny(
                 "constraint.blocked",
                 "The constraint blocked the request before regional overlay."))],
-            new RegionalOverlayDecisionPolicy(CreateSupportedRegionSet()));
+            decisionPolicy: new RegionalOverlayDecisionPolicy(CreateSupportedRegionSet()));
 
         GovernanceDecision decision = await evaluator.EvaluateAsync(
             ExamplePolicyContext.Create("US-LA", "high"),

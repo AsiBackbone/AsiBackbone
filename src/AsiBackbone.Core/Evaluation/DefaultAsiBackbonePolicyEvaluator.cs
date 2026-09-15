@@ -47,83 +47,10 @@ public sealed class DefaultAsiBackbonePolicyEvaluator<TContext> : IAsiBackbonePo
     /// <summary>
     /// Initializes a new instance of the <see cref="DefaultAsiBackbonePolicyEvaluator{TContext}" /> class.
     /// </summary>
-    /// <param name="constraints">The constraints that make up the active policy structure.</param>
-    /// <param name="decisionPolicy">Optional decision policy applied after constraint composition.</param>
-    [Obsolete(AsiBackboneObsoletions.PolicyEvaluatorConstructorMessage, DiagnosticId = AsiBackboneObsoletions.PolicyEvaluatorConstructorDiagnosticId, UrlFormat = AsiBackboneObsoletions.PolicyEvaluatorConstructorUrl)]
-    public DefaultAsiBackbonePolicyEvaluator(
-        IEnumerable<IAsiBackboneConstraint<TContext>> constraints,
-        IAsiBackboneDecisionPolicy<TContext>? decisionPolicy = null)
-        : this(constraints, threatModelContributors: null, decisionPolicy, options: null, logger: null)
-    {
-    }
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="DefaultAsiBackbonePolicyEvaluator{TContext}" /> class.
-    /// </summary>
-    /// <param name="constraints">The constraints that make up the active policy structure.</param>
-    /// <param name="decisionPolicy">Optional decision policy applied after constraint composition.</param>
-    /// <param name="options">Evaluator options applied during constraint composition.</param>
-    [Obsolete(AsiBackboneObsoletions.PolicyEvaluatorConstructorMessage, DiagnosticId = AsiBackboneObsoletions.PolicyEvaluatorConstructorDiagnosticId, UrlFormat = AsiBackboneObsoletions.PolicyEvaluatorConstructorUrl)]
-    public DefaultAsiBackbonePolicyEvaluator(
-        IEnumerable<IAsiBackboneConstraint<TContext>> constraints,
-        IAsiBackboneDecisionPolicy<TContext>? decisionPolicy,
-        AsiBackbonePolicyEvaluatorOptions? options)
-        : this(constraints, threatModelContributors: null, decisionPolicy, options, logger: null)
-    {
-    }
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="DefaultAsiBackbonePolicyEvaluator{TContext}" /> class.
-    /// </summary>
-    /// <param name="constraints">The constraints that make up the active policy structure.</param>
-    /// <param name="decisionPolicy">Optional decision policy applied after constraint composition.</param>
-    /// <param name="options">Evaluator options applied during constraint composition.</param>
-    /// <param name="logger">Optional logger used to emit operational warning signals.</param>
-    [Obsolete(AsiBackboneObsoletions.PolicyEvaluatorConstructorMessage, DiagnosticId = AsiBackboneObsoletions.PolicyEvaluatorConstructorDiagnosticId, UrlFormat = AsiBackboneObsoletions.PolicyEvaluatorConstructorUrl)]
-    public DefaultAsiBackbonePolicyEvaluator(
-        IEnumerable<IAsiBackboneConstraint<TContext>> constraints,
-        IAsiBackboneDecisionPolicy<TContext>? decisionPolicy,
-        AsiBackbonePolicyEvaluatorOptions? options,
-        ILogger<DefaultAsiBackbonePolicyEvaluator<TContext>>? logger)
-        : this(constraints, threatModelContributors: null, decisionPolicy, options, logger)
-    {
-    }
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="DefaultAsiBackbonePolicyEvaluator{TContext}" /> class.
-    /// </summary>
-    /// <param name="constraints">The constraints that make up the active policy structure.</param>
-    /// <param name="threatModelContributors">Threat model contributors that inspect the context before constraint composition.</param>
-    /// <param name="decisionPolicy">Optional decision policy applied after composition.</param>
-    [Obsolete(AsiBackboneObsoletions.PolicyEvaluatorConstructorMessage, DiagnosticId = AsiBackboneObsoletions.PolicyEvaluatorConstructorDiagnosticId, UrlFormat = AsiBackboneObsoletions.PolicyEvaluatorConstructorUrl)]
-    public DefaultAsiBackbonePolicyEvaluator(
-        IEnumerable<IAsiBackboneConstraint<TContext>> constraints,
-        IEnumerable<IThreatModelContributor<TContext>> threatModelContributors,
-        IAsiBackboneDecisionPolicy<TContext>? decisionPolicy = null)
-        : this(constraints, threatModelContributors, decisionPolicy, options: null, logger: null)
-    {
-    }
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="DefaultAsiBackbonePolicyEvaluator{TContext}" /> class.
-    /// </summary>
-    /// <param name="constraints">The constraints that make up the active policy structure.</param>
-    /// <param name="threatModelContributors">Threat model contributors that inspect the context before constraint composition.</param>
-    /// <param name="decisionPolicy">Optional decision policy applied after composition.</param>
-    /// <param name="options">Evaluator options applied during composition.</param>
-    [Obsolete(AsiBackboneObsoletions.PolicyEvaluatorConstructorMessage, DiagnosticId = AsiBackboneObsoletions.PolicyEvaluatorConstructorDiagnosticId, UrlFormat = AsiBackboneObsoletions.PolicyEvaluatorConstructorUrl)]
-    public DefaultAsiBackbonePolicyEvaluator(
-        IEnumerable<IAsiBackboneConstraint<TContext>> constraints,
-        IEnumerable<IThreatModelContributor<TContext>> threatModelContributors,
-        IAsiBackboneDecisionPolicy<TContext>? decisionPolicy,
-        AsiBackbonePolicyEvaluatorOptions? options)
-        : this(constraints, threatModelContributors, decisionPolicy, options, logger: null)
-    {
-    }
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="DefaultAsiBackbonePolicyEvaluator{TContext}" /> class.
-    /// </summary>
+    /// <remarks>
+    /// This is the single supported public constructor in 6.0. Prefer
+    /// <see cref="DefaultAsiBackbonePolicyEvaluator.CreateBuilder{TContext}" /> for application code.
+    /// </remarks>
     /// <param name="constraints">The constraints that make up the active policy structure.</param>
     /// <param name="threatModelContributors">Threat model contributors that inspect the context before constraint composition.</param>
     /// <param name="decisionPolicy">Optional decision policy applied after composition.</param>
@@ -131,10 +58,10 @@ public sealed class DefaultAsiBackbonePolicyEvaluator<TContext> : IAsiBackbonePo
     /// <param name="logger">Optional logger used to emit operational warning signals.</param>
     public DefaultAsiBackbonePolicyEvaluator(
         IEnumerable<IAsiBackboneConstraint<TContext>> constraints,
-        IEnumerable<IThreatModelContributor<TContext>>? threatModelContributors,
-        IAsiBackboneDecisionPolicy<TContext>? decisionPolicy,
-        AsiBackbonePolicyEvaluatorOptions? options,
-        ILogger<DefaultAsiBackbonePolicyEvaluator<TContext>>? logger)
+        IEnumerable<IThreatModelContributor<TContext>>? threatModelContributors = null,
+        IAsiBackboneDecisionPolicy<TContext>? decisionPolicy = null,
+        AsiBackbonePolicyEvaluatorOptions? options = null,
+        ILogger<DefaultAsiBackbonePolicyEvaluator<TContext>>? logger = null)
     {
         ArgumentNullException.ThrowIfNull(constraints);
 

@@ -169,8 +169,8 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorFastAbortTests
                         return ConstraintEvaluationResult.Allow();
                     })
             ],
-            policy,
-            new AsiBackbonePolicyEvaluatorOptions
+            decisionPolicy: policy,
+            options: new AsiBackbonePolicyEvaluatorOptions
             {
                 ShortCircuitOnFirstDenial = true
             });
