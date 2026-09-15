@@ -18,7 +18,7 @@ The repo is a genuine package family, not a monolith: `Core` (framework-neutral 
 
 Two things stand out as more disciplined than typical for a project of this size:
 
-**Overclaiming discipline.** Despite the "ASI" branding and the stated tie to the author's own Eden Hypothesis / ASI Backbone framework, the code and docs go out of their way to *not* claim more than the software does. The README has a dedicated "what does it not do" section and a "safe language / avoid language" table (e.g., explicitly: don't say "AsiBackbone proves the Eden Hypothesis" or "is tamper-evident by default"). That's an unusual and good practice for a project whose external framing could tempt overclaiming.
+**Overclaiming discipline.** Despite the "ASI" branding, the code and docs go out of their way to *not* claim more than the software does. The README has a dedicated "what does it not do" section and a "safe language / avoid language" table (e.g., explicitly: don't present AsiBackbone as proving a broader conceptual framework or say it "is tamper-evident by default"). That's an unusual and good practice for a project whose external framing could tempt overclaiming.
 
 **Release engineering.** CI (`ci.yml`) runs dependency review, build, `dotnet format --verify-no-changes`, a 75%-line / 90%-Core-branch coverage gate via Coverlet, an XML-doc gap inventory, CodeQL, SBOM generation, and build-provenance attestation for every package — on every push/PR. That's a mature pipeline for a single-maintainer OSS project, and it directly supports the benchmark discipline discussed below (benchmarks are deliberately *excluded* from normal CI because timing is machine-sensitive — a sound call).
 

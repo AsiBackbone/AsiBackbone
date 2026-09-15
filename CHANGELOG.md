@@ -1590,8 +1590,8 @@ This release focuses on post-`1.1.0` hardening, documentation clarity, endpoint-
 
 ### Boundary Notes
 
-* Reinforced that AsiBackbone does not implement artificial superintelligence, host or train AI models, control robots, or prove the Eden/Backbone framework.
-* Clarified that broader Eden/Backbone concepts may inspire the package while implementation claims remain limited to practical software governance.
+* Reinforced that AsiBackbone does not implement artificial superintelligence, host or train AI models, control robots, or exceed its documented governance-infrastructure boundary.
+* Clarified that conceptual background does not expand implementation claims beyond practical software governance.
 
 ## [0.4.0-alpha.1] - 2026-06-11
 
@@ -1768,7 +1768,7 @@ This release focuses on post-`1.1.0` hardening, documentation clarity, endpoint-
 
 * Core does not implement artificial superintelligence.
 * Core does not host, train, or run AI models.
-* Core does not prove the ASI Backbone concept or the Eden Hypothesis.
+* Core does not claim to prove a broader conceptual framework.
 * Core does not depend on ASP.NET Core, Entity Framework Core, NetCoreApplicationTemplate, robotics packages, or AI model dependencies.
 * Core does not provide middleware, endpoint mapping, database storage, signing implementation, robotics control, or provider-specific persistence behavior.
 

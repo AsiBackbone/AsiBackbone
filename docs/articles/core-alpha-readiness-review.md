@@ -128,7 +128,7 @@ The README and Core domain language documentation were expected to describe AsiB
 Documentation was expected to avoid claims that AsiBackbone:
 
 - implements artificial superintelligence;
-- proves the Eden Hypothesis;
+- claims to prove a broader conceptual framework;
 - is an AI model;
 - replaces legal review, AI safety governance, or organizational accountability.
 

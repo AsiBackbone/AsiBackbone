@@ -92,7 +92,7 @@ Prefer implementation-grounded wording:
 
 ## Handling conceptual language
 
-Some pages use broader Eden/Backbone or collapse language as optional conceptual background. Implementation pages should translate those terms back into ordinary software architecture language:
+Some pages use broader conceptual or collapse language as optional background. Implementation pages should translate those terms back into ordinary software architecture language:
 
 | Conceptual phrase | Implementation phrase |
 | --- | --- |
