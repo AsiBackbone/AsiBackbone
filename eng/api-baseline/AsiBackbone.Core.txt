@@ -152,6 +152,18 @@ MEMBER | AsiBackbone.Core.Actors.AsiBackboneActorContext.System | public static 
 MEMBER | AsiBackbone.Core.Actors.AsiBackboneActorContext.SystemActorId | public const string SystemActorId = "system"
 MEMBER | AsiBackbone.Core.Actors.AsiBackboneActorContext.Unknown | public static AsiBackboneActorContext Unknown { get; }
 MEMBER | AsiBackbone.Core.Actors.AsiBackboneActorContext.UnknownActorId | public const string UnknownActorId = "unknown"
+MEMBER | AsiBackbone.Core.Actors.GovernanceActorContext.ActorId | public string ActorId { get; }
+MEMBER | AsiBackbone.Core.Actors.GovernanceActorContext.ActorType | public AsiBackboneActorType ActorType { get; }
+MEMBER | AsiBackbone.Core.Actors.GovernanceActorContext.Agent(System.String,System.String,System.Boolean) | public static GovernanceActorContext Agent(string actorId, string? displayName = null, bool isAuthenticated = true)
+MEMBER | AsiBackbone.Core.Actors.GovernanceActorContext.DisplayName | public string? DisplayName { get; }
+MEMBER | AsiBackbone.Core.Actors.GovernanceActorContext.Human(System.String,System.String,System.Boolean) | public static GovernanceActorContext Human(string actorId, string? displayName = null, bool isAuthenticated = true)
+MEMBER | AsiBackbone.Core.Actors.GovernanceActorContext.IsAuthenticated | public bool IsAuthenticated { get; }
+MEMBER | AsiBackbone.Core.Actors.GovernanceActorContext.IsKnown | public bool IsKnown { get; }
+MEMBER | AsiBackbone.Core.Actors.GovernanceActorContext.Service(System.String,System.String) | public static GovernanceActorContext Service(string actorId, string? displayName = null)
+MEMBER | AsiBackbone.Core.Actors.GovernanceActorContext.System | public static GovernanceActorContext System { get; }
+MEMBER | AsiBackbone.Core.Actors.GovernanceActorContext.SystemActorId | public const string SystemActorId = "system"
+MEMBER | AsiBackbone.Core.Actors.GovernanceActorContext.Unknown | public static GovernanceActorContext Unknown { get; }
+MEMBER | AsiBackbone.Core.Actors.GovernanceActorContext.UnknownActorId | public const string UnknownActorId = "unknown"
 MEMBER | AsiBackbone.Core.Actors.IAsiBackboneActorContext.ActorId | string ActorId { get; }
 MEMBER | AsiBackbone.Core.Actors.IAsiBackboneActorContext.ActorType | AsiBackboneActorType ActorType { get; }
 MEMBER | AsiBackbone.Core.Actors.IAsiBackboneActorContext.DisplayName | string? DisplayName { get; }
@@ -455,6 +467,12 @@ MEMBER | AsiBackbone.Core.Constraints.ConstraintEvaluationResult.Reasons | publi
 MEMBER | AsiBackbone.Core.Constraints.ConstraintEvaluationResult.Warning(AsiBackbone.Core.Results.OperationReason) | public static ConstraintEvaluationResult Warning(OperationReason reason)
 MEMBER | AsiBackbone.Core.Constraints.ConstraintEvaluationResult.Warning(System.Collections.Generic.IEnumerable{AsiBackbone.Core.Results.OperationReason}) | public static ConstraintEvaluationResult Warning(IEnumerable<OperationReason> reasons)
 MEMBER | AsiBackbone.Core.Constraints.ConstraintEvaluationResult.Warning(System.String,System.String) | public static ConstraintEvaluationResult Warning(string code, string message)
+MEMBER | AsiBackbone.Core.Constraints.GovernanceEvaluationContext.#ctor(System.String,System.String,System.String,System.Collections.Generic.IReadOnlyDictionary{System.String,System.String}) | public GovernanceEvaluationContext(string? correlationId = null, string? policyVersion = null, string? policyHash = null, IReadOnlyDictionary<string, string>? metadata = null)
+MEMBER | AsiBackbone.Core.Constraints.GovernanceEvaluationContext.CorrelationId | public string? CorrelationId { get; }
+MEMBER | AsiBackbone.Core.Constraints.GovernanceEvaluationContext.HasMetadata | public bool HasMetadata { get; }
+MEMBER | AsiBackbone.Core.Constraints.GovernanceEvaluationContext.Metadata | public IReadOnlyDictionary<string, string> Metadata { get; }
+MEMBER | AsiBackbone.Core.Constraints.GovernanceEvaluationContext.PolicyHash | public string? PolicyHash { get; }
+MEMBER | AsiBackbone.Core.Constraints.GovernanceEvaluationContext.PolicyVersion | public string? PolicyVersion { get; }
 MEMBER | AsiBackbone.Core.Constraints.IAsiBackboneConstraintEvaluationContext.CorrelationId | string? CorrelationId { get; }
 MEMBER | AsiBackbone.Core.Constraints.IAsiBackboneConstraintEvaluationContext.Metadata | IReadOnlyDictionary<string, string> Metadata { get; }
 MEMBER | AsiBackbone.Core.Constraints.IAsiBackboneConstraintEvaluationContext.PolicyHash | string? PolicyHash { get; }
@@ -1045,7 +1063,9 @@ MEMBER | AsiBackbone.Core.ThreatModeling.ThreatCategories.ReplayAttempt | public
 MEMBER | AsiBackbone.Core.ThreatModeling.ThreatCategories.UnsafeExternalCommand | public const string UnsafeExternalCommand = "UnsafeExternalCommand"
 TYPE | AsiBackbone.Core.Actors.AsiBackboneActorContext | public sealed record AsiBackboneActorContext : IAsiBackboneActorContext, IEquatable<AsiBackboneActorContext>
 TYPE | AsiBackbone.Core.Actors.AsiBackboneActorType | public enum AsiBackboneActorType
+TYPE | AsiBackbone.Core.Actors.GovernanceActorContext | public sealed record GovernanceActorContext : IGovernanceActorContext
 TYPE | AsiBackbone.Core.Actors.IAsiBackboneActorContext | public interface IAsiBackboneActorContext
+TYPE | AsiBackbone.Core.Actors.IGovernanceActorContext | public interface IGovernanceActorContext : IAsiBackboneActorContext
 TYPE | AsiBackbone.Core.AsiBackboneIdentifierLimits | public static class AsiBackboneIdentifierLimits
 TYPE | AsiBackbone.Core.AssemblyReference | public static class AssemblyReference
 TYPE | AsiBackbone.Core.Audit.AuditLedgerRecord | public sealed class AuditLedgerRecord : IAsiBackboneAuditResidue
@@ -1078,8 +1098,11 @@ TYPE | AsiBackbone.Core.Classification.IAsiBackboneDlpFailurePolicyResolver | pu
 TYPE | AsiBackbone.Core.Constraints.AsiBackboneConstraintEvaluationContext | public sealed class AsiBackboneConstraintEvaluationContext : IAsiBackboneConstraintEvaluationContext
 TYPE | AsiBackbone.Core.Constraints.ConstraintEvaluationOutcome | public enum ConstraintEvaluationOutcome
 TYPE | AsiBackbone.Core.Constraints.ConstraintEvaluationResult | public sealed class ConstraintEvaluationResult
+TYPE | AsiBackbone.Core.Constraints.GovernanceEvaluationContext | public sealed class GovernanceEvaluationContext : IGovernanceEvaluationContext
 TYPE | AsiBackbone.Core.Constraints.IAsiBackboneConstraintEvaluationContext | public interface IAsiBackboneConstraintEvaluationContext
 TYPE | AsiBackbone.Core.Constraints.IAsiBackboneConstraint`1 | public interface IAsiBackboneConstraint<in TContext>
+TYPE | AsiBackbone.Core.Constraints.IGovernanceConstraint`1 | public interface IGovernanceConstraint<in TContext> : IAsiBackboneConstraint<TContext>
+TYPE | AsiBackbone.Core.Constraints.IGovernanceEvaluationContext | public interface IGovernanceEvaluationContext : IAsiBackboneConstraintEvaluationContext
 TYPE | AsiBackbone.Core.Decisions.GovernanceDecision | public sealed class GovernanceDecision
 TYPE | AsiBackbone.Core.Decisions.GovernanceDecisionOutcome | public enum GovernanceDecisionOutcome
 TYPE | AsiBackbone.Core.Emissions.GovernanceEmissionEnvelope | public sealed class GovernanceEmissionEnvelope
@@ -1094,11 +1117,14 @@ TYPE | AsiBackbone.Core.Entities.AsiBackboneEntity | public abstract class AsiBa
 TYPE | AsiBackbone.Core.Entities.IAsiBackboneEntity | public interface IAsiBackboneEntity
 TYPE | AsiBackbone.Core.Entities.IConcurrencyTrackedEntity | public interface IConcurrencyTrackedEntity
 TYPE | AsiBackbone.Core.Evaluation.AsiBackbonePolicyEvaluatorBuilder`1 | public sealed class AsiBackbonePolicyEvaluatorBuilder<TContext> where TContext : IAsiBackboneConstraintEvaluationContext
-TYPE | AsiBackbone.Core.Evaluation.AsiBackbonePolicyEvaluatorOptions | public sealed class AsiBackbonePolicyEvaluatorOptions
+TYPE | AsiBackbone.Core.Evaluation.AsiBackbonePolicyEvaluatorOptions | public class AsiBackbonePolicyEvaluatorOptions
 TYPE | AsiBackbone.Core.Evaluation.DefaultAsiBackbonePolicyEvaluator | public static class DefaultAsiBackbonePolicyEvaluator
-TYPE | AsiBackbone.Core.Evaluation.DefaultAsiBackbonePolicyEvaluator`1 | public sealed class DefaultAsiBackbonePolicyEvaluator<TContext> : IAsiBackbonePolicyEvaluator<TContext> where TContext : IAsiBackboneConstraintEvaluationContext
+TYPE | AsiBackbone.Core.Evaluation.DefaultAsiBackbonePolicyEvaluator`1 | public sealed class DefaultAsiBackbonePolicyEvaluator<TContext> : IAsiBackbonePolicyEvaluator<TContext>, IGovernancePolicyEvaluator<TContext> where TContext : IAsiBackboneConstraintEvaluationContext
+TYPE | AsiBackbone.Core.Evaluation.GovernancePolicyOptions | public sealed class GovernancePolicyOptions : AsiBackbonePolicyEvaluatorOptions
 TYPE | AsiBackbone.Core.Evaluation.IAsiBackboneDecisionPolicy`1 | public interface IAsiBackboneDecisionPolicy<in TContext> where TContext : IAsiBackboneConstraintEvaluationContext
 TYPE | AsiBackbone.Core.Evaluation.IAsiBackbonePolicyEvaluator`1 | public interface IAsiBackbonePolicyEvaluator<in TContext> where TContext : IAsiBackboneConstraintEvaluationContext
+TYPE | AsiBackbone.Core.Evaluation.IGovernanceDecisionPolicy`1 | public interface IGovernanceDecisionPolicy<in TContext> : IAsiBackboneDecisionPolicy<TContext> where TContext : IAsiBackboneConstraintEvaluationContext
+TYPE | AsiBackbone.Core.Evaluation.IGovernancePolicyEvaluator`1 | public interface IGovernancePolicyEvaluator<in TContext> : IAsiBackbonePolicyEvaluator<TContext> where TContext : IAsiBackboneConstraintEvaluationContext
 TYPE | AsiBackbone.Core.Handshakes.LiabilityHandshakeAcknowledgment | public sealed class LiabilityHandshakeAcknowledgment
 TYPE | AsiBackbone.Core.Handshakes.LiabilityHandshakeRequest | public sealed class LiabilityHandshakeRequest
 TYPE | AsiBackbone.Core.Handshakes.LiabilityHandshakeRiskLevel | public enum LiabilityHandshakeRiskLevel

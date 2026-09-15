@@ -8,7 +8,7 @@ namespace AsiBackbone.Core.Evaluation;
 /// instance during construction so later caller mutation cannot change evaluator behavior. Configure a separate options
 /// instance for each evaluator posture that must differ.
 /// </remarks>
-public sealed class AsiBackbonePolicyEvaluatorOptions
+public class AsiBackbonePolicyEvaluatorOptions
 {
     private const string DefaultNoConstraintsReasonMessage =
         "No policy constraints were registered or supplied for evaluation.";

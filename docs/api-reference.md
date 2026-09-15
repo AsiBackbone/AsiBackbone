@@ -12,9 +12,12 @@ The API pages are produced by DocFX from the current public .NET surface. Use th
 
 - [GovernanceDecision](xref:AsiBackbone.Core.Decisions.GovernanceDecision)
 - [GovernanceDecisionOutcome](xref:AsiBackbone.Core.Decisions.GovernanceDecisionOutcome)
-- [IAsiBackbonePolicyEvaluator<TContext>](xref:AsiBackbone.Core.Evaluation.IAsiBackbonePolicyEvaluator`1)
-- [IAsiBackboneConstraint<TContext>](xref:AsiBackbone.Core.Constraints.IAsiBackboneConstraint`1)
-- [AsiBackboneConstraintEvaluationContext](xref:AsiBackbone.Core.Constraints.AsiBackboneConstraintEvaluationContext)
+- [IGovernancePolicyEvaluator<TContext>](xref:AsiBackbone.Core.Evaluation.IGovernancePolicyEvaluator`1)
+- [IGovernanceDecisionPolicy<TContext>](xref:AsiBackbone.Core.Evaluation.IGovernanceDecisionPolicy`1)
+- [IGovernanceConstraint<TContext>](xref:AsiBackbone.Core.Constraints.IGovernanceConstraint`1)
+- [GovernanceEvaluationContext](xref:AsiBackbone.Core.Constraints.GovernanceEvaluationContext)
+- [GovernancePolicyOptions](xref:AsiBackbone.Core.Evaluation.GovernancePolicyOptions)
+- [GovernanceActorContext](xref:AsiBackbone.Core.Actors.GovernanceActorContext)
 
 ## Accountability and continuation APIs
 

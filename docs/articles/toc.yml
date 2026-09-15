@@ -67,6 +67,8 @@
       href: schema-versioning.md
     - name: API Compatibility and SemVer
       href: api-compatibility-and-semver.md
+    - name: Public API Naming in 6.0
+      href: public-api-naming-600.md
     - name: "Upgrade Guide: 5.2.x to 6.0.0"
       href: upgrade-520-to-600.md
     - name: "ASIB900: Obsolete Policy Evaluator Constructors"

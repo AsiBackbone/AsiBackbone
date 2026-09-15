@@ -64,6 +64,32 @@ not resolve a policy type or select a constraint set by itself.
 The `[RequireGovernancePolicy]` controller/action attribute remains supported.
 Only the two route-builder extension methods were removed.
 
+## Preferred semantic API names
+
+Issue #782 establishes domain-qualified names for the core governance lifecycle. Existing 5.x names remain source-compatible
+in 6.0, but new code and current documentation should prefer the semantic names below.
+
+| 5.x / compatibility name | Preferred 6.0 name |
+| --- | --- |
+| `IAsiBackboneConstraint<TContext>` | `IGovernanceConstraint<TContext>` |
+| `IAsiBackboneConstraintEvaluationContext` | `IGovernanceEvaluationContext` |
+| `AsiBackboneConstraintEvaluationContext` | `GovernanceEvaluationContext` |
+| `IAsiBackbonePolicyEvaluator<TContext>` | `IGovernancePolicyEvaluator<TContext>` |
+| `IAsiBackboneDecisionPolicy<TContext>` | `IGovernanceDecisionPolicy<TContext>` |
+| `AsiBackbonePolicyEvaluatorOptions` | `GovernancePolicyOptions` |
+| `IAsiBackboneActorContext` | `IGovernanceActorContext` |
+| `AsiBackboneActorContext` | `GovernanceActorContext` |
+
+The concrete `DefaultAsiBackbonePolicyEvaluator<TContext>` and `AsiBackbonePolicyEvaluatorBuilder<TContext>` names are
+intentionally retained: they identify AsiBackbone-owned implementation/factory surfaces rather than generic domain entities.
+Likewise, package registration, schema/version, and ASP.NET Core integration entry points keep the product qualifier where it
+adds ownership meaning.
+
+Audit-vocabulary changes are coordinated separately with issue #781 so this pass does not introduce an intermediate audit
+rename immediately before the `DecisionReceipt` terminology decision.
+
+See [Public API Naming in 6.0](public-api-naming-600.md) for the naming rule and review rationale.
+
 ## Removal inventory for issue #783
 
 The repository-wide obsolete inventory identified two completed 5.x deprecation

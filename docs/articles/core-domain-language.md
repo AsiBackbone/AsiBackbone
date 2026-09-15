@@ -34,12 +34,12 @@ Core defines the governance primitives for this lane. It does not own the extern
 
 | Learning concept | Core API mapping | Core contract |
 | --- | --- | --- |
-| Actor context | [`IAsiBackboneActorContext`](xref:AsiBackbone.Core.Actors.IAsiBackboneActorContext) | Framework-neutral actor data supplied by the host. Core does not authenticate the actor. |
-| Policy context | [`IAsiBackboneConstraintEvaluationContext`](xref:AsiBackbone.Core.Constraints.IAsiBackboneConstraintEvaluationContext), [`AsiBackboneConstraintEvaluationContext`](xref:AsiBackbone.Core.Constraints.AsiBackboneConstraintEvaluationContext) | Carries the decision-relevant input used by constraints and evaluation. |
-| Constraint | [`IAsiBackkboneConstraint<TContext>`](xref:AsiBackbone.Core.Constraints.IAsiBackboneConstraint`1) | Evaluates one policy condition without performing the governed side effect. |
+| Actor context | [`IGovernanceActorContext`](xref:AsiBackbone.Core.Actors.IGovernanceActorContext), [`GovernanceActorContext`](xref:AsiBackbone.Core.Actors.GovernanceActorContext) | Framework-neutral actor data supplied by the host. Core does not authenticate the actor. |
+| Policy context | [`IGovernanceEvaluationContext`](xref:AsiBackbone.Core.Constraints.IGovernanceEvaluationContext), [`GovernanceEvaluationContext`](xref:AsiBackbone.Core.Constraints.GovernanceEvaluationContext) | Carries the decision-relevant input used by constraints and evaluation. |
+| Constraint | [`IGovernanceConstraint<TContext>`](xref:AsiBackbone.Core.Constraints.IGovernanceConstraint`1) | Evaluates one policy condition without performing the governed side effect. |
 | Constraint result | [`ConstraintEvaluationResult`](xref:AsiBackbone.Core.Constraints.ConstraintEvaluationResult) | Carries the constraint's product result/reasons into decision composition. |
-| Policy evaluation | [`IAsiBackbonePolicyEvaluator<TContext>`](xref:AsiBackbone.Core.Evaluation.IAsiBackbonePolicyEvaluator`1) | Composes constraint results into a governance decision. |
-| Decision policy | [`IAsiBackboneDecisionPolicy<TContext>`](xref:AsiBackbone.Core.Evaluation.IAsiBackboneDecisionPolicy`1) | Optional post-composition policy hook that can reshape or raise the final decision. |
+| Policy evaluation | [`IGovernancePolicyEvaluator<TContext>`](xref:AsiBackbone.Core.Evaluation.IGovernancePolicyEvaluator`1) | Composes constraint results into a governance decision. |
+| Decision policy | [`IGovernanceDecisionPolicy<TContext>`](xref:AsiBackbone.Core.Evaluation.IGovernanceDecisionPolicy`1) | Optional post-composition policy hook that can reshape or raise the final decision. |
 | Decision outcome | [`GovernanceDecision`](xref:AsiBackbone.Core.Decisions.GovernanceDecision), [`GovernanceDecisionOutcome`](xref:AsiBackbone.Core.Decisions.GovernanceDecisionOutcome) | Structured product outcome, policy identity metadata, reason data, and correlation information. |
 | Acknowledgment | [`LiabilityHandshakeRequest`](xref:AsiBackbone.Core.Handshakes.LiabilityHandshakeRequest), [`LiabilityHandshakeAcknowledgment`](xref:AsiBackbone.Core.Handshakes.LiabilityHandshakeAcknowledgment) | Product acknowledgment request/response primitives. Naming is preserved for API compatibility and does not create legal protection. |
 | Audit residue | [`AuditResidue`](xref:AsiBackbone.Core.Audit.AuditResidue) | Structured evidence of the governance decision. |

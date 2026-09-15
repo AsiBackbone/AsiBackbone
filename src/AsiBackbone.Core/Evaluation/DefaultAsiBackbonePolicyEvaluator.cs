@@ -11,7 +11,9 @@ namespace AsiBackbone.Core.Evaluation;
 /// Default policy evaluator that runs the active constraint structure and composes the result into a governance decision.
 /// </summary>
 /// <typeparam name="TContext">The framework-neutral evaluation context type.</typeparam>
-public sealed class DefaultAsiBackbonePolicyEvaluator<TContext> : IAsiBackbonePolicyEvaluator<TContext>
+public sealed class DefaultAsiBackbonePolicyEvaluator<TContext> :
+    IAsiBackbonePolicyEvaluator<TContext>,
+    IGovernancePolicyEvaluator<TContext>
     where TContext : IAsiBackboneConstraintEvaluationContext
 {
     private static readonly IReadOnlyList<ConstraintEvaluationResult> EmptyConstraintResults =
