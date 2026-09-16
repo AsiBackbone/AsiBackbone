@@ -33,7 +33,7 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorHotPathTests
                         observedOrder.Add("second");
                         return ConstraintEvaluationResult.Allow();
                     })
-            ]);
+            ], threatModelContributors: null, decisionPolicy: null, options: null, logger: null);
 
         GovernanceDecision decision = await evaluator.EvaluateAsync(context, TestContext.Current.CancellationToken);
 
@@ -62,7 +62,7 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorHotPathTests
                     ConstraintEvaluationResult.Warning(
                         "constraint.warning",
                         "The constraint produced a warning."))
-            ]);
+            ], threatModelContributors: null, decisionPolicy: null, options: null, logger: null);
 
         GovernanceDecision decision = await evaluator.EvaluateAsync(context, TestContext.Current.CancellationToken);
 
@@ -86,7 +86,7 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorHotPathTests
                     ConstraintEvaluationResult.Deny(
                         "constraint.denied",
                         "The constraint denied the operation."))
-            ]);
+            ], threatModelContributors: null, decisionPolicy: null, options: null, logger: null);
 
         GovernanceDecision decision = await evaluator.EvaluateAsync(context, TestContext.Current.CancellationToken);
 
@@ -129,7 +129,7 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorHotPathTests
                             "constraint.denied",
                             "The constraint denied the operation.");
                     })
-            ]);
+            ], threatModelContributors: null, decisionPolicy: null, options: null, logger: null);
 
         GovernanceDecision decision = await evaluator.EvaluateAsync(context, TestContext.Current.CancellationToken);
 

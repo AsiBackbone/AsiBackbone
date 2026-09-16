@@ -30,7 +30,7 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorThreatModelingTests
                 {
                     contributorRan = true;
                     return ThreatAssessment.NoThreat();
-                })]);
+                })], decisionPolicy: null, options: null, logger: null);
 
         GovernanceDecision decision = await evaluator.EvaluateAsync(context, TestContext.Current.CancellationToken);
 
@@ -52,7 +52,7 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorThreatModelingTests
         TestPolicyContext context = CreateContext();
         var evaluator = new DefaultAsiBackbonePolicyEvaluator<TestPolicyContext>(
             [new StaticConstraint(ConstraintEvaluationResult.Allow())],
-            [new DelegateThreatContributor("null-threat-contributor", (_, _) => null!)]);
+            [new DelegateThreatContributor("null-threat-contributor", (_, _) => null!)], decisionPolicy: null, options: null, logger: null);
 
         GovernanceDecision decision = await evaluator.EvaluateAsync(context, TestContext.Current.CancellationToken);
 
@@ -85,7 +85,7 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorThreatModelingTests
                     ThreatCategories.InputOversized,
                     "threat.input_oversized",
                     "Oversized input indicator was reported.",
-                    GovernanceDecisionOutcome.Allowed))]);
+                    GovernanceDecisionOutcome.Allowed))], decisionPolicy: null, options: null, logger: null);
 
         InvalidOperationException exception = await Assert.ThrowsAsync<InvalidOperationException>(
             async () => await evaluator.EvaluateAsync(context, TestContext.Current.CancellationToken));
@@ -114,7 +114,7 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorThreatModelingTests
                     ThreatCategories.RegionPolicyMismatch,
                     "threat.region_policy_mismatch",
                     "Region policy mismatch was reported.",
-                    GovernanceDecisionOutcome.Deferred))]);
+                    GovernanceDecisionOutcome.Deferred))], decisionPolicy: null, options: null, logger: null);
 
         GovernanceDecision decision = await evaluator.EvaluateAsync(context, TestContext.Current.CancellationToken);
 
@@ -142,7 +142,7 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorThreatModelingTests
                     ThreatCategories.AuditIntegrityRisk,
                     "threat.audit_ack_required",
                     "Audit acknowledgment was requested.",
-                    GovernanceDecisionOutcome.AcknowledgmentRequired))]);
+                    GovernanceDecisionOutcome.AcknowledgmentRequired))], decisionPolicy: null, options: null, logger: null);
 
         GovernanceDecision decision = await evaluator.EvaluateAsync(context, TestContext.Current.CancellationToken);
 
@@ -189,7 +189,7 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorThreatModelingTests
                             "Capability token mismatch was reported.",
                             GovernanceDecisionOutcome.Denied);
                     })
-            ]);
+            ], decisionPolicy: null, options: null, logger: null);
 
         GovernanceDecision decision = await evaluator.EvaluateAsync(context, TestContext.Current.CancellationToken);
 
@@ -222,7 +222,7 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorThreatModelingTests
         TestPolicyContext context = CreateContext();
         var evaluator = new DefaultAsiBackbonePolicyEvaluator<TestPolicyContext>(
             [new StaticConstraint(ConstraintEvaluationResult.Allow())],
-            [new ThrowingThreatContributor("throwing-threat-contributor")]);
+            [new ThrowingThreatContributor("throwing-threat-contributor")], decisionPolicy: null, options: null, logger: null);
 
         GovernanceDecision decision = await evaluator.EvaluateAsync(context, TestContext.Current.CancellationToken);
 
@@ -253,7 +253,7 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorThreatModelingTests
             new AsiBackbonePolicyEvaluatorOptions
             {
                 TreatThreatContributorExceptionAsDenial = false
-            });
+            }, logger: null);
 
         _ = await Assert.ThrowsAsync<InvalidOperationException>(
             async () => await evaluator.EvaluateAsync(context, TestContext.Current.CancellationToken));
@@ -279,7 +279,7 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorThreatModelingTests
                     "threat.input_malformed",
                     "Malformed input indicator was reported.",
                     GovernanceDecisionOutcome.Warning))],
-            new AlwaysAllowDecisionPolicy());
+            new AlwaysAllowDecisionPolicy(), options: null, logger: null);
 
         GovernanceDecision decision = await evaluator.EvaluateAsync(context, TestContext.Current.CancellationToken);
 
@@ -312,7 +312,7 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorThreatModelingTests
             new AsiBackbonePolicyEvaluatorOptions
             {
                 PreventThreatAssessmentAllowDowngrade = false
-            });
+            }, logger: null);
 
         GovernanceDecision decision = await evaluator.EvaluateAsync(context, TestContext.Current.CancellationToken);
 
@@ -344,7 +344,7 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorThreatModelingTests
             new AsiBackbonePolicyEvaluatorOptions
             {
                 DenyWhenNoConstraints = false
-            });
+            }, logger: null);
 
         GovernanceDecision decision = await evaluator.EvaluateAsync(context, TestContext.Current.CancellationToken);
 
@@ -376,7 +376,7 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorThreatModelingTests
             new AsiBackbonePolicyEvaluatorOptions
             {
                 DenyWhenNoConstraints = true
-            });
+            }, logger: null);
 
         GovernanceDecision decision = await evaluator.EvaluateAsync(context, TestContext.Current.CancellationToken);
 

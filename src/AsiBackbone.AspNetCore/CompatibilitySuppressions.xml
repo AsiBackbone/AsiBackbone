@@ -1,0 +1,20 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<!-- https://learn.microsoft.com/dotnet/fundamentals/package-validation/diagnostic-ids -->
+<!-- Issue #783: intentional 6.0 removal of the two obsolete policy-marker extensions.
+     Keep the previous-release baseline gate active for every other API. -->
+<Suppressions xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <Suppression>
+    <DiagnosticId>CP0002</DiagnosticId>
+    <Target>M:AsiBackbone.AspNetCore.Endpoints.AsiBackboneEndpointGovernanceRouteBuilderExtensions.RequireGovernancePolicy``1(``0,System.Type)</Target>
+    <Left>lib/net10.0/AsiBackbone.AspNetCore.dll</Left>
+    <Right>lib/net10.0/AsiBackbone.AspNetCore.dll</Right>
+    <IsBaselineSuppression>true</IsBaselineSuppression>
+  </Suppression>
+  <Suppression>
+    <DiagnosticId>CP0002</DiagnosticId>
+    <Target>M:AsiBackbone.AspNetCore.Endpoints.AsiBackboneEndpointGovernanceRouteBuilderExtensions.RequireGovernancePolicy``1(Microsoft.AspNetCore.Builder.RouteHandlerBuilder)</Target>
+    <Left>lib/net10.0/AsiBackbone.AspNetCore.dll</Left>
+    <Right>lib/net10.0/AsiBackbone.AspNetCore.dll</Right>
+    <IsBaselineSuppression>true</IsBaselineSuppression>
+  </Suppression>
+</Suppressions>

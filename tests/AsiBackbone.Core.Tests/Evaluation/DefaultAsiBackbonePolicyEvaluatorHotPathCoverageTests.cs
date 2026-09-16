@@ -23,7 +23,7 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorHotPathCoverageTests
                 new StaticConstraint(ConstraintEvaluationResult.Allow()),
                 new StaticConstraint(ConstraintEvaluationResult.NotApplicable()),
                 new StaticConstraint(ConstraintEvaluationResult.Allow())
-            ]);
+            ], threatModelContributors: null, decisionPolicy: null, options: null, logger: null);
 
         GovernanceDecision decision = await evaluator.EvaluateAsync(context, TestContext.Current.CancellationToken);
 
@@ -54,7 +54,7 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorHotPathCoverageTests
                     ConstraintEvaluationResult.Warning(
                         "constraint.second_warning",
                         "The second constraint produced a warning."))
-            ]);
+            ], threatModelContributors: null, decisionPolicy: null, options: null, logger: null);
 
         GovernanceDecision decision = await evaluator.EvaluateAsync(context, TestContext.Current.CancellationToken);
 
@@ -87,7 +87,7 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorHotPathCoverageTests
                     ConstraintEvaluationResult.Deny(
                         "constraint.second_denied",
                         "The second constraint denied the operation."))
-            ]);
+            ], threatModelContributors: null, decisionPolicy: null, options: null, logger: null);
 
         GovernanceDecision decision = await evaluator.EvaluateAsync(context, TestContext.Current.CancellationToken);
 
@@ -135,7 +135,7 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorHotPathCoverageTests
             options: new AsiBackbonePolicyEvaluatorOptions
             {
                 ShortCircuitOnFirstDenial = true
-            });
+            }, threatModelContributors: null, logger: null);
 
         GovernanceDecision decision = await evaluator.EvaluateAsync(context, TestContext.Current.CancellationToken);
 
@@ -161,7 +161,7 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorHotPathCoverageTests
                 new StaticConstraint(ConstraintEvaluationResult.Allow()),
                 new StaticConstraint(ConstraintEvaluationResult.NotApplicable())
             ],
-            policy);
+            decisionPolicy: policy, threatModelContributors: null, options: null, logger: null);
 
         GovernanceDecision decision = await evaluator.EvaluateAsync(context, TestContext.Current.CancellationToken);
 

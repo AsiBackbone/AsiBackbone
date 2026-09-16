@@ -60,7 +60,7 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorWarningSuppressionTests
                             "The second denial also blocked the operation.");
                     })
             ],
-            [CreateWarningContributor()]);
+            [CreateWarningContributor()], decisionPolicy: null, options: null, logger: null);
 
         GovernanceDecision decision = await evaluator.EvaluateAsync(context, TestContext.Current.CancellationToken);
 
@@ -117,7 +117,7 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorWarningSuppressionTests
             options: new AsiBackbonePolicyEvaluatorOptions
             {
                 ShortCircuitOnFirstDenial = true
-            });
+            }, logger: null);
 
         GovernanceDecision decision = await evaluator.EvaluateAsync(context, TestContext.Current.CancellationToken);
 
@@ -140,7 +140,7 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorWarningSuppressionTests
         var evaluator = new DefaultAsiBackbonePolicyEvaluator<TestPolicyContext>(
             [new StaticConstraint(ConstraintEvaluationResult.Allow())],
             [CreateWarningContributor()],
-            new AlwaysAllowDecisionPolicy());
+            new AlwaysAllowDecisionPolicy(), options: null, logger: null);
 
         GovernanceDecision decision = await evaluator.EvaluateAsync(context, TestContext.Current.CancellationToken);
 

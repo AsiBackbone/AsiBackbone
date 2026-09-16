@@ -187,7 +187,7 @@ public sealed class PolicyInputHardeningFuzzTests
             options: new AsiBackbonePolicyEvaluatorOptions
             {
                 PreventThreatAssessmentAllowDowngrade = true
-            });
+            }, logger: null);
 
         GovernanceDecision decision = await evaluator.EvaluateAsync(context, TestContext.Current.CancellationToken);
 
@@ -216,7 +216,7 @@ public sealed class PolicyInputHardeningFuzzTests
             options: new AsiBackbonePolicyEvaluatorOptions
             {
                 TreatThreatContributorExceptionAsDenial = true
-            });
+            }, logger: null);
 
         GovernanceDecision decision = await evaluator.EvaluateAsync(context, TestContext.Current.CancellationToken);
 
@@ -240,7 +240,7 @@ public sealed class PolicyInputHardeningFuzzTests
             {
                 TreatThreatContributorExceptionAsDenial = true,
                 PreventThreatAssessmentAllowDowngrade = true
-            });
+            }, logger: null);
     }
 
     private static AsiBackboneConstraintEvaluationContext CreateContext(

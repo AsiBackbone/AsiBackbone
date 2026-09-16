@@ -55,7 +55,7 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorThreatReasonSelectionTests
                         selectedReasonCode,
                         selectedReasonMessage,
                         selectedOutcome))
-            ]);
+            ], decisionPolicy: null, options: null, logger: null);
 
         GovernanceDecision decision = await evaluator.EvaluateAsync(
             CreateContext(),
@@ -107,7 +107,7 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorThreatReasonSelectionTests
                         "threat.second_matching",
                         "The second matching restrictive reason was reported.",
                         selectedOutcome))
-            ]);
+            ], decisionPolicy: null, options: null, logger: null);
 
         GovernanceDecision decision = await evaluator.EvaluateAsync(
             CreateContext(),

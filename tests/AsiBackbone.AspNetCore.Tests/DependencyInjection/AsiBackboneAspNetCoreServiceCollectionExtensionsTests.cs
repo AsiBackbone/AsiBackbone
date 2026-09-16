@@ -214,7 +214,7 @@ public sealed class AsiBackboneAspNetCoreServiceCollectionExtensionsTests
         var evaluator = new DefaultAsiBackbonePolicyEvaluator<AsiBackboneConstraintEvaluationContext>(
             [],
             decisionPolicy: null,
-            options);
+            options: options, threatModelContributors: null, logger: null);
 
         GovernanceDecision decision = await evaluator.EvaluateAsync(CreateContext(), TestContext.Current.CancellationToken);
 
@@ -240,7 +240,7 @@ public sealed class AsiBackboneAspNetCoreServiceCollectionExtensionsTests
         var evaluator = new DefaultAsiBackbonePolicyEvaluator<AsiBackboneConstraintEvaluationContext>(
             [new ThrowingConstraint(new InvalidOperationException("sensitive host failure detail"))],
             decisionPolicy: null,
-            options);
+            options: options, threatModelContributors: null, logger: null);
 
         GovernanceDecision decision = await evaluator.EvaluateAsync(CreateContext(), TestContext.Current.CancellationToken);
 

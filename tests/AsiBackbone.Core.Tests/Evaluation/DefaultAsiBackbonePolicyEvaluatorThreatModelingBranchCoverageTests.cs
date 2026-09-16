@@ -23,7 +23,7 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorThreatModelingBranchCoverag
         TestPolicyContext context = CreateContext();
         var evaluator = new DefaultAsiBackbonePolicyEvaluator<TestPolicyContext>(
             [new StaticConstraint(ConstraintEvaluationResult.Deny("constraint.denied", "Constraint denied."))],
-            [CreateWarningContributor()]);
+            [CreateWarningContributor()], decisionPolicy: null, options: null, logger: null);
 
         GovernanceDecision decision = await evaluator.EvaluateAsync(context, TestContext.Current.CancellationToken);
 
@@ -49,7 +49,7 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorThreatModelingBranchCoverag
             new AsiBackbonePolicyEvaluatorOptions
             {
                 ShortCircuitOnFirstDenial = true
-            });
+            }, logger: null);
 
         GovernanceDecision decision = await evaluator.EvaluateAsync(context, TestContext.Current.CancellationToken);
 
@@ -73,7 +73,7 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorThreatModelingBranchCoverag
                 new StaticConstraint(ConstraintEvaluationResult.Deny("constraint.denied", "Constraint denied.")),
                 new StaticConstraint(ConstraintEvaluationResult.Warning("constraint.warning", "Constraint warned."))
             ],
-            []);
+            [], decisionPolicy: null, options: null, logger: null);
 
         GovernanceDecision decision = await evaluator.EvaluateAsync(context, TestContext.Current.CancellationToken);
 
@@ -99,7 +99,7 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorThreatModelingBranchCoverag
             new AsiBackbonePolicyEvaluatorOptions
             {
                 ShortCircuitOnFirstDenial = true
-            });
+            }, logger: null);
 
         GovernanceDecision decision = await evaluator.EvaluateAsync(context, TestContext.Current.CancellationToken);
 
@@ -133,7 +133,7 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorThreatModelingBranchCoverag
             new AsiBackbonePolicyEvaluatorOptions
             {
                 ShortCircuitOnFirstDenial = true
-            });
+            }, logger: null);
 
         GovernanceDecision decision = await evaluator.EvaluateAsync(context, TestContext.Current.CancellationToken);
 
@@ -153,7 +153,7 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorThreatModelingBranchCoverag
         TestPolicyContext context = CreateContext();
         var evaluator = new DefaultAsiBackbonePolicyEvaluator<TestPolicyContext>(
             [new StaticConstraint(ConstraintEvaluationResult.Warning("constraint.warning", "Constraint warned."))],
-            [CreateWarningContributor()]);
+            [CreateWarningContributor()], decisionPolicy: null, options: null, logger: null);
 
         GovernanceDecision decision = await evaluator.EvaluateAsync(context, TestContext.Current.CancellationToken);
 
@@ -177,7 +177,7 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorThreatModelingBranchCoverag
                 new StaticConstraint(ConstraintEvaluationResult.Deny("constraint.denied.one", "Constraint one denied.")),
                 new StaticConstraint(ConstraintEvaluationResult.Deny("constraint.denied.two", "Constraint two denied."))
             ],
-            []);
+            [], decisionPolicy: null, options: null, logger: null);
 
         GovernanceDecision decision = await evaluator.EvaluateAsync(context, TestContext.Current.CancellationToken);
 
@@ -199,7 +199,7 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorThreatModelingBranchCoverag
         var evaluator = new DefaultAsiBackbonePolicyEvaluator<TestPolicyContext>(
             [new StaticConstraint(ConstraintEvaluationResult.Allow())],
             [CreateWarningContributor()],
-            new AlwaysDenyDecisionPolicy());
+            new AlwaysDenyDecisionPolicy(), options: null, logger: null);
 
         GovernanceDecision decision = await evaluator.EvaluateAsync(context, TestContext.Current.CancellationToken);
 
@@ -224,7 +224,7 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorThreatModelingBranchCoverag
             new AsiBackbonePolicyEvaluatorOptions
             {
                 PreventThreatAssessmentAllowDowngrade = false
-            });
+            }, logger: null);
 
         GovernanceDecision decision = await evaluator.EvaluateAsync(context, TestContext.Current.CancellationToken);
 
@@ -253,7 +253,7 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorThreatModelingBranchCoverag
                 {
                     contributorRan = true;
                     return ThreatAssessment.NoThreat();
-                })]);
+                })], decisionPolicy: null, options: null, logger: null);
 
         _ = await Assert.ThrowsAsync<OperationCanceledException>(
             async () => await evaluator.EvaluateAsync(context, cancellationTokenSource.Token));
@@ -277,7 +277,7 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorThreatModelingBranchCoverag
             [new StaticConstraint(ConstraintEvaluationResult.Allow())],
             [new DelegateThreatContributor(
                 "canceling-threat-contributor",
-                (_, _) => throw new OperationCanceledException())]);
+                (_, _) => throw new OperationCanceledException())], decisionPolicy: null, options: null, logger: null);
 
         _ = await Assert.ThrowsAsync<OperationCanceledException>(
             async () => await evaluator.EvaluateAsync(context, TestContext.Current.CancellationToken));
@@ -295,7 +295,7 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorThreatModelingBranchCoverag
         TestPolicyContext context = CreateContext();
         var evaluator = new DefaultAsiBackbonePolicyEvaluator<TestPolicyContext>(
             [new ThrowingConstraint(new OperationCanceledException())],
-            []);
+            [], decisionPolicy: null, options: null, logger: null);
 
         _ = await Assert.ThrowsAsync<OperationCanceledException>(
             async () => await evaluator.EvaluateAsync(context, TestContext.Current.CancellationToken));
@@ -323,7 +323,7 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorThreatModelingBranchCoverag
                         "Denied threat indicator was reported.",
                         GovernanceDecisionOutcome.Denied)),
                 CreateWarningContributor()
-            ]);
+            ], decisionPolicy: null, options: null, logger: null);
 
         GovernanceDecision decision = await evaluator.EvaluateAsync(context, TestContext.Current.CancellationToken);
 

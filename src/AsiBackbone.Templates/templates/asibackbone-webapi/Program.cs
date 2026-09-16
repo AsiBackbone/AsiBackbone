@@ -5,8 +5,10 @@ using AsiBackbone.Core.Audit;
 using AsiBackbone.Core.Constraints;
 using AsiBackbone.Core.Decisions;
 using AsiBackbone.Core.Evaluation;
+using AsiBackbone.Core.ThreatModeling;
 using AsiBackbone.Storage.InMemory.Audit;
 using Company.AsibackboneTemplate.Governance;
+using Microsoft.Extensions.Options;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
@@ -20,7 +22,14 @@ builder.Services.AddSingleton<IAsiBackboneAuditSink>(serviceProvider =>
 builder.Services.AddSingleton<IAsiBackboneEndpointCapabilityGrantValidator, SampleCapabilityGrantValidator>();
 builder.Services.AddSingleton<IAsiBackboneConstraint<AsiBackboneConstraintEvaluationContext>, SampleRegionConstraint>();
 builder.Services.AddSingleton<IAsiBackboneDecisionPolicy<AsiBackboneConstraintEvaluationContext>, SampleDecisionPolicy>();
-builder.Services.AddSingleton<IAsiBackbonePolicyEvaluator<AsiBackboneConstraintEvaluationContext>, DefaultAsiBackbonePolicyEvaluator<AsiBackboneConstraintEvaluationContext>>();
+builder.Services.AddSingleton<IAsiBackbonePolicyEvaluator<AsiBackboneConstraintEvaluationContext>>(serviceProvider =>
+    DefaultAsiBackbonePolicyEvaluator.CreateBuilder<AsiBackboneConstraintEvaluationContext>()
+        .AddConstraints(serviceProvider.GetServices<IAsiBackboneConstraint<AsiBackboneConstraintEvaluationContext>>())
+        .AddThreatModelContributors(serviceProvider.GetServices<IThreatModelContributor<AsiBackboneConstraintEvaluationContext>>())
+        .WithDecisionPolicy(serviceProvider.GetService<IAsiBackboneDecisionPolicy<AsiBackboneConstraintEvaluationContext>>())
+        .WithOptions(serviceProvider.GetRequiredService<IOptions<AsiBackbonePolicyEvaluatorOptions>>().Value)
+        .WithLogger(serviceProvider.GetService<ILogger<DefaultAsiBackbonePolicyEvaluator<AsiBackboneConstraintEvaluationContext>>>())
+        .Build());
 
 WebApplication app = builder.Build();
 

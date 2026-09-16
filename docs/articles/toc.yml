@@ -65,6 +65,8 @@
       href: managed-key-signing-provider.md
     - name: Schema Versioning
       href: schema-versioning.md
+    - name: Upgrade from 5.x to 6.0
+      href: upgrade-500-to-600.md
     - name: API Compatibility and SemVer
       href: api-compatibility-and-semver.md
     - name: "ASIB900: Obsolete Policy Evaluator Constructors"
@@ -219,6 +221,8 @@
       href: consumer-verification-520.md
     - name: 5.0.0 Migration Guide
       href: upgrade-400-to-500.md
+    - name: Upgrade from 5.x to 6.0
+      href: upgrade-500-to-600.md
     - name: API Compatibility and SemVer
       href: api-compatibility-and-semver.md
     - name: Schema Versioning

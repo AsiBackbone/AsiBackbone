@@ -48,7 +48,7 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorFastAbortTests
                             "constraint.third_warning",
                             "The third constraint produced a warning.");
                     })
-            ]);
+            ], threatModelContributors: null, decisionPolicy: null, options: null, logger: null);
 
         GovernanceDecision decision = await evaluator.EvaluateAsync(context, TestContext.Current.CancellationToken);
 
@@ -88,7 +88,7 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorFastAbortTests
             options: new AsiBackbonePolicyEvaluatorOptions
             {
                 ShortCircuitOnFirstDenial = true
-            });
+            }, threatModelContributors: null, logger: null);
 
         GovernanceDecision decision = await evaluator.EvaluateAsync(context, TestContext.Current.CancellationToken);
 
@@ -130,7 +130,7 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorFastAbortTests
             options: new AsiBackbonePolicyEvaluatorOptions
             {
                 ShortCircuitOnFirstDenial = true
-            });
+            }, threatModelContributors: null, logger: null);
 
         GovernanceDecision decision = await evaluator.EvaluateAsync(context, TestContext.Current.CancellationToken);
 
@@ -169,11 +169,11 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorFastAbortTests
                         return ConstraintEvaluationResult.Allow();
                     })
             ],
-            policy,
-            new AsiBackbonePolicyEvaluatorOptions
+            decisionPolicy: policy,
+            options: new AsiBackbonePolicyEvaluatorOptions
             {
                 ShortCircuitOnFirstDenial = true
-            });
+            }, threatModelContributors: null, logger: null);
 
         GovernanceDecision decision = await evaluator.EvaluateAsync(context, TestContext.Current.CancellationToken);
 

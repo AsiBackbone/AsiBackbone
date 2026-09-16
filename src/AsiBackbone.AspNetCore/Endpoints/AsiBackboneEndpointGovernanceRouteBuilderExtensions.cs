@@ -50,32 +50,6 @@ public static class AsiBackboneEndpointGovernanceRouteBuilderExtensions
     }
 
     /// <summary>
-    /// Adds a host-defined governance policy marker to a Minimal API route handler endpoint.
-    /// </summary>
-    /// <typeparam name="TPolicy">The host-defined policy marker or resolver type.</typeparam>
-    /// <param name="builder">The route handler builder.</param>
-    /// <returns>The same builder so calls can be chained.</returns>
-    [Obsolete("The framework never resolved the policy type or selected constraints from it, so the 'Require' name overstated what this does. Use MarkGovernancePolicy, which records the same metadata under an accurate name.")]
-    public static RouteHandlerBuilder RequireGovernancePolicy<TPolicy>(this RouteHandlerBuilder builder)
-    {
-        return builder.MarkGovernancePolicy(typeof(TPolicy));
-    }
-
-    /// <summary>
-    /// Adds a host-defined governance policy marker to an endpoint.
-    /// </summary>
-    /// <typeparam name="TBuilder">The endpoint convention builder type.</typeparam>
-    /// <param name="builder">The endpoint convention builder.</param>
-    /// <param name="policyType">The host-defined policy marker or resolver type.</param>
-    /// <returns>The same builder so calls can be chained.</returns>
-    [Obsolete("The framework never resolved the policy type or selected constraints from it, so the 'Require' name overstated what this does. Use MarkGovernancePolicy, which records the same metadata under an accurate name.")]
-    public static TBuilder RequireGovernancePolicy<TBuilder>(this TBuilder builder, Type policyType)
-        where TBuilder : IEndpointConventionBuilder
-    {
-        return builder.MarkGovernancePolicy(policyType);
-    }
-
-    /// <summary>
     /// Adds endpoint-scoped metadata requesting latency-optimized fast-abort policy evaluation after the first denied constraint result.
     /// </summary>
     /// <typeparam name="TBuilder">The endpoint convention builder type.</typeparam>

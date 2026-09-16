@@ -4,6 +4,7 @@ using AsiBackbone.Core.Constraints;
 using AsiBackbone.Core.Decisions;
 using AsiBackbone.Core.Evaluation;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.AspNetCore.Routing.Patterns;
 using Xunit;
@@ -30,6 +31,11 @@ public sealed class AsiBackboneEndpointGovernanceRouteBuilderExtensionsTests
         RouteHandlerBuilder returned = routeBuilder.MarkGovernancePolicy<TestDecisionPolicy>();
 
         Assert.Same(routeBuilder, returned);
+
+        Endpoint endpoint = Assert.Single(((IEndpointRouteBuilder)app).DataSources.SelectMany(source => source.Endpoints));
+        RequireGovernancePolicyAttribute metadata =
+            Assert.Single(endpoint.Metadata.OfType<RequireGovernancePolicyAttribute>());
+        Assert.Equal(typeof(TestDecisionPolicy), metadata.PolicyType);
     }
 
     /// <summary>
@@ -53,54 +59,6 @@ public sealed class AsiBackboneEndpointGovernanceRouteBuilderExtensionsTests
             Assert.Single(endpointBuilder.Metadata.OfType<RequireGovernancePolicyAttribute>());
 
         Assert.Equal(typeof(TestPolicy), metadata.PolicyType);
-    }
-
-    /// <summary>
-    /// Tests that the obsolete generic marker still records the same metadata as its replacement so existing callers keep working.
-    /// </summary>
-    [Fact]
-    public void ObsoleteRequireGovernancePolicy_RecordsSameMetadataAsMarkGovernancePolicy()
-    {
-        var obsoleteBuilder = new CapturingEndpointConventionBuilder();
-        var currentBuilder = new CapturingEndpointConventionBuilder();
-
-        // The obsolete overloads are exercised deliberately: they remain the supported path for existing callers
-        // until they are removed, so their forwarding behavior needs coverage.
-#pragma warning disable CS0618 // Type or member is obsolete
-        _ = obsoleteBuilder.RequireGovernancePolicy(typeof(TestPolicy));
-#pragma warning restore CS0618
-        _ = currentBuilder.MarkGovernancePolicy(typeof(TestPolicy));
-
-        EndpointBuilder obsoleteEndpoint = CreateEndpointBuilder();
-        EndpointBuilder currentEndpoint = CreateEndpointBuilder();
-        Assert.Single(obsoleteBuilder.Conventions)(obsoleteEndpoint);
-        Assert.Single(currentBuilder.Conventions)(currentEndpoint);
-
-        RequireGovernancePolicyAttribute obsoleteMetadata =
-            Assert.Single(obsoleteEndpoint.Metadata.OfType<RequireGovernancePolicyAttribute>());
-        RequireGovernancePolicyAttribute currentMetadata =
-            Assert.Single(currentEndpoint.Metadata.OfType<RequireGovernancePolicyAttribute>());
-
-        Assert.Equal(currentMetadata.PolicyType, obsoleteMetadata.PolicyType);
-    }
-
-    /// <summary>
-    /// Tests that the obsolete overloads carry an <see cref="ObsoleteAttribute"/> pointing callers at the replacement.
-    /// </summary>
-    [Fact]
-    public void ObsoleteRequireGovernancePolicyOverloadsNameTheReplacement()
-    {
-        MethodInfo[] obsoleteOverloads = [.. typeof(AsiBackboneEndpointGovernanceRouteBuilderExtensions)
-            .GetMethods(BindingFlags.Public | BindingFlags.Static)
-            .Where(method => method.Name == "RequireGovernancePolicy")];
-
-        Assert.Equal(2, obsoleteOverloads.Length);
-        Assert.All(obsoleteOverloads, method =>
-        {
-            ObsoleteAttribute? obsolete = method.GetCustomAttribute<ObsoleteAttribute>();
-            Assert.NotNull(obsolete);
-            Assert.Contains("MarkGovernancePolicy", obsolete.Message, StringComparison.Ordinal);
-        });
     }
 
     /// <summary>

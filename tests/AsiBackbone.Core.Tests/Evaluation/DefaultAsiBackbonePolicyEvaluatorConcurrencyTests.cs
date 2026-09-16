@@ -26,7 +26,7 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorConcurrencyTests
         var evaluator = new DefaultAsiBackbonePolicyEvaluator<TestContext>(
             constraints: [],
             decisionPolicy: null,
-            options: options);
+            options: options, threatModelContributors: null, logger: null);
 
         _ = Assert.Throws<InvalidOperationException>(() => options.DenyWhenNoConstraints = true);
 
@@ -55,7 +55,7 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorConcurrencyTests
             options: new AsiBackbonePolicyEvaluatorOptions
             {
                 ShortCircuitOnFirstDenial = true
-            });
+            }, threatModelContributors: null, logger: null);
 
         constraints.Clear();
         constraints.Add(new FixedConstraint("replacement", ConstraintEvaluationResult.Allow()));
@@ -84,7 +84,7 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorConcurrencyTests
             constraints: [new FixedConstraint("allow", ConstraintEvaluationResult.Allow())],
             threatModelContributors: contributors,
             decisionPolicy: null,
-            options: null);
+            options: null, logger: null);
 
         contributors.Clear();
         contributors.Add(new FixedThreatContributor("replacement", ThreatAssessment.NoThreat()));
@@ -108,7 +108,7 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorConcurrencyTests
             [
                 new FixedConstraint("warning", ConstraintEvaluationResult.Warning("policy.warning", "Warning.")),
                 new FixedConstraint("allow", ConstraintEvaluationResult.Allow())
-            ]);
+            ], threatModelContributors: null, decisionPolicy: null, options: null, logger: null);
 
         Task<GovernanceDecision>[] evaluations = [.. Enumerable.Range(0, 64)
             .Select(index => evaluator
