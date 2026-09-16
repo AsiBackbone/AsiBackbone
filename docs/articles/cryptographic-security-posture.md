@@ -4,7 +4,7 @@ This article documents the AsiBackbone cryptographic security posture for signin
 
 Issue: #216, updated for #253.
 
-In this software project, **ASI** means **Accountable Systems Infrastructure**. AsiBackbone provides governance infrastructure around consequential software decision flow. It is not a key-management system, immutable ledger, blockchain product, legal evidence system, compliance certification service, or tamper-proof storage system by itself.
+AsiBackbone provides governance infrastructure around consequential software decision flow. It is not a key-management system, immutable ledger, blockchain product, legal evidence system, compliance certification service, or tamper-proof storage system by itself.
 
 > [!IMPORTANT]
 > `1.1.0` includes stable Core signing-ready metadata, canonical payload hashing, signing seams, verification-policy primitives, a local-development signing provider, and a managed-key adapter boundary. Production cryptographic assurance still requires a host-owned or provider-owned implementation that signs canonical artifacts, protects keys, verifies signatures, stores records durably, monitors failures, manages retention, and defines operational response procedures.
@@ -141,14 +141,14 @@ var hash = canonicalHasher.Hash(payload);
 var signingResult = await signingService.SignAsync(
     SigningRequest.Create(
         artifactId: payload.ArtifactId,
-        artifactType: "audit-receipt",
+        artifactType: "audit-residue",
         signingHash: hash.Value,
         hashAlgorithm: hash.Algorithm,
         metadata: payload.SafeMetadata),
     cancellationToken);
 
 var signedRecord = AuditLedgerRecord.FromResidue(
-    residue,
+    receipt,
     signingHash: signingResult.Metadata.SigningHash,
     signatureKeyId: signingResult.Metadata.KeyId,
     signatureKeyVersion: signingResult.Metadata.KeyVersion,
@@ -212,7 +212,7 @@ Chaining is not the same as external anchoring.
 
 Use the phrase "tamper-evident" only when the deployed design includes signing, verification, durable storage controls, and a tested audit-chain or anchoring process.
 
-## Governance outbox emission
+## Outbox emission
 
 Governance emission should preserve local accountability before downstream projection.
 
@@ -223,7 +223,7 @@ Decision / acknowledgment / capability event
   -> build decision receipt or lifecycle event
   -> persist durable local audit record
   -> optionally sign the local artifact or outbox envelope
-  -> enqueue governance outbox entry
+  -> enqueue outbox entry
   -> drain through configured provider
   -> verify delivery result
   -> preserve delivery status and failure reason

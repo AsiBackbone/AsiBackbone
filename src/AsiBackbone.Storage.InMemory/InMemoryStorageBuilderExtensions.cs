@@ -40,7 +40,7 @@ public static class InMemoryStorageBuilderExtensions
     }
 
     /// <summary>
-    /// Adds the non-durable in-memory governance outbox store through the AsiBackbone builder facade.
+    /// Adds the non-durable in-memory outbox store through the AsiBackbone builder facade.
     /// </summary>
     public static IAsiBackboneBuilder UseInMemoryGovernanceOutbox(this IAsiBackboneBuilder builder)
     {

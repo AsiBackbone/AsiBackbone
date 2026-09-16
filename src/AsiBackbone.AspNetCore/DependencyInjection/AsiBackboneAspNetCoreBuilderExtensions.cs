@@ -31,7 +31,7 @@ public static class AsiBackboneAspNetCoreBuilderExtensions
     }
 
     /// <summary>
-    /// Adds the host-owned governance outbox drain worker through the AsiBackbone builder facade using default options.
+    /// Adds the host-owned outbox drain worker through the AsiBackbone builder facade using default options.
     /// </summary>
     public static IAsiBackboneBuilder UseGovernanceOutboxDrain(this IAsiBackboneBuilder builder)
     {
@@ -39,7 +39,7 @@ public static class AsiBackboneAspNetCoreBuilderExtensions
     }
 
     /// <summary>
-    /// Adds the host-owned governance outbox drain worker through the AsiBackbone builder facade using configured options.
+    /// Adds the host-owned outbox drain worker through the AsiBackbone builder facade using configured options.
     /// </summary>
     public static IAsiBackboneBuilder UseGovernanceOutboxDrain(
         this IAsiBackboneBuilder builder,

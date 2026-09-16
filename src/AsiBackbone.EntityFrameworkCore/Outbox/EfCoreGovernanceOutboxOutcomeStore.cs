@@ -8,7 +8,7 @@ using Microsoft.Extensions.Logging.Abstractions;
 namespace AsiBackbone.EntityFrameworkCore.Outbox;
 
 /// <summary>
-/// EF Core governance outbox store that exposes explicit caller-owned claim transition outcomes.
+/// EF Core outbox store that exposes explicit caller-owned claim transition outcomes.
 /// </summary>
 /// <remarks>
 /// This store preserves the existing convenience API while adding an outcome-aware contract that distinguishes applied

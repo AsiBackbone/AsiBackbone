@@ -210,7 +210,7 @@ public static class GovernanceArtifactSigner
     }
 
     /// <summary>
-    /// Creates an unsigned wrapper for a governance outbox entry.
+    /// Creates an unsigned wrapper for an outbox entry.
     /// </summary>
     public static SignedGovernanceArtifact<GovernanceOutboxEntry> CreateUnsignedGovernanceOutboxEntry(
         GovernanceOutboxEntry entry,
@@ -221,7 +221,7 @@ public static class GovernanceArtifactSigner
     }
 
     /// <summary>
-    /// Creates signing-ready metadata for a governance outbox entry without invoking a signing provider.
+    /// Creates signing-ready metadata for an outbox entry without invoking a signing provider.
     /// </summary>
     public static SignedGovernanceArtifact<GovernanceOutboxEntry> CreateSigningReadyGovernanceOutboxEntry(
         GovernanceOutboxEntry entry,
@@ -233,7 +233,7 @@ public static class GovernanceArtifactSigner
     }
 
     /// <summary>
-    /// Signs a governance outbox entry after canonical payload hashing.
+    /// Signs an outbox entry after canonical payload hashing.
     /// </summary>
     public static ValueTask<SignedGovernanceArtifact<GovernanceOutboxEntry>> SignGovernanceOutboxEntryAsync(
         GovernanceOutboxEntry entry,

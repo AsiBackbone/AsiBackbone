@@ -2,7 +2,7 @@
 
 This page records the historical mutation-testing scope accepted for the `1.0.0` release boundary and the current incremental expansion strategy for the stable package family.
 
-In this software project, **ASI** means **Accountable Systems Infrastructure**. Mutation testing is used as a quality signal for implemented governance behavior; it is not a compliance certification and does not make the package family an execution engine, AI model host, robot controller, or production audit guarantee.
+Mutation testing is used as a quality signal for implemented governance behavior; it is not a compliance certification and does not make the package family an execution engine, AI model host, robot controller, or production audit guarantee.
 
 ## Current quality context
 

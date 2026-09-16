@@ -6,7 +6,7 @@ namespace AsiBackbone.Core.Audit;
 /// Represents a framework-neutral lifecycle event linked to a governed decision receipt flow.
 /// </summary>
 /// <remarks>
-/// Lifecycle events are append-only progress records. They allow acknowledgment, capability token, gateway, outbox, and provider delivery activity to be recorded without rewriting the original decision residue.
+/// Lifecycle events are append-only progress records. They allow acknowledgment, capability token, gateway, outbox, and provider delivery activity to be recorded without rewriting the original decision receipt.
 /// </remarks>
 public sealed class DecisionReceiptLifecycleEvent
 {
@@ -70,7 +70,7 @@ public sealed class DecisionReceiptLifecycleEvent
     public string CorrelationId { get; }
 
     /// <summary>
-    /// Gets the related decision receipt identifier when the original decision residue is available.
+    /// Gets the related decision receipt identifier when the original decision receipt is available.
     /// </summary>
     public string? AuditResidueId { get; }
 
@@ -109,7 +109,7 @@ public sealed class DecisionReceiptLifecycleEvent
     /// </summary>
     /// <param name="stage">The lifecycle stage represented by this event.</param>
     /// <param name="correlationId">The correlation identifier linking the event to the original decision context.</param>
-    /// <param name="auditResidueId">Optional decision receipt identifier when the original decision residue is available.</param>
+    /// <param name="auditResidueId">Optional decision receipt identifier when the original decision receipt is available.</param>
     /// <param name="eventId">Optional lifecycle event identifier. When omitted, a new identifier is generated.</param>
     /// <param name="occurredUtc">Optional lifecycle timestamp. When omitted, the current UTC timestamp is used.</param>
     /// <param name="traceId">Optional trace identifier.</param>

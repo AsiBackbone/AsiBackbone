@@ -18,7 +18,7 @@ A production path should do one of the following instead:
 
 ## Why this matters
 
-AsiBackbone is a governance spine for accountable software decision flow. Consumers should not discover incomplete paths only after a production request enters a policy evaluator, storage provider, signing path, emitter, or host integration boundary.
+AsiBackbone is a policy decision pipeline for accountable software decision flow. Consumers should not discover incomplete paths only after a production request enters a policy evaluator, storage provider, signing path, emitter, or host integration boundary.
 
 The package should make invalid states explicit. Placeholder exceptions blur that line because they can hide an unfinished branch behind a successful build.
 

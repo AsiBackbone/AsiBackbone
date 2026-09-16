@@ -1,7 +1,7 @@
 namespace AsiBackbone.Core.Audit;
 
 /// <summary>
-/// Receives decision receipt produced by the governance spine.
+/// Receives decision receipt produced by the policy decision pipeline.
 /// </summary>
 /// <remarks>
 /// Core defines the contract only. Storage providers, hosts, or future integration packages own how and where residue is recorded.

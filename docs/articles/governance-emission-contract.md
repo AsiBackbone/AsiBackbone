@@ -2,7 +2,7 @@
 
 This article documents the provider-neutral governance emission contract introduced for the `1.1.0 - Observability, Outbox, and Governance Emission Providers` milestone.
 
-In this software project, **ASI** means **Accountable Systems Infrastructure**. AsiBackbone remains a governance spine for consequential software decision flow. It is not an AI model host, cloud governance platform, observability backend, SIEM product, streaming system, signing product, or provider SDK wrapper.
+AsiBackbone remains a policy decision pipeline for consequential software decision flow. It is not an AI model host, cloud governance platform, observability backend, SIEM product, streaming system, signing product, or provider SDK wrapper.
 
 ## Purpose
 
@@ -135,6 +135,6 @@ This keeps AsiBackbone from starting at a vendor provider and working backward i
 ## Related documentation
 
 - [Observability and Governance Emission Architecture](observability-and-governance-emission-architecture.md)
-- [Audit Residue Observability Schema](audit-residue-observability-schema.md)
+- [Decision Receipt Observability Schema](decision-receipt-observability-schema.md)
 - [Core Domain Language](core-domain-language.md)
 - [Privacy and Signing Boundaries](privacy-and-signing-boundaries.md)

@@ -4,7 +4,7 @@ Issue: #222.
 
 This article documents the provider-neutral verification policy APIs and result handling for signed AsiBackbone governance artifacts.
 
-In this software project, **ASI** means **Accountable Systems Infrastructure**. AsiBackbone provides governance primitives and verification seams. It does not provide provider-specific key lookup, immutable storage, external anchoring, automatic compliance guarantees, legal evidence guarantees, or tamper-evidence by itself.
+AsiBackbone provides governance primitives and verification seams. It does not provide provider-specific key lookup, immutable storage, external anchoring, automatic compliance guarantees, legal evidence guarantees, or tamper-evidence by itself.
 
 > [!IMPORTANT]
 > A signed artifact is not verified until a verifier confirms the expected hash, signature metadata, key reference, and policy context. Verification must be explicit and policy-driven.

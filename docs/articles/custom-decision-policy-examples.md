@@ -219,13 +219,13 @@ After a decision policy returns, keep enforcement explicit:
 ```csharp
 GovernanceDecision decision = await evaluator.EvaluateAsync(context, cancellationToken);
 
-DecisionReceipt residue = DecisionReceipt.FromDecision(
+DecisionReceipt receipt = DecisionReceipt.FromDecision(
     actor,
     operationName,
     decision,
     metadata: context.Metadata);
 
-await auditSink.WriteAsync(residue, cancellationToken);
+await auditSink.WriteAsync(receipt, cancellationToken);
 
 if (!decision.CanProceed)
 {

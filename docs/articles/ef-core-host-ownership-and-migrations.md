@@ -137,9 +137,9 @@ Raw `DbUpdateException` messages are not returned through public `OperationResul
 
 If a host supplies an `ILogger<EfCoreAuditLedgerStore>`, exception details are logged inside the host-controlled diagnostics boundary. The host owns logger configuration, redaction, routing, retention, access control, and any decision to forward detailed persistence diagnostics outside the application boundary.
 
-## Durable governance outbox tables
+## Durable outbox tables
 
-The EF Core adapter now includes durable local storage for provider-neutral governance outbox entries and decision receipt lifecycle events. The durable tables are intended to prove local persistence before optional downstream provider emission is attempted.
+The EF Core adapter now includes durable local storage for provider-neutral outbox entries and decision receipt lifecycle events. The durable tables are intended to prove local persistence before optional downstream provider emission is attempted.
 
 The host migration generated from `ApplyAsiBackboneConfigurations()` should include, among the existing audit ledger and handshake tables:
 
@@ -148,7 +148,7 @@ The host migration generated from `ApplyAsiBackboneConfigurations()` should incl
 
 `AsiBackboneGovernanceOutboxEntries` stores the minimized governance emission envelope plus operational delivery state, including status, retry count, max retry count, next retry UTC, delivered UTC, provider name, provider record ID, last provider-neutral error fields, dead-letter reason, and safe metadata JSON.
 
-`AsiBackboneAuditResidueLifecycleEvents` stores append-oriented lifecycle progress such as decision evaluated, external emission queued, delivered, failed, or dead-lettered. These rows let hosts correlate the local outbox with original decision receipt without rewriting the original decision residue.
+`AsiBackboneAuditResidueLifecycleEvents` stores append-oriented lifecycle progress such as decision evaluated, external emission queued, delivered, failed, or dead-lettered. These rows let hosts correlate the local outbox with original decision receipt without rewriting the original decision receipt.
 
 ## Durable outbox and downstream providers
 
@@ -181,10 +181,10 @@ The EF Core package contributes provider-neutral mappings for ASI Backbone accou
 - handshake request metadata
 - handshake acknowledgments
 - handshake acknowledgment metadata
-- governance outbox entries
+- outbox entries
 - decision receipt lifecycle events
 
-These records are part of the governance spine. They are intended to preserve durable accountability snapshots such as actor identity, actor type, operation name, outcome, reason codes, metadata, correlation ID, trace ID, policy version, policy hash, handshake identifiers, acknowledgment identifiers, capability-token identifiers, signing hashes, key references, signature descriptors, outbox status, retry posture, lifecycle stage, and provider-neutral delivery diagnostics.
+These records are part of the policy decision pipeline. They are intended to preserve durable accountability snapshots such as actor identity, actor type, operation name, outcome, reason codes, metadata, correlation ID, trace ID, policy version, policy hash, handshake identifiers, acknowledgment identifiers, capability-token identifiers, signing hashes, key references, signature descriptors, outbox status, retry posture, lifecycle stage, and provider-neutral delivery diagnostics.
 
 ## What the package does not do automatically
 
@@ -231,7 +231,7 @@ When integrating ASI Backbone EF Core persistence, the host application should d
 5. How migrations are reviewed, deployed, rolled back, and audited.
 6. How accountability records are retained, archived, protected, or purged.
 7. Whether provider-specific conversions or conventions are needed.
-8. Which background service, hosted worker, or provider package drains the governance outbox.
+8. Which background service, hosted worker, or provider package drains the outbox.
 9. How failed, deferred, retryable, and dead-lettered entries are monitored and escalated.
 10. How signing metadata is protected, reviewed, verified, and correlated during key rotation or audit-chain investigation.
 11. How sanitized persistence failures are surfaced while detailed EF Core diagnostics remain inside host-owned logging and operational review boundaries.

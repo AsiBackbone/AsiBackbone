@@ -55,7 +55,7 @@ The `2.0.0` release established the simplified `AsiBackbone.*` package and names
 
 ### `4.x` stable family
 
-`4.0.0` established the previous stable line. It preserved the `AsiBackbone.*` package IDs and namespaces while advancing the binary assembly identity to `4.0.0.0` and changing the governance outbox claim-leasing default.
+`4.0.0` established the previous stable line. It preserved the `AsiBackbone.*` package IDs and namespaces while advancing the binary assembly identity to `4.0.0.0` and changing the outbox claim-leasing default.
 
 ### Current `5.x` stable family
 

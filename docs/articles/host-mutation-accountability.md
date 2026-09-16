@@ -47,7 +47,7 @@ GovernedOperationExecutionReceipt receipt =
 
 DecisionReceiptLifecycleEvent completed =
     HostAccountabilityLifecycleEvent.FromExecutionReceipt(
-        residue,
+        receipt,
         receipt);
 
 await lifecycleStore.AppendAsync(completed, cancellationToken);
@@ -65,7 +65,7 @@ The helper uses the existing `GatewayExecutionCompleted` lifecycle stage. Outcom
 6. Commit or roll back the host transaction.
 7. Create a `GovernedOperationExecutionReceipt` from the host result.
 8. Append the completion lifecycle event locally.
-9. Optionally place the lifecycle artifact into the configured governance outbox or signing/integrity process.
+9. Optionally place the lifecycle artifact into the configured outbox or signing/integrity process.
 
 ## Mutation-manifest binding
 

@@ -1,6 +1,6 @@
 # AsiBackbone.Templates
 
-`AsiBackbone.Templates` provides `dotnet new` templates for creating Accountable Systems Infrastructure governed ASP.NET Core hosts.
+`AsiBackbone.Templates` provides `dotnet new` templates for creating governed ASP.NET Core hosts with AsiBackbone.
 
 The package is a developer-experience scaffold. It is not a runtime dependency. It helps generate local adoption starting points, not production authority or operational control.
 

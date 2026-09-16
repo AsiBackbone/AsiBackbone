@@ -4,7 +4,7 @@ This roadmap splits AsiBackbone cryptographic security hardening into implementa
 
 Issue: #207.
 
-In this software project, **ASI** means **Accountable Systems Infrastructure**. AsiBackbone is a governance spine for consequential software decision flow. It is not an intelligence engine, signing appliance, key-management system, immutable ledger, blockchain product, compliance certification service, or legal evidence system by itself.
+AsiBackbone is a policy decision pipeline for consequential software decision flow. It is not an intelligence engine, signing appliance, key-management system, immutable ledger, blockchain product, compliance certification service, or legal evidence system by itself.
 
 > [!IMPORTANT]
 > Status note: the stable `5.x` package family includes released surfaces for canonical hashing/signing seams, provider-neutral signing and verification abstractions, local-development signing, managed-key adapter boundaries, signed audit/outbox metadata, capability-grant canonical payload construction, and verification-policy/result handling. This roadmap is retained for traceability of the hardening sequence. Those released surfaces still do **not** create production tamper-evidence, immutability, legal non-repudiation, or compliance certification by themselves; production claims require concrete host storage, signing, verification, key-management, rotation, retention, and operational controls.
@@ -55,7 +55,7 @@ Concrete provider work should live in provider packages, host integrations, samp
 | --- | --- | --- | --- |
 | 1 | #219 | Canonical payload hashing and deterministic signing payloads. | Released provider-neutral surface and tests exist; not production tamper-evidence by itself. |
 | 2 | #220 | Concrete signing-provider package boundary. | Released package-boundary documentation plus LocalDevelopment and ManagedKey provider surfaces. |
-| 3 | #221 | Signing audit receipts and governance outbox records. | Released signing metadata/canonicalization support for selected governance artifacts. |
+| 3 | #221 | Signing audit receipts and outbox records. | Released signing metadata/canonicalization support for selected governance artifacts. |
 | 4 | #222 | Verification policy APIs and verification result handling. | Released verification-policy/result handling surface. |
 | 5 | #223 | Key rotation and retired-key verification guidance. | Guidance/hardening path; host/provider-owned operational controls remain required. |
 | 6 | #224 | Append-only hash-chain or Merkle audit integrity model. | Documented model/guidance; concrete immutable/external anchoring providers remain outside the stable package boundary. |
@@ -68,7 +68,7 @@ Concrete provider work should live in provider packages, host integrations, samp
 
 Child issue: #219. Status: released provider-neutral surface in the stable `1.1.x` line.
 
-Define how selected artifacts become deterministic payloads before hashing. Candidate artifacts include audit receipts, audit ledger records, decision receipt lifecycle events, governance outbox entries, governance emission envelopes, and capability-token grants.
+Define how selected artifacts become deterministic payloads before hashing. Candidate artifacts include audit receipts, audit ledger records, decision receipt lifecycle events, outbox entries, governance emission envelopes, and capability-token grants.
 
 Minimum design decisions include canonical property order, UTC timestamp format, null handling, collection ordering, metadata allow-listing, schema version binding, artifact type binding, hash algorithm recording, and canonicalization version recording.
 

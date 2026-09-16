@@ -2,7 +2,7 @@
 
 This article explains the current supply-chain metadata posture for AsiBackbone NuGet package artifacts.
 
-In this software project, **ASI** means **Accountable Systems Infrastructure**. Supply-chain metadata strengthens the release evidence around generated packages, but it does not change the runtime API surface and does not make the packages a compliance product by themselves.
+Supply-chain metadata strengthens the release evidence around generated packages, but it does not change the runtime API surface and does not make the packages a compliance product by themselves.
 
 ## Current behavior
 

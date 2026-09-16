@@ -1,7 +1,7 @@
 namespace AsiBackbone.AspNetCore.Outbox;
 
 /// <summary>
-/// Provides host-owned scheduling options for the governance outbox drain worker.
+/// Provides host-owned scheduling options for the outbox drain worker.
 /// </summary>
 /// <remarks>
 /// The hosted worker is local to the process in which it is registered. In horizontally scaled deployments, each

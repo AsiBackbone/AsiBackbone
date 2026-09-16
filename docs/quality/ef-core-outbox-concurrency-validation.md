@@ -2,7 +2,7 @@
 
 Issue: #311.
 
-This page documents the repeatable validation path for EF Core-backed governance outbox persistence and provider-neutral drain behavior under concurrent writes, retry handling, and drain-worker contention.
+This page documents the repeatable validation path for EF Core-backed outbox persistence and provider-neutral drain behavior under concurrent writes, retry handling, and drain-worker contention.
 
 The goal is evidence, not a production throughput guarantee. These tests run against SQLite in shared in-memory mode so they remain CI-friendly while still exercising EF Core relational persistence and separate host-owned `DbContext` instances.
 

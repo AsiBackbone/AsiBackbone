@@ -13,6 +13,8 @@
       href: documentation-ownership.md
     - name: AsiBackbone API Terminology Map
       href: terminology-map.md
+    - name: 6.0 Product Terminology
+      href: terminology-600.md
     - name: AsiBackbone API Glossary
       href: glossary.md
     - name: Core Governance Flow Diagrams
@@ -157,8 +159,8 @@
       href: governance-emission-contract.md
     - name: Safe Audit and Telemetry Data
       href: safe-audit-telemetry-data.md
-    - name: Audit Residue Observability Schema
-      href: audit-residue-observability-schema.md
+    - name: Decision Receipt Observability Schema
+      href: decision-receipt-observability-schema.md
     - name: DLP and Classification Failure Policy
       href: dlp-classification-failure-policy.md
     - name: DLP and Classification Scanner Integration

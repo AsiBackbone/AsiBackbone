@@ -1,7 +1,7 @@
 namespace AsiBackbone.Core.Outbox;
 
 /// <summary>
-/// Represents a successful claim over a governance outbox entry.
+/// Represents a successful claim over an outbox entry.
 /// </summary>
 /// <remarks>
 /// A claim proves that a worker acquired a lease before provider emission. It reduces duplicate selection risk for cooperating workers, but it does not provide exactly-once delivery.

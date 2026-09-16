@@ -2,7 +2,7 @@
 
 This article documents the released `3.1.0` observability, durable outbox, signing, and governance-emission architecture boundary together with provider directions that remain design-only.
 
-In this software project, **ASI** means **Accountable Systems Infrastructure**. AsiBackbone is a governance spine for consequential software decision flow. It is not an artificial superintelligence implementation, AI model host, robot controller, compliance product, signing product, or cloud-governance platform by itself.
+AsiBackbone is a policy decision pipeline for consequential software decision flow. It is not an artificial superintelligence implementation, AI model host, robot controller, compliance product, signing product, or cloud-governance platform by itself.
 
 > [!IMPORTANT]
 > Provider-specific integrations depend on Core. Core must never depend on provider-specific integrations.
@@ -13,7 +13,7 @@ In this software project, **ASI** means **Accountable Systems Infrastructure**. 
 
 ## Purpose
 
-The `3.1.0` integration direction preserves AsiBackbone's neutral governance spine while allowing host applications to emit structured decision records into operational and governance systems.
+The `3.1.0` integration direction preserves AsiBackbone's neutral policy decision pipeline while allowing host applications to emit structured decision records into operational and governance systems.
 
 The primary architecture path is:
 
@@ -112,7 +112,7 @@ Decision receipt / lifecycle event
   -> delivered / failed / retryable / deferred / dead-letter state
 ```
 
-A process crash, provider outage, network failure, rate limit, or DLP failure should not erase the original decision residue.
+A process crash, provider outage, network failure, rate limit, or DLP failure should not erase the original decision receipt.
 
 ## OpenTelemetry as the released provider
 

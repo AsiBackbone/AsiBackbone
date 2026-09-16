@@ -1,7 +1,7 @@
 namespace AsiBackbone.Core.Outbox;
 
 /// <summary>
-/// Describes an opt-in governance outbox claim and lease request.
+/// Describes an opt-in outbox claim and lease request.
 /// </summary>
 /// <remarks>
 /// Claim requests are used by claim-capable stores to coordinate scaled workers before provider emission. They do not create exactly-once delivery guarantees by themselves.

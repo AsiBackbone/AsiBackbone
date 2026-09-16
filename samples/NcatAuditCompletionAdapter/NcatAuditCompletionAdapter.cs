@@ -21,7 +21,7 @@ public sealed class NcatAuditCompletionAdapter
     private const string LifecycleEventPrefix = "ncat-completion-";
 
     private readonly IDecisionReceiptLifecycleStore lifecycleStore;
-    private readonly INcatDecisionResidueResolver decisionResidueResolver;
+    private readonly INcatDecisionReceiptResolver decisionReceiptResolver;
     private readonly NcatAuditCompletionAdapterOptions options;
 
     /// <summary>
@@ -29,11 +29,11 @@ public sealed class NcatAuditCompletionAdapter
     /// </summary>
     public NcatAuditCompletionAdapter(
         IDecisionReceiptLifecycleStore lifecycleStore,
-        INcatDecisionResidueResolver decisionResidueResolver,
+        INcatDecisionReceiptResolver decisionReceiptResolver,
         NcatAuditCompletionAdapterOptions? options = null)
     {
         this.lifecycleStore = lifecycleStore ?? throw new ArgumentNullException(nameof(lifecycleStore));
-        this.decisionResidueResolver = decisionResidueResolver ?? throw new ArgumentNullException(nameof(decisionResidueResolver));
+        this.decisionReceiptResolver = decisionReceiptResolver ?? throw new ArgumentNullException(nameof(decisionReceiptResolver));
         this.options = options ?? new NcatAuditCompletionAdapterOptions();
         this.options.Validate();
     }
@@ -59,28 +59,28 @@ public sealed class NcatAuditCompletionAdapter
             return Terminal("unsupported-persistence-outcome");
         }
 
-        IDecisionReceipt? residue = await decisionResidueResolver.ResolveAsync(
+        IDecisionReceipt? decisionReceipt = await decisionReceiptResolver.ResolveAsync(
             handoff.DecisionAuditRecordId!.Trim(),
             NormalizeOptional(handoff.CorrelationId),
             cancellationToken).ConfigureAwait(false);
 
-        if (residue is null)
+        if (decisionReceipt is null)
         {
             return new NcatAuditCompletionDeliveryResult(
                 NcatAuditCompletionDeliveryDisposition.Deferred,
                 "decision-residue-not-available");
         }
 
-        NcatAuditCompletionDeliveryResult? correlationFailure = ValidateDecisionCorrelation(handoff, residue);
+        NcatAuditCompletionDeliveryResult? correlationFailure = ValidateDecisionCorrelation(handoff, decisionReceipt);
         if (correlationFailure is not null)
         {
             return correlationFailure;
         }
 
-        GovernedOperationExecutionReceipt receipt;
+        GovernedOperationExecutionReceipt executionReceipt;
         try
         {
-            receipt = GovernedOperationExecutionReceipt.Create(
+            executionReceipt = GovernedOperationExecutionReceipt.Create(
                 operationExecutionId: handoff.OperationExecutionId!,
                 persistenceOutcome: persistenceOutcome,
                 executionAttemptId: handoff.ExecutionAttemptId,
@@ -105,8 +105,8 @@ public sealed class NcatAuditCompletionAdapter
         };
 
         DecisionReceiptLifecycleEvent lifecycleEvent = HostAccountabilityLifecycleEvent.FromExecutionReceipt(
-            residue,
-            receipt,
+            decisionReceipt,
+            executionReceipt,
             eventId: lifecycleEventId,
             metadata: metadata);
 
@@ -121,7 +121,7 @@ public sealed class NcatAuditCompletionAdapter
                     NcatAuditCompletionDeliveryDisposition.Duplicate,
                     "completion-already-delivered",
                     lifecycleEventId,
-                    receipt,
+                    executionReceipt,
                     existing)
                 : Terminal("idempotency-conflict", lifecycleEventId: lifecycleEventId);
         }
@@ -136,7 +136,7 @@ public sealed class NcatAuditCompletionAdapter
                 NcatAuditCompletionDeliveryDisposition.Delivered,
                 "lifecycle-event-appended",
                 appended.EventId,
-                receipt,
+                executionReceipt,
                 appended);
         }
         catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
@@ -145,7 +145,7 @@ public sealed class NcatAuditCompletionAdapter
         }
         catch (Exception exception)
         {
-            return PersistenceFailure(handoff, lifecycleEventId, receipt, lifecycleEvent, exception);
+            return PersistenceFailure(handoff, lifecycleEventId, executionReceipt, lifecycleEvent, exception);
         }
     }
 
@@ -168,18 +168,18 @@ public sealed class NcatAuditCompletionAdapter
 
     private static NcatAuditCompletionDeliveryResult? ValidateDecisionCorrelation(
         NcatAuditCompletionHandoff handoff,
-        IDecisionReceipt residue)
+        IDecisionReceipt decisionReceipt)
     {
         string? correlationId = NormalizeOptional(handoff.CorrelationId);
         if (correlationId is not null &&
-            !string.Equals(correlationId, residue.CorrelationId, StringComparison.Ordinal))
+            !string.Equals(correlationId, decisionReceipt.CorrelationId, StringComparison.Ordinal))
         {
             return Terminal("correlation-id-mismatch");
         }
 
         string? traceId = NormalizeOptional(handoff.TraceId);
         return traceId is not null &&
-            !string.Equals(traceId, residue.TraceId, StringComparison.Ordinal)
+            !string.Equals(traceId, decisionReceipt.TraceId, StringComparison.Ordinal)
             ? Terminal("trace-id-mismatch")
             : null;
     }
@@ -187,7 +187,7 @@ public sealed class NcatAuditCompletionAdapter
     private NcatAuditCompletionDeliveryResult PersistenceFailure(
         NcatAuditCompletionHandoff handoff,
         string lifecycleEventId,
-        GovernedOperationExecutionReceipt receipt,
+        GovernedOperationExecutionReceipt executionReceipt,
         DecisionReceiptLifecycleEvent lifecycleEvent,
         Exception exception)
     {
@@ -202,7 +202,7 @@ public sealed class NcatAuditCompletionAdapter
                 ? "lifecycle-persistence-dead-lettered"
                 : "lifecycle-persistence-failed",
             lifecycleEventId,
-            receipt,
+            executionReceipt,
             lifecycleEvent,
             exception.GetType().Name);
     }

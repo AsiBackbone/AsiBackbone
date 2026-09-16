@@ -15,7 +15,7 @@ This scenario is useful when a change is consequential enough that the host need
 | Host platform | Owns environment data, automation tooling, rollback, and execution. |
 | AsiBackbone | Evaluates the host-provided policy context and returns a governance decision. |
 | Acknowledgment layer | Handles responsibility acknowledgment when the decision requires it. |
-| Audit sink or ledger | Preserves decision residue, reason codes, policy metadata, and correlation data. |
+| Audit sink or ledger | Preserves decision receipt, reason codes, policy metadata, and correlation data. |
 | Automation system | Executes only if the host decides the governed action may proceed. |
 
 ## Sequence
@@ -28,17 +28,17 @@ Requesting actor or pipeline
   -> Host platform: receives governance decision
 
 If denied, deferred, or escalation-recommended:
-  -> Host platform persists decision residue
+  -> Host platform persists decision receipt
   -> Host platform returns governed outcome without execution
 
 If acknowledgment-required:
   -> Host platform presents acknowledgment challenge
   -> Acknowledgment layer returns accepted or rejected response
-  -> Host platform persists decision and acknowledgment residue
+  -> Host platform persists decision receipt and acknowledgment record
   -> Host platform runs automation only if accepted and host policy permits execution
 
 If allowed or warning:
-  -> Host platform persists decision residue
+  -> Host platform persists decision receipt
   -> Host platform decides whether and how to run host-owned automation
 ```
 

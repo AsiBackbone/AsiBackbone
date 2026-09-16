@@ -29,7 +29,7 @@ The package contributes EF Core model configuration, persistence-facing entities
 * EF Core entity type configurations for AsiBackbone persistence models
 * `ModelBuilder` extension methods for applying AsiBackbone configurations
 * EF Core-backed implementations of Core storage contracts
-* persistence models for audit records, handshake records, reason codes, metadata, policy trace fields, lifecycle events, and governance outbox records
+* persistence models for audit records, handshake records, reason codes, metadata, policy trace fields, lifecycle events, and outbox records
 * provider-neutral EF Core configuration where practical
 * integration tests proving the package works inside a host-owned `DbContext`
 
@@ -140,7 +140,7 @@ Provider-specific examples may appear later in samples or documentation, but the
 
 ## Metadata JSON storage strategy
 
-The governance outbox currently stores minimized metadata dictionaries in string-backed JSON columns such as `MetadataJson`, `EnvelopeMetadataJson`, and `EnvelopePayloadMetadataJson`.
+The outbox currently stores minimized metadata dictionaries in string-backed JSON columns such as `MetadataJson`, `EnvelopeMetadataJson`, and `EnvelopePayloadMetadataJson`.
 
 That remains the selected provider-neutral strategy for the current release line. Native EF Core JSON mapping can be valuable for strongly typed aggregates or complex types, but it is not adopted for the open-ended outbox metadata dictionaries because provider support, column types, compatibility levels, query translation, and migrations remain host/provider concerns.
 
@@ -191,9 +191,9 @@ The EF Core package contributes provider-neutral model configurations for:
 - handshake acknowledgments
 - handshake acknowledgment metadata
 - decision receipt lifecycle events
-- governance outbox entries
-- governance outbox metadata JSON columns
-- governance outbox envelope and payload projection columns
+- outbox entries
+- outbox metadata JSON columns
+- outbox envelope and payload projection columns
 
 The host application still owns the DbContext, provider, migrations, schema lifecycle, retention policy, and deployment workflow.
 
@@ -207,14 +207,14 @@ Implemented persistence areas include:
 * liability/responsibility handshake requests
 * liability/responsibility handshake acknowledgments
 * decision receipt lifecycle events
-* governance outbox entries
+* outbox entries
 * reason codes
 * actor identifiers and actor type
 * policy version and policy hash
 * correlation ID and trace ID
 * metadata snapshots
 
-This aligns persistence with the AsiBackbone governance spine: decisions, acknowledgments, and audit trails should be durable and queryable.
+This aligns persistence with the AsiBackbone policy decision pipeline: decisions, acknowledgments, and audit trails should be durable and queryable.
 
 ## Non-goals for the first EF Core milestone
 

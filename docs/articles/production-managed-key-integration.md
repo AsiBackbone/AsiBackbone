@@ -2,9 +2,9 @@
 
 Issue: #512.
 
-This guide documents the production runtime signing path for AsiBackbone governance residue when a host wants managed-key signing without making AsiBackbone responsible for key custody or cloud/provider-specific key-management behavior.
+This guide documents the production runtime signing path for AsiBackbone governance receipt when a host wants managed-key signing without making AsiBackbone responsible for key custody or cloud/provider-specific key-management behavior.
 
-In this software project, **ASI** means **Accountable Systems Infrastructure**. AsiBackbone is a governance spine for accountable decision flow. It is not a key-management platform, HSM appliance, cloud KMS wrapper, compliance certification service, immutable ledger, or legal non-repudiation product by itself.
+AsiBackbone is a policy decision pipeline for accountable decision flow. It is not a key-management platform, HSM appliance, cloud KMS wrapper, compliance certification service, immutable ledger, or legal non-repudiation product by itself.
 
 > [!IMPORTANT]
 > Production runtime signing remains **provider-neutral**. AsiBackbone documents how a host can connect Azure Key Vault, AWS KMS, GCP Cloud KMS, HSM, or enterprise key-management clients behind the existing managed-key boundary. AsiBackbone does not ship or maintain first-party production signing providers, production-style signing sample hosts, credentials, key storage, key rotation, legal non-repudiation guarantees, or provider-specific security guarantees.
@@ -27,7 +27,7 @@ Do not collapse these concerns into one claim:
 | --- | --- | --- |
 | NuGet package signing | Whether published `.nupkg` files are signed release artifacts. | Deferred unless a reviewed package-signing process is adopted. See the consumer verification guide. |
 | GitHub provenance and SBOM | Source Link, repository metadata, package SBOMs, and workflow provenance where available. | Useful supply-chain evidence, but not package signing and not runtime audit signing. |
-| Runtime governance-residue signing | A host signs decision receipt, outbox records, or decision receipts through configured signing infrastructure. | Supported through provider-neutral abstractions and the managed-key adapter boundary; production key custody remains host-owned. |
+| Runtime decision-receipt signing | A host signs decision receipts, audit ledger records, or outbox records through configured signing infrastructure. | Supported through provider-neutral abstractions and the managed-key adapter boundary; production key custody remains host-owned. |
 
 A package can have Source Link and SBOM provenance without being maintainer-signed. A governance record can be signed at runtime without proving legal non-repudiation. A signed governance record still requires verification, durable storage controls, key-retention policy, monitoring, and incident response before a host should make stronger integrity claims.
 
@@ -124,7 +124,7 @@ Production-oriented managed-key registration fails closed by default because `Re
 
 When signing is required for a governed operation, a host should usually treat provider unavailability, unsupported algorithms, key mismatch, missing required key version, or verification failure as a denial, deferral, escalation, or dead-letter condition according to host policy.
 
-Unsigned failure metadata is useful for local validation, diagnostics, and explicitly policy-routed fallback. It is not a successful signature and must not be described as signed governance residue.
+Unsigned failure metadata is useful for local validation, diagnostics, and explicitly policy-routed fallback. It is not a successful signature and must not be described as signed governance receipt.
 
 ## Verification path
 

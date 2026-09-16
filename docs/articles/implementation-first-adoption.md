@@ -3,7 +3,7 @@
 This page is the default route for a pragmatic .NET adopter. It keeps the first experience grounded in familiar engineering concepts before introducing optional conceptual background.
 
 > [!IMPORTANT]
-> In this software project, **ASI** means **Accountable Systems Infrastructure**. AsiBackbone is a .NET governance package family for policy-controlled decision flow. It is not an intelligence engine, AI model host, compliance certification system, or production tamper-evidence provider by itself.
+> AsiBackbone is a .NET governance package family for policy-controlled decision flow. It is not an intelligence engine, AI model host, compliance certification system, or production tamper-evidence provider by itself.
 
 ## Page navigation
 
@@ -15,18 +15,18 @@ AsiBackbone helps a host application evaluate a consequential request, return a 
 
 ## Translate the project terms first
 
-| Project term | Plain .NET / architecture mapping | First-use question |
+| Term | Plain .NET / architecture mapping | First-use question |
 | --- | --- | --- |
-| Governance spine | A policy decision pipeline around consequential operations. | Should this request continue? |
+| Policy decision pipeline | Rules evaluate request facts and return a structured decision. | Should this request continue? |
 | Constraint | A small rule or guard used by the decision pipeline. | Which rule allowed or blocked the request? |
 | Evaluation context | A safe DTO of request facts such as operation, region, risk, policy version, and correlation ID. | What facts did the rules inspect? |
 | Governance decision | A structured allow, deny, warn, defer, acknowledgment-required, or escalation result. | What did the policy pipeline decide? |
-| Decision receipt | A decision receipt or audit-log payload. | What record proves how the decision was made? |
-| Acknowledgment handshake | An explicit acknowledgment workflow before a risky action. | Does the actor need to acknowledge risk before continuing? |
+| Decision receipt | A record of a decision, its outcome, and its reasons. | What record shows how the decision was made? |
+| Acknowledgment | An explicit confirmation before a risky action. | Does the actor need to acknowledge risk before continuing? |
 | Capability grant | A short-lived, scoped permission after a decision. | Is continuation limited to a specific operation, actor, scope, and time window? |
-| Governance outbox | A durable outbox for governance events before external emission. | Can decision records survive restart and be retried safely? |
+| Outbox | Durable local records awaiting external delivery. | Can decision records survive restart and be retried safely? |
 | OpenTelemetry projection | Optional telemetry emission after local audit/outbox handling. | Should decision envelopes appear in traces or metrics? |
-| Host-owned execution boundary | The application code that actually performs or refuses the protected operation. | Where does AsiBackbone stop and the host begin? |
+| Host-owned execution | The application code that actually performs or refuses the protected operation. | Where does AsiBackbone stop and the host begin? |
 | Decision boundary | The moment a proposed action becomes a concrete governance decision. | What result must the host inspect before execution? |
 
 ## Recommended first reading path
@@ -51,7 +51,7 @@ A minimal adopter should be able to answer these engineering questions without k
 - Which host-owned rule or constraint evaluated the request?
 - Which decision outcome was returned?
 - Which reason codes explain the result?
-- Where was the decision receipt or decision receipt written?
+- Where was the decision receipt written?
 - Where would durable persistence be added?
 - Where would optional OpenTelemetry projection be added?
 - Where does the host execute, deny, defer, or escalate the actual operation?

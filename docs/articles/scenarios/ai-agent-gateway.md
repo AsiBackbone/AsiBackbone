@@ -15,7 +15,7 @@ In this scenario, the model or agent proposes intent. The host application conve
 | Host application | Owns the model runtime, tool registry, actor context, authorization, policy-context construction, final execution, and error handling. |
 | AsiBackbone | Evaluates the host-provided context through constraints and decision policy, then returns a governance decision. |
 | Acknowledgment layer | Handles host-presented acknowledgment for consequential actions when the decision requires it. |
-| Audit sink or ledger | Stores the decision residue, reason codes, policy metadata, correlation identifiers, and host-provided metadata. |
+| Audit sink or ledger | Stores the decision receipt, reason codes, policy metadata, correlation identifiers, and host-provided metadata. |
 | External tool or API | Executes only if the host decides the governed action may proceed. |
 
 ## Sequence
@@ -34,17 +34,17 @@ sequenceDiagram
     Host->>Backbone: EvaluateAsync(context)
     Backbone-->>Host: GovernanceDecision
     alt Denied Deferred or EscalationRecommended
-        Host->>Audit: Persist decision residue
+        Host->>Audit: Persist decision receipt
         Host-->>Agent: Do not execute and return governed outcome
     else AcknowledgmentRequired
         Host->>Ack: Create and present challenge
         Ack-->>Host: Accepted or rejected response
-        Host->>Audit: Persist decision and acknowledgment residue
+        Host->>Audit: Persist decision receipt and acknowledgment record
         opt Accepted and host policy permits execution
             Host->>Tool: Execute host-owned operation
         end
     else Allowed or Warning
-        Host->>Audit: Persist decision residue
+        Host->>Audit: Persist decision receipt
         Host->>Tool: Execute host-owned operation
     end
 ```
@@ -124,13 +124,13 @@ switch (decision.Outcome)
 After evaluation, the host can create decision receipt from the decision.
 
 ```csharp
-DecisionReceipt residue = DecisionReceipt.FromDecision(
+DecisionReceipt receipt = DecisionReceipt.FromDecision(
     actor,
     operationName: "agent.notification.send",
     decision,
     metadata: metadata);
 
-await auditSink.WriteAsync(residue, cancellationToken);
+await auditSink.WriteAsync(receipt, cancellationToken);
 ```
 
 For durable persistence, the host can map decision receipt into its host-owned persistence plan, such as an EF Core ledger store. The host remains responsible for database provider, connection strings, migrations, retention, and deployment.

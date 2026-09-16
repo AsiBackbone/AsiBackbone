@@ -1,14 +1,14 @@
-# Audit Residue Observability Schema
+# Decision Receipt Observability Schema
 
 This article documents the provider-neutral telemetry, traceability, and operational diagnostics fields added to the decision receipt model for the `1.1.0 - Observability, Outbox, and Governance Emission Providers` milestone.
 
-In this software project, **ASI** means **Accountable Systems Infrastructure**. These fields support observability and governance emission without making `AsiBackbone.Core` depend on OpenTelemetry, Azure Monitor, Event Hubs, Purview, SIEM products, or any provider-specific package.
+These fields support observability and governance emission without making `AsiBackbone.Core` depend on OpenTelemetry, Azure Monitor, Event Hubs, Purview, SIEM products, or any provider-specific package.
 
 ## Design intent
 
-Decision receipt should remain a framework-neutral governance record. The observability schema adds enough structure for hosts and provider adapters to correlate decisions across logs, traces, outbox records, gateways, dashboards, and governance enrichment systems.
+A decision receipt should remain a framework-neutral governance record. The observability schema adds enough structure for hosts and provider adapters to correlate decisions across logs, traces, outbox records, gateways, dashboards, and governance enrichment systems.
 
-The fields are additive. Existing hosts can keep creating decision receipt with only the original identifiers, actor context, outcome, reason codes, policy fields, and metadata. New hosts can populate telemetry fields when the values are available.
+The fields are additive. Existing hosts can keep creating decision receipts with only the original identifiers, actor context, outcome, reason codes, policy fields, and metadata. New hosts can populate telemetry fields when the values are available.
 
 ## Construction guidance
 
@@ -17,7 +17,7 @@ The fields are additive. Existing hosts can keep creating decision receipt with 
 For richer records, prefer `DecisionReceiptBuilder` so each optional field is named at the call site while the resulting `DecisionReceipt` remains immutable:
 
 ```csharp
-DecisionReceipt residue = DecisionReceiptBuilder.FromDecision(
+DecisionReceipt receipt = DecisionReceiptBuilder.FromDecision(
     actor,
     "payments.approve",
     decision)
@@ -41,9 +41,9 @@ The builder is an ergonomic construction helper, not a mutable audit record. `Bu
 | --- | --- | --- |
 | `AuditResidueId` | Stable identifier for the decision receipt shape. Defaults to `EventId` when not supplied. | Use an opaque identifier. Do not embed actor names, email addresses, document names, or protected resource values. |
 | `SchemaVersion` | Serialized schema version for forward-compatible envelopes. | Safe to emit when it contains only package schema identity. |
-| `TraceId` | Links the residue to host or distributed tracing context. | Use standard trace identifiers. Do not place user or resource information in trace IDs. |
-| `SpanId` | Links the residue to the active span or operation segment. | Use opaque span identifiers only. |
-| `ParentSpanId` | Links the residue to the parent span when available. | Use opaque span identifiers only. |
+| `TraceId` | Links the receipt to host or distributed tracing context. | Use standard trace identifiers. Do not place user or resource information in trace IDs. |
+| `SpanId` | Links the receipt to the active span or operation segment. | Use opaque span identifiers only. |
+| `ParentSpanId` | Links the receipt to the parent span when available. | Use opaque span identifiers only. |
 | `DecisionLatencyMs` | Records elapsed decision/evaluation latency in milliseconds. | Numeric operational diagnostic; safe when not combined with sensitive payload fields. |
 | `ConstraintSetHash` | Hash of the evaluated constraint set or policy bundle. | Emit hashes, not raw policy documents, secrets, prompts, or protected content. |
 | `ConstraintCount` | Number of constraints evaluated. | Numeric operational diagnostic; safe by default. |
@@ -54,12 +54,12 @@ The builder is an ergonomic construction helper, not a mutable audit record. `Bu
 | `EmitterStatus` | Provider-neutral emission status such as `queued`, `delivered`, `failed`, `blocked`, or `dead-lettered`. | Safe when values are controlled status codes. |
 | `EmitterProvider` | Provider-neutral provider label such as `open-telemetry`, `log-analytics`, `event-hubs`, `purview`, or `siem`. | Safe when values are provider labels rather than tenant/workspace secrets. |
 | `OutboxSequence` | Local sequence value for durable outbox ordering. | Numeric operational diagnostic; safe by default. |
-| `GatewayExecutionId` | Identifier linking the residue to a gateway execution boundary. | Use an opaque identifier. Do not embed command text, prompt text, or resource names. |
+| `GatewayExecutionId` | Identifier linking the receipt to a gateway execution boundary. | Use an opaque identifier. Do not embed command text, prompt text, or resource names. |
 | `DecisionStage` | Provider-neutral stage name for the decision or emission lifecycle. | Use controlled values. Do not encode sensitive detail in the stage string. |
 
 ## Correlation behavior
 
-`CorrelationId` remains the primary host workflow join key. `AuditResidueId` provides a stable residue reference. `TraceId`, `SpanId`, and `ParentSpanId` let host applications or optional adapters project the same governance record into logs, traces, spans, events, and metrics.
+`CorrelationId` remains the primary host workflow join key. `AuditResidueId` provides a stable receipt reference. `TraceId`, `SpanId`, and `ParentSpanId` let host applications or optional adapters project the same governance record into logs, traces, spans, events, and metrics.
 
 A typical host path is:
 
@@ -77,7 +77,7 @@ The correlation fields should be stable and opaque. They should not contain raw 
 
 ## Version awareness
 
-`SchemaVersion` is included on decision receipt so serialized records can be interpreted safely as the package family evolves. The field is additive and defaults to the stable artifact schema version when the host does not provide one.
+`SchemaVersion` is included on each decision receipt so serialized records can be interpreted safely as the package family evolves. The field is additive and defaults to the stable artifact schema version when the host does not provide one.
 
 Hosts and provider adapters should treat unknown schema versions conservatively. They may store the record locally, skip unsupported provider enrichment, or emit a minimized safe envelope according to host policy.
 

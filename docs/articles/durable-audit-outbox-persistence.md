@@ -2,7 +2,7 @@
 
 This article documents the provider-neutral durable persistence seam for decision receipt, lifecycle events, and governance emission outbox entries.
 
-In this software project, **ASI** means **Accountable Systems Infrastructure**. AsiBackbone remains a governance spine for consequential software decision flow. It is not an AI model host, observability backend, SIEM product, cloud provider, or completed ASI implementation.
+AsiBackbone remains a policy decision pipeline for consequential software decision flow. It is not an AI model host, observability backend, SIEM product, cloud provider, or completed ASI implementation.
 
 ## Purpose
 
@@ -15,7 +15,7 @@ Governed decision
   -> DecisionReceipt / DecisionReceiptLifecycleEvent
   -> local audit/lifecycle store
   -> GovernanceEmissionEnvelope
-  -> governance outbox
+  -> outbox
   -> optional provider emitter
 ```
 
@@ -38,7 +38,7 @@ Core does not reference Azure Monitor, Event Hubs, Purview, OpenTelemetry, SIEM 
 
 ## Outbox semantic contract
 
-The governance outbox is a **durable local state record**, not a package-owned distributed queue and not an append-only event stream.
+The outbox is a **durable local state record**, not a package-owned distributed queue and not an append-only event stream.
 
 The current contract is:
 
@@ -61,7 +61,7 @@ See [Governance Outbox Delivery Semantics](governance-outbox-delivery-semantics.
 | Type | Purpose |
 | --- | --- |
 | `InMemoryDecisionReceiptLifecycleStore` | Stores lifecycle events in memory for tests, samples, and local development. |
-| `InMemoryGovernanceOutboxStore` | Stores governance outbox entries in memory for tests, samples, and local development. |
+| `InMemoryGovernanceOutboxStore` | Stores outbox entries in memory for tests, samples, and local development. |
 
 These stores are intentionally not durable across process restarts. Production hosts should use EF Core or another host-owned durable storage adapter.
 
@@ -176,5 +176,5 @@ See [Safe Audit and Telemetry Data Guidance](safe-audit-telemetry-data.md) for p
 - [Outbox Drain Reliability and Alerting](outbox-drain-reliability-and-alerting.md)
 - [Outbox Multi-Worker Concurrency](outbox-multi-worker-concurrency.md)
 - [Safe Audit and Telemetry Data Guidance](safe-audit-telemetry-data.md)
-- [Audit Residue Observability Schema](audit-residue-observability-schema.md)
+- [Decision Receipt Observability Schema](decision-receipt-observability-schema.md)
 - [EF Core Integration Boundary](ef-core-integration-boundary.md)

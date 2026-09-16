@@ -37,7 +37,7 @@ The same pattern can also apply to other external systems where an action leaves
 | ASI or global strategy layer | Sends high-level goals or optimization targets only. It does not issue direct robot commands. |
 | Regional policy/planning layer | Converts goals into local, lawful, bounded plans using regional policy, licensing, environmental, and cultural constraints. |
 | Host application | Owns the policy context, actor context, robotics integration, user experience, authorization, and final execution decision. |
-| AsiBackbone | Evaluates host-provided context through constraints and decision policy, then returns a governance decision and audit-ready residue. |
+| AsiBackbone | Evaluates host-provided context through constraints and decision policy, then returns a governance decision and decision receipt. |
 | Operational gateway | Validates proposed actions against robot capability, location, rate limits, command grammar, token scope, and fail-closed rules. |
 | Edge or robot layer | Executes only validated commands and retains independent, non-overridable safety governors. |
 | Human operator or safety system | Provides out-of-band supervision, interlock, or emergency stop where required by the physical system. |
@@ -61,7 +61,7 @@ sequenceDiagram
     Host->>Backbone: EvaluateAsync(context)
     Backbone-->>Host: GovernanceDecision
     alt Denied Deferred or EscalationRecommended
-        Host->>Audit: Persist decision residue
+        Host->>Audit: Persist decision receipt
         Host-->>Regional: Do not execute and return governed outcome
     else AcknowledgmentRequired
         Host->>Audit: Persist decision and acknowledgment requirement
@@ -73,7 +73,7 @@ sequenceDiagram
             Gateway->>Audit: Persist gateway result
         end
     else Allowed or Warning
-        Host->>Audit: Persist decision residue
+        Host->>Audit: Persist decision receipt
         Host->>Gateway: Submit bounded command for validation
         Gateway->>Edge: Forward only validated command
         Edge-->>Gateway: Execution result or safe-state result

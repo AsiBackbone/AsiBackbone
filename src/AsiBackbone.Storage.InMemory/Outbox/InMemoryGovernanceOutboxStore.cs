@@ -5,7 +5,7 @@ using AsiBackbone.Core.Outbox;
 namespace AsiBackbone.Storage.InMemory.Outbox;
 
 /// <summary>
-/// In-memory governance outbox store for tests, samples, and development hosts.
+/// In-memory outbox store for tests, samples, and development hosts.
 /// </summary>
 /// <remarks>
 /// This store is not durable across process restarts. Production hosts should use a durable provider such as EF Core or another host-owned storage adapter.

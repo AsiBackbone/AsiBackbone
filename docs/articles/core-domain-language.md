@@ -8,7 +8,7 @@ This article documents the concrete domain model of `AsiBackbone.Core` and the h
 
 For canonical architecture definitions, use the [ASI Backbone Learning Architecture Glossary](https://asibackbone.github.io/Learning/architecture/glossary.html). This page owns the **product mapping**: exact Core types, current outcome semantics, package boundaries, and implementation invariants.
 
-In this software project, **ASI** means **Accountable Systems Infrastructure**. `AsiBackbone.Core` is governance infrastructure, not an intelligence engine or AI-model package.
+`AsiBackbone.Core` is governance infrastructure, not an intelligence engine or AI-model package.
 
 > [!IMPORTANT]
 > Learning terminology explains the architecture. The released `AsiBackbone.Core` API defines how this package implements that architecture. If a teaching example is intentionally smaller than the product surface, the product API and runtime documentation remain authoritative for implementation behavior.
@@ -48,7 +48,7 @@ Core defines the governance primitives for this lane. It does not own the extern
 | Scoped capability | [`CapabilityTokenGrant`](xref:AsiBackbone.Core.CapabilityTokens.CapabilityTokenGrant), [`CapabilityGrantValidator`](xref:AsiBackbone.Core.CapabilityTokens.CapabilityGrantValidator) | Bounded grant data plus product validation logic. |
 | Operation result | [`OperationResult`](xref:AsiBackbone.Core.Results.OperationResult) | Package-operation success/failure, deliberately separate from governance outcome. |
 
-Not every architecture term maps to one class. **Governance spine**, **host-owned execution**, **operational gateway**, **decision provenance**, **active policy structure**, and similar terms describe relationships among APIs and host responsibilities rather than a required universal type.
+Not every architecture term maps to one class. **Policy decision pipeline**, **host-owned execution**, **operational gateway**, **decision provenance**, **active policy structure**, and similar terms describe relationships among APIs and host responsibilities rather than a required universal type.
 
 ## Decision outcome contract
 

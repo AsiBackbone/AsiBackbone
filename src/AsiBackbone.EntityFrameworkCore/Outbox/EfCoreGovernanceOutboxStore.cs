@@ -9,7 +9,7 @@ using Microsoft.EntityFrameworkCore;
 namespace AsiBackbone.EntityFrameworkCore.Outbox;
 
 /// <summary>
-/// Entity Framework Core-backed governance outbox store that persists provider-neutral emission envelopes through a host-owned <see cref="DbContext" />.
+/// Entity Framework Core-backed outbox store that persists provider-neutral emission envelopes through a host-owned <see cref="DbContext" />.
 /// </summary>
 /// <remarks>
 /// This store provides durable local storage only. Provider delivery, telemetry export, SIEM routing, and cloud emission remain downstream and optional.

@@ -1,9 +1,9 @@
 # AsiBackbone Product Documentation
 
-This section organizes the stable `5.x` Accountable Systems Infrastructure documentation around product implementation, API use, operations, compatibility, and release evidence.
+This section organizes the stable `5.x` governance infrastructure documentation around product implementation, API use, operations, compatibility, and release evidence.
 
 > [!IMPORTANT]
-> In this software project, **ASI** means **Accountable Systems Infrastructure**. AsiBackbone is governance infrastructure for accountable software decision flow, not an artificial superintelligence implementation. See [Project Boundaries and Non-Claims](project-boundaries.md) for the canonical boundary reference.
+> AsiBackbone is governance infrastructure for accountable software decision flow, not an artificial superintelligence implementation. See [Project Boundaries and Non-Claims](project-boundaries.md) for the canonical boundary reference.
 
 ## Documentation ownership
 
@@ -49,6 +49,7 @@ Use these pages to establish the product boundary before integrating the package
 * [Package and Integration Boundaries](integration-boundaries.md)
 * [Target Framework Support](target-framework-support.md)
 * [Documentation Ownership](documentation-ownership.md)
+* [6.0 Product Terminology](terminology-600.md)
 * [AsiBackbone API Terminology Map](terminology-map.md)
 * [AsiBackbone API Glossary](glossary.md)
 * [Core Governance Flow Diagrams](core-governance-flow-diagrams.md)

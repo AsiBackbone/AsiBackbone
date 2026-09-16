@@ -195,7 +195,7 @@ public sealed class GovernanceOutboxEntry
     public bool HasClaim => ClaimOwner is not null && ClaimToken is not null && ClaimedUtc.HasValue && ClaimExpiresUtc.HasValue;
 
     /// <summary>
-    /// Creates a pending durable governance outbox entry.
+    /// Creates a pending durable outbox entry.
     /// </summary>
     public static GovernanceOutboxEntry Create(
         GovernanceEmissionEnvelope envelope,

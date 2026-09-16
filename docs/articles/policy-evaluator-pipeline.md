@@ -2,7 +2,7 @@
 
 This article documents the host-neutral policy evaluation loop for `AsiBackbone.Core`.
 
-The Core evaluator proves the governance spine without requiring ASP.NET Core, Entity Framework Core, a database, a web host, robotics integration, or an AI model runtime.
+The Core evaluator proves the policy decision pipeline without requiring ASP.NET Core, Entity Framework Core, a database, a web host, robotics integration, or an AI model runtime.
 
 ```text
 intent or request
@@ -196,7 +196,7 @@ Use this mode only when the host explicitly prefers latency or throughput over c
 After the decision is produced, a host or gateway can create decision receipt and write it through an audit sink:
 
 ```csharp
-DecisionReceipt residue = DecisionReceipt.FromDecision(
+DecisionReceipt receipt = DecisionReceipt.FromDecision(
     actor,
     operationName,
     decision,

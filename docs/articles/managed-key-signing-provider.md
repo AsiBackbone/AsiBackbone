@@ -2,7 +2,7 @@
 
 This article documents the released `AsiBackbone.Signing.ManagedKey` provider package.
 
-In this software project, **ASI** means **Accountable Systems Infrastructure**. AsiBackbone provides provider-neutral signing, verification, and audit metadata seams. It does not provide immutable storage, external anchoring, blockchain, legal evidence guarantees, compliance certification, production key management, or tamper-evidence by itself.
+AsiBackbone provides provider-neutral signing, verification, and audit metadata seams. It does not provide immutable storage, external anchoring, blockchain, legal evidence guarantees, compliance certification, production key management, or tamper-evidence by itself.
 
 > [!IMPORTANT]
 > The managed-key package is a stable provider adapter and client boundary. It does not include a live Azure Key Vault, Managed HSM, AWS KMS, GCP Cloud KMS, certificate store, cloud KMS, or HSM implementation by default. Host applications supply the actual managed-key client, credentials, verification path, monitoring, and operational policy.
