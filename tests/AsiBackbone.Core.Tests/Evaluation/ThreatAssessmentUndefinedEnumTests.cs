@@ -71,7 +71,7 @@ public sealed class ThreatAssessmentUndefinedEnumTests
                     ThreatCategories.AuditIntegrityRisk,
                     "threat.undefined_outcome",
                     "Undefined threat outcome should fail closed.",
-                    (GovernanceDecisionOutcome)999))]);
+                    (GovernanceDecisionOutcome)999))], decisionPolicy: null, options: null, logger: null);
 
         GovernanceDecision decision = await evaluator.EvaluateAsync(
             context,

@@ -169,7 +169,7 @@ public sealed class StablePackageIntegrationSmokeTests
     public async Task CoreAndInMemoryAuditPackagesComposeDecisionAndStoreResidue()
     {
         var evaluator = new DefaultAsiBackbonePolicyEvaluator<AsiBackboneConstraintEvaluationContext>(
-            [new StableRegionConstraint()]);
+            [new StableRegionConstraint()], threatModelContributors: null, decisionPolicy: null, options: null, logger: null);
 
         string correlationId = $"stable-core-{Guid.NewGuid():N}";
         var context = new AsiBackboneConstraintEvaluationContext(

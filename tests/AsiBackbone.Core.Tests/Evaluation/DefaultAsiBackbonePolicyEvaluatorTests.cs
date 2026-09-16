@@ -18,7 +18,7 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorTests
     public void ConstructorThrowsForNullConstraints()
     {
         _ = Assert.Throws<ArgumentNullException>(() =>
-            new DefaultAsiBackbonePolicyEvaluator<TestPolicyContext>(null!));
+            new DefaultAsiBackbonePolicyEvaluator<TestPolicyContext>(null!, threatModelContributors: null, decisionPolicy: null, options: null, logger: null));
     }
 
     /// <summary>
@@ -28,7 +28,7 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorTests
     [Fact]
     public async Task EvaluateThrowsForNullContext()
     {
-        var evaluator = new DefaultAsiBackbonePolicyEvaluator<TestPolicyContext>([]);
+        var evaluator = new DefaultAsiBackbonePolicyEvaluator<TestPolicyContext>([], threatModelContributors: null, decisionPolicy: null, options: null, logger: null);
 
         _ = await Assert.ThrowsAsync<ArgumentNullException>(async () =>
             await evaluator.EvaluateAsync(null!, TestContext.Current.CancellationToken));
@@ -43,7 +43,7 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorTests
     {
         TestPolicyContext context = CreateContext();
 
-        var evaluator = new DefaultAsiBackbonePolicyEvaluator<TestPolicyContext>([]);
+        var evaluator = new DefaultAsiBackbonePolicyEvaluator<TestPolicyContext>([], threatModelContributors: null, decisionPolicy: null, options: null, logger: null);
 
         GovernanceDecision decision = await evaluator.EvaluateAsync(context, TestContext.Current.CancellationToken);
 
@@ -74,7 +74,7 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorTests
             {
                 DenyWhenNoConstraints = false
             },
-            logger: logger);
+            logger: logger, threatModelContributors: null);
 
         GovernanceDecision decision = await evaluator.EvaluateAsync(context, TestContext.Current.CancellationToken);
 
@@ -106,7 +106,7 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorTests
             {
                 DenyWhenNoConstraints = true
             },
-            logger: logger);
+            logger: logger, threatModelContributors: null);
 
         GovernanceDecision decision = await evaluator.EvaluateAsync(context, TestContext.Current.CancellationToken);
 
@@ -129,7 +129,7 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorTests
             options: new AsiBackbonePolicyEvaluatorOptions
             {
                 DenyWhenNoConstraints = true
-            });
+            }, threatModelContributors: null, logger: null);
 
         GovernanceDecision decision = await evaluator.EvaluateAsync(context, TestContext.Current.CancellationToken);
 
@@ -160,7 +160,7 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorTests
                 DenyWhenNoConstraints = true,
                 NoConstraintsReasonCode = "host.policy.empty",
                 NoConstraintsReasonMessage = "Host policy load produced no constraints."
-            });
+            }, threatModelContributors: null, logger: null);
 
         GovernanceDecision decision = await evaluator.EvaluateAsync(context, TestContext.Current.CancellationToken);
 
@@ -187,7 +187,7 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorTests
                 {
                     DenyWhenNoConstraints = true,
                     NoConstraintsReasonCode = reasonCode!
-                }));
+                }, threatModelContributors: null, logger: null));
     }
 
     /// <summary>
@@ -208,7 +208,7 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorTests
                 {
                     DenyWhenNoConstraints = true,
                     NoConstraintsReasonMessage = reasonMessage!
-                }));
+                }, threatModelContributors: null, logger: null));
     }
 
     /// <summary>
@@ -229,7 +229,7 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorTests
                 {
                     TreatConstraintExceptionAsDenial = true,
                     ConstraintExceptionReasonCode = reasonCode!
-                }));
+                }, threatModelContributors: null, logger: null));
     }
 
     /// <summary>
@@ -250,7 +250,7 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorTests
                 {
                     TreatConstraintExceptionAsDenial = true,
                     ConstraintExceptionReasonMessage = reasonMessage!
-                }));
+                }, threatModelContributors: null, logger: null));
     }
 
     /// <summary>
@@ -275,7 +275,7 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorTests
             options: new AsiBackbonePolicyEvaluatorOptions
             {
                 DenyWhenNoConstraints = true
-            });
+            }, threatModelContributors: null, logger: null);
 
         GovernanceDecision decision = await evaluator.EvaluateAsync(context, TestContext.Current.CancellationToken);
 
@@ -307,7 +307,7 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorTests
             options: new AsiBackbonePolicyEvaluatorOptions
             {
                 DenyWhenNoConstraints = true
-            });
+            }, threatModelContributors: null, logger: null);
 
         GovernanceDecision decision = await evaluator.EvaluateAsync(context, TestContext.Current.CancellationToken);
 
@@ -330,11 +330,11 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorTests
 
         var evaluator = new DefaultAsiBackbonePolicyEvaluator<TestPolicyContext>(
             [],
-            policy,
-            new AsiBackbonePolicyEvaluatorOptions
+            decisionPolicy: policy,
+            options: new AsiBackbonePolicyEvaluatorOptions
             {
                 DenyWhenNoConstraints = true
-            });
+            }, threatModelContributors: null, logger: null);
 
         GovernanceDecision decision = await evaluator.EvaluateAsync(context, TestContext.Current.CancellationToken);
 
@@ -368,7 +368,7 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorTests
             constraints: [new ThrowingConstraint(expectedException)],
             decisionPolicy: null,
             options: null,
-            logger: logger);
+            logger: logger, threatModelContributors: null);
 
         GovernanceDecision decision = await evaluator.EvaluateAsync(context, TestContext.Current.CancellationToken);
 
@@ -402,7 +402,7 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorTests
             options: new AsiBackbonePolicyEvaluatorOptions
             {
                 TreatConstraintExceptionAsDenial = false
-            });
+            }, threatModelContributors: null, logger: null);
 
         InvalidOperationException exception = await Assert.ThrowsAsync<InvalidOperationException>(async () =>
             await evaluator.EvaluateAsync(context, TestContext.Current.CancellationToken));
@@ -430,7 +430,7 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorTests
             {
                 TreatConstraintExceptionAsDenial = true
             },
-            logger: logger);
+            logger: logger, threatModelContributors: null);
 
         GovernanceDecision decision = await evaluator.EvaluateAsync(context, TestContext.Current.CancellationToken);
 
@@ -475,7 +475,7 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorTests
             {
                 TreatConstraintExceptionAsDenial = true
             },
-            logger: logger);
+            logger: logger, threatModelContributors: null);
 
         GovernanceDecision decision = await evaluator.EvaluateAsync(context, TestContext.Current.CancellationToken);
 
@@ -503,7 +503,7 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorTests
                 TreatConstraintExceptionAsDenial = true,
                 ConstraintExceptionReasonCode = "host.constraint.exception",
                 ConstraintExceptionReasonMessage = "The host policy constraint failed closed."
-            });
+            }, threatModelContributors: null, logger: null);
 
         GovernanceDecision decision = await evaluator.EvaluateAsync(context, TestContext.Current.CancellationToken);
 
@@ -529,11 +529,11 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorTests
                 new StaticConstraint(ConstraintEvaluationResult.Allow()),
                 new ThrowingConstraint(new InvalidOperationException("sensitive failure text"))
             ],
-            policy,
-            new AsiBackbonePolicyEvaluatorOptions
+            decisionPolicy: policy,
+            options: new AsiBackbonePolicyEvaluatorOptions
             {
                 TreatConstraintExceptionAsDenial = true
-            });
+            }, threatModelContributors: null, logger: null);
 
         GovernanceDecision decision = await evaluator.EvaluateAsync(context, TestContext.Current.CancellationToken);
 
@@ -570,7 +570,7 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorTests
             options: new AsiBackbonePolicyEvaluatorOptions
             {
                 TreatConstraintExceptionAsDenial = true
-            });
+            }, threatModelContributors: null, logger: null);
 
         OperationCanceledException exception = await Assert.ThrowsAsync<OperationCanceledException>(async () =>
             await evaluator.EvaluateAsync(context, TestContext.Current.CancellationToken));
@@ -593,7 +593,7 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorTests
             CreateConstraintEnumerable(
                 ConstraintEvaluationResult.Warning(
                     "constraint.warning",
-                    "The constraint produced a warning.")));
+                    "The constraint produced a warning.")), threatModelContributors: null, decisionPolicy: null, options: null, logger: null);
 
         GovernanceDecision decision = await evaluator.EvaluateAsync(context, TestContext.Current.CancellationToken);
 
@@ -620,7 +620,7 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorTests
                     "The original constraint produced a warning."))
         };
 
-        var evaluator = new DefaultAsiBackbonePolicyEvaluator<TestPolicyContext>(callerOwnedConstraints);
+        var evaluator = new DefaultAsiBackbonePolicyEvaluator<TestPolicyContext>(callerOwnedConstraints, threatModelContributors: null, decisionPolicy: null, options: null, logger: null);
 
         callerOwnedConstraints.Clear();
         callerOwnedConstraints.Add(
@@ -667,7 +667,7 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorTests
                             "constraint.warning",
                             "The second constraint produced a warning.");
                     })
-            ]);
+            ], threatModelContributors: null, decisionPolicy: null, options: null, logger: null);
 
         GovernanceDecision decision = await evaluator.EvaluateAsync(context, TestContext.Current.CancellationToken);
 
@@ -696,7 +696,7 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorTests
                 return ConstraintEvaluationResult.Allow();
             });
 
-        var evaluator = new DefaultAsiBackbonePolicyEvaluator<TestPolicyContext>([constraint]);
+        var evaluator = new DefaultAsiBackbonePolicyEvaluator<TestPolicyContext>([constraint], threatModelContributors: null, decisionPolicy: null, options: null, logger: null);
 
         using var cancellationTokenSource = new CancellationTokenSource();
         await cancellationTokenSource.CancelAsync();
@@ -728,7 +728,7 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorTests
                     ConstraintEvaluationResult.Deny(
                         "constraint.denied",
                         "The constraint denied the operation."))
-            ]);
+            ], threatModelContributors: null, decisionPolicy: null, options: null, logger: null);
 
         GovernanceDecision decision = await evaluator.EvaluateAsync(context, TestContext.Current.CancellationToken);
 
@@ -760,7 +760,7 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorTests
                         "constraint.warning",
                         "The constraint produced a warning."))
             ],
-            policy);
+            decisionPolicy: policy, threatModelContributors: null, options: null, logger: null);
 
         GovernanceDecision decision = await evaluator.EvaluateAsync(
             context,

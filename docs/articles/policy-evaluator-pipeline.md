@@ -49,20 +49,9 @@ The evaluator propagates correlation, policy version, and policy hash metadata f
 
 When an optional `ILogger<DefaultAsiBackbonePolicyEvaluator<TContext>>` is supplied and evaluation runs with zero constraints while `DenyWhenNoConstraints` is explicitly set to `false`, the evaluator emits a warning. This makes the intentional permissive empty-policy path visible in operational logs.
 
-## Constructor overload selection
+## Evaluator construction
 
-`DefaultAsiBackbonePolicyEvaluator<TContext>` keeps several constructor overloads so simple hosts, compatibility callers, and fully wired dependency-injection hosts can all create the evaluator. Pick the smallest overload that honestly represents the host posture, but do not drop configured options or diagnostics just to make registration shorter.
-
-| Overload group | Use when | Guidance |
-| --- | --- | --- |
-| Constraints only | The host accepts the `3.x` fail-closed defaults and has no custom decision policy, explicit evaluator options, threat contributors, or logger. | This is the simplest path. Empty policies deny, eligible constraint exceptions deny, and threat contributor exceptions deny. |
-| Constraints plus decision policy | The host wants normal constraint composition followed by a custom `IAsiBackboneDecisionPolicy<TContext>` that can raise or reshape the composed decision. | Use this when the policy needs outcomes such as defer, acknowledgment-required, or escalation-recommended after base composition. |
-| Constraints plus evaluator options | The host needs explicit settings for empty-policy denial, constraint-exception denial, fast-abort behavior, or threat-assessment downgrade protection. | Use this when the host intentionally overrides a default, such as setting `TreatConstraintExceptionAsDenial = false`. |
-| Constraints plus threat model contributors | The host wants pre-constraint threat contributors to inspect the context and emit actionable warnings or blocking decisions. | Use one of the overloads that accepts `IEnumerable<IThreatModelContributor<TContext>>`; include evaluator options when contributor exception behavior matters. |
-| Logger overloads | The host wants operational diagnostics for permissive empty policies, converted constraint exceptions, or converted threat-contributor exceptions. | Prefer the logger overload in production-style DI wiring so warnings and fail-closed conversions become visible in normal logging. |
-| Full overload | The host has constraints, threat contributors, an optional decision policy, configured options, and a logger. | This is the most explicit DI path and is usually the clearest choice for production registrations. |
-
-Strict or fail-closed hosts should pass configured options into the evaluator rather than constructing unrelated option instances at the call site. This is especially important with `AddAsiBackboneStrictGovernance()` or `UseStrictGovernanceProfile()`: those helpers configure `IOptions<AsiBackbonePolicyEvaluatorOptions>`, but they cannot rewrite a manually constructed options object that the host passes directly to the evaluator.
+In 6.0, use the evaluator builder for manual construction or the single constructor accepting constraints, threat contributors, decision policy, options, and logger. Pass null for optional dependencies that the host does not supply. Preserve configured options and diagnostics when wiring dependency injection. See [Upgrade from 5.x to 6.0](upgrade-500-to-600.md) for removed overloads.
 
 A DI registration that preserves the configured profile and operational diagnostics should resolve options and logger from the service provider:
 

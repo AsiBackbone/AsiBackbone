@@ -132,7 +132,7 @@ factory.WithWebHostBuilder(builder =>
 });
 ```
 
-Use this pattern when a host application already calls `AddAsiBackboneAspNetCore()` and exposes endpoints with metadata such as `.RequireGovernancePolicy<TPolicy>()`, `.RequireCapabilityGrant(...)`, or `.EmitGovernanceAudit()`.
+Use this pattern when a host application already calls `AddAsiBackboneAspNetCore()` and exposes endpoints with metadata such as `.MarkGovernancePolicy<TPolicy>()`, `.RequireCapabilityGrant(...)`, or `.EmitGovernanceAudit()`.
 
 ## Production boundary
 

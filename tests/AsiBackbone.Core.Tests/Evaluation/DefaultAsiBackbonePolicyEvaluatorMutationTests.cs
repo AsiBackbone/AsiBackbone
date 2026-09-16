@@ -34,7 +34,7 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorMutationTests
                     ConstraintEvaluationResult.Deny(
                         "constraint.denied.second",
                         "The second constraint denied the operation."))
-            ]);
+            ], threatModelContributors: null, decisionPolicy: null, options: null, logger: null);
 
         GovernanceDecision decision = await evaluator.EvaluateAsync(context, TestContext.Current.CancellationToken);
 
@@ -70,7 +70,7 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorMutationTests
                     ConstraintEvaluationResult.Warning(
                         "constraint.warning.second",
                         "The second warning was produced."))
-            ]);
+            ], threatModelContributors: null, decisionPolicy: null, options: null, logger: null);
 
         GovernanceDecision decision = await evaluator.EvaluateAsync(context, TestContext.Current.CancellationToken);
 
@@ -122,7 +122,7 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorMutationTests
                                 "The constraint produced a warning."));
                     })
             ],
-            policy);
+            decisionPolicy: policy, threatModelContributors: null, options: null, logger: null);
 
         GovernanceDecision decision = await evaluator.EvaluateAsync(context, TestContext.Current.CancellationToken);
 
@@ -169,7 +169,7 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorMutationTests
                         secondConstraintRuns++;
                         return new ValueTask<ConstraintEvaluationResult>(ConstraintEvaluationResult.Allow());
                     })
-            ]);
+            ], threatModelContributors: null, decisionPolicy: null, options: null, logger: null);
 
         _ = await Assert.ThrowsAsync<OperationCanceledException>(async () =>
             await evaluator.EvaluateAsync(context, cancellationTokenSource.Token));

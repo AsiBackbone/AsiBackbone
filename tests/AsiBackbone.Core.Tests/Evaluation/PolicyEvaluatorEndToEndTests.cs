@@ -157,7 +157,7 @@ public sealed class PolicyEvaluatorEndToEndTests
             authenticated: true);
 
         var evaluator = new DefaultAsiBackbonePolicyEvaluator<DocumentApprovalContext>(
-            [new NotApplicableConstraint()]);
+            [new NotApplicableConstraint()], threatModelContributors: null, decisionPolicy: null, options: null, logger: null);
 
         GovernanceDecision decision = await evaluator.EvaluateAsync(context, CancellationToken.None);
 
@@ -176,7 +176,7 @@ public sealed class PolicyEvaluatorEndToEndTests
                 new OwnershipConstraint(),
                 new ElevatedRiskConstraint()
             ],
-            decisionPolicy: new DocumentRiskDecisionPolicy());
+            decisionPolicy: new DocumentRiskDecisionPolicy(), threatModelContributors: null, options: null, logger: null);
 
         return await evaluator.EvaluateAsync(context, CancellationToken.None);
     }

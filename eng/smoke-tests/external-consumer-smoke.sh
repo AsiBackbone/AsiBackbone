@@ -140,6 +140,7 @@ using AsiBackbone.Core.Constraints;
 using AsiBackbone.Core.Decisions;
 using AsiBackbone.Core.Evaluation;
 using AsiBackbone.Core.Results;
+using AsiBackbone.Core.ThreatModeling;
 using AsiBackbone.EntityFrameworkCore;
 using AsiBackbone.EntityFrameworkCore.Audit;
 using AsiBackbone.Storage.InMemory.Audit;
@@ -149,6 +150,8 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Xunit;
 
 namespace ExternalConsumerSmoke.Tests;
@@ -239,7 +242,14 @@ internal static class SmokeHost
 
         builder.Services.AddSingleton<IAsiBackboneConstraint<AsiBackboneConstraintEvaluationContext>, SmokeRegionConstraint>();
         builder.Services.AddSingleton<IAsiBackboneDecisionPolicy<AsiBackboneConstraintEvaluationContext>, SmokeDecisionPolicy>();
-        builder.Services.AddSingleton<IAsiBackbonePolicyEvaluator<AsiBackboneConstraintEvaluationContext>, DefaultAsiBackbonePolicyEvaluator<AsiBackboneConstraintEvaluationContext>>();
+        builder.Services.AddSingleton<IAsiBackbonePolicyEvaluator<AsiBackboneConstraintEvaluationContext>>(serviceProvider =>
+            DefaultAsiBackbonePolicyEvaluator.CreateBuilder<AsiBackboneConstraintEvaluationContext>()
+                .AddConstraints(serviceProvider.GetServices<IAsiBackboneConstraint<AsiBackboneConstraintEvaluationContext>>())
+                .AddThreatModelContributors(serviceProvider.GetServices<IThreatModelContributor<AsiBackboneConstraintEvaluationContext>>())
+                .WithDecisionPolicy(serviceProvider.GetService<IAsiBackboneDecisionPolicy<AsiBackboneConstraintEvaluationContext>>())
+                .WithOptions(serviceProvider.GetRequiredService<IOptions<AsiBackbonePolicyEvaluatorOptions>>().Value)
+                .WithLogger(serviceProvider.GetService<ILogger<DefaultAsiBackbonePolicyEvaluator<AsiBackboneConstraintEvaluationContext>>>())
+                .Build());
 
         WebApplication app = builder.Build();
 

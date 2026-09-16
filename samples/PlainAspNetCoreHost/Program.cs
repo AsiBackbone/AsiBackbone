@@ -7,6 +7,7 @@ using AsiBackbone.Core.Constraints;
 using AsiBackbone.Core.Decisions;
 using AsiBackbone.Core.Evaluation;
 using AsiBackbone.Core.Signing;
+using AsiBackbone.Core.ThreatModeling;
 using AsiBackbone.EntityFrameworkCore;
 using AsiBackbone.EntityFrameworkCore.Audit;
 using AsiBackbone.Signing.LocalDevelopment;
@@ -43,7 +44,14 @@ builder.Services.AddSingleton<SampleAcknowledgmentChallengeStore>();
 
 builder.Services.AddSingleton<IAsiBackboneConstraint<AsiBackboneConstraintEvaluationContext>, RegionConstraint>();
 builder.Services.AddSingleton<IAsiBackboneDecisionPolicy<AsiBackboneConstraintEvaluationContext>, ConsequentialActionDecisionPolicy>();
-builder.Services.AddSingleton<IAsiBackbonePolicyEvaluator<AsiBackboneConstraintEvaluationContext>, DefaultAsiBackbonePolicyEvaluator<AsiBackboneConstraintEvaluationContext>>();
+builder.Services.AddSingleton<IAsiBackbonePolicyEvaluator<AsiBackboneConstraintEvaluationContext>>(serviceProvider =>
+    DefaultAsiBackbonePolicyEvaluator.CreateBuilder<AsiBackboneConstraintEvaluationContext>()
+        .AddConstraints(serviceProvider.GetServices<IAsiBackboneConstraint<AsiBackboneConstraintEvaluationContext>>())
+        .AddThreatModelContributors(serviceProvider.GetServices<IThreatModelContributor<AsiBackboneConstraintEvaluationContext>>())
+        .WithDecisionPolicy(serviceProvider.GetService<IAsiBackboneDecisionPolicy<AsiBackboneConstraintEvaluationContext>>())
+        .WithOptions(serviceProvider.GetRequiredService<IOptions<AsiBackbonePolicyEvaluatorOptions>>().Value)
+        .WithLogger(serviceProvider.GetService<ILogger<DefaultAsiBackbonePolicyEvaluator<AsiBackboneConstraintEvaluationContext>>>())
+        .Build());
 
 WebApplication app = builder.Build();
 

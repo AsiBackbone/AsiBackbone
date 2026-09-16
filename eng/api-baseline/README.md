@@ -1,7 +1,8 @@
 # Stable public API baselines
 
 These files are the reviewable public managed-API baseline for the stable
-AsiBackbone `5.x` package family.
+AsiBackbone package family, including the intentional `6.0` removals on the
+`release/6.0.0` branch.
 
 The initial baseline was generated from the DocFX managed-reference output for
 the published `v5.0.0` source at commit
@@ -46,6 +47,13 @@ reviewed. Baseline row order is not semantically significant during validation;
 across Windows and Linux runners.
 
 ## Intentional API changes
+
+Issue #783 removes exactly five obsolete partial evaluator constructors and two
+obsolete `RequireGovernancePolicy` route-builder extensions at the 6.0 major
+boundary. See `docs/articles/upgrade-500-to-600.md` for the complete inventory
+and replacements. The Core and ASP.NET Core package compatibility suppression
+files allow only these seven previous-release member removals; package
+validation remains enabled for all other compatibility changes.
 
 A baseline update is an approval artifact, not an approval mechanism. First
 classify the API change under the project's Semantic Versioning policy. Additive

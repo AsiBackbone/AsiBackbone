@@ -50,7 +50,7 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorCriticalExceptionTests
             options: new AsiBackbonePolicyEvaluatorOptions
             {
                 TreatConstraintExceptionAsDenial = true
-            });
+            }, threatModelContributors: null, logger: null);
 
         GovernanceDecision decision = await evaluator.EvaluateAsync(context, TestContext.Current.CancellationToken);
 
@@ -76,7 +76,7 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorCriticalExceptionTests
             options: new AsiBackbonePolicyEvaluatorOptions
             {
                 TreatConstraintExceptionAsDenial = true
-            });
+            }, threatModelContributors: null, logger: null);
 
         GovernanceDecision decision = await evaluator.EvaluateAsync(context, TestContext.Current.CancellationToken);
 
@@ -103,7 +103,7 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorCriticalExceptionTests
             options: new AsiBackbonePolicyEvaluatorOptions
             {
                 TreatConstraintExceptionAsDenial = true
-            });
+            }, threatModelContributors: null, logger: null);
 
         Exception? exception = await Record.ExceptionAsync(async () =>
             await evaluator.EvaluateAsync(context, TestContext.Current.CancellationToken));
@@ -127,7 +127,7 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorCriticalExceptionTests
             options: new AsiBackbonePolicyEvaluatorOptions
             {
                 TreatConstraintExceptionAsDenial = true
-            });
+            }, threatModelContributors: null, logger: null);
 
         InvalidOperationException exception = await Assert.ThrowsAsync<InvalidOperationException>(async () =>
             await evaluator.EvaluateAsync(context, TestContext.Current.CancellationToken));
@@ -146,7 +146,7 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorCriticalExceptionTests
         TestPolicyContext context = CreateContext();
         var evaluator = new DefaultAsiBackbonePolicyEvaluator<TestPolicyContext>(
             [new StaticConstraint(ConstraintEvaluationResult.Allow())],
-            [new ThrowingThreatContributor(new InvalidOperationException("ordinary contributor failure"))]);
+            [new ThrowingThreatContributor(new InvalidOperationException("ordinary contributor failure"))], decisionPolicy: null, options: null, logger: null);
 
         GovernanceDecision decision = await evaluator.EvaluateAsync(context, TestContext.Current.CancellationToken);
 
@@ -168,7 +168,7 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorCriticalExceptionTests
             [new StaticConstraint(ConstraintEvaluationResult.Allow())],
             [new ThrowingThreatContributor(new InvalidOperationException(
                 "ordinary wrapper failure",
-                new TimeoutException("ordinary inner failure")))]);
+                new TimeoutException("ordinary inner failure")))], decisionPolicy: null, options: null, logger: null);
 
         GovernanceDecision decision = await evaluator.EvaluateAsync(context, TestContext.Current.CancellationToken);
 
@@ -193,7 +193,7 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorCriticalExceptionTests
         Exception expectedException = CreateCriticalException(criticalExceptionType);
         var evaluator = new DefaultAsiBackbonePolicyEvaluator<TestPolicyContext>(
             [new StaticConstraint(ConstraintEvaluationResult.Allow())],
-            [new ThrowingThreatContributor(expectedException)]);
+            [new ThrowingThreatContributor(expectedException)], decisionPolicy: null, options: null, logger: null);
 
         Exception? exception = await Record.ExceptionAsync(async () =>
             await evaluator.EvaluateAsync(context, TestContext.Current.CancellationToken));
@@ -212,7 +212,7 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorCriticalExceptionTests
         var expectedException = new OperationCanceledException("Threat contributor cancellation should not be converted to denial.");
         var evaluator = new DefaultAsiBackbonePolicyEvaluator<TestPolicyContext>(
             [new StaticConstraint(ConstraintEvaluationResult.Allow())],
-            [new ThrowingThreatContributor(expectedException)]);
+            [new ThrowingThreatContributor(expectedException)], decisionPolicy: null, options: null, logger: null);
 
         OperationCanceledException exception = await Assert.ThrowsAsync<OperationCanceledException>(async () =>
             await evaluator.EvaluateAsync(context, TestContext.Current.CancellationToken));

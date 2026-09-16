@@ -1,0 +1,41 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<!-- https://learn.microsoft.com/dotnet/fundamentals/package-validation/diagnostic-ids -->
+<!-- Issue #783: intentional 6.0 removal of the five obsolete partial constructors.
+     Keep the previous-release baseline gate active for every other API. -->
+<Suppressions xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <Suppression>
+    <DiagnosticId>CP0002</DiagnosticId>
+    <Target>M:AsiBackbone.Core.Evaluation.DefaultAsiBackbonePolicyEvaluator`1.#ctor(System.Collections.Generic.IEnumerable{AsiBackbone.Core.Constraints.IAsiBackboneConstraint{`0}},AsiBackbone.Core.Evaluation.IAsiBackboneDecisionPolicy{`0},AsiBackbone.Core.Evaluation.AsiBackbonePolicyEvaluatorOptions,Microsoft.Extensions.Logging.ILogger{AsiBackbone.Core.Evaluation.DefaultAsiBackbonePolicyEvaluator{`0}})</Target>
+    <Left>lib/net10.0/AsiBackbone.Core.dll</Left>
+    <Right>lib/net10.0/AsiBackbone.Core.dll</Right>
+    <IsBaselineSuppression>true</IsBaselineSuppression>
+  </Suppression>
+  <Suppression>
+    <DiagnosticId>CP0002</DiagnosticId>
+    <Target>M:AsiBackbone.Core.Evaluation.DefaultAsiBackbonePolicyEvaluator`1.#ctor(System.Collections.Generic.IEnumerable{AsiBackbone.Core.Constraints.IAsiBackboneConstraint{`0}},AsiBackbone.Core.Evaluation.IAsiBackboneDecisionPolicy{`0},AsiBackbone.Core.Evaluation.AsiBackbonePolicyEvaluatorOptions)</Target>
+    <Left>lib/net10.0/AsiBackbone.Core.dll</Left>
+    <Right>lib/net10.0/AsiBackbone.Core.dll</Right>
+    <IsBaselineSuppression>true</IsBaselineSuppression>
+  </Suppression>
+  <Suppression>
+    <DiagnosticId>CP0002</DiagnosticId>
+    <Target>M:AsiBackbone.Core.Evaluation.DefaultAsiBackbonePolicyEvaluator`1.#ctor(System.Collections.Generic.IEnumerable{AsiBackbone.Core.Constraints.IAsiBackboneConstraint{`0}},AsiBackbone.Core.Evaluation.IAsiBackboneDecisionPolicy{`0})</Target>
+    <Left>lib/net10.0/AsiBackbone.Core.dll</Left>
+    <Right>lib/net10.0/AsiBackbone.Core.dll</Right>
+    <IsBaselineSuppression>true</IsBaselineSuppression>
+  </Suppression>
+  <Suppression>
+    <DiagnosticId>CP0002</DiagnosticId>
+    <Target>M:AsiBackbone.Core.Evaluation.DefaultAsiBackbonePolicyEvaluator`1.#ctor(System.Collections.Generic.IEnumerable{AsiBackbone.Core.Constraints.IAsiBackboneConstraint{`0}},System.Collections.Generic.IEnumerable{AsiBackbone.Core.ThreatModeling.IThreatModelContributor{`0}},AsiBackbone.Core.Evaluation.IAsiBackboneDecisionPolicy{`0},AsiBackbone.Core.Evaluation.AsiBackbonePolicyEvaluatorOptions)</Target>
+    <Left>lib/net10.0/AsiBackbone.Core.dll</Left>
+    <Right>lib/net10.0/AsiBackbone.Core.dll</Right>
+    <IsBaselineSuppression>true</IsBaselineSuppression>
+  </Suppression>
+  <Suppression>
+    <DiagnosticId>CP0002</DiagnosticId>
+    <Target>M:AsiBackbone.Core.Evaluation.DefaultAsiBackbonePolicyEvaluator`1.#ctor(System.Collections.Generic.IEnumerable{AsiBackbone.Core.Constraints.IAsiBackboneConstraint{`0}},System.Collections.Generic.IEnumerable{AsiBackbone.Core.ThreatModeling.IThreatModelContributor{`0}},AsiBackbone.Core.Evaluation.IAsiBackboneDecisionPolicy{`0})</Target>
+    <Left>lib/net10.0/AsiBackbone.Core.dll</Left>
+    <Right>lib/net10.0/AsiBackbone.Core.dll</Right>
+    <IsBaselineSuppression>true</IsBaselineSuppression>
+  </Suppression>
+</Suppressions>
