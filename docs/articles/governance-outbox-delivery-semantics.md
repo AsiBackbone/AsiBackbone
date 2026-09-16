@@ -2,7 +2,7 @@
 
 This article defines the production semantics for outbox entries: identity, persistence, retry, idempotency, ordering, and host responsibilities.
 
-AsiBackbone provides a policy decision pipeline, durable local outbox records, and provider-neutral drain primitives. It is not an AI model host, distributed queue, SIEM product, immutable ledger, or exactly-once delivery system.
+AsiBackbone remains a governance and policy spine. It provides durable local outbox records and provider-neutral drain primitives; it is not an distributed queue, SIEM product, immutable ledger, or exactly-once delivery system.
 
 ## Summary contract
 

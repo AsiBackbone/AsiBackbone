@@ -4,7 +4,7 @@ This article documents the stable Core-neutral signing and verification primitiv
 
 Issues: #147, #219, #253.
 
-AsiBackbone is a policy decision pipeline for consequential software decision flow. It is not a signing product, key-management system, immutable ledger, legal certification system, or compliance guarantee by itself.
+AsiBackbone is a governance spine for consequential software decision flow. It is not a signing product, key-management system, immutable ledger, legal certification system, or compliance guarantee by itself.
 
 > [!IMPORTANT]
 > `AsiBackbone.Core` includes stable signing-ready metadata, canonical payload hashing, capability-grant payload construction, signing seams, and verification-policy primitives in `4.0.0`. Those Core primitives make artifacts ready for provider signing and later verification workflows; they do not create production tamper-evidence by themselves. Production tamper evidence requires a concrete signing provider, protected key management, verification policy, durable storage guarantees, retention policy, monitoring, and operational procedures supplied by the host or provider environment.

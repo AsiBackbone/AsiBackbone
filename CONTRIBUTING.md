@@ -2,7 +2,7 @@
 
 Thank you for helping improve AsiBackbone.
 
-In this software project, **ASI** means **Accountable Systems Infrastructure**. AsiBackbone is a .NET package family for governance-oriented decision flow. Contributions should keep the project grounded as practical governance infrastructure, not an artificial superintelligence implementation, AI model host, legal/compliance guarantee, or robot controller.
+Accountable Systems Infrastructure Backbone (AsiBackbone) is a .NET package family for governance-oriented decision flow. Contributions should keep the project grounded as practical governance infrastructure.
 
 ## Contribution goals
 

@@ -2,7 +2,7 @@
 
 This article documents implementation guidance for host-provided governance services that may run on ASP.NET Core request hot paths, hosted outbox drain paths, or other high-volume execution paths.
 
-AsiBackbone provides governance contracts, decision orchestration, host adapters, decision receipt models, and outbox/drain primitives. It does not own the host application's database, network clients, external telemetry providers, retry policy, queue infrastructure, or production operations.
+AsiBackbone provides governance contracts, decision orchestration, host adapters, audit residue models, and outbox/drain primitives. It does not own the host application's database, network clients, external telemetry providers, retry policy, queue infrastructure, or production operations.
 
 ## Why host service throughput matters
 

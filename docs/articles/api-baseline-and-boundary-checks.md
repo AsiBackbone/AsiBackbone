@@ -2,7 +2,7 @@
 
 This page documents the guardrails used to protect the stable AsiBackbone package line.
 
-These checks protect implemented package contracts; they do not turn AsiBackbone into an artificial superintelligence implementation, AI model host, robot controller, compliance product, signing system, or production audit guarantee.
+These checks protect implemented package contracts; they do not turn AsiBackbone into a compliance product, signing system, or production audit guarantee.
 
 ## Purpose
 

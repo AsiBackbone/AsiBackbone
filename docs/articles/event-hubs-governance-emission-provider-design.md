@@ -4,7 +4,7 @@ This article documents a **design-only** future provider strategy for an optiona
 
 Issue: #145.
 
-AsiBackbone is a policy decision pipeline for consequential software decision flow. It is not an AI model host, robot controller, streaming platform, SIEM product, cloud governance platform, signing product, or compliance guarantee by itself.
+AsiBackbone is a governance spine for consequential software decision flow. It is not a streaming platform, SIEM product, cloud governance platform, signing product, or compliance guarantee by itself.
 
 > [!IMPORTANT]
 > This page does **not** document a released NuGet package. No Event Hubs provider package, Azure Event Hubs SDK adapter, Azure-specific emission package, or Event Hubs publishing implementation is included in the `1.1.0` stable package family.

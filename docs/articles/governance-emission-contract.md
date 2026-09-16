@@ -2,7 +2,7 @@
 
 This article documents the provider-neutral governance emission contract introduced for the `1.1.0 - Observability, Outbox, and Governance Emission Providers` milestone.
 
-AsiBackbone remains a policy decision pipeline for consequential software decision flow. It is not an AI model host, cloud governance platform, observability backend, SIEM product, streaming system, signing product, or provider SDK wrapper.
+AsiBackbone remains a governance spine for consequential software decision flow. It is not an cloud governance platform, observability backend, SIEM product, streaming system, signing product, or provider SDK wrapper.
 
 ## Purpose
 

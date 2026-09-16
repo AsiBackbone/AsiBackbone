@@ -4,7 +4,7 @@ This review records the public API review for the initial stable AsiBackbone pac
 
 Current package status is documented in [API Compatibility and Semantic Versioning](api-compatibility-and-semver.md), [3.0.0 Release Notes](release-notes-300.md), and the current release-readiness record. This page is intentionally historical and should not be read as the current stable package-family index.
 
-In this software project, **ASI** means **Accountable Systems Infrastructure**. This review is limited to implemented .NET package APIs and does not treat AsiBackbone as an artificial superintelligence implementation, AI model host, legal/compliance guarantee, or robot controller.
+This review is limited to implemented .NET package APIs and does not treat AsiBackbone as a legal/compliance guarantee, or robot controller.
 
 ## Review status
 

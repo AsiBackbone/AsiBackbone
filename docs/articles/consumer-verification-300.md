@@ -2,7 +2,7 @@
 
 This guide gives consumers and maintainers a conservative verification path for the `3.0.0` package family while NuGet package signing is deferred.
 
-In this software project, **ASI** means **Accountable Systems Infrastructure**. This page describes package-source, metadata, Source Link, SBOM, and workflow-provenance checks. It does not convert AsiBackbone into a compliance product, a signed-package distribution, a production tamper-evident ledger, or a legal non-repudiation mechanism by itself.
+This page describes package-source, metadata, Source Link, SBOM, and workflow-provenance checks. It does not convert AsiBackbone into a compliance product, a signed-package distribution, a production tamper-evident ledger, or a legal non-repudiation mechanism by itself.
 
 ## Current verification boundary
 

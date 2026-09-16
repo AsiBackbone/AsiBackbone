@@ -2,9 +2,6 @@
 
 This page provides lightweight Mermaid diagrams for the main AsiBackbone governance flows. The diagrams are intentionally implementation-facing: they show where the package family can help structure policy evaluation, acknowledgment, decision receipt, capability boundaries, and optional governance emission without claiming that AsiBackbone owns the host application's execution path.
 
-> [!IMPORTANT]
-> AsiBackbone is a policy decision pipeline for accountable software decision flow, not an intelligence engine, model host, robotics controller, compliance certification system, or production tamper-evidence provider by itself.
-
 ## How to read these diagrams
 
 - **Host-owned execution** means the consumer application still owns authorization, business rules, side effects, infrastructure access, database provider choices, retries, and operational safeguards.

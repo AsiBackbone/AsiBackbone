@@ -1,7 +1,5 @@
 # ASI Backbone Concept: Product Boundary
 
-In this software project, **ASI** means **Accountable Systems Infrastructure**.
-
 The broader architecture teaching for Accountable Systems Infrastructure is canonical in [ASI Backbone Learning](https://asibackbone.github.io/Learning/architecture/accountable-systems-infrastructure-and-governed-execution.html).
 
 This page is retained at its existing URL for continuity and documents only the concrete product boundary.

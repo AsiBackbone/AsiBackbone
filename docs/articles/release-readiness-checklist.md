@@ -4,7 +4,7 @@ This document is retained as the historical release-candidate control sheet for 
 
 For future stable releases, use this record as a reusable checklist shape together with [Stable Release Validation](release-validation.md), then copy or adapt the checks for the new release version.
 
-In this software project, **ASI** means **Accountable Systems Infrastructure**. This record verifies the package family as governance infrastructure for accountable decision flow. It does not treat AsiBackbone as an artificial superintelligence implementation, AI model host, robot controller, legal/compliance guarantee, or production tamper-evident ledger provider.
+This record verifies the package family as governance infrastructure for accountable decision flow. It does not treat AsiBackbone as a legal/compliance guarantee, or production tamper-evident ledger provider.
 
 ## Stable package family recorded for 1.1.0
 

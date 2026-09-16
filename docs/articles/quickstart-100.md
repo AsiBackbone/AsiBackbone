@@ -2,7 +2,7 @@
 
 This quickstart shows the minimum supported setup for the initial stable `1.0.0` release line.
 
-In this software project, **ASI** means **Accountable Systems Infrastructure**. AsiBackbone provides governance-oriented software primitives for policy-shaped, auditable, acknowledgment-aware, and capability-bounded decision flow. It is not an intelligence engine and does not host, train, run, or orchestrate AI models.
+AsiBackbone provides governance-oriented software primitives for policy-shaped, auditable, acknowledgment-aware, and capability-bounded decision flow.
 
 ## Stable `1.0.0` scope
 

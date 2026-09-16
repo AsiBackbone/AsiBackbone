@@ -4,7 +4,7 @@ This article documents a **strategy-only** future Microsoft Purview governance a
 
 Issue: #146.
 
-AsiBackbone is a policy decision pipeline for consequential software decision flow. It is not an AI model host, robot controller, cloud governance platform, Purview catalog provider, SIEM product, signing product, or compliance guarantee by itself.
+AsiBackbone is a governance spine for consequential software decision flow. It is not a cloud governance platform, Purview catalog provider, SIEM product, signing product, or compliance guarantee by itself.
 
 > [!IMPORTANT]
 > This page does **not** document a released NuGet package. No Purview provider package, Purview SDK adapter, catalog-ingestion implementation, or Azure-specific enrichment package is included in the `1.1.0` stable package family.

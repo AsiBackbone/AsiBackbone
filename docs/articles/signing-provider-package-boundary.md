@@ -4,7 +4,7 @@ This article documents the stable signing-provider package boundary carried forw
 
 Issue: #253, updated for #512.
 
-AsiBackbone is a policy decision pipeline for consequential software decision flow. It is not a signing appliance, key-management system, immutable ledger, blockchain service, legal non-repudiation system, or compliance certification service by itself.
+AsiBackbone is a governance spine for consequential software decision flow. It is not a signing appliance, key-management system, immutable ledger, blockchain service, legal non-repudiation system, or compliance certification service by itself.
 
 > [!IMPORTANT]
 > Signing-related package surfaces do not make records tamper-evident, immutable, legally non-repudiable, or compliance-certified by default. Those claims require concrete signing, verification, durable storage controls, key management, retention, monitoring, and operational procedures supplied by the host or provider environment.

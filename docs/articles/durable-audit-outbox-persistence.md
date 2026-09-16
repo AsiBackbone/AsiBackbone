@@ -2,7 +2,7 @@
 
 This article documents the provider-neutral durable persistence seam for decision receipt, lifecycle events, and governance emission outbox entries.
 
-AsiBackbone remains a policy decision pipeline for consequential software decision flow. It is not an AI model host, observability backend, SIEM product, cloud provider, or completed ASI implementation.
+AsiBackbone remains a governance spine for consequential software decision flow. It is not an AI model host, observability backend, SIEM product, cloud provider, or completed ASI implementation.
 
 ## Purpose
 
