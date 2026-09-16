@@ -32,7 +32,7 @@ public sealed class ManagedKeySigningServiceCollectionExtensionsTests
 
         using ServiceProvider provider = services.BuildServiceProvider();
         ManagedKeySigningService concrete = provider.GetRequiredService<ManagedKeySigningService>();
-        IAsiBackboneSigningService abstraction = provider.GetRequiredService<IAsiBackboneSigningService>();
+        IGovernanceSigningService abstraction = provider.GetRequiredService<IGovernanceSigningService>();
 
         Assert.Same(concrete, abstraction);
         Assert.Same(concrete, provider.GetRequiredService<ManagedKeySigningService>());
@@ -60,7 +60,7 @@ public sealed class ManagedKeySigningServiceCollectionExtensionsTests
         using ServiceProvider provider = services.BuildServiceProvider();
         ManagedKeySigningService concrete = provider.GetRequiredService<ManagedKeySigningService>();
 
-        Assert.Same(concrete, provider.GetRequiredService<IAsiBackboneSigningService>());
+        Assert.Same(concrete, provider.GetRequiredService<IGovernanceSigningService>());
         Assert.Same(client, provider.GetRequiredService<IManagedKeySigningClient>());
         Assert.False(provider.GetRequiredService<ManagedKeySigningOptions>().ReturnUnsignedOnFailure);
     }
@@ -88,7 +88,7 @@ public sealed class ManagedKeySigningServiceCollectionExtensionsTests
         using ServiceProvider provider = services.BuildServiceProvider();
         ManagedKeySigningService concrete = provider.GetRequiredService<ManagedKeySigningService>();
 
-        Assert.Same(concrete, provider.GetRequiredService<IAsiBackboneSigningService>());
+        Assert.Same(concrete, provider.GetRequiredService<IGovernanceSigningService>());
         Assert.Same(client, provider.GetRequiredService<IManagedKeySigningClient>());
         Assert.True(provider.GetRequiredService<ManagedKeySigningOptions>().ReturnUnsignedOnFailure);
     }
@@ -115,7 +115,7 @@ public sealed class ManagedKeySigningServiceCollectionExtensionsTests
         using ServiceProvider provider = services.BuildServiceProvider();
         ManagedKeySigningService concrete = provider.GetRequiredService<ManagedKeySigningService>();
 
-        Assert.Same(concrete, provider.GetRequiredService<IAsiBackboneSigningService>());
+        Assert.Same(concrete, provider.GetRequiredService<IGovernanceSigningService>());
         Assert.Same(client, provider.GetRequiredService<IManagedKeySigningClient>());
         Assert.True(provider.GetRequiredService<ManagedKeySigningOptions>().ReturnUnsignedOnFailure);
     }
@@ -196,7 +196,7 @@ public sealed class ManagedKeySigningServiceCollectionExtensionsTests
             && descriptor.Lifetime == ServiceLifetime.Singleton);
         Assert.Contains(services, descriptor => descriptor.ServiceType == typeof(ManagedKeySigningService)
             && descriptor.Lifetime == ServiceLifetime.Singleton);
-        Assert.Contains(services, descriptor => descriptor.ServiceType == typeof(IAsiBackboneSigningService)
+        Assert.Contains(services, descriptor => descriptor.ServiceType == typeof(IGovernanceSigningService)
             && descriptor.Lifetime == ServiceLifetime.Singleton);
         Assert.Contains(services, descriptor => descriptor.ServiceType == typeof(IManagedKeySigningClient)
             && descriptor.Lifetime == ServiceLifetime.Singleton);

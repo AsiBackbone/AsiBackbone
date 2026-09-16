@@ -35,7 +35,7 @@ The `1.1.0` stable package family is an additive compatible expansion over the `
 | --- | --- | --- |
 | `AsiBackbone.Core` | Adds provider-neutral governance emission contracts, durable outbox contracts, DLP/classification policy primitives, signing-ready metadata abstractions, canonical hashing/signing seams, verification-policy primitives, lifecycle events, and expanded audit/outbox vocabulary. | Stable additive Core expansion. Core must remain framework-neutral and provider-neutral. |
 | `AsiBackbone.Storage.InMemory` | Adds non-durable lifecycle and outbox proof paths for tests, samples, local validation, and no-op proof flows. | Stable non-durable helper boundary. Not production storage. |
-| `AsiBackbone.EntityFrameworkCore` | Adds host-owned persistence integration for audit residue lifecycle and governance outbox records. | Stable EF Core integration boundary. Host still owns `DbContext`, provider, migrations, connection string, deployment, and retention. |
+| `AsiBackbone.EntityFrameworkCore` | Adds host-owned persistence integration for decision receipt lifecycle and governance outbox records. | Stable EF Core integration boundary. Host still owns `DbContext`, provider, migrations, connection string, deployment, and retention. |
 | `AsiBackbone.AspNetCore` | Adds endpoint governance and hosted outbox drain integration. | Stable ASP.NET Core host adapter boundary. Does not replace authentication, authorization, routing, persistence, UI, or execution controls. |
 | `AsiBackbone.Analyzers` | Provides Roslyn analyzer safety rails for governance persistence and continuation flows. | Stable build-time guidance. Analyzer diagnostics are not runtime enforcement. |
 | `AsiBackbone.OpenTelemetry` | Provides the concrete OpenTelemetry governance emission provider package. | Stable provider package. Projects provider-neutral governance envelopes into .NET diagnostics while exporter configuration remains host-owned. |
@@ -59,7 +59,7 @@ The reviewed public naming pattern was acceptable for `1.0.0` and remains useful
 - package names consistently use `AsiBackbone.*`;
 - namespaces mirror package boundaries;
 - public host integration types use the `AsiBackbone` prefix where they are package-specific;
-- Core domain types such as `GovernanceDecision`, `OperationResult`, `AuditResidue`, and `AuditLedgerRecord` are acceptable without repeating the prefix because they are already under the `AsiBackbone.Core` namespace;
+- Core domain types such as `GovernanceDecision`, `OperationResult`, `DecisionReceipt`, and `AuditLedgerRecord` are acceptable without repeating the prefix because they are already under the `AsiBackbone.Core` namespace;
 - ASP.NET Core, EF Core, OpenTelemetry, analyzer, and signing-provider types carry package-specific names where ambiguity is likely;
 - extension method names are readable and host-oriented, such as `AddAsiBackboneAspNetCore`, `AddAsiBackboneOpenTelemetryGovernanceEmission`, and `ApplyAsiBackboneConfigurations`.
 
@@ -75,7 +75,7 @@ The namespace layout was acceptable for `1.0.0` and is corrected here for the pu
 | `AsiBackbone.Core.Constraints` | Clear home for policy constraint abstractions and evaluation results. |
 | `AsiBackbone.Core.Decisions` | Clear home for composed governance decisions and outcomes. |
 | `AsiBackbone.Core.Evaluation` | Clear home for evaluator and decision policy contracts. |
-| `AsiBackbone.Core.Audit` | Clear home for audit residue, ledger records, lifecycle events, and ledger store contracts. |
+| `AsiBackbone.Core.Audit` | Clear home for decision receipt, ledger records, lifecycle events, and ledger store contracts. |
 | `AsiBackbone.Core.Handshakes` | Clear home for acknowledgment and responsibility-handshake primitives. |
 | `AsiBackbone.Core.CapabilityTokens` | Clear home for capability token abstractions. |
 | `AsiBackbone.Core.Emissions` | Clear home for provider-neutral governance emission contracts and envelopes. |
@@ -124,12 +124,12 @@ The reviewed extension points were acceptable for `1.0.0`:
 
 | Extension point | Review result |
 | --- | --- |
-| `IAsiBackboneActorContext` | Acceptable framework-neutral actor abstraction. Keeps host identity/authentication ownership explicit. |
-| `IAsiBackboneConstraint<TContext>` | Acceptable host-extensible constraint abstraction with async evaluation and cancellation support. |
-| `IAsiBackbonePolicyEvaluator<TContext>` | Acceptable composition point for converting constraint output into governance decisions. |
-| `IAsiBackboneDecisionPolicy` | Acceptable customization point for post-composition decision policy. |
-| `IAsiBackboneAuditSink` | Acceptable minimal audit emission contract. |
-| `IAsiBackboneAuditLedgerStore` | Acceptable framework-neutral persisted ledger store contract. |
+| `IGovernanceActorContext` | Acceptable framework-neutral actor abstraction. Keeps host identity/authentication ownership explicit. |
+| `IGovernanceConstraint<TContext>` | Acceptable host-extensible constraint abstraction with async evaluation and cancellation support. |
+| `IGovernancePolicyEvaluator<TContext>` | Acceptable composition point for converting constraint output into governance decisions. |
+| `IGovernanceDecisionPolicy` | Acceptable customization point for post-composition decision policy. |
+| `IDecisionReceiptSink` | Acceptable minimal audit emission contract. |
+| `IGovernanceAuditLedgerStore` | Acceptable framework-neutral persisted ledger store contract. |
 | ASP.NET Core actor/correlation/challenge services | Acceptable host adapter contracts. They should remain adapters, not host policy owners. |
 | `AddAsiBackboneAspNetCore` | Acceptable service-registration entry point. |
 | `ApplyAsiBackboneConfigurations` | Acceptable EF Core model configuration entry point for host-owned DbContexts. |
@@ -138,9 +138,9 @@ The `1.1.0` addendum recognizes additional stable extension seams:
 
 | Extension point | Review result |
 | --- | --- |
-| `IAsiBackboneGovernanceEmitter` | Acceptable provider-neutral governance emission seam. Concrete providers adapt this contract downstream. |
-| `IAsiBackboneGovernanceOutboxStore` | Acceptable provider-neutral durable outbox seam. Host/storage packages own persistence behavior. |
-| `AsiBackboneGovernanceOutboxDrain` | Acceptable provider-neutral drain helper. Concrete emission provider remains replaceable. |
+| `IGovernanceEmitter` | Acceptable provider-neutral governance emission seam. Concrete providers adapt this contract downstream. |
+| `IGovernanceOutboxStore` | Acceptable provider-neutral durable outbox seam. Host/storage packages own persistence behavior. |
+| `GovernanceOutboxDrain` | Acceptable provider-neutral drain helper. Concrete emission provider remains replaceable. |
 | OpenTelemetry governance emitter registration | Acceptable provider package registration boundary. Exporter configuration remains host-owned. |
 | Signing provider abstractions and verification policy seams | Acceptable provider-neutral trust-boundary seams. They do not imply production tamper-evidence by themselves. |
 | Managed-key signing adapter boundary | Acceptable adapter boundary when the host supplies the actual managed-key client and operational policy. |
@@ -153,9 +153,9 @@ Stable persisted or exported artifacts should remain covered by schema-version g
 
 Reviewed artifact families include:
 
-- audit residue;
+- decision receipt;
 - audit ledger records;
-- audit residue lifecycle events;
+- decision receipt lifecycle events;
 - acknowledgment and responsibility-handshake records;
 - capability token records;
 - governance emission envelopes and payload descriptors;

@@ -11,7 +11,7 @@ namespace AsiBackbone.Storage.InMemory.Outbox;
 /// This store is not durable across process restarts. Production hosts should use a durable provider such as EF Core or another host-owned storage adapter.
 /// Same-entry status transitions use single-process compare-and-swap updates so tests and local validation do not accidentally observe last-write-wins behavior.
 /// </remarks>
-public sealed class InMemoryGovernanceOutboxStore : IAsiBackboneGovernanceOutboxClaimStore
+public sealed class InMemoryGovernanceOutboxStore : IGovernanceOutboxClaimStore
 {
     private readonly ConcurrentDictionary<string, GovernanceOutboxEntry> entries = new(StringComparer.Ordinal);
 

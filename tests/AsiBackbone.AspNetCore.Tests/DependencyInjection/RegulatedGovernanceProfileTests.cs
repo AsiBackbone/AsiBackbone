@@ -26,11 +26,11 @@ public sealed class RegulatedGovernanceProfileTests
         _ = services.AddAsiBackboneRegulatedGovernance();
 
         using ServiceProvider provider = services.BuildServiceProvider(validateScopes: true);
-        AsiBackbonePolicyEvaluatorOptions evaluatorOptions = provider
-            .GetRequiredService<IOptions<AsiBackbonePolicyEvaluatorOptions>>()
+        GovernancePolicyOptions evaluatorOptions = provider
+            .GetRequiredService<IOptions<GovernancePolicyOptions>>()
             .Value;
-        AsiBackboneEndpointGovernanceOptions endpointOptions = provider
-            .GetRequiredService<IOptions<AsiBackboneEndpointGovernanceOptions>>()
+        EndpointGovernanceOptions endpointOptions = provider
+            .GetRequiredService<IOptions<EndpointGovernanceOptions>>()
             .Value;
 
         Assert.True(evaluatorOptions.DenyWhenNoConstraints);
@@ -45,7 +45,7 @@ public sealed class RegulatedGovernanceProfileTests
 
         using IServiceScope scope = provider.CreateScope();
         _ = scope.ServiceProvider.GetRequiredService<IGovernanceMetadataSanitizer>();
-        _ = scope.ServiceProvider.GetRequiredService<IAsiBackboneEndpointGovernanceService>();
+        _ = scope.ServiceProvider.GetRequiredService<IEndpointGovernanceService>();
     }
 
     /// <summary>
@@ -59,8 +59,8 @@ public sealed class RegulatedGovernanceProfileTests
         _ = services.AddAsiBackbone(builder => builder.UseRegulatedGovernanceProfile());
 
         using ServiceProvider provider = services.BuildServiceProvider(validateScopes: true);
-        AsiBackboneEndpointGovernanceOptions endpointOptions = provider
-            .GetRequiredService<IOptions<AsiBackboneEndpointGovernanceOptions>>()
+        EndpointGovernanceOptions endpointOptions = provider
+            .GetRequiredService<IOptions<EndpointGovernanceOptions>>()
             .Value;
 
         Assert.True(endpointOptions.RequireGovernanceMetadata);
@@ -92,11 +92,11 @@ public sealed class RegulatedGovernanceProfileTests
             static _ => Task.CompletedTask,
             new EndpointMetadataCollection(new RequireGovernancePolicyAttribute(typeof(RegulatedPolicy))),
             "regulated.operation");
-        var descriptor = AsiBackboneEndpointGovernanceDescriptor.FromEndpoint(endpoint);
-        IAsiBackboneEndpointGovernanceService governanceService = scope.ServiceProvider
-            .GetRequiredService<IAsiBackboneEndpointGovernanceService>();
+        var descriptor = EndpointGovernanceDescriptor.FromEndpoint(endpoint);
+        IEndpointGovernanceService governanceService = scope.ServiceProvider
+            .GetRequiredService<IEndpointGovernanceService>();
 
-        AsiBackboneEndpointGovernanceResult result = await governanceService
+        EndpointGovernanceResult result = await governanceService
             .EvaluateAsync(httpContext, descriptor, TestContext.Current.CancellationToken);
 
         Assert.False(result.CanExecute);

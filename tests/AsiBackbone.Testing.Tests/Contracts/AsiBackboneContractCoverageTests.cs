@@ -23,38 +23,38 @@ public sealed class AsiBackboneContractCoverageTests
     {
         GovernanceDecision decision = CreateSafeDecision(safeDecisionCase);
 
-        GovernanceDecision verifiedDecision = AsiBackboneDecisionContract.VerifySafeDecision(decision, "coverage decision");
+        GovernanceDecision verifiedDecision = GovernanceDecisionContract.VerifySafeDecision(decision, "coverage decision");
 
         Assert.Same(decision, verifiedDecision);
     }
 
     /// <summary>
-    /// Verifies that the VerifySafeDecision method rejects a null decision and throws an AsiBackboneContractViolationException with an appropriate message.
+    /// Verifies that the VerifySafeDecision method rejects a null decision and throws an GovernanceContractViolationException with an appropriate message.
     /// </summary>
     [Fact]
     public void VerifySafeDecisionRejectsNullDecision()
     {
-        AsiBackboneContractViolationException exception = Assert.Throws<AsiBackboneContractViolationException>(
-            () => AsiBackboneDecisionContract.VerifySafeDecision(null));
+        GovernanceContractViolationException exception = Assert.Throws<GovernanceContractViolationException>(
+            () => GovernanceDecisionContract.VerifySafeDecision(null));
 
         Assert.Contains("never return null", exception.Message, StringComparison.Ordinal);
     }
 
     /// <summary>
-    /// Verifies that the VerifyInvalidCapabilityGrantDoesNotAllow method rejects a denied decision and throws an AsiBackboneContractViolationException with an appropriate message.
+    /// Verifies that the VerifyInvalidCapabilityGrantDoesNotAllow method rejects a denied decision and throws an GovernanceContractViolationException with an appropriate message.
     /// </summary>
     [Fact]
     public void VerifyInvalidCapabilityGrantDoesNotAllowAcceptsDeniedDecision()
     {
         var decision = GovernanceDecision.Deny("contract.capability_denied", "Capability grant denied.");
 
-        GovernanceDecision verifiedDecision = AsiBackboneDecisionContract.VerifyInvalidCapabilityGrantDoesNotAllow(decision);
+        GovernanceDecision verifiedDecision = GovernanceDecisionContract.VerifyInvalidCapabilityGrantDoesNotAllow(decision);
 
         Assert.Same(decision, verifiedDecision);
     }
 
     /// <summary>
-    /// Verifies that the PolicyEvaluatorContract rejects a null decision returned by the policy evaluator and throws an AsiBackboneContractViolationException with an appropriate message.
+    /// Verifies that the PolicyEvaluatorContract rejects a null decision returned by the policy evaluator and throws an GovernanceContractViolationException with an appropriate message.
     /// </summary>
     /// <returns>
     /// A task representing the asynchronous operation.
@@ -64,14 +64,14 @@ public sealed class AsiBackboneContractCoverageTests
     {
         var contract = new PolicyEvaluatorContract(new NullDecisionPolicyEvaluator());
 
-        AsiBackboneContractViolationException exception = await Assert.ThrowsAsync<AsiBackboneContractViolationException>(
+        GovernanceContractViolationException exception = await Assert.ThrowsAsync<GovernanceContractViolationException>(
             async () => await contract.VerifyEvaluatorReturnsSafeDecisionAsync(TestContext.Current.CancellationToken));
 
         Assert.Contains("must return a decision", exception.Message, StringComparison.Ordinal);
     }
 
     /// <summary>
-    /// Verifies that the PolicyEvaluatorContract wraps any exceptions thrown by the policy evaluator and throws an AsiBackboneContractViolationException with an appropriate message and inner exception.
+    /// Verifies that the PolicyEvaluatorContract wraps any exceptions thrown by the policy evaluator and throws an GovernanceContractViolationException with an appropriate message and inner exception.
     /// </summary>
     /// <returns>
     /// A task representing the asynchronous operation.
@@ -81,7 +81,7 @@ public sealed class AsiBackboneContractCoverageTests
     {
         var contract = new PolicyEvaluatorContract(new ThrowingPolicyEvaluator());
 
-        AsiBackboneContractViolationException exception = await Assert.ThrowsAsync<AsiBackboneContractViolationException>(
+        GovernanceContractViolationException exception = await Assert.ThrowsAsync<GovernanceContractViolationException>(
             async () => await contract.VerifyEvaluatorReturnsSafeDecisionAsync(TestContext.Current.CancellationToken));
 
         Assert.Contains("must not fail open", exception.Message, StringComparison.Ordinal);
@@ -108,7 +108,7 @@ public sealed class AsiBackboneContractCoverageTests
     }
 
     /// <summary>
-    /// Verifies that the DecisionPolicyContract wraps any exceptions thrown by the decision policy and throws an AsiBackboneContractViolationException with an appropriate message and inner exception.
+    /// Verifies that the DecisionPolicyContract wraps any exceptions thrown by the decision policy and throws an GovernanceContractViolationException with an appropriate message and inner exception.
     /// </summary>
     /// <returns>
     /// A task representing the asynchronous operation.
@@ -118,7 +118,7 @@ public sealed class AsiBackboneContractCoverageTests
     {
         var contract = new DecisionPolicyContract(new ThrowingDecisionPolicy());
 
-        AsiBackboneContractViolationException exception = await Assert.ThrowsAsync<AsiBackboneContractViolationException>(
+        GovernanceContractViolationException exception = await Assert.ThrowsAsync<GovernanceContractViolationException>(
             async () => await contract.VerifyDecisionPolicyReturnsSafeDecisionAsync(TestContext.Current.CancellationToken));
 
         Assert.Contains("Decision-policy implementations", exception.Message, StringComparison.Ordinal);
@@ -169,7 +169,7 @@ public sealed class AsiBackboneContractCoverageTests
     {
         var contract = new ConstraintContract(new EmptyNameConstraint());
 
-        AsiBackboneContractViolationException exception = await Assert.ThrowsAsync<AsiBackboneContractViolationException>(
+        GovernanceContractViolationException exception = await Assert.ThrowsAsync<GovernanceContractViolationException>(
             async () => await contract.VerifyConstraintReturnsSafeResultAsync(TestContext.Current.CancellationToken));
 
         Assert.Contains("stable, non-empty", exception.Message, StringComparison.Ordinal);
@@ -186,14 +186,14 @@ public sealed class AsiBackboneContractCoverageTests
     {
         var contract = new ConstraintContract(new NullResultConstraint());
 
-        AsiBackboneContractViolationException exception = await Assert.ThrowsAsync<AsiBackboneContractViolationException>(
+        GovernanceContractViolationException exception = await Assert.ThrowsAsync<GovernanceContractViolationException>(
             async () => await contract.VerifyConstraintReturnsSafeResultAsync(TestContext.Current.CancellationToken));
 
         Assert.Contains("must return a result", exception.Message, StringComparison.Ordinal);
     }
 
     /// <summary>
-    /// Verifies that the ConstraintContract wraps any exceptions thrown by the constraint and throws an AsiBackboneContractViolationException with an appropriate message and inner exception.
+    /// Verifies that the ConstraintContract wraps any exceptions thrown by the constraint and throws an GovernanceContractViolationException with an appropriate message and inner exception.
     /// </summary>
     /// <returns>
     /// A task representing the asynchronous operation.
@@ -203,7 +203,7 @@ public sealed class AsiBackboneContractCoverageTests
     {
         var contract = new ConstraintContract(new ThrowingConstraint());
 
-        AsiBackboneContractViolationException exception = await Assert.ThrowsAsync<AsiBackboneContractViolationException>(
+        GovernanceContractViolationException exception = await Assert.ThrowsAsync<GovernanceContractViolationException>(
             async () => await contract.VerifyConstraintReturnsSafeResultAsync(TestContext.Current.CancellationToken));
 
         Assert.Contains("must not throw", exception.Message, StringComparison.Ordinal);
@@ -211,7 +211,7 @@ public sealed class AsiBackboneContractCoverageTests
     }
 
     /// <summary>
-    /// Verifies that the AuditSinkContract wraps any exceptions thrown by the audit sink and throws an AsiBackboneContractViolationException with an appropriate message and inner exception.
+    /// Verifies that the AuditSinkContract wraps any exceptions thrown by the audit sink and throws an GovernanceContractViolationException with an appropriate message and inner exception.
     /// </summary>
     /// <returns>
     /// A task representing the asynchronous operation.
@@ -221,7 +221,7 @@ public sealed class AsiBackboneContractCoverageTests
     {
         var contract = new AuditSinkContract(new ThrowingAuditSink());
 
-        AsiBackboneContractViolationException exception = await Assert.ThrowsAsync<AsiBackboneContractViolationException>(
+        GovernanceContractViolationException exception = await Assert.ThrowsAsync<GovernanceContractViolationException>(
             async () => await contract.VerifyAuditSinkAcceptsValidResidueAsync(TestContext.Current.CancellationToken));
 
         Assert.Contains("Audit sink implementations", exception.Message, StringComparison.Ordinal);
@@ -309,87 +309,87 @@ public sealed class AsiBackboneContractCoverageTests
     }
 
     private sealed class PolicyEvaluatorContract(
-        IAsiBackbonePolicyEvaluator<AsiBackboneConstraintEvaluationContext> evaluator)
-        : AsiBackbonePolicyEvaluatorContract<AsiBackboneConstraintEvaluationContext>
+        IGovernancePolicyEvaluator<GovernanceEvaluationContext> evaluator)
+        : GovernancePolicyEvaluatorContract<GovernanceEvaluationContext>
     {
-        protected override IAsiBackbonePolicyEvaluator<AsiBackboneConstraintEvaluationContext> CreateEvaluator()
+        protected override IGovernancePolicyEvaluator<GovernanceEvaluationContext> CreateEvaluator()
         {
             return evaluator;
         }
 
-        protected override AsiBackboneConstraintEvaluationContext CreateEvaluationContext()
+        protected override GovernanceEvaluationContext CreateEvaluationContext()
         {
             return CreateContractContext();
         }
     }
 
     private sealed class DecisionPolicyContract(
-        IAsiBackboneDecisionPolicy<AsiBackboneConstraintEvaluationContext> decisionPolicy)
-        : AsiBackboneDecisionPolicyContract<AsiBackboneConstraintEvaluationContext>
+        IGovernanceDecisionPolicy<GovernanceEvaluationContext> decisionPolicy)
+        : GovernanceDecisionPolicyContract<GovernanceEvaluationContext>
     {
-        protected override IAsiBackboneDecisionPolicy<AsiBackboneConstraintEvaluationContext> CreateDecisionPolicy()
+        protected override IGovernanceDecisionPolicy<GovernanceEvaluationContext> CreateDecisionPolicy()
         {
             return decisionPolicy;
         }
 
-        protected override AsiBackboneConstraintEvaluationContext CreateEvaluationContext()
+        protected override GovernanceEvaluationContext CreateEvaluationContext()
         {
             return CreateContractContext();
         }
     }
 
     private sealed class ConstraintContract(
-        IAsiBackboneConstraint<AsiBackboneConstraintEvaluationContext> constraint)
-        : AsiBackboneConstraintContract<AsiBackboneConstraintEvaluationContext>
+        IGovernanceConstraint<GovernanceEvaluationContext> constraint)
+        : GovernanceConstraintContract<GovernanceEvaluationContext>
     {
-        protected override IAsiBackboneConstraint<AsiBackboneConstraintEvaluationContext> CreateConstraint()
+        protected override IGovernanceConstraint<GovernanceEvaluationContext> CreateConstraint()
         {
             return constraint;
         }
 
-        protected override AsiBackboneConstraintEvaluationContext CreateEvaluationContext()
+        protected override GovernanceEvaluationContext CreateEvaluationContext()
         {
             return CreateContractContext();
         }
     }
 
-    private sealed class AuditSinkContract(IAsiBackboneAuditSink auditSink) : AsiBackboneAuditSinkContract
+    private sealed class AuditSinkContract(IDecisionReceiptSink auditSink) : DecisionReceiptSinkContract
     {
-        protected override IAsiBackboneAuditSink CreateAuditSink()
+        protected override IDecisionReceiptSink CreateAuditSink()
         {
             return auditSink;
         }
 
-        protected override IAsiBackboneAuditResidue CreateAuditResidue()
+        protected override IDecisionReceipt CreateAuditResidue()
         {
             return new TestAuditResidue();
         }
     }
 
-    private sealed class NullDecisionPolicyEvaluator : IAsiBackbonePolicyEvaluator<AsiBackboneConstraintEvaluationContext>
+    private sealed class NullDecisionPolicyEvaluator : IGovernancePolicyEvaluator<GovernanceEvaluationContext>
     {
         public ValueTask<GovernanceDecision> EvaluateAsync(
-            AsiBackboneConstraintEvaluationContext context,
+            GovernanceEvaluationContext context,
             CancellationToken cancellationToken = default)
         {
             return ValueTask.FromResult<GovernanceDecision>(null!);
         }
     }
 
-    private sealed class ThrowingPolicyEvaluator : IAsiBackbonePolicyEvaluator<AsiBackboneConstraintEvaluationContext>
+    private sealed class ThrowingPolicyEvaluator : IGovernancePolicyEvaluator<GovernanceEvaluationContext>
     {
         public ValueTask<GovernanceDecision> EvaluateAsync(
-            AsiBackboneConstraintEvaluationContext context,
+            GovernanceEvaluationContext context,
             CancellationToken cancellationToken = default)
         {
             throw new InvalidOperationException("Policy evaluator failed.");
         }
     }
 
-    private sealed class PassthroughDecisionPolicy : IAsiBackboneDecisionPolicy<AsiBackboneConstraintEvaluationContext>
+    private sealed class PassthroughDecisionPolicy : IGovernanceDecisionPolicy<GovernanceEvaluationContext>
     {
         public ValueTask<GovernanceDecision> ApplyAsync(
-            AsiBackboneConstraintEvaluationContext context,
+            GovernanceEvaluationContext context,
             GovernanceDecision composedDecision,
             IReadOnlyList<ConstraintEvaluationResult> constraintResults,
             CancellationToken cancellationToken = default)
@@ -398,10 +398,10 @@ public sealed class AsiBackboneContractCoverageTests
         }
     }
 
-    private sealed class ThrowingDecisionPolicy : IAsiBackboneDecisionPolicy<AsiBackboneConstraintEvaluationContext>
+    private sealed class ThrowingDecisionPolicy : IGovernanceDecisionPolicy<GovernanceEvaluationContext>
     {
         public ValueTask<GovernanceDecision> ApplyAsync(
-            AsiBackboneConstraintEvaluationContext context,
+            GovernanceEvaluationContext context,
             GovernanceDecision composedDecision,
             IReadOnlyList<ConstraintEvaluationResult> constraintResults,
             CancellationToken cancellationToken = default)
@@ -410,77 +410,77 @@ public sealed class AsiBackboneContractCoverageTests
         }
     }
 
-    private sealed class AllowingConstraint : IAsiBackboneConstraint<AsiBackboneConstraintEvaluationContext>
+    private sealed class AllowingConstraint : IGovernanceConstraint<GovernanceEvaluationContext>
     {
         public string Name => "contract.allow";
 
         public ValueTask<ConstraintEvaluationResult> EvaluateAsync(
-            AsiBackboneConstraintEvaluationContext context,
+            GovernanceEvaluationContext context,
             CancellationToken cancellationToken = default)
         {
             return ValueTask.FromResult(ConstraintEvaluationResult.Allow());
         }
     }
 
-    private sealed class DenyingConstraint : IAsiBackboneConstraint<AsiBackboneConstraintEvaluationContext>
+    private sealed class DenyingConstraint : IGovernanceConstraint<GovernanceEvaluationContext>
     {
         public string Name => "contract.deny";
 
         public ValueTask<ConstraintEvaluationResult> EvaluateAsync(
-            AsiBackboneConstraintEvaluationContext context,
+            GovernanceEvaluationContext context,
             CancellationToken cancellationToken = default)
         {
             return ValueTask.FromResult(ConstraintEvaluationResult.Deny("contract.constraint_denied", "Constraint denied."));
         }
     }
 
-    private sealed class EmptyNameConstraint : IAsiBackboneConstraint<AsiBackboneConstraintEvaluationContext>
+    private sealed class EmptyNameConstraint : IGovernanceConstraint<GovernanceEvaluationContext>
     {
         public string Name => " ";
 
         public ValueTask<ConstraintEvaluationResult> EvaluateAsync(
-            AsiBackboneConstraintEvaluationContext context,
+            GovernanceEvaluationContext context,
             CancellationToken cancellationToken = default)
         {
             return ValueTask.FromResult(ConstraintEvaluationResult.Allow());
         }
     }
 
-    private sealed class NullResultConstraint : IAsiBackboneConstraint<AsiBackboneConstraintEvaluationContext>
+    private sealed class NullResultConstraint : IGovernanceConstraint<GovernanceEvaluationContext>
     {
         public string Name => "contract.null_result";
 
         public ValueTask<ConstraintEvaluationResult> EvaluateAsync(
-            AsiBackboneConstraintEvaluationContext context,
+            GovernanceEvaluationContext context,
             CancellationToken cancellationToken = default)
         {
             return ValueTask.FromResult<ConstraintEvaluationResult>(null!);
         }
     }
 
-    private sealed class ThrowingConstraint : IAsiBackboneConstraint<AsiBackboneConstraintEvaluationContext>
+    private sealed class ThrowingConstraint : IGovernanceConstraint<GovernanceEvaluationContext>
     {
         public string Name => "contract.throwing";
 
         public ValueTask<ConstraintEvaluationResult> EvaluateAsync(
-            AsiBackboneConstraintEvaluationContext context,
+            GovernanceEvaluationContext context,
             CancellationToken cancellationToken = default)
         {
             throw new InvalidOperationException("Constraint failed.");
         }
     }
 
-    private sealed class ThrowingAuditSink : IAsiBackboneAuditSink
+    private sealed class ThrowingAuditSink : IDecisionReceiptSink
     {
         public ValueTask WriteAsync(
-            IAsiBackboneAuditResidue residue,
+            IDecisionReceipt residue,
             CancellationToken cancellationToken = default)
         {
             throw new InvalidOperationException("Audit sink failed.");
         }
     }
 
-    private sealed class TestAuditResidue : IAsiBackboneAuditResidue
+    private sealed class TestAuditResidue : IDecisionReceipt
     {
         public string EventId => "contract-event";
 
@@ -488,7 +488,7 @@ public sealed class AsiBackboneContractCoverageTests
 
         public string ActorId => "contract-actor";
 
-        public AsiBackboneActorType ActorType => AsiBackboneActorType.System;
+        public GovernanceActorType ActorType => GovernanceActorType.System;
 
         public string? ActorDisplayName => "Contract Actor";
 
@@ -512,9 +512,9 @@ public sealed class AsiBackboneContractCoverageTests
         };
     }
 
-    private static AsiBackboneConstraintEvaluationContext CreateContractContext()
+    private static GovernanceEvaluationContext CreateContractContext()
     {
-        return new AsiBackboneConstraintEvaluationContext(
+        return new GovernanceEvaluationContext(
             correlationId: "contract-correlation",
             policyVersion: "contract-policy-v1",
             policyHash: "contract-policy-hash");

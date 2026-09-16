@@ -1,6 +1,6 @@
 # Core Governance Flow Diagrams
 
-This page provides lightweight Mermaid diagrams for the main AsiBackbone governance flows. The diagrams are intentionally implementation-facing: they show where the package family can help structure policy evaluation, acknowledgment, audit residue, capability boundaries, and optional governance emission without claiming that AsiBackbone owns the host application's execution path.
+This page provides lightweight Mermaid diagrams for the main AsiBackbone governance flows. The diagrams are intentionally implementation-facing: they show where the package family can help structure policy evaluation, acknowledgment, decision receipt, capability boundaries, and optional governance emission without claiming that AsiBackbone owns the host application's execution path.
 
 > [!IMPORTANT]
 > In this software project, **ASI** means **Accountable Systems Infrastructure**. AsiBackbone is a governance spine for accountable software decision flow, not an intelligence engine, model host, robotics controller, compliance certification system, or production tamper-evidence provider by itself.
@@ -10,11 +10,11 @@ This page provides lightweight Mermaid diagrams for the main AsiBackbone governa
 - **Host-owned execution** means the consumer application still owns authorization, business rules, side effects, infrastructure access, database provider choices, retries, and operational safeguards.
 - **Released provider** means a package exists in the stable package family.
 - **Design-only** or **strategy-only** means the surface is documentation or future-provider strategy unless a later stable release explicitly ships it.
-- **Audit residue** and **outbox records** are governance records. They do not replace host security controls, legal review, operational monitoring, or production key custody.
+- **Decision receipt** and **outbox records** are governance records. They do not replace host security controls, legal review, operational monitoring, or production key custody.
 
 ## Intent-to-execution spine
 
-This diagram shows the highest-level flow: a request enters the governance spine, receives a decision, may require acknowledgment, may produce audit residue or outbox records, and only reaches execution through a host-owned boundary.
+This diagram shows the highest-level flow: a request enters the governance spine, receives a decision, may require acknowledgment, may produce decision receipt or outbox records, and only reaches execution through a host-owned boundary.
 
 ```mermaid
 flowchart LR
@@ -22,7 +22,7 @@ flowchart LR
     Context --> Constraints["Evaluate constraints"]
     Constraints --> Decision["GovernanceDecision"]
 
-    Decision -->|"Allowed or Warning"| PersistBeforeExecution["Persist audit residue or outbox before execution"]
+    Decision -->|"Allowed or Warning"| PersistBeforeExecution["Persist decision receipt or outbox before execution"]
     Decision -->|"AcknowledgmentRequired"| Ack["Host-owned acknowledgment challenge"]
     Ack -->|"Accepted and host policy permits"| PersistBeforeExecution
     Ack -->|"Rejected or incomplete"| PersistNoExecution["Persist governed outcome and do not execute"]
@@ -104,7 +104,7 @@ This diagram separates local durable governance records from optional external o
 
 ```mermaid
 flowchart LR
-    Decision["GovernanceDecision"] --> Residue["Audit residue"]
+    Decision["GovernanceDecision"] --> Residue["Decision receipt"]
     Residue --> LocalDurable["Host-owned durable audit ledger or outbox"]
     LocalDurable --> Drain["Hosted outbox drain with retry policy"]
     Drain --> OTel["Released OpenTelemetry provider"]

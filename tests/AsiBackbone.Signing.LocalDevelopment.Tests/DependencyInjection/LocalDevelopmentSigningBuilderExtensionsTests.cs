@@ -27,9 +27,9 @@ public sealed class LocalDevelopmentSigningBuilderExtensionsTests
         using ServiceProvider provider = services.BuildServiceProvider();
         LocalDevelopmentSigningOptions options = provider.GetRequiredService<LocalDevelopmentSigningOptions>();
         LocalDevelopmentSigningService concrete = provider.GetRequiredService<LocalDevelopmentSigningService>();
-        IAsiBackboneSigningService signing = provider.GetRequiredService<IAsiBackboneSigningService>();
-        IAsiBackboneSignatureVerificationService verification =
-            provider.GetRequiredService<IAsiBackboneSignatureVerificationService>();
+        IGovernanceSigningService signing = provider.GetRequiredService<IGovernanceSigningService>();
+        IGovernanceSignatureVerificationService verification =
+            provider.GetRequiredService<IGovernanceSignatureVerificationService>();
 
         Assert.Equal(LocalDevelopmentSigningOptions.DefaultProviderName, options.ProviderName);
         Assert.Equal(LocalDevelopmentSigningOptions.DefaultKeyId, options.KeyId);
@@ -65,9 +65,9 @@ public sealed class LocalDevelopmentSigningBuilderExtensionsTests
         using ServiceProvider provider = services.BuildServiceProvider();
         LocalDevelopmentSigningOptions resolved = provider.GetRequiredService<LocalDevelopmentSigningOptions>();
         LocalDevelopmentSigningService concrete = provider.GetRequiredService<LocalDevelopmentSigningService>();
-        IAsiBackboneSigningService signing = provider.GetRequiredService<IAsiBackboneSigningService>();
-        IAsiBackboneSignatureVerificationService verification =
-            provider.GetRequiredService<IAsiBackboneSignatureVerificationService>();
+        IGovernanceSigningService signing = provider.GetRequiredService<IGovernanceSigningService>();
+        IGovernanceSignatureVerificationService verification =
+            provider.GetRequiredService<IGovernanceSignatureVerificationService>();
 
         Assert.Same(configured, resolved);
         Assert.Equal("local-test-provider", resolved.ProviderName);
@@ -138,12 +138,12 @@ public sealed class LocalDevelopmentSigningBuilderExtensionsTests
                 && descriptor.Lifetime == ServiceLifetime.Singleton);
         Assert.Contains(
             services,
-            descriptor => descriptor.ServiceType == typeof(IAsiBackboneSigningService)
+            descriptor => descriptor.ServiceType == typeof(IGovernanceSigningService)
                 && descriptor.ImplementationFactory is not null
                 && descriptor.Lifetime == ServiceLifetime.Singleton);
         Assert.Contains(
             services,
-            descriptor => descriptor.ServiceType == typeof(IAsiBackboneSignatureVerificationService)
+            descriptor => descriptor.ServiceType == typeof(IGovernanceSignatureVerificationService)
                 && descriptor.ImplementationFactory is not null
                 && descriptor.Lifetime == ServiceLifetime.Singleton);
     }

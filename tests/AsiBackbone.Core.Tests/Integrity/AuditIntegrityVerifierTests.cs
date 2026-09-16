@@ -419,7 +419,7 @@ public sealed class AuditIntegrityVerifierTests
             recordHash.HashValue.ToUpperInvariant(),
             recordHash.HashAlgorithm.ToLowerInvariant(),
             recordHash.CanonicalizationVersion,
-            AsiBackboneSchemaVersions.StableArtifactsV1,
+            GovernanceSchemaVersions.StableArtifactsV1,
             Now,
             new Dictionary<string, string>
             {
@@ -453,7 +453,7 @@ public sealed class AuditIntegrityVerifierTests
                 recordHash.HashValue,
                 recordHash.HashAlgorithm,
                 recordHash.CanonicalizationVersion,
-                AsiBackboneSchemaVersions.StableArtifactsV1,
+                GovernanceSchemaVersions.StableArtifactsV1,
                 Now));
     }
 
@@ -489,7 +489,7 @@ public sealed class AuditIntegrityVerifierTests
             recordHash.HashValue,
             recordHash.HashAlgorithm,
             recordHash.CanonicalizationVersion,
-            AsiBackboneSchemaVersions.StableArtifactsV1,
+            GovernanceSchemaVersions.StableArtifactsV1,
             Now.AddSeconds(sequence));
 
         return AuditIntegrityLink.Rehydrate(
@@ -511,7 +511,7 @@ public sealed class AuditIntegrityVerifierTests
         var payload = CanonicalPayload.Create(
             CanonicalArtifactTypes.AuditLedgerRecord,
             recordId,
-            AsiBackboneSchemaVersions.StableArtifactsV1,
+            GovernanceSchemaVersions.StableArtifactsV1,
             CanonicalPayloadOptions.DefaultCanonicalizationVersion,
             new Dictionary<string, object?>
             {

@@ -101,7 +101,7 @@ public sealed class EndpointGovernanceMetadataSanitizationTests
     [Fact]
     public void ToEvaluationContextCanTreatSuppliedMetadataAsAuthoritative()
     {
-        var correlation = new AsiBackboneHttpRequestCorrelation(
+        var correlation = new GovernanceHttpRequestCorrelation(
             correlationId: "correlation-1",
             metadata: new Dictionary<string, string>(StringComparer.Ordinal)
             {
@@ -112,8 +112,8 @@ public sealed class EndpointGovernanceMetadataSanitizationTests
             [" endpoint.operation_name "] = " sample "
         };
 
-        AsiBackboneConstraintEvaluationContext merged = correlation.ToEvaluationContext(metadata: supplied);
-        AsiBackboneConstraintEvaluationContext authoritative = correlation.ToEvaluationContext(
+        GovernanceEvaluationContext merged = correlation.ToEvaluationContext(metadata: supplied);
+        GovernanceEvaluationContext authoritative = correlation.ToEvaluationContext(
             metadata: supplied,
             mergeRequestMetadata: false);
 
@@ -122,15 +122,15 @@ public sealed class EndpointGovernanceMetadataSanitizationTests
         Assert.Equal("sample", authoritative.Metadata["endpoint.operation_name"]);
     }
 
-    private static async Task<AsiBackboneEndpointGovernanceResult> EvaluateAsync(
+    private static async Task<EndpointGovernanceResult> EvaluateAsync(
         IGovernanceMetadataSanitizer sanitizer,
         CapturingPolicyEvaluator evaluator)
     {
         using ServiceProvider services = new ServiceCollection()
             .AddSingleton(sanitizer)
             .AddAsiBackboneAspNetCore()
-            .AddSingleton<IAsiBackbonePolicyEvaluator<AsiBackboneConstraintEvaluationContext>>(evaluator)
-            .AddSingleton<IAsiBackboneHttpRequestCorrelationResolver>(new StubCorrelationResolver())
+            .AddSingleton<IGovernancePolicyEvaluator<GovernanceEvaluationContext>>(evaluator)
+            .AddSingleton<IHttpGovernanceRequestCorrelationResolver>(new StubCorrelationResolver())
             .BuildServiceProvider(validateScopes: true);
 
         using IServiceScope scope = services.CreateScope();
@@ -145,9 +145,9 @@ public sealed class EndpointGovernanceMetadataSanitizationTests
             static _ => Task.CompletedTask,
             new EndpointMetadataCollection(new RequireGovernancePolicyAttribute(typeof(SanitizationPolicy))),
             "sample.sanitization");
-        var descriptor = AsiBackboneEndpointGovernanceDescriptor.FromEndpoint(endpoint);
-        IAsiBackboneEndpointGovernanceService service =
-            scope.ServiceProvider.GetRequiredService<IAsiBackboneEndpointGovernanceService>();
+        var descriptor = EndpointGovernanceDescriptor.FromEndpoint(endpoint);
+        IEndpointGovernanceService service =
+            scope.ServiceProvider.GetRequiredService<IEndpointGovernanceService>();
 
         return await service.EvaluateAsync(httpContext, descriptor, TestContext.Current.CancellationToken);
     }
@@ -156,11 +156,11 @@ public sealed class EndpointGovernanceMetadataSanitizationTests
     {
     }
 
-    private sealed class StubCorrelationResolver : IAsiBackboneHttpRequestCorrelationResolver
+    private sealed class StubCorrelationResolver : IHttpGovernanceRequestCorrelationResolver
     {
-        public AsiBackboneHttpRequestCorrelation ResolveRequestCorrelation()
+        public GovernanceHttpRequestCorrelation ResolveRequestCorrelation()
         {
-            return new AsiBackboneHttpRequestCorrelation(
+            return new GovernanceHttpRequestCorrelation(
                 correlationId: "correlation-sanitization",
                 traceId: "trace-sanitization",
                 metadata: new Dictionary<string, string>(StringComparer.Ordinal)
@@ -225,12 +225,12 @@ public sealed class EndpointGovernanceMetadataSanitizationTests
         }
     }
 
-    private sealed class CapturingPolicyEvaluator : IAsiBackbonePolicyEvaluator<AsiBackboneConstraintEvaluationContext>
+    private sealed class CapturingPolicyEvaluator : IGovernancePolicyEvaluator<GovernanceEvaluationContext>
     {
         public IReadOnlyDictionary<string, string>? CapturedMetadata { get; private set; }
 
         public ValueTask<GovernanceDecision> EvaluateAsync(
-            AsiBackboneConstraintEvaluationContext context,
+            GovernanceEvaluationContext context,
             CancellationToken cancellationToken = default)
         {
             CapturedMetadata = context.Metadata;

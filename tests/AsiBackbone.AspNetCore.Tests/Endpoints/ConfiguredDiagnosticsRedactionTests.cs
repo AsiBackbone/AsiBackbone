@@ -18,7 +18,7 @@ public sealed class ConfiguredDiagnosticsRedactionTests
     [Fact]
     public void ConfiguredMetadataKeyIsRedactedCaseInsensitively()
     {
-        var options = new AsiBackboneEndpointGovernanceOptions();
+        var options = new EndpointGovernanceOptions();
         _ = options.DevelopmentDiagnosticsRedactedMetadataKeys.Add("tenant.reference");
 
         Assert.True(ShouldRedact(options, "TENANT.REFERENCE"));
@@ -38,10 +38,10 @@ public sealed class ConfiguredDiagnosticsRedactionTests
     [InlineData("signing.key")]
     public void SensitiveNameMetadataKeyIsRedacted(string key)
     {
-        Assert.True(ShouldRedact(new AsiBackboneEndpointGovernanceOptions(), key));
+        Assert.True(ShouldRedact(new EndpointGovernanceOptions(), key));
     }
 
-    private static bool ShouldRedact(AsiBackboneEndpointGovernanceOptions options, string key)
+    private static bool ShouldRedact(EndpointGovernanceOptions options, string key)
     {
         return (bool)ShouldRedactMethod.Invoke(null, [options, key])!;
     }

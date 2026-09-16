@@ -10,16 +10,16 @@ namespace AsiBackbone.Core.Tests.Audit;
 public sealed class AuditLedgerRecordTests
 {
     /// <summary>
-    /// Verifies that <see cref="AuditLedgerRecord.FromResidue"/> correctly copies all relevant fields from an <see cref="IAsiBackboneAuditResidue"/> instance, including normalization of string fields and proper handling of timestamps and metadata. This test ensures that the resulting <see cref="AuditLedgerRecord"/> accurately reflects the information contained in the source residue while also applying any necessary transformations or defaults for missing optional fields.
+    /// Verifies that <see cref="AuditLedgerRecord.FromResidue"/> correctly copies all relevant fields from an <see cref="IDecisionReceipt"/> instance, including normalization of string fields and proper handling of timestamps and metadata. This test ensures that the resulting <see cref="AuditLedgerRecord"/> accurately reflects the information contained in the source residue while also applying any necessary transformations or defaults for missing optional fields.
     /// </summary>
     [Fact]
     public void FromResidueCopiesAuditResidueFieldsAndLedgerReferences()
     {
-        var actor = AsiBackboneActorContext.Human(" user-123 ", " Chris ");
+        var actor = GovernanceActorContext.Human(" user-123 ", " Chris ");
         DateTimeOffset occurredUtc = new(2026, 6, 4, 7, 0, 0, TimeSpan.FromHours(-5));
         DateTimeOffset recordedUtc = new(2026, 6, 4, 8, 0, 0, TimeSpan.FromHours(-5));
 
-        var residue = AuditResidue.Create(
+        var residue = DecisionReceipt.Create(
             actor,
             " document.approve ",
             " Allowed ",
@@ -53,7 +53,7 @@ public sealed class AuditLedgerRecordTests
         Assert.Equal(new DateTimeOffset(2026, 6, 4, 12, 0, 0, TimeSpan.Zero), record.OccurredUtc);
         Assert.Equal(new DateTimeOffset(2026, 6, 4, 13, 0, 0, TimeSpan.Zero), record.RecordedUtc);
         Assert.Equal("user-123", record.ActorId);
-        Assert.Equal(AsiBackboneActorType.Human, record.ActorType);
+        Assert.Equal(GovernanceActorType.Human, record.ActorType);
         Assert.Equal("Chris", record.ActorDisplayName);
         Assert.Equal("document.approve", record.OperationName);
         Assert.Equal("Allowed", record.Outcome);
@@ -76,14 +76,14 @@ public sealed class AuditLedgerRecordTests
     }
 
     /// <summary>
-    /// Verifies that the object returned by <see cref="AuditLedgerRecord.FromResidue"/> implements the <see cref="IAsiBackboneAuditResidue"/> interface, ensuring that it can be used interchangeably with other audit residue implementations in contexts where the interface is expected. This test confirms that the factory method produces an object that adheres to the required contract for audit residues, allowing it to be seamlessly integrated into existing systems and workflows that rely on the <see cref="IAsiBackboneAuditResidue"/> abstraction.
+    /// Verifies that the object returned by <see cref="AuditLedgerRecord.FromResidue"/> implements the <see cref="IDecisionReceipt"/> interface, ensuring that it can be used interchangeably with other audit residue implementations in contexts where the interface is expected. This test confirms that the factory method produces an object that adheres to the required contract for audit residues, allowing it to be seamlessly integrated into existing systems and workflows that rely on the <see cref="IDecisionReceipt"/> abstraction.
     /// </summary>
     [Fact]
     public void FromResidueImplementsAuditResidueContract()
     {
         var record = AuditLedgerRecord.FromResidue(CreateValidResidue());
 
-        _ = Assert.IsType<IAsiBackboneAuditResidue>(record, exactMatch: false);
+        _ = Assert.IsType<IDecisionReceipt>(record, exactMatch: false);
     }
 
     /// <summary>
@@ -173,7 +173,7 @@ public sealed class AuditLedgerRecordTests
     }
 
     /// <summary>
-    /// Verifies that <see cref="AuditLedgerRecord.FromResidue"/> correctly handles cases where the source <see cref="IAsiBackboneAuditResidue"/> has a null or empty collection of reason codes. The resulting <see cref="AuditLedgerRecord"/> should have an empty collection for <see cref="AuditLedgerRecord.ReasonCodes"/> and the <see cref="AuditLedgerRecord.HasReasonCodes"/> property should return false, indicating that there are no valid reason codes associated with the record. This test ensures that the factory method gracefully handles cases where reason codes are not provided, without throwing exceptions or producing invalid state in the resulting audit ledger record.
+    /// Verifies that <see cref="AuditLedgerRecord.FromResidue"/> correctly handles cases where the source <see cref="IDecisionReceipt"/> has a null or empty collection of reason codes. The resulting <see cref="AuditLedgerRecord"/> should have an empty collection for <see cref="AuditLedgerRecord.ReasonCodes"/> and the <see cref="AuditLedgerRecord.HasReasonCodes"/> property should return false, indicating that there are no valid reason codes associated with the record. This test ensures that the factory method gracefully handles cases where reason codes are not provided, without throwing exceptions or producing invalid state in the resulting audit ledger record.
     /// </summary>
     [Fact]
     public void FromResidueWithNoReasonCodesHasNoReasonCodes()
@@ -188,7 +188,7 @@ public sealed class AuditLedgerRecordTests
     }
 
     /// <summary>
-    /// Verifies that <see cref="AuditLedgerRecord.FromResidue"/> correctly merges metadata from both the source <see cref="IAsiBackboneAuditResidue"/> and the optional metadata parameter, with the ledger metadata taking precedence in cases of duplicate keys. This test ensures that the resulting <see cref="AuditLedgerRecord.Metadata"/> contains a combined set of key-value pairs from both sources, with any keys present in both collections being overridden by the values from the ledger metadata. This behavior is important for allowing callers to provide additional context or override existing metadata when creating audit ledger records, while still preserving relevant information from the original residue.
+    /// Verifies that <see cref="AuditLedgerRecord.FromResidue"/> correctly merges metadata from both the source <see cref="IDecisionReceipt"/> and the optional metadata parameter, with the ledger metadata taking precedence in cases of duplicate keys. This test ensures that the resulting <see cref="AuditLedgerRecord.Metadata"/> contains a combined set of key-value pairs from both sources, with any keys present in both collections being overridden by the values from the ledger metadata. This behavior is important for allowing callers to provide additional context or override existing metadata when creating audit ledger records, while still preserving relevant information from the original residue.
     /// </summary>
     [Fact]
     public void FromResidueMergesResidueAndLedgerMetadataAndLedgerOverridesDuplicateKeys()
@@ -244,7 +244,7 @@ public sealed class AuditLedgerRecordTests
     }
 
     /// <summary>
-    /// Verifies that <see cref="AuditLedgerRecord.FromResidue"/> correctly handles cases where the source <see cref="IAsiBackboneAuditResidue"/> has a null or empty metadata collection. The resulting <see cref="AuditLedgerRecord"/> should have an empty collection for <see cref="AuditLedgerRecord.Metadata"/> and the <see cref="AuditLedgerRecord.HasMetadata"/> property should return false, indicating that there is no metadata associated with the record. This test ensures that the factory method gracefully handles cases where metadata is not provided in the source residue, without throwing exceptions or producing invalid state in the resulting audit ledger record.
+    /// Verifies that <see cref="AuditLedgerRecord.FromResidue"/> correctly handles cases where the source <see cref="IDecisionReceipt"/> has a null or empty metadata collection. The resulting <see cref="AuditLedgerRecord"/> should have an empty collection for <see cref="AuditLedgerRecord.Metadata"/> and the <see cref="AuditLedgerRecord.HasMetadata"/> property should return false, indicating that there is no metadata associated with the record. This test ensures that the factory method gracefully handles cases where metadata is not provided in the source residue, without throwing exceptions or producing invalid state in the resulting audit ledger record.
     /// </summary>
     [Fact]
     public void FromResidueWithNullMetadataSourcesHasNoMetadata()
@@ -259,7 +259,7 @@ public sealed class AuditLedgerRecordTests
     }
 
     /// <summary>
-    /// Verifies that <see cref="AuditLedgerRecord.FromResidue"/> correctly handles cases where the source <see cref="IAsiBackboneAuditResidue"/> has an empty metadata collection. The resulting <see cref="AuditLedgerRecord"/> should have an empty collection for <see cref="AuditLedgerRecord.Metadata"/> and the <see cref="AuditLedgerRecord.HasMetadata"/> property should return false, indicating that there is no metadata associated with the record. This test ensures that the factory method gracefully handles cases where metadata is provided as an empty collection in the source residue, without throwing exceptions or producing invalid state in the resulting audit ledger record.
+    /// Verifies that <see cref="AuditLedgerRecord.FromResidue"/> correctly handles cases where the source <see cref="IDecisionReceipt"/> has an empty metadata collection. The resulting <see cref="AuditLedgerRecord"/> should have an empty collection for <see cref="AuditLedgerRecord.Metadata"/> and the <see cref="AuditLedgerRecord.HasMetadata"/> property should return false, indicating that there is no metadata associated with the record. This test ensures that the factory method gracefully handles cases where metadata is provided as an empty collection in the source residue, without throwing exceptions or producing invalid state in the resulting audit ledger record.
     /// </summary>
     [Fact]
     public void FromResidueWithEmptyMetadataSourcesHasNoMetadata()
@@ -276,7 +276,7 @@ public sealed class AuditLedgerRecordTests
     }
 
     /// <summary>
-    /// Verifies that the collections for reason codes and metadata in the object returned by <see cref="AuditLedgerRecord.FromResidue"/> do not alias the source collections from the input <see cref="IAsiBackboneAuditResidue"/> or the optional metadata parameter. Modifying the original collections after creating the audit ledger record should not affect the contents of the record's reason codes or metadata, confirming that defensive copying is performed to maintain immutability and prevent unintended side effects. This test ensures that the integrity of the audit ledger record is preserved regardless of changes to the source collections after its creation.
+    /// Verifies that the collections for reason codes and metadata in the object returned by <see cref="AuditLedgerRecord.FromResidue"/> do not alias the source collections from the input <see cref="IDecisionReceipt"/> or the optional metadata parameter. Modifying the original collections after creating the audit ledger record should not affect the contents of the record's reason codes or metadata, confirming that defensive copying is performed to maintain immutability and prevent unintended side effects. This test ensures that the integrity of the audit ledger record is preserved regardless of changes to the source collections after its creation.
     /// </summary>
     [Fact]
     public void FromResidueDoesNotAliasSourceCollections()
@@ -335,7 +335,7 @@ public sealed class AuditLedgerRecordTests
     }
 
     /// <summary>
-    /// Verifies that the metadata collection in the object returned by <see cref="AuditLedgerRecord.FromResidue"/> cannot be mutated through casts to mutable dictionary types even when the source <see cref="IAsiBackboneAuditResidue"/> has an empty metadata collection. Attempting to cast the <see cref="AuditLedgerRecord.Metadata"/> property to either a generic <see cref="IDictionary{TKey, TValue}"/> or a non-generic <c>IDictionary</c> and modify it should result in an exception, confirming that the metadata is exposed as a read-only collection and cannot be altered after the audit ledger record has been created, regardless of the initial state of the source metadata. This test ensures that the immutability of the metadata is consistently enforced at runtime, preventing any modifications that could compromise the integrity of the audit record even when starting with no metadata.
+    /// Verifies that the metadata collection in the object returned by <see cref="AuditLedgerRecord.FromResidue"/> cannot be mutated through casts to mutable dictionary types even when the source <see cref="IDecisionReceipt"/> has an empty metadata collection. Attempting to cast the <see cref="AuditLedgerRecord.Metadata"/> property to either a generic <see cref="IDictionary{TKey, TValue}"/> or a non-generic <c>IDictionary</c> and modify it should result in an exception, confirming that the metadata is exposed as a read-only collection and cannot be altered after the audit ledger record has been created, regardless of the initial state of the source metadata. This test ensures that the immutability of the metadata is consistently enforced at runtime, preventing any modifications that could compromise the integrity of the audit record even when starting with no metadata.
     /// </summary>
     [Fact]
     public void EmptyMetadataCannotBeMutatedThroughDictionaryCasts()
@@ -352,7 +352,7 @@ public sealed class AuditLedgerRecordTests
     }
 
     /// <summary>
-    /// Verifies that <see cref="AuditLedgerRecord.FromResidue"/> throws an <see cref="ArgumentNullException"/> when the input <see cref="IAsiBackboneAuditResidue"/> parameter is null. This test ensures that the factory method enforces the requirement for a valid audit residue to create an audit ledger record, and that it provides a clear and specific exception when this precondition is not met. Proper handling of null inputs is critical for preventing unexpected errors and maintaining the robustness of the audit logging system.
+    /// Verifies that <see cref="AuditLedgerRecord.FromResidue"/> throws an <see cref="ArgumentNullException"/> when the input <see cref="IDecisionReceipt"/> parameter is null. This test ensures that the factory method enforces the requirement for a valid audit residue to create an audit ledger record, and that it provides a clear and specific exception when this precondition is not met. Proper handling of null inputs is critical for preventing unexpected errors and maintaining the robustness of the audit logging system.
     /// </summary>
     [Fact]
     public void FromResidueThrowsForMissingResidue()
@@ -362,10 +362,10 @@ public sealed class AuditLedgerRecordTests
     }
 
     /// <summary>
-    /// Verifies that <see cref="AuditLedgerRecord.FromResidue"/> throws an appropriate exception when the input <see cref="IAsiBackboneAuditResidue"/> contains invalid values for required fields such as <see cref="IAsiBackboneAuditResidue.EventId"/>, <see cref="IAsiBackboneAuditResidue.ActorId"/>, <see cref="IAsiBackboneAuditResidue.OperationName"/>, or <see cref="IAsiBackboneAuditResidue.Outcome"/>. The test iterates through each of these fields, setting them to invalid values (e.g., null, empty, or whitespace) and asserting that the factory method throws an exception, confirming that it properly validates the input residue and enforces the presence of essential information needed to create a valid audit ledger record. This validation is crucial for ensuring the integrity and usefulness of audit records generated from residues.
+    /// Verifies that <see cref="AuditLedgerRecord.FromResidue"/> throws an appropriate exception when the input <see cref="IDecisionReceipt"/> contains invalid values for required fields such as <see cref="IDecisionReceipt.EventId"/>, <see cref="IDecisionReceipt.ActorId"/>, <see cref="IDecisionReceipt.OperationName"/>, or <see cref="IDecisionReceipt.Outcome"/>. The test iterates through each of these fields, setting them to invalid values (e.g., null, empty, or whitespace) and asserting that the factory method throws an exception, confirming that it properly validates the input residue and enforces the presence of essential information needed to create a valid audit ledger record. This validation is crucial for ensuring the integrity and usefulness of audit records generated from residues.
     /// </summary>
     /// <param name="fieldName">
-    /// The name of the required field in the <see cref="IAsiBackboneAuditResidue"/> to be set to an invalid value for testing. This parameter is used to identify which field is being tested for validation, allowing the test to systematically verify that each required field is properly checked by the <see cref="AuditLedgerRecord.FromResidue"/> method. The test will cover fields such as "EventId", "ActorId", "OperationName", and "Outcome", which are critical for the creation of a valid audit ledger record.
+    /// The name of the required field in the <see cref="IDecisionReceipt"/> to be set to an invalid value for testing. This parameter is used to identify which field is being tested for validation, allowing the test to systematically verify that each required field is properly checked by the <see cref="AuditLedgerRecord.FromResidue"/> method. The test will cover fields such as "EventId", "ActorId", "OperationName", and "Outcome", which are critical for the creation of a valid audit ledger record.
     /// </param>
     [Theory]
     [InlineData("EventId")]
@@ -466,7 +466,7 @@ public sealed class AuditLedgerRecordTests
             EventId = "event-123",
             OccurredUtc = new DateTimeOffset(2026, 6, 4, 12, 0, 0, TimeSpan.Zero),
             ActorId = "actor-123",
-            ActorType = AsiBackboneActorType.System,
+            ActorType = GovernanceActorType.System,
             ActorDisplayName = "System",
             OperationName = "system.sync",
             Outcome = "Allowed",
@@ -482,7 +482,7 @@ public sealed class AuditLedgerRecordTests
         };
     }
 
-    private sealed class TestAuditResidue : IAsiBackboneAuditResidue
+    private sealed class TestAuditResidue : IDecisionReceipt
     {
         public string EventId { get; set; } = "event-123";
 
@@ -491,7 +491,7 @@ public sealed class AuditLedgerRecordTests
 
         public string ActorId { get; set; } = "actor-123";
 
-        public AsiBackboneActorType ActorType { get; set; } = AsiBackboneActorType.System;
+        public GovernanceActorType ActorType { get; set; } = GovernanceActorType.System;
 
         public string? ActorDisplayName { get; set; } = "System";
 

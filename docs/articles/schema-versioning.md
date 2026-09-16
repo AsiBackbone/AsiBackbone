@@ -4,7 +4,7 @@ AsiBackbone treats persisted or exported governance artifacts as durable contrac
 
 ## Current stable artifact schema
 
-The initial stable artifact schema version is `1.0.0` and is exposed through `AsiBackboneSchemaVersions.StableArtifactsV1`.
+The initial stable artifact schema version is `1.0.0` and is exposed through `GovernanceSchemaVersions.StableArtifactsV1`.
 
 Package-owned stable serialized artifacts that carry this version include:
 
@@ -16,7 +16,7 @@ The EF Core persistence entities for audit ledger records, handshake requests, a
 
 ## Default behavior
 
-When an `AuditLedgerRecord`, `LiabilityHandshakeRequest`, or `LiabilityHandshakeAcknowledgment` is created without an explicit schema version, the package defaults the record to `AsiBackboneSchemaVersions.StableArtifactsV1`.
+When an `AuditLedgerRecord`, `LiabilityHandshakeRequest`, or `LiabilityHandshakeAcknowledgment` is created without an explicit schema version, the package defaults the record to `GovernanceSchemaVersions.StableArtifactsV1`.
 
 Hosts or future package components may provide an explicit schema version when replaying, importing, migrating, or testing alternate artifact shapes. The value is trimmed and preserved.
 
@@ -39,4 +39,4 @@ When a future release changes a durable artifact shape, the release should:
 
 Host applications that persist or export governance decisions, receipts, audit records, or acknowledgment records should include a schema/version field in any host-defined durable payloads. If the host wraps AsiBackbone records in a larger envelope, the host envelope may have its own version, but it should preserve the underlying artifact schema version as well.
 
-This keeps audit residue, decision receipts, and future governance artifacts migratable after `1.0.0` without pulling provider-specific emission work into the core package line.
+This keeps decision receipt, decision receipts, and future governance artifacts migratable after `1.0.0` without pulling provider-specific emission work into the core package line.

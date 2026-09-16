@@ -13,9 +13,9 @@ namespace AsiBackbone.Core.Signing;
 public static class CanonicalPayloadBuilder
 {
     /// <summary>
-    /// Builds a canonical payload for audit residue.
+    /// Builds a canonical payload for decision receipt.
     /// </summary>
-    public static CanonicalPayload ForAuditResidue(IAsiBackboneAuditResidue residue, CanonicalPayloadOptions? options = null)
+    public static CanonicalPayload ForAuditResidue(IDecisionReceipt residue, CanonicalPayloadOptions? options = null)
     {
         ArgumentNullException.ThrowIfNull(residue);
         CanonicalPayloadOptions effectiveOptions = options ?? CanonicalPayloadOptions.Default;
@@ -56,9 +56,9 @@ public static class CanonicalPayloadBuilder
     }
 
     /// <summary>
-    /// Builds a canonical payload for an audit residue lifecycle event.
+    /// Builds a canonical payload for an decision receipt lifecycle event.
     /// </summary>
-    public static CanonicalPayload ForAuditResidueLifecycleEvent(AuditResidueLifecycleEvent lifecycleEvent, CanonicalPayloadOptions? options = null)
+    public static CanonicalPayload ForAuditResidueLifecycleEvent(DecisionReceiptLifecycleEvent lifecycleEvent, CanonicalPayloadOptions? options = null)
     {
         ArgumentNullException.ThrowIfNull(lifecycleEvent);
         CanonicalPayloadOptions effectiveOptions = options ?? CanonicalPayloadOptions.Default;
@@ -80,7 +80,7 @@ public static class CanonicalPayloadBuilder
         return CanonicalPayload.Create(
             CanonicalArtifactTypes.AuditResidueLifecycleEvent,
             lifecycleEvent.EventId,
-            AsiBackboneSchemaVersions.StableArtifactsV1,
+            GovernanceSchemaVersions.StableArtifactsV1,
             effectiveOptions.CanonicalizationVersion,
             effectiveOptions.HashAlgorithm,
             content);
@@ -187,7 +187,7 @@ public static class CanonicalPayloadBuilder
         // A use limit supplied only at the validation call site is unsigned local policy that the issuer never
         // authorized. Binding it requires the grant to record the schema version that carries it, so grants signed under
         // the earlier version continue to hash exactly as they did and keep verifying.
-        if (!string.Equals(grant.SchemaVersion, AsiBackboneSchemaVersions.StableArtifactsV1, StringComparison.Ordinal))
+        if (!string.Equals(grant.SchemaVersion, GovernanceSchemaVersions.StableArtifactsV1, StringComparison.Ordinal))
         {
             content["maxUseCount"] = grant.MaxUseCount;
         }
@@ -202,7 +202,7 @@ public static class CanonicalPayloadBuilder
     }
 
     private static SortedDictionary<string, object?> BuildAuditResidueContent(
-        IAsiBackboneAuditResidue residue,
+        IDecisionReceipt residue,
         CanonicalPayloadOptions options,
         string auditResidueId)
     {
@@ -354,7 +354,7 @@ public static class CanonicalPayloadBuilder
         return timestamp.ToUniversalTime().ToString("yyyy-MM-dd'T'HH:mm:ss.fffffff'Z'", CultureInfo.InvariantCulture);
     }
 
-    private static string GetAuditResidueId(IAsiBackboneAuditResidue residue)
+    private static string GetAuditResidueId(IDecisionReceipt residue)
     {
         return string.IsNullOrWhiteSpace(residue.AuditResidueId)
             ? residue.EventId

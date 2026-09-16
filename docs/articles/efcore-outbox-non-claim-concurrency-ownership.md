@@ -75,9 +75,9 @@ The example deliberately rethrows after inspection. A production host should rep
 
 Scaled or competing workers should prefer the claim-capable path:
 
-- enable `AsiBackboneGovernanceOutboxOptions.UseClaimLeases`;
-- use an `IAsiBackboneGovernanceOutboxClaimStore`;
-- use `IAsiBackboneGovernanceOutboxClaimOutcomeStore` when the caller must know whether its own invocation applied the transition.
+- enable `GovernanceOutboxOptions.UseClaimLeases`;
+- use an `IGovernanceOutboxClaimStore`;
+- use `IGovernanceOutboxClaimOutcomeStore` when the caller must know whether its own invocation applied the transition.
 
 The outcome-aware contract distinguishes:
 

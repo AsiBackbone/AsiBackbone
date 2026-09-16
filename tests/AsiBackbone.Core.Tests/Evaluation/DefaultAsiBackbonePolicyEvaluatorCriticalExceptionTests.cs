@@ -44,10 +44,10 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorCriticalExceptionTests
     public async Task ConstraintExceptionAsDenialStillConvertsNormalConstraintException()
     {
         TestPolicyContext context = CreateContext();
-        var evaluator = new DefaultAsiBackbonePolicyEvaluator<TestPolicyContext>(
+        var evaluator = new DefaultGovernancePolicyEvaluator<TestPolicyContext>(
             [new ThrowingConstraint(new InvalidOperationException("ordinary constraint failure"))],
             decisionPolicy: null,
-            options: new AsiBackbonePolicyEvaluatorOptions
+            options: new GovernancePolicyOptions
             {
                 TreatConstraintExceptionAsDenial = true
             }, threatModelContributors: null, logger: null);
@@ -56,7 +56,7 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorCriticalExceptionTests
 
         Assert.True(decision.IsDenied);
         Assert.Equal(
-            AsiBackbonePolicyEvaluatorOptions.DefaultConstraintExceptionReasonCode,
+            GovernancePolicyOptions.DefaultConstraintExceptionReasonCode,
             Assert.Single(decision.ReasonCodes));
     }
 
@@ -68,12 +68,12 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorCriticalExceptionTests
     public async Task ConstraintExceptionAsDenialStillConvertsWrappedNonCriticalConstraintException()
     {
         TestPolicyContext context = CreateContext();
-        var evaluator = new DefaultAsiBackbonePolicyEvaluator<TestPolicyContext>(
+        var evaluator = new DefaultGovernancePolicyEvaluator<TestPolicyContext>(
             [new ThrowingConstraint(new InvalidOperationException(
                 "ordinary wrapper failure",
                 new TimeoutException("ordinary inner failure")))],
             decisionPolicy: null,
-            options: new AsiBackbonePolicyEvaluatorOptions
+            options: new GovernancePolicyOptions
             {
                 TreatConstraintExceptionAsDenial = true
             }, threatModelContributors: null, logger: null);
@@ -82,7 +82,7 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorCriticalExceptionTests
 
         Assert.True(decision.IsDenied);
         Assert.Equal(
-            AsiBackbonePolicyEvaluatorOptions.DefaultConstraintExceptionReasonCode,
+            GovernancePolicyOptions.DefaultConstraintExceptionReasonCode,
             Assert.Single(decision.ReasonCodes));
     }
 
@@ -97,10 +97,10 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorCriticalExceptionTests
     {
         TestPolicyContext context = CreateContext();
         Exception expectedException = CreateCriticalException(criticalExceptionType);
-        var evaluator = new DefaultAsiBackbonePolicyEvaluator<TestPolicyContext>(
+        var evaluator = new DefaultGovernancePolicyEvaluator<TestPolicyContext>(
             [new ThrowingConstraint(expectedException)],
             decisionPolicy: null,
-            options: new AsiBackbonePolicyEvaluatorOptions
+            options: new GovernancePolicyOptions
             {
                 TreatConstraintExceptionAsDenial = true
             }, threatModelContributors: null, logger: null);
@@ -121,10 +121,10 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorCriticalExceptionTests
         TestPolicyContext context = CreateContext();
         var criticalException = new AccessViolationException("Critical inner failure should preserve host/runtime failure semantics.");
         var expectedException = new InvalidOperationException("Wrapper around critical failure.", criticalException);
-        var evaluator = new DefaultAsiBackbonePolicyEvaluator<TestPolicyContext>(
+        var evaluator = new DefaultGovernancePolicyEvaluator<TestPolicyContext>(
             [new ThrowingConstraint(expectedException)],
             decisionPolicy: null,
-            options: new AsiBackbonePolicyEvaluatorOptions
+            options: new GovernancePolicyOptions
             {
                 TreatConstraintExceptionAsDenial = true
             }, threatModelContributors: null, logger: null);
@@ -144,7 +144,7 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorCriticalExceptionTests
     public async Task ThreatContributorExceptionAsDenialStillConvertsNormalContributorException()
     {
         TestPolicyContext context = CreateContext();
-        var evaluator = new DefaultAsiBackbonePolicyEvaluator<TestPolicyContext>(
+        var evaluator = new DefaultGovernancePolicyEvaluator<TestPolicyContext>(
             [new StaticConstraint(ConstraintEvaluationResult.Allow())],
             [new ThrowingThreatContributor(new InvalidOperationException("ordinary contributor failure"))], decisionPolicy: null, options: null, logger: null);
 
@@ -152,7 +152,7 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorCriticalExceptionTests
 
         Assert.True(decision.IsDenied);
         Assert.Equal(
-            AsiBackbonePolicyEvaluatorOptions.DefaultThreatContributorExceptionReasonCode,
+            GovernancePolicyOptions.DefaultThreatContributorExceptionReasonCode,
             Assert.Single(decision.ReasonCodes));
     }
 
@@ -164,7 +164,7 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorCriticalExceptionTests
     public async Task ThreatContributorExceptionAsDenialStillConvertsWrappedNonCriticalContributorException()
     {
         TestPolicyContext context = CreateContext();
-        var evaluator = new DefaultAsiBackbonePolicyEvaluator<TestPolicyContext>(
+        var evaluator = new DefaultGovernancePolicyEvaluator<TestPolicyContext>(
             [new StaticConstraint(ConstraintEvaluationResult.Allow())],
             [new ThrowingThreatContributor(new InvalidOperationException(
                 "ordinary wrapper failure",
@@ -174,7 +174,7 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorCriticalExceptionTests
 
         Assert.True(decision.IsDenied);
         Assert.Equal(
-            AsiBackbonePolicyEvaluatorOptions.DefaultThreatContributorExceptionReasonCode,
+            GovernancePolicyOptions.DefaultThreatContributorExceptionReasonCode,
             Assert.Single(decision.ReasonCodes));
     }
 
@@ -191,7 +191,7 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorCriticalExceptionTests
     {
         TestPolicyContext context = CreateContext();
         Exception expectedException = CreateCriticalException(criticalExceptionType);
-        var evaluator = new DefaultAsiBackbonePolicyEvaluator<TestPolicyContext>(
+        var evaluator = new DefaultGovernancePolicyEvaluator<TestPolicyContext>(
             [new StaticConstraint(ConstraintEvaluationResult.Allow())],
             [new ThrowingThreatContributor(expectedException)], decisionPolicy: null, options: null, logger: null);
 
@@ -210,7 +210,7 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorCriticalExceptionTests
     {
         TestPolicyContext context = CreateContext();
         var expectedException = new OperationCanceledException("Threat contributor cancellation should not be converted to denial.");
-        var evaluator = new DefaultAsiBackbonePolicyEvaluator<TestPolicyContext>(
+        var evaluator = new DefaultGovernancePolicyEvaluator<TestPolicyContext>(
             [new StaticConstraint(ConstraintEvaluationResult.Allow())],
             [new ThrowingThreatContributor(expectedException)], decisionPolicy: null, options: null, logger: null);
 
@@ -244,7 +244,7 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorCriticalExceptionTests
         };
     }
 
-    private sealed class TestPolicyContext : IAsiBackboneConstraintEvaluationContext
+    private sealed class TestPolicyContext : IGovernanceEvaluationContext
     {
         public string? CorrelationId { get; init; }
 
@@ -256,7 +256,7 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorCriticalExceptionTests
             new Dictionary<string, string>(StringComparer.Ordinal);
     }
 
-    private sealed class StaticConstraint(ConstraintEvaluationResult result) : IAsiBackboneConstraint<TestPolicyContext>
+    private sealed class StaticConstraint(ConstraintEvaluationResult result) : IGovernanceConstraint<TestPolicyContext>
     {
         public string Name => "static-critical-constraint";
 
@@ -268,7 +268,7 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorCriticalExceptionTests
         }
     }
 
-    private sealed class ThrowingConstraint(Exception exception) : IAsiBackboneConstraint<TestPolicyContext>
+    private sealed class ThrowingConstraint(Exception exception) : IGovernanceConstraint<TestPolicyContext>
     {
         public string Name => "throwing-critical-constraint";
 

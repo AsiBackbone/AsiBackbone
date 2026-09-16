@@ -55,5 +55,5 @@ TYPE | AsiBackbone.Signing.ManagedKey.ManagedKeySignResult | public sealed class
 TYPE | AsiBackbone.Signing.ManagedKey.ManagedKeySigningBuilderExtensions | public static class ManagedKeySigningBuilderExtensions
 TYPE | AsiBackbone.Signing.ManagedKey.ManagedKeySigningException | public sealed class ManagedKeySigningException : Exception, ISerializable
 TYPE | AsiBackbone.Signing.ManagedKey.ManagedKeySigningOptions | public sealed class ManagedKeySigningOptions
-TYPE | AsiBackbone.Signing.ManagedKey.ManagedKeySigningService | public sealed class ManagedKeySigningService : IAsiBackboneSigningService
+TYPE | AsiBackbone.Signing.ManagedKey.ManagedKeySigningService | public sealed class ManagedKeySigningService : IGovernanceSigningService
 TYPE | AsiBackbone.Signing.ManagedKey.ManagedKeySigningServiceCollectionExtensions | public static class ManagedKeySigningServiceCollectionExtensions

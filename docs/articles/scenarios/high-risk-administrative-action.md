@@ -66,4 +66,4 @@ The host can then map the `GovernanceDecision` into its own UI, API response, qu
 
 ## Adoption note
 
-Start with one administrative workflow that already needs review. Keep execution owned by the host, but route the proposed action through policy evaluation, audit residue, and acknowledgment handling first.
+Start with one administrative workflow that already needs review. Keep execution owned by the host, but route the proposed action through policy evaluation, decision receipt, and acknowledgment handling first.

@@ -127,7 +127,7 @@ public sealed class EfCoreGovernanceOutboxJsonMetadataTests
         var store = new EfCoreGovernanceOutboxStore(context);
         var timestamp = new DateTimeOffset(2026, 7, 7, 10, 10, 0, TimeSpan.Zero);
 
-        _ = context.GovernanceOutboxEntries.Add(new AsiBackboneGovernanceOutboxEntryEntity
+        _ = context.GovernanceOutboxEntries.Add(new GovernanceOutboxEntryEntity
         {
             OutboxEntryId = "outbox-future-metadata",
             Status = GovernanceEmissionStatus.Pending,
@@ -144,8 +144,8 @@ public sealed class EfCoreGovernanceOutboxJsonMetadataTests
             EnvelopeCreatedUtc = timestamp,
             EnvelopeCorrelationId = "correlation-future-metadata",
             EnvelopeAuditResidueId = "audit-future-metadata",
-            EnvelopeLifecycleStage = AuditResidueLifecycleStage.ExternalEmissionQueued,
-            EnvelopeLifecycleStageSequence = (int)AuditResidueLifecycleStage.ExternalEmissionQueued,
+            EnvelopeLifecycleStage = DecisionReceiptLifecycleStage.ExternalEmissionQueued,
+            EnvelopeLifecycleStageSequence = (int)DecisionReceiptLifecycleStage.ExternalEmissionQueued,
             EnvelopeMetadataJson = /*lang=json,strict*/ "{\"envelope.future.key\":\"envelope-future-value\",\"envelope.source\":\"manual-json\"}",
             EnvelopePayloadType = "audit-residue",
             EnvelopePayloadSchemaVersion = "1.0.0",
@@ -206,7 +206,7 @@ public sealed class EfCoreGovernanceOutboxJsonMetadataTests
             schemaVersion: "1.0.0",
             correlationId: $"correlation-{eventId}",
             auditResidueId: $"audit-{eventId}",
-            lifecycleStage: AuditResidueLifecycleStage.ExternalEmissionQueued,
+            lifecycleStage: DecisionReceiptLifecycleStage.ExternalEmissionQueued,
             policyVersion: "2026.07",
             policyHash: "policy-hash-json-metadata",
             traceId: "trace-json-metadata",
@@ -222,8 +222,8 @@ public sealed class EfCoreGovernanceOutboxJsonMetadataTests
     private sealed class HostOwnedGovernanceDbContext(DbContextOptions<HostOwnedGovernanceDbContext> options)
         : DbContext(options)
     {
-        public DbSet<AsiBackboneGovernanceOutboxEntryEntity> GovernanceOutboxEntries =>
-            Set<AsiBackboneGovernanceOutboxEntryEntity>();
+        public DbSet<GovernanceOutboxEntryEntity> GovernanceOutboxEntries =>
+            Set<GovernanceOutboxEntryEntity>();
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

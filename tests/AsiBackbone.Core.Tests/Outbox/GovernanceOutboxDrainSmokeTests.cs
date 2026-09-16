@@ -44,7 +44,7 @@ public sealed class GovernanceOutboxDrainSmokeTests
     public async Task DrainAsyncHandsPendingEntryToNoOpSinkAndMarksDelivered()
     {
         var outboxStore = new InMemoryGovernanceOutboxStore();
-        var drain = new AsiBackboneGovernanceOutboxDrain(outboxStore, NoOpGovernanceEmitter.Instance);
+        var drain = new GovernanceOutboxDrain(outboxStore, NoOpGovernanceEmitter.Instance);
         GovernanceEmissionEnvelope envelope = CreateEnvelope();
         GovernanceOutboxEntry entry = await outboxStore.EnqueueAsync(
             envelope,
@@ -67,7 +67,7 @@ public sealed class GovernanceOutboxDrainSmokeTests
         Assert.Equal(envelope.EnvelopeId, deliveredEntry.ProviderRecordId);
         Assert.Equal("correlation-193", deliveredEntry.Envelope.CorrelationId);
         Assert.Equal("residue-193", deliveredEntry.Envelope.AuditResidueId);
-        Assert.Equal(AuditResidueLifecycleStage.ExternalEmissionQueued, deliveredEntry.Envelope.LifecycleStage);
+        Assert.Equal(DecisionReceiptLifecycleStage.ExternalEmissionQueued, deliveredEntry.Envelope.LifecycleStage);
         Assert.Equal(envelope.SchemaVersion, deliveredEntry.Envelope.SchemaVersion);
         Assert.Equal("noop", deliveredEntry.Metadata["emitter.kind"]);
         Assert.DoesNotContain(pendingEntries, pendingEntry => pendingEntry.OutboxEntryId == entry.OutboxEntryId);
@@ -84,7 +84,7 @@ public sealed class GovernanceOutboxDrainSmokeTests
     {
         var outboxStore = new InMemoryGovernanceOutboxStore();
         DateTimeOffset retryUtc = new(2026, 6, 15, 16, 5, 0, TimeSpan.Zero);
-        var drain = new AsiBackboneGovernanceOutboxDrain(
+        var drain = new GovernanceOutboxDrain(
             outboxStore,
             new ResultEmitter(GovernanceEmissionResult.RetryableFailure(
                 GovernanceEmissionError.Create(
@@ -132,7 +132,7 @@ public sealed class GovernanceOutboxDrainSmokeTests
             envelopeId: "envelope-193",
             correlationId: "correlation-193",
             auditResidueId: "residue-193",
-            lifecycleStage: AuditResidueLifecycleStage.ExternalEmissionQueued,
+            lifecycleStage: DecisionReceiptLifecycleStage.ExternalEmissionQueued,
             policyVersion: "v1",
             policyHash: "hash-193",
             traceId: "trace-193",
@@ -149,7 +149,7 @@ public sealed class GovernanceOutboxDrainSmokeTests
             });
     }
 
-    private sealed class ResultEmitter(GovernanceEmissionResult result) : IAsiBackboneGovernanceEmitter
+    private sealed class ResultEmitter(GovernanceEmissionResult result) : IGovernanceEmitter
     {
         private readonly GovernanceEmissionResult result = result;
 

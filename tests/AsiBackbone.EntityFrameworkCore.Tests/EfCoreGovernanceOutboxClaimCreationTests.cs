@@ -166,8 +166,8 @@ public sealed class EfCoreGovernanceOutboxClaimCreationTests
     private sealed class HostOwnedGovernanceDbContext(DbContextOptions<HostOwnedGovernanceDbContext> options)
         : DbContext(options)
     {
-        public DbSet<AsiBackboneGovernanceOutboxEntryEntity> GovernanceOutboxEntries =>
-            Set<AsiBackboneGovernanceOutboxEntryEntity>();
+        public DbSet<GovernanceOutboxEntryEntity> GovernanceOutboxEntries =>
+            Set<GovernanceOutboxEntryEntity>();
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

@@ -55,51 +55,51 @@ public class AsiBackboneHotPathBenchmarks
         ["policy.scope"] = "benchmark"
     };
 
-    private readonly IAsiBackbonePolicyEvaluator<BdnBenchmarkPolicyContext> zeroConstraintsEvaluator =
-        DefaultAsiBackbonePolicyEvaluator.CreateBuilder<BdnBenchmarkPolicyContext>()
+    private readonly IGovernancePolicyEvaluator<BdnBenchmarkPolicyContext> zeroConstraintsEvaluator =
+        DefaultGovernancePolicyEvaluator.CreateBuilder<BdnBenchmarkPolicyContext>()
             .Build();
 
-    private readonly IAsiBackbonePolicyEvaluator<BdnBenchmarkPolicyContext> allAllowEvaluator =
-        DefaultAsiBackbonePolicyEvaluator.CreateBuilder<BdnBenchmarkPolicyContext>()
+    private readonly IGovernancePolicyEvaluator<BdnBenchmarkPolicyContext> allAllowEvaluator =
+        DefaultGovernancePolicyEvaluator.CreateBuilder<BdnBenchmarkPolicyContext>()
             .AddConstraints(CreateStaticConstraints(8, ConstraintEvaluationResult.Allow()))
             .Build();
 
-    private readonly IAsiBackbonePolicyEvaluator<BdnBenchmarkPolicyContext> mixedEvaluator =
-        DefaultAsiBackbonePolicyEvaluator.CreateBuilder<BdnBenchmarkPolicyContext>()
+    private readonly IGovernancePolicyEvaluator<BdnBenchmarkPolicyContext> mixedEvaluator =
+        DefaultGovernancePolicyEvaluator.CreateBuilder<BdnBenchmarkPolicyContext>()
             .AddConstraints(CreateMixedConstraints())
             .Build();
 
-    private readonly IAsiBackbonePolicyEvaluator<BdnBenchmarkPolicyContext> firstDenialEvaluator =
-        DefaultAsiBackbonePolicyEvaluator.CreateBuilder<BdnBenchmarkPolicyContext>()
+    private readonly IGovernancePolicyEvaluator<BdnBenchmarkPolicyContext> firstDenialEvaluator =
+        DefaultGovernancePolicyEvaluator.CreateBuilder<BdnBenchmarkPolicyContext>()
             .AddConstraints(CreateMixedConstraints())
-            .WithOptions(new AsiBackbonePolicyEvaluatorOptions { ShortCircuitOnFirstDenial = true })
+            .WithOptions(new GovernancePolicyOptions { ShortCircuitOnFirstDenial = true })
             .Build();
 
-    private readonly IAsiBackbonePolicyEvaluator<BdnBenchmarkPolicyContext> acknowledgmentEvaluator =
-        DefaultAsiBackbonePolicyEvaluator.CreateBuilder<BdnBenchmarkPolicyContext>()
+    private readonly IGovernancePolicyEvaluator<BdnBenchmarkPolicyContext> acknowledgmentEvaluator =
+        DefaultGovernancePolicyEvaluator.CreateBuilder<BdnBenchmarkPolicyContext>()
             .AddConstraints(CreateStaticConstraints(4, ConstraintEvaluationResult.Allow()))
             .WithDecisionPolicy(new BdnRequireAcknowledgmentPolicy())
             .Build();
 
-    private readonly IAsiBackbonePolicyEvaluator<BdnBenchmarkPolicyContext> escalationEvaluator =
-        DefaultAsiBackbonePolicyEvaluator.CreateBuilder<BdnBenchmarkPolicyContext>()
+    private readonly IGovernancePolicyEvaluator<BdnBenchmarkPolicyContext> escalationEvaluator =
+        DefaultGovernancePolicyEvaluator.CreateBuilder<BdnBenchmarkPolicyContext>()
             .AddConstraints(CreateStaticConstraints(4, ConstraintEvaluationResult.Allow()))
             .WithDecisionPolicy(new BdnEscalatePolicy())
             .Build();
 
-    private readonly IAsiBackbonePolicyEvaluator<BdnBenchmarkPolicyContext> exceptionAsDenialEvaluator =
-        DefaultAsiBackbonePolicyEvaluator.CreateBuilder<BdnBenchmarkPolicyContext>()
+    private readonly IGovernancePolicyEvaluator<BdnBenchmarkPolicyContext> exceptionAsDenialEvaluator =
+        DefaultGovernancePolicyEvaluator.CreateBuilder<BdnBenchmarkPolicyContext>()
             .AddConstraint(new BdnThrowingConstraint(new InvalidOperationException("Benchmark constraint failure.")))
-            .WithOptions(new AsiBackbonePolicyEvaluatorOptions { TreatConstraintExceptionAsDenial = true })
+            .WithOptions(new GovernancePolicyOptions { TreatConstraintExceptionAsDenial = true })
             .Build();
 
     private readonly EndpointGovernanceHarness endpointAllow = new("endpoint_governance.policy_allow", EndpointDecisionKind.Allow);
     private readonly EndpointGovernanceHarness endpointWarning = new("endpoint_governance.policy_warning", EndpointDecisionKind.Warning);
     private readonly EndpointGovernanceHarness endpointDeny = new("endpoint_governance.policy_deny", EndpointDecisionKind.Deny);
-    private readonly AsiBackboneGovernanceOutboxDrain outboxDrain25 = new(new BdnBenchmarkOutboxStore(25), NoOpGovernanceEmitter.Instance);
-    private readonly AsiBackboneGovernanceOutboxDrain outboxDrain100 = new(new BdnBenchmarkOutboxStore(100), NoOpGovernanceEmitter.Instance);
+    private readonly GovernanceOutboxDrain outboxDrain25 = new(new BdnBenchmarkOutboxStore(25), NoOpGovernanceEmitter.Instance);
+    private readonly GovernanceOutboxDrain outboxDrain100 = new(new BdnBenchmarkOutboxStore(100), NoOpGovernanceEmitter.Instance);
     private readonly ScopedOutboxDrainHarness scopedOutbox100 = new(100);
-    private readonly IAsiBackboneActorContext actor = AsiBackboneActorContext.Service("benchmark-service");
+    private readonly IGovernanceActorContext actor = GovernanceActorContext.Service("benchmark-service");
     private readonly GovernanceDecision auditDecision = GovernanceDecision.Deny(
         "policy.denied",
         "Policy denied the benchmark operation.",
@@ -400,7 +400,7 @@ public class AsiBackboneHotPathBenchmarks
     [Benchmark(Description = "audit_residue.from_decision")]
     public int AuditResidueFromDecision()
     {
-        var residue = AuditResidue.FromDecision(
+        var residue = DecisionReceipt.FromDecision(
             actor,
             "benchmark.operation",
             auditDecision,
@@ -424,7 +424,7 @@ public class AsiBackboneHotPathBenchmarks
     [Benchmark(Description = "audit_residue.builder_no_metadata")]
     public int AuditResidueBuilderNoMetadata()
     {
-        AuditResidue residue = AuditResidueBuilder.Create(actor, "benchmark.operation", "Allowed")
+        DecisionReceipt residue = DecisionReceiptBuilder.Create(actor, "benchmark.operation", "Allowed")
             .WithEventId("benchmark-builder-no-metadata")
             .WithOccurredUtc(BenchmarkDrainUtc)
             .WithCorrelationId("benchmark-correlation")
@@ -443,7 +443,7 @@ public class AsiBackboneHotPathBenchmarks
     [Benchmark(Description = "audit_residue.builder_one_metadata")]
     public int AuditResidueBuilderOneMetadata()
     {
-        AuditResidue residue = AuditResidueBuilder.Create(actor, "benchmark.operation", "Allowed")
+        DecisionReceipt residue = DecisionReceiptBuilder.Create(actor, "benchmark.operation", "Allowed")
             .WithEventId("benchmark-builder-one-metadata")
             .WithOccurredUtc(BenchmarkDrainUtc)
             .WithCorrelationId("benchmark-correlation")
@@ -463,7 +463,7 @@ public class AsiBackboneHotPathBenchmarks
     [Benchmark(Description = "audit_residue.builder_many_metadata")]
     public int AuditResidueBuilderManyMetadata()
     {
-        AuditResidue residue = AuditResidueBuilder.Create(actor, "benchmark.operation", "Allowed")
+        DecisionReceipt residue = DecisionReceiptBuilder.Create(actor, "benchmark.operation", "Allowed")
             .WithEventId("benchmark-builder-many-metadata")
             .WithOccurredUtc(BenchmarkDrainUtc)
             .WithCorrelationId("benchmark-correlation")
@@ -480,7 +480,7 @@ public class AsiBackboneHotPathBenchmarks
 
     private static int Checksum(OperationResult result) => (result.Succeeded ? 17 : 31) ^ result.ReasonCodes.Count ^ result.Warnings.Count;
 
-    private static int Checksum(AuditResidue residue) => residue.ReasonCodes.Count ^ residue.Metadata.Count ^ residue.EventId.Length;
+    private static int Checksum(DecisionReceipt residue) => residue.ReasonCodes.Count ^ residue.Metadata.Count ^ residue.EventId.Length;
 
     private static BdnBenchmarkPolicyContext CreateContext(string scenarioName)
     {
@@ -497,9 +497,9 @@ public class AsiBackboneHotPathBenchmarks
         };
     }
 
-    private static IAsiBackboneConstraint<BdnBenchmarkPolicyContext>[] CreateStaticConstraints(int count, ConstraintEvaluationResult result)
+    private static IGovernanceConstraint<BdnBenchmarkPolicyContext>[] CreateStaticConstraints(int count, ConstraintEvaluationResult result)
     {
-        var constraints = new IAsiBackboneConstraint<BdnBenchmarkPolicyContext>[count];
+        var constraints = new IGovernanceConstraint<BdnBenchmarkPolicyContext>[count];
 
         for (int index = 0; index < constraints.Length; index++)
         {
@@ -509,7 +509,7 @@ public class AsiBackboneHotPathBenchmarks
         return constraints;
     }
 
-    private static IAsiBackboneConstraint<BdnBenchmarkPolicyContext>[] CreateMixedConstraints()
+    private static IGovernanceConstraint<BdnBenchmarkPolicyContext>[] CreateMixedConstraints()
     {
         return
         [
@@ -533,7 +533,7 @@ public class AsiBackboneHotPathBenchmarks
             envelopeId: $"envelope-{suffix}",
             correlationId: $"correlation-{suffix}",
             auditResidueId: $"residue-{suffix}",
-            lifecycleStage: AuditResidueLifecycleStage.ExternalEmissionQueued,
+            lifecycleStage: DecisionReceiptLifecycleStage.ExternalEmissionQueued,
             policyVersion: "benchmark-policy-v1",
             policyHash: "benchmark-policy-hash",
             traceId: $"trace-{suffix}",
@@ -556,14 +556,14 @@ public class AsiBackboneHotPathBenchmarks
         private readonly ServiceProvider services;
         private readonly IServiceScope serviceScope;
         private readonly HttpContext httpContext;
-        private readonly AsiBackboneEndpointGovernanceDescriptor descriptor;
-        private readonly IAsiBackboneEndpointGovernanceService service;
+        private readonly EndpointGovernanceDescriptor descriptor;
+        private readonly IEndpointGovernanceService service;
 
         public EndpointGovernanceHarness(string name, EndpointDecisionKind decisionKind)
         {
             services = new ServiceCollection()
                 .AddAsiBackboneAspNetCore()
-                .AddSingleton<IAsiBackbonePolicyEvaluator<AsiBackboneConstraintEvaluationContext>>(new BdnFixedEndpointPolicyEvaluator(decisionKind))
+                .AddSingleton<IGovernancePolicyEvaluator<GovernanceEvaluationContext>>(new BdnFixedEndpointPolicyEvaluator(decisionKind))
                 .BuildServiceProvider(validateScopes: true);
 
             serviceScope = services.CreateScope();
@@ -579,13 +579,13 @@ public class AsiBackboneHotPathBenchmarks
                 new EndpointMetadataCollection(new RequireGovernancePolicyAttribute(typeof(BdnBenchmarkEndpointPolicy))),
                 name);
 
-            descriptor = AsiBackboneEndpointGovernanceDescriptor.FromEndpoint(endpoint);
-            service = serviceScope.ServiceProvider.GetRequiredService<IAsiBackboneEndpointGovernanceService>();
+            descriptor = EndpointGovernanceDescriptor.FromEndpoint(endpoint);
+            service = serviceScope.ServiceProvider.GetRequiredService<IEndpointGovernanceService>();
         }
 
         public int Evaluate()
         {
-            AsiBackboneEndpointGovernanceResult result = service.EvaluateAsync(httpContext, descriptor).GetAwaiter().GetResult();
+            EndpointGovernanceResult result = service.EvaluateAsync(httpContext, descriptor).GetAwaiter().GetResult();
             GovernanceDecision? decision = result.Decision;
             return (result.CanExecute ? 17 : 31) ^ (decision is null ? 0 : ((int)decision.Outcome * 397) ^ decision.ReasonCodes.Count);
         }
@@ -608,16 +608,16 @@ public class AsiBackboneHotPathBenchmarks
             this.batchSize = batchSize;
             services = new ServiceCollection()
                 .AddLogging()
-                .AddSingleton<IAsiBackboneGovernanceOutboxStore>(_ => new BdnBenchmarkOutboxStore(batchSize))
-                .AddSingleton<IAsiBackboneGovernanceEmitter>(NoOpGovernanceEmitter.Instance)
-                .AddScoped<AsiBackboneGovernanceOutboxDrain>()
+                .AddSingleton<IGovernanceOutboxStore>(_ => new BdnBenchmarkOutboxStore(batchSize))
+                .AddSingleton<IGovernanceEmitter>(NoOpGovernanceEmitter.Instance)
+                .AddScoped<GovernanceOutboxDrain>()
                 .BuildServiceProvider(validateScopes: true);
         }
 
         public int Drain(DateTimeOffset utcNow)
         {
             using IServiceScope scope = services.CreateScope();
-            AsiBackboneGovernanceOutboxDrain drain = scope.ServiceProvider.GetRequiredService<AsiBackboneGovernanceOutboxDrain>();
+            GovernanceOutboxDrain drain = scope.ServiceProvider.GetRequiredService<GovernanceOutboxDrain>();
             IReadOnlyList<GovernanceOutboxEntry> entries = drain.DrainAsync(utcNow, batchSize).GetAwaiter().GetResult();
             return entries.Count ^ entries[0].Metadata.Count;
         }
@@ -625,7 +625,7 @@ public class AsiBackboneHotPathBenchmarks
         public void Dispose() => services.Dispose();
     }
 
-    private sealed class BdnBenchmarkOutboxStore : IAsiBackboneGovernanceOutboxStore
+    private sealed class BdnBenchmarkOutboxStore : IGovernanceOutboxStore
     {
         private readonly GovernanceOutboxEntry[] pendingEntries;
         private readonly Dictionary<string, GovernanceOutboxEntry> entriesById;
@@ -723,7 +723,7 @@ public class AsiBackboneHotPathBenchmarks
         }
     }
 
-    private sealed class BdnStaticConstraint(string name, ConstraintEvaluationResult result) : IAsiBackboneConstraint<BdnBenchmarkPolicyContext>
+    private sealed class BdnStaticConstraint(string name, ConstraintEvaluationResult result) : IGovernanceConstraint<BdnBenchmarkPolicyContext>
     {
         public string Name { get; } = name;
 
@@ -734,7 +734,7 @@ public class AsiBackboneHotPathBenchmarks
         }
     }
 
-    private sealed class BdnThrowingConstraint(Exception exception) : IAsiBackboneConstraint<BdnBenchmarkPolicyContext>
+    private sealed class BdnThrowingConstraint(Exception exception) : IGovernanceConstraint<BdnBenchmarkPolicyContext>
     {
         public string Name => "throwing-benchmark-constraint";
 
@@ -746,9 +746,9 @@ public class AsiBackboneHotPathBenchmarks
     }
 
     private sealed class BdnFixedEndpointPolicyEvaluator(EndpointDecisionKind decisionKind)
-        : IAsiBackbonePolicyEvaluator<AsiBackboneConstraintEvaluationContext>
+        : IGovernancePolicyEvaluator<GovernanceEvaluationContext>
     {
-        public ValueTask<GovernanceDecision> EvaluateAsync(AsiBackboneConstraintEvaluationContext context, CancellationToken cancellationToken = default)
+        public ValueTask<GovernanceDecision> EvaluateAsync(GovernanceEvaluationContext context, CancellationToken cancellationToken = default)
         {
             cancellationToken.ThrowIfCancellationRequested();
             GovernanceDecision decision = decisionKind switch
@@ -762,7 +762,7 @@ public class AsiBackboneHotPathBenchmarks
         }
     }
 
-    private sealed class BdnRequireAcknowledgmentPolicy : IAsiBackboneDecisionPolicy<BdnBenchmarkPolicyContext>
+    private sealed class BdnRequireAcknowledgmentPolicy : IGovernanceDecisionPolicy<BdnBenchmarkPolicyContext>
     {
         public ValueTask<GovernanceDecision> ApplyAsync(
             BdnBenchmarkPolicyContext context,
@@ -780,7 +780,7 @@ public class AsiBackboneHotPathBenchmarks
         }
     }
 
-    private sealed class BdnEscalatePolicy : IAsiBackboneDecisionPolicy<BdnBenchmarkPolicyContext>
+    private sealed class BdnEscalatePolicy : IGovernanceDecisionPolicy<BdnBenchmarkPolicyContext>
     {
         public ValueTask<GovernanceDecision> ApplyAsync(
             BdnBenchmarkPolicyContext context,
@@ -798,7 +798,7 @@ public class AsiBackboneHotPathBenchmarks
         }
     }
 
-    private sealed class BdnBenchmarkPolicyContext : IAsiBackboneConstraintEvaluationContext
+    private sealed class BdnBenchmarkPolicyContext : IGovernanceEvaluationContext
     {
         public string? CorrelationId { get; init; }
         public string? PolicyVersion { get; init; }

@@ -7,12 +7,12 @@ using Xunit;
 namespace AsiBackbone.Core.Tests.Outbox;
 
 /// <summary>
-/// Tests for the <see cref="AsiBackboneGovernanceOutboxDrain"/> class when claim leases are enabled and a claim store is used.
+/// Tests for the <see cref="GovernanceOutboxDrain"/> class when claim leases are enabled and a claim store is used.
 /// </summary>
 public sealed class GovernanceOutboxClaimDrainTests
 {
     /// <summary>
-    /// Tests that the <see cref="AsiBackboneGovernanceOutboxDrain.DrainAsync"/> method throws an <see cref="InvalidOperationException"/> when claim leases are enabled but no claim store is provided.
+    /// Tests that the <see cref="GovernanceOutboxDrain.DrainAsync"/> method throws an <see cref="InvalidOperationException"/> when claim leases are enabled but no claim store is provided.
     /// </summary>
     /// <returns>
     /// A <see cref="Task"/> representing the asynchronous operation.
@@ -20,10 +20,10 @@ public sealed class GovernanceOutboxClaimDrainTests
     [Fact]
     public async Task DrainAsyncThrowsWhenClaimLeasesEnabledWithoutClaimStore()
     {
-        var drain = new AsiBackboneGovernanceOutboxDrain(
+        var drain = new GovernanceOutboxDrain(
             new SelectionOnlyOutboxStore(),
             new DeliveredEmitter(),
-            outboxOptions: Options.Create(new AsiBackboneGovernanceOutboxOptions
+            outboxOptions: Options.Create(new GovernanceOutboxOptions
             {
                 UseClaimLeases = true,
                 ClaimWorkerId = "worker-1"
@@ -34,7 +34,7 @@ public sealed class GovernanceOutboxClaimDrainTests
     }
 
     /// <summary>
-    /// Tests that the <see cref="AsiBackboneGovernanceOutboxDrain.DrainAsync"/> method drains a pending entry and marks it as delivered when claim leases are enabled and a claim store is used.
+    /// Tests that the <see cref="GovernanceOutboxDrain.DrainAsync"/> method drains a pending entry and marks it as delivered when claim leases are enabled and a claim store is used.
     /// </summary>
     /// <returns>
     /// A <see cref="Task"/> representing the asynchronous operation.
@@ -46,7 +46,7 @@ public sealed class GovernanceOutboxClaimDrainTests
         GovernanceOutboxEntry entry = await outboxStore.EnqueueAsync(
             CreateEnvelope("event-1"),
             TestContext.Current.CancellationToken);
-        AsiBackboneGovernanceOutboxDrain drain = CreateClaimDrain(outboxStore, new DeliveredEmitter());
+        GovernanceOutboxDrain drain = CreateClaimDrain(outboxStore, new DeliveredEmitter());
 
         IReadOnlyList<GovernanceOutboxEntry> drainedEntries = await drain.DrainAsync(
             new DateTimeOffset(2026, 7, 8, 12, 0, 0, TimeSpan.Zero),
@@ -65,7 +65,7 @@ public sealed class GovernanceOutboxClaimDrainTests
     }
 
     /// <summary>
-    /// Tests that the <see cref="AsiBackboneGovernanceOutboxDrain.DrainAsync"/> method returns an empty list when the claim store has no eligible entries to drain.
+    /// Tests that the <see cref="GovernanceOutboxDrain.DrainAsync"/> method returns an empty list when the claim store has no eligible entries to drain.
     /// </summary>
     /// <returns>
     /// A <see cref="Task"/> representing the asynchronous operation.
@@ -74,7 +74,7 @@ public sealed class GovernanceOutboxClaimDrainTests
     public async Task DrainAsyncReturnsEmptyWhenClaimStoreHasNoEligibleEntries()
     {
         var outboxStore = new InMemoryGovernanceOutboxStore();
-        AsiBackboneGovernanceOutboxDrain drain = CreateClaimDrain(outboxStore, new DeliveredEmitter());
+        GovernanceOutboxDrain drain = CreateClaimDrain(outboxStore, new DeliveredEmitter());
 
         IReadOnlyList<GovernanceOutboxEntry> drainedEntries = await drain.DrainAsync(
             new DateTimeOffset(2026, 7, 8, 12, 0, 0, TimeSpan.Zero),
@@ -84,7 +84,7 @@ public sealed class GovernanceOutboxClaimDrainTests
     }
 
     /// <summary>
-    /// Tests that the <see cref="AsiBackboneGovernanceOutboxDrain.DrainAsync"/> method drains a retry-ready entry and marks it as delivered when claim leases are enabled and a claim store is used, even if there are no pending entries to claim.
+    /// Tests that the <see cref="GovernanceOutboxDrain.DrainAsync"/> method drains a retry-ready entry and marks it as delivered when claim leases are enabled and a claim store is used, even if there are no pending entries to claim.
     /// </summary>
     /// <returns>
     /// A <see cref="Task"/> representing the asynchronous operation.
@@ -102,7 +102,7 @@ public sealed class GovernanceOutboxClaimDrainTests
             GovernanceEmissionError.Create("provider.transient", "Transient provider failure.", isRetryable: true),
             drainUtc.AddMinutes(-1),
             TestContext.Current.CancellationToken);
-        AsiBackboneGovernanceOutboxDrain drain = CreateClaimDrain(outboxStore, new DeliveredEmitter());
+        GovernanceOutboxDrain drain = CreateClaimDrain(outboxStore, new DeliveredEmitter());
 
         IReadOnlyList<GovernanceOutboxEntry> drainedEntries = await drain.DrainAsync(
             drainUtc,
@@ -115,7 +115,7 @@ public sealed class GovernanceOutboxClaimDrainTests
     }
 
     /// <summary>
-    /// Tests that the <see cref="AsiBackboneGovernanceOutboxDrain.DrainAsync"/> method stops draining after reaching the specified maximum count of pending claims, even if there are retry-ready entries available.
+    /// Tests that the <see cref="GovernanceOutboxDrain.DrainAsync"/> method stops draining after reaching the specified maximum count of pending claims, even if there are retry-ready entries available.
     /// </summary>
     /// <returns>
     /// A <see cref="Task"/> representing the asynchronous operation.
@@ -126,7 +126,7 @@ public sealed class GovernanceOutboxClaimDrainTests
         var outboxStore = new InMemoryGovernanceOutboxStore();
         _ = await outboxStore.EnqueueAsync(CreateEnvelope("event-1"), TestContext.Current.CancellationToken);
         _ = await outboxStore.EnqueueAsync(CreateEnvelope("event-2"), TestContext.Current.CancellationToken);
-        AsiBackboneGovernanceOutboxDrain drain = CreateClaimDrain(outboxStore, new DeliveredEmitter());
+        GovernanceOutboxDrain drain = CreateClaimDrain(outboxStore, new DeliveredEmitter());
 
         IReadOnlyList<GovernanceOutboxEntry> drainedEntries = await drain.DrainAsync(
             new DateTimeOffset(2026, 7, 8, 12, 0, 0, TimeSpan.Zero),
@@ -138,7 +138,7 @@ public sealed class GovernanceOutboxClaimDrainTests
     }
 
     /// <summary>
-    /// Tests that the <see cref="AsiBackboneGovernanceOutboxDrain.DrainAsync"/> method saves a deferred result and clears the claim when claim leases are enabled and a claim store is used.
+    /// Tests that the <see cref="GovernanceOutboxDrain.DrainAsync"/> method saves a deferred result and clears the claim when claim leases are enabled and a claim store is used.
     /// </summary>
     /// <returns>
     /// A <see cref="Task"/> representing the asynchronous operation.
@@ -151,7 +151,7 @@ public sealed class GovernanceOutboxClaimDrainTests
             CreateEnvelope("event-1"),
             TestContext.Current.CancellationToken);
         DateTimeOffset retryAfterUtc = new(2026, 7, 8, 12, 10, 0, TimeSpan.Zero);
-        AsiBackboneGovernanceOutboxDrain drain = CreateClaimDrain(outboxStore, new ResultEmitter(GovernanceEmissionResult.Deferred(
+        GovernanceOutboxDrain drain = CreateClaimDrain(outboxStore, new ResultEmitter(GovernanceEmissionResult.Deferred(
             GovernanceEmissionError.Create("provider.deferred", "Provider deferred the emission.", isRetryable: true),
             retryAfterUtc,
             "test-provider")));
@@ -172,7 +172,7 @@ public sealed class GovernanceOutboxClaimDrainTests
     }
 
     /// <summary>
-    /// Tests that the <see cref="AsiBackboneGovernanceOutboxDrain.DrainAsync"/> method saves a pending result as deferred with the default retry interval when claim leases are enabled and a claim store is used.
+    /// Tests that the <see cref="GovernanceOutboxDrain.DrainAsync"/> method saves a pending result as deferred with the default retry interval when claim leases are enabled and a claim store is used.
     /// </summary>
     /// <returns>
     /// A <see cref="Task"/> representing the asynchronous operation.
@@ -183,7 +183,7 @@ public sealed class GovernanceOutboxClaimDrainTests
         var outboxStore = new InMemoryGovernanceOutboxStore();
         _ = await outboxStore.EnqueueAsync(CreateEnvelope("event-1"), TestContext.Current.CancellationToken);
         DateTimeOffset drainUtc = new(2026, 7, 8, 12, 0, 0, TimeSpan.Zero);
-        AsiBackboneGovernanceOutboxDrain drain = CreateClaimDrain(outboxStore, new ResultEmitter(GovernanceEmissionResult.Pending("test-provider")));
+        GovernanceOutboxDrain drain = CreateClaimDrain(outboxStore, new ResultEmitter(GovernanceEmissionResult.Pending("test-provider")));
 
         IReadOnlyList<GovernanceOutboxEntry> drainedEntries = await drain.DrainAsync(
             drainUtc,
@@ -197,7 +197,7 @@ public sealed class GovernanceOutboxClaimDrainTests
     }
 
     /// <summary>
-    /// Tests that the <see cref="AsiBackboneGovernanceOutboxDrain.DrainAsync"/> method marks a claim as dead-lettered when the emitter returns a dead-letter result, and clears the claim from the entry.
+    /// Tests that the <see cref="GovernanceOutboxDrain.DrainAsync"/> method marks a claim as dead-lettered when the emitter returns a dead-letter result, and clears the claim from the entry.
     /// </summary>
     /// <returns>
     /// A <see cref="Task"/> representing the asynchronous operation.
@@ -208,7 +208,7 @@ public sealed class GovernanceOutboxClaimDrainTests
         var outboxStore = new InMemoryGovernanceOutboxStore();
         _ = await outboxStore.EnqueueAsync(CreateEnvelope("event-1"), TestContext.Current.CancellationToken);
         var error = GovernanceEmissionError.Create("provider.deadletter", "Provider rejected the emission.", providerName: "test-provider");
-        AsiBackboneGovernanceOutboxDrain drain = CreateClaimDrain(outboxStore, new ResultEmitter(GovernanceEmissionResult.DeadLettered(error)));
+        GovernanceOutboxDrain drain = CreateClaimDrain(outboxStore, new ResultEmitter(GovernanceEmissionResult.DeadLettered(error)));
 
         IReadOnlyList<GovernanceOutboxEntry> drainedEntries = await drain.DrainAsync(
             new DateTimeOffset(2026, 7, 8, 12, 0, 0, TimeSpan.Zero),
@@ -221,7 +221,7 @@ public sealed class GovernanceOutboxClaimDrainTests
     }
 
     /// <summary>
-    /// Tests that the <see cref="AsiBackboneGovernanceOutboxDrain.DrainAsync"/> method marks a claim as failed when the emitter returns a failed result, and clears the claim from the entry.
+    /// Tests that the <see cref="GovernanceOutboxDrain.DrainAsync"/> method marks a claim as failed when the emitter returns a failed result, and clears the claim from the entry.
     /// </summary>
     /// <returns>
     /// A <see cref="Task"/> representing the asynchronous operation.
@@ -232,7 +232,7 @@ public sealed class GovernanceOutboxClaimDrainTests
         var outboxStore = new InMemoryGovernanceOutboxStore();
         _ = await outboxStore.EnqueueAsync(CreateEnvelope("event-1"), TestContext.Current.CancellationToken);
         var error = GovernanceEmissionError.Create("provider.failed", "Provider failed the emission.", isRetryable: false, providerName: "test-provider");
-        AsiBackboneGovernanceOutboxDrain drain = CreateClaimDrain(outboxStore, new ResultEmitter(GovernanceEmissionResult.Failed(error)));
+        GovernanceOutboxDrain drain = CreateClaimDrain(outboxStore, new ResultEmitter(GovernanceEmissionResult.Failed(error)));
 
         IReadOnlyList<GovernanceOutboxEntry> drainedEntries = await drain.DrainAsync(
             new DateTimeOffset(2026, 7, 8, 12, 0, 0, TimeSpan.Zero),
@@ -245,7 +245,7 @@ public sealed class GovernanceOutboxClaimDrainTests
     }
 
     /// <summary>
-    /// Tests that the <see cref="AsiBackboneGovernanceOutboxDrain.DrainAsync"/> method marks a claim as failed when the emitter throws an exception, and clears the claim from the entry.
+    /// Tests that the <see cref="GovernanceOutboxDrain.DrainAsync"/> method marks a claim as failed when the emitter throws an exception, and clears the claim from the entry.
     /// </summary>
     /// <returns>
     /// A <see cref="Task"/> representing the asynchronous operation.
@@ -256,7 +256,7 @@ public sealed class GovernanceOutboxClaimDrainTests
         var outboxStore = new InMemoryGovernanceOutboxStore();
         _ = await outboxStore.EnqueueAsync(CreateEnvelope("event-1"), TestContext.Current.CancellationToken);
         DateTimeOffset drainUtc = new(2026, 7, 8, 12, 0, 0, TimeSpan.Zero);
-        AsiBackboneGovernanceOutboxDrain drain = CreateClaimDrain(outboxStore, new ThrowingEmitter());
+        GovernanceOutboxDrain drain = CreateClaimDrain(outboxStore, new ThrowingEmitter());
 
         IReadOnlyList<GovernanceOutboxEntry> drainedEntries = await drain.DrainAsync(
             drainUtc,
@@ -269,14 +269,14 @@ public sealed class GovernanceOutboxClaimDrainTests
         Assert.False(drainedEntry.HasClaim);
     }
 
-    private static AsiBackboneGovernanceOutboxDrain CreateClaimDrain(
+    private static GovernanceOutboxDrain CreateClaimDrain(
         InMemoryGovernanceOutboxStore outboxStore,
-        IAsiBackboneGovernanceEmitter emitter)
+        IGovernanceEmitter emitter)
     {
-        return new AsiBackboneGovernanceOutboxDrain(
+        return new GovernanceOutboxDrain(
             outboxStore,
             emitter,
-            outboxOptions: Options.Create(new AsiBackboneGovernanceOutboxOptions
+            outboxOptions: Options.Create(new GovernanceOutboxOptions
             {
                 UseClaimLeases = true,
                 ClaimWorkerId = "worker-1",
@@ -293,7 +293,7 @@ public sealed class GovernanceOutboxClaimDrainTests
             envelopeId: $"envelope-{eventId}");
     }
 
-    private sealed class DeliveredEmitter : IAsiBackboneGovernanceEmitter
+    private sealed class DeliveredEmitter : IGovernanceEmitter
     {
         public ValueTask<GovernanceEmissionResult> EmitAsync(
             GovernanceEmissionEnvelope envelope,
@@ -303,7 +303,7 @@ public sealed class GovernanceOutboxClaimDrainTests
         }
     }
 
-    private sealed class ResultEmitter(GovernanceEmissionResult result) : IAsiBackboneGovernanceEmitter
+    private sealed class ResultEmitter(GovernanceEmissionResult result) : IGovernanceEmitter
     {
         public ValueTask<GovernanceEmissionResult> EmitAsync(
             GovernanceEmissionEnvelope envelope,
@@ -313,7 +313,7 @@ public sealed class GovernanceOutboxClaimDrainTests
         }
     }
 
-    private sealed class ThrowingEmitter : IAsiBackboneGovernanceEmitter
+    private sealed class ThrowingEmitter : IGovernanceEmitter
     {
         public ValueTask<GovernanceEmissionResult> EmitAsync(
             GovernanceEmissionEnvelope envelope,
@@ -323,7 +323,7 @@ public sealed class GovernanceOutboxClaimDrainTests
         }
     }
 
-    private sealed class SelectionOnlyOutboxStore : IAsiBackboneGovernanceOutboxStore
+    private sealed class SelectionOnlyOutboxStore : IGovernanceOutboxStore
     {
         public ValueTask<GovernanceOutboxEntry> EnqueueAsync(GovernanceEmissionEnvelope envelope, CancellationToken cancellationToken = default)
         {

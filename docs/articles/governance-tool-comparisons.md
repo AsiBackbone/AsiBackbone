@@ -14,7 +14,7 @@ AsiBackbone is a .NET governance spine for consequential application actions. It
 - AI-agent/tool governance frameworks;
 - SIEM, observability, and governance-emission systems.
 
-Those tools may govern adjacent boundaries. AsiBackbone remains focused on explicit application-level decisions, acknowledgment, audit residue, scoped continuation authority, and host-owned execution.
+Those tools may govern adjacent boundaries. AsiBackbone remains focused on explicit application-level decisions, acknowledgment, decision receipt, scoped continuation authority, and host-owned execution.
 
 ## Product-specific references
 

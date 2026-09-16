@@ -13,7 +13,7 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorFastAbortTests
     private static readonly string[] ExpectedDefaultEvaluationOrder = ["first", "second", "third"];
 
     /// <summary>
-    /// Tests that the default evaluation behavior of the <see cref="DefaultAsiBackbonePolicyEvaluator{TContext}"/> runs all constraints even after the first denied result is encountered.
+    /// Tests that the default evaluation behavior of the <see cref="DefaultGovernancePolicyEvaluator{TContext}"/> runs all constraints even after the first denied result is encountered.
     /// </summary>
     /// <returns>A task representing the asynchronous operation.</returns>
     [Fact]
@@ -22,7 +22,7 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorFastAbortTests
         TestPolicyContext context = CreateContext();
         var observedOrder = new List<string>();
 
-        var evaluator = new DefaultAsiBackbonePolicyEvaluator<TestPolicyContext>(
+        var evaluator = new DefaultGovernancePolicyEvaluator<TestPolicyContext>(
             [
                 new DelegateConstraint(
                     (_, _) =>
@@ -60,7 +60,7 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorFastAbortTests
     }
 
     /// <summary>
-    /// Tests that when the <see cref="AsiBackbonePolicyEvaluatorOptions.ShortCircuitOnFirstDenial"/> option is enabled, the evaluation stops after the first denied result is encountered.
+    /// Tests that when the <see cref="GovernancePolicyOptions.ShortCircuitOnFirstDenial"/> option is enabled, the evaluation stops after the first denied result is encountered.
     /// </summary>
     /// <returns>A task representing the asynchronous operation.</returns>
     [Fact]
@@ -69,7 +69,7 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorFastAbortTests
         TestPolicyContext context = CreateContext();
         int skippedEvaluationCount = 0;
 
-        var evaluator = new DefaultAsiBackbonePolicyEvaluator<TestPolicyContext>(
+        var evaluator = new DefaultGovernancePolicyEvaluator<TestPolicyContext>(
             [
                 new StaticConstraint(
                     ConstraintEvaluationResult.Deny(
@@ -85,7 +85,7 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorFastAbortTests
                     })
             ],
             decisionPolicy: null,
-            options: new AsiBackbonePolicyEvaluatorOptions
+            options: new GovernancePolicyOptions
             {
                 ShortCircuitOnFirstDenial = true
             }, threatModelContributors: null, logger: null);
@@ -98,7 +98,7 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorFastAbortTests
     }
 
     /// <summary>
-    /// Tests that when the <see cref="AsiBackbonePolicyEvaluatorOptions.ShortCircuitOnFirstDenial"/> option is enabled, any warnings produced before the first denied result are preserved in the final decision.
+    /// Tests that when the <see cref="GovernancePolicyOptions.ShortCircuitOnFirstDenial"/> option is enabled, any warnings produced before the first denied result are preserved in the final decision.
     /// </summary>
     /// <returns>A task representing the asynchronous operation.</returns>
     [Fact]
@@ -107,7 +107,7 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorFastAbortTests
         TestPolicyContext context = CreateContext();
         int skippedEvaluationCount = 0;
 
-        var evaluator = new DefaultAsiBackbonePolicyEvaluator<TestPolicyContext>(
+        var evaluator = new DefaultGovernancePolicyEvaluator<TestPolicyContext>(
             [
                 new StaticConstraint(
                     ConstraintEvaluationResult.Warning(
@@ -127,7 +127,7 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorFastAbortTests
                     })
             ],
             decisionPolicy: null,
-            options: new AsiBackbonePolicyEvaluatorOptions
+            options: new GovernancePolicyOptions
             {
                 ShortCircuitOnFirstDenial = true
             }, threatModelContributors: null, logger: null);
@@ -142,7 +142,7 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorFastAbortTests
     }
 
     /// <summary>
-    /// Tests that when the <see cref="AsiBackbonePolicyEvaluatorOptions.ShortCircuitOnFirstDenial"/> option is enabled, only the evaluated constraint results are passed to the decision policy, and any skipped constraints are not included in the results.
+    /// Tests that when the <see cref="GovernancePolicyOptions.ShortCircuitOnFirstDenial"/> option is enabled, only the evaluated constraint results are passed to the decision policy, and any skipped constraints are not included in the results.
     /// </summary>
     /// <returns>A task representing the asynchronous operation.</returns>
     [Fact]
@@ -152,7 +152,7 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorFastAbortTests
         var policy = new CapturingDecisionPolicy();
         int skippedEvaluationCount = 0;
 
-        var evaluator = new DefaultAsiBackbonePolicyEvaluator<TestPolicyContext>(
+        var evaluator = new DefaultGovernancePolicyEvaluator<TestPolicyContext>(
             [
                 new StaticConstraint(
                     ConstraintEvaluationResult.Warning(
@@ -170,7 +170,7 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorFastAbortTests
                     })
             ],
             decisionPolicy: policy,
-            options: new AsiBackbonePolicyEvaluatorOptions
+            options: new GovernancePolicyOptions
             {
                 ShortCircuitOnFirstDenial = true
             }, threatModelContributors: null, logger: null);
@@ -198,7 +198,7 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorFastAbortTests
         };
     }
 
-    private sealed class TestPolicyContext : IAsiBackboneConstraintEvaluationContext
+    private sealed class TestPolicyContext : IGovernanceEvaluationContext
     {
         public string? CorrelationId { get; init; }
 
@@ -210,7 +210,7 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorFastAbortTests
             new Dictionary<string, string>(StringComparer.Ordinal);
     }
 
-    private sealed class StaticConstraint(ConstraintEvaluationResult result) : IAsiBackboneConstraint<TestPolicyContext>
+    private sealed class StaticConstraint(ConstraintEvaluationResult result) : IGovernanceConstraint<TestPolicyContext>
     {
         private readonly ConstraintEvaluationResult result = result;
 
@@ -225,7 +225,7 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorFastAbortTests
     }
 
     private sealed class DelegateConstraint(
-        Func<TestPolicyContext, CancellationToken, ConstraintEvaluationResult> evaluate) : IAsiBackboneConstraint<TestPolicyContext>
+        Func<TestPolicyContext, CancellationToken, ConstraintEvaluationResult> evaluate) : IGovernanceConstraint<TestPolicyContext>
     {
         private readonly Func<TestPolicyContext, CancellationToken, ConstraintEvaluationResult> evaluate = evaluate;
 
@@ -240,7 +240,7 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorFastAbortTests
         }
     }
 
-    private sealed class CapturingDecisionPolicy : IAsiBackboneDecisionPolicy<TestPolicyContext>
+    private sealed class CapturingDecisionPolicy : IGovernanceDecisionPolicy<TestPolicyContext>
     {
         public int ApplyCount { get; private set; }
 

@@ -124,7 +124,7 @@ The explicit profiles are additive and do not silently change existing 3.x behav
 - Existing calls to `ValidateAsync(signedGrant)` continue to use the legacy default options where proof, acknowledgment-reference, and bounded-use checks are disabled.
 - New operational-gateway and consequential-execution code should prefer `CreateExecutionBoundary(...)`.
 - Code that intentionally performs only structural or temporal validation should prefer `CreateMetadataValidation(...)` so the reduced validation contract is visible in code review.
-- Hosts migrating an existing execution boundary should supply both an `IAsiBackboneSignatureVerificationService` and, when the profile keeps its default bounded-use requirement, an `ICapabilityGrantUseStore`.
+- Hosts migrating an existing execution boundary should supply both an `IGovernanceSignatureVerificationService` and, when the profile keeps its default bounded-use requirement, an `ICapabilityGrantUseStore`.
 
 The ambiguous no-options path remains available for 3.x compatibility. A future major version may tighten or remove that path; such a change would require explicit migration guidance rather than a silent behavioral change.
 

@@ -33,7 +33,7 @@ The implemented baseline direction is:
 
 1. Keep current single-worker selection APIs supported.
 2. Add opt-in Core claim/lease contracts so the concept remains provider-neutral.
-3. Add an opt-in drain path that uses claim leases only when `AsiBackboneGovernanceOutboxOptions.UseClaimLeases` is enabled.
+3. Add an opt-in drain path that uses claim leases only when `GovernanceOutboxOptions.UseClaimLeases` is enabled.
 4. Implement baseline claim/lease behavior in the in-memory and EF Core stores.
 5. Continue requiring provider-side idempotency guidance because claim/lease reduces duplicate selection risk but does not create universal exactly-once delivery.
 
@@ -41,10 +41,10 @@ This preserves existing package behavior while creating a path for scaled durabl
 
 ## Implemented contract shape
 
-The claim-capable contract is additive. It does not replace `IAsiBackboneGovernanceOutboxStore` for hosts that only need local tests, samples, or one active worker.
+The claim-capable contract is additive. It does not replace `IGovernanceOutboxStore` for hosts that only need local tests, samples, or one active worker.
 
 ```csharp
-public interface IAsiBackboneGovernanceOutboxClaimStore : IAsiBackboneGovernanceOutboxStore
+public interface IGovernanceOutboxClaimStore : IGovernanceOutboxStore
 {
     ValueTask<IReadOnlyList<GovernanceOutboxClaim>> ClaimPendingAsync(
         GovernanceOutboxClaimRequest request,
@@ -186,7 +186,7 @@ With the initial claim/lease support available, the recommended production guida
 
 * use one active worker per durable outbox partition when simple operations are preferred;
 * use disjoint partitions when running multiple workers without claim leases;
-* enable the claim-capable drain path only when the configured store implements `IAsiBackboneGovernanceOutboxClaimStore` and the host has applied any required schema migration;
+* enable the claim-capable drain path only when the configured store implements `IGovernanceOutboxClaimStore` and the host has applied any required schema migration;
 * use provider-side idempotency keys wherever the downstream provider supports them.
 
 This design record records the implemented baseline without overstating runtime guarantees.

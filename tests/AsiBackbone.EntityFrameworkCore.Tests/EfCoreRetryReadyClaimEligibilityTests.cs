@@ -30,7 +30,7 @@ public sealed class EfCoreRetryReadyClaimEligibilityTests
     public void EligibilityAcceptsRetryCapableStatuses(GovernanceEmissionStatus status)
     {
         DateTimeOffset utcNow = new(2026, 7, 10, 18, 0, 0, TimeSpan.Zero);
-        AsiBackboneGovernanceOutboxEntryEntity entity = CreateEligibilityEntity(status: status);
+        GovernanceOutboxEntryEntity entity = CreateEligibilityEntity(status: status);
 
         Assert.True(IsRetryReadyClaimEligible(entity, utcNow));
     }
@@ -46,7 +46,7 @@ public sealed class EfCoreRetryReadyClaimEligibilityTests
     public void EligibilityRejectsNonRetryStatuses(GovernanceEmissionStatus status)
     {
         DateTimeOffset utcNow = new(2026, 7, 10, 18, 0, 0, TimeSpan.Zero);
-        AsiBackboneGovernanceOutboxEntryEntity entity = CreateEligibilityEntity(status: status);
+        GovernanceOutboxEntryEntity entity = CreateEligibilityEntity(status: status);
 
         Assert.False(IsRetryReadyClaimEligible(entity, utcNow));
     }
@@ -142,7 +142,7 @@ public sealed class EfCoreRetryReadyClaimEligibilityTests
     public void EligibilityRejectsActiveClaimsRegardlessOfOwner(string? claimOwner)
     {
         DateTimeOffset utcNow = new(2026, 7, 10, 18, 0, 0, TimeSpan.Zero);
-        AsiBackboneGovernanceOutboxEntryEntity entity = CreateEligibilityEntity(
+        GovernanceOutboxEntryEntity entity = CreateEligibilityEntity(
             claimOwner: claimOwner,
             claimToken: "active-token",
             claimedUtc: utcNow.AddMinutes(-1),
@@ -354,14 +354,14 @@ public sealed class EfCoreRetryReadyClaimEligibilityTests
     }
 
     private static bool IsRetryReadyClaimEligible(
-        AsiBackboneGovernanceOutboxEntryEntity entity,
+        GovernanceOutboxEntryEntity entity,
         DateTimeOffset utcNow)
     {
         object? result = RetryReadyEligibilityMethod.Invoke(null, [entity, utcNow]);
         return Assert.IsType<bool>(result);
     }
 
-    private static AsiBackboneGovernanceOutboxEntryEntity CreateEligibilityEntity(
+    private static GovernanceOutboxEntryEntity CreateEligibilityEntity(
         GovernanceEmissionStatus status = GovernanceEmissionStatus.RetryableFailure,
         int retryCount = 1,
         int maxRetryCount = 5,
@@ -371,7 +371,7 @@ public sealed class EfCoreRetryReadyClaimEligibilityTests
         DateTimeOffset? claimedUtc = null,
         DateTimeOffset? claimExpiresUtc = null)
     {
-        return new AsiBackboneGovernanceOutboxEntryEntity
+        return new GovernanceOutboxEntryEntity
         {
             Status = status,
             RetryCount = retryCount,
@@ -454,7 +454,7 @@ public sealed class EfCoreRetryReadyClaimEligibilityTests
             schemaVersion: "1.0.0",
             correlationId: "efcore-retry-claim-eligibility",
             auditResidueId: $"audit-{outboxEntryId}",
-            lifecycleStage: AuditResidueLifecycleStage.ExternalEmissionQueued,
+            lifecycleStage: DecisionReceiptLifecycleStage.ExternalEmissionQueued,
             policyVersion: "2026.07",
             policyHash: "policy-hash-retry-claim",
             traceId: $"trace-{outboxEntryId}",

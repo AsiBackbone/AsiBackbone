@@ -8,15 +8,15 @@ Core remains free of hosting, scheduling, ASP.NET Core, EF Core, OpenTelemetry, 
 
 The hosted drain worker:
 
-- resolves `AsiBackboneGovernanceOutboxDrain` from a scoped service provider;
-- uses `IAsiBackboneGovernanceOutboxStore` to read pending and retry-ready outbox entries;
-- uses `IAsiBackboneGovernanceEmitter` to attempt provider-neutral delivery;
+- resolves `GovernanceOutboxDrain` from a scoped service provider;
+- uses `IGovernanceOutboxStore` to read pending and retry-ready outbox entries;
+- uses `IGovernanceEmitter` to attempt provider-neutral delivery;
 - persists delivered, deferred, failed, retryable, or dead-letter transitions through the store;
 - keeps provider selection outside Core and outside the worker itself.
 
 The worker is intentionally an integration host, not an emitter provider. It can run with the no-op emitter for proof-path validation, with an in-memory store for development, or with durable EF Core storage and an OpenTelemetry-style emitter when those provider packages are available.
 
-The worker validates its scoped drain dependency graph during host startup. Registration requires both an `IAsiBackboneGovernanceOutboxStore` and an `IAsiBackboneGovernanceEmitter`; if either dependency cannot be resolved, startup logs a critical error and fails instead of leaving a worker that polls forever without draining. The startup scope is disposed immediately. Normal drain passes continue to create their own scopes so scoped stores and host-owned `DbContext` instances are not retained by the hosted service.
+The worker validates its scoped drain dependency graph during host startup. Registration requires both an `IGovernanceOutboxStore` and an `IGovernanceEmitter`; if either dependency cannot be resolved, startup logs a critical error and fails instead of leaving a worker that polls forever without draining. The startup scope is disposed immediately. Normal drain passes continue to create their own scopes so scoped stores and host-owned `DbContext` instances are not retained by the hosted service.
 
 Store and emitter implementations are host-provided services that can dominate drain throughput. Keep them async, cancellable, batch-aware, bounded, and observable. See [High-Throughput Host Service Guidance](high-throughput-host-services.md) for blocking-I/O anti-patterns, batching guidance, queue/backpressure expectations, and the host/framework responsibility boundary.
 
@@ -25,8 +25,8 @@ Store and emitter implementations are host-provided services that can dominate d
 For local validation, tests, and samples, wire the worker with an outbox store and the provider-neutral no-op emitter:
 
 ```csharp
-builder.Services.AddSingleton<IAsiBackboneGovernanceOutboxStore, InMemoryGovernanceOutboxStore>();
-builder.Services.AddSingleton<IAsiBackboneGovernanceEmitter>(NoOpGovernanceEmitter.Instance);
+builder.Services.AddSingleton<IGovernanceOutboxStore, InMemoryGovernanceOutboxStore>();
+builder.Services.AddSingleton<IGovernanceEmitter>(NoOpGovernanceEmitter.Instance);
 
 builder.Services.AddAsiBackboneGovernanceOutboxDrainWorker(options =>
 {
@@ -43,10 +43,10 @@ A production host should normally use durable persistence and an actual governan
 
 ```csharp
 builder.Services.AddDbContext<AppDbContext>(/* host-owned EF Core configuration */);
-builder.Services.AddScoped<IAsiBackboneGovernanceOutboxStore, EfCoreGovernanceOutboxStore>();
-builder.Services.AddScoped<IAsiBackboneGovernanceEmitter, OpenTelemetryGovernanceEmitter>();
+builder.Services.AddScoped<IGovernanceOutboxStore, EfCoreGovernanceOutboxStore>();
+builder.Services.AddScoped<IGovernanceEmitter, OpenTelemetryGovernanceEmitter>();
 
-builder.Services.Configure<AsiBackboneGovernanceOutboxOptions>(options =>
+builder.Services.Configure<GovernanceOutboxOptions>(options =>
 {
     options.RetryDelay = TimeSpan.FromMinutes(2);
     options.DeferredDelay = TimeSpan.FromMinutes(5);
@@ -79,7 +79,7 @@ High-throughput production hosts should load-test the selected `BatchSize`, `Pol
 
 ## Runtime enable and disable behavior
 
-`AsiBackboneGovernanceOutboxDrainHostedService` uses `IOptionsMonitor<AsiBackboneGovernanceOutboxDrainWorkerOptions>` for runtime configuration. The service remains alive when `Enabled` is `false`, including when the process starts in the disabled state.
+`GovernanceOutboxDrainHostedService` uses `IOptionsMonitor<GovernanceOutboxDrainWorkerOptions>` for runtime configuration. The service remains alive when `Enabled` is `false`, including when the process starts in the disabled state.
 
 When disabled, the worker validates its drain dependencies once during startup and then:
 
@@ -94,7 +94,7 @@ Changing `Enabled` to `false` does not cancel a drain cycle already in progress.
 
 ## Core outbox retry options
 
-`AsiBackboneGovernanceOutboxOptions` controls retry timestamps persisted by the Core drain when the emitter does not supply a provider-specific retry-after value.
+`GovernanceOutboxOptions` controls retry timestamps persisted by the Core drain when the emitter does not supply a provider-specific retry-after value.
 
 | Option | Default | Purpose |
 | --- | ---: | --- |
@@ -132,7 +132,7 @@ Choose polling intervals based on operational urgency and provider stability:
 
 Emitter failures should be returned as provider-neutral `GovernanceEmissionResult` values whenever possible. The Core drain then persists deferred, retryable, failed, or dead-letter state transitions through the outbox store.
 
-If the provider throws unexpectedly, the Core drain converts the exception into a retryable provider-neutral outbox failure and schedules the next retry using `AsiBackboneGovernanceOutboxOptions.RetryDelay`. Missing or unresolvable drain dependencies fail host startup. If the running worker later encounters a transient store or infrastructure exception outside emission, it waits for `FailureDelay` before the next pass.
+If the provider throws unexpectedly, the Core drain converts the exception into a retryable provider-neutral outbox failure and schedules the next retry using `GovernanceOutboxOptions.RetryDelay`. Missing or unresolvable drain dependencies fail host startup. If the running worker later encounters a transient store or infrastructure exception outside emission, it waits for `FailureDelay` before the next pass.
 
 ## Operational reliability guidance
 

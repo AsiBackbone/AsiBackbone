@@ -14,7 +14,7 @@ namespace AsiBackbone.EntityFrameworkCore.Outbox;
 /// <remarks>
 /// This store provides durable local storage only. Provider delivery, telemetry export, SIEM routing, and cloud emission remain downstream and optional.
 /// </remarks>
-public sealed class EfCoreGovernanceOutboxStore : IAsiBackboneGovernanceOutboxClaimStore
+public sealed class EfCoreGovernanceOutboxStore : IGovernanceOutboxClaimStore
 {
     private static readonly JsonSerializerOptions JsonOptions = new(JsonSerializerDefaults.Web);
 
@@ -42,7 +42,7 @@ public sealed class EfCoreGovernanceOutboxStore : IAsiBackboneGovernanceOutboxCl
         var entry = GovernanceOutboxEntry.Create(envelope);
 
         _ = dbContext
-            .Set<AsiBackboneGovernanceOutboxEntryEntity>()
+            .Set<GovernanceOutboxEntryEntity>()
             .Add(ToEntity(entry));
 
         _ = await dbContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
@@ -58,16 +58,16 @@ public sealed class EfCoreGovernanceOutboxStore : IAsiBackboneGovernanceOutboxCl
         ArgumentNullException.ThrowIfNull(entry);
         cancellationToken.ThrowIfCancellationRequested();
 
-        AsiBackboneGovernanceOutboxEntryEntity persistedEntity = ToEntity(entry);
-        AsiBackboneGovernanceOutboxEntryEntity? existingEntity = await dbContext
-            .Set<AsiBackboneGovernanceOutboxEntryEntity>()
+        GovernanceOutboxEntryEntity persistedEntity = ToEntity(entry);
+        GovernanceOutboxEntryEntity? existingEntity = await dbContext
+            .Set<GovernanceOutboxEntryEntity>()
             .SingleOrDefaultAsync(entity => entity.OutboxEntryId == entry.OutboxEntryId, cancellationToken)
             .ConfigureAwait(false);
 
         if (existingEntity is null)
         {
             _ = dbContext
-                .Set<AsiBackboneGovernanceOutboxEntryEntity>()
+                .Set<GovernanceOutboxEntryEntity>()
                 .Add(persistedEntity);
         }
         else
@@ -79,7 +79,7 @@ public sealed class EfCoreGovernanceOutboxStore : IAsiBackboneGovernanceOutboxCl
             }
 
             persistedEntity.Id = existingEntity.Id;
-            persistedEntity.ConcurrencyStamp = AsiBackboneEntity.NewConcurrencyStamp();
+            persistedEntity.ConcurrencyStamp = GovernanceEntity.NewConcurrencyStamp();
             dbContext.Entry(existingEntity).CurrentValues.SetValues(persistedEntity);
         }
 
@@ -97,7 +97,7 @@ public sealed class EfCoreGovernanceOutboxStore : IAsiBackboneGovernanceOutboxCl
 
         string normalizedOutboxEntryId = outboxEntryId.Trim();
 
-        AsiBackboneGovernanceOutboxEntryEntity? entity = await OutboxEntries()
+        GovernanceOutboxEntryEntity? entity = await OutboxEntries()
             .Where(outboxEntry => outboxEntry.OutboxEntryId == normalizedOutboxEntryId)
             .SingleOrDefaultAsync(cancellationToken)
             .ConfigureAwait(false);
@@ -112,7 +112,7 @@ public sealed class EfCoreGovernanceOutboxStore : IAsiBackboneGovernanceOutboxCl
     {
         int normalizedMaxCount = NormalizeMaxCount(maxCount);
 
-        List<AsiBackboneGovernanceOutboxEntryEntity> entities = await OutboxEntries()
+        List<GovernanceOutboxEntryEntity> entities = await OutboxEntries()
             .Where(outboxEntry => outboxEntry.Status == GovernanceEmissionStatus.Pending)
             .OrderBy(outboxEntry => outboxEntry.CreatedUtc)
             .ThenBy(outboxEntry => outboxEntry.OutboxEntryId)
@@ -132,7 +132,7 @@ public sealed class EfCoreGovernanceOutboxStore : IAsiBackboneGovernanceOutboxCl
         int normalizedMaxCount = NormalizeMaxCount(maxCount);
         DateTimeOffset normalizedUtcNow = utcNow.ToUniversalTime();
 
-        List<AsiBackboneGovernanceOutboxEntryEntity> entities = await OutboxEntries()
+        List<GovernanceOutboxEntryEntity> entities = await OutboxEntries()
             .Where(outboxEntry =>
                 outboxEntry.Status == GovernanceEmissionStatus.Deferred ||
                 outboxEntry.Status == GovernanceEmissionStatus.Failed ||
@@ -155,7 +155,7 @@ public sealed class EfCoreGovernanceOutboxStore : IAsiBackboneGovernanceOutboxCl
         ArgumentNullException.ThrowIfNull(request);
         cancellationToken.ThrowIfCancellationRequested();
 
-        IQueryable<AsiBackboneGovernanceOutboxEntryEntity> candidates = OutboxEntries()
+        IQueryable<GovernanceOutboxEntryEntity> candidates = OutboxEntries()
             .Where(outboxEntry => outboxEntry.Status == GovernanceEmissionStatus.Pending)
             .Where(outboxEntry => outboxEntry.ClaimToken == null || outboxEntry.ClaimExpiresUtc == null || outboxEntry.ClaimExpiresUtc <= request.UtcNow)
             .OrderBy(outboxEntry => outboxEntry.CreatedUtc)
@@ -180,7 +180,7 @@ public sealed class EfCoreGovernanceOutboxStore : IAsiBackboneGovernanceOutboxCl
         ArgumentNullException.ThrowIfNull(request);
         cancellationToken.ThrowIfCancellationRequested();
 
-        IQueryable<AsiBackboneGovernanceOutboxEntryEntity> candidates = OutboxEntries()
+        IQueryable<GovernanceOutboxEntryEntity> candidates = OutboxEntries()
             .Where(outboxEntry =>
                 outboxEntry.Status == GovernanceEmissionStatus.Deferred ||
                 outboxEntry.Status == GovernanceEmissionStatus.Failed ||
@@ -332,8 +332,8 @@ public sealed class EfCoreGovernanceOutboxStore : IAsiBackboneGovernanceOutboxCl
         ArgumentNullException.ThrowIfNull(claim);
         cancellationToken.ThrowIfCancellationRequested();
 
-        AsiBackboneGovernanceOutboxEntryEntity? entity = await dbContext
-            .Set<AsiBackboneGovernanceOutboxEntryEntity>()
+        GovernanceOutboxEntryEntity? entity = await dbContext
+            .Set<GovernanceOutboxEntryEntity>()
             .SingleOrDefaultAsync(outboxEntry => outboxEntry.OutboxEntryId == claim.OutboxEntryId, cancellationToken)
             .ConfigureAwait(false);
 
@@ -355,13 +355,13 @@ public sealed class EfCoreGovernanceOutboxStore : IAsiBackboneGovernanceOutboxCl
     }
 
     private async ValueTask<IReadOnlyList<GovernanceOutboxClaim>> ClaimEntriesAsync(
-        IQueryable<AsiBackboneGovernanceOutboxEntryEntity> candidates,
-        Func<IQueryable<AsiBackboneGovernanceOutboxEntryEntity>, IOrderedQueryable<AsiBackboneGovernanceOutboxEntryEntity>> orderClaimedEntries,
+        IQueryable<GovernanceOutboxEntryEntity> candidates,
+        Func<IQueryable<GovernanceOutboxEntryEntity>, IOrderedQueryable<GovernanceOutboxEntryEntity>> orderClaimedEntries,
         GovernanceOutboxClaimRequest request,
         CancellationToken cancellationToken)
     {
         string claimToken = Guid.NewGuid().ToString("N");
-        string concurrencyStamp = AsiBackboneEntity.NewConcurrencyStamp();
+        string concurrencyStamp = GovernanceEntity.NewConcurrencyStamp();
 
         int claimedCount = await candidates
             .ExecuteUpdateAsync(
@@ -381,7 +381,7 @@ public sealed class EfCoreGovernanceOutboxStore : IAsiBackboneGovernanceOutboxCl
             return [];
         }
 
-        List<AsiBackboneGovernanceOutboxEntryEntity> claimedEntities = await orderClaimedEntries(
+        List<GovernanceOutboxEntryEntity> claimedEntities = await orderClaimedEntries(
             OutboxEntries().Where(outboxEntry => outboxEntry.ClaimToken == claimToken))
             .ToListAsync(cancellationToken)
             .ConfigureAwait(false);
@@ -394,7 +394,7 @@ public sealed class EfCoreGovernanceOutboxStore : IAsiBackboneGovernanceOutboxCl
         Func<GovernanceOutboxEntry, GovernanceOutboxEntry> updateEntry,
         CancellationToken cancellationToken)
     {
-        AsiBackboneGovernanceOutboxEntryEntity entity = await RequireEntityAsync(claim.OutboxEntryId, cancellationToken).ConfigureAwait(false);
+        GovernanceOutboxEntryEntity entity = await RequireEntityAsync(claim.OutboxEntryId, cancellationToken).ConfigureAwait(false);
         GovernanceOutboxEntry currentEntry = ToEntry(entity);
 
         if (!currentEntry.IsClaimedBy(claim) || IsTerminal(currentEntry))
@@ -418,13 +418,13 @@ public sealed class EfCoreGovernanceOutboxStore : IAsiBackboneGovernanceOutboxCl
     }
 
     private async ValueTask ApplyEntryUpdateAsync(
-        AsiBackboneGovernanceOutboxEntryEntity entity,
+        GovernanceOutboxEntryEntity entity,
         GovernanceOutboxEntry entry,
         CancellationToken cancellationToken)
     {
-        AsiBackboneGovernanceOutboxEntryEntity persistedEntity = ToEntity(entry);
+        GovernanceOutboxEntryEntity persistedEntity = ToEntity(entry);
         persistedEntity.Id = entity.Id;
-        persistedEntity.ConcurrencyStamp = AsiBackboneEntity.NewConcurrencyStamp();
+        persistedEntity.ConcurrencyStamp = GovernanceEntity.NewConcurrencyStamp();
         dbContext.Entry(entity).CurrentValues.SetValues(persistedEntity);
 
         _ = await dbContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
@@ -439,30 +439,30 @@ public sealed class EfCoreGovernanceOutboxStore : IAsiBackboneGovernanceOutboxCl
         return entry ?? throw new InvalidOperationException($"Outbox entry '{outboxEntryId.Trim()}' was not found.");
     }
 
-    private async ValueTask<AsiBackboneGovernanceOutboxEntryEntity> RequireEntityAsync(
+    private async ValueTask<GovernanceOutboxEntryEntity> RequireEntityAsync(
         string outboxEntryId,
         CancellationToken cancellationToken)
     {
-        AsiBackboneGovernanceOutboxEntryEntity? entity = await dbContext
-            .Set<AsiBackboneGovernanceOutboxEntryEntity>()
+        GovernanceOutboxEntryEntity? entity = await dbContext
+            .Set<GovernanceOutboxEntryEntity>()
             .SingleOrDefaultAsync(outboxEntry => outboxEntry.OutboxEntryId == outboxEntryId.Trim(), cancellationToken)
             .ConfigureAwait(false);
 
         return entity ?? throw new InvalidOperationException($"Outbox entry '{outboxEntryId.Trim()}' was not found.");
     }
 
-    private IQueryable<AsiBackboneGovernanceOutboxEntryEntity> OutboxEntries()
+    private IQueryable<GovernanceOutboxEntryEntity> OutboxEntries()
     {
-        return dbContext.Set<AsiBackboneGovernanceOutboxEntryEntity>().AsNoTracking();
+        return dbContext.Set<GovernanceOutboxEntryEntity>().AsNoTracking();
     }
 
-    private static AsiBackboneGovernanceOutboxEntryEntity ToEntity(GovernanceOutboxEntry entry)
+    private static GovernanceOutboxEntryEntity ToEntity(GovernanceOutboxEntry entry)
     {
         GovernanceEmissionEnvelope envelope = entry.Envelope;
         GovernanceEmissionPayload? payload = envelope.Payload;
         GovernanceEmissionError? lastError = entry.LastError;
 
-        return new AsiBackboneGovernanceOutboxEntryEntity
+        return new GovernanceOutboxEntryEntity
         {
             OutboxEntryId = entry.OutboxEntryId,
             Status = entry.Status,
@@ -519,12 +519,12 @@ public sealed class EfCoreGovernanceOutboxStore : IAsiBackboneGovernanceOutboxCl
         };
     }
 
-    private static GovernanceOutboxEntry[] ToEntries(IEnumerable<AsiBackboneGovernanceOutboxEntryEntity> entities)
+    private static GovernanceOutboxEntry[] ToEntries(IEnumerable<GovernanceOutboxEntryEntity> entities)
     {
         return [.. entities.Select(ToEntry)];
     }
 
-    private static GovernanceOutboxEntry ToEntry(AsiBackboneGovernanceOutboxEntryEntity entity)
+    private static GovernanceOutboxEntry ToEntry(GovernanceOutboxEntryEntity entity)
     {
         GovernanceEmissionPayload? payload = string.IsNullOrWhiteSpace(entity.EnvelopePayloadType)
             ? null
@@ -602,19 +602,19 @@ public sealed class EfCoreGovernanceOutboxStore : IAsiBackboneGovernanceOutboxCl
             entry.ClaimExpiresUtc ?? throw new InvalidOperationException("Claimed entry is missing claim expiration timestamp."));
     }
 
-    internal static bool IsPendingClaimEligible(AsiBackboneGovernanceOutboxEntryEntity entity, DateTimeOffset utcNow)
+    internal static bool IsPendingClaimEligible(GovernanceOutboxEntryEntity entity, DateTimeOffset utcNow)
     {
         return entity.Status is GovernanceEmissionStatus.Pending && IsClaimAvailable(entity, utcNow);
     }
 
-    internal static bool IsRetryReadyClaimEligible(AsiBackboneGovernanceOutboxEntryEntity entity, DateTimeOffset utcNow)
+    internal static bool IsRetryReadyClaimEligible(GovernanceOutboxEntryEntity entity, DateTimeOffset utcNow)
     {
         return (entity.Status is GovernanceEmissionStatus.Deferred or GovernanceEmissionStatus.Failed or GovernanceEmissionStatus.RetryableFailure)
             && (entity.NextRetryUtc is null || entity.NextRetryUtc <= utcNow.ToUniversalTime())
             && IsClaimAvailable(entity, utcNow);
     }
 
-    private static bool IsClaimAvailable(AsiBackboneGovernanceOutboxEntryEntity entity, DateTimeOffset utcNow)
+    private static bool IsClaimAvailable(GovernanceOutboxEntryEntity entity, DateTimeOffset utcNow)
     {
         return entity.ClaimToken is null || entity.ClaimExpiresUtc is null || entity.ClaimExpiresUtc <= utcNow.ToUniversalTime();
     }

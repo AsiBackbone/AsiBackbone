@@ -122,7 +122,7 @@ Build audit receipt
   -> classify and minimize metadata
   -> canonicalize receipt payload
   -> compute artifact hash
-  -> sign artifact hash through IAsiBackboneSigningService
+  -> sign artifact hash through IGovernanceSigningService
   -> attach SigningMetadata to the receipt or ledger record
   -> persist receipt and signing metadata durably
 ```
@@ -170,7 +170,7 @@ Conceptual flow:
 Load receipt
   -> rebuild canonical payload using the recorded schema version
   -> recompute artifact hash
-  -> verify hash and signature metadata through IAsiBackboneSignatureVerificationService
+  -> verify hash and signature metadata through IGovernanceSignatureVerificationService
   -> apply host verification policy
 ```
 
@@ -220,7 +220,7 @@ Recommended secure sequence:
 
 ```text
 Decision / acknowledgment / capability event
-  -> build audit residue or lifecycle event
+  -> build decision receipt or lifecycle event
   -> persist durable local audit record
   -> optionally sign the local artifact or outbox envelope
   -> enqueue governance outbox entry

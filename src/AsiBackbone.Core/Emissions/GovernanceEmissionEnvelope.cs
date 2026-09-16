@@ -25,7 +25,7 @@ public sealed class GovernanceEmissionEnvelope
         DateTimeOffset createdUtc,
         string? correlationId,
         string? auditResidueId,
-        AuditResidueLifecycleStage? lifecycleStage,
+        DecisionReceiptLifecycleStage? lifecycleStage,
         string? policyVersion,
         string? policyHash,
         string? traceId,
@@ -55,7 +55,7 @@ public sealed class GovernanceEmissionEnvelope
         }
 
         EnvelopeId = envelopeId.Trim();
-        SchemaVersion = AsiBackboneSchemaVersions.Normalize(schemaVersion);
+        SchemaVersion = GovernanceSchemaVersions.Normalize(schemaVersion);
         EventType = eventType;
         EventId = NormalizeOptional(eventId);
         OccurredUtc = occurredUtc.ToUniversalTime();
@@ -117,14 +117,14 @@ public sealed class GovernanceEmissionEnvelope
     public string? CorrelationId { get; }
 
     /// <summary>
-    /// Gets the audit residue identifier linked to this emission, when available.
+    /// Gets the decision receipt identifier linked to this emission, when available.
     /// </summary>
     public string? AuditResidueId { get; }
 
     /// <summary>
-    /// Gets the audit residue lifecycle stage linked to this emission, when available.
+    /// Gets the decision receipt lifecycle stage linked to this emission, when available.
     /// </summary>
-    public AuditResidueLifecycleStage? LifecycleStage { get; }
+    public DecisionReceiptLifecycleStage? LifecycleStage { get; }
 
     /// <summary>
     /// Gets the stable lifecycle stage sequence value, when a lifecycle stage is supplied.
@@ -228,7 +228,7 @@ public sealed class GovernanceEmissionEnvelope
         string? schemaVersion = null,
         string? correlationId = null,
         string? auditResidueId = null,
-        AuditResidueLifecycleStage? lifecycleStage = null,
+        DecisionReceiptLifecycleStage? lifecycleStage = null,
         string? policyVersion = null,
         string? policyHash = null,
         string? traceId = null,
@@ -247,7 +247,7 @@ public sealed class GovernanceEmissionEnvelope
     {
         return new GovernanceEmissionEnvelope(
             NormalizeIdentifier(envelopeId),
-            schemaVersion ?? AsiBackboneSchemaVersions.StableArtifactsV1,
+            schemaVersion ?? GovernanceSchemaVersions.StableArtifactsV1,
             eventType,
             eventId,
             occurredUtc ?? DateTimeOffset.UtcNow,
@@ -273,10 +273,10 @@ public sealed class GovernanceEmissionEnvelope
     }
 
     /// <summary>
-    /// Creates a provider-neutral governance emission envelope from audit residue.
+    /// Creates a provider-neutral governance emission envelope from decision receipt.
     /// </summary>
     public static GovernanceEmissionEnvelope FromResidue(
-        IAsiBackboneAuditResidue residue,
+        IDecisionReceipt residue,
         GovernanceEmissionEventType eventType = GovernanceEmissionEventType.AuditResidue,
         string? envelopeId = null,
         DateTimeOffset? createdUtc = null,
@@ -313,10 +313,10 @@ public sealed class GovernanceEmissionEnvelope
     }
 
     /// <summary>
-    /// Creates a provider-neutral governance emission envelope from an audit residue lifecycle event.
+    /// Creates a provider-neutral governance emission envelope from an decision receipt lifecycle event.
     /// </summary>
     public static GovernanceEmissionEnvelope FromLifecycleEvent(
-        AuditResidueLifecycleEvent lifecycleEvent,
+        DecisionReceiptLifecycleEvent lifecycleEvent,
         string? envelopeId = null,
         DateTimeOffset? createdUtc = null,
         GovernanceEmissionPayload? payload = null,
@@ -326,7 +326,7 @@ public sealed class GovernanceEmissionEnvelope
 
         return new GovernanceEmissionEnvelope(
             NormalizeIdentifier(envelopeId),
-            AsiBackboneSchemaVersions.StableArtifactsV1,
+            GovernanceSchemaVersions.StableArtifactsV1,
             GovernanceEmissionEventType.AuditLifecycle,
             lifecycleEvent.EventId,
             lifecycleEvent.OccurredUtc,

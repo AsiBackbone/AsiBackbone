@@ -18,7 +18,7 @@ public sealed class LiabilityHandshakeRequest
         string handshakeId,
         string? schemaVersion,
         string actorId,
-        AsiBackboneActorType actorType,
+        GovernanceActorType actorType,
         string? actorDisplayName,
         string operationName,
         string reasonCode,
@@ -42,7 +42,7 @@ public sealed class LiabilityHandshakeRequest
         ArgumentException.ThrowIfNullOrWhiteSpace(requiredAcknowledgmentText);
 
         HandshakeId = handshakeId.Trim();
-        SchemaVersion = AsiBackboneSchemaVersions.Normalize(schemaVersion);
+        SchemaVersion = GovernanceSchemaVersions.Normalize(schemaVersion);
         ActorId = actorId.Trim();
         ActorType = actorType;
         ActorDisplayName = NormalizeOptional(actorDisplayName);
@@ -78,7 +78,7 @@ public sealed class LiabilityHandshakeRequest
     /// <summary>
     /// Gets the actor type associated with the handshake.
     /// </summary>
-    public AsiBackboneActorType ActorType { get; }
+    public GovernanceActorType ActorType { get; }
 
     /// <summary>
     /// Gets the optional display name or label associated with the actor.
@@ -170,7 +170,7 @@ public sealed class LiabilityHandshakeRequest
     /// <param name="schemaVersion">Optional schema version for serialized or persisted handshake records.</param>
     /// <returns>A liability handshake request.</returns>
     public static LiabilityHandshakeRequest Create(
-        IAsiBackboneActorContext actor,
+        IGovernanceActorContext actor,
         string operationName,
         string reasonCode,
         string message,
@@ -223,7 +223,7 @@ public sealed class LiabilityHandshakeRequest
     /// <param name="schemaVersion">Optional schema version for serialized or persisted handshake records.</param>
     /// <returns>A liability handshake request.</returns>
     public static LiabilityHandshakeRequest FromDecision(
-        IAsiBackboneActorContext actor,
+        IGovernanceActorContext actor,
         string operationName,
         GovernanceDecision decision,
         string requiredAcknowledgmentCode,

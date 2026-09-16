@@ -40,7 +40,7 @@ public sealed class ManagedKeySigningBuilderExtensionsTests
         using ServiceProvider provider = services.BuildServiceProvider();
         ManagedKeySigningOptions options = provider.GetRequiredService<ManagedKeySigningOptions>();
         ManagedKeySigningService concrete = provider.GetRequiredService<ManagedKeySigningService>();
-        IAsiBackboneSigningService signing = provider.GetRequiredService<IAsiBackboneSigningService>();
+        IGovernanceSigningService signing = provider.GetRequiredService<IGovernanceSigningService>();
         IManagedKeySigningClient resolvedClient = provider.GetRequiredService<IManagedKeySigningClient>();
 
         Assert.Equal("managed-key-test", options.ProviderName);
@@ -72,7 +72,7 @@ public sealed class ManagedKeySigningBuilderExtensionsTests
         using ServiceProvider provider = services.BuildServiceProvider();
         ManagedKeySigningOptions options = provider.GetRequiredService<ManagedKeySigningOptions>();
         ManagedKeySigningService concrete = provider.GetRequiredService<ManagedKeySigningService>();
-        IAsiBackboneSigningService signing = provider.GetRequiredService<IAsiBackboneSigningService>();
+        IGovernanceSigningService signing = provider.GetRequiredService<IGovernanceSigningService>();
 
         Assert.Equal("managed-key-1", options.KeyId);
         Assert.Equal("v1", options.KeyVersion);
@@ -156,7 +156,7 @@ public sealed class ManagedKeySigningBuilderExtensionsTests
             services,
             descriptor => descriptor.ServiceType == typeof(ManagedKeySigningOptions)
                 || descriptor.ServiceType == typeof(ManagedKeySigningService)
-                || descriptor.ServiceType == typeof(IAsiBackboneSigningService));
+                || descriptor.ServiceType == typeof(IGovernanceSigningService));
     }
 
     private static void ConfigureValidOptions(ManagedKeySigningOptions options)
@@ -180,7 +180,7 @@ public sealed class ManagedKeySigningBuilderExtensionsTests
                 && descriptor.Lifetime == ServiceLifetime.Singleton);
         Assert.Contains(
             services,
-            descriptor => descriptor.ServiceType == typeof(IAsiBackboneSigningService)
+            descriptor => descriptor.ServiceType == typeof(IGovernanceSigningService)
                 && descriptor.ImplementationFactory is not null
                 && descriptor.Lifetime == ServiceLifetime.Singleton);
 

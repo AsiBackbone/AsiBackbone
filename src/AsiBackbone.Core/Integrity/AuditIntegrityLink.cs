@@ -53,7 +53,7 @@ public sealed class AuditIntegrityLink
         LinkHash = linkHash.Trim().ToLowerInvariant();
         HashAlgorithm = CanonicalPayloadHash.NormalizeHashAlgorithm(hashAlgorithm);
         CanonicalizationVersion = canonicalizationVersion.Trim();
-        SchemaVersion = AsiBackboneSchemaVersions.Normalize(schemaVersion);
+        SchemaVersion = GovernanceSchemaVersions.Normalize(schemaVersion);
         CreatedUtc = createdUtc.ToUniversalTime();
         Metadata = metadata;
     }
@@ -227,7 +227,7 @@ public sealed class AuditIntegrityLink
     {
         ArgumentNullException.ThrowIfNull(recordHash);
 
-        string schemaVersion = AsiBackboneSchemaVersions.StableArtifactsV1;
+        string schemaVersion = GovernanceSchemaVersions.StableArtifactsV1;
         string canonicalizationVersion = recordHash.CanonicalizationVersion;
         var draft = new AuditIntegrityLink(
             chainId,

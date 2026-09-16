@@ -23,7 +23,7 @@ Use this package when:
 
 - writing unit tests or integration tests around policy evaluation;
 - building sample applications;
-- validating audit residue and audit ledger behavior locally;
+- validating decision receipt and audit ledger behavior locally;
 - validating governance outbox state transitions locally;
 - validating first-use and replay-denied capability grant flows locally;
 - demonstrating host-neutral ASI Backbone flows before adding durable storage.

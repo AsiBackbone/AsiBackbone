@@ -50,7 +50,7 @@ public sealed class CanonicalPayloadJsonBranchTests
         var payload = CanonicalPayload.Create(
             CanonicalArtifactTypes.AuditLedgerRecord,
             "record-1",
-            AsiBackboneSchemaVersions.StableArtifactsV1,
+            GovernanceSchemaVersions.StableArtifactsV1,
             CanonicalPayloadOptions.DefaultCanonicalizationVersion,
             new Dictionary<string, object?>
             {
@@ -101,7 +101,7 @@ public sealed class CanonicalPayloadJsonBranchTests
             CanonicalPayload.Create(
                 CanonicalArtifactTypes.AuditLedgerRecord,
                 "record-1",
-                AsiBackboneSchemaVersions.StableArtifactsV1,
+                GovernanceSchemaVersions.StableArtifactsV1,
                 CanonicalPayloadOptions.DefaultCanonicalizationVersion,
                 new Dictionary<string, object?>
                 {
@@ -119,7 +119,7 @@ public sealed class CanonicalPayloadJsonBranchTests
             CanonicalPayload.Create(
                 CanonicalArtifactTypes.AuditLedgerRecord,
                 "record-1",
-                AsiBackboneSchemaVersions.StableArtifactsV1,
+                GovernanceSchemaVersions.StableArtifactsV1,
                 CanonicalPayloadOptions.DefaultCanonicalizationVersion,
                 new Dictionary<string, object?>
                 {

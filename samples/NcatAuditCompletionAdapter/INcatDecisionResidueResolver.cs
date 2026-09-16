@@ -15,7 +15,7 @@ public interface INcatDecisionResidueResolver
     /// <summary>
     /// Resolves the decision residue associated with the supplied decision and correlation identifiers.
     /// </summary>
-    ValueTask<IAsiBackboneAuditResidue?> ResolveAsync(
+    ValueTask<IDecisionReceipt?> ResolveAsync(
         string decisionAuditRecordId,
         string? correlationId,
         CancellationToken cancellationToken = default);

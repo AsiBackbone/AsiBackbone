@@ -42,10 +42,10 @@ public sealed class AsiBackboneTestHarnessTests
                 new RequireCapabilityGrantAttribute("robotics.execute"),
                 new EmitGovernanceAuditAttribute()),
             "testing.protected");
-        var descriptor = AsiBackboneEndpointGovernanceDescriptor.FromEndpoint(endpoint);
-        IAsiBackboneEndpointGovernanceService service = scope.ServiceProvider.GetRequiredService<IAsiBackboneEndpointGovernanceService>();
+        var descriptor = EndpointGovernanceDescriptor.FromEndpoint(endpoint);
+        IEndpointGovernanceService service = scope.ServiceProvider.GetRequiredService<IEndpointGovernanceService>();
 
-        AsiBackboneEndpointGovernanceResult result = await service.EvaluateAsync(
+        EndpointGovernanceResult result = await service.EvaluateAsync(
             httpContext,
             descriptor,
             TestContext.Current.CancellationToken);
@@ -54,7 +54,7 @@ public sealed class AsiBackboneTestHarnessTests
         Assert.NotNull(result.Decision);
         Assert.True(result.Decision.IsAllowed);
 
-        AsiBackboneTestAuditSink auditSink = scope.ServiceProvider.GetRequiredService<AsiBackboneTestAuditSink>();
+        GovernanceTestDecisionReceiptSink auditSink = scope.ServiceProvider.GetRequiredService<GovernanceTestDecisionReceiptSink>();
         _ = Assert.Single(auditSink.Entries);
         Assert.Equal("testing.protected", auditSink.Entries[0].OperationName);
     }
@@ -85,10 +85,10 @@ public sealed class AsiBackboneTestHarnessTests
             static _ => Task.CompletedTask,
             new EndpointMetadataCollection(new RequireGovernancePolicyAttribute(typeof(StrictPolicy))),
             "testing.denied");
-        var descriptor = AsiBackboneEndpointGovernanceDescriptor.FromEndpoint(endpoint);
-        IAsiBackboneEndpointGovernanceService service = scope.ServiceProvider.GetRequiredService<IAsiBackboneEndpointGovernanceService>();
+        var descriptor = EndpointGovernanceDescriptor.FromEndpoint(endpoint);
+        IEndpointGovernanceService service = scope.ServiceProvider.GetRequiredService<IEndpointGovernanceService>();
 
-        AsiBackboneEndpointGovernanceResult result = await service.EvaluateAsync(
+        EndpointGovernanceResult result = await service.EvaluateAsync(
             httpContext,
             descriptor,
             TestContext.Current.CancellationToken);
@@ -114,9 +114,9 @@ public sealed class AsiBackboneTestHarnessTests
             .BuildServiceProvider(validateScopes: true);
 
         using IServiceScope scope = services.CreateScope();
-        IAsiBackbonePolicyEvaluator<AsiBackboneConstraintEvaluationContext> evaluator =
-            scope.ServiceProvider.GetRequiredService<IAsiBackbonePolicyEvaluator<AsiBackboneConstraintEvaluationContext>>();
-        var context = new AsiBackboneConstraintEvaluationContext(
+        IGovernancePolicyEvaluator<GovernanceEvaluationContext> evaluator =
+            scope.ServiceProvider.GetRequiredService<IGovernancePolicyEvaluator<GovernanceEvaluationContext>>();
+        var context = new GovernanceEvaluationContext(
             correlationId: "correlation-1",
             metadata: new Dictionary<string, string>(StringComparer.Ordinal)
             {
@@ -145,9 +145,9 @@ public sealed class AsiBackboneTestHarnessTests
             .BuildServiceProvider(validateScopes: true);
 
         using IServiceScope scope = services.CreateScope();
-        IAsiBackbonePolicyEvaluator<AsiBackboneConstraintEvaluationContext> evaluator =
-            scope.ServiceProvider.GetRequiredService<IAsiBackbonePolicyEvaluator<AsiBackboneConstraintEvaluationContext>>();
-        var context = new AsiBackboneConstraintEvaluationContext(
+        IGovernancePolicyEvaluator<GovernanceEvaluationContext> evaluator =
+            scope.ServiceProvider.GetRequiredService<IGovernancePolicyEvaluator<GovernanceEvaluationContext>>();
+        var context = new GovernanceEvaluationContext(
             metadata: new Dictionary<string, string>(StringComparer.Ordinal)
             {
                 ["endpoint.policy_types"] = typeof(SamplePolicy).FullName ?? nameof(SamplePolicy)
@@ -185,10 +185,10 @@ public sealed class AsiBackboneTestHarnessTests
                 new RequireGovernancePolicyAttribute(typeof(SamplePolicy)),
                 new RequireCapabilityGrantAttribute("robotics.execute")),
             "testing.capability");
-        var descriptor = AsiBackboneEndpointGovernanceDescriptor.FromEndpoint(endpoint);
-        IAsiBackboneEndpointGovernanceService service = scope.ServiceProvider.GetRequiredService<IAsiBackboneEndpointGovernanceService>();
+        var descriptor = EndpointGovernanceDescriptor.FromEndpoint(endpoint);
+        IEndpointGovernanceService service = scope.ServiceProvider.GetRequiredService<IEndpointGovernanceService>();
 
-        AsiBackboneEndpointGovernanceResult result = await service.EvaluateAsync(
+        EndpointGovernanceResult result = await service.EvaluateAsync(
             httpContext,
             descriptor,
             TestContext.Current.CancellationToken);
@@ -212,7 +212,7 @@ public sealed class AsiBackboneTestHarnessTests
             .AddAsiBackboneTestHarness()
             .BuildServiceProvider(validateScopes: true);
 
-        IAsiBackboneSigningService signingService = services.GetRequiredService<IAsiBackboneSigningService>();
+        IGovernanceSigningService signingService = services.GetRequiredService<IGovernanceSigningService>();
 
         SigningResult result = await signingService.SignAsync(
             new SigningRequest("test-payload-hash", "SHA256", "test"),

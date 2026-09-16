@@ -12,12 +12,12 @@ namespace AsiBackbone.Core.Tests.Audit;
 public sealed class AuditResidueMutationTests
 {
     /// <summary>
-    /// Tests that the <see cref="AuditResidue.FromDecision"/> method correctly copies decision trace and policy metadata, and ensures that the metadata dictionary is not aliased (i.e., changes to the original dictionary after creation do not affect the residue's metadata).
+    /// Tests that the <see cref="DecisionReceipt.FromDecision"/> method correctly copies decision trace and policy metadata, and ensures that the metadata dictionary is not aliased (i.e., changes to the original dictionary after creation do not affect the residue's metadata).
     /// </summary>
     [Fact]
     public void FromDecisionCopiesDecisionTracePolicyMetadataAndDoesNotAliasMetadata()
     {
-        IAsiBackboneActorContext actor = AsiBackboneActorContext.Human(" user-123 ", " Chris ");
+        IGovernanceActorContext actor = GovernanceActorContext.Human(" user-123 ", " Chris ");
         var decision = GovernanceDecision.RequireAcknowledgment(
             "decision.ack.required",
             "Acknowledgment is required.",
@@ -31,7 +31,7 @@ public sealed class AuditResidueMutationTests
             ["risk"] = " high "
         };
 
-        var residue = AuditResidue.FromDecision(
+        var residue = DecisionReceipt.FromDecision(
             actor,
             " document.approve ",
             decision,
@@ -45,7 +45,7 @@ public sealed class AuditResidueMutationTests
         Assert.Equal("event-123", residue.EventId);
         Assert.Equal(new DateTimeOffset(2026, 6, 13, 12, 30, 0, TimeSpan.Zero), residue.OccurredUtc);
         Assert.Equal("user-123", residue.ActorId);
-        Assert.Equal(AsiBackboneActorType.Human, residue.ActorType);
+        Assert.Equal(GovernanceActorType.Human, residue.ActorType);
         Assert.Equal("Chris", residue.ActorDisplayName);
         Assert.Equal("document.approve", residue.OperationName);
         Assert.Equal(nameof(GovernanceDecisionOutcome.AcknowledgmentRequired), residue.Outcome);
@@ -60,17 +60,17 @@ public sealed class AuditResidueMutationTests
     }
 
     /// <summary>
-    /// Tests that the <see cref="AuditResidue.FromConstraint"/> method correctly copies constraint evaluation trace and policy metadata, ensuring that the metadata dictionary is not aliased (i.e., changes to the original dictionary after creation do not affect the residue's metadata).
+    /// Tests that the <see cref="DecisionReceipt.FromConstraint"/> method correctly copies constraint evaluation trace and policy metadata, ensuring that the metadata dictionary is not aliased (i.e., changes to the original dictionary after creation do not affect the residue's metadata).
     /// </summary>
     [Fact]
     public void FromConstraintCopiesFullTracePolicyDataAndMetadata()
     {
-        IAsiBackboneActorContext actor = AsiBackboneActorContext.Service(" service-123 ");
+        IGovernanceActorContext actor = GovernanceActorContext.Service(" service-123 ");
         var constraintResult = ConstraintEvaluationResult.Deny(
             "constraint.denied",
             "Constraint denied the operation.");
 
-        var residue = AuditResidue.FromConstraint(
+        var residue = DecisionReceipt.FromConstraint(
             actor,
             " external.call ",
             constraintResult,
@@ -99,14 +99,14 @@ public sealed class AuditResidueMutationTests
     }
 
     /// <summary>
-    /// Tests that the <see cref="AuditResidue.Create"/> method generates identifiers and initializes empty collections when optional inputs are missing, ensuring that the residue is still valid and usable even with minimal input.
+    /// Tests that the <see cref="DecisionReceipt.Create"/> method generates identifiers and initializes empty collections when optional inputs are missing, ensuring that the residue is still valid and usable even with minimal input.
     /// </summary>
     [Fact]
     public void CreateUsesGeneratedIdentifiersAndEmptyCollectionsWhenOptionalInputsAreMissing()
     {
-        IAsiBackboneActorContext actor = AsiBackboneActorContext.Service(" service-123 ");
+        IGovernanceActorContext actor = GovernanceActorContext.Service(" service-123 ");
 
-        var residue = AuditResidue.Create(actor, "gateway.execute", "Allowed");
+        var residue = DecisionReceipt.Create(actor, "gateway.execute", "Allowed");
 
         Assert.False(string.IsNullOrWhiteSpace(residue.EventId));
         Assert.Equal(residue.EventId, residue.AuditResidueId);
@@ -122,12 +122,12 @@ public sealed class AuditResidueMutationTests
     }
 
     /// <summary>
-    /// Tests that the <see cref="AuditResidue.Create"/> method normalizes reason codes, telemetry identifiers, and metadata keys/values by trimming whitespace and handling nulls appropriately, ensuring that the resulting residue contains clean and consistent data.
+    /// Tests that the <see cref="DecisionReceipt.Create"/> method normalizes reason codes, telemetry identifiers, and metadata keys/values by trimming whitespace and handling nulls appropriately, ensuring that the resulting residue contains clean and consistent data.
     /// </summary>
     [Fact]
     public void CreateNormalizesReasonCodesTelemetryAndMetadataBranches()
     {
-        IAsiBackboneActorContext actor = AsiBackboneActorContext.Human(" user-123 ", " Chris ");
+        IGovernanceActorContext actor = GovernanceActorContext.Human(" user-123 ", " Chris ");
         Dictionary<string, string> metadata = new(StringComparer.Ordinal)
         {
             [" source "] = " branch-test ",
@@ -135,7 +135,7 @@ public sealed class AuditResidueMutationTests
             ["nullable"] = null!
         };
 
-        var residue = AuditResidue.Create(
+        var residue = DecisionReceipt.Create(
             actor,
             " gateway.execute ",
             " Allowed ",
@@ -194,15 +194,15 @@ public sealed class AuditResidueMutationTests
     }
 
     /// <summary>
-    /// Tests that the <see cref="AuditResidue.Create"/> method throws an <see cref="ArgumentOutOfRangeException"/> when a negative decision latency is provided, ensuring that invalid input is properly rejected.
+    /// Tests that the <see cref="DecisionReceipt.Create"/> method throws an <see cref="ArgumentOutOfRangeException"/> when a negative decision latency is provided, ensuring that invalid input is properly rejected.
     /// </summary>
     [Fact]
     public void CreateRejectsNegativeDecisionLatency()
     {
-        IAsiBackboneActorContext actor = AsiBackboneActorContext.Service("service-123");
+        IGovernanceActorContext actor = GovernanceActorContext.Service("service-123");
 
         _ = Assert.Throws<ArgumentOutOfRangeException>(() =>
-            AuditResidue.Create(
+            DecisionReceipt.Create(
                 actor,
                 "gateway.execute",
                 "Allowed",
@@ -210,15 +210,15 @@ public sealed class AuditResidueMutationTests
     }
 
     /// <summary>
-    /// Tests that the <see cref="AuditResidue.Create"/> method throws an <see cref="ArgumentOutOfRangeException"/> when a negative constraint count is provided, ensuring that invalid input is properly rejected.
+    /// Tests that the <see cref="DecisionReceipt.Create"/> method throws an <see cref="ArgumentOutOfRangeException"/> when a negative constraint count is provided, ensuring that invalid input is properly rejected.
     /// </summary>
     [Fact]
     public void CreateRejectsNegativeConstraintCount()
     {
-        IAsiBackboneActorContext actor = AsiBackboneActorContext.Service("service-123");
+        IGovernanceActorContext actor = GovernanceActorContext.Service("service-123");
 
         _ = Assert.Throws<ArgumentOutOfRangeException>(() =>
-            AuditResidue.Create(
+            DecisionReceipt.Create(
                 actor,
                 "gateway.execute",
                 "Allowed",
@@ -226,15 +226,15 @@ public sealed class AuditResidueMutationTests
     }
 
     /// <summary>
-    /// Tests that the <see cref="AuditResidue.Create"/> method throws an <see cref="ArgumentOutOfRangeException"/> when a negative outbox sequence is provided, ensuring that invalid input is properly rejected.
+    /// Tests that the <see cref="DecisionReceipt.Create"/> method throws an <see cref="ArgumentOutOfRangeException"/> when a negative outbox sequence is provided, ensuring that invalid input is properly rejected.
     /// </summary>
     [Fact]
     public void CreateRejectsNegativeOutboxSequence()
     {
-        IAsiBackboneActorContext actor = AsiBackboneActorContext.Service("service-123");
+        IGovernanceActorContext actor = GovernanceActorContext.Service("service-123");
 
         _ = Assert.Throws<ArgumentOutOfRangeException>(() =>
-            AuditResidue.Create(
+            DecisionReceipt.Create(
                 actor,
                 "gateway.execute",
                 "Allowed",
@@ -242,7 +242,7 @@ public sealed class AuditResidueMutationTests
     }
 
     /// <summary>
-    /// Tests that the <see cref="AuditResidue.Create"/> method throws an <see cref="ArgumentOutOfRangeException"/> when an invalid risk score is provided (negative, NaN, or positive infinity), ensuring that invalid input is properly rejected.
+    /// Tests that the <see cref="DecisionReceipt.Create"/> method throws an <see cref="ArgumentOutOfRangeException"/> when an invalid risk score is provided (negative, NaN, or positive infinity), ensuring that invalid input is properly rejected.
     /// </summary>
     /// <param name="riskScore">The risk score to test.</param>
     [Theory]
@@ -251,10 +251,10 @@ public sealed class AuditResidueMutationTests
     [InlineData(double.PositiveInfinity)]
     public void CreateRejectsInvalidRiskScore(double riskScore)
     {
-        IAsiBackboneActorContext actor = AsiBackboneActorContext.Service("service-123");
+        IGovernanceActorContext actor = GovernanceActorContext.Service("service-123");
 
         _ = Assert.Throws<ArgumentOutOfRangeException>(() =>
-            AuditResidue.Create(
+            DecisionReceipt.Create(
                 actor,
                 "gateway.execute",
                 "Allowed",

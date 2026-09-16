@@ -21,7 +21,7 @@ public static class AsiBackboneAspNetCoreBuilderExtensions
     /// </summary>
     public static IAsiBackboneBuilder UseAspNetCoreEndpointGovernance(
         this IAsiBackboneBuilder builder,
-        Action<AsiBackboneAspNetCoreOptions> configure)
+        Action<AspNetCoreGovernanceOptions> configure)
     {
         ArgumentNullException.ThrowIfNull(builder);
         ArgumentNullException.ThrowIfNull(configure);
@@ -43,7 +43,7 @@ public static class AsiBackboneAspNetCoreBuilderExtensions
     /// </summary>
     public static IAsiBackboneBuilder UseGovernanceOutboxDrain(
         this IAsiBackboneBuilder builder,
-        Action<AsiBackboneGovernanceOutboxDrainWorkerOptions> configure)
+        Action<GovernanceOutboxDrainWorkerOptions> configure)
     {
         ArgumentNullException.ThrowIfNull(builder);
         ArgumentNullException.ThrowIfNull(configure);

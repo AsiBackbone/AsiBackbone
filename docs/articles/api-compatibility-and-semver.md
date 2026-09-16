@@ -40,7 +40,7 @@ The initial stable `1.0.0` package family established the first compatible `1.x`
 
 | Package | Stable role |
 | --- | --- |
-| `AsiBackbone.Core` | Framework-neutral governance primitives, decisions, constraints, actor context, audit residue, acknowledgment, capability-token abstractions, and operation results. |
+| `AsiBackbone.Core` | Framework-neutral governance primitives, decisions, constraints, actor context, decision receipt, acknowledgment, capability-token abstractions, and operation results. |
 | `AsiBackbone.AspNetCore` | ASP.NET Core host adapters for actor context, request correlation, HTTP result mapping, and acknowledgment challenge support. |
 | `AsiBackbone.Storage.InMemory` | Non-durable in-memory storage helpers for tests, samples, and local validation. |
 | `AsiBackbone.EntityFrameworkCore` | EF Core model configuration and host-owned persistence integration. |

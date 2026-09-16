@@ -62,7 +62,7 @@ services.AddAsiBackboneManagedKeySigningForLocalValidation(
     serviceProvider => new HostOwnedManagedKeySigningClient());
 ```
 
-The registration wires `ManagedKeySigningService` as `IAsiBackboneSigningService`. Verification remains a separate provider or host responsibility.
+The registration wires `ManagedKeySigningService` as `IGovernanceSigningService`. Verification remains a separate provider or host responsibility.
 
 ## Failure behavior
 

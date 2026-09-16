@@ -12,7 +12,7 @@ This page documents the in-repository reference deployment path for AsiBackbone:
 | Plain ASP.NET Core host | `samples/PlainAspNetCoreHost/` | AsiBackbone can run without `NetCoreApplicationTemplate` or a custom application template. |
 | Policy evaluation | `GET /sample/decision` | The host builds policy context and receives a structured `GovernanceDecision`. |
 | Acknowledgment-required decision | `risk=consequential` sample metadata | A host decision policy can require acknowledgment before continuation. |
-| Audit residue | in-memory audit ledger | The decision is written to a local inspectable audit path. |
+| Decision receipt | in-memory audit ledger | The decision is written to a local inspectable audit path. |
 | Durable host-owned ledger | SQLite through a host-owned EF Core `DbContext` | The host can persist audit ledger records while owning provider, connection string, migrations, and deployment. |
 | Signing-ready artifact | local-development signing service | Canonical hash, signature metadata, and verification output can be attached in a local validation path. |
 | Endpoint governance ergonomics | `/sample/ergonomic/minimal` and `/sample/ergonomic/controller` | Endpoint metadata can require governance policy, liability handshake, capability grant, and audit emission. |
@@ -26,14 +26,14 @@ flowchart LR
     Context --> Constraint["RegionConstraint"]
     Constraint --> Policy["ConsequentialActionDecisionPolicy"]
     Policy --> Decision["GovernanceDecision"]
-    Decision --> Audit["In-memory audit residue"]
+    Decision --> Audit["In-memory decision receipt"]
     Decision --> Hash["Canonical audit hash"]
     Hash --> Sign["Local-development signer"]
     Sign --> Ledger["Host-owned EF Core SQLite ledger"]
     Ledger --> Response["JSON evidence response"]
 ```
 
-**Boundary:** AsiBackbone participates in policy evaluation, audit residue, signing-ready metadata, and ASP.NET Core endpoint governance. The sample host owns the web application, database provider, connection string, database creation, endpoint behavior, and any decision to continue or stop execution.
+**Boundary:** AsiBackbone participates in policy evaluation, decision receipt, signing-ready metadata, and ASP.NET Core endpoint governance. The sample host owns the web application, database provider, connection string, database creation, endpoint behavior, and any decision to continue or stop execution.
 
 ## Run the reference deployment locally
 
@@ -57,14 +57,14 @@ The `GET /sample/decision` path demonstrates this sequence:
 
 1. ASP.NET Core receives the request.
 2. The host sets the correlation identifier from `HttpContext.TraceIdentifier`.
-3. The host builds an `AsiBackboneConstraintEvaluationContext` with sample metadata:
+3. The host builds an `GovernanceEvaluationContext` with sample metadata:
    - `region=US-LA`
    - `risk=consequential`
    - `intent=external-api-call`
 4. `RegionConstraint` verifies that the request has a region or endpoint policy metadata.
 5. `ConsequentialActionDecisionPolicy` turns a consequential request into an `AcknowledgmentRequired` decision.
-6. The host creates `AuditResidue` for `sample.external-api-call`.
-7. The sample writes audit residue to the in-memory ledger.
+6. The host creates `DecisionReceipt` for `sample.external-api-call`.
+7. The sample writes decision receipt to the in-memory ledger.
 8. The sample builds a canonical audit-ledger payload and hash.
 9. The local-development signing service signs and verifies the hash for validation purposes.
 10. The host persists an EF Core audit ledger record through the sample-owned SQLite `DbContext`.
@@ -104,7 +104,7 @@ The exact IDs and hash values are generated at runtime. The shape below is repre
 }
 ```
 
-The important evidence is not the specific generated identifiers. The important evidence is that one local request produces a structured decision, reason codes, correlation metadata, audit residue identifier, ledger record identifier, canonical hash, signing metadata, and verification result.
+The important evidence is not the specific generated identifiers. The important evidence is that one local request produces a structured decision, reason codes, correlation metadata, decision receipt identifier, ledger record identifier, canonical hash, signing metadata, and verification result.
 
 ## Inspect audit and ledger output
 
@@ -167,7 +167,7 @@ The controller version uses the equivalent attributes:
 
 These paths are useful as evidence that endpoint metadata can carry governance requirements into middleware, but the sample still keeps execution host-owned. The endpoint body returns only after endpoint-governance metadata has been evaluated by the ASP.NET Core integration path.
 
-The sample also exposes `POST /sample/acknowledgments/challenges` and `POST /sample/acknowledgments/responses` to demonstrate a complete host-owned acknowledgment round trip. The first endpoint creates and temporarily stores a challenge; the second retrieves it and calls `IAsiBackboneAcknowledgmentChallengeService.HandleResponse`. This illustrative in-memory workflow is separate from `RequireLiabilityHandshake` metadata: the middleware returns `428 Precondition Required` when acknowledgment is required, while the host remains responsible for accepting the response, retaining protected challenge state, revalidating authority and current policy, and deciding whether execution may proceed.
+The sample also exposes `POST /sample/acknowledgments/challenges` and `POST /sample/acknowledgments/responses` to demonstrate a complete host-owned acknowledgment round trip. The first endpoint creates and temporarily stores a challenge; the second retrieves it and calls `IAcknowledgmentChallengeService.HandleResponse`. This illustrative in-memory workflow is separate from `RequireLiabilityHandshake` metadata: the middleware returns `428 Precondition Required` when acknowledgment is required, while the host remains responsible for accepting the response, retaining protected challenge state, revalidating authority and current policy, and deciding whether execution may proceed.
 
 ## What this reference deployment does not claim
 
@@ -191,7 +191,7 @@ A skeptical adopter can validate the reference path by confirming that one local
 - an acknowledgment-required result for consequential metadata,
 - reason codes,
 - a correlation identifier,
-- in-memory audit residue,
+- in-memory decision receipt,
 - a durable EF Core audit ledger record,
 - canonical hash metadata,
 - local-development signing and verification metadata,

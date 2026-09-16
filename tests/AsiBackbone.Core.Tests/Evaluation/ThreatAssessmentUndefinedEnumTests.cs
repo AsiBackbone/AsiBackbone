@@ -57,7 +57,7 @@ public sealed class ThreatAssessmentUndefinedEnumTests
             PolicyHash = "hash-undefined-threat-enum"
         };
         bool constraintRan = false;
-        var evaluator = new DefaultAsiBackbonePolicyEvaluator<TestPolicyContext>(
+        var evaluator = new DefaultGovernancePolicyEvaluator<TestPolicyContext>(
             [new DelegateConstraint(
                 (_, _) =>
                 {
@@ -82,7 +82,7 @@ public sealed class ThreatAssessmentUndefinedEnumTests
         Assert.False(decision.CanProceed);
         Assert.False(constraintRan);
         Assert.Equal(
-            AsiBackbonePolicyEvaluatorOptions.DefaultThreatContributorExceptionReasonCode,
+            GovernancePolicyOptions.DefaultThreatContributorExceptionReasonCode,
             Assert.Single(decision.ReasonCodes));
 
         OperationReason reason = Assert.Single(decision.Reasons);
@@ -90,7 +90,7 @@ public sealed class ThreatAssessmentUndefinedEnumTests
         Assert.Equal(nameof(ArgumentOutOfRangeException), reason.Metadata["threat.failure"]);
     }
 
-    private sealed class TestPolicyContext : IAsiBackboneConstraintEvaluationContext
+    private sealed class TestPolicyContext : IGovernanceEvaluationContext
     {
         public string? CorrelationId { get; init; }
 
@@ -104,7 +104,7 @@ public sealed class ThreatAssessmentUndefinedEnumTests
 
     private sealed class DelegateConstraint(
         Func<TestPolicyContext, CancellationToken, ConstraintEvaluationResult> evaluate) :
-        IAsiBackboneConstraint<TestPolicyContext>
+        IGovernanceConstraint<TestPolicyContext>
     {
         private readonly Func<TestPolicyContext, CancellationToken, ConstraintEvaluationResult> evaluate = evaluate;
 

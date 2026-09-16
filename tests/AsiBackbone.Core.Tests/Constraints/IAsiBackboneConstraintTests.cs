@@ -4,7 +4,7 @@ using Xunit;
 namespace AsiBackbone.Core.Tests.Constraints;
 
 /// <summary>
-/// Tests for <see cref="IAsiBackboneConstraint{TContext}"/> implementations.
+/// Tests for <see cref="IGovernanceConstraint{TContext}"/> implementations.
 /// </summary>
 public sealed class IAsiBackboneConstraintTests
 {
@@ -65,7 +65,7 @@ public sealed class IAsiBackboneConstraintTests
 
     private sealed record TestContext(string IntentName);
 
-    private sealed class TestConstraint : IAsiBackboneConstraint<TestContext>
+    private sealed class TestConstraint : IGovernanceConstraint<TestContext>
     {
         public string Name => "test.constraint";
 
@@ -81,7 +81,7 @@ public sealed class IAsiBackboneConstraintTests
         }
     }
 
-    private sealed class CancellationAwareTestConstraint : IAsiBackboneConstraint<TestContext>
+    private sealed class CancellationAwareTestConstraint : IGovernanceConstraint<TestContext>
     {
         public string Name => "test.cancellation-aware.constraint";
 

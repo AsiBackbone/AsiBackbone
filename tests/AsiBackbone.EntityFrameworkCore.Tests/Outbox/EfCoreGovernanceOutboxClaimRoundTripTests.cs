@@ -100,8 +100,8 @@ public sealed class EfCoreGovernanceOutboxClaimRoundTripTests
     private sealed class RoundTripDbContext(DbContextOptions<RoundTripDbContext> options)
         : DbContext(options)
     {
-        public DbSet<AsiBackboneGovernanceOutboxEntryEntity> GovernanceOutboxEntries =>
-            Set<AsiBackboneGovernanceOutboxEntryEntity>();
+        public DbSet<GovernanceOutboxEntryEntity> GovernanceOutboxEntries =>
+            Set<GovernanceOutboxEntryEntity>();
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

@@ -138,7 +138,7 @@ IReadOnlyDictionary<string, string> metadata = new Dictionary<string, string>(St
     ["command.maxForce"] = "10N"
 };
 
-var context = new AsiBackboneConstraintEvaluationContext(
+var context = new GovernanceEvaluationContext(
     correlationId: correlationId,
     policyVersion: "robotics-simulation-v1",
     policyHash: policyHash,
@@ -157,7 +157,7 @@ if (decision.Outcome is GovernanceDecisionOutcome.Denied
     or GovernanceDecisionOutcome.EscalationRecommended)
 {
     await auditSink.WriteAsync(
-        AuditResidue.FromDecision(actor, "robot.move", decision, metadata: metadata),
+        DecisionReceipt.FromDecision(actor, "robot.move", decision, metadata: metadata),
         cancellationToken);
 
     return SimulatedGatewayResult.FailClosed("Governance decision did not permit execution.");
@@ -215,7 +215,7 @@ A robotics operational gateway helps avoid high-risk integration mistakes:
 
 ## Adoption note
 
-Robotics should remain a later integration package or advanced scenario. A good first validation is a simulated command gateway that never touches hardware. The host should prove policy evaluation, acknowledgment flow, audit residue, capability-token scope, and fail-closed behavior before connecting the pattern to any external system.
+Robotics should remain a later integration package or advanced scenario. A good first validation is a simulated command gateway that never touches hardware. The host should prove policy evaluation, acknowledgment flow, decision receipt, capability-token scope, and fail-closed behavior before connecting the pattern to any external system.
 
 ## Related documentation
 

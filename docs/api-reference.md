@@ -12,15 +12,15 @@ The API pages are produced by DocFX from the current public .NET surface. Use th
 
 - [GovernanceDecision](xref:AsiBackbone.Core.Decisions.GovernanceDecision)
 - [GovernanceDecisionOutcome](xref:AsiBackbone.Core.Decisions.GovernanceDecisionOutcome)
-- [IAsiBackbonePolicyEvaluator<TContext>](xref:AsiBackbone.Core.Evaluation.IAsiBackbonePolicyEvaluator`1)
-- [IAsiBackboneConstraint<TContext>](xref:AsiBackbone.Core.Constraints.IAsiBackboneConstraint`1)
-- [AsiBackboneConstraintEvaluationContext](xref:AsiBackbone.Core.Constraints.AsiBackboneConstraintEvaluationContext)
+- [IGovernancePolicyEvaluator<TContext>](xref:AsiBackbone.Core.Evaluation.IGovernancePolicyEvaluator`1)
+- [IGovernanceConstraint<TContext>](xref:AsiBackbone.Core.Constraints.IGovernanceConstraint`1)
+- [GovernanceEvaluationContext](xref:AsiBackbone.Core.Constraints.GovernanceEvaluationContext)
 
 ## Accountability and continuation APIs
 
 - [LiabilityHandshakeRequest](xref:AsiBackbone.Core.Handshakes.LiabilityHandshakeRequest)
 - [LiabilityHandshakeAcknowledgment](xref:AsiBackbone.Core.Handshakes.LiabilityHandshakeAcknowledgment)
-- [AuditResidue](xref:AsiBackbone.Core.Audit.AuditResidue)
+- [DecisionReceipt](xref:AsiBackbone.Core.Audit.DecisionReceipt)
 - [AuditLedgerRecord](xref:AsiBackbone.Core.Audit.AuditLedgerRecord)
 - [CapabilityTokenGrant](xref:AsiBackbone.Core.CapabilityTokens.CapabilityTokenGrant)
 - [OperationResult](xref:AsiBackbone.Core.Results.OperationResult)

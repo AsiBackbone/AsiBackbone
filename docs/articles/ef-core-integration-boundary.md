@@ -190,7 +190,7 @@ The EF Core package contributes provider-neutral model configurations for:
 - handshake request metadata
 - handshake acknowledgments
 - handshake acknowledgment metadata
-- audit residue lifecycle events
+- decision receipt lifecycle events
 - governance outbox entries
 - governance outbox metadata JSON columns
 - governance outbox envelope and payload projection columns
@@ -206,7 +206,7 @@ Implemented persistence areas include:
 * audit ledger records
 * liability/responsibility handshake requests
 * liability/responsibility handshake acknowledgments
-* audit residue lifecycle events
+* decision receipt lifecycle events
 * governance outbox entries
 * reason codes
 * actor identifiers and actor type

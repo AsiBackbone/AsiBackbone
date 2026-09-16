@@ -5,12 +5,12 @@ using Xunit;
 namespace AsiBackbone.Core.Tests.Audit;
 
 /// <summary>
-/// Unit tests for <see cref="IAsiBackboneAuditLedgerStore"/>. These tests verify the contract of the interface, but do not test any specific implementation. Each implementation should have its own set of unit tests to verify its behavior and correctness.
+/// Unit tests for <see cref="IGovernanceAuditLedgerStore"/>. These tests verify the contract of the interface, but do not test any specific implementation. Each implementation should have its own set of unit tests to verify its behavior and correctness.
 /// </summary>
 public sealed class IAsiBackboneAuditLedgerStoreTests
 {
     /// <summary>
-    /// Verifies that an implementation of <see cref="IAsiBackboneAuditLedgerStore"/> allows appending a record and then looking it up by its record ID. This test uses a simple in-memory implementation of the interface to validate the expected behavior of the contract.
+    /// Verifies that an implementation of <see cref="IGovernanceAuditLedgerStore"/> allows appending a record and then looking it up by its record ID. This test uses a simple in-memory implementation of the interface to validate the expected behavior of the contract.
     /// </summary>
     /// <returns>
     /// A task that represents the asynchronous test operation. The test will pass if the record can be successfully appended and retrieved by its record ID, and will fail if any of these operations do not behave as expected.
@@ -18,10 +18,10 @@ public sealed class IAsiBackboneAuditLedgerStoreTests
     [Fact]
     public async Task ContractAllowsAppendAndLookupByRecordId()
     {
-        IAsiBackboneAuditLedgerStore store = new TestAuditLedgerStore();
+        IGovernanceAuditLedgerStore store = new TestAuditLedgerStore();
 
-        var residue = AuditResidue.Create(
-            AsiBackboneActorContext.System,
+        var residue = DecisionReceipt.Create(
+            GovernanceActorContext.System,
             "system.sync",
             "Allowed",
             eventId: "event-123",
@@ -40,13 +40,13 @@ public sealed class IAsiBackboneAuditLedgerStoreTests
     }
 
     /// <summary>
-    /// Verifies that an implementation of <see cref="IAsiBackboneAuditLedgerStore"/> allows looking up records by their correlation ID.
+    /// Verifies that an implementation of <see cref="IGovernanceAuditLedgerStore"/> allows looking up records by their correlation ID.
     /// </summary>
     /// <returns>A task that represents the asynchronous test operation.</returns>
     [Fact]
     public async Task ContractAllowsLookupByCorrelationId()
     {
-        IAsiBackboneAuditLedgerStore store = new TestAuditLedgerStore();
+        IGovernanceAuditLedgerStore store = new TestAuditLedgerStore();
         AuditLedgerRecord firstRecord = CreateRecord("record-1", "correlation-123", "trace-1", "actor-1");
         AuditLedgerRecord secondRecord = CreateRecord("record-2", "correlation-123", "trace-2", "actor-2");
         AuditLedgerRecord thirdRecord = CreateRecord("record-3", "correlation-456", "trace-3", "actor-3");
@@ -65,13 +65,13 @@ public sealed class IAsiBackboneAuditLedgerStoreTests
     }
 
     /// <summary>
-    /// Verifies that an implementation of <see cref="IAsiBackboneAuditLedgerStore"/> allows looking up records by their trace ID.
+    /// Verifies that an implementation of <see cref="IGovernanceAuditLedgerStore"/> allows looking up records by their trace ID.
     /// </summary>
     /// <returns>A task that represents the asynchronous test operation.</returns>
     [Fact]
     public async Task ContractAllowsLookupByTraceId()
     {
-        IAsiBackboneAuditLedgerStore store = new TestAuditLedgerStore();
+        IGovernanceAuditLedgerStore store = new TestAuditLedgerStore();
         AuditLedgerRecord firstRecord = CreateRecord("record-1", "correlation-1", "trace-123", "actor-1");
         AuditLedgerRecord secondRecord = CreateRecord("record-2", "correlation-2", "trace-123", "actor-2");
         AuditLedgerRecord thirdRecord = CreateRecord("record-3", "correlation-3", "trace-456", "actor-3");
@@ -90,13 +90,13 @@ public sealed class IAsiBackboneAuditLedgerStoreTests
     }
 
     /// <summary>
-    /// Verifies that an implementation of <see cref="IAsiBackboneAuditLedgerStore"/> allows looking up records by their actor ID.
+    /// Verifies that an implementation of <see cref="IGovernanceAuditLedgerStore"/> allows looking up records by their actor ID.
     /// </summary>
     /// <returns>A task that represents the asynchronous test operation.</returns>
     [Fact]
     public async Task ContractAllowsLookupByActorId()
     {
-        IAsiBackboneAuditLedgerStore store = new TestAuditLedgerStore();
+        IGovernanceAuditLedgerStore store = new TestAuditLedgerStore();
         AuditLedgerRecord firstRecord = CreateRecord("record-1", "correlation-1", "trace-1", "actor-123");
         AuditLedgerRecord secondRecord = CreateRecord("record-2", "correlation-2", "trace-2", "actor-123");
         AuditLedgerRecord thirdRecord = CreateRecord("record-3", "correlation-3", "trace-3", "actor-456");
@@ -115,13 +115,13 @@ public sealed class IAsiBackboneAuditLedgerStoreTests
     }
 
     /// <summary>
-    /// Verifies that an implementation of <see cref="IAsiBackboneAuditLedgerStore"/> allows looking up records by recorded UTC range.
+    /// Verifies that an implementation of <see cref="IGovernanceAuditLedgerStore"/> allows looking up records by recorded UTC range.
     /// </summary>
     /// <returns>A task that represents the asynchronous test operation.</returns>
     [Fact]
     public async Task ContractAllowsLookupByRecordedUtcRange()
     {
-        IAsiBackboneAuditLedgerStore store = new TestAuditLedgerStore();
+        IGovernanceAuditLedgerStore store = new TestAuditLedgerStore();
         AuditLedgerRecord firstRecord = CreateRecord(
             "record-1",
             "correlation-1",
@@ -162,8 +162,8 @@ public sealed class IAsiBackboneAuditLedgerStoreTests
         string actorId,
         DateTimeOffset? recordedUtc = null)
     {
-        var actor = AsiBackboneActorContext.Human(actorId);
-        var residue = AuditResidue.Create(
+        var actor = GovernanceActorContext.Human(actorId);
+        var residue = DecisionReceipt.Create(
             actor,
             "system.sync",
             "Allowed",
@@ -177,7 +177,7 @@ public sealed class IAsiBackboneAuditLedgerStoreTests
             recordedUtc: recordedUtc);
     }
 
-    private sealed class TestAuditLedgerStore : IAsiBackboneAuditLedgerStore
+    private sealed class TestAuditLedgerStore : IGovernanceAuditLedgerStore
     {
         private readonly Dictionary<string, AuditLedgerRecord> records = new(StringComparer.Ordinal);
 

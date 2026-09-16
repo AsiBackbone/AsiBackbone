@@ -20,7 +20,7 @@ public sealed class NcatAuditCompletionAdapter
     private const string SourceAdapterMetadataValue = "NCAT";
     private const string LifecycleEventPrefix = "ncat-completion-";
 
-    private readonly IAsiBackboneAuditResidueLifecycleStore lifecycleStore;
+    private readonly IDecisionReceiptLifecycleStore lifecycleStore;
     private readonly INcatDecisionResidueResolver decisionResidueResolver;
     private readonly NcatAuditCompletionAdapterOptions options;
 
@@ -28,7 +28,7 @@ public sealed class NcatAuditCompletionAdapter
     /// Initializes a new optional NCAT audit-completion adapter.
     /// </summary>
     public NcatAuditCompletionAdapter(
-        IAsiBackboneAuditResidueLifecycleStore lifecycleStore,
+        IDecisionReceiptLifecycleStore lifecycleStore,
         INcatDecisionResidueResolver decisionResidueResolver,
         NcatAuditCompletionAdapterOptions? options = null)
     {
@@ -59,7 +59,7 @@ public sealed class NcatAuditCompletionAdapter
             return Terminal("unsupported-persistence-outcome");
         }
 
-        IAsiBackboneAuditResidue? residue = await decisionResidueResolver.ResolveAsync(
+        IDecisionReceipt? residue = await decisionResidueResolver.ResolveAsync(
             handoff.DecisionAuditRecordId!.Trim(),
             NormalizeOptional(handoff.CorrelationId),
             cancellationToken).ConfigureAwait(false);
@@ -104,13 +104,13 @@ public sealed class NcatAuditCompletionAdapter
             [SourceAdapterMetadataKey] = SourceAdapterMetadataValue
         };
 
-        AuditResidueLifecycleEvent lifecycleEvent = HostAccountabilityLifecycleEvent.FromExecutionReceipt(
+        DecisionReceiptLifecycleEvent lifecycleEvent = HostAccountabilityLifecycleEvent.FromExecutionReceipt(
             residue,
             receipt,
             eventId: lifecycleEventId,
             metadata: metadata);
 
-        AuditResidueLifecycleEvent? existing = await lifecycleStore.FindByEventIdAsync(
+        DecisionReceiptLifecycleEvent? existing = await lifecycleStore.FindByEventIdAsync(
             lifecycleEventId,
             cancellationToken).ConfigureAwait(false);
 
@@ -128,7 +128,7 @@ public sealed class NcatAuditCompletionAdapter
 
         try
         {
-            AuditResidueLifecycleEvent appended = await lifecycleStore.AppendAsync(
+            DecisionReceiptLifecycleEvent appended = await lifecycleStore.AppendAsync(
                 lifecycleEvent,
                 cancellationToken).ConfigureAwait(false);
 
@@ -168,7 +168,7 @@ public sealed class NcatAuditCompletionAdapter
 
     private static NcatAuditCompletionDeliveryResult? ValidateDecisionCorrelation(
         NcatAuditCompletionHandoff handoff,
-        IAsiBackboneAuditResidue residue)
+        IDecisionReceipt residue)
     {
         string? correlationId = NormalizeOptional(handoff.CorrelationId);
         if (correlationId is not null &&
@@ -188,7 +188,7 @@ public sealed class NcatAuditCompletionAdapter
         NcatAuditCompletionHandoff handoff,
         string lifecycleEventId,
         GovernedOperationExecutionReceipt receipt,
-        AuditResidueLifecycleEvent lifecycleEvent,
+        DecisionReceiptLifecycleEvent lifecycleEvent,
         Exception exception)
     {
         bool deadLettered = options.DeadLetterAfterAttempts is int threshold &&
@@ -234,8 +234,8 @@ public sealed class NcatAuditCompletionAdapter
     }
 
     private static bool Equivalent(
-        AuditResidueLifecycleEvent existing,
-        AuditResidueLifecycleEvent candidate)
+        DecisionReceiptLifecycleEvent existing,
+        DecisionReceiptLifecycleEvent candidate)
     {
         if (existing.Stage != candidate.Stage ||
             !string.Equals(existing.CorrelationId, candidate.CorrelationId, StringComparison.Ordinal) ||

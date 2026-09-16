@@ -7,7 +7,7 @@ using Xunit;
 namespace AsiBackbone.Core.Tests.Evaluation;
 
 /// <summary>
-/// Branch-focused unit tests for <see cref="DefaultAsiBackbonePolicyEvaluator{TContext}"/>.
+/// Branch-focused unit tests for <see cref="DefaultGovernancePolicyEvaluator{TContext}"/>.
 /// </summary>
 public sealed class DefaultAsiBackbonePolicyEvaluatorTests
 {
@@ -18,24 +18,24 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorTests
     public void ConstructorThrowsForNullConstraints()
     {
         _ = Assert.Throws<ArgumentNullException>(() =>
-            new DefaultAsiBackbonePolicyEvaluator<TestPolicyContext>(null!, threatModelContributors: null, decisionPolicy: null, options: null, logger: null));
+            new DefaultGovernancePolicyEvaluator<TestPolicyContext>(null!, threatModelContributors: null, decisionPolicy: null, options: null, logger: null));
     }
 
     /// <summary>
-    /// Verifies that the <see cref="DefaultAsiBackbonePolicyEvaluator{TContext}.EvaluateAsync"/> method throws an <see cref="ArgumentNullException"/> when the context argument is null.
+    /// Verifies that the <see cref="DefaultGovernancePolicyEvaluator{TContext}.EvaluateAsync"/> method throws an <see cref="ArgumentNullException"/> when the context argument is null.
     /// </summary>
     /// <returns>A task representing the asynchronous operation.</returns>
     [Fact]
     public async Task EvaluateThrowsForNullContext()
     {
-        var evaluator = new DefaultAsiBackbonePolicyEvaluator<TestPolicyContext>([], threatModelContributors: null, decisionPolicy: null, options: null, logger: null);
+        var evaluator = new DefaultGovernancePolicyEvaluator<TestPolicyContext>([], threatModelContributors: null, decisionPolicy: null, options: null, logger: null);
 
         _ = await Assert.ThrowsAsync<ArgumentNullException>(async () =>
             await evaluator.EvaluateAsync(null!, TestContext.Current.CancellationToken));
     }
 
     /// <summary>
-    /// Verifies that the <see cref="DefaultAsiBackbonePolicyEvaluator{TContext}.EvaluateAsync"/> method produces a denied decision when there are no constraints and the default options are used.
+    /// Verifies that the <see cref="DefaultGovernancePolicyEvaluator{TContext}.EvaluateAsync"/> method produces a denied decision when there are no constraints and the default options are used.
     /// </summary>
     /// <returns>A task representing the asynchronous operation.</returns>
     [Fact]
@@ -43,14 +43,14 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorTests
     {
         TestPolicyContext context = CreateContext();
 
-        var evaluator = new DefaultAsiBackbonePolicyEvaluator<TestPolicyContext>([], threatModelContributors: null, decisionPolicy: null, options: null, logger: null);
+        var evaluator = new DefaultGovernancePolicyEvaluator<TestPolicyContext>([], threatModelContributors: null, decisionPolicy: null, options: null, logger: null);
 
         GovernanceDecision decision = await evaluator.EvaluateAsync(context, TestContext.Current.CancellationToken);
 
         Assert.True(decision.IsDenied);
         Assert.False(decision.CanProceed);
         Assert.Equal(
-            AsiBackbonePolicyEvaluatorOptions.DefaultNoConstraintsReasonCode,
+            GovernancePolicyOptions.DefaultNoConstraintsReasonCode,
             Assert.Single(decision.ReasonCodes));
         Assert.Equal(context.CorrelationId, decision.CorrelationId);
         Assert.Equal(context.PolicyVersion, decision.PolicyVersion);
@@ -58,19 +58,19 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorTests
     }
 
     /// <summary>
-    /// Verifies that the <see cref="DefaultAsiBackbonePolicyEvaluator{TContext}.EvaluateAsync"/> method logs a warning when there are no constraints and permissive empty-policy behavior is explicitly enabled.
+    /// Verifies that the <see cref="DefaultGovernancePolicyEvaluator{TContext}.EvaluateAsync"/> method logs a warning when there are no constraints and permissive empty-policy behavior is explicitly enabled.
     /// </summary>
     /// <returns>A task representing the asynchronous operation.</returns>
     [Fact]
     public async Task EvaluateWithNoConstraintsAndPermissiveOptionLogsWarning()
     {
         TestPolicyContext context = CreateContext();
-        var logger = new CapturingLogger<DefaultAsiBackbonePolicyEvaluator<TestPolicyContext>>();
+        var logger = new CapturingLogger<DefaultGovernancePolicyEvaluator<TestPolicyContext>>();
 
-        var evaluator = new DefaultAsiBackbonePolicyEvaluator<TestPolicyContext>(
+        var evaluator = new DefaultGovernancePolicyEvaluator<TestPolicyContext>(
             constraints: [],
             decisionPolicy: null,
-            options: new AsiBackbonePolicyEvaluatorOptions
+            options: new GovernancePolicyOptions
             {
                 DenyWhenNoConstraints = false
             },
@@ -90,19 +90,19 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorTests
     }
 
     /// <summary>
-    /// Verifies that the <see cref="DefaultAsiBackbonePolicyEvaluator{TContext}.EvaluateAsync"/> method does not log a warning when there are no constraints and the strict option is used.
+    /// Verifies that the <see cref="DefaultGovernancePolicyEvaluator{TContext}.EvaluateAsync"/> method does not log a warning when there are no constraints and the strict option is used.
     /// </summary>
     /// <returns>A task representing the asynchronous operation.</returns>
     [Fact]
     public async Task EvaluateWithNoConstraintsAndStrictOptionDoesNotLogWarning()
     {
         TestPolicyContext context = CreateContext();
-        var logger = new CapturingLogger<DefaultAsiBackbonePolicyEvaluator<TestPolicyContext>>();
+        var logger = new CapturingLogger<DefaultGovernancePolicyEvaluator<TestPolicyContext>>();
 
-        var evaluator = new DefaultAsiBackbonePolicyEvaluator<TestPolicyContext>(
+        var evaluator = new DefaultGovernancePolicyEvaluator<TestPolicyContext>(
             constraints: [],
             decisionPolicy: null,
-            options: new AsiBackbonePolicyEvaluatorOptions
+            options: new GovernancePolicyOptions
             {
                 DenyWhenNoConstraints = true
             },
@@ -115,7 +115,7 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorTests
     }
 
     /// <summary>
-    /// Verifies that the <see cref="DefaultAsiBackbonePolicyEvaluator{TContext}.EvaluateAsync"/> method produces a denied decision when there are no constraints and the strict option is used.
+    /// Verifies that the <see cref="DefaultGovernancePolicyEvaluator{TContext}.EvaluateAsync"/> method produces a denied decision when there are no constraints and the strict option is used.
     /// </summary>
     /// <returns>A task representing the asynchronous operation.</returns>
     [Fact]
@@ -123,10 +123,10 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorTests
     {
         TestPolicyContext context = CreateContext();
 
-        var evaluator = new DefaultAsiBackbonePolicyEvaluator<TestPolicyContext>(
+        var evaluator = new DefaultGovernancePolicyEvaluator<TestPolicyContext>(
             [],
             decisionPolicy: null,
-            options: new AsiBackbonePolicyEvaluatorOptions
+            options: new GovernancePolicyOptions
             {
                 DenyWhenNoConstraints = true
             }, threatModelContributors: null, logger: null);
@@ -136,7 +136,7 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorTests
         Assert.True(decision.IsDenied);
         Assert.False(decision.CanProceed);
         Assert.Equal(
-            AsiBackbonePolicyEvaluatorOptions.DefaultNoConstraintsReasonCode,
+            GovernancePolicyOptions.DefaultNoConstraintsReasonCode,
             Assert.Single(decision.ReasonCodes));
         Assert.Equal(context.CorrelationId, decision.CorrelationId);
         Assert.Equal(context.PolicyVersion, decision.PolicyVersion);
@@ -144,7 +144,7 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorTests
     }
 
     /// <summary>
-    /// Verifies that the <see cref="DefaultAsiBackbonePolicyEvaluator{TContext}.EvaluateAsync"/> method produces a denied decision with the configured reason code and message when there are no constraints and the strict option is used.
+    /// Verifies that the <see cref="DefaultGovernancePolicyEvaluator{TContext}.EvaluateAsync"/> method produces a denied decision with the configured reason code and message when there are no constraints and the strict option is used.
     /// </summary>
     /// <returns>A task representing the asynchronous operation.</returns>
     [Fact]
@@ -152,10 +152,10 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorTests
     {
         TestPolicyContext context = CreateContext();
 
-        var evaluator = new DefaultAsiBackbonePolicyEvaluator<TestPolicyContext>(
+        var evaluator = new DefaultGovernancePolicyEvaluator<TestPolicyContext>(
             [],
             decisionPolicy: null,
-            options: new AsiBackbonePolicyEvaluatorOptions
+            options: new GovernancePolicyOptions
             {
                 DenyWhenNoConstraints = true,
                 NoConstraintsReasonCode = "host.policy.empty",
@@ -180,10 +180,10 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorTests
     public void ConstructorThrowsForInvalidNoConstraintsReasonCode(string? reasonCode)
     {
         _ = Assert.Throws<InvalidOperationException>(() =>
-            new DefaultAsiBackbonePolicyEvaluator<TestPolicyContext>(
+            new DefaultGovernancePolicyEvaluator<TestPolicyContext>(
                 [],
                 decisionPolicy: null,
-                options: new AsiBackbonePolicyEvaluatorOptions
+                options: new GovernancePolicyOptions
                 {
                     DenyWhenNoConstraints = true,
                     NoConstraintsReasonCode = reasonCode!
@@ -201,10 +201,10 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorTests
     public void ConstructorThrowsForInvalidNoConstraintsReasonMessage(string? reasonMessage)
     {
         _ = Assert.Throws<InvalidOperationException>(() =>
-            new DefaultAsiBackbonePolicyEvaluator<TestPolicyContext>(
+            new DefaultGovernancePolicyEvaluator<TestPolicyContext>(
                 [],
                 decisionPolicy: null,
-                options: new AsiBackbonePolicyEvaluatorOptions
+                options: new GovernancePolicyOptions
                 {
                     DenyWhenNoConstraints = true,
                     NoConstraintsReasonMessage = reasonMessage!
@@ -222,10 +222,10 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorTests
     public void ConstructorThrowsForInvalidConstraintExceptionReasonCode(string? reasonCode)
     {
         _ = Assert.Throws<InvalidOperationException>(() =>
-            new DefaultAsiBackbonePolicyEvaluator<TestPolicyContext>(
+            new DefaultGovernancePolicyEvaluator<TestPolicyContext>(
                 [],
                 decisionPolicy: null,
-                options: new AsiBackbonePolicyEvaluatorOptions
+                options: new GovernancePolicyOptions
                 {
                     TreatConstraintExceptionAsDenial = true,
                     ConstraintExceptionReasonCode = reasonCode!
@@ -243,10 +243,10 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorTests
     public void ConstructorThrowsForInvalidConstraintExceptionReasonMessage(string? reasonMessage)
     {
         _ = Assert.Throws<InvalidOperationException>(() =>
-            new DefaultAsiBackbonePolicyEvaluator<TestPolicyContext>(
+            new DefaultGovernancePolicyEvaluator<TestPolicyContext>(
                 [],
                 decisionPolicy: null,
-                options: new AsiBackbonePolicyEvaluatorOptions
+                options: new GovernancePolicyOptions
                 {
                     TreatConstraintExceptionAsDenial = true,
                     ConstraintExceptionReasonMessage = reasonMessage!
@@ -254,7 +254,7 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorTests
     }
 
     /// <summary>
-    /// Verifies that the <see cref="DefaultAsiBackbonePolicyEvaluator{TContext}.EvaluateAsync"/> method produces a warning decision when there is a warning constraint and the strict option is used.
+    /// Verifies that the <see cref="DefaultGovernancePolicyEvaluator{TContext}.EvaluateAsync"/> method produces a warning decision when there is a warning constraint and the strict option is used.
     /// </summary>
     /// <returns>
     /// A task representing the asynchronous operation.
@@ -264,7 +264,7 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorTests
     {
         TestPolicyContext context = CreateContext();
 
-        var evaluator = new DefaultAsiBackbonePolicyEvaluator<TestPolicyContext>(
+        var evaluator = new DefaultGovernancePolicyEvaluator<TestPolicyContext>(
             [
                 new StaticConstraint(
                     ConstraintEvaluationResult.Warning(
@@ -272,7 +272,7 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorTests
                         "The constraint produced a warning."))
             ],
             decisionPolicy: null,
-            options: new AsiBackbonePolicyEvaluatorOptions
+            options: new GovernancePolicyOptions
             {
                 DenyWhenNoConstraints = true
             }, threatModelContributors: null, logger: null);
@@ -282,11 +282,11 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorTests
         Assert.True(decision.IsWarning);
         Assert.True(decision.CanProceed);
         Assert.Contains("constraint.warning", decision.ReasonCodes);
-        Assert.DoesNotContain(AsiBackbonePolicyEvaluatorOptions.DefaultNoConstraintsReasonCode, decision.ReasonCodes);
+        Assert.DoesNotContain(GovernancePolicyOptions.DefaultNoConstraintsReasonCode, decision.ReasonCodes);
     }
 
     /// <summary>
-    /// Verifies that the <see cref="DefaultAsiBackbonePolicyEvaluator{TContext}.EvaluateAsync"/> method produces a denied decision when there is a denial constraint and the strict option is used.
+    /// Verifies that the <see cref="DefaultGovernancePolicyEvaluator{TContext}.EvaluateAsync"/> method produces a denied decision when there is a denial constraint and the strict option is used.
     /// </summary>
     /// <returns>
     /// A task representing the asynchronous operation.
@@ -296,7 +296,7 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorTests
     {
         TestPolicyContext context = CreateContext();
 
-        var evaluator = new DefaultAsiBackbonePolicyEvaluator<TestPolicyContext>(
+        var evaluator = new DefaultGovernancePolicyEvaluator<TestPolicyContext>(
             [
                 new StaticConstraint(
                     ConstraintEvaluationResult.Deny(
@@ -304,7 +304,7 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorTests
                         "The constraint denied the operation."))
             ],
             decisionPolicy: null,
-            options: new AsiBackbonePolicyEvaluatorOptions
+            options: new GovernancePolicyOptions
             {
                 DenyWhenNoConstraints = true
             }, threatModelContributors: null, logger: null);
@@ -317,7 +317,7 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorTests
     }
 
     /// <summary>
-    /// Verifies that the <see cref="DefaultAsiBackbonePolicyEvaluator{TContext}.EvaluateAsync"/> method applies the decision policy with an empty constraint results list when there are no constraints and the strict option is used.
+    /// Verifies that the <see cref="DefaultGovernancePolicyEvaluator{TContext}.EvaluateAsync"/> method applies the decision policy with an empty constraint results list when there are no constraints and the strict option is used.
     /// </summary>
     /// <returns>
     /// A task representing the asynchronous operation.
@@ -328,10 +328,10 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorTests
         TestPolicyContext context = CreateContext();
         var policy = new CapturingDecisionPolicy();
 
-        var evaluator = new DefaultAsiBackbonePolicyEvaluator<TestPolicyContext>(
+        var evaluator = new DefaultGovernancePolicyEvaluator<TestPolicyContext>(
             [],
             decisionPolicy: policy,
-            options: new AsiBackbonePolicyEvaluatorOptions
+            options: new GovernancePolicyOptions
             {
                 DenyWhenNoConstraints = true
             }, threatModelContributors: null, logger: null);
@@ -345,14 +345,14 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorTests
         Assert.NotNull(policy.ComposedDecision);
         Assert.True(policy.ComposedDecision.IsDenied);
         Assert.Equal(
-            AsiBackbonePolicyEvaluatorOptions.DefaultNoConstraintsReasonCode,
+            GovernancePolicyOptions.DefaultNoConstraintsReasonCode,
             Assert.Single(policy.ComposedDecision.ReasonCodes));
         Assert.NotNull(policy.ConstraintResults);
         Assert.Empty(policy.ConstraintResults);
     }
 
     /// <summary>
-    /// Verifies that the <see cref="DefaultAsiBackbonePolicyEvaluator{TContext}.EvaluateAsync"/> method produces a denied governance decision for constraint exceptions by default.
+    /// Verifies that the <see cref="DefaultGovernancePolicyEvaluator{TContext}.EvaluateAsync"/> method produces a denied governance decision for constraint exceptions by default.
     /// </summary>
     /// <returns>
     /// A task representing the asynchronous operation.
@@ -362,9 +362,9 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorTests
     {
         TestPolicyContext context = CreateContext();
         var expectedException = new InvalidOperationException("Sensitive exception details should stay with the host.");
-        var logger = new CapturingLogger<DefaultAsiBackbonePolicyEvaluator<TestPolicyContext>>();
+        var logger = new CapturingLogger<DefaultGovernancePolicyEvaluator<TestPolicyContext>>();
 
-        var evaluator = new DefaultAsiBackbonePolicyEvaluator<TestPolicyContext>(
+        var evaluator = new DefaultGovernancePolicyEvaluator<TestPolicyContext>(
             constraints: [new ThrowingConstraint(expectedException)],
             decisionPolicy: null,
             options: null,
@@ -375,7 +375,7 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorTests
         Assert.True(decision.IsDenied);
         Assert.False(decision.CanProceed);
         Assert.Equal(
-            AsiBackbonePolicyEvaluatorOptions.DefaultConstraintExceptionReasonCode,
+            GovernancePolicyOptions.DefaultConstraintExceptionReasonCode,
             Assert.Single(decision.ReasonCodes));
         Assert.DoesNotContain("Sensitive", Assert.Single(decision.Reasons).Message, StringComparison.OrdinalIgnoreCase);
         Assert.Equal(context.CorrelationId, decision.CorrelationId);
@@ -385,7 +385,7 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorTests
     }
 
     /// <summary>
-    /// Verifies that the <see cref="DefaultAsiBackbonePolicyEvaluator{TContext}.EvaluateAsync"/> method propagates constraint exceptions when fail-closed conversion is explicitly disabled.
+    /// Verifies that the <see cref="DefaultGovernancePolicyEvaluator{TContext}.EvaluateAsync"/> method propagates constraint exceptions when fail-closed conversion is explicitly disabled.
     /// </summary>
     /// <returns>
     /// A task representing the asynchronous operation.
@@ -396,10 +396,10 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorTests
         TestPolicyContext context = CreateContext();
         var expectedException = new InvalidOperationException("Sensitive exception details should stay with the host.");
 
-        var evaluator = new DefaultAsiBackbonePolicyEvaluator<TestPolicyContext>(
+        var evaluator = new DefaultGovernancePolicyEvaluator<TestPolicyContext>(
             [new ThrowingConstraint(expectedException)],
             decisionPolicy: null,
-            options: new AsiBackbonePolicyEvaluatorOptions
+            options: new GovernancePolicyOptions
             {
                 TreatConstraintExceptionAsDenial = false
             }, threatModelContributors: null, logger: null);
@@ -411,7 +411,7 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorTests
     }
 
     /// <summary>
-    /// Verifies that the <see cref="DefaultAsiBackbonePolicyEvaluator{TContext}.EvaluateAsync"/> method produces a denied decision when there is a constraint exception and the option to treat constraint exceptions as denials is enabled.
+    /// Verifies that the <see cref="DefaultGovernancePolicyEvaluator{TContext}.EvaluateAsync"/> method produces a denied decision when there is a constraint exception and the option to treat constraint exceptions as denials is enabled.
     /// </summary>
     /// <returns>
     /// A task representing the asynchronous operation.
@@ -421,12 +421,12 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorTests
     {
         TestPolicyContext context = CreateContext();
         var expectedException = new InvalidOperationException("sensitive database connection string details");
-        var logger = new CapturingLogger<DefaultAsiBackbonePolicyEvaluator<TestPolicyContext>>();
+        var logger = new CapturingLogger<DefaultGovernancePolicyEvaluator<TestPolicyContext>>();
 
-        var evaluator = new DefaultAsiBackbonePolicyEvaluator<TestPolicyContext>(
+        var evaluator = new DefaultGovernancePolicyEvaluator<TestPolicyContext>(
             constraints: [new ThrowingConstraint(expectedException)],
             decisionPolicy: null,
-            options: new AsiBackbonePolicyEvaluatorOptions
+            options: new GovernancePolicyOptions
             {
                 TreatConstraintExceptionAsDenial = true
             },
@@ -437,7 +437,7 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorTests
         Assert.True(decision.IsDenied);
         Assert.False(decision.CanProceed);
         Assert.Equal(
-            AsiBackbonePolicyEvaluatorOptions.DefaultConstraintExceptionReasonCode,
+            GovernancePolicyOptions.DefaultConstraintExceptionReasonCode,
             Assert.Single(decision.ReasonCodes));
         Assert.Equal(
             "A policy constraint failed during evaluation. The operation was denied by the evaluator failure policy.",
@@ -457,7 +457,7 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorTests
     }
 
     /// <summary>
-    /// Verifies that the <see cref="DefaultAsiBackbonePolicyEvaluator{TContext}.EvaluateAsync"/> method logs a warning when there is a constraint exception with an unnamed constraint and the option to treat constraint exceptions as denials is enabled.
+    /// Verifies that the <see cref="DefaultGovernancePolicyEvaluator{TContext}.EvaluateAsync"/> method logs a warning when there is a constraint exception with an unnamed constraint and the option to treat constraint exceptions as denials is enabled.
     /// </summary>
     /// <returns>
     /// A task representing the asynchronous operation.
@@ -466,12 +466,12 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorTests
     public async Task EvaluateWithConstraintExceptionOptionLogsUnnamedConstraint()
     {
         TestPolicyContext context = CreateContext();
-        var logger = new CapturingLogger<DefaultAsiBackbonePolicyEvaluator<TestPolicyContext>>();
+        var logger = new CapturingLogger<DefaultGovernancePolicyEvaluator<TestPolicyContext>>();
 
-        var evaluator = new DefaultAsiBackbonePolicyEvaluator<TestPolicyContext>(
+        var evaluator = new DefaultGovernancePolicyEvaluator<TestPolicyContext>(
             constraints: [new ThrowingConstraint(new InvalidOperationException("failure"), " ")],
             decisionPolicy: null,
-            options: new AsiBackbonePolicyEvaluatorOptions
+            options: new GovernancePolicyOptions
             {
                 TreatConstraintExceptionAsDenial = true
             },
@@ -485,7 +485,7 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorTests
     }
 
     /// <summary>
-    /// Verifies that the <see cref="DefaultAsiBackbonePolicyEvaluator{TContext}.EvaluateAsync"/> method produces a denied decision with the configured reason code and message when there is a constraint exception and the option to treat constraint exceptions as denials is enabled.
+    /// Verifies that the <see cref="DefaultGovernancePolicyEvaluator{TContext}.EvaluateAsync"/> method produces a denied decision with the configured reason code and message when there is a constraint exception and the option to treat constraint exceptions as denials is enabled.
     /// </summary>
     /// <returns>
     /// A task representing the asynchronous operation.
@@ -495,10 +495,10 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorTests
     {
         TestPolicyContext context = CreateContext();
 
-        var evaluator = new DefaultAsiBackbonePolicyEvaluator<TestPolicyContext>(
+        var evaluator = new DefaultGovernancePolicyEvaluator<TestPolicyContext>(
             [new ThrowingConstraint(new InvalidOperationException("sensitive failure text"))],
             decisionPolicy: null,
-            options: new AsiBackbonePolicyEvaluatorOptions
+            options: new GovernancePolicyOptions
             {
                 TreatConstraintExceptionAsDenial = true,
                 ConstraintExceptionReasonCode = "host.constraint.exception",
@@ -513,7 +513,7 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorTests
     }
 
     /// <summary>
-    /// Verifies that the <see cref="DefaultAsiBackbonePolicyEvaluator{TContext}.EvaluateAsync"/> method applies the decision policy with a synthetic denied result when there is a constraint exception and the option to treat constraint exceptions as denials is enabled.
+    /// Verifies that the <see cref="DefaultGovernancePolicyEvaluator{TContext}.EvaluateAsync"/> method applies the decision policy with a synthetic denied result when there is a constraint exception and the option to treat constraint exceptions as denials is enabled.
     /// </summary>
     /// <returns>
     /// A task representing the asynchronous operation.
@@ -524,13 +524,13 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorTests
         TestPolicyContext context = CreateContext();
         var policy = new CapturingDecisionPolicy();
 
-        var evaluator = new DefaultAsiBackbonePolicyEvaluator<TestPolicyContext>(
+        var evaluator = new DefaultGovernancePolicyEvaluator<TestPolicyContext>(
             [
                 new StaticConstraint(ConstraintEvaluationResult.Allow()),
                 new ThrowingConstraint(new InvalidOperationException("sensitive failure text"))
             ],
             decisionPolicy: policy,
-            options: new AsiBackbonePolicyEvaluatorOptions
+            options: new GovernancePolicyOptions
             {
                 TreatConstraintExceptionAsDenial = true
             }, threatModelContributors: null, logger: null);
@@ -542,18 +542,18 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorTests
         Assert.NotNull(policy.ComposedDecision);
         Assert.True(policy.ComposedDecision.IsDenied);
         Assert.Equal(
-            AsiBackbonePolicyEvaluatorOptions.DefaultConstraintExceptionReasonCode,
+            GovernancePolicyOptions.DefaultConstraintExceptionReasonCode,
             Assert.Single(policy.ComposedDecision.ReasonCodes));
         Assert.NotNull(policy.ConstraintResults);
         Assert.Equal(2, policy.ConstraintResults.Count);
         Assert.True(policy.ConstraintResults[1].IsDenied);
         Assert.Equal(
-            AsiBackbonePolicyEvaluatorOptions.DefaultConstraintExceptionReasonCode,
+            GovernancePolicyOptions.DefaultConstraintExceptionReasonCode,
             Assert.Single(policy.ConstraintResults[1].ReasonCodes));
     }
 
     /// <summary>
-    /// Verifies that the <see cref="DefaultAsiBackbonePolicyEvaluator{TContext}.EvaluateAsync"/> method propagates <see cref="OperationCanceledException"/> even when the option to treat constraint exceptions as denials is enabled.
+    /// Verifies that the <see cref="DefaultGovernancePolicyEvaluator{TContext}.EvaluateAsync"/> method propagates <see cref="OperationCanceledException"/> even when the option to treat constraint exceptions as denials is enabled.
     /// </summary>
     /// <returns>
     /// A task representing the asynchronous operation.
@@ -564,10 +564,10 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorTests
         TestPolicyContext context = CreateContext();
         var expectedException = new OperationCanceledException("Host cancellation should not be converted to denial.");
 
-        var evaluator = new DefaultAsiBackbonePolicyEvaluator<TestPolicyContext>(
+        var evaluator = new DefaultGovernancePolicyEvaluator<TestPolicyContext>(
             [new ThrowingConstraint(expectedException)],
             decisionPolicy: null,
-            options: new AsiBackbonePolicyEvaluatorOptions
+            options: new GovernancePolicyOptions
             {
                 TreatConstraintExceptionAsDenial = true
             }, threatModelContributors: null, logger: null);
@@ -579,7 +579,7 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorTests
     }
 
     /// <summary>
-    /// Verifies that the <see cref="DefaultAsiBackbonePolicyEvaluator{TContext}"/> constructor materializes a non-list enumerable of constraints into an internal list.
+    /// Verifies that the <see cref="DefaultGovernancePolicyEvaluator{TContext}"/> constructor materializes a non-list enumerable of constraints into an internal list.
     /// </summary>
     /// <returns>
     /// A task representing the asynchronous operation.
@@ -589,7 +589,7 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorTests
     {
         TestPolicyContext context = CreateContext();
 
-        var evaluator = new DefaultAsiBackbonePolicyEvaluator<TestPolicyContext>(
+        var evaluator = new DefaultGovernancePolicyEvaluator<TestPolicyContext>(
             CreateConstraintEnumerable(
                 ConstraintEvaluationResult.Warning(
                     "constraint.warning",
@@ -603,7 +603,7 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorTests
     }
 
     /// <summary>
-    /// Verifies that the <see cref="DefaultAsiBackbonePolicyEvaluator{TContext}"/> constructor defensively copies the caller-owned list of constraints so that subsequent mutations to the caller's list do not affect the evaluator's behavior.
+    /// Verifies that the <see cref="DefaultGovernancePolicyEvaluator{TContext}"/> constructor defensively copies the caller-owned list of constraints so that subsequent mutations to the caller's list do not affect the evaluator's behavior.
     /// </summary>
     /// <returns>
     /// A task representing the asynchronous operation.
@@ -612,7 +612,7 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorTests
     public async Task ConstructorDefensivelyCopiesCallerOwnedConstraintList()
     {
         TestPolicyContext context = CreateContext();
-        var callerOwnedConstraints = new List<IAsiBackboneConstraint<TestPolicyContext>>
+        var callerOwnedConstraints = new List<IGovernanceConstraint<TestPolicyContext>>
         {
             new StaticConstraint(
                 ConstraintEvaluationResult.Warning(
@@ -620,7 +620,7 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorTests
                     "The original constraint produced a warning."))
         };
 
-        var evaluator = new DefaultAsiBackbonePolicyEvaluator<TestPolicyContext>(callerOwnedConstraints, threatModelContributors: null, decisionPolicy: null, options: null, logger: null);
+        var evaluator = new DefaultGovernancePolicyEvaluator<TestPolicyContext>(callerOwnedConstraints, threatModelContributors: null, decisionPolicy: null, options: null, logger: null);
 
         callerOwnedConstraints.Clear();
         callerOwnedConstraints.Add(
@@ -640,7 +640,7 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorTests
     private static readonly string[] Expected = ["first", "second"];
 
     /// <summary>
-    /// Verifies that the <see cref="DefaultAsiBackbonePolicyEvaluator{TContext}.EvaluateAsync"/> method runs constraints in the order they were supplied after materializing an array of constraints.
+    /// Verifies that the <see cref="DefaultGovernancePolicyEvaluator{TContext}.EvaluateAsync"/> method runs constraints in the order they were supplied after materializing an array of constraints.
     /// </summary>
     /// <returns>
     /// A task representing the asynchronous operation.
@@ -651,7 +651,7 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorTests
         TestPolicyContext context = CreateContext();
         var observedOrder = new List<string>();
 
-        var evaluator = new DefaultAsiBackbonePolicyEvaluator<TestPolicyContext>(
+        var evaluator = new DefaultGovernancePolicyEvaluator<TestPolicyContext>(
             [
                 new DelegateConstraint(
                     (_, _) =>
@@ -678,7 +678,7 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorTests
     }
 
     /// <summary>
-    /// Verifies that the <see cref="DefaultAsiBackbonePolicyEvaluator{TContext}.EvaluateAsync"/> method honors cancellation before any constraints are evaluated.
+    /// Verifies that the <see cref="DefaultGovernancePolicyEvaluator{TContext}.EvaluateAsync"/> method honors cancellation before any constraints are evaluated.
     /// </summary>
     /// <returns>
     /// A task representing the asynchronous operation.
@@ -696,7 +696,7 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorTests
                 return ConstraintEvaluationResult.Allow();
             });
 
-        var evaluator = new DefaultAsiBackbonePolicyEvaluator<TestPolicyContext>([constraint], threatModelContributors: null, decisionPolicy: null, options: null, logger: null);
+        var evaluator = new DefaultGovernancePolicyEvaluator<TestPolicyContext>([constraint], threatModelContributors: null, decisionPolicy: null, options: null, logger: null);
 
         using var cancellationTokenSource = new CancellationTokenSource();
         await cancellationTokenSource.CancelAsync();
@@ -708,7 +708,7 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorTests
     }
 
     /// <summary>
-    /// Verifies that the <see cref="DefaultAsiBackbonePolicyEvaluator{TContext}.EvaluateAsync"/> method produces a denied decision when there is a warning constraint followed by a denial constraint, and the denial takes precedence over the warning.
+    /// Verifies that the <see cref="DefaultGovernancePolicyEvaluator{TContext}.EvaluateAsync"/> method produces a denied decision when there is a warning constraint followed by a denial constraint, and the denial takes precedence over the warning.
     /// </summary>
     /// <returns>
     /// A task representing the asynchronous operation.
@@ -718,7 +718,7 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorTests
     {
         TestPolicyContext context = CreateContext();
 
-        var evaluator = new DefaultAsiBackbonePolicyEvaluator<TestPolicyContext>(
+        var evaluator = new DefaultGovernancePolicyEvaluator<TestPolicyContext>(
             [
                 new StaticConstraint(
                     ConstraintEvaluationResult.Warning(
@@ -739,7 +739,7 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorTests
     }
 
     /// <summary>
-    /// Verifies that the <see cref="DefaultAsiBackbonePolicyEvaluator{TContext}.EvaluateAsync"/> method applies the decision policy with a read-only list of constraint results.
+    /// Verifies that the <see cref="DefaultGovernancePolicyEvaluator{TContext}.EvaluateAsync"/> method applies the decision policy with a read-only list of constraint results.
     /// </summary>
     /// <returns>
     /// A task representing the asynchronous operation.
@@ -752,7 +752,7 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorTests
 
         var policy = new CapturingDecisionPolicy();
 
-        var evaluator = new DefaultAsiBackbonePolicyEvaluator<TestPolicyContext>(
+        var evaluator = new DefaultGovernancePolicyEvaluator<TestPolicyContext>(
             [
                 new StaticConstraint(ConstraintEvaluationResult.Allow()),
                 new StaticConstraint(
@@ -797,7 +797,7 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorTests
         };
     }
 
-    private static IEnumerable<IAsiBackboneConstraint<TestPolicyContext>> CreateConstraintEnumerable(
+    private static IEnumerable<IGovernanceConstraint<TestPolicyContext>> CreateConstraintEnumerable(
         params ConstraintEvaluationResult[] results)
     {
         foreach (ConstraintEvaluationResult result in results)
@@ -806,7 +806,7 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorTests
         }
     }
 
-    private sealed class TestPolicyContext : IAsiBackboneConstraintEvaluationContext
+    private sealed class TestPolicyContext : IGovernanceEvaluationContext
     {
         public string? CorrelationId { get; init; }
 
@@ -818,7 +818,7 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorTests
             new Dictionary<string, string>(StringComparer.Ordinal);
     }
 
-    private sealed class StaticConstraint(ConstraintEvaluationResult result) : IAsiBackboneConstraint<TestPolicyContext>
+    private sealed class StaticConstraint(ConstraintEvaluationResult result) : IGovernanceConstraint<TestPolicyContext>
     {
         private readonly ConstraintEvaluationResult result = result;
 
@@ -832,7 +832,7 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorTests
         }
     }
 
-    private sealed class ThrowingConstraint(Exception exception, string name = "throwing-constraint") : IAsiBackboneConstraint<TestPolicyContext>
+    private sealed class ThrowingConstraint(Exception exception, string name = "throwing-constraint") : IGovernanceConstraint<TestPolicyContext>
     {
         public string Name => name;
 
@@ -845,7 +845,7 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorTests
     }
 
     private sealed class DelegateConstraint(
-        Func<TestPolicyContext, CancellationToken, ConstraintEvaluationResult> evaluate) : IAsiBackboneConstraint<TestPolicyContext>
+        Func<TestPolicyContext, CancellationToken, ConstraintEvaluationResult> evaluate) : IGovernanceConstraint<TestPolicyContext>
     {
         private readonly Func<TestPolicyContext, CancellationToken, ConstraintEvaluationResult> evaluate = evaluate;
 
@@ -860,7 +860,7 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorTests
         }
     }
 
-    private sealed class CapturingDecisionPolicy : IAsiBackboneDecisionPolicy<TestPolicyContext>
+    private sealed class CapturingDecisionPolicy : IGovernanceDecisionPolicy<TestPolicyContext>
     {
         public int ApplyCount { get; private set; }
 

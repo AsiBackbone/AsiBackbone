@@ -18,7 +18,7 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorHotPathCoverageTests
     public async Task EvaluateWithAllPassThroughConstraintsProducesAllowedDecision()
     {
         TestPolicyContext context = CreateContext();
-        var evaluator = new DefaultAsiBackbonePolicyEvaluator<TestPolicyContext>(
+        var evaluator = new DefaultGovernancePolicyEvaluator<TestPolicyContext>(
             [
                 new StaticConstraint(ConstraintEvaluationResult.Allow()),
                 new StaticConstraint(ConstraintEvaluationResult.NotApplicable()),
@@ -43,7 +43,7 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorHotPathCoverageTests
     public async Task EvaluateWithMultipleWarningsAggregatesWarningReasons()
     {
         TestPolicyContext context = CreateContext();
-        var evaluator = new DefaultAsiBackbonePolicyEvaluator<TestPolicyContext>(
+        var evaluator = new DefaultGovernancePolicyEvaluator<TestPolicyContext>(
             [
                 new StaticConstraint(
                     ConstraintEvaluationResult.Warning(
@@ -73,7 +73,7 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorHotPathCoverageTests
     public async Task EvaluateWithMultipleDenialsAggregatesDeniedReasonsAndDropsPriorWarningsByDefault()
     {
         TestPolicyContext context = CreateContext();
-        var evaluator = new DefaultAsiBackbonePolicyEvaluator<TestPolicyContext>(
+        var evaluator = new DefaultGovernancePolicyEvaluator<TestPolicyContext>(
             [
                 new StaticConstraint(
                     ConstraintEvaluationResult.Warning(
@@ -108,7 +108,7 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorHotPathCoverageTests
     {
         TestPolicyContext context = CreateContext();
         int skippedEvaluationCount = 0;
-        var evaluator = new DefaultAsiBackbonePolicyEvaluator<TestPolicyContext>(
+        var evaluator = new DefaultGovernancePolicyEvaluator<TestPolicyContext>(
             [
                 new StaticConstraint(
                     ConstraintEvaluationResult.Warning(
@@ -132,7 +132,7 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorHotPathCoverageTests
                     })
             ],
             decisionPolicy: null,
-            options: new AsiBackbonePolicyEvaluatorOptions
+            options: new GovernancePolicyOptions
             {
                 ShortCircuitOnFirstDenial = true
             }, threatModelContributors: null, logger: null);
@@ -156,7 +156,7 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorHotPathCoverageTests
     {
         TestPolicyContext context = CreateContext();
         var policy = new CapturingDecisionPolicy();
-        var evaluator = new DefaultAsiBackbonePolicyEvaluator<TestPolicyContext>(
+        var evaluator = new DefaultGovernancePolicyEvaluator<TestPolicyContext>(
             [
                 new StaticConstraint(ConstraintEvaluationResult.Allow()),
                 new StaticConstraint(ConstraintEvaluationResult.NotApplicable())
@@ -187,7 +187,7 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorHotPathCoverageTests
         };
     }
 
-    private sealed class TestPolicyContext : IAsiBackboneConstraintEvaluationContext
+    private sealed class TestPolicyContext : IGovernanceEvaluationContext
     {
         public string? CorrelationId { get; init; }
 
@@ -199,7 +199,7 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorHotPathCoverageTests
             new Dictionary<string, string>(StringComparer.Ordinal);
     }
 
-    private sealed class StaticConstraint(ConstraintEvaluationResult result) : IAsiBackboneConstraint<TestPolicyContext>
+    private sealed class StaticConstraint(ConstraintEvaluationResult result) : IGovernanceConstraint<TestPolicyContext>
     {
         private readonly ConstraintEvaluationResult result = result;
 
@@ -214,7 +214,7 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorHotPathCoverageTests
     }
 
     private sealed class DelegateConstraint(
-        Func<TestPolicyContext, CancellationToken, ConstraintEvaluationResult> evaluate) : IAsiBackboneConstraint<TestPolicyContext>
+        Func<TestPolicyContext, CancellationToken, ConstraintEvaluationResult> evaluate) : IGovernanceConstraint<TestPolicyContext>
     {
         private readonly Func<TestPolicyContext, CancellationToken, ConstraintEvaluationResult> evaluate = evaluate;
 
@@ -228,7 +228,7 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorHotPathCoverageTests
         }
     }
 
-    private sealed class CapturingDecisionPolicy : IAsiBackboneDecisionPolicy<TestPolicyContext>
+    private sealed class CapturingDecisionPolicy : IGovernanceDecisionPolicy<TestPolicyContext>
     {
         public int ApplyCount { get; private set; }
 

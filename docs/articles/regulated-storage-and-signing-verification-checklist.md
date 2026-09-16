@@ -91,7 +91,7 @@ signed artifact from storage or a queue, so a stored payload and stored hash tha
 
 - [ ] Resolve the exact provider, key ID, and key version recorded at signing time.
 - [ ] Check active, retired, revoked, disabled, expired, and unknown key states according to host policy.
-- [ ] Verify the signature through `IAsiBackboneSignatureVerificationService` or the host's provider-specific implementation.
+- [ ] Verify the signature through `IGovernanceSignatureVerificationService` or the host's provider-specific implementation.
 - [ ] Apply `VerificationPolicyOptions` and the appropriate `VerificationPolicyContext`.
 - [ ] Persist the verification attempt, category, action, timestamp, and safe failure code separately from signing metadata.
 - [ ] Reverify samples after key rotation, provider migration, restore testing, or canonicalization changes.

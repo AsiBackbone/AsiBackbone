@@ -16,7 +16,7 @@ The OpenTelemetry provider gives hosts a vendor-neutral path for projecting AsiB
 The provider should adapt provider-neutral governance emission envelopes into OpenTelemetry-compatible telemetry without making `AsiBackbone.Core` depend on OpenTelemetry packages, exporters, cloud SDKs, or backend-specific concepts.
 
 ```text
-Audit residue / lifecycle event / gateway result
+Decision receipt / lifecycle event / gateway result
   -> GovernanceEmissionEnvelope
   -> durable governance outbox
   -> OpenTelemetry governance emitter
@@ -63,20 +63,20 @@ Azure Monitor should receive these events through normal host-configured OpenTel
 
 Core already owns the provider-neutral contracts:
 
-* `IAsiBackboneGovernanceEmitter`
+* `IGovernanceEmitter`
 * `GovernanceEmissionEnvelope`
 * `GovernanceEmissionPayload`
 * `GovernanceEmissionResult`
 * `GovernanceEmissionStatus`
 * `GovernanceEmissionError`
 * `GovernanceEmissionEventType`
-* `IAsiBackboneGovernanceOutboxStore`
-* `AsiBackboneGovernanceOutboxDrain`
+* `IGovernanceOutboxStore`
+* `GovernanceOutboxDrain`
 
 The OpenTelemetry provider should implement the neutral emitter seam:
 
 ```text
-IAsiBackboneGovernanceEmitter
+IGovernanceEmitter
   -> OpenTelemetryGovernanceEmitter
 ```
 
@@ -112,7 +112,7 @@ The provider should also expose constants for source names and stable attribute 
 | `Acknowledgment` | `asibackbone.acknowledgment.recorded` | Count requested/completed acknowledgment stages. |
 | `CapabilityToken` | `asibackbone.capability_token.issued` | Count token issuance without raw token values. |
 | `Gateway` | `asibackbone.gateway.completed` | Count gateway allow/deny/error outcomes. |
-| `AuditResidue` | `asibackbone.audit_residue.created` | Count durable residue creation. |
+| `DecisionReceipt` | `asibackbone.audit_residue.created` | Count durable residue creation. |
 | `Lifecycle` | `asibackbone.lifecycle.recorded` | Track stage progression. |
 | `Outbox` | `asibackbone.outbox.updated` | Track pending, delivered, failed, deferred, and dead-letter state. |
 | `ProviderEmission` | `asibackbone.emission.delivered` or `asibackbone.emission.failed` | Track provider handoff result. |
@@ -129,7 +129,7 @@ Attribute names should be stable, lowercase, dotted, and namespaced. Use `asibac
 | Attribute | Source field | Guidance |
 | --- | --- | --- |
 | `asibackbone.correlation_id` | `CorrelationId` | Opaque host workflow join key. |
-| `asibackbone.audit_residue_id` | `AuditResidueId` | Opaque audit residue identifier. |
+| `asibackbone.audit_residue_id` | `AuditResidueId` | Opaque decision receipt identifier. |
 | `asibackbone.event_id` | `EventId` | Opaque governance event identifier. |
 | `asibackbone.envelope_id` | `EnvelopeId` | Opaque emission envelope identifier. |
 | `asibackbone.schema_version` | `SchemaVersion` | Safe schema identity. |
@@ -147,10 +147,10 @@ Attribute names should be stable, lowercase, dotted, and namespaced. Use `asibac
 | `asibackbone.reason_codes` | metadata or source envelope | Prefer low-cardinality reason-code family where possible. |
 | `asibackbone.policy.version` | `PolicyVersion` | Stable policy version. |
 | `asibackbone.policy.hash` | `PolicyHash` | Hash only; never raw policy content. |
-| `asibackbone.policy.scope` | metadata or audit residue | Coarse scope only. |
-| `asibackbone.constraint_set.hash` | metadata or audit residue | Hash only. |
-| `asibackbone.constraint.count` | metadata or audit residue | Numeric count. |
-| `asibackbone.risk.score` | metadata or audit residue | Numeric host-defined score. |
+| `asibackbone.policy.scope` | metadata or decision receipt | Coarse scope only. |
+| `asibackbone.constraint_set.hash` | metadata or decision receipt | Hash only. |
+| `asibackbone.constraint.count` | metadata or decision receipt | Numeric count. |
+| `asibackbone.risk.score` | metadata or decision receipt | Numeric host-defined score. |
 
 ### Lifecycle and gateway attributes
 
@@ -202,7 +202,7 @@ Recommended histograms:
 | `asibackbone.governance.emission_latency_ms` | Histogram | `event_type`, `provider` |
 | `asibackbone.governance.decision_latency_ms` | Histogram | `event_type`, `outcome` |
 
-Avoid actor IDs, correlation IDs, envelope IDs, audit residue IDs, trace IDs, policy hashes, and gateway execution IDs as metric labels. Those values are too high-cardinality for metrics.
+Avoid actor IDs, correlation IDs, envelope IDs, decision receipt IDs, trace IDs, policy hashes, and gateway execution IDs as metric labels. Those values are too high-cardinality for metrics.
 
 ## Emission sequence
 
@@ -210,11 +210,11 @@ The provider should be downstream of durable outbox persistence.
 
 Recommended host sequence:
 
-1. Evaluate policy and produce the neutral decision/audit residue.
-2. Persist audit residue or lifecycle event locally.
+1. Evaluate policy and produce the neutral decision/decision receipt.
+2. Persist decision receipt or lifecycle event locally.
 3. Build a `GovernanceEmissionEnvelope`.
-4. Enqueue the envelope in `IAsiBackboneGovernanceOutboxStore`.
-5. Drain the outbox through `AsiBackboneGovernanceOutboxDrain` using `OpenTelemetryGovernanceEmitter`.
+4. Enqueue the envelope in `IGovernanceOutboxStore`.
+5. Drain the outbox through `GovernanceOutboxDrain` using `OpenTelemetryGovernanceEmitter`.
 6. The emitter records an OpenTelemetry activity event, structured log, and optional metrics.
 7. The emitter returns `GovernanceEmissionResult.Delivered` when local OpenTelemetry instrumentation accepted the event.
 8. The outbox marks the entry delivered, deferred, failed, retryable, or dead-lettered according to the result.
@@ -270,14 +270,14 @@ The design should be testable without live Azure, Datadog, Grafana, Splunk, Elas
 Recommended tests:
 
 * provider emits an activity event for a decision envelope;
-* provider preserves correlation, audit residue ID, event ID, schema version, policy version/hash, trace fields, lifecycle stage, gateway ID, outcome, and status attributes;
+* provider preserves correlation, decision receipt ID, event ID, schema version, policy version/hash, trace fields, lifecycle stage, gateway ID, outcome, and status attributes;
 * provider records low-cardinality counters and histograms without high-cardinality labels;
 * provider returns delivered result when instrumentation succeeds;
 * provider normalizes instrumentation failure into provider-neutral result/error details;
 * provider respects cancellation;
 * Core has no OpenTelemetry dependency;
 * provider package has no Azure SDK dependencies;
-* outbox drain can use the OpenTelemetry emitter through `IAsiBackboneGovernanceEmitter` without knowing about OpenTelemetry types.
+* outbox drain can use the OpenTelemetry emitter through `IGovernanceEmitter` without knowing about OpenTelemetry types.
 
 Tests can use in-memory activity listeners, fake loggers, meter listeners, and in-memory outbox stores. Live exporter tests should be optional and excluded from default CI.
 
@@ -303,9 +303,9 @@ Before implementation begins, confirm:
 | --- | --- |
 | #140 Durable outbox | OpenTelemetry emission should happen after local durable outbox persistence. |
 | #141 Lifecycle stages | Lifecycle stage and sequence should map to activity attributes/events. |
-| #142 Audit residue telemetry | Trace, latency, gateway, outbox, and PII-safe identifiers provide provider mapping fields. |
+| #142 Decision receipt telemetry | Trace, latency, gateway, outbox, and PII-safe identifiers provide provider mapping fields. |
 | #149 Observability architecture | This provider design follows the Core-neutral provider package architecture. |
-| #187 Governance emission contract | The provider implements the neutral `IAsiBackboneGovernanceEmitter` seam. |
+| #187 Governance emission contract | The provider implements the neutral `IGovernanceEmitter` seam. |
 | #193 No-op outbox drain | The no-op proof path validates the drain sequence before this real provider is added. |
 
 ## Related documentation

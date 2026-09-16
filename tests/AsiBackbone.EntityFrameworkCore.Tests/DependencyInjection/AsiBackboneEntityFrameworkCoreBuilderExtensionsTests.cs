@@ -27,7 +27,7 @@ public sealed class AsiBackboneEntityFrameworkCoreBuilderExtensionsTests
         IAsiBackboneBuilder result = builder.UseEfCoreAuditLedger<TestDbContext>();
 
         Assert.Same(builder, result);
-        AssertResolvesTo<IAsiBackboneAuditLedgerStore, EfCoreAuditLedgerStore>(services);
+        AssertResolvesTo<IGovernanceAuditLedgerStore, EfCoreAuditLedgerStore>(services);
         AssertOpenDbContextIsNotRegistered(services);
     }
 
@@ -57,7 +57,7 @@ public sealed class AsiBackboneEntityFrameworkCoreBuilderExtensionsTests
         IAsiBackboneBuilder result = builder.UseEfCoreAuditLifecycle<TestDbContext>();
 
         Assert.Same(builder, result);
-        AssertResolvesTo<IAsiBackboneAuditResidueLifecycleStore, EfCoreAuditResidueLifecycleStore>(services);
+        AssertResolvesTo<IDecisionReceiptLifecycleStore, EfCoreDecisionReceiptLifecycleStore>(services);
         AssertOpenDbContextIsNotRegistered(services);
     }
 
@@ -88,18 +88,18 @@ public sealed class AsiBackboneEntityFrameworkCoreBuilderExtensionsTests
 
         Assert.Same(builder, result);
         AssertResolvesTo<EfCoreGovernanceOutboxOutcomeStore, EfCoreGovernanceOutboxOutcomeStore>(services);
-        AssertScopedFactoryRegistration<IAsiBackboneGovernanceOutboxClaimOutcomeStore>(services);
-        AssertScopedFactoryRegistration<IAsiBackboneGovernanceOutboxClaimStore>(services);
-        AssertScopedFactoryRegistration<IAsiBackboneGovernanceOutboxStore>(services);
+        AssertScopedFactoryRegistration<IGovernanceOutboxClaimOutcomeStore>(services);
+        AssertScopedFactoryRegistration<IGovernanceOutboxClaimStore>(services);
+        AssertScopedFactoryRegistration<IGovernanceOutboxStore>(services);
         AssertOpenDbContextIsNotRegistered(services);
 
         using ServiceProvider provider = services.BuildServiceProvider();
         using IServiceScope scope = provider.CreateScope();
         EfCoreGovernanceOutboxOutcomeStore concrete = scope.ServiceProvider.GetRequiredService<EfCoreGovernanceOutboxOutcomeStore>();
 
-        Assert.Same(concrete, scope.ServiceProvider.GetRequiredService<IAsiBackboneGovernanceOutboxClaimOutcomeStore>());
-        Assert.Same(concrete, scope.ServiceProvider.GetRequiredService<IAsiBackboneGovernanceOutboxClaimStore>());
-        Assert.Same(concrete, scope.ServiceProvider.GetRequiredService<IAsiBackboneGovernanceOutboxStore>());
+        Assert.Same(concrete, scope.ServiceProvider.GetRequiredService<IGovernanceOutboxClaimOutcomeStore>());
+        Assert.Same(concrete, scope.ServiceProvider.GetRequiredService<IGovernanceOutboxClaimStore>());
+        Assert.Same(concrete, scope.ServiceProvider.GetRequiredService<IGovernanceOutboxStore>());
     }
 
     /// <summary>
@@ -141,8 +141,8 @@ public sealed class AsiBackboneEntityFrameworkCoreBuilderExtensionsTests
         TestDbContext ledgerContext = scope.ServiceProvider.GetRequiredService<TestDbContext>();
         SecondTestDbContext outboxContext = scope.ServiceProvider.GetRequiredService<SecondTestDbContext>();
 
-        Assert.Same(ledgerContext, GetStoreDbContext(scope.ServiceProvider.GetRequiredService<IAsiBackboneAuditLedgerStore>()));
-        Assert.Same(outboxContext, GetStoreDbContext(scope.ServiceProvider.GetRequiredService<IAsiBackboneGovernanceOutboxStore>()));
+        Assert.Same(ledgerContext, GetStoreDbContext(scope.ServiceProvider.GetRequiredService<IGovernanceAuditLedgerStore>()));
+        Assert.Same(outboxContext, GetStoreDbContext(scope.ServiceProvider.GetRequiredService<IGovernanceOutboxStore>()));
     }
 
     /// <summary>

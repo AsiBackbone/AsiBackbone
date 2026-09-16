@@ -60,7 +60,7 @@ public sealed class EfCoreGovernanceOutboxConcurrencyRecoveryTests
 
         Assert.Empty(losingClaims);
         Assert.NotNull(winningClaim);
-        Assert.Empty(losingContext.ChangeTracker.Entries<AsiBackboneGovernanceOutboxEntryEntity>());
+        Assert.Empty(losingContext.ChangeTracker.Entries<GovernanceOutboxEntryEntity>());
 
         await using (GovernanceOutboxTestDbContext verificationContext = new(durableOptions))
         {
@@ -93,7 +93,7 @@ public sealed class EfCoreGovernanceOutboxConcurrencyRecoveryTests
         Assert.Equal(outboxEntryId, retryClaim.OutboxEntryId);
         Assert.Equal("worker-retry", retryClaim.WorkerId);
         Assert.Equal(2, retryClaim.Entry.ClaimAttemptCount);
-        Assert.Empty(losingContext.ChangeTracker.Entries<AsiBackboneGovernanceOutboxEntryEntity>());
+        Assert.Empty(losingContext.ChangeTracker.Entries<GovernanceOutboxEntryEntity>());
     }
 
     /// <summary>
@@ -159,7 +159,7 @@ public sealed class EfCoreGovernanceOutboxConcurrencyRecoveryTests
         Assert.Null(result.ProviderRecordId);
         Assert.False(result.Metadata.ContainsKey("concurrency.result"));
         Assert.False(result.HasClaim);
-        Assert.Empty(staleContext.ChangeTracker.Entries<AsiBackboneGovernanceOutboxEntryEntity>());
+        Assert.Empty(staleContext.ChangeTracker.Entries<GovernanceOutboxEntryEntity>());
 
         await using GovernanceOutboxTestDbContext verificationContext = new(durableOptions);
         var verificationStore = new EfCoreGovernanceOutboxStore(verificationContext);
@@ -200,7 +200,7 @@ public sealed class EfCoreGovernanceOutboxConcurrencyRecoveryTests
         interceptor.Arm(async callbackCancellationToken =>
         {
             await using GovernanceOutboxTestDbContext deletingContext = new(durableOptions);
-            AsiBackboneGovernanceOutboxEntryEntity entity = await deletingContext.GovernanceOutboxEntries
+            GovernanceOutboxEntryEntity entity = await deletingContext.GovernanceOutboxEntries
                 .SingleAsync(item => item.OutboxEntryId == claim.OutboxEntryId, callbackCancellationToken);
             _ = deletingContext.GovernanceOutboxEntries.Remove(entity);
             _ = await deletingContext.SaveChangesAsync(callbackCancellationToken);
@@ -219,7 +219,7 @@ public sealed class EfCoreGovernanceOutboxConcurrencyRecoveryTests
         Assert.Equal(1, result.ClaimAttemptCount);
         Assert.Null(result.ProviderName);
         Assert.Null(result.ProviderRecordId);
-        Assert.Empty(staleContext.ChangeTracker.Entries<AsiBackboneGovernanceOutboxEntryEntity>());
+        Assert.Empty(staleContext.ChangeTracker.Entries<GovernanceOutboxEntryEntity>());
 
         await using GovernanceOutboxTestDbContext verificationContext = new(durableOptions);
         var verificationStore = new EfCoreGovernanceOutboxStore(verificationContext);

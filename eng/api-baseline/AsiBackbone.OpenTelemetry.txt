@@ -68,6 +68,6 @@ MEMBER | AsiBackbone.OpenTelemetry.OpenTelemetryGovernanceInstrumentation.Outbox
 MEMBER | AsiBackbone.OpenTelemetry.OpenTelemetryGovernanceInstrumentation.ProviderName | public const string ProviderName = "open-telemetry"
 TYPE | AsiBackbone.OpenTelemetry.OpenTelemetryGovernanceAttributes | public static class OpenTelemetryGovernanceAttributes
 TYPE | AsiBackbone.OpenTelemetry.OpenTelemetryGovernanceBuilderExtensions | public static class OpenTelemetryGovernanceBuilderExtensions
-TYPE | AsiBackbone.OpenTelemetry.OpenTelemetryGovernanceEmitter | public sealed class OpenTelemetryGovernanceEmitter : IAsiBackboneGovernanceEmitter
+TYPE | AsiBackbone.OpenTelemetry.OpenTelemetryGovernanceEmitter | public sealed class OpenTelemetryGovernanceEmitter : IGovernanceEmitter
 TYPE | AsiBackbone.OpenTelemetry.OpenTelemetryGovernanceEmitterOptions | public sealed class OpenTelemetryGovernanceEmitterOptions
 TYPE | AsiBackbone.OpenTelemetry.OpenTelemetryGovernanceInstrumentation | public static class OpenTelemetryGovernanceInstrumentation

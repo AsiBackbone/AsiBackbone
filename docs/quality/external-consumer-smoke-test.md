@@ -22,7 +22,7 @@ The generated consumer project validates:
 The stable package integration smoke script also generates focused xUnit tests for the `1.0.0` release path:
 
 - Core + `Storage.InMemory` decision/audit composition through public package APIs;
-- a host-defined stub implementation of `IAsiBackboneAuditSink`;
+- a host-defined stub implementation of `IDecisionReceiptSink`;
 - ASP.NET Core + EF Core + SQLite host-owned workflow composition.
 
 These checks intentionally avoid outbox, provider emission, cloud telemetry, or other behavior deferred beyond the initial stable package family.
@@ -71,7 +71,7 @@ The EF Core path remains host-owned:
 The non-durable path remains explicit:
 
 - the host registers `InMemoryAuditLedger`;
-- the host maps it to `IAsiBackboneAuditSink`;
+- the host maps it to `IDecisionReceiptSink`;
 - the smoke test verifies that in-memory records are written alongside EF ledger records where that path is under test.
 
 ## Decision flows
@@ -89,7 +89,7 @@ The stable package integration smoke path adds explicit package-composition asse
 | Test | Purpose |
 | --- | --- |
 | Core + in-memory decision/audit composition | Confirms the Core evaluator and in-memory ledger can be consumed together from packages. |
-| Stubbed audit sink | Confirms a consuming application can implement `IAsiBackboneAuditSink` without internal dependencies. |
+| Stubbed audit sink | Confirms a consuming application can implement `IDecisionReceiptSink` without internal dependencies. |
 | ASP.NET Core + EF Core + SQLite host wiring | Confirms host-owned web and persistence integration remains package-consumer friendly. |
 
 ## Pre-release use

@@ -13,7 +13,7 @@ internal static class AsiBackboneEndpointGovernanceDevelopmentDiagnostics
 
     public static bool IsEnabled(
         HttpContext httpContext,
-        AsiBackboneEndpointGovernanceOptions options)
+        EndpointGovernanceOptions options)
     {
         ArgumentNullException.ThrowIfNull(httpContext);
         ArgumentNullException.ThrowIfNull(options);
@@ -30,8 +30,8 @@ internal static class AsiBackboneEndpointGovernanceDevelopmentDiagnostics
 
     public static IResult CreateProblem(
         HttpContext httpContext,
-        AsiBackboneEndpointGovernanceOptions options,
-        AsiBackboneEndpointGovernanceDescriptor descriptor,
+        EndpointGovernanceOptions options,
+        EndpointGovernanceDescriptor descriptor,
         GovernanceDecision? decision,
         string decisionStage,
         string title,
@@ -64,8 +64,8 @@ internal static class AsiBackboneEndpointGovernanceDevelopmentDiagnostics
     }
 
     private static Dictionary<string, object?> CreateExtensions(
-        AsiBackboneEndpointGovernanceOptions options,
-        AsiBackboneEndpointGovernanceDescriptor descriptor,
+        EndpointGovernanceOptions options,
+        EndpointGovernanceDescriptor descriptor,
         GovernanceDecision? decision,
         string decisionStage,
         IReadOnlyDictionary<string, string> metadata)
@@ -109,7 +109,7 @@ internal static class AsiBackboneEndpointGovernanceDevelopmentDiagnostics
     }
 
     private static Dictionary<string, string> RedactMetadata(
-        AsiBackboneEndpointGovernanceOptions options,
+        EndpointGovernanceOptions options,
         IReadOnlyDictionary<string, string> metadata)
     {
         Dictionary<string, string> redacted = new(StringComparer.Ordinal);
@@ -125,7 +125,7 @@ internal static class AsiBackboneEndpointGovernanceDevelopmentDiagnostics
     }
 
     private static bool ShouldRedactMetadataValue(
-        AsiBackboneEndpointGovernanceOptions options,
+        EndpointGovernanceOptions options,
         string key)
     {
         if (!options.IncludeDevelopmentDiagnosticsMetadataValues)

@@ -16,7 +16,7 @@ public sealed class LiabilityHandshakeRequestTests
     [Fact]
     public void CreateStoresRequiredFields()
     {
-        var actor = AsiBackboneActorContext.Human(" user-123 ", " Chris ");
+        var actor = GovernanceActorContext.Human(" user-123 ", " Chris ");
 
         var request = LiabilityHandshakeRequest.Create(
             actor,
@@ -35,7 +35,7 @@ public sealed class LiabilityHandshakeRequestTests
 
         Assert.Equal("handshake-123", request.HandshakeId);
         Assert.Equal("user-123", request.ActorId);
-        Assert.Equal(AsiBackboneActorType.Human, request.ActorType);
+        Assert.Equal(GovernanceActorType.Human, request.ActorType);
         Assert.Equal("Chris", request.ActorDisplayName);
         Assert.Equal("document.approve", request.OperationName);
         Assert.Equal("ack.required", request.ReasonCode);
@@ -57,7 +57,7 @@ public sealed class LiabilityHandshakeRequestTests
     public void CreateGeneratesHandshakeIdWhenMissing()
     {
         var request = LiabilityHandshakeRequest.Create(
-            AsiBackboneActorContext.System,
+            GovernanceActorContext.System,
             "system.sync",
             "ack.required",
             "Acknowledgment is required.",
@@ -74,7 +74,7 @@ public sealed class LiabilityHandshakeRequestTests
     public void CreateNormalizesMetadata()
     {
         var request = LiabilityHandshakeRequest.Create(
-            AsiBackboneActorContext.Service("service-123"),
+            GovernanceActorContext.Service("service-123"),
             "external.call",
             "risk.high",
             "High risk operation.",
@@ -99,7 +99,7 @@ public sealed class LiabilityHandshakeRequestTests
     [Fact]
     public void FromDecisionCopiesDecisionTraceData()
     {
-        var actor = AsiBackboneActorContext.Human("user-123", "Chris");
+        var actor = GovernanceActorContext.Human("user-123", "Chris");
         var decision = GovernanceDecision.RequireAcknowledgment(
             "ack.required",
             "Acknowledgment is required.",
@@ -156,7 +156,7 @@ public sealed class LiabilityHandshakeRequestTests
     {
         _ = Assert.Throws<ArgumentException>(() =>
             LiabilityHandshakeRequest.Create(
-                AsiBackboneActorContext.System,
+                GovernanceActorContext.System,
                 operationName,
                 "ack.required",
                 "Acknowledgment is required.",
@@ -177,7 +177,7 @@ public sealed class LiabilityHandshakeRequestTests
     {
         _ = Assert.Throws<ArgumentException>(() =>
             LiabilityHandshakeRequest.Create(
-                AsiBackboneActorContext.System,
+                GovernanceActorContext.System,
                 "system.sync",
                 reasonCode,
                 "Acknowledgment is required.",
@@ -198,7 +198,7 @@ public sealed class LiabilityHandshakeRequestTests
     {
         _ = Assert.Throws<ArgumentException>(() =>
             LiabilityHandshakeRequest.Create(
-                AsiBackboneActorContext.System,
+                GovernanceActorContext.System,
                 "system.sync",
                 "ack.required",
                 "Acknowledgment is required.",
@@ -213,7 +213,7 @@ public sealed class LiabilityHandshakeRequestTests
     public void FromDecision_WithNoReasons_UsesDefaultReasonCodeAndMessage()
     {
         var request = LiabilityHandshakeRequest.FromDecision(
-            AsiBackboneActorContext.System,
+            GovernanceActorContext.System,
             "system.sync",
             GovernanceDecision.Allow(),
             "ACK-001",
@@ -231,7 +231,7 @@ public sealed class LiabilityHandshakeRequestTests
     public void Create_WithWhitespaceOptionalFields_NormalizesToNull()
     {
         var request = LiabilityHandshakeRequest.Create(
-            AsiBackboneActorContext.System,
+            GovernanceActorContext.System,
             "system.sync",
             "ack.required",
             "Acknowledgment is required.",
@@ -257,7 +257,7 @@ public sealed class LiabilityHandshakeRequestTests
     public void Create_WithNullMetadata_HasNoMetadata()
     {
         var request = LiabilityHandshakeRequest.Create(
-            AsiBackboneActorContext.System,
+            GovernanceActorContext.System,
             "system.sync",
             "ack.required",
             "Acknowledgment is required.",
@@ -276,7 +276,7 @@ public sealed class LiabilityHandshakeRequestTests
     public void Create_WithEmptyMetadata_HasNoMetadata()
     {
         var request = LiabilityHandshakeRequest.Create(
-            AsiBackboneActorContext.System,
+            GovernanceActorContext.System,
             "system.sync",
             "ack.required",
             "Acknowledgment is required.",
@@ -295,7 +295,7 @@ public sealed class LiabilityHandshakeRequestTests
     public void Create_WithOnlyBlankMetadataKeys_HasNoMetadata()
     {
         var request = LiabilityHandshakeRequest.Create(
-            AsiBackboneActorContext.System,
+            GovernanceActorContext.System,
             "system.sync",
             "ack.required",
             "Acknowledgment is required.",
@@ -318,7 +318,7 @@ public sealed class LiabilityHandshakeRequestTests
     public void Create_WithNullMetadataValue_StoresEmptyString()
     {
         var request = LiabilityHandshakeRequest.Create(
-            AsiBackboneActorContext.System,
+            GovernanceActorContext.System,
             "system.sync",
             "ack.required",
             "Acknowledgment is required.",
@@ -340,7 +340,7 @@ public sealed class LiabilityHandshakeRequestTests
     public void MetadataCannotBeMutatedThroughDictionaryCasts()
     {
         var request = LiabilityHandshakeRequest.Create(
-            AsiBackboneActorContext.System,
+            GovernanceActorContext.System,
             "system.sync",
             "ack.required",
             "Acknowledgment is required.",
@@ -364,7 +364,7 @@ public sealed class LiabilityHandshakeRequestTests
     public void EmptyMetadataCannotBeMutatedThroughDictionaryCasts()
     {
         var request = LiabilityHandshakeRequest.Create(
-            AsiBackboneActorContext.System,
+            GovernanceActorContext.System,
             "system.sync",
             "ack.required",
             "Acknowledgment is required.",

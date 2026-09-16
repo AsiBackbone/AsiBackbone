@@ -10,7 +10,7 @@ namespace AsiBackbone.Signing.LocalDevelopment;
 /// <remarks>
 /// This service generates an in-process RSA key for samples and tests. It is not a production managed-key provider.
 /// </remarks>
-public sealed class LocalDevelopmentSigningService : IAsiBackboneSigningService, IAsiBackboneSignatureVerificationService, IDisposable
+public sealed class LocalDevelopmentSigningService : IGovernanceSigningService, IGovernanceSignatureVerificationService, IDisposable
 {
     private const string SupportedHashAlgorithm = "SHA-256";
     private static readonly Encoding SigningEncoding = Encoding.UTF8;

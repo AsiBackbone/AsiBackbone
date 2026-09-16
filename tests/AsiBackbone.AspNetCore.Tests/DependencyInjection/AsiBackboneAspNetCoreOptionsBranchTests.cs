@@ -4,17 +4,17 @@ using Xunit;
 namespace AsiBackbone.AspNetCore.Tests.DependencyInjection;
 
 /// <summary>
-/// Tests for the <see cref="AsiBackboneAspNetCoreOptions"/> class, focusing on the behavior of its properties and validation logic.
+/// Tests for the <see cref="AspNetCoreGovernanceOptions"/> class, focusing on the behavior of its properties and validation logic.
 /// </summary>
 public sealed class AsiBackboneAspNetCoreOptionsBranchTests
 {
     /// <summary>
-    /// Tests that the <see cref="AsiBackboneAspNetCoreOptions.IncludeEndpointMetadata"/> property correctly reflects the state of the <see cref="AsiBackboneAspNetCoreOptions.IncludeEndpointDisplayName"/> and <see cref="AsiBackboneAspNetCoreOptions.IncludeRoutePattern"/> properties.
+    /// Tests that the <see cref="AspNetCoreGovernanceOptions.IncludeEndpointMetadata"/> property correctly reflects the state of the <see cref="AspNetCoreGovernanceOptions.IncludeEndpointDisplayName"/> and <see cref="AspNetCoreGovernanceOptions.IncludeRoutePattern"/> properties.
     /// </summary>
     [Fact]
     public void IncludeEndpointMetadataGetterReflectsDisplayNameAndRoutePatternFlags()
     {
-        var options = new AsiBackboneAspNetCoreOptions
+        var options = new AspNetCoreGovernanceOptions
         {
             IncludeEndpointDisplayName = false,
             IncludeRoutePattern = false,
@@ -33,12 +33,12 @@ public sealed class AsiBackboneAspNetCoreOptionsBranchTests
     }
 
     /// <summary>
-    /// Tests that setting the <see cref="AsiBackboneAspNetCoreOptions.IncludeEndpointMetadata"/> property updates both the <see cref="AsiBackboneAspNetCoreOptions.IncludeEndpointDisplayName"/> and <see cref="AsiBackboneAspNetCoreOptions.IncludeRoutePattern"/> properties accordingly.
+    /// Tests that setting the <see cref="AspNetCoreGovernanceOptions.IncludeEndpointMetadata"/> property updates both the <see cref="AspNetCoreGovernanceOptions.IncludeEndpointDisplayName"/> and <see cref="AspNetCoreGovernanceOptions.IncludeRoutePattern"/> properties accordingly.
     /// </summary>
     [Fact]
     public void IncludeEndpointMetadataSetterUpdatesBothEndpointFlags()
     {
-        var options = new AsiBackboneAspNetCoreOptions
+        var options = new AspNetCoreGovernanceOptions
         {
             IncludeEndpointMetadata = false,
         };
@@ -53,12 +53,12 @@ public sealed class AsiBackboneAspNetCoreOptionsBranchTests
     }
 
     /// <summary>
-    /// Tests that the <see cref="AsiBackboneAspNetCoreOptions.CorrelationIdHeaderName"/> property returns an empty string when no header names are configured.
+    /// Tests that the <see cref="AspNetCoreGovernanceOptions.CorrelationIdHeaderName"/> property returns an empty string when no header names are configured.
     /// </summary>
     [Fact]
     public void CorrelationIdHeaderNameReturnsEmptyWhenNoHeaderNamesAreConfigured()
     {
-        var options = new AsiBackboneAspNetCoreOptions
+        var options = new AspNetCoreGovernanceOptions
         {
             CorrelationIdHeaderNames = [],
         };
@@ -67,12 +67,12 @@ public sealed class AsiBackboneAspNetCoreOptionsBranchTests
     }
 
     /// <summary>
-    /// Tests that setting the <see cref="AsiBackboneAspNetCoreOptions.CorrelationIdHeaderName"/> property replaces any previously configured header names in the <see cref="AsiBackboneAspNetCoreOptions.CorrelationIdHeaderNames"/> collection.
+    /// Tests that setting the <see cref="AspNetCoreGovernanceOptions.CorrelationIdHeaderName"/> property replaces any previously configured header names in the <see cref="AspNetCoreGovernanceOptions.CorrelationIdHeaderNames"/> collection.
     /// </summary>
     [Fact]
     public void CorrelationIdHeaderNameSetterReplacesConfiguredHeaderNames()
     {
-        var options = new AsiBackboneAspNetCoreOptions
+        var options = new AspNetCoreGovernanceOptions
         {
             CorrelationIdHeaderNames = ["X-First", "X-Second"],
             CorrelationIdHeaderName = "X-Replacement"
@@ -83,12 +83,12 @@ public sealed class AsiBackboneAspNetCoreOptionsBranchTests
     }
 
     /// <summary>
-    /// Tests that the <see cref="AsiBackboneAspNetCoreOptions.Validate"/> method accepts header names when at least one configured header is not blank.
+    /// Tests that the <see cref="AspNetCoreGovernanceOptions.Validate"/> method accepts header names when at least one configured header is not blank.
     /// </summary>
     [Fact]
     public void ValidateAcceptsHeaderNamesWhenAtLeastOneConfiguredHeaderIsNotBlank()
     {
-        var options = new AsiBackboneAspNetCoreOptions
+        var options = new AspNetCoreGovernanceOptions
         {
             CorrelationIdHeaderNames = [" ", "X-Correlation-ID"],
         };
@@ -99,12 +99,12 @@ public sealed class AsiBackboneAspNetCoreOptionsBranchTests
     }
 
     /// <summary>
-    /// Tests that the <see cref="AsiBackboneAspNetCoreOptions.Validate"/> method throws an <see cref="InvalidOperationException"/> when the <see cref="AsiBackboneAspNetCoreOptions.CorrelationIdHeaderNames"/> property is set to null.
+    /// Tests that the <see cref="AspNetCoreGovernanceOptions.Validate"/> method throws an <see cref="InvalidOperationException"/> when the <see cref="AspNetCoreGovernanceOptions.CorrelationIdHeaderNames"/> property is set to null.
     /// </summary>
     [Fact]
     public void ValidateRejectsNullCorrelationHeaderNames()
     {
-        var options = new AsiBackboneAspNetCoreOptions
+        var options = new AspNetCoreGovernanceOptions
         {
             CorrelationIdHeaderNames = null!,
         };
@@ -115,12 +115,12 @@ public sealed class AsiBackboneAspNetCoreOptionsBranchTests
     }
 
     /// <summary>
-    /// Tests that the <see cref="AsiBackboneAspNetCoreOptions.Validate"/> method throws an <see cref="InvalidOperationException"/> when the <see cref="AsiBackboneAspNetCoreOptions.CorrelationIdHeaderNames"/> property is set to an empty collection.
+    /// Tests that the <see cref="AspNetCoreGovernanceOptions.Validate"/> method throws an <see cref="InvalidOperationException"/> when the <see cref="AspNetCoreGovernanceOptions.CorrelationIdHeaderNames"/> property is set to an empty collection.
     /// </summary>
     [Fact]
     public void ValidateRejectsEmptyCorrelationHeaderNames()
     {
-        var options = new AsiBackboneAspNetCoreOptions
+        var options = new AspNetCoreGovernanceOptions
         {
             CorrelationIdHeaderNames = [],
         };
@@ -131,12 +131,12 @@ public sealed class AsiBackboneAspNetCoreOptionsBranchTests
     }
 
     /// <summary>
-    /// Tests that the <see cref="AsiBackboneAspNetCoreOptions.Validate"/> method throws an <see cref="InvalidOperationException"/> when the <see cref="AsiBackboneAspNetCoreOptions.CorrelationIdHeaderNames"/> property is set to a collection containing only whitespace.
+    /// Tests that the <see cref="AspNetCoreGovernanceOptions.Validate"/> method throws an <see cref="InvalidOperationException"/> when the <see cref="AspNetCoreGovernanceOptions.CorrelationIdHeaderNames"/> property is set to a collection containing only whitespace.
     /// </summary>
     [Fact]
     public void ValidateRejectsWhitespaceOnlyCorrelationHeaderNames()
     {
-        var options = new AsiBackboneAspNetCoreOptions
+        var options = new AspNetCoreGovernanceOptions
         {
             CorrelationIdHeaderNames = [" ", "\t"],
         };

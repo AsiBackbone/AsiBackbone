@@ -23,8 +23,8 @@ public sealed class CanonicalPayloadBuilderBranchTests
     public void ForAuditResidueUsesEventIdentifierWhenResidueIdIsMissingAndFiltersMetadata()
     {
         var options = CanonicalPayloadOptions.Create(["safe"]);
-        var residue = AuditResidue.Create(
-            AsiBackboneActorContext.Service(" system-1 ", " System "),
+        var residue = DecisionReceipt.Create(
+            GovernanceActorContext.Service(" system-1 ", " System "),
             " gateway.execute ",
             " Allowed ",
             reasonCodes: [" reason.beta ", "", "reason.alpha", "reason.beta"],
@@ -56,8 +56,8 @@ public sealed class CanonicalPayloadBuilderBranchTests
     public void ForAuditResidueLifecycleEventIncludesFilteredMetadataAndStageSequence()
     {
         var options = CanonicalPayloadOptions.Create(["safe"]);
-        var lifecycleEvent = AuditResidueLifecycleEvent.Create(
-            AuditResidueLifecycleStage.ExternalEmissionQueued,
+        var lifecycleEvent = DecisionReceiptLifecycleEvent.Create(
+            DecisionReceiptLifecycleStage.ExternalEmissionQueued,
             " correlation-1 ",
             auditResidueId: " residue-1 ",
             eventId: " lifecycle-1 ",
@@ -76,7 +76,7 @@ public sealed class CanonicalPayloadBuilderBranchTests
         Assert.Equal(CanonicalArtifactTypes.AuditResidueLifecycleEvent, payload.ArtifactType);
         Assert.Equal("lifecycle-1", payload.ArtifactId);
         Assert.Contains("\"metadata\":{\"safe\":\"included\"}", payload.CanonicalJson, StringComparison.Ordinal);
-        Assert.Contains($"\"stageSequence\":{(int)AuditResidueLifecycleStage.ExternalEmissionQueued}", payload.CanonicalJson, StringComparison.Ordinal);
+        Assert.Contains($"\"stageSequence\":{(int)DecisionReceiptLifecycleStage.ExternalEmissionQueued}", payload.CanonicalJson, StringComparison.Ordinal);
         Assert.DoesNotContain("ignored", payload.CanonicalJson, StringComparison.Ordinal);
     }
 
@@ -191,7 +191,7 @@ public sealed class CanonicalPayloadBuilderBranchTests
             createdUtc: CreatedUtc,
             correlationId: " correlation-1 ",
             auditResidueId: " residue-1 ",
-            lifecycleStage: AuditResidueLifecycleStage.ExternalEmissionQueued,
+            lifecycleStage: DecisionReceiptLifecycleStage.ExternalEmissionQueued,
             policyVersion: " policy-v1 ",
             policyHash: " policy-hash ",
             traceId: " trace-1 ",

@@ -48,7 +48,7 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorInvalidThreatOutcomeTests
 
     private static MethodInfo GetPrivateStaticMethod(string testName, string methodName)
     {
-        return typeof(DefaultAsiBackbonePolicyEvaluator<TestPolicyContext>).GetMethod(
+        return typeof(DefaultGovernancePolicyEvaluator<TestPolicyContext>).GetMethod(
             methodName,
             BindingFlags.NonPublic | BindingFlags.Static)
             ?? throw new InvalidOperationException($"{testName} could not find {methodName}.");
@@ -64,7 +64,7 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorInvalidThreatOutcomeTests
         };
     }
 
-    private sealed class TestPolicyContext : IAsiBackboneConstraintEvaluationContext
+    private sealed class TestPolicyContext : IGovernanceEvaluationContext
     {
         public string? CorrelationId { get; init; }
 

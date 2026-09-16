@@ -14,7 +14,7 @@ For sensitive security concerns, use the repository [Security Policy and Vulnera
 | Topic | Preferred wording | Avoid wording |
 | --- | --- | --- |
 | Project identity | `Accountable Systems Infrastructure`, governance spine, decision governance infrastructure | artificial superintelligence implementation, AI model, ASI engine |
-| Current audit records | audit residue, audit ledger record, durable local/outbox record when configured | immutable audit store or production-grade evidence by default |
+| Current audit records | decision receipt, audit ledger record, durable local/outbox record when configured | immutable audit store or production-grade evidence by default |
 | Stable Core signing primitives | signing-ready metadata, canonical payload hashing, provider-neutral signing and verification seams, verification-policy primitives | cryptographically signed by default or automatically verified by default |
 | Local-development signing provider | released local-development signer for tests, samples, local validation, and wiring proof paths | production signer or production key custody |
 | Managed-key adapter boundary | released managed-key signing adapter boundary with host-owned managed-key client and operational policy | built-in cloud key service or automatic production trust |
@@ -64,7 +64,7 @@ Default wording should preserve this sequence:
 
 ```text
 Decision or acknowledgment
-  -> audit residue / governance record
+  -> decision receipt / governance record
   -> durable local store or outbox when configured
   -> optional signing or verification boundary when configured
   -> optional provider emission

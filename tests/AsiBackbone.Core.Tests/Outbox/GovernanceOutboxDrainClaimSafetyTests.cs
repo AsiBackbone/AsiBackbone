@@ -20,14 +20,14 @@ public sealed class GovernanceOutboxDrainClaimSafetyTests
     [Fact]
     public async Task DrainAsyncFailsWithActionableErrorWhenStoreIsNotClaimCapable()
     {
-        var drain = new AsiBackboneGovernanceOutboxDrain(
+        var drain = new GovernanceOutboxDrain(
             new NonClaimStore(),
             new DeliveringEmitter());
 
         InvalidOperationException exception = await Assert.ThrowsAsync<InvalidOperationException>(
             async () => await drain.DrainAsync(DrainUtc, cancellationToken: TestContext.Current.CancellationToken));
 
-        Assert.Contains(nameof(IAsiBackboneGovernanceOutboxClaimStore), exception.Message, StringComparison.Ordinal);
+        Assert.Contains(nameof(IGovernanceOutboxClaimStore), exception.Message, StringComparison.Ordinal);
         Assert.Contains("UseClaimLeases", exception.Message, StringComparison.Ordinal);
     }
 
@@ -39,12 +39,12 @@ public sealed class GovernanceOutboxDrainClaimSafetyTests
     public async Task DrainAsyncClaimsInPagesBoundedByClaimPageSize()
     {
         var store = new RecordingClaimStore(availableEntryCount: 7);
-        var options = new AsiBackboneGovernanceOutboxOptions
+        var options = new GovernanceOutboxOptions
         {
             ClaimWorkerId = "worker-1",
             ClaimPageSize = 3
         };
-        var drain = new AsiBackboneGovernanceOutboxDrain(
+        var drain = new GovernanceOutboxDrain(
             store,
             new DeliveringEmitter(),
             outboxOptions: Options.Create(options));
@@ -69,8 +69,8 @@ public sealed class GovernanceOutboxDrainClaimSafetyTests
     public async Task DrainAsyncNeverLeasesTheEntireBatchAtOnce()
     {
         var store = new RecordingClaimStore(availableEntryCount: 100);
-        var options = new AsiBackboneGovernanceOutboxOptions { ClaimWorkerId = "worker-1" };
-        var drain = new AsiBackboneGovernanceOutboxDrain(
+        var options = new GovernanceOutboxOptions { ClaimWorkerId = "worker-1" };
+        var drain = new GovernanceOutboxDrain(
             store,
             new DeliveringEmitter(),
             outboxOptions: Options.Create(options));
@@ -79,7 +79,7 @@ public sealed class GovernanceOutboxDrainClaimSafetyTests
 
         Assert.All(
             store.PendingClaimMaxCounts,
-            maxCount => Assert.Equal(AsiBackboneGovernanceOutboxOptions.DefaultClaimPageSize, maxCount));
+            maxCount => Assert.Equal(GovernanceOutboxOptions.DefaultClaimPageSize, maxCount));
     }
 
     /// <summary>
@@ -91,19 +91,19 @@ public sealed class GovernanceOutboxDrainClaimSafetyTests
     {
         var store = new RecordingClaimStore(availableEntryCount: 1, claimAttemptCount: 6);
         var emitter = new DeliveringEmitter();
-        var options = new AsiBackboneGovernanceOutboxOptions
+        var options = new GovernanceOutboxOptions
         {
             ClaimWorkerId = "worker-1",
             MaxClaimAttempts = 5
         };
-        var drain = new AsiBackboneGovernanceOutboxDrain(store, emitter, outboxOptions: Options.Create(options));
+        var drain = new GovernanceOutboxDrain(store, emitter, outboxOptions: Options.Create(options));
 
         _ = await drain.DrainAsync(DrainUtc, maxCount: 1, TestContext.Current.CancellationToken);
 
         Assert.Equal(0, emitter.EmissionCount);
         Assert.Equal(1, store.DeadLetteredCount);
         Assert.Equal(
-            AsiBackboneGovernanceOutboxOptions.DefaultMaxClaimAttemptsReasonCode,
+            GovernanceOutboxOptions.DefaultMaxClaimAttemptsReasonCode,
             store.LastDeadLetterError?.Code);
     }
 
@@ -116,12 +116,12 @@ public sealed class GovernanceOutboxDrainClaimSafetyTests
     {
         var store = new RecordingClaimStore(availableEntryCount: 1, claimAttemptCount: 5);
         var emitter = new DeliveringEmitter();
-        var options = new AsiBackboneGovernanceOutboxOptions
+        var options = new GovernanceOutboxOptions
         {
             ClaimWorkerId = "worker-1",
             MaxClaimAttempts = 5
         };
-        var drain = new AsiBackboneGovernanceOutboxDrain(store, emitter, outboxOptions: Options.Create(options));
+        var drain = new GovernanceOutboxDrain(store, emitter, outboxOptions: Options.Create(options));
 
         _ = await drain.DrainAsync(DrainUtc, maxCount: 1, TestContext.Current.CancellationToken);
 
@@ -138,13 +138,13 @@ public sealed class GovernanceOutboxDrainClaimSafetyTests
     {
         var store = new RecordingClaimStore(availableEntryCount: 1, claimAttemptCount: 99);
         var emitter = new DeliveringEmitter();
-        var options = new AsiBackboneGovernanceOutboxOptions
+        var options = new GovernanceOutboxOptions
         {
             ClaimWorkerId = "worker-1",
             MaxClaimAttempts = 5,
             DeadLetterOnMaxClaimAttempts = false
         };
-        var drain = new AsiBackboneGovernanceOutboxDrain(store, emitter, outboxOptions: Options.Create(options));
+        var drain = new GovernanceOutboxDrain(store, emitter, outboxOptions: Options.Create(options));
 
         _ = await drain.DrainAsync(DrainUtc, maxCount: 1, TestContext.Current.CancellationToken);
 
@@ -160,10 +160,10 @@ public sealed class GovernanceOutboxDrainClaimSafetyTests
             occurredUtc: DrainUtc,
             envelopeId: $"envelope-{index}",
             correlationId: $"correlation-{index}",
-            lifecycleStage: AuditResidueLifecycleStage.ExternalEmissionQueued);
+            lifecycleStage: DecisionReceiptLifecycleStage.ExternalEmissionQueued);
     }
 
-    private sealed class DeliveringEmitter : IAsiBackboneGovernanceEmitter
+    private sealed class DeliveringEmitter : IGovernanceEmitter
     {
         public int EmissionCount { get; private set; }
 
@@ -180,7 +180,7 @@ public sealed class GovernanceOutboxDrainClaimSafetyTests
     /// A claim store that hands out a fixed number of entries and records how each page was requested.
     /// </summary>
     private sealed class RecordingClaimStore(int availableEntryCount, int claimAttemptCount = 1)
-        : IAsiBackboneGovernanceOutboxClaimStore
+        : IGovernanceOutboxClaimStore
     {
         private int issuedEntryCount;
 
@@ -342,7 +342,7 @@ public sealed class GovernanceOutboxDrainClaimSafetyTests
         }
     }
 
-    private sealed class NonClaimStore : IAsiBackboneGovernanceOutboxStore
+    private sealed class NonClaimStore : IGovernanceOutboxStore
     {
         public ValueTask<GovernanceOutboxEntry> EnqueueAsync(
             GovernanceEmissionEnvelope envelope,

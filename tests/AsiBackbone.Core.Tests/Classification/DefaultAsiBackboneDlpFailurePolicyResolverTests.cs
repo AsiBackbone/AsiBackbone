@@ -17,7 +17,7 @@ public sealed class DefaultAsiBackboneDlpFailurePolicyResolverTests
     [Fact]
     public async Task ResolveLowRiskServiceUnavailableWarnsAndAllowsByDefault()
     {
-        var resolver = new DefaultAsiBackboneDlpFailurePolicyResolver();
+        var resolver = new DefaultDlpFailurePolicyResolver();
         var context = DlpFailurePolicyContext.Create(
             DlpClassificationFailureKind.ServiceUnavailable,
             DlpIntentRiskLevel.Low,
@@ -50,7 +50,7 @@ public sealed class DefaultAsiBackboneDlpFailurePolicyResolverTests
     [Fact]
     public async Task ResolveMediumRiskTimeoutRequiresAcknowledgmentByDefault()
     {
-        var resolver = new DefaultAsiBackboneDlpFailurePolicyResolver();
+        var resolver = new DefaultDlpFailurePolicyResolver();
         var context = DlpFailurePolicyContext.TimeoutFailure(
             DlpIntentRiskLevel.Medium,
             timeout: TimeSpan.FromSeconds(2),
@@ -84,7 +84,7 @@ public sealed class DefaultAsiBackboneDlpFailurePolicyResolverTests
     [Fact]
     public async Task ResolveHighRiskIndeterminateResultFailsClosedByDefault()
     {
-        var resolver = new DefaultAsiBackboneDlpFailurePolicyResolver();
+        var resolver = new DefaultDlpFailurePolicyResolver();
         var context = DlpFailurePolicyContext.Create(
             DlpClassificationFailureKind.IndeterminateResult,
             DlpIntentRiskLevel.High);
@@ -110,7 +110,7 @@ public sealed class DefaultAsiBackboneDlpFailurePolicyResolverTests
     [Fact]
     public async Task CustomRiskDefaultBehaviorsAreHonoredWhenNoExactOverrideExists()
     {
-        var resolver = new DefaultAsiBackboneDlpFailurePolicyResolver(
+        var resolver = new DefaultDlpFailurePolicyResolver(
             new DlpFailurePolicyOptions
             {
                 LowRiskBehavior = DlpFailureBehavior.Allow,
@@ -164,7 +164,7 @@ public sealed class DefaultAsiBackboneDlpFailurePolicyResolverTests
             DlpIntentRiskLevel.Medium,
             DlpClassificationFailureKind.Timeout)] = DlpFailureBehavior.Allow;
 
-        var resolver = new DefaultAsiBackboneDlpFailurePolicyResolver(options);
+        var resolver = new DefaultDlpFailurePolicyResolver(options);
         var context = DlpFailurePolicyContext.TimeoutFailure(DlpIntentRiskLevel.Medium);
 
         DlpFailurePolicyResolution resolution = await resolver.ResolveAsync(
@@ -192,7 +192,7 @@ public sealed class DefaultAsiBackboneDlpFailurePolicyResolverTests
             DlpIntentRiskLevel.High,
             DlpClassificationFailureKind.BlockedResult)] = DlpFailureBehavior.Escalate;
 
-        var resolver = new DefaultAsiBackboneDlpFailurePolicyResolver(options);
+        var resolver = new DefaultDlpFailurePolicyResolver(options);
         var context = DlpFailurePolicyContext.Create(
             DlpClassificationFailureKind.BlockedResult,
             DlpIntentRiskLevel.High);
@@ -220,7 +220,7 @@ public sealed class DefaultAsiBackboneDlpFailurePolicyResolverTests
             DlpIntentRiskLevel.Low,
             DlpClassificationFailureKind.ClassifiedResult)] = DlpFailureBehavior.Defer;
 
-        var resolver = new DefaultAsiBackboneDlpFailurePolicyResolver(options);
+        var resolver = new DefaultDlpFailurePolicyResolver(options);
         var context = DlpFailurePolicyContext.Create(
             DlpClassificationFailureKind.ClassifiedResult,
             DlpIntentRiskLevel.Low,
@@ -386,7 +386,7 @@ public sealed class DefaultAsiBackboneDlpFailurePolicyResolverTests
         DlpClassificationFailureKind failureKind,
         string expectedReasonCode)
     {
-        var resolver = new DefaultAsiBackboneDlpFailurePolicyResolver(
+        var resolver = new DefaultDlpFailurePolicyResolver(
             new DlpFailurePolicyOptions
             {
                 LowRiskBehavior = DlpFailureBehavior.WarnAndAllow
@@ -456,7 +456,7 @@ public sealed class DefaultAsiBackboneDlpFailurePolicyResolverTests
                 throw new InvalidOperationException("Unexpected DLP risk level under test.");
         }
 
-        var resolver = new DefaultAsiBackboneDlpFailurePolicyResolver(options);
+        var resolver = new DefaultDlpFailurePolicyResolver(options);
         var context = DlpFailurePolicyContext.Create(
             DlpClassificationFailureKind.ServiceUnavailable,
             riskLevel);
@@ -479,7 +479,7 @@ public sealed class DefaultAsiBackboneDlpFailurePolicyResolverTests
             DlpIntentRiskLevel.Low,
             DlpClassificationFailureKind.ServiceUnavailable)] = (DlpFailureBehavior)999;
 
-        var resolver = new DefaultAsiBackboneDlpFailurePolicyResolver(options);
+        var resolver = new DefaultDlpFailurePolicyResolver(options);
         var context = DlpFailurePolicyContext.Create(
             DlpClassificationFailureKind.ServiceUnavailable,
             DlpIntentRiskLevel.Low);
@@ -511,7 +511,7 @@ public sealed class DefaultAsiBackboneDlpFailurePolicyResolverTests
     [Fact]
     public async Task NullContextThrowsArgumentNullException()
     {
-        var resolver = new DefaultAsiBackboneDlpFailurePolicyResolver();
+        var resolver = new DefaultDlpFailurePolicyResolver();
 
         _ = await Assert.ThrowsAsync<ArgumentNullException>(async () =>
             await resolver.ResolveAsync(null!, TestContext.Current.CancellationToken));
@@ -532,7 +532,7 @@ public sealed class DefaultAsiBackboneDlpFailurePolicyResolverTests
     [Fact]
     public async Task ResolveHonorsCancellationBeforeResolution()
     {
-        var resolver = new DefaultAsiBackboneDlpFailurePolicyResolver();
+        var resolver = new DefaultDlpFailurePolicyResolver();
         var context = DlpFailurePolicyContext.Create(
             DlpClassificationFailureKind.ServiceUnavailable,
             DlpIntentRiskLevel.Low);

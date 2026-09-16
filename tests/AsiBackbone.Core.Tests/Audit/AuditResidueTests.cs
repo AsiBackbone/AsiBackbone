@@ -7,20 +7,20 @@ using Xunit;
 namespace AsiBackbone.Core.Tests.Audit;
 
 /// <summary>
-/// Unit tests for the <see cref="AuditResidue"/> class, which represents the audit information captured from a governance decision or constraint evaluation.
+/// Unit tests for the <see cref="DecisionReceipt"/> class, which represents the audit information captured from a governance decision or constraint evaluation.
 /// </summary>
 public sealed class AuditResidueTests
 {
     /// <summary>
-    /// Verifies that the <see cref="AuditResidue.Create"/> method correctly stores all required fields and normalizes input values by trimming whitespace.
+    /// Verifies that the <see cref="DecisionReceipt.Create"/> method correctly stores all required fields and normalizes input values by trimming whitespace.
     /// </summary>
     [Fact]
     public void CreateStoresRequiredFields()
     {
-        var actor = AsiBackboneActorContext.Human(" user-123 ", " Chris ");
+        var actor = GovernanceActorContext.Human(" user-123 ", " Chris ");
         DateTimeOffset occurredUtc = new(2026, 6, 4, 12, 0, 0, TimeSpan.Zero);
 
-        var residue = AuditResidue.Create(
+        var residue = DecisionReceipt.Create(
             actor,
             " document.approve ",
             " Allowed ",
@@ -30,7 +30,7 @@ public sealed class AuditResidueTests
         Assert.Equal("event-123", residue.EventId);
         Assert.Equal(occurredUtc, residue.OccurredUtc);
         Assert.Equal("user-123", residue.ActorId);
-        Assert.Equal(AsiBackboneActorType.Human, residue.ActorType);
+        Assert.Equal(GovernanceActorType.Human, residue.ActorType);
         Assert.Equal("Chris", residue.ActorDisplayName);
         Assert.Equal("document.approve", residue.OperationName);
         Assert.Equal("Allowed", residue.Outcome);
@@ -39,14 +39,14 @@ public sealed class AuditResidueTests
     }
 
     /// <summary>
-    /// Verifies that the <see cref="AuditResidue.Create"/> method generates a non-empty EventId when one is not provided, and that it is properly normalized if provided with whitespace.
+    /// Verifies that the <see cref="DecisionReceipt.Create"/> method generates a non-empty EventId when one is not provided, and that it is properly normalized if provided with whitespace.
     /// </summary>
     [Fact]
     public void CreateGeneratesEventIdWhenMissing()
     {
-        AsiBackboneActorContext actor = AsiBackboneActorContext.System;
+        GovernanceActorContext actor = GovernanceActorContext.System;
 
-        var residue = AuditResidue.Create(
+        var residue = DecisionReceipt.Create(
             actor,
             "system.sync",
             "Allowed");
@@ -55,14 +55,14 @@ public sealed class AuditResidueTests
     }
 
     /// <summary>
-    /// Verifies that the <see cref="AuditResidue.Create"/> method generates a non-empty EventId when the supplied event identifier is whitespace.
+    /// Verifies that the <see cref="DecisionReceipt.Create"/> method generates a non-empty EventId when the supplied event identifier is whitespace.
     /// </summary>
     [Fact]
     public void CreateGeneratesEventIdWhenEventIdIsWhitespace()
     {
-        AsiBackboneActorContext actor = AsiBackboneActorContext.System;
+        GovernanceActorContext actor = GovernanceActorContext.System;
 
-        var residue = AuditResidue.Create(
+        var residue = DecisionReceipt.Create(
             actor,
             "system.sync",
             "Allowed",
@@ -72,14 +72,14 @@ public sealed class AuditResidueTests
     }
 
     /// <summary>
-    /// Verifies that the <see cref="AuditResidue.Create"/> method normalizes reason codes by trimming whitespace and removing empty entries, and that it normalizes trace fields and
+    /// Verifies that the <see cref="DecisionReceipt.Create"/> method normalizes reason codes by trimming whitespace and removing empty entries, and that it normalizes trace fields and
     /// </summary>
     [Fact]
     public void CreateNormalizesReasonCodesTraceFieldsAndMetadata()
     {
-        var actor = AsiBackboneActorContext.Service(" service-123 ");
+        var actor = GovernanceActorContext.Service(" service-123 ");
 
-        var residue = AuditResidue.Create(
+        var residue = DecisionReceipt.Create(
             actor,
             "external.call",
             "Warning",
@@ -110,14 +110,14 @@ public sealed class AuditResidueTests
     }
 
     /// <summary>
-    /// Verifies that the <see cref="AuditResidue.Create"/> method converts whitespace-only trace fields (CorrelationId, TraceId, PolicyVersion, PolicyHash) to null, as they are considered optional and should not be stored as empty strings.
+    /// Verifies that the <see cref="DecisionReceipt.Create"/> method converts whitespace-only trace fields (CorrelationId, TraceId, PolicyVersion, PolicyHash) to null, as they are considered optional and should not be stored as empty strings.
     /// </summary>
     [Fact]
     public void CreateConvertsWhitespaceTraceFieldsToNull()
     {
-        AsiBackboneActorContext actor = AsiBackboneActorContext.System;
+        GovernanceActorContext actor = GovernanceActorContext.System;
 
-        var residue = AuditResidue.Create(
+        var residue = DecisionReceipt.Create(
             actor,
             "system.sync",
             "Allowed",
@@ -138,10 +138,10 @@ public sealed class AuditResidueTests
     [Fact]
     public void CreateFiltersNullAndBlankReasonCodes()
     {
-        AsiBackboneActorContext actor = AsiBackboneActorContext.System;
+        GovernanceActorContext actor = GovernanceActorContext.System;
         string[] reasonCodes = [" policy.warning ", null!, "", "   "];
 
-        var residue = AuditResidue.Create(
+        var residue = DecisionReceipt.Create(
             actor,
             "system.sync",
             "Warning",
@@ -157,9 +157,9 @@ public sealed class AuditResidueTests
     [Fact]
     public void CreateWithNullMetadataValueStoresEmptyString()
     {
-        AsiBackboneActorContext actor = AsiBackboneActorContext.System;
+        GovernanceActorContext actor = GovernanceActorContext.System;
 
-        var residue = AuditResidue.Create(
+        var residue = DecisionReceipt.Create(
             actor,
             "system.sync",
             "Allowed",
@@ -178,9 +178,9 @@ public sealed class AuditResidueTests
     [Fact]
     public void CreateWithEmptyMetadataReturnsNoMetadata()
     {
-        AsiBackboneActorContext actor = AsiBackboneActorContext.System;
+        GovernanceActorContext actor = GovernanceActorContext.System;
 
-        var residue = AuditResidue.Create(
+        var residue = DecisionReceipt.Create(
             actor,
             "system.sync",
             "Allowed",
@@ -196,9 +196,9 @@ public sealed class AuditResidueTests
     [Fact]
     public void CreateWithOnlyBlankMetadataKeysReturnsNoMetadata()
     {
-        AsiBackboneActorContext actor = AsiBackboneActorContext.System;
+        GovernanceActorContext actor = GovernanceActorContext.System;
 
-        var residue = AuditResidue.Create(
+        var residue = DecisionReceipt.Create(
             actor,
             "system.sync",
             "Allowed",
@@ -213,20 +213,20 @@ public sealed class AuditResidueTests
     }
 
     /// <summary>
-    /// Verifies that the <see cref="AuditResidue.Create"/> method throws an <see cref="ArgumentNullException"/> when the required <c>actor</c> parameter is null.
+    /// Verifies that the <see cref="DecisionReceipt.Create"/> method throws an <see cref="ArgumentNullException"/> when the required <c>actor</c> parameter is null.
     /// </summary>
     [Fact]
     public void CreateThrowsForMissingActor()
     {
         _ = Assert.Throws<ArgumentNullException>(() =>
-            AuditResidue.Create(
+            DecisionReceipt.Create(
                 actor: null!,
                 operationName: "document.approve",
                 outcome: "Allowed"));
     }
 
     /// <summary>
-    /// Verifies that the <see cref="AuditResidue.Create"/> method throws an <see cref="ArgumentException"/> when the required <paramref name="operationName"/> parameter is null, empty, or whitespace, as an audit residue must have a valid operation name to be meaningful.
+    /// Verifies that the <see cref="DecisionReceipt.Create"/> method throws an <see cref="ArgumentException"/> when the required <paramref name="operationName"/> parameter is null, empty, or whitespace, as an audit residue must have a valid operation name to be meaningful.
     /// </summary>
     /// <param name="operationName">
     /// The invalid operation name value to test, which can be an empty string or a whitespace string. The test will verify that both cases are properly handled by the method and result in an exception being thrown.
@@ -237,17 +237,17 @@ public sealed class AuditResidueTests
     [InlineData(" ")]
     public void CreateThrowsForMissingOperationName(string? operationName)
     {
-        AsiBackboneActorContext actor = AsiBackboneActorContext.System;
+        GovernanceActorContext actor = GovernanceActorContext.System;
 
         _ = Assert.ThrowsAny<ArgumentException>(() =>
-            AuditResidue.Create(
+            DecisionReceipt.Create(
                 actor,
                 operationName!,
                 "Allowed"));
     }
 
     /// <summary>
-    /// Verifies that the <see cref="AuditResidue.Create"/> method throws an <see cref="ArgumentException"/> when the required <paramref name="outcome"/> parameter is null, empty, or whitespace, as an audit residue must have a valid outcome to indicate the result of the operation being audited.
+    /// Verifies that the <see cref="DecisionReceipt.Create"/> method throws an <see cref="ArgumentException"/> when the required <paramref name="outcome"/> parameter is null, empty, or whitespace, as an audit residue must have a valid outcome to indicate the result of the operation being audited.
     /// </summary>
     /// <param name="outcome">
     /// The invalid outcome value to test, which can be an empty string or a whitespace string. The test will verify that both cases are properly handled by the method and result in an exception being thrown.
@@ -258,22 +258,22 @@ public sealed class AuditResidueTests
     [InlineData(" ")]
     public void CreateThrowsForMissingOutcome(string? outcome)
     {
-        AsiBackboneActorContext actor = AsiBackboneActorContext.System;
+        GovernanceActorContext actor = GovernanceActorContext.System;
 
         _ = Assert.ThrowsAny<ArgumentException>(() =>
-            AuditResidue.Create(
+            DecisionReceipt.Create(
                 actor,
                 "document.approve",
                 outcome!));
     }
 
     /// <summary>
-    /// Verifies that the <see cref="AuditResidue.FromDecision"/> method correctly copies the outcome, reason codes, correlation ID, trace ID, policy version, and policy hash from the provided <see cref="GovernanceDecision"/> when creating an audit residue, ensuring that all relevant information from the decision is captured in the audit record.
+    /// Verifies that the <see cref="DecisionReceipt.FromDecision"/> method correctly copies the outcome, reason codes, correlation ID, trace ID, policy version, and policy hash from the provided <see cref="GovernanceDecision"/> when creating an audit residue, ensuring that all relevant information from the decision is captured in the audit record.
     /// </summary>
     [Fact]
     public void FromDecisionCopiesDecisionOutcomeAndTraceData()
     {
-        var actor = AsiBackboneActorContext.Human("user-123", "Chris");
+        var actor = GovernanceActorContext.Human("user-123", "Chris");
         var decision = GovernanceDecision.Deny(
             "policy.denied",
             "Policy denied the operation.",
@@ -282,7 +282,7 @@ public sealed class AuditResidueTests
             policyVersion: "v1",
             policyHash: "hash-abc");
 
-        var residue = AuditResidue.FromDecision(
+        var residue = DecisionReceipt.FromDecision(
             actor,
             "document.approve",
             decision,
@@ -299,32 +299,32 @@ public sealed class AuditResidueTests
     }
 
     /// <summary>
-    /// Verifies that the <see cref="AuditResidue.FromDecision"/> method throws when the decision is missing.
+    /// Verifies that the <see cref="DecisionReceipt.FromDecision"/> method throws when the decision is missing.
     /// </summary>
     [Fact]
     public void FromDecisionThrowsForMissingDecision()
     {
-        AsiBackboneActorContext actor = AsiBackboneActorContext.System;
+        GovernanceActorContext actor = GovernanceActorContext.System;
 
         _ = Assert.Throws<ArgumentNullException>(() =>
-            AuditResidue.FromDecision(
+            DecisionReceipt.FromDecision(
                 actor,
                 "document.approve",
                 decision: null!));
     }
 
     /// <summary>
-    /// Verifies that the <see cref="AuditResidue.FromConstraint"/> method correctly copies the outcome, reason codes, correlation ID, and policy version from the provided <see cref="ConstraintEvaluationResult"/> when creating an audit residue, ensuring that all relevant information from the constraint evaluation is captured in the audit record.
+    /// Verifies that the <see cref="DecisionReceipt.FromConstraint"/> method correctly copies the outcome, reason codes, correlation ID, and policy version from the provided <see cref="ConstraintEvaluationResult"/> when creating an audit residue, ensuring that all relevant information from the constraint evaluation is captured in the audit record.
     /// </summary>
     [Fact]
     public void FromConstraintCopiesConstraintOutcomeAndReasonCodes()
     {
-        var actor = AsiBackboneActorContext.Service("service-123");
+        var actor = GovernanceActorContext.Service("service-123");
         var constraintResult = ConstraintEvaluationResult.Warning(
             "constraint.high_risk",
             "Constraint produced a high-risk warning.");
 
-        var residue = AuditResidue.FromConstraint(
+        var residue = DecisionReceipt.FromConstraint(
             actor,
             "external.call",
             constraintResult,
@@ -341,15 +341,15 @@ public sealed class AuditResidueTests
     }
 
     /// <summary>
-    /// Verifies that the <see cref="AuditResidue.FromConstraint"/> method throws when the constraint result is missing.
+    /// Verifies that the <see cref="DecisionReceipt.FromConstraint"/> method throws when the constraint result is missing.
     /// </summary>
     [Fact]
     public void FromConstraintThrowsForMissingConstraintResult()
     {
-        AsiBackboneActorContext actor = AsiBackboneActorContext.System;
+        GovernanceActorContext actor = GovernanceActorContext.System;
 
         _ = Assert.Throws<ArgumentNullException>(() =>
-            AuditResidue.FromConstraint(
+            DecisionReceipt.FromConstraint(
                 actor,
                 "external.call",
                 constraintResult: null!));
@@ -361,10 +361,10 @@ public sealed class AuditResidueTests
     [Fact]
     public void CreateWithoutTimestampUsesCurrentUtcTimestamp()
     {
-        AsiBackboneActorContext actor = AsiBackboneActorContext.System;
+        GovernanceActorContext actor = GovernanceActorContext.System;
         DateTimeOffset beforeCreate = DateTimeOffset.UtcNow;
 
-        var residue = AuditResidue.Create(
+        var residue = DecisionReceipt.Create(
             actor,
             "system.sync",
             "Allowed");
@@ -381,14 +381,14 @@ public sealed class AuditResidueTests
     [Fact]
     public void CreateDoesNotAliasSourceCollections()
     {
-        AsiBackboneActorContext actor = AsiBackboneActorContext.System;
+        GovernanceActorContext actor = GovernanceActorContext.System;
         List<string> reasonCodes = [" policy.warning "];
         Dictionary<string, string> metadata = new(StringComparer.Ordinal)
         {
             [" source "] = " original "
         };
 
-        var residue = AuditResidue.Create(
+        var residue = DecisionReceipt.Create(
             actor,
             "system.sync",
             "Warning",
@@ -411,8 +411,8 @@ public sealed class AuditResidueTests
     [Fact]
     public void MetadataCannotBeMutatedThroughDictionaryCasts()
     {
-        var residue = AuditResidue.Create(
-            AsiBackboneActorContext.System,
+        var residue = DecisionReceipt.Create(
+            GovernanceActorContext.System,
             "system.sync",
             "Allowed",
             metadata: new Dictionary<string, string>
@@ -432,8 +432,8 @@ public sealed class AuditResidueTests
     [Fact]
     public void EmptyMetadataCannotBeMutatedThroughDictionaryCasts()
     {
-        var residue = AuditResidue.Create(
-            AsiBackboneActorContext.System,
+        var residue = DecisionReceipt.Create(
+            GovernanceActorContext.System,
             "system.sync",
             "Allowed");
 

@@ -18,7 +18,7 @@ namespace AsiBackbone.AspNetCore.Endpoints;
 /// </remarks>
 /// <param name="policyType">The host-defined policy marker or decision policy type associated with the endpoint.</param>
 [AttributeUsage(AttributeTargets.Class | AttributeTargets.Method, AllowMultiple = true, Inherited = true)]
-public sealed class RequireGovernancePolicyAttribute(Type policyType) : Attribute, IAsiBackboneEndpointGovernancePolicyMetadata
+public sealed class RequireGovernancePolicyAttribute(Type policyType) : Attribute, IEndpointGovernancePolicyMetadata
 {
 
     /// <inheritdoc />
@@ -37,7 +37,7 @@ public sealed class RequireGovernancePolicyAttribute(Type policyType) : Attribut
 /// </remarks>
 /// <param name="enabled">Whether first-denial short-circuit metadata is enabled for the endpoint.</param>
 [AttributeUsage(AttributeTargets.Class | AttributeTargets.Method, AllowMultiple = false, Inherited = true)]
-public sealed class ShortCircuitOnFirstDenialAttribute(bool enabled = true) : Attribute, IAsiBackboneEndpointPolicyEvaluationOptionsMetadata
+public sealed class ShortCircuitOnFirstDenialAttribute(bool enabled = true) : Attribute, IEndpointPolicyEvaluationOptionsMetadata
 {
 
     /// <inheritdoc />
@@ -48,7 +48,7 @@ public sealed class ShortCircuitOnFirstDenialAttribute(bool enabled = true) : At
 /// Marks an ASP.NET Core endpoint as requiring liability-handshake support when a governance decision requires acknowledgment.
 /// </summary>
 [AttributeUsage(AttributeTargets.Class | AttributeTargets.Method, AllowMultiple = false, Inherited = true)]
-public sealed class RequireLiabilityHandshakeAttribute : Attribute, IAsiBackboneEndpointLiabilityHandshakeMetadata
+public sealed class RequireLiabilityHandshakeAttribute : Attribute, IEndpointLiabilityHandshakeMetadata
 {
     /// <inheritdoc />
     public bool RequiresLiabilityHandshake => true;
@@ -58,7 +58,7 @@ public sealed class RequireLiabilityHandshakeAttribute : Attribute, IAsiBackbone
 /// Marks an ASP.NET Core endpoint as requiring a host-validated capability grant before execution.
 /// </summary>
 [AttributeUsage(AttributeTargets.Class | AttributeTargets.Method, AllowMultiple = true, Inherited = true)]
-public sealed class RequireCapabilityGrantAttribute : Attribute, IAsiBackboneEndpointCapabilityGrantMetadata
+public sealed class RequireCapabilityGrantAttribute : Attribute, IEndpointCapabilityGrantMetadata
 {
     /// <summary>
     /// Initializes a new instance of the <see cref="RequireCapabilityGrantAttribute" /> class.
@@ -78,7 +78,7 @@ public sealed class RequireCapabilityGrantAttribute : Attribute, IAsiBackboneEnd
 /// Marks an ASP.NET Core endpoint as requesting governance audit emission through the host-owned audit path.
 /// </summary>
 [AttributeUsage(AttributeTargets.Class | AttributeTargets.Method, AllowMultiple = false, Inherited = true)]
-public sealed class EmitGovernanceAuditAttribute : Attribute, IAsiBackboneEndpointAuditEmissionMetadata
+public sealed class EmitGovernanceAuditAttribute : Attribute, IEndpointAuditEmissionMetadata
 {
     /// <inheritdoc />
     public bool EmitGovernanceAudit => true;

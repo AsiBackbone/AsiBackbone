@@ -25,7 +25,7 @@ A governed production host should start from this posture and then intentionally
 A typical explicit evaluator configuration for a governed production surface is:
 
 ```csharp
-var evaluatorOptions = new AsiBackbonePolicyEvaluatorOptions
+var evaluatorOptions = new GovernancePolicyOptions
 {
     // Production governance surfaces should fail closed if expected constraints are missing.
     DenyWhenNoConstraints = true,
@@ -43,7 +43,7 @@ var evaluatorOptions = new AsiBackbonePolicyEvaluatorOptions
 When the host intentionally opts out of exception-as-denial behavior, document the reason and make sure the host still records the failed governed attempt through its central failure path:
 
 ```csharp
-var evaluatorOptions = new AsiBackbonePolicyEvaluatorOptions
+var evaluatorOptions = new GovernancePolicyOptions
 {
     DenyWhenNoConstraints = true,
     TreatConstraintExceptionAsDenial = false
@@ -87,7 +87,7 @@ asibackbone.policy.constraint_exception
 
 The public decision message is intentionally curated and must not include stack traces, connection strings, raw request bodies, secrets, tokens, protected data, raw prompts, or arbitrary user input.
 
-When the evaluator has an `ILogger<DefaultAsiBackbonePolicyEvaluator<TContext>>`, the exception-as-denial path writes an error-level log entry with:
+When the evaluator has an `ILogger<DefaultGovernancePolicyEvaluator<TContext>>`, the exception-as-denial path writes an error-level log entry with:
 
 - event id `4120`;
 - event name `ConstraintExceptionDeniedError`;
@@ -144,7 +144,7 @@ This is a provider-neutral compatibility choice. It keeps the package portable a
 
 Production query guidance:
 
-- prefer first-class indexed columns such as status, outbox id, envelope id, correlation id, audit residue id, policy version, policy hash, trace id, timestamps, provider name, provider record id, and error code;
+- prefer first-class indexed columns such as status, outbox id, envelope id, correlation id, decision receipt id, policy version, policy hash, trace id, timestamps, provider name, provider record id, and error code;
 - do not build primary operational behavior around parsing arbitrary metadata JSON;
 - add host-owned computed columns, generated columns, JSON indexes, views, or provider-specific SQL only when the host has a documented provider and migration strategy;
 - keep JSON metadata minimized and safe to store.

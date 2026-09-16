@@ -29,8 +29,8 @@ public sealed class OpenTelemetryGovernanceBuilderExtensionsTests
             provider.GetRequiredService<OpenTelemetryGovernanceEmitterOptions>();
         OpenTelemetryGovernanceEmitter concreteEmitter =
             provider.GetRequiredService<OpenTelemetryGovernanceEmitter>();
-        IAsiBackboneGovernanceEmitter emitter =
-            provider.GetRequiredService<IAsiBackboneGovernanceEmitter>();
+        IGovernanceEmitter emitter =
+            provider.GetRequiredService<IGovernanceEmitter>();
 
         Assert.True(options.EmitActivityEvents);
         Assert.True(options.EmitMetrics);
@@ -64,8 +64,8 @@ public sealed class OpenTelemetryGovernanceBuilderExtensionsTests
             provider.GetRequiredService<OpenTelemetryGovernanceEmitterOptions>();
         OpenTelemetryGovernanceEmitter concreteEmitter =
             provider.GetRequiredService<OpenTelemetryGovernanceEmitter>();
-        IAsiBackboneGovernanceEmitter emitter =
-            provider.GetRequiredService<IAsiBackboneGovernanceEmitter>();
+        IGovernanceEmitter emitter =
+            provider.GetRequiredService<IGovernanceEmitter>();
 
         Assert.Same(builder, result);
         Assert.True(configureInvoked);
@@ -136,7 +136,7 @@ public sealed class OpenTelemetryGovernanceBuilderExtensionsTests
             services,
             descriptor => descriptor.ServiceType == typeof(OpenTelemetryGovernanceEmitterOptions)
                 || descriptor.ServiceType == typeof(OpenTelemetryGovernanceEmitter)
-                || descriptor.ServiceType == typeof(IAsiBackboneGovernanceEmitter));
+                || descriptor.ServiceType == typeof(IGovernanceEmitter));
     }
 
     private static void AssertSingletonRegistrations(IServiceCollection services)
@@ -153,7 +153,7 @@ public sealed class OpenTelemetryGovernanceBuilderExtensionsTests
                 && descriptor.Lifetime == ServiceLifetime.Singleton);
         Assert.Contains(
             services,
-            descriptor => descriptor.ServiceType == typeof(IAsiBackboneGovernanceEmitter)
+            descriptor => descriptor.ServiceType == typeof(IGovernanceEmitter)
                 && descriptor.ImplementationFactory is not null
                 && descriptor.Lifetime == ServiceLifetime.Singleton);
     }

@@ -45,15 +45,15 @@ app.UseAsiBackboneEndpointGovernance();
 
 | Option | Regulated value | Rationale |
 | --- | --- | --- |
-| `AsiBackbonePolicyEvaluatorOptions.DenyWhenNoConstraints` | `true` | Empty policy structure denies instead of silently allowing. |
-| `AsiBackbonePolicyEvaluatorOptions.TreatConstraintExceptionAsDenial` | `true` | Eligible ordinary constraint failures become safe denied decisions. Cancellation and critical runtime failures still propagate. |
-| `AsiBackbonePolicyEvaluatorOptions.TreatThreatContributorExceptionAsDenial` | `true` | Threat-contributor failures do not silently remove a screening layer. |
-| `AsiBackbonePolicyEvaluatorOptions.PreventThreatAssessmentAllowDowngrade` | `true` | Actionable threat outcomes cannot be reduced to a pure allow decision. |
-| `AsiBackboneEndpointGovernanceOptions.FailClosedWhenPolicyEvaluatorMissing` | `true` | Endpoints requesting policy evaluation fail closed when the evaluator is absent. |
-| `AsiBackboneEndpointGovernanceOptions.FailClosedWhenCapabilityValidatorMissing` | `true` | Capability-gated endpoints fail closed when the host validator is absent. |
-| `AsiBackboneEndpointGovernanceOptions.FailClosedWhenAuditSinkMissing` | `true` | Endpoints requesting governance audit fail closed when the host audit sink is absent. |
-| `AsiBackboneEndpointGovernanceOptions.RequireGovernanceMetadata` | `true` | Endpoints must be governed or explicitly marked as intentionally exempt. |
-| `AsiBackboneEndpointGovernanceOptions.IncludeDevelopmentDiagnosticsMetadataValues` | `false` | Development diagnostics may retain bounded keys, but metadata values remain redacted. |
+| `GovernancePolicyOptions.DenyWhenNoConstraints` | `true` | Empty policy structure denies instead of silently allowing. |
+| `GovernancePolicyOptions.TreatConstraintExceptionAsDenial` | `true` | Eligible ordinary constraint failures become safe denied decisions. Cancellation and critical runtime failures still propagate. |
+| `GovernancePolicyOptions.TreatThreatContributorExceptionAsDenial` | `true` | Threat-contributor failures do not silently remove a screening layer. |
+| `GovernancePolicyOptions.PreventThreatAssessmentAllowDowngrade` | `true` | Actionable threat outcomes cannot be reduced to a pure allow decision. |
+| `EndpointGovernanceOptions.FailClosedWhenPolicyEvaluatorMissing` | `true` | Endpoints requesting policy evaluation fail closed when the evaluator is absent. |
+| `EndpointGovernanceOptions.FailClosedWhenCapabilityValidatorMissing` | `true` | Capability-gated endpoints fail closed when the host validator is absent. |
+| `EndpointGovernanceOptions.FailClosedWhenAuditSinkMissing` | `true` | Endpoints requesting governance audit fail closed when the host audit sink is absent. |
+| `EndpointGovernanceOptions.RequireGovernanceMetadata` | `true` | Endpoints must be governed or explicitly marked as intentionally exempt. |
+| `EndpointGovernanceOptions.IncludeDevelopmentDiagnosticsMetadataValues` | `false` | Development diagnostics may retain bounded keys, but metadata values remain redacted. |
 
 The registered metadata sanitizer normalizes metadata into a new collection, applies host classifiers in registration order, performs redaction, dropping, warning, or denial, and then applies the recommended metadata budget. A denied sanitation result blocks endpoint governance before policy evaluation, audit emission, acknowledgment challenge construction, or endpoint execution.
 

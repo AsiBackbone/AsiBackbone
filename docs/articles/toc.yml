@@ -65,6 +65,8 @@
       href: managed-key-signing-provider.md
     - name: Schema Versioning
       href: schema-versioning.md
+    - name: 6.0 Public API Naming Convention
+      href: public-api-naming-600.md
     - name: Upgrade from 5.x to 6.0
       href: upgrade-500-to-600.md
     - name: API Compatibility and SemVer

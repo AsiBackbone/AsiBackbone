@@ -207,7 +207,7 @@ public sealed class SignedArtifactContentBindingTests
         ]);
     }
 
-    private sealed class AlwaysValidVerificationService : IAsiBackboneSignatureVerificationService
+    private sealed class AlwaysValidVerificationService : IGovernanceSignatureVerificationService
     {
         public bool WasCalled { get; private set; }
 

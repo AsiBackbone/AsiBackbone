@@ -13,7 +13,7 @@ AsiBackbone is a .NET governance spine for consequential software actions. The s
 - policy context and constraint evaluation;
 - explicit governance decisions;
 - acknowledgment/responsibility workflows;
-- audit residue and lifecycle events;
+- decision receipt and lifecycle events;
 - capability-scoped continuation authority;
 - durable local audit/outbox persistence;
 - optional governance emission;

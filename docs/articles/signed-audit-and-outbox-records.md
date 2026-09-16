@@ -2,7 +2,7 @@
 
 Issue: #221, updated for #253.
 
-This article documents the implemented signing flow for audit receipts, audit ledger records, audit residue lifecycle events, governance emission envelopes, and governance outbox entries.
+This article documents the implemented signing flow for audit receipts, audit ledger records, decision receipt lifecycle events, governance emission envelopes, and governance outbox entries.
 
 In this software project, **ASI** means **Accountable Systems Infrastructure**. AsiBackbone provides provider-neutral governance primitives and signing seams. It does not provide immutable storage, external anchoring, legal non-repudiation, or tamper-evidence by itself.
 
@@ -26,9 +26,9 @@ The Core signing helpers support the following canonical governance artifacts:
 
 | Artifact | Canonical type | Typical signing point |
 | --- | --- | --- |
-| Audit residue | `asibackbone.audit-residue` | After audit residue creation and canonical hashing, before the host treats the residue as a signed receipt. |
+| Decision receipt | `asibackbone.audit-residue` | After decision receipt creation and canonical hashing, before the host treats the residue as a signed receipt. |
 | Audit ledger record | `asibackbone.audit-ledger-record` | After ledger record construction and canonical hashing, before durable append when the persisted row must carry signing metadata. |
-| Audit residue lifecycle event | `asibackbone.audit-residue-lifecycle-event` | After lifecycle event creation and canonical hashing, before lifecycle-store append when lifecycle events require signatures. |
+| Decision receipt lifecycle event | `asibackbone.audit-residue-lifecycle-event` | After lifecycle event creation and canonical hashing, before lifecycle-store append when lifecycle events require signatures. |
 | Governance emission envelope | `asibackbone.governance-emission-envelope` | After envelope construction and canonical hashing, before outbox enqueue or provider emission when the envelope itself is the signed artifact. |
 | Governance outbox entry | `asibackbone.governance-outbox-entry` | After outbox entry construction and canonical hashing, before provider emission when the durable outbox entry is the signed artifact. |
 
@@ -42,7 +42,7 @@ For issue #221, an **audit receipt** is represented by either a persistence-read
 | --- | --- | --- |
 | Unsigned | The artifact has a canonical payload and canonical hash, but no signing metadata is attached. | Artifact ID, artifact type, canonicalization version, payload schema version, hash algorithm, hash value. |
 | Signing-ready | The artifact hash has been projected into `SigningMetadata`, but no signature value is present. | Signing hash, hash algorithm, artifact ID/type metadata, canonicalization metadata, optional host metadata. |
-| Signed | A configured `IAsiBackboneSigningService` returned provider-neutral signature metadata for the canonical hash. | Signing hash, hash algorithm, key ID, key version, signature algorithm, signature value, signature provider, signed timestamp, artifact ID/type metadata. |
+| Signed | A configured `IGovernanceSigningService` returned provider-neutral signature metadata for the canonical hash. | Signing hash, hash algorithm, key ID, key version, signature algorithm, signature value, signature provider, signed timestamp, artifact ID/type metadata. |
 
 Unsigned and signing-ready flows intentionally remain supported. This allows hosts to run in local development, low-assurance, phased rollout, or provider-deferral modes without pretending that signatures exist.
 
@@ -109,11 +109,11 @@ The helper rejects mismatched signing hashes. If provider metadata contains a si
 Use this order when the durable audit ledger row must carry signature metadata:
 
 ```text
-Build audit residue
+Build decision receipt
   -> build audit ledger record
   -> canonicalize audit ledger record
   -> compute canonical hash
-  -> sign canonical hash through IAsiBackboneSigningService
+  -> sign canonical hash through IGovernanceSigningService
   -> attach or project signing metadata
   -> persist durable audit ledger record
 ```
@@ -201,7 +201,7 @@ Use the phrase **tamper-evident** only when the deployed system also includes ve
 
 Core remains provider-neutral. It does not choose Azure Key Vault, HSM, certificate store, local-development keys, cloud KMS, blockchain, transparency log, or object-lock storage.
 
-Provider packages implement `IAsiBackboneSigningService`. Host applications decide:
+Provider packages implement `IGovernanceSigningService`. Host applications decide:
 
 - which artifacts must be signed;
 - which key provider is authoritative;

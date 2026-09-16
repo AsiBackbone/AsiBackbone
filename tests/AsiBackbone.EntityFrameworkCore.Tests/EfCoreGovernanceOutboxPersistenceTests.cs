@@ -52,7 +52,7 @@ public sealed class EfCoreGovernanceOutboxPersistenceTests
             Assert.Equal("2026.06", found.Envelope.PolicyVersion);
             Assert.Equal("policy-hash-123", found.Envelope.PolicyHash);
             Assert.Equal("trace-123", found.Envelope.TraceId);
-            Assert.Equal(AuditResidueLifecycleStage.ExternalEmissionQueued, found.Envelope.LifecycleStage);
+            Assert.Equal(DecisionReceiptLifecycleStage.ExternalEmissionQueued, found.Envelope.LifecycleStage);
             Assert.NotNull(found.Envelope.Payload);
             Assert.Equal("audit-residue", found.Envelope.Payload.PayloadType);
             Assert.Equal("payload-hash", found.Envelope.Payload.ContentHash);
@@ -260,22 +260,22 @@ public sealed class EfCoreGovernanceOutboxPersistenceTests
         await EnsureCreatedAsync(options);
 
         await using HostOwnedGovernanceDbContext context = new(options);
-        var store = new EfCoreAuditResidueLifecycleStore(context);
-        AuditResidueLifecycleEvent first = CreateLifecycleEvent(
+        var store = new EfCoreDecisionReceiptLifecycleStore(context);
+        DecisionReceiptLifecycleEvent first = CreateLifecycleEvent(
             "lifecycle-1",
-            AuditResidueLifecycleStage.ExternalEmissionQueued,
+            DecisionReceiptLifecycleStage.ExternalEmissionQueued,
             "correlation-shared",
             "audit-shared",
             new DateTimeOffset(2026, 6, 15, 10, 0, 0, TimeSpan.Zero));
-        AuditResidueLifecycleEvent second = CreateLifecycleEvent(
+        DecisionReceiptLifecycleEvent second = CreateLifecycleEvent(
             "lifecycle-2",
-            AuditResidueLifecycleStage.ExternalEmissionDelivered,
+            DecisionReceiptLifecycleStage.ExternalEmissionDelivered,
             "correlation-shared",
             "audit-shared",
             new DateTimeOffset(2026, 6, 15, 10, 1, 0, TimeSpan.Zero));
-        AuditResidueLifecycleEvent third = CreateLifecycleEvent(
+        DecisionReceiptLifecycleEvent third = CreateLifecycleEvent(
             "lifecycle-3",
-            AuditResidueLifecycleStage.ExternalEmissionFailed,
+            DecisionReceiptLifecycleStage.ExternalEmissionFailed,
             "correlation-other",
             "audit-other",
             new DateTimeOffset(2026, 6, 15, 10, 2, 0, TimeSpan.Zero));
@@ -286,12 +286,12 @@ public sealed class EfCoreGovernanceOutboxPersistenceTests
 
         context.ChangeTracker.Clear();
 
-        AuditResidueLifecycleEvent? found = await store.FindByEventIdAsync("lifecycle-1", TestContext.Current.CancellationToken);
-        IReadOnlyList<AuditResidueLifecycleEvent> correlationMatches = await store.FindByCorrelationIdAsync("correlation-shared", TestContext.Current.CancellationToken);
-        IReadOnlyList<AuditResidueLifecycleEvent> auditResidueMatches = await store.FindByAuditResidueIdAsync("audit-shared", TestContext.Current.CancellationToken);
+        DecisionReceiptLifecycleEvent? found = await store.FindByEventIdAsync("lifecycle-1", TestContext.Current.CancellationToken);
+        IReadOnlyList<DecisionReceiptLifecycleEvent> correlationMatches = await store.FindByCorrelationIdAsync("correlation-shared", TestContext.Current.CancellationToken);
+        IReadOnlyList<DecisionReceiptLifecycleEvent> auditResidueMatches = await store.FindByAuditResidueIdAsync("audit-shared", TestContext.Current.CancellationToken);
 
         Assert.NotNull(found);
-        Assert.Equal(AuditResidueLifecycleStage.ExternalEmissionQueued, found.Stage);
+        Assert.Equal(DecisionReceiptLifecycleStage.ExternalEmissionQueued, found.Stage);
         Assert.Equal("trace-lifecycle-1", found.TraceId);
         Assert.Equal("test", found.Metadata["source"]);
         Assert.Equal(["lifecycle-1", "lifecycle-2"], [.. correlationMatches.Select(match => match.EventId)]);
@@ -344,7 +344,7 @@ public sealed class EfCoreGovernanceOutboxPersistenceTests
             schemaVersion: "1.0.0",
             correlationId: correlationId,
             auditResidueId: auditResidueId,
-            lifecycleStage: AuditResidueLifecycleStage.ExternalEmissionQueued,
+            lifecycleStage: DecisionReceiptLifecycleStage.ExternalEmissionQueued,
             policyVersion: "2026.06",
             policyHash: "policy-hash-123",
             traceId: "trace-123",
@@ -374,14 +374,14 @@ public sealed class EfCoreGovernanceOutboxPersistenceTests
             });
     }
 
-    private static AuditResidueLifecycleEvent CreateLifecycleEvent(
+    private static DecisionReceiptLifecycleEvent CreateLifecycleEvent(
         string eventId,
-        AuditResidueLifecycleStage stage,
+        DecisionReceiptLifecycleStage stage,
         string correlationId,
         string auditResidueId,
         DateTimeOffset occurredUtc)
     {
-        return AuditResidueLifecycleEvent.Create(
+        return DecisionReceiptLifecycleEvent.Create(
             stage,
             correlationId,
             auditResidueId,
@@ -399,11 +399,11 @@ public sealed class EfCoreGovernanceOutboxPersistenceTests
     private sealed class HostOwnedGovernanceDbContext(DbContextOptions<HostOwnedGovernanceDbContext> options)
         : DbContext(options)
     {
-        public DbSet<AsiBackboneGovernanceOutboxEntryEntity> GovernanceOutboxEntries =>
-            Set<AsiBackboneGovernanceOutboxEntryEntity>();
+        public DbSet<GovernanceOutboxEntryEntity> GovernanceOutboxEntries =>
+            Set<GovernanceOutboxEntryEntity>();
 
-        public DbSet<AsiBackboneAuditResidueLifecycleEventEntity> AuditResidueLifecycleEvents =>
-            Set<AsiBackboneAuditResidueLifecycleEventEntity>();
+        public DbSet<DecisionReceiptLifecycleEventEntity> AuditResidueLifecycleEvents =>
+            Set<DecisionReceiptLifecycleEventEntity>();
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

@@ -8,7 +8,7 @@ public static class OpenTelemetryGovernanceAttributes
     /// <summary>Envelope correlation identifier.</summary>
     public const string CorrelationId = "asibackbone.correlation_id";
 
-    /// <summary>Audit residue identifier.</summary>
+    /// <summary>Decision receipt identifier.</summary>
     public const string AuditResidueId = "asibackbone.audit_residue_id";
 
     /// <summary>Source governance event identifier.</summary>

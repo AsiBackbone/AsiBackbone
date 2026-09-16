@@ -38,12 +38,12 @@ public sealed class EfCoreOutboxConcurrencyValidationTests
 
         await using HostOwnedGovernanceDbContext verificationContext = new(options);
         var outboxStore = new EfCoreGovernanceOutboxStore(verificationContext);
-        var lifecycleStore = new EfCoreAuditResidueLifecycleStore(verificationContext);
+        var lifecycleStore = new EfCoreDecisionReceiptLifecycleStore(verificationContext);
 
         IReadOnlyList<GovernanceOutboxEntry> pendingEntries = await outboxStore.FindPendingAsync(
             ConcurrentWriteCount + 1,
             TestContext.Current.CancellationToken);
-        IReadOnlyList<AuditResidueLifecycleEvent> lifecycleEvents = await lifecycleStore.FindByCorrelationIdAsync(
+        IReadOnlyList<DecisionReceiptLifecycleEvent> lifecycleEvents = await lifecycleStore.FindByCorrelationIdAsync(
             "efcore-concurrency-validation",
             TestContext.Current.CancellationToken);
 
@@ -55,12 +55,12 @@ public sealed class EfCoreOutboxConcurrencyValidationTests
         {
             Assert.Equal("efcore-concurrency-validation", entry.Envelope.CorrelationId);
             Assert.Equal(GovernanceEmissionStatus.Pending, entry.Status);
-            Assert.Equal(AuditResidueLifecycleStage.ExternalEmissionQueued, entry.Envelope.LifecycleStage);
+            Assert.Equal(DecisionReceiptLifecycleStage.ExternalEmissionQueued, entry.Envelope.LifecycleStage);
         });
         Assert.All(lifecycleEvents, lifecycleEvent =>
         {
             Assert.Equal("efcore-concurrency-validation", lifecycleEvent.CorrelationId);
-            Assert.Equal(AuditResidueLifecycleStage.ExternalEmissionQueued, lifecycleEvent.Stage);
+            Assert.Equal(DecisionReceiptLifecycleStage.ExternalEmissionQueued, lifecycleEvent.Stage);
         });
     }
 
@@ -190,7 +190,7 @@ public sealed class EfCoreOutboxConcurrencyValidationTests
         await using (HostOwnedGovernanceDbContext drainContext = new(options))
         {
             var drainStore = new EfCoreGovernanceOutboxStore(drainContext);
-            var drain = new AsiBackboneGovernanceOutboxDrain(
+            var drain = new GovernanceOutboxDrain(
                 drainStore,
                 new RetryableFailureEmitter(retryReadyUtc));
 
@@ -227,12 +227,12 @@ public sealed class EfCoreOutboxConcurrencyValidationTests
     {
         await using HostOwnedGovernanceDbContext context = new(options);
         var outboxStore = new EfCoreGovernanceOutboxStore(context);
-        var lifecycleStore = new EfCoreAuditResidueLifecycleStore(context);
+        var lifecycleStore = new EfCoreDecisionReceiptLifecycleStore(context);
 
         GovernanceOutboxEntry entry = await outboxStore.EnqueueAsync(
             CreateEnvelope(index),
             TestContext.Current.CancellationToken);
-        AuditResidueLifecycleEvent lifecycleEvent = await lifecycleStore.AppendAsync(
+        DecisionReceiptLifecycleEvent lifecycleEvent = await lifecycleStore.AppendAsync(
             CreateLifecycleEvent(index),
             TestContext.Current.CancellationToken);
 
@@ -248,17 +248,17 @@ public sealed class EfCoreOutboxConcurrencyValidationTests
     /// <returns>The entries attempted by this drain.</returns>
     private static async Task<IReadOnlyList<GovernanceOutboxEntry>> DrainWithNewContextAsync(
         DbContextOptions<HostOwnedGovernanceDbContext> options,
-        IAsiBackboneGovernanceEmitter emitter,
+        IGovernanceEmitter emitter,
         string? workerId)
     {
         await using HostOwnedGovernanceDbContext context = new(options);
         var store = new EfCoreGovernanceOutboxStore(context);
-        var outboxOptions = new AsiBackboneGovernanceOutboxOptions
+        var outboxOptions = new GovernanceOutboxOptions
         {
             UseClaimLeases = workerId is not null,
-            ClaimWorkerId = workerId ?? AsiBackboneGovernanceOutboxOptions.DefaultClaimWorkerId
+            ClaimWorkerId = workerId ?? GovernanceOutboxOptions.DefaultClaimWorkerId
         };
-        var drain = new AsiBackboneGovernanceOutboxDrain(
+        var drain = new GovernanceOutboxDrain(
             store,
             emitter,
             outboxOptions: Options.Create(outboxOptions));
@@ -315,7 +315,7 @@ public sealed class EfCoreOutboxConcurrencyValidationTests
             schemaVersion: "1.0.0",
             correlationId: "efcore-concurrency-validation",
             auditResidueId: $"audit-concurrency-{index:D3}",
-            lifecycleStage: AuditResidueLifecycleStage.ExternalEmissionQueued,
+            lifecycleStage: DecisionReceiptLifecycleStage.ExternalEmissionQueued,
             policyVersion: "2026.06",
             policyHash: "policy-hash-concurrency",
             traceId: $"trace-concurrency-{index:D3}",
@@ -335,10 +335,10 @@ public sealed class EfCoreOutboxConcurrencyValidationTests
             });
     }
 
-    private static AuditResidueLifecycleEvent CreateLifecycleEvent(int index)
+    private static DecisionReceiptLifecycleEvent CreateLifecycleEvent(int index)
     {
-        return AuditResidueLifecycleEvent.Create(
-            AuditResidueLifecycleStage.ExternalEmissionQueued,
+        return DecisionReceiptLifecycleEvent.Create(
+            DecisionReceiptLifecycleStage.ExternalEmissionQueued,
             "efcore-concurrency-validation",
             $"audit-concurrency-{index:D3}",
             $"lifecycle-concurrency-{index:D3}",
@@ -355,7 +355,7 @@ public sealed class EfCoreOutboxConcurrencyValidationTests
 
     private readonly record struct WriteEvidence(string OutboxEntryId, string LifecycleEventId);
 
-    private sealed class CoordinatedDeliveredEmitter(int expectedEmissionCount) : IAsiBackboneGovernanceEmitter
+    private sealed class CoordinatedDeliveredEmitter(int expectedEmissionCount) : IGovernanceEmitter
     {
         private readonly TaskCompletionSource allExpectedEmissionsArrived = new(TaskCreationOptions.RunContinuationsAsynchronously);
         private int emissionCount;
@@ -388,7 +388,7 @@ public sealed class EfCoreOutboxConcurrencyValidationTests
         }
     }
 
-    private sealed class RetryableFailureEmitter(DateTimeOffset retryReadyUtc) : IAsiBackboneGovernanceEmitter
+    private sealed class RetryableFailureEmitter(DateTimeOffset retryReadyUtc) : IGovernanceEmitter
     {
         public ValueTask<GovernanceEmissionResult> EmitAsync(
             GovernanceEmissionEnvelope envelope,
@@ -410,11 +410,11 @@ public sealed class EfCoreOutboxConcurrencyValidationTests
     private sealed class HostOwnedGovernanceDbContext(DbContextOptions<HostOwnedGovernanceDbContext> options)
         : DbContext(options)
     {
-        public DbSet<AsiBackboneGovernanceOutboxEntryEntity> GovernanceOutboxEntries =>
-            Set<AsiBackboneGovernanceOutboxEntryEntity>();
+        public DbSet<GovernanceOutboxEntryEntity> GovernanceOutboxEntries =>
+            Set<GovernanceOutboxEntryEntity>();
 
-        public DbSet<AsiBackboneAuditResidueLifecycleEventEntity> AuditResidueLifecycleEvents =>
-            Set<AsiBackboneAuditResidueLifecycleEventEntity>();
+        public DbSet<DecisionReceiptLifecycleEventEntity> AuditResidueLifecycleEvents =>
+            Set<DecisionReceiptLifecycleEventEntity>();
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

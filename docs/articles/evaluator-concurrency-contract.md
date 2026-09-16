@@ -1,6 +1,6 @@
 # Evaluator Concurrency Contract
 
-This article defines the supported concurrency and construction-snapshot behavior of `DefaultAsiBackbonePolicyEvaluator<TContext>`.
+This article defines the supported concurrency and construction-snapshot behavior of `DefaultGovernancePolicyEvaluator<TContext>`.
 
 The contract is intentionally narrow. AsiBackbone can keep its own evaluator state stable, but it cannot make arbitrary host-provided constraints, threat contributors, decision policies, contexts, loggers, or external dependencies thread-safe.
 
@@ -14,7 +14,7 @@ The evaluator captures the following inputs when it is constructed:
 
 Later mutation of the caller-owned constraint or contributor collections does not add, remove, or reorder extensions inside the existing evaluator instance.
 
-`AsiBackbonePolicyEvaluatorOptions` remains mutable while a host configures it. Evaluator construction validates and freezes the supplied instance. Attempts to change it afterward throw `InvalidOperationException`. Create a separate options instance before constructing another evaluator when a different posture is required.
+`GovernancePolicyOptions` remains mutable while a host configures it. Evaluator construction validates and freezes the supplied instance. Attempts to change it afterward throw `InvalidOperationException`. Create a separate options instance before constructing another evaluator when a different posture is required.
 
 This prevents a long-lived evaluator from silently changing behavior because another component retained and modified the original options reference.
 
@@ -26,9 +26,9 @@ An evaluator instance may therefore be invoked concurrently when all objects use
 
 Host-provided implementations must be safe for the lifetime and registration scope in which the host shares them:
 
-- `IAsiBackboneConstraint<TContext>` implementations;
+- `IGovernanceConstraint<TContext>` implementations;
 - `IThreatModelContributor<TContext>` implementations;
-- `IAsiBackboneDecisionPolicy<TContext>` implementations;
+- `IGovernanceDecisionPolicy<TContext>` implementations;
 - evaluation contexts and any mutable objects reachable from them;
 - loggers, caches, clients, repositories, policy stores, and other dependencies used by extensions.
 
@@ -44,7 +44,7 @@ Do not rely on one concurrent evaluation completing before another unless the ho
 
 ## Result artifacts
 
-`GovernanceDecision`, `ConstraintEvaluationResult`, and `AuditResidue` are immutable snapshots after creation:
+`GovernanceDecision`, `ConstraintEvaluationResult`, and `DecisionReceipt` are immutable snapshots after creation:
 
 - scalar properties are get-only;
 - reason and reason-code collections are normalized into private read-only snapshots;

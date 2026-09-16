@@ -8,17 +8,17 @@ using Xunit;
 namespace AsiBackbone.Core.Tests.Audit;
 
 /// <summary>
-/// Unit tests for the fluent <see cref="AuditResidueBuilder" /> construction path.
+/// Unit tests for the fluent <see cref="DecisionReceiptBuilder" /> construction path.
 /// </summary>
 public sealed class AuditResidueBuilderTests
 {
     /// <summary>
-    /// Verifies that the fluent builder produces an <see cref="AuditResidue" /> equivalent to the direct creation method.
+    /// Verifies that the fluent builder produces an <see cref="DecisionReceipt" /> equivalent to the direct creation method.
     /// </summary>
     [Fact]
     public void BuilderCreateMatchesDirectCreateSemantics()
     {
-        var actor = AsiBackboneActorContext.Human(" user-123 ", " Chris ");
+        var actor = GovernanceActorContext.Human(" user-123 ", " Chris ");
         DateTimeOffset occurredUtc = new(2026, 6, 26, 10, 30, 0, TimeSpan.FromHours(-5));
         Dictionary<string, string> metadata = new(StringComparer.Ordinal)
         {
@@ -26,7 +26,7 @@ public sealed class AuditResidueBuilderTests
             ["risk"] = " high "
         };
 
-        var direct = AuditResidue.Create(
+        var direct = DecisionReceipt.Create(
             actor,
             " documents.approve ",
             " Warning ",
@@ -55,7 +55,7 @@ public sealed class AuditResidueBuilderTests
             decisionStage: " DecisionEvaluated ",
             schemaVersion: " asi.audit.v9 ");
 
-        AuditResidue built = AuditResidueBuilder.Create(actor, " documents.approve ", " Warning ")
+        DecisionReceipt built = DecisionReceiptBuilder.Create(actor, " documents.approve ", " Warning ")
             .AddReasonCode(" policy.warning ")
             .AddReasonCode(" latency.high ")
             .WithEventId(" event-123 ")
@@ -87,12 +87,12 @@ public sealed class AuditResidueBuilderTests
     }
 
     /// <summary>
-    /// Verifies that the fluent builder produces an <see cref="AuditResidue" /> equivalent to the direct creation method when starting from a <see cref="GovernanceDecision" />.
+    /// Verifies that the fluent builder produces an <see cref="DecisionReceipt" /> equivalent to the direct creation method when starting from a <see cref="GovernanceDecision" />.
     /// </summary>
     [Fact]
     public void BuilderFromDecisionMatchesDirectFromDecisionSemantics()
     {
-        var actor = AsiBackboneActorContext.Service("service-123");
+        var actor = GovernanceActorContext.Service("service-123");
         var decision = GovernanceDecision.Deny(
             "policy.denied",
             "Policy denied the operation.",
@@ -106,7 +106,7 @@ public sealed class AuditResidueBuilderTests
             ["source"] = "unit-test"
         };
 
-        var direct = AuditResidue.FromDecision(
+        var direct = DecisionReceipt.FromDecision(
             actor,
             "system.sync",
             decision,
@@ -130,7 +130,7 @@ public sealed class AuditResidueBuilderTests
             decisionStage: "DecisionEvaluated",
             schemaVersion: "asi.audit.v9");
 
-        AuditResidue built = AuditResidueBuilder.FromDecision(actor, "system.sync", decision)
+        DecisionReceipt built = DecisionReceiptBuilder.FromDecision(actor, "system.sync", decision)
             .WithEventId("event-123")
             .WithOccurredUtc(occurredUtc)
             .WithMetadata(metadata)
@@ -156,18 +156,18 @@ public sealed class AuditResidueBuilderTests
     }
 
     /// <summary>
-    /// Verifies that the fluent builder produces an <see cref="AuditResidue" /> equivalent to the direct creation method when starting from a <see cref="ConstraintEvaluationResult" />.
+    /// Verifies that the fluent builder produces an <see cref="DecisionReceipt" /> equivalent to the direct creation method when starting from a <see cref="ConstraintEvaluationResult" />.
     /// </summary>
     [Fact]
     public void BuilderFromConstraintMatchesDirectFromConstraintSemantics()
     {
-        AsiBackboneActorContext actor = AsiBackboneActorContext.System;
+        GovernanceActorContext actor = GovernanceActorContext.System;
         var constraintResult = ConstraintEvaluationResult.Warning(
             "constraint.warning",
             "Constraint produced a warning.");
         DateTimeOffset occurredUtc = new(2026, 6, 26, 15, 30, 0, TimeSpan.Zero);
 
-        var direct = AuditResidue.FromConstraint(
+        var direct = DecisionReceipt.FromConstraint(
             actor,
             "system.sync",
             constraintResult,
@@ -182,7 +182,7 @@ public sealed class AuditResidueBuilderTests
                 ["source"] = "unit-test"
             });
 
-        AuditResidue built = AuditResidueBuilder.FromConstraint(actor, "system.sync", constraintResult)
+        DecisionReceipt built = DecisionReceiptBuilder.FromConstraint(actor, "system.sync", constraintResult)
             .WithEventId("event-123")
             .WithOccurredUtc(occurredUtc)
             .WithCorrelationId("correlation-123")
@@ -196,19 +196,19 @@ public sealed class AuditResidueBuilderTests
     }
 
     /// <summary>
-    /// Verifies that the fluent builder does not allocate metadata storage when no metadata is added, and that the built <see cref="AuditResidue" /> has no metadata.
+    /// Verifies that the fluent builder does not allocate metadata storage when no metadata is added, and that the built <see cref="DecisionReceipt" /> has no metadata.
     /// </summary>
     [Fact]
     public void BuilderDoesNotAllocateMetadataStorageWhenNoMetadataIsAdded()
     {
-        var builder = AuditResidueBuilder.Create(
-            AsiBackboneActorContext.System,
+        var builder = DecisionReceiptBuilder.Create(
+            GovernanceActorContext.System,
             "system.sync",
             "Allowed");
 
         Assert.Null(GetMetadataStorage(builder));
 
-        AuditResidue residue = builder.Build();
+        DecisionReceipt residue = builder.Build();
 
         Assert.False(residue.HasMetadata);
         Assert.Empty(residue.Metadata);
@@ -216,17 +216,17 @@ public sealed class AuditResidueBuilderTests
     }
 
     /// <summary>
-    /// Verifies that the fluent builder allocates metadata storage when metadata is added, and that the built <see cref="AuditResidue" /> has the expected metadata.
+    /// Verifies that the fluent builder allocates metadata storage when metadata is added, and that the built <see cref="DecisionReceipt" /> has the expected metadata.
     /// </summary>
     [Fact]
     public void AddMetadataInitializesStorageAndBuildsSingleEntry()
     {
-        var builder = AuditResidueBuilder.Create(
-            AsiBackboneActorContext.System,
+        var builder = DecisionReceiptBuilder.Create(
+            GovernanceActorContext.System,
             "system.sync",
             "Allowed");
 
-        AuditResidue residue = builder
+        DecisionReceipt residue = builder
             .AddMetadata("source", "unit-test")
             .Build();
 
@@ -237,13 +237,13 @@ public sealed class AuditResidueBuilderTests
     }
 
     /// <summary>
-    /// Verifies that the fluent builder allocates metadata storage when metadata is added, and that the built <see cref="AuditResidue" /> has the expected metadata.
+    /// Verifies that the fluent builder allocates metadata storage when metadata is added, and that the built <see cref="DecisionReceipt" /> has the expected metadata.
     /// </summary>
     [Fact]
     public void WithMetadataInitializesStorageAndBuildsMultipleEntries()
     {
-        var builder = AuditResidueBuilder.Create(
-            AsiBackboneActorContext.System,
+        var builder = DecisionReceiptBuilder.Create(
+            GovernanceActorContext.System,
             "system.sync",
             "Allowed");
         Dictionary<string, string> metadata = new(StringComparer.Ordinal)
@@ -252,7 +252,7 @@ public sealed class AuditResidueBuilderTests
             ["region"] = "us-la"
         };
 
-        AuditResidue residue = builder
+        DecisionReceipt residue = builder
             .WithMetadata(metadata)
             .Build();
 
@@ -264,13 +264,13 @@ public sealed class AuditResidueBuilderTests
     }
 
     /// <summary>
-    /// Verifies that the fluent builder overwrites existing metadata entries when the same key is added again, and that the built <see cref="AuditResidue" /> has the updated value.
+    /// Verifies that the fluent builder overwrites existing metadata entries when the same key is added again, and that the built <see cref="DecisionReceipt" /> has the updated value.
     /// </summary>
     [Fact]
     public void AddMetadataOverwritesExistingEntry()
     {
-        AuditResidue residue = AuditResidueBuilder.Create(
-            AsiBackboneActorContext.System,
+        DecisionReceipt residue = DecisionReceiptBuilder.Create(
+            GovernanceActorContext.System,
             "system.sync",
             "Allowed")
             .AddMetadata("source", "original")
@@ -282,27 +282,27 @@ public sealed class AuditResidueBuilderTests
     }
 
     /// <summary>
-    /// Verifies that the fluent builder clears existing metadata storage when null or empty metadata is provided, and that the built <see cref="AuditResidue" /> has no metadata.
+    /// Verifies that the fluent builder clears existing metadata storage when null or empty metadata is provided, and that the built <see cref="DecisionReceipt" /> has no metadata.
     /// </summary>
     [Fact]
     public void WithMetadataClearsStorageForNullAndEmptyInputs()
     {
-        AuditResidueBuilder builder = AuditResidueBuilder.Create(
-            AsiBackboneActorContext.System,
+        DecisionReceiptBuilder builder = DecisionReceiptBuilder.Create(
+            GovernanceActorContext.System,
             "system.sync",
             "Allowed")
             .AddMetadata("source", "original");
 
         Assert.NotNull(GetMetadataStorage(builder));
 
-        AuditResidue nullMetadataResidue = builder
+        DecisionReceipt nullMetadataResidue = builder
             .WithMetadata(null)
             .Build();
 
         Assert.Null(GetMetadataStorage(builder));
         Assert.Empty(nullMetadataResidue.Metadata);
 
-        AuditResidue emptyMetadataResidue = builder
+        DecisionReceipt emptyMetadataResidue = builder
             .AddMetadata("source", "replacement")
             .WithMetadata(new Dictionary<string, string>(StringComparer.Ordinal))
             .Build();
@@ -312,7 +312,7 @@ public sealed class AuditResidueBuilderTests
     }
 
     /// <summary>
-    /// Verifies that the built <see cref="AuditResidue" /> has immutable metadata, and that attempts to modify the metadata dictionary throw a <see cref="NotSupportedException" />.
+    /// Verifies that the built <see cref="DecisionReceipt" /> has immutable metadata, and that attempts to modify the metadata dictionary throw a <see cref="NotSupportedException" />.
     /// </summary>
     [Fact]
     public void BuiltResidueMetadataIsImmutable()
@@ -322,8 +322,8 @@ public sealed class AuditResidueBuilderTests
             ["source"] = "original"
         };
 
-        AuditResidue residue = AuditResidueBuilder.Create(
-            AsiBackboneActorContext.System,
+        DecisionReceipt residue = DecisionReceiptBuilder.Create(
+            GovernanceActorContext.System,
             "system.sync",
             "Allowed")
             .WithMetadata(sourceMetadata)
@@ -337,20 +337,20 @@ public sealed class AuditResidueBuilderTests
     }
 
     /// <summary>
-    /// Verifies that the built <see cref="AuditResidue" /> does not change when the builder is reused to build another residue, ensuring that each build produces a separate instance with its own state.
+    /// Verifies that the built <see cref="DecisionReceipt" /> does not change when the builder is reused to build another residue, ensuring that each build produces a separate instance with its own state.
     /// </summary>
     [Fact]
     public void BuiltResidueDoesNotChangeWhenBuilderIsReused()
     {
-        AuditResidueBuilder builder = AuditResidueBuilder.Create(
-            AsiBackboneActorContext.System,
+        DecisionReceiptBuilder builder = DecisionReceiptBuilder.Create(
+            GovernanceActorContext.System,
             "system.sync",
             "Warning")
             .AddReasonCode("policy.warning")
             .AddMetadata("source", "original");
 
-        AuditResidue first = builder.Build();
-        AuditResidue second = builder
+        DecisionReceipt first = builder.Build();
+        DecisionReceipt second = builder
             .AddReasonCode("policy.added")
             .AddMetadata("source", "mutated")
             .Build();
@@ -362,40 +362,40 @@ public sealed class AuditResidueBuilderTests
     }
 
     /// <summary>
-    /// Verifies that the fluent builder throws an <see cref="ArgumentNullException" /> when attempting to create an <see cref="AuditResidue" /> from a null <see cref="GovernanceDecision" />.
+    /// Verifies that the fluent builder throws an <see cref="ArgumentNullException" /> when attempting to create an <see cref="DecisionReceipt" /> from a null <see cref="GovernanceDecision" />.
     /// </summary>
     [Fact]
     public void BuilderThrowsForMissingDecision()
     {
         _ = Assert.Throws<ArgumentNullException>(() =>
-            AuditResidueBuilder.FromDecision(
-                AsiBackboneActorContext.System,
+            DecisionReceiptBuilder.FromDecision(
+                GovernanceActorContext.System,
                 "system.sync",
                 decision: null!));
     }
 
     /// <summary>
-    /// Verifies that the fluent builder throws an <see cref="ArgumentNullException" /> when attempting to create an <see cref="AuditResidue" /> from a null <see cref="ConstraintEvaluationResult" />.
+    /// Verifies that the fluent builder throws an <see cref="ArgumentNullException" /> when attempting to create an <see cref="DecisionReceipt" /> from a null <see cref="ConstraintEvaluationResult" />.
     /// </summary>
     [Fact]
     public void BuilderThrowsForMissingConstraintResult()
     {
         _ = Assert.Throws<ArgumentNullException>(() =>
-            AuditResidueBuilder.FromConstraint(
-                AsiBackboneActorContext.System,
+            DecisionReceiptBuilder.FromConstraint(
+                GovernanceActorContext.System,
                 "system.sync",
                 constraintResult: null!));
     }
 
-    private static Dictionary<string, string>? GetMetadataStorage(AuditResidueBuilder builder)
+    private static Dictionary<string, string>? GetMetadataStorage(DecisionReceiptBuilder builder)
     {
-        FieldInfo? field = typeof(AuditResidueBuilder).GetField("metadata", BindingFlags.Instance | BindingFlags.NonPublic);
+        FieldInfo? field = typeof(DecisionReceiptBuilder).GetField("metadata", BindingFlags.Instance | BindingFlags.NonPublic);
         Assert.NotNull(field);
 
         return (Dictionary<string, string>?)field.GetValue(builder);
     }
 
-    private static void AssertEquivalentResidue(AuditResidue expected, AuditResidue actual)
+    private static void AssertEquivalentResidue(DecisionReceipt expected, DecisionReceipt actual)
     {
         Assert.Equal(expected.EventId, actual.EventId);
         Assert.Equal(expected.AuditResidueId, actual.AuditResidueId);

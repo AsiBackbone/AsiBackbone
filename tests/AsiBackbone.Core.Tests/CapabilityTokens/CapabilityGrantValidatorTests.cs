@@ -611,7 +611,7 @@ public sealed class CapabilityGrantValidatorTests
         field.SetValue(result, value);
     }
 
-    private sealed class StubVerificationService(SignatureVerificationResult result) : IAsiBackboneSignatureVerificationService
+    private sealed class StubVerificationService(SignatureVerificationResult result) : IGovernanceSignatureVerificationService
     {
         public bool WasCalled { get; private set; }
 
