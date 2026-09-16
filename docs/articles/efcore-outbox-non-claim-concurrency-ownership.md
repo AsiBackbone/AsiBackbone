@@ -1,6 +1,6 @@
 # EF Core Outbox Non-Claim Concurrency Ownership
 
-This article defines the concurrency contract for non-claim mutation methods on the EF Core governance outbox store.
+This article defines the concurrency contract for non-claim mutation methods on the EF Core outbox store.
 
 ## Decision
 

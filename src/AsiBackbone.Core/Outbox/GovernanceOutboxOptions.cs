@@ -1,7 +1,7 @@
 namespace AsiBackbone.Core.Outbox;
 
 /// <summary>
-/// Provides provider-neutral retry timing, poison-message, and optional claim/lease options for governance outbox drain processing.
+/// Provides provider-neutral retry timing, poison-message, and optional claim/lease options for outbox drain processing.
 /// </summary>
 /// <remarks>
 /// These options control default retry timestamps when a downstream emitter does not provide its own retry-after value. Claim leasing is enabled by default and requires a claim-capable outbox store; hosts supplying a store that does not implement <see cref="IGovernanceOutboxClaimStore" /> must set <see cref="UseClaimLeases" /> to <see langword="false" /> and accept the duplicate-emission behavior that follows from it.

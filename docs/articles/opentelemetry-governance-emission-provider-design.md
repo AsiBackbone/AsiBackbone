@@ -7,7 +7,7 @@ Issue: #144.
 > [!NOTE]
 > **Historical/superseded design record.** This page preserves the pre-implementation design used for issue #144. For current released behavior and package guidance, use [OpenTelemetry Governance Emission Provider](opentelemetry-governance-emission-provider.md). The material below is retained without rewriting the original design history.
 
-In this software project, **ASI** means **Accountable Systems Infrastructure**. AsiBackbone is a governance spine for consequential software decision flow. It is not an AI model host, robot controller, observability backend, SIEM product, cloud governance platform, signing product, or compliance guarantee by itself.
+AsiBackbone is a policy decision pipeline for consequential software decision flow. It is not an AI model host, robot controller, observability backend, SIEM product, cloud governance platform, signing product, or compliance guarantee by itself.
 
 ## Purpose
 
@@ -18,7 +18,7 @@ The provider should adapt provider-neutral governance emission envelopes into Op
 ```text
 Decision receipt / lifecycle event / gateway result
   -> GovernanceEmissionEnvelope
-  -> durable governance outbox
+  -> durable outbox
   -> OpenTelemetry governance emitter
   -> ActivitySource / logger / Meter
   -> host-configured OpenTelemetry exporters
@@ -112,7 +112,7 @@ The provider should also expose constants for source names and stable attribute 
 | `Acknowledgment` | `asibackbone.acknowledgment.recorded` | Count requested/completed acknowledgment stages. |
 | `CapabilityToken` | `asibackbone.capability_token.issued` | Count token issuance without raw token values. |
 | `Gateway` | `asibackbone.gateway.completed` | Count gateway allow/deny/error outcomes. |
-| `DecisionReceipt` | `asibackbone.audit_residue.created` | Count durable residue creation. |
+| `DecisionReceipt` | `asibackbone.audit_residue.created` | Count durable receipt creation. |
 | `Lifecycle` | `asibackbone.lifecycle.recorded` | Track stage progression. |
 | `Outbox` | `asibackbone.outbox.updated` | Track pending, delivered, failed, deferred, and dead-letter state. |
 | `ProviderEmission` | `asibackbone.emission.delivered` or `asibackbone.emission.failed` | Track provider handoff result. |
@@ -313,7 +313,7 @@ Before implementation begins, confirm:
 - [Observability and Governance Emission Architecture](observability-and-governance-emission-architecture.md)
 - [Governance Emission Contract](governance-emission-contract.md)
 - [Durable Audit and Outbox Persistence](durable-audit-outbox-persistence.md)
-- [Audit Residue Observability Schema](audit-residue-observability-schema.md)
+- [Decision Receipt Observability Schema](decision-receipt-observability-schema.md)
 - [Privacy and Signing Boundaries](privacy-and-signing-boundaries.md)
 
 ## Non-goals

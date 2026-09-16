@@ -1,6 +1,6 @@
 # AsiBackbone.Storage.InMemory
 
-Non-durable in-memory storage helpers for Accountable Systems Infrastructure local validation, samples, and tests.
+Non-durable in-memory storage helpers for AsiBackbone local validation, samples, and tests.
 
 This package provides non-durable storage implementations that make it easy to exercise ASI Backbone governance flows without requiring a database, EF Core provider, or host infrastructure.
 
@@ -12,7 +12,7 @@ This package provides non-durable storage implementations that make it easy to e
 ## What this package provides
 
 - In-memory audit ledger behavior for local validation and tests.
-- In-memory governance outbox behavior for local validation, samples, and integration tests.
+- In-memory outbox behavior for local validation, samples, and integration tests.
 - In-memory capability grant use tracking for local validation, samples, and integration tests.
 - Storage implementations that depend on `AsiBackbone.Core` only.
 - A simple bridge for samples that need audit, outbox, or bounded-use capability grant records without introducing EF Core or a database.
@@ -24,7 +24,7 @@ Use this package when:
 - writing unit tests or integration tests around policy evaluation;
 - building sample applications;
 - validating decision receipt and audit ledger behavior locally;
-- validating governance outbox state transitions locally;
+- validating outbox state transitions locally;
 - validating first-use and replay-denied capability grant flows locally;
 - demonstrating host-neutral ASI Backbone flows before adding durable storage.
 

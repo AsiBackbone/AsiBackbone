@@ -57,7 +57,7 @@ public static class AsiBackboneEntityFrameworkCoreBuilderExtensions
     }
 
     /// <summary>
-    /// Adds outcome-aware EF Core durable governance outbox storage through the AsiBackbone builder facade.
+    /// Adds outcome-aware EF Core durable outbox storage through the AsiBackbone builder facade.
     /// </summary>
     /// <typeparam name="TDbContext">The host-owned context holding the outbox set.</typeparam>
     /// <param name="builder">The AsiBackbone builder.</param>

@@ -2,10 +2,10 @@
 
 This guide explains the current direction of the AsiBackbone repository and how to begin working with the project.
 
-In this software project, **ASI** means **Accountable Systems Infrastructure**. AsiBackbone is a stable `5.x` .NET package family for governance-oriented decision flow. The foundation package is `AsiBackbone.Core`, with optional integration packages for in-memory validation, EF Core host-owned persistence, ASP.NET Core host integration, analyzer guidance, OpenTelemetry projection, and signing-provider boundaries.
+AsiBackbone is a stable `5.x` .NET package family for governance-oriented decision flow. The foundation package is `AsiBackbone.Core`, with optional integration packages for in-memory validation, EF Core host-owned persistence, ASP.NET Core host integration, analyzer guidance, OpenTelemetry projection, and signing-provider boundaries.
 
 > [!IMPORTANT]
-> This project does not implement artificial superintelligence. It provides Accountable Systems Infrastructure: governance-oriented software building blocks inspired by broader Backbone framework concepts.
+> This project does not implement artificial superintelligence. It provides governance infrastructure: governance-oriented software building blocks inspired by broader Backbone framework concepts.
 
 ## Current status
 
@@ -47,7 +47,7 @@ The current implementation direction is:
 7. In-memory local validation storage
 8. EF Core host-owned persistence integration
 9. ASP.NET Core host integration
-10. Durable audit lifecycle and governance outbox persistence
+10. Durable audit lifecycle and outbox persistence
 11. Provider-neutral governance emission contracts
 12. OpenTelemetry provider projection
 13. Analyzer safety rails
@@ -97,7 +97,7 @@ DocFX will build the documentation and serve it locally. Use the local URL print
 
 ## Project orientation
 
-AsiBackbone should be understood as a governance spine for Accountable Systems Infrastructure.
+AsiBackbone is a policy decision framework for accountable software execution.
 
 A typical AsiBackbone-style flow is:
 

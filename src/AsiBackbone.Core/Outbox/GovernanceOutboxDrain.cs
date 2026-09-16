@@ -6,7 +6,7 @@ using Microsoft.Extensions.Options;
 namespace AsiBackbone.Core.Outbox;
 
 /// <summary>
-/// Drains provider-neutral governance outbox entries through a configured governance emitter.
+/// Drains provider-neutral outbox entries through a configured governance emitter.
 /// </summary>
 /// <remarks>
 /// This drain path is provider-neutral. It is suitable for tests, samples, local validation, and host-owned workers that need to hand persisted outbox entries to an optional downstream emitter without coupling Core to a provider SDK.

@@ -104,7 +104,7 @@ public static class CanonicalPayloadBuilder
     }
 
     /// <summary>
-    /// Builds a canonical payload for a durable governance outbox entry.
+    /// Builds a canonical payload for a durable outbox entry.
     /// </summary>
     public static CanonicalPayload ForGovernanceOutboxEntry(GovernanceOutboxEntry entry, CanonicalPayloadOptions? options = null)
     {

@@ -1,8 +1,8 @@
 # Governance Outbox Delivery Semantics
 
-This article defines the production semantics for governance outbox entries: identity, persistence, retry, idempotency, ordering, and host responsibilities.
+This article defines the production semantics for outbox entries: identity, persistence, retry, idempotency, ordering, and host responsibilities.
 
-In this software project, **ASI** means **Accountable Systems Infrastructure**. AsiBackbone remains a governance and policy spine. It provides durable local outbox records and provider-neutral drain primitives; it is not an AI model host, distributed queue, SIEM product, immutable ledger, or exactly-once delivery system.
+AsiBackbone provides a policy decision pipeline, durable local outbox records, and provider-neutral drain primitives. It is not an AI model host, distributed queue, SIEM product, immutable ledger, or exactly-once delivery system.
 
 ## Summary contract
 
@@ -30,7 +30,7 @@ The chosen semantics are:
 5. **Host-owned scale-out safety**: the package does not silently claim rows, lease rows, lock rows, or create a distributed singleton.
 6. **Provider-neutral failure vocabulary**: retries, deferrals, failures, and dead letters are represented without binding Core to a provider SDK.
 
-This fits AsiBackbone's role as a governance spine: it preserves local decision and emission state, but it does not pretend to own the entire distributed delivery path.
+This fits AsiBackbone's role as a policy decision pipeline: it preserves local decision and emission state, but it does not pretend to own the entire distributed delivery path.
 
 ## Identity and idempotency fields
 

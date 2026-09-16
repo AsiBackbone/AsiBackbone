@@ -5,7 +5,7 @@ Last reviewed: July 12, 2026
 > [!IMPORTANT]
 > This page is a scoping crosswalk, not a certification, legal opinion, compliance assessment, control implementation statement, or claim that AsiBackbone satisfies any framework, regulation, or standard. AsiBackbone provides software primitives that a host may use within a broader governance, security, privacy, risk-management, or assurance program.
 
-AsiBackbone is a governance spine for consequential .NET decision flow. It can help a host make policy decisions explicit, preserve evidence about those decisions, require acknowledgment, constrain follow-on authority, and keep execution under host control. It does not determine which laws apply, define an organization's risk appetite, establish a management system, configure security infrastructure, or make a consuming application compliant.
+AsiBackbone is a policy decision pipeline for consequential .NET decision flow. It can help a host make policy decisions explicit, preserve evidence about those decisions, require acknowledgment, constrain follow-on authority, and keep execution under host control. It does not determine which laws apply, define an organization's risk appetite, establish a management system, configure security infrastructure, or make a consuming application compliant.
 
 ## How to read this page
 

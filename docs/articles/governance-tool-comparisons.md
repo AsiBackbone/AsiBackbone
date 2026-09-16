@@ -6,7 +6,7 @@ This URL is retained for continuity.
 
 ## AsiBackbone's product boundary
 
-AsiBackbone is a .NET governance spine for consequential application actions. It can coexist with:
+AsiBackbone is a .NET policy decision pipeline for consequential application actions. It can coexist with:
 
 - cloud/resource governance platforms;
 - external policy engines;

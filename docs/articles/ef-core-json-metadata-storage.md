@@ -1,10 +1,10 @@
 # EF Core JSON Metadata Storage Strategy
 
-This article records the current decision for governance outbox metadata storage in `AsiBackbone.EntityFrameworkCore`.
+This article records the current decision for outbox metadata storage in `AsiBackbone.EntityFrameworkCore`.
 
 ## Decision
 
-For the current provider-neutral EF Core package, AsiBackbone keeps governance outbox metadata in explicit string-backed JSON columns:
+For the current provider-neutral EF Core package, AsiBackbone keeps outbox metadata in explicit string-backed JSON columns:
 
 - `MetadataJson`
 - `EnvelopeMetadataJson`
@@ -21,7 +21,7 @@ References for future review:
 
 ## Why manual string JSON remains the default
 
-The governance outbox metadata fields are intentionally small, minimized, provider-neutral dictionaries. Their main job is to preserve safe diagnostic context and stable identifiers, not to become a provider-specific document database surface.
+The outbox metadata fields are intentionally small, minimized, provider-neutral dictionaries. Their main job is to preserve safe diagnostic context and stable identifiers, not to become a provider-specific document database surface.
 
 Manual string JSON remains the chosen baseline because it gives the package:
 

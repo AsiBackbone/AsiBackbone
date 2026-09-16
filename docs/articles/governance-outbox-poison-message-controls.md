@@ -1,8 +1,8 @@
 # Governance Outbox Poison-Message Controls
 
-This article documents the provider-neutral maximum retry and dead-letter controls used by the AsiBackbone governance outbox drain.
+This article documents the provider-neutral maximum retry and dead-letter controls used by the AsiBackbone outbox drain.
 
-In this software project, **ASI** means **Accountable Systems Infrastructure**. These controls provide deterministic quarantine behavior for repeatedly failing governance emissions. They do not replace host-owned monitoring, incident response, legal review, provider configuration, or replay authorization.
+These controls provide deterministic quarantine behavior for repeatedly failing governance emissions. They do not replace host-owned monitoring, incident response, legal review, provider configuration, or replay authorization.
 
 ## Configuration
 
@@ -13,7 +13,7 @@ In this software project, **ASI** means **Accountable Systems Infrastructure**. 
 | `MaxRetryAttempts` | `5` | Maximum failed emission attempts permitted before the drain applies its poison-message policy. The failure currently being processed counts toward the threshold. |
 | `DeadLetterOnMaxRetryAttempts` | `true` | Dead-letters the entry when the configured threshold is reached. When disabled, retry failures remain eligible for later drain attempts until the host applies another terminal policy. |
 | `DeadLetterReasonCode` | `outbox.max_retry_attempts_exceeded` | Stable provider-neutral error code recorded on threshold dead-lettering. |
-| `DeadLetterReasonMessage` | `Governance outbox entry exceeded the configured maximum retry attempts.` | Stable provider-neutral diagnostic and dead-letter reason. |
+| `DeadLetterReasonMessage` | `Outbox entry exceeded the configured maximum retry attempts.` | Stable provider-neutral diagnostic and dead-letter reason. |
 
 Example:
 
@@ -24,7 +24,7 @@ services.Configure<GovernanceOutboxOptions>(options =>
     options.DeadLetterOnMaxRetryAttempts = true;
     options.DeadLetterReasonCode = "outbox.max_retry_attempts_exceeded";
     options.DeadLetterReasonMessage =
-        "Governance outbox entry exceeded the configured maximum retry attempts.";
+        "Outbox entry exceeded the configured maximum retry attempts.";
 });
 ```
 

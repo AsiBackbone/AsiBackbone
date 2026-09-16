@@ -38,7 +38,7 @@ The harness registers deterministic test substitutes for:
 - policy evaluation;
 - endpoint capability-grant validation;
 - in-memory decision receipt inspection;
-- non-durable in-memory governance outbox storage;
+- non-durable in-memory outbox storage;
 - deterministic no-signature signing.
 
 ## Deterministic policy results

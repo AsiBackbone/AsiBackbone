@@ -2,7 +2,7 @@
 
 This guide shows the smallest useful way to adopt AsiBackbone first, then how to add stable `3.x` capabilities only when a host actually needs them.
 
-In this software project, **ASI** means **Accountable Systems Infrastructure**. AsiBackbone is a governance spine for consequential software decision flow. It is not an intelligence engine, AI model host, robot controller, compliance product, observability backend, or signing appliance.
+AsiBackbone is a policy decision pipeline for consequential software decision flow. It is not an intelligence engine, AI model host, robot controller, compliance product, observability backend, or signing appliance.
 
 > [!IMPORTANT]
 > You do not need to adopt the entire package family on day one. Start with the smallest governance boundary that solves the immediate host problem, then add persistence, outbox, provider emission, analyzers, DLP/classification, or signing only when the scenario requires them.
@@ -92,7 +92,7 @@ var actor = GovernanceActorContext.Human(
     actorId: "demo-user",
     displayName: "Demo User");
 
-DecisionReceipt residue = DecisionReceipt.FromDecision(
+DecisionReceipt receipt = DecisionReceipt.FromDecision(
     actor,
     operationName: "orders.approve",
     decision,
@@ -100,7 +100,7 @@ DecisionReceipt residue = DecisionReceipt.FromDecision(
 
 Console.WriteLine($"Decision: {decision.Outcome}");
 Console.WriteLine($"Can proceed: {decision.CanProceed}");
-Console.WriteLine($"Audit event: {residue.EventId}");
+Console.WriteLine($"Audit event: {receipt.EventId}");
 
 internal sealed class AllowedOperationConstraint : IGovernanceConstraint<GovernanceEvaluationContext>
 {

@@ -2,11 +2,11 @@
 
 This article documents the execution boundary that every AsiBackbone adopter must understand: AsiBackbone can produce governance decisions, decision receipt, capability-boundary artifacts, and signing-ready records, but the host application remains responsible for honoring those decisions before consequential work is executed.
 
-In this software project, **ASI** means **Accountable Systems Infrastructure**. AsiBackbone is a governance spine and decision-flow layer. It is not an execution engine, legal certification mechanism, compliance guarantee, AI model host, or artificial superintelligence implementation.
+AsiBackbone is a policy decision pipeline and decision-flow layer. It is not an execution engine, legal certification mechanism, compliance guarantee, AI model host, or artificial superintelligence implementation.
 
 ## The host-owned execution gap
 
-The governance spine can only protect a consequential operation when the host places the operation behind a decision gate.
+The policy decision pipeline can only protect a consequential operation when the host places the operation behind a decision gate.
 
 ```text
 proposed operation

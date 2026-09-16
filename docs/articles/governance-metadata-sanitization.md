@@ -2,7 +2,7 @@
 
 This article documents the provider-neutral governance metadata sanitation pipeline introduced for issue #525.
 
-In this software project, **ASI** means **Accountable Systems Infrastructure**. The pipeline provides an enforcement seam before host-owned metadata reaches decision receipt, audit ledger storage, governance outbox records, OpenTelemetry, or another emitter. It is not a complete DLP product, privacy certification, encryption service, or provider-specific classification engine.
+The pipeline provides an enforcement seam before host-owned metadata reaches decision receipt, audit ledger storage, outbox records, OpenTelemetry, or another emitter. It is not a complete DLP product, privacy certification, encryption service, or provider-specific classification engine.
 
 ## Budget validation is not DLP
 
@@ -90,7 +90,7 @@ Use curated reason codes and messages. Do not place the detected secret, persona
 Apply sanitation before the first durable or external boundary. Typical locations include:
 
 1. metadata construction for decision receipt or an audit ledger record;
-2. governance outbox envelope creation;
+2. outbox envelope creation;
 3. OpenTelemetry or other governance emission;
 4. ASP.NET Core endpoint-governance metadata mapping;
 5. regulated templates or host composition roots.

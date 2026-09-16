@@ -2,9 +2,9 @@
 
 Issue: #221, updated for #253.
 
-This article documents the implemented signing flow for audit receipts, audit ledger records, decision receipt lifecycle events, governance emission envelopes, and governance outbox entries.
+This article documents the implemented signing flow for audit receipts, audit ledger records, decision receipt lifecycle events, governance emission envelopes, and outbox entries.
 
-In this software project, **ASI** means **Accountable Systems Infrastructure**. AsiBackbone provides provider-neutral governance primitives and signing seams. It does not provide immutable storage, external anchoring, legal non-repudiation, or tamper-evidence by itself.
+AsiBackbone provides provider-neutral governance primitives and signing seams. It does not provide immutable storage, external anchoring, legal non-repudiation, or tamper-evidence by itself.
 
 > [!IMPORTANT]
 > A signed record is not automatically a verified record. A signed record is also not automatically tamper-evident. Verification, hash chaining, durable write controls, immutable/object-lock storage, external anchoring, retention, monitoring, and incident response remain host or provider responsibilities.
@@ -26,11 +26,11 @@ The Core signing helpers support the following canonical governance artifacts:
 
 | Artifact | Canonical type | Typical signing point |
 | --- | --- | --- |
-| Decision receipt | `asibackbone.audit-residue` | After decision receipt creation and canonical hashing, before the host treats the residue as a signed receipt. |
+| Decision receipt | `asibackbone.audit-residue` | After decision receipt creation and canonical hashing, before the host treats the receipt as a signed receipt. |
 | Audit ledger record | `asibackbone.audit-ledger-record` | After ledger record construction and canonical hashing, before durable append when the persisted row must carry signing metadata. |
 | Decision receipt lifecycle event | `asibackbone.audit-residue-lifecycle-event` | After lifecycle event creation and canonical hashing, before lifecycle-store append when lifecycle events require signatures. |
 | Governance emission envelope | `asibackbone.governance-emission-envelope` | After envelope construction and canonical hashing, before outbox enqueue or provider emission when the envelope itself is the signed artifact. |
-| Governance outbox entry | `asibackbone.governance-outbox-entry` | After outbox entry construction and canonical hashing, before provider emission when the durable outbox entry is the signed artifact. |
+| Outbox entry | `asibackbone.governance-outbox-entry` | After outbox entry construction and canonical hashing, before provider emission when the durable outbox entry is the signed artifact. |
 
 For issue #221, an **audit receipt** is represented by either a persistence-ready `AuditLedgerRecord` or the provider-neutral `SignedGovernanceArtifact<TArtifact>` wrapper around a canonicalized audit artifact. Hosts may persist the wrapper metadata directly or project it into their own storage model.
 
@@ -63,7 +63,7 @@ SignedGovernanceArtifact<AuditLedgerRecord> signed =
         cancellationToken: cancellationToken);
 ```
 
-Governance outbox entries use the same pattern:
+Outbox entries use the same pattern:
 
 ```csharp
 SignedGovernanceArtifact<GovernanceOutboxEntry> signedOutboxEntry =
@@ -145,13 +145,13 @@ Build governance emission envelope
   -> enqueue or emit signed envelope projection
 ```
 
-### Governance outbox entry signing
+### Outbox entry signing
 
 Use this order when the durable outbox entry is the signed artifact:
 
 ```text
 Build governance emission envelope
-  -> create governance outbox entry
+  -> create outbox entry
   -> canonicalize outbox entry
   -> compute canonical hash
   -> sign canonical hash

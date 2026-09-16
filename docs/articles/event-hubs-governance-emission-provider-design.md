@@ -4,7 +4,7 @@ This article documents a **design-only** future provider strategy for an optiona
 
 Issue: #145.
 
-In this software project, **ASI** means **Accountable Systems Infrastructure**. AsiBackbone is a governance spine for consequential software decision flow. It is not an AI model host, robot controller, streaming platform, SIEM product, cloud governance platform, signing product, or compliance guarantee by itself.
+AsiBackbone is a policy decision pipeline for consequential software decision flow. It is not an AI model host, robot controller, streaming platform, SIEM product, cloud governance platform, signing product, or compliance guarantee by itself.
 
 > [!IMPORTANT]
 > This page does **not** document a released NuGet package. No Event Hubs provider package, Azure Event Hubs SDK adapter, Azure-specific emission package, or Event Hubs publishing implementation is included in the `1.1.0` stable package family.
@@ -25,7 +25,7 @@ A future provider should adapt provider-neutral governance emission envelopes in
 ```text
 Decision receipt / lifecycle event / gateway result
   -> GovernanceEmissionEnvelope
-  -> durable governance outbox
+  -> durable outbox
   -> future Event Hubs governance emitter
   -> Azure Event Hubs namespace / event hub
   -> downstream monitoring, compliance, lineage, SIEM, enrichment, or analytics consumers
@@ -340,7 +340,7 @@ Before implementation begins, confirm:
 - [Governance Emission Contract](governance-emission-contract.md)
 - [Durable Audit and Outbox Persistence](durable-audit-outbox-persistence.md)
 - [Hosted Governance Outbox Drain](hosted-governance-outbox-drain.md)
-- [Audit Residue Observability Schema](audit-residue-observability-schema.md)
+- [Decision Receipt Observability Schema](decision-receipt-observability-schema.md)
 - [DLP and Classification Failure Policy](dlp-classification-failure-policy.md)
 - [Privacy and Signing Boundaries](privacy-and-signing-boundaries.md)
 

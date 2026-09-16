@@ -20,7 +20,7 @@ It does not configure exporters. Hosts can route the diagnostics pipeline to Azu
 
 ```text
 GovernanceEmissionEnvelope
-  -> durable governance outbox
+  -> durable outbox
   -> GovernanceOutboxDrain
   -> OpenTelemetryGovernanceEmitter
   -> ActivitySource / Meter

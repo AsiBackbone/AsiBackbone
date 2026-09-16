@@ -144,15 +144,15 @@ app.MapGet("/asi-backbone/validation", async (
 
     GovernanceDecision decision = await evaluator.EvaluateAsync(context, cancellationToken);
 
-    DecisionReceipt residue = DecisionReceipt.FromDecision(
+    DecisionReceipt receipt = DecisionReceipt.FromDecision(
         GovernanceActorContext.Human("validation-user", "Validation User"),
         "netcore-template.validation",
         decision,
         metadata: context.Metadata);
 
-    await auditSink.WriteAsync(residue, cancellationToken);
+    await auditSink.WriteAsync(receipt, cancellationToken);
 
-    AuditLedgerRecord record = AuditLedgerRecord.FromResidue(residue);
+    AuditLedgerRecord record = AuditLedgerRecord.FromResidue(receipt);
     await ledgerStore.AppendAsync(record, cancellationToken);
 
     return Results.Ok(new
@@ -162,7 +162,7 @@ app.MapGet("/asi-backbone/validation", async (
         decision.CorrelationId,
         decision.PolicyVersion,
         decision.PolicyHash,
-        auditEventId = residue.EventId,
+        auditEventId = receipt.EventId,
         ledgerRecordId = record.RecordId
     });
 });

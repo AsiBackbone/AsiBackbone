@@ -132,7 +132,7 @@ using AsiBackbone.Core.Audit;
 
 GovernanceHttpRequestCorrelation correlation = correlationResolver.ResolveRequestCorrelation();
 
-DecisionReceipt residue = correlation.CreateAuditResidue(
+DecisionReceipt receipt = correlation.CreateAuditResidue(
     actor,
     "ApproveWidget",
     decision);
@@ -297,4 +297,4 @@ It belongs at the edge between ASP.NET Core requests and Core governance primiti
 
 It does not own persistence, policy definitions, authentication schemes, authorization rules, database migrations, signing providers, NetCoreApplicationTemplate conventions, endpoint exposure, middleware enforcement, or external execution.
 
-That boundary keeps the package useful for both plain ASP.NET Core applications and NetCoreApplicationTemplate hosts while preserving the broader AsiBackbone principle: governance spine first, host assumptions last.
+That boundary keeps the package useful for both plain ASP.NET Core applications and NetCoreApplicationTemplate hosts while preserving the broader AsiBackbone principle: policy decision pipeline first, host assumptions last.

@@ -1,6 +1,6 @@
 # Outbox Claim and Lease Design Record
 
-This design record captures the selected direction for multi-worker governance outbox claim and lease support.
+This design record captures the selected direction for multi-worker outbox claim and lease support.
 
 Issue: [#407](https://github.com/AsiBackbone/AsiBackbone/issues/407), implemented baseline for [#464](https://github.com/AsiBackbone/AsiBackbone/issues/464)
 
@@ -8,7 +8,7 @@ Status: **Accepted design direction; initial provider-neutral claim contracts an
 
 ## Context
 
-The provider-neutral governance outbox drain can read pending or retry-ready entries, emit each envelope to a provider, and then save the resulting delivered, deferred, failed, retryable-failure, or dead-lettered state.
+The provider-neutral outbox drain can read pending or retry-ready entries, emit each envelope to a provider, and then save the resulting delivered, deferred, failed, retryable-failure, or dead-lettered state.
 
 That default behavior remains appropriate for a single active worker or a host that partitions workers so each worker reads a disjoint durable outbox slice. It is not sufficient by itself for multiple workers reading the same durable outbox rows.
 

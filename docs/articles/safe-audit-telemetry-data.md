@@ -2,7 +2,7 @@
 
 This article documents practical data-hygiene guidance for AsiBackbone decision receipt, governance emission envelopes, outbox records, and telemetry attributes.
 
-In this software project, **ASI** means **Accountable Systems Infrastructure**. AsiBackbone provides governance-oriented decision-flow primitives, but the host application controls much of the context, metadata, reason text, storage configuration, and downstream telemetry/export behavior. That host-provided data must be reviewed before it is stored, emitted, retained, replicated, searched, or shared.
+AsiBackbone provides governance-oriented decision-flow primitives, but the host application controls much of the context, metadata, reason text, storage configuration, and downstream telemetry/export behavior. That host-provided data must be reviewed before it is stored, emitted, retained, replicated, searched, or shared.
 
 ## Why this matters
 
@@ -14,7 +14,7 @@ A safe implementation should assume:
 host context
   -> governance decision
   -> decision receipt / lifecycle record
-  -> governance outbox entry
+  -> outbox entry
   -> optional telemetry or provider emission
   -> long-lived searchable operational data
 ```
@@ -284,7 +284,7 @@ Before enabling durable audit persistence or telemetry export, confirm:
 ## Related documentation
 
 - [Durable Audit and Outbox Persistence](durable-audit-outbox-persistence.md)
-- [Audit Residue Observability Schema](audit-residue-observability-schema.md)
+- [Decision Receipt Observability Schema](decision-receipt-observability-schema.md)
 - [Governance Emission Contract](governance-emission-contract.md)
 - [OpenTelemetry Governance Emission Provider](opentelemetry-governance-emission-provider.md)
 - [DLP and Classification Failure Policy](dlp-classification-failure-policy.md)

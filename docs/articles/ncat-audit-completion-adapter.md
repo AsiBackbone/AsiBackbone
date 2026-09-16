@@ -9,7 +9,7 @@ The adapter is intentionally outside every required AsiBackbone package. It refe
 | Component | Authoritative responsibility |
 | --- | --- |
 | NCAT | Application mutation details, transaction outcome, mutation batch, privacy-safe canonical manifest, and completion-outbox delivery state |
-| AsiBackbone | Policy decision evidence, governed execution receipt, lifecycle evidence, optional signing, and governance outbox delivery |
+| AsiBackbone | Policy decision evidence, governed execution receipt, lifecycle evidence, optional signing, and outbox delivery |
 | Optional adapter | Translation, correlation validation, idempotent lifecycle append, and normalized handoff result |
 
 The adapter does not create a distributed transaction and does not claim exactly-once delivery. It uses an at-least-once handoff with a deterministic lifecycle event identifier so duplicate attempts can be detected safely.
@@ -41,7 +41,7 @@ Every handoff requires:
 - the NCAT persistence outcome;
 - the completion timestamp.
 
-Correlation ID, trace ID, and execution attempt ID should be supplied whenever available. The adapter rejects a supplied correlation or trace identifier that conflicts with the resolved decision residue.
+Correlation ID, trace ID, and execution attempt ID should be supplied whenever available. The adapter rejects a supplied correlation or trace identifier that conflicts with the resolved decision receipt.
 
 A committed outcome additionally requires:
 
@@ -65,12 +65,12 @@ Outcome matching ignores case and separators. Unknown outcomes are terminal vali
 
 ## Combined host registration
 
-The host supplies a decision-residue resolver and a durable lifecycle store:
+The host supplies a decision-receipt resolver and a durable lifecycle store:
 
 ```csharp
 var adapter = new NcatAuditCompletionAdapter(
     lifecycleStore,
-    decisionResidueResolver,
+    decisionReceiptResolver,
     new NcatAuditCompletionAdapterOptions
     {
         PersistenceProvider = "NCAT",
@@ -78,7 +78,7 @@ var adapter = new NcatAuditCompletionAdapter(
     });
 ```
 
-`INcatDecisionResidueResolver` is host-owned because the decision residue may be stored through EF Core, an in-memory development provider, or another repository.
+`INcatDecisionReceiptResolver` is host-owned because the decision receipt may be stored through EF Core, an in-memory development provider, or another repository.
 
 A completion dispatcher can translate the source entry and invoke the adapter:
 
@@ -124,7 +124,7 @@ The source entry is acknowledged only after the lifecycle event has been durably
 | `Delivered` | Lifecycle event appended | Yes |
 | `Duplicate` | Equivalent event already exists | Yes |
 | `Retryable` | Append failed and should be retried | No |
-| `Deferred` | Required decision residue is not available yet | No |
+| `Deferred` | Required decision receipt is not available yet | No |
 | `Terminal` | Invalid handoff or idempotency conflict | No |
 | `DeadLetter` | Configured retry threshold was exhausted | No |
 

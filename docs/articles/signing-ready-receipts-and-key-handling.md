@@ -4,7 +4,7 @@ This article documents the stable Core-neutral signing and verification primitiv
 
 Issues: #147, #219, #253.
 
-In this software project, **ASI** means **Accountable Systems Infrastructure**. AsiBackbone is a governance spine for consequential software decision flow. It is not a signing product, key-management system, immutable ledger, legal certification system, or compliance guarantee by itself.
+AsiBackbone is a policy decision pipeline for consequential software decision flow. It is not a signing product, key-management system, immutable ledger, legal certification system, or compliance guarantee by itself.
 
 > [!IMPORTANT]
 > `AsiBackbone.Core` includes stable signing-ready metadata, canonical payload hashing, capability-grant payload construction, signing seams, and verification-policy primitives in `4.0.0`. Those Core primitives make artifacts ready for provider signing and later verification workflows; they do not create production tamper-evidence by themselves. Production tamper evidence requires a concrete signing provider, protected key management, verification policy, durable storage guarantees, retention policy, monitoring, and operational procedures supplied by the host or provider environment.
@@ -36,7 +36,7 @@ The signing-ready model gives host applications and provider packages a neutral 
 | `CanonicalArtifactTypes` | Stable artifact type identifiers bound into canonical payloads before hashing. |
 | `CanonicalPayloadOptions` | Canonicalization version, hash algorithm, and metadata allow-list configuration. |
 | `CanonicalPayload` | Deterministic JSON payload envelope containing artifact type, artifact ID, payload schema version, canonicalization version, and artifact content. |
-| `CanonicalPayloadBuilder` | Provider-neutral builders for decision receipt, audit ledger records, lifecycle events, governance emission envelopes, and governance outbox entries. |
+| `CanonicalPayloadBuilder` | Provider-neutral builders for decision receipt, audit ledger records, lifecycle events, governance emission envelopes, and outbox entries. |
 | `CanonicalPayloadHash` | Provider-neutral hash result metadata containing hash value, hash algorithm, canonicalization version, artifact type, artifact ID, and payload schema version. |
 | `CanonicalPayloadHasher` | Built-in SHA-256 hasher for canonical payload bytes. |
 | `SigningMetadata` | Provider-neutral signing metadata containing signing hash, hash algorithm, signature, signature algorithm, key ID, key version, provider descriptor, signed timestamp, and safe metadata. |
@@ -125,5 +125,5 @@ The Core tests use deterministic canonical payload builders, stable hash asserti
 - [Privacy and Signing Boundaries](privacy-and-signing-boundaries.md)
 - [Governance Emission Contract](governance-emission-contract.md)
 - [Durable Audit and Outbox Persistence](durable-audit-outbox-persistence.md)
-- [Audit Residue Observability Schema](audit-residue-observability-schema.md)
+- [Decision Receipt Observability Schema](decision-receipt-observability-schema.md)
 - [Observability and Governance Emission Architecture](observability-and-governance-emission-architecture.md)

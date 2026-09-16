@@ -26,7 +26,7 @@ public static class CanonicalArtifactTypes
     public const string GovernanceEmissionEnvelope = "asibackbone.governance-emission-envelope";
 
     /// <summary>
-    /// Identifies a durable governance outbox entry payload.
+    /// Identifies a durable outbox entry payload.
     /// </summary>
     public const string GovernanceOutboxEntry = "asibackbone.governance-outbox-entry";
 

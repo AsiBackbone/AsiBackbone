@@ -132,7 +132,7 @@ public static class AsiBackboneAspNetCoreServiceCollectionExtensions
     }
 
     /// <summary>
-    /// Adds the host-owned governance outbox drain worker using default scheduling options.
+    /// Adds the host-owned outbox drain worker using default scheduling options.
     /// </summary>
     /// <remarks>
     /// The worker is local to the process in which it is registered, so every replica of a horizontally scaled host runs
@@ -151,7 +151,7 @@ public static class AsiBackboneAspNetCoreServiceCollectionExtensions
     }
 
     /// <summary>
-    /// Adds the host-owned governance outbox drain worker using configured scheduling options.
+    /// Adds the host-owned outbox drain worker using configured scheduling options.
     /// </summary>
     /// <remarks>
     /// The worker is local to the process in which it is registered, so every replica of a horizontally scaled host runs

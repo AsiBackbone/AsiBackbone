@@ -6,7 +6,7 @@ using AsiBackbone.Core.Serialization;
 namespace AsiBackbone.EntityFrameworkCore.Persistence;
 
 /// <summary>
-/// Represents the Entity Framework Core persistence shape for a durable governance outbox entry.
+/// Represents the Entity Framework Core persistence shape for a durable outbox entry.
 /// </summary>
 public sealed class GovernanceOutboxEntryEntity : GovernanceEntity
 {

@@ -244,7 +244,7 @@ public sealed class NcatAuditCompletionAdapterTests
             DeliveryAttempt: 1);
     }
 
-    private sealed class StubResolver(IDecisionReceipt? residue) : INcatDecisionResidueResolver
+    private sealed class StubResolver(IDecisionReceipt? receipt) : INcatDecisionReceiptResolver
     {
         public ValueTask<IDecisionReceipt?> ResolveAsync(
             string decisionAuditRecordId,
@@ -252,7 +252,7 @@ public sealed class NcatAuditCompletionAdapterTests
             CancellationToken cancellationToken = default)
         {
             cancellationToken.ThrowIfCancellationRequested();
-            return ValueTask.FromResult(residue);
+            return ValueTask.FromResult(receipt);
         }
     }
 

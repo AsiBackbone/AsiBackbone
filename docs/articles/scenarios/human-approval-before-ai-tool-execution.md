@@ -26,7 +26,7 @@ AI proposes action
 | Host application | Validates proposal shape, builds policy context, presents acknowledgment, and owns final execution. |
 | AsiBackbone | Evaluates constraints and returns a governance decision. |
 | Human reviewer | Accepts or rejects the acknowledgment challenge when required. |
-| Audit sink or ledger | Preserves decision residue and acknowledgment residue. |
+| Audit sink or ledger | Preserves the decision receipt and acknowledgment record. |
 | Tool or API | Executes only if the host decides execution may proceed. |
 
 ## Sequence
@@ -47,15 +47,15 @@ sequenceDiagram
     alt AcknowledgmentRequired
         Host->>Human: Present acknowledgment challenge
         Human-->>Host: Accepts or rejects
-        Host->>Audit: Persist decision and acknowledgment residue
+        Host->>Audit: Persist decision receipt and acknowledgment record
         opt Accepted and host policy permits execution
             Host->>Tool: Execute host-owned tool action
         end
     else Denied Deferred or EscalationRecommended
-        Host->>Audit: Persist decision residue
+        Host->>Audit: Persist decision receipt
         Host-->>AI: Return governed outcome without execution
     else Allowed or Warning
-        Host->>Audit: Persist decision residue
+        Host->>Audit: Persist decision receipt
         Host->>Tool: Execute host-owned tool action
     end
 ```

@@ -50,7 +50,7 @@ public sealed class GovernanceTestHarnessOptions
     public bool RegisterInMemoryAuditSink { get; set; } = true;
 
     /// <summary>
-    /// Gets or sets a value indicating whether the harness registers the non-durable in-memory governance outbox store.
+    /// Gets or sets a value indicating whether the harness registers the non-durable in-memory outbox store.
     /// </summary>
     public bool RegisterInMemoryOutboxStore { get; set; } = true;
 

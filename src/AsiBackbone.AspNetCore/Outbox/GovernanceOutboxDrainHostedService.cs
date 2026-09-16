@@ -7,7 +7,7 @@ using Microsoft.Extensions.Options;
 namespace AsiBackbone.AspNetCore.Outbox;
 
 /// <summary>
-/// Runs the provider-neutral governance outbox drain from an ASP.NET Core or generic-host background worker.
+/// Runs the provider-neutral outbox drain from an ASP.NET Core or generic-host background worker.
 /// </summary>
 /// <remarks>
 /// Hosting remains outside Core. Startup validates the scoped drain dependency graph and fails when the store or emitter

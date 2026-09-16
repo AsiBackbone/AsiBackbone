@@ -1,6 +1,6 @@
 # Outbox Multi-Worker Concurrency Guidance
 
-This article records the current concurrency review for the provider-neutral governance outbox drain, the in-memory outbox store, and the EF Core-backed outbox store.
+This article records the current concurrency review for the provider-neutral outbox drain, the in-memory outbox store, and the EF Core-backed outbox store.
 
 The goal is to help hosts avoid accidental duplicate emissions when an ASP.NET Core application is horizontally scaled and the hosted drain worker is registered in every replica.
 

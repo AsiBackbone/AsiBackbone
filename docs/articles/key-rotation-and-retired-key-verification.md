@@ -4,7 +4,7 @@ Issue: #223.
 
 This article documents key rotation, key versioning, retired-key verification, and compromised-key response guidance for AsiBackbone signing providers and host integrations.
 
-In this software project, **ASI** means **Accountable Systems Infrastructure**. AsiBackbone defines provider-neutral signing, verification, and policy seams. It does not provide managed-key storage, automatic key rotation, emergency key revocation, legal evidence guarantees, compliance certification, immutable storage, or tamper-evidence by itself.
+AsiBackbone defines provider-neutral signing, verification, and policy seams. It does not provide managed-key storage, automatic key rotation, emergency key revocation, legal evidence guarantees, compliance certification, immutable storage, or tamper-evidence by itself.
 
 > [!IMPORTANT]
 > Key rotation changes which key version should sign new artifacts. It should not make already-signed governance artifacts unverifiable during the configured audit-retention period. Hosts and provider packages must preserve enough key metadata and verification material to verify historical records.

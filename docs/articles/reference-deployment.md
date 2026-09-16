@@ -3,7 +3,7 @@
 This page documents the in-repository reference deployment path for AsiBackbone: the `samples/PlainAspNetCoreHost` application. It is intended to answer the practical adopter question: "What does this look like when it is actually wired into a host?"
 
 > [!IMPORTANT]
-> This is a repeatable local reference deployment, not a public hosted production deployment, compliance certification, or production tamper-evidence claim. It shows AsiBackbone operating as Accountable Systems Infrastructure inside a realistic ASP.NET Core host while preserving the boundary that the host owns execution, persistence choices, deployment, credentials, monitoring, and operational safeguards.
+> This is a repeatable local reference deployment, not a public hosted production deployment, compliance certification, or production tamper-evidence claim. It shows AsiBackbone operating as governance infrastructure inside a realistic ASP.NET Core host while preserving the boundary that the host owns execution, persistence choices, deployment, credentials, monitoring, and operational safeguards.
 
 ## Evidence summary
 
@@ -197,7 +197,7 @@ A skeptical adopter can validate the reference path by confirming that one local
 - local-development signing and verification metadata,
 - endpoint metadata requiring policy, acknowledgment, capability scope, and audit emission.
 
-That is the practical evidence boundary for this sample: a working governance spine around a realistic ASP.NET Core host, not a production deployment claim.
+That is the practical evidence boundary for this sample: a working policy decision pipeline around a realistic ASP.NET Core host, not a production deployment claim.
 
 ## Related documentation
 

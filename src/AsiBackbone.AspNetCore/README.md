@@ -1,6 +1,6 @@
 # AsiBackbone.AspNetCore
 
-ASP.NET Core host adapters for Accountable Systems Infrastructure governance primitives.
+ASP.NET Core host adapters for AsiBackbone governance primitives.
 
 Stable `5.x` package family. `5.2.0` is the current release for this package.
 
@@ -68,7 +68,7 @@ public IActionResult ExecuteHighRiskAction()
 
 The metadata layer is optional and ergonomic. It does not replace full manual wire-up. Hosts that attach policy metadata should register an `IGovernancePolicyEvaluator<GovernanceEvaluationContext>`. Hosts that attach capability metadata should register an `IEndpointCapabilityGrantValidator`. Hosts that request audit emission should register a host-owned `IDecisionReceiptSink`.
 
-## Hosted governance outbox drain
+## Hosted outbox drain
 
 `AddAsiBackboneGovernanceOutboxDrainWorker` registers a host-owned background worker that runs the provider-neutral Core `GovernanceOutboxDrain` through dependency injection.
 
@@ -121,7 +121,7 @@ using AsiBackbone.Core.Audit;
 
 GovernanceHttpRequestCorrelation correlation = correlationResolver.ResolveRequestCorrelation();
 
-DecisionReceipt residue = correlation.CreateAuditResidue(
+DecisionReceipt receipt = correlation.CreateAuditResidue(
     actor,
     "ApproveWidget",
     decision);

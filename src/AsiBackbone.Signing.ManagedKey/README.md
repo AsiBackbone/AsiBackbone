@@ -107,7 +107,7 @@ Provider-supplied retry timing is not accepted from the general provider metadat
 
 ## Safe metadata
 
-Provider metadata is an untrusted external input and is minimized before it can reach signing metadata, logs, governance residue, or audit records. The managed-key result boundary retains only these provider-neutral diagnostic keys:
+Provider metadata is an untrusted external input and is minimized before it can reach signing metadata, logs, decision receipts, or audit records. The managed-key result boundary retains only these provider-neutral diagnostic keys:
 
 - `provider_region`
 - `provider_zone`

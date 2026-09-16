@@ -2,7 +2,7 @@
 
 This article documents the current stable `5.x` boundary for metadata privacy, identifier handling, signing-ready fields, released signing providers, host responsibilities, and future provider work.
 
-In this software project, **ASI** means **Accountable Systems Infrastructure**. AsiBackbone provides governance-oriented software building blocks. It does not provide legal, compliance, privacy, security, or cryptographic guarantees by itself.
+AsiBackbone provides governance-oriented software building blocks. It does not provide legal, compliance, privacy, security, or cryptographic guarantees by itself.
 
 > [!IMPORTANT]
 > The stable `5.x` package family includes metadata budget and sanitation primitives, signing-ready Core metadata, released local-development signing, and a managed-key adapter boundary. These surfaces do not provide production key custody, tamper-evidence, immutable storage, automatic privacy classification, legal non-repudiation, or compliance certification by themselves.
@@ -205,7 +205,7 @@ Provider documentation should state whether a provider is:
 
 Use this checklist when preparing stable release notes or documentation:
 
-- State that AsiBackbone provides Accountable Systems Infrastructure, not artificial superintelligence.
+- State that AsiBackbone provides governance infrastructure, not artificial superintelligence.
 - State that metadata is host-owned.
 - State that hosts must classify, minimize, redact, or omit sensitive metadata before passing it into package APIs.
 - State that metadata budgets and sanitation helpers are policy guardrails, not automatic DLP, privacy certification, or compliance certification.

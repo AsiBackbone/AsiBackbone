@@ -4,7 +4,7 @@ This quickstart is the shortest practical path for a developer who wants to answ
 
 > Should this API request continue, and can I leave an audit trail showing how that decision was made?
 
-In this project, **ASI** means **Accountable Systems Infrastructure**. AsiBackbone is a governance spine for decision flow. It does not host AI models, make autonomous choices, or implement artificial superintelligence. Your application still owns authentication, authorization, persistence, business logic, and execution.
+AsiBackbone is a policy decision pipeline for decision flow. It does not host AI models, make autonomous choices, or implement artificial superintelligence. Your application still owns authentication, authorization, persistence, business logic, and execution.
 
 ## The 80% mental model
 
@@ -132,13 +132,13 @@ app.MapPost("/api/orders/{region}/approve", async (
         displayName: "Quickstart API caller");
 
     // Decision receipt records the decision context whether the request is allowed or denied.
-    DecisionReceipt residue = DecisionReceipt.FromDecision(
+    DecisionReceipt receipt = DecisionReceipt.FromDecision(
         actor,
         operationName,
         decision,
         metadata: context.Metadata);
 
-    await auditSink.WriteAsync(residue, cancellationToken).ConfigureAwait(false);
+    await auditSink.WriteAsync(receipt, cancellationToken).ConfigureAwait(false);
 
     if (!decision.CanProceed)
     {
@@ -149,7 +149,7 @@ app.MapPost("/api/orders/{region}/approve", async (
                 decision = decision.Outcome.ToString(),
                 decision.ReasonCodes,
                 decision.CorrelationId,
-                auditEventId = residue.EventId
+                auditEventId = receipt.EventId
             },
             statusCode: StatusCodes.Status403Forbidden);
     }
@@ -162,7 +162,7 @@ app.MapPost("/api/orders/{region}/approve", async (
         message = "Order approval would run here after governance evaluation.",
         decision = decision.Outcome.ToString(),
         decision.CorrelationId,
-        auditEventId = residue.EventId
+        auditEventId = receipt.EventId
     });
 })
 // Endpoint metadata gives the route a governance identity for later middleware-based orchestration.

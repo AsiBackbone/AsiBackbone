@@ -4,7 +4,7 @@ This article documents a **strategy-only** future Microsoft Purview governance a
 
 Issue: #146.
 
-In this software project, **ASI** means **Accountable Systems Infrastructure**. AsiBackbone is a governance spine for consequential software decision flow. It is not an AI model host, robot controller, cloud governance platform, Purview catalog provider, SIEM product, signing product, or compliance guarantee by itself.
+AsiBackbone is a policy decision pipeline for consequential software decision flow. It is not an AI model host, robot controller, cloud governance platform, Purview catalog provider, SIEM product, signing product, or compliance guarantee by itself.
 
 > [!IMPORTANT]
 > This page does **not** document a released NuGet package. No Purview provider package, Purview SDK adapter, catalog-ingestion implementation, or Azure-specific enrichment package is included in the `1.1.0` stable package family.
@@ -314,7 +314,7 @@ Before implementation begins, confirm:
 - [Governance Emission Contract](governance-emission-contract.md)
 - [Durable Audit and Outbox Persistence](durable-audit-outbox-persistence.md)
 - [Hosted Governance Outbox Drain](hosted-governance-outbox-drain.md)
-- [Audit Residue Observability Schema](audit-residue-observability-schema.md)
+- [Decision Receipt Observability Schema](decision-receipt-observability-schema.md)
 - [DLP and Classification Failure Policy](dlp-classification-failure-policy.md)
 - [Privacy and Signing Boundaries](privacy-and-signing-boundaries.md)
 

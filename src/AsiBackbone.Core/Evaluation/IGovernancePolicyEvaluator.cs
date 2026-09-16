@@ -7,7 +7,7 @@ namespace AsiBackbone.Core.Evaluation;
 /// Evaluates a framework-neutral context against the active policy structure and composes the result into a governance decision.
 /// </summary>
 /// <remarks>
-/// This is the decision step of the governance spine. The host supplies the constraints and context; the evaluator owns the composition loop.
+/// This is the decision step of the policy decision pipeline. The host supplies the constraints and context; the evaluator owns the composition loop.
 /// </remarks>
 /// <typeparam name="TContext">The framework-neutral evaluation context type.</typeparam>
 public interface IGovernancePolicyEvaluator<in TContext>

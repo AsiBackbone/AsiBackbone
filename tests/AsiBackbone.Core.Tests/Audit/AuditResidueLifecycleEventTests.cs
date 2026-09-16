@@ -66,7 +66,7 @@ public sealed class AuditResidueLifecycleEventTests
     }
 
     /// <summary>
-    /// Verifies that lifecycle events can be correlated to original decision residue without rewriting that original residue.
+    /// Verifies that lifecycle events can be correlated to the original decision receipt without rewriting it.
     /// </summary>
     [Fact]
     public void FromResidueCopiesDecisionContextWithoutRewritingOriginalResidue()

@@ -121,7 +121,7 @@ public sealed class AuditResidueTelemetryFieldsTests
     }
 
     /// <summary>
-    /// Verifies that governance decision residue can carry neutral telemetry without changing decision correlation behavior.
+    /// Verifies that a decision receipt can carry neutral telemetry without changing decision correlation behavior.
     /// </summary>
     [Fact]
     public void FromDecisionPreservesCorrelationAndCarriesTelemetryFieldsIntoLedgerRecord()

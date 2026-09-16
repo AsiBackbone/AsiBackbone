@@ -2,7 +2,7 @@
 
 Welcome to the AsiBackbone product documentation.
 
-In this software project, **ASI** means **Accountable Systems Infrastructure**. AsiBackbone is a .NET governance and policy-control package family implemented as practical software infrastructure. The project is a governance spine, not an intelligence engine.
+AsiBackbone is a .NET governance and policy-control package family for accountable software execution. It is not an intelligence engine.
 
 > [!IMPORTANT]
 > AsiBackbone provides framework-neutral building blocks and host integration seams for governing consequential actions in software systems. Host applications remain responsible for authentication, authorization, execution, persistence, deployment, monitoring, compliance review, and operational controls. See [Project Boundaries and Non-Claims](articles/project-boundaries.md) for the canonical boundary reference.
@@ -65,6 +65,7 @@ Package-specific READMEs and release notes define which surfaces are stable, opt
 * [Target Framework Support](articles/target-framework-support.md)
 * [Documentation Ownership](articles/documentation-ownership.md)
 * [AsiBackbone API Terminology Map](articles/terminology-map.md)
+* [6.0 Product Terminology](articles/terminology-600.md)
 * [AsiBackbone API Glossary](articles/glossary.md)
 
 ### Get started

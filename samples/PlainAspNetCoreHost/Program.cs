@@ -108,15 +108,15 @@ app.MapGet("/sample/decision", async (
         actorId: "sample-user",
         displayName: "Sample User");
 
-    var residue = DecisionReceipt.FromDecision(
+    var receipt = DecisionReceipt.FromDecision(
         actor,
         "sample.external-api-call",
         decision,
         metadata: context.Metadata);
 
-    await auditSink.WriteAsync(residue, cancellationToken).ConfigureAwait(false);
+    await auditSink.WriteAsync(receipt, cancellationToken).ConfigureAwait(false);
 
-    var unsignedRecord = AuditLedgerRecord.FromResidue(residue);
+    var unsignedRecord = AuditLedgerRecord.FromResidue(receipt);
     CanonicalPayload canonicalPayload = CanonicalPayloadBuilder.ForAuditLedgerRecord(unsignedRecord);
     CanonicalPayloadHash canonicalHash = CanonicalPayloadHasher.ComputeHash(canonicalPayload);
     var hashMetadata = canonicalHash.ToSigningMetadata();
@@ -141,7 +141,7 @@ app.MapGet("/sample/decision", async (
         .ConfigureAwait(false);
 
     var record = AuditLedgerRecord.FromResidue(
-        residue,
+        receipt,
         recordId: unsignedRecord.RecordId,
         recordedUtc: unsignedRecord.RecordedUtc,
         signingHash: signingResult.Metadata.SigningHash,
@@ -167,7 +167,7 @@ app.MapGet("/sample/decision", async (
         decision.CorrelationId,
         decision.PolicyVersion,
         decision.PolicyHash,
-        auditEventId = residue.EventId,
+        auditEventId = receipt.EventId,
         ledgerRecordId = record.RecordId,
         canonicalHash = canonicalHash.HashValue,
         signing = new
