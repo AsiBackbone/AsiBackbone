@@ -2,7 +2,7 @@
 
 These notes describe the `1.2.1 - Release Metadata, Source Link, and Validation Hardening` package-family patch boundary.
 
-In this software project, **ASI** means **Accountable Systems Infrastructure**. AsiBackbone is governance infrastructure for accountable software decision flow. It does not implement artificial superintelligence, host AI models, control robots, certify compliance, or provide production tamper-evidence by itself.
+AsiBackbone is governance infrastructure for accountable software decision flow. It does not certify compliance, or provide production tamper-evidence by itself.
 
 ## Release summary
 

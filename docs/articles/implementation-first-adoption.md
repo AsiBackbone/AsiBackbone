@@ -2,9 +2,6 @@
 
 This page is the default route for a pragmatic .NET adopter. It keeps the first experience grounded in familiar engineering concepts before introducing optional conceptual background.
 
-> [!IMPORTANT]
-> In this software project, **ASI** means **Accountable Systems Infrastructure**. AsiBackbone is a .NET governance package family for policy-controlled decision flow. It is not an intelligence engine, AI model host, compliance certification system, or production tamper-evidence provider by itself.
-
 ## Page navigation
 
 Use the left navigation tree for nearby adoption articles, the right **In this article** rail for headings on long pages, and the search box in the site header for package names, API concepts, or article titles. Search is enabled in the DocFX configuration for the published site; if a newly merged page does not appear immediately, wait for the documentation publish workflow to complete and refresh the browser cache.

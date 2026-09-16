@@ -2,7 +2,7 @@
 
 These notes describe the released `1.1.0 - Observability, Outbox, Signing, and Governance Emission Providers` package-family boundary.
 
-In this software project, **ASI** means **Accountable Systems Infrastructure**. AsiBackbone is governance infrastructure for accountable software decision flow. It does not implement artificial superintelligence, host AI models, control robots, certify compliance, or provide production tamper-evidence by itself.
+AsiBackbone is governance infrastructure for accountable software decision flow. It does not certify compliance, or provide production tamper-evidence by itself.
 
 ## Release summary
 

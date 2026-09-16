@@ -2,7 +2,7 @@
 
 These notes describe the first stable release boundary for AsiBackbone. They are written for the `1.0.0` release and align with the repository version metadata, citation metadata, Zenodo metadata, and `v1.0.0` tag path.
 
-In this software project, **ASI** means **Accountable Systems Infrastructure**. AsiBackbone is governance infrastructure for accountable decision flow. It does not implement artificial superintelligence, host AI models, control robots, or guarantee legal or regulatory compliance.
+AsiBackbone is governance infrastructure for accountable decision flow. It does not guarantee legal or regulatory compliance.
 
 ## Release identity
 

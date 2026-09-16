@@ -4,7 +4,7 @@ This article documents the AsiBackbone cryptographic security posture for signin
 
 Issue: #216, updated for #253.
 
-In this software project, **ASI** means **Accountable Systems Infrastructure**. AsiBackbone provides governance infrastructure around consequential software decision flow. It is not a key-management system, immutable ledger, blockchain product, legal evidence system, compliance certification service, or tamper-proof storage system by itself.
+AsiBackbone provides governance infrastructure around consequential software decision flow. It is not a key-management system, immutable ledger, blockchain product, legal evidence system, compliance certification service, or tamper-proof storage system by itself.
 
 > [!IMPORTANT]
 > `1.1.0` includes stable Core signing-ready metadata, canonical payload hashing, signing seams, verification-policy primitives, a local-development signing provider, and a managed-key adapter boundary. Production cryptographic assurance still requires a host-owned or provider-owned implementation that signs canonical artifacts, protects keys, verifies signatures, stores records durably, monitors failures, manages retention, and defines operational response procedures.

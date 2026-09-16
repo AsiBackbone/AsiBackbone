@@ -2,7 +2,7 @@
 
 This guide covers upgrading from the stable `1.0.0` package family to the `1.1.0 - Observability, Outbox, and Governance Emission Providers` package family.
 
-In this software project, **ASI** means **Accountable Systems Infrastructure**. AsiBackbone remains governance infrastructure for consequential software decision flow. It is not an AI model host, robot controller, cloud observability backend, signing product, immutable ledger, or compliance guarantee by itself.
+AsiBackbone remains governance infrastructure for consequential software decision flow. It is not a cloud observability backend, signing product, immutable ledger, or compliance guarantee by itself.
 
 ## Compatibility summary
 

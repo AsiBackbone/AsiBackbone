@@ -1,9 +1,6 @@
 # Project Boundaries and Non-Claims
 
-This page is the canonical boundary reference for AsiBackbone documentation. Use it when a page needs to point readers to the full non-claim posture without repeating every disclaimer inline.
-
-> [!IMPORTANT]
-> In this software project, **ASI** means **Accountable Systems Infrastructure**. AsiBackbone is practical .NET governance infrastructure for accountable software decision flow, not an artificial superintelligence implementation.
+This page is the canonical boundary reference for the Accountable Systems Infrastructure Backbone documentation. Use it when a page needs to point readers to the full non-claim posture without repeating every disclaimer inline.
 
 ## Short scope statement
 

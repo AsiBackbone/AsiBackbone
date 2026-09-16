@@ -2,7 +2,7 @@
 
 This article documents practical data-hygiene guidance for AsiBackbone audit residue, governance emission envelopes, outbox records, and telemetry attributes.
 
-In this software project, **ASI** means **Accountable Systems Infrastructure**. AsiBackbone provides governance-oriented decision-flow primitives, but the host application controls much of the context, metadata, reason text, storage configuration, and downstream telemetry/export behavior. That host-provided data must be reviewed before it is stored, emitted, retained, replicated, searched, or shared.
+AsiBackbone provides governance-oriented decision-flow primitives, but the host application controls much of the context, metadata, reason text, storage configuration, and downstream telemetry/export behavior. That host-provided data must be reviewed before it is stored, emitted, retained, replicated, searched, or shared.
 
 ## Why this matters
 

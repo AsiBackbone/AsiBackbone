@@ -2,7 +2,7 @@
 
 This article documents the selected provider-neutral append-only audit integrity model for AsiBackbone audit and outbox records.
 
-In this software project, **ASI** means **Accountable Systems Infrastructure**. AsiBackbone provides canonical hashing, signing, verification, and audit-integrity seams. It does not provide immutable storage, external anchoring, blockchain, transparency logs, legal evidence guarantees, compliance certification, or tamper-evidence by itself.
+AsiBackbone provides canonical hashing, signing, verification, and audit-integrity seams. It does not provide immutable storage, external anchoring, blockchain, transparency logs, legal evidence guarantees, compliance certification, or tamper-evidence by itself.
 
 > [!IMPORTANT]
 > A local hash chain can detect changed, missing, reordered, or forked records when verification is run against retained chain metadata. It is not automatically tamper-evident unless the deployed system also includes durable append-only storage controls, verification, monitoring, retention, and any required external anchoring.

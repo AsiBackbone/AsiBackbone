@@ -2,7 +2,7 @@
 
 This article documents the released `3.1.0` observability, durable outbox, signing, and governance-emission architecture boundary together with provider directions that remain design-only.
 
-In this software project, **ASI** means **Accountable Systems Infrastructure**. AsiBackbone is a governance spine for consequential software decision flow. It is not an artificial superintelligence implementation, AI model host, robot controller, compliance product, signing product, or cloud-governance platform by itself.
+AsiBackbone is a governance spine for consequential software decision flow. It is not a compliance product, signing product, or cloud-governance platform by itself.
 
 > [!IMPORTANT]
 > Provider-specific integrations depend on Core. Core must never depend on provider-specific integrations.

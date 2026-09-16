@@ -2,7 +2,7 @@
 
 This article documents the provider-neutral governance metadata sanitation pipeline introduced for issue #525.
 
-In this software project, **ASI** means **Accountable Systems Infrastructure**. The pipeline provides an enforcement seam before host-owned metadata reaches audit residue, audit ledger storage, governance outbox records, OpenTelemetry, or another emitter. It is not a complete DLP product, privacy certification, encryption service, or provider-specific classification engine.
+The pipeline provides an enforcement seam before host-owned metadata reaches audit residue, audit ledger storage, governance outbox records, OpenTelemetry, or another emitter. It is not a complete DLP product, privacy certification, encryption service, or provider-specific classification engine.
 
 ## Budget validation is not DLP
 

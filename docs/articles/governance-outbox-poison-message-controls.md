@@ -2,7 +2,7 @@
 
 This article documents the provider-neutral maximum retry and dead-letter controls used by the AsiBackbone governance outbox drain.
 
-In this software project, **ASI** means **Accountable Systems Infrastructure**. These controls provide deterministic quarantine behavior for repeatedly failing governance emissions. They do not replace host-owned monitoring, incident response, legal review, provider configuration, or replay authorization.
+These controls provide deterministic quarantine behavior for repeatedly failing governance emissions. They do not replace host-owned monitoring, incident response, legal review, provider configuration, or replay authorization.
 
 ## Configuration
 

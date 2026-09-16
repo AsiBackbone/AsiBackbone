@@ -2,7 +2,7 @@
 
 This article defines the release-cadence and release-readiness guidance for the stable AsiBackbone package family.
 
-In this software project, **ASI** means **Accountable Systems Infrastructure**. Release process language should stay grounded in practical governance infrastructure. A stable package line is a compatibility promise and a release-management posture; it is not a claim that every consumer environment has already validated the package over a long adoption window.
+Release process language should stay grounded in practical governance infrastructure. A stable package line is a compatibility promise and a release-management posture; it is not a claim that every consumer environment has already validated the package over a long adoption window.
 
 ## Why this guidance exists
 

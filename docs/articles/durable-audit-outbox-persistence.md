@@ -2,7 +2,7 @@
 
 This article documents the provider-neutral durable persistence seam for audit residue, lifecycle events, and governance emission outbox entries.
 
-In this software project, **ASI** means **Accountable Systems Infrastructure**. AsiBackbone remains a governance spine for consequential software decision flow. It is not an AI model host, observability backend, SIEM product, cloud provider, or completed ASI implementation.
+AsiBackbone remains a governance spine for consequential software decision flow. It is not an AI model host, observability backend, SIEM product, cloud provider, or completed ASI implementation.
 
 ## Purpose
 

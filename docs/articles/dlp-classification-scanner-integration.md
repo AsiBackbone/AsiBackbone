@@ -4,7 +4,7 @@ This article shows where a host-owned DLP, classification, or governance-screeni
 
 Issue: #286.
 
-In this software project, **ASI** means **Accountable Systems Infrastructure**. AsiBackbone supplies provider-neutral governance policy primitives after a host reports a DLP/classification outcome. It is not a DLP scanner, content-safety service, Microsoft Purview adapter, regex engine, classifier, compliance product, or external screening provider by itself.
+AsiBackbone supplies provider-neutral governance policy primitives after a host reports a DLP/classification outcome. It is not a DLP scanner, content-safety service, Microsoft Purview adapter, regex engine, classifier, compliance product, or external screening provider by itself.
 
 > [!IMPORTANT]
 > Scanner execution is host-owned and provider-specific. The host chooses and invokes its scanner before provider emission or before a governed execution path continues. AsiBackbone receives the normalized failure or policy-handling context through `DlpFailurePolicyContext`, resolves it with `IAsiBackboneDlpFailurePolicyResolver`, and returns a `DlpFailurePolicyResolution` containing a `GovernanceDecision`.

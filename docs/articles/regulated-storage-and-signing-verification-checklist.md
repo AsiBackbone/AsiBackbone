@@ -4,7 +4,7 @@ Issue: #530.
 
 This article gives regulated and high-assurance hosts a practical checklist for moving from a signed AsiBackbone governance artifact to a defensible verification, storage, retention, and incident-response process.
 
-In this software project, **ASI** means **Accountable Systems Infrastructure**. AsiBackbone provides provider-neutral canonicalization, hashing, signing, verification-policy, and audit-integrity seams. It does not provide immutable storage, WORM configuration, legal-hold administration, evidentiary certification, provider-specific key custody, or compliance approval by itself.
+AsiBackbone provides provider-neutral canonicalization, hashing, signing, verification-policy, and audit-integrity seams. It does not provide immutable storage, WORM configuration, legal-hold administration, evidentiary certification, provider-specific key custody, or compliance approval by itself.
 
 > [!IMPORTANT]
 > A signature is one control in an assurance chain. A signed artifact is not automatically verified, append-only, immutable, legally admissible, or tamper-evident. Hosts must deploy and operate the remaining controls described below.
