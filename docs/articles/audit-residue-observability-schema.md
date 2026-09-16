@@ -2,7 +2,7 @@
 
 This article documents the provider-neutral telemetry, traceability, and operational diagnostics fields added to the audit residue model for the `1.1.0 - Observability, Outbox, and Governance Emission Providers` milestone.
 
-In this software project, **ASI** means **Accountable Systems Infrastructure**. These fields support observability and governance emission without making `AsiBackbone.Core` depend on OpenTelemetry, Azure Monitor, Event Hubs, Purview, SIEM products, or any provider-specific package.
+These fields support observability and governance emission without making `AsiBackbone.Core` depend on OpenTelemetry, Azure Monitor, Event Hubs, Purview, SIEM products, or any provider-specific package.
 
 ## Design intent
 

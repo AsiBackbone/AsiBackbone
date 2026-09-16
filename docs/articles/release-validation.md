@@ -4,7 +4,7 @@ This article documents the reusable release-blocking validation path for stable 
 
 The binary assembly identity for the `5.x` line is `5.0.0.0`.
 
-In this software project, **ASI** means **Accountable Systems Infrastructure**. Release validation should confirm that the package family remains practical governance infrastructure and that implementation claims stay within the documented software boundary. See [Release Cadence and Readiness](release-cadence-and-readiness.md) for the release-stream and stabilization guidance that complements this checklist.
+Release validation should confirm that the package family remains practical governance infrastructure and that implementation claims stay within the documented software boundary. See [Release Cadence and Readiness](release-cadence-and-readiness.md) for the release-stream and stabilization guidance that complements this checklist.
 
 The [5.2.0 Release Readiness Record](release-readiness-520.md) is the current release-candidate control sheet, and the [5.2.0 Consumer Verification Guide](consumer-verification-520.md) covers package-source, API-compatibility, Source Link, SBOM/provenance, deprecation, and deferred package-signing verification. The [5.0.0 Migration Guide](upgrade-400-to-500.md) remains authoritative for consumers moving from `4.x`. Earlier readiness records are retained for traceability.
 

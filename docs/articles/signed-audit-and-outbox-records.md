@@ -4,7 +4,7 @@ Issue: #221, updated for #253.
 
 This article documents the implemented signing flow for audit receipts, audit ledger records, audit residue lifecycle events, governance emission envelopes, and governance outbox entries.
 
-In this software project, **ASI** means **Accountable Systems Infrastructure**. AsiBackbone provides provider-neutral governance primitives and signing seams. It does not provide immutable storage, external anchoring, legal non-repudiation, or tamper-evidence by itself.
+AsiBackbone provides provider-neutral governance primitives and signing seams. It does not provide immutable storage, external anchoring, legal non-repudiation, or tamper-evidence by itself.
 
 > [!IMPORTANT]
 > A signed record is not automatically a verified record. A signed record is also not automatically tamper-evident. Verification, hash chaining, durable write controls, immutable/object-lock storage, external anchoring, retention, monitoring, and incident response remain host or provider responsibilities.

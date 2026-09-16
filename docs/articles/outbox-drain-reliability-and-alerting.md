@@ -2,7 +2,7 @@
 
 This article documents provider-neutral operational guidance for monitoring, alerting, and recovering AsiBackbone governance outbox drain failures.
 
-In this software project, **ASI** means **Accountable Systems Infrastructure**. AsiBackbone can preserve local governance records and provide outbox/drain primitives, but it does not guarantee centralized compliance visibility, immutable evidence, legal non-repudiation, or successful external ledger delivery without host-owned configuration and operations.
+AsiBackbone can preserve local governance records and provide outbox/drain primitives, but it does not guarantee centralized compliance visibility, immutable evidence, legal non-repudiation, or successful external ledger delivery without host-owned configuration and operations.
 
 ## Why drain reliability matters
 

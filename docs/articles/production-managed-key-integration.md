@@ -4,7 +4,7 @@ Issue: #512.
 
 This guide documents the production runtime signing path for AsiBackbone governance residue when a host wants managed-key signing without making AsiBackbone responsible for key custody or cloud/provider-specific key-management behavior.
 
-In this software project, **ASI** means **Accountable Systems Infrastructure**. AsiBackbone is a governance spine for accountable decision flow. It is not a key-management platform, HSM appliance, cloud KMS wrapper, compliance certification service, immutable ledger, or legal non-repudiation product by itself.
+AsiBackbone is a governance spine for accountable decision flow. It is not a key-management platform, HSM appliance, cloud KMS wrapper, compliance certification service, immutable ledger, or legal non-repudiation product by itself.
 
 > [!IMPORTANT]
 > Production runtime signing remains **provider-neutral**. AsiBackbone documents how a host can connect Azure Key Vault, AWS KMS, GCP Cloud KMS, HSM, or enterprise key-management clients behind the existing managed-key boundary. AsiBackbone does not ship or maintain first-party production signing providers, production-style signing sample hosts, credentials, key storage, key rotation, legal non-repudiation guarantees, or provider-specific security guarantees.

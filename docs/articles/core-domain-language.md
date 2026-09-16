@@ -8,8 +8,6 @@ This article documents the concrete domain model of `AsiBackbone.Core` and the h
 
 For canonical architecture definitions, use the [ASI Backbone Learning Architecture Glossary](https://asibackbone.github.io/Learning/architecture/glossary.html). This page owns the **product mapping**: exact Core types, current outcome semantics, package boundaries, and implementation invariants.
 
-In this software project, **ASI** means **Accountable Systems Infrastructure**. `AsiBackbone.Core` is governance infrastructure, not an intelligence engine or AI-model package.
-
 > [!IMPORTANT]
 > Learning terminology explains the architecture. The released `AsiBackbone.Core` API defines how this package implements that architecture. If a teaching example is intentionally smaller than the product surface, the product API and runtime documentation remain authoritative for implementation behavior.
 

@@ -2,7 +2,7 @@
 
 This document is the release-candidate control sheet for the AsiBackbone `1.2.0` NuGet package-family release.
 
-In this software project, **ASI** means **Accountable Systems Infrastructure**. This record verifies the package family as governance infrastructure for accountable decision flow. It does not treat AsiBackbone as an artificial superintelligence implementation, AI model host, robot controller, legal/compliance guarantee, or production tamper-evident ledger provider.
+This record verifies the package family as governance infrastructure for accountable decision flow. It does not treat AsiBackbone as a legal/compliance guarantee, or production tamper-evident ledger provider.
 
 ## Stable package family prepared for 1.2.0
 

@@ -2,7 +2,7 @@
 
 This article defines the production semantics for governance outbox entries: identity, persistence, retry, idempotency, ordering, and host responsibilities.
 
-In this software project, **ASI** means **Accountable Systems Infrastructure**. AsiBackbone remains a governance and policy spine. It provides durable local outbox records and provider-neutral drain primitives; it is not an AI model host, distributed queue, SIEM product, immutable ledger, or exactly-once delivery system.
+AsiBackbone remains a governance and policy spine. It provides durable local outbox records and provider-neutral drain primitives; it is not an distributed queue, SIEM product, immutable ledger, or exactly-once delivery system.
 
 ## Summary contract
 

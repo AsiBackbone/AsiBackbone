@@ -2,7 +2,7 @@
 
 This article documents provider-neutral capability grant validation, proof handling, and bounded-use checks for AsiBackbone.
 
-In this software project, **ASI** means **Accountable Systems Infrastructure**. AsiBackbone can model short-lived, scoped grants for governed execution, but it does not replace host authentication, host authorization, resource authorization, or external execution controls.
+AsiBackbone can model short-lived, scoped grants for governed execution, but it does not replace host authentication, host authorization, resource authorization, or external execution controls.
 
 > [!IMPORTANT]
 > A capability grant is not broad authority. It should be short-lived, scoped, bound to policy and acknowledgment context when needed, and checked at the execution boundary before any consequential action proceeds.

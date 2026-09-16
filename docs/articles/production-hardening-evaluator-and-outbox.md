@@ -5,7 +5,7 @@ This article gives production-oriented guidance for two areas that can otherwise
 - evaluator exception handling, especially `TreatConstraintExceptionAsDenial`;
 - EF Core governance outbox persistence, especially durable local writes, metadata storage, and host-owned delivery responsibilities.
 
-In this software project, **ASI** means **Accountable Systems Infrastructure**. AsiBackbone is a governance and policy spine for accountable software decision flow. It is not an AI model host, a SIEM product, a distributed queue, a compliance product, an immutable ledger, or an artificial superintelligence implementation.
+AsiBackbone is a governance and policy spine for accountable software decision flow. It is not a SIEM product, a distributed queue, a compliance product, or an immutable ledger.
 
 ## Recommended production posture
 
