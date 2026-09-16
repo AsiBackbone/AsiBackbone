@@ -24,7 +24,7 @@ HTTP request
   -> host builds policy context
   -> Core evaluates constraints
   -> host decision policy may require acknowledgment
-  -> audit residue is written
+  -> decision receipt is written
   -> EF Core ledger record is persisted by the host-owned DbContext
 ```
 

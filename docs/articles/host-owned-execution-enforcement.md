@@ -1,6 +1,6 @@
 # Host-Owned Execution Enforcement
 
-This article documents the execution boundary that every AsiBackbone adopter must understand: AsiBackbone can produce governance decisions, audit residue, capability-boundary artifacts, and signing-ready records, but the host application remains responsible for honoring those decisions before consequential work is executed.
+This article documents the execution boundary that every AsiBackbone adopter must understand: AsiBackbone can produce governance decisions, decision receipt, capability-boundary artifacts, and signing-ready records, but the host application remains responsible for honoring those decisions before consequential work is executed.
 
 In this software project, **ASI** means **Accountable Systems Infrastructure**. AsiBackbone is a governance spine and decision-flow layer. It is not an execution engine, legal certification mechanism, compliance guarantee, AI model host, or artificial superintelligence implementation.
 
@@ -13,7 +13,7 @@ proposed operation
   -> build governance context
   -> evaluate constraints and decision policy
   -> receive GovernanceDecision
-  -> write audit residue / outbox records as needed
+  -> write decision receipt / outbox records as needed
   -> check decision.CanProceed according to host policy
   -> execute or stop the consequential operation
 ```
@@ -84,12 +84,12 @@ Use a small host-owned wrapper for consequential service methods so manual check
 ```csharp
 public sealed class GovernedPaymentApprovalService
 {
-    private readonly IAsiBackbonePolicyEvaluator<PaymentApprovalContext> _evaluator;
+    private readonly IGovernancePolicyEvaluator<PaymentApprovalContext> _evaluator;
     private readonly IAuditSink _auditSink;
     private readonly PaymentService _payments;
 
     public GovernedPaymentApprovalService(
-        IAsiBackbonePolicyEvaluator<PaymentApprovalContext> evaluator,
+        IGovernancePolicyEvaluator<PaymentApprovalContext> evaluator,
         IAuditSink auditSink,
         PaymentService payments)
     {
@@ -107,7 +107,7 @@ public sealed class GovernedPaymentApprovalService
             cancellationToken);
 
         await _auditSink.WriteAsync(
-            AuditResidue.Create(
+            DecisionReceipt.Create(
                 actor: context.Actor,
                 operationName: context.OperationName,
                 outcome: decision.Outcome.ToString(),
@@ -148,7 +148,7 @@ public async Task HandleAsync(
         cancellationToken);
 
     await _auditSink.WriteAsync(
-        AuditResidue.Create(
+        DecisionReceipt.Create(
             actor: context.Actor,
             operationName: context.OperationName,
             outcome: decision.Outcome.ToString(),
@@ -180,10 +180,10 @@ A regulated host should prefer a fail-closed helper for repeated manual gates.
 
 ```csharp
 public static async Task<GovernanceDecision> EvaluateOrDenyAsync<TContext>(
-    IAsiBackbonePolicyEvaluator<TContext>? evaluator,
+    IGovernancePolicyEvaluator<TContext>? evaluator,
     TContext context,
     CancellationToken cancellationToken)
-    where TContext : IAsiBackboneConstraintEvaluationContext
+    where TContext : IGovernanceEvaluationContext
 {
     if (evaluator is null)
     {
@@ -213,7 +213,7 @@ For internal service methods that perform consequential work, prefer a small wra
 
 1. Build a minimal, safe governance context.
 2. Evaluate policy with the registered evaluator.
-3. Persist audit residue or lifecycle records according to host policy.
+3. Persist decision receipt or lifecycle records according to host policy.
 4. Stop when `decision.CanProceed` is false.
 5. Stop when the decision is missing or evaluation fails.
 6. Execute the side effect only after the decision is honored.

@@ -3,7 +3,7 @@ using Xunit;
 namespace AsiBackbone.Core.Tests.Results;
 
 /// <summary>
-/// Unit tests for the BackboneResult class, verifying the behavior of success and failure result creation, message normalization, and handling of blank messages.
+/// Unit tests for the GovernanceOperationResult class, verifying the behavior of success and failure result creation, message normalization, and handling of blank messages.
 /// </summary>
 public sealed class BackboneResultTests
 {
@@ -13,7 +13,7 @@ public sealed class BackboneResultTests
     [Fact]
     public void SuccessCreatesSucceededResult()
     {
-        var result = BackboneResult.Success();
+        var result = GovernanceOperationResult.Success();
 
         Assert.True(result.Succeeded);
         Assert.False(result.Failed);
@@ -26,7 +26,7 @@ public sealed class BackboneResultTests
     [Fact]
     public void SuccessWithMessageStoresNormalizedMessage()
     {
-        var result = BackboneResult.Success(" Operation completed. ");
+        var result = GovernanceOperationResult.Success(" Operation completed. ");
 
         Assert.True(result.Succeeded);
         Assert.False(result.Failed);
@@ -40,7 +40,7 @@ public sealed class BackboneResultTests
     [Fact]
     public void SuccessWithMessagesStoresNormalizedMessages()
     {
-        var result = BackboneResult.Success(
+        var result = GovernanceOperationResult.Success(
         [
             " First success. ",
             " Second success. "
@@ -59,7 +59,7 @@ public sealed class BackboneResultTests
     [Fact]
     public void SuccessWithBlankMessagesReturnsEmptyMessages()
     {
-        var result = BackboneResult.Success(["", "   "]);
+        var result = GovernanceOperationResult.Success(["", "   "]);
 
         Assert.True(result.Succeeded);
         Assert.Empty(result.Messages);
@@ -71,7 +71,7 @@ public sealed class BackboneResultTests
     [Fact]
     public void FailureCreatesFailedResult()
     {
-        var result = BackboneResult.Failure(" Operation failed for validation reasons. ");
+        var result = GovernanceOperationResult.Failure(" Operation failed for validation reasons. ");
 
         Assert.False(result.Succeeded);
         Assert.True(result.Failed);
@@ -85,7 +85,7 @@ public sealed class BackboneResultTests
     [Fact]
     public void FailureWithMessagesStoresNormalizedMessages()
     {
-        var result = BackboneResult.Failure(
+        var result = GovernanceOperationResult.Failure(
         [
             " First error. ",
             "",
@@ -105,7 +105,7 @@ public sealed class BackboneResultTests
     [Fact]
     public void FailureWithBlankMessagesUsesDefaultFailureMessage()
     {
-        var result = BackboneResult.Failure(["", "   "]);
+        var result = GovernanceOperationResult.Failure(["", "   "]);
 
         Assert.False(result.Succeeded);
         Assert.True(result.Failed);
@@ -119,7 +119,7 @@ public sealed class BackboneResultTests
     [Fact]
     public void SuccessWithNullMessagesReturnsEmptyMessages()
     {
-        var result = BackboneResult.Success((IEnumerable<string>?)null!);
+        var result = GovernanceOperationResult.Success((IEnumerable<string>?)null!);
 
         Assert.True(result.Succeeded);
         Assert.False(result.Failed);
@@ -132,7 +132,7 @@ public sealed class BackboneResultTests
     [Fact]
     public void SuccessWithNullMessageReturnsEmptyMessages()
     {
-        var result = BackboneResult.Success((string)null!);
+        var result = GovernanceOperationResult.Success((string)null!);
 
         Assert.True(result.Succeeded);
         Assert.False(result.Failed);
@@ -145,7 +145,7 @@ public sealed class BackboneResultTests
     [Fact]
     public void FailureWithNullMessagesUsesDefaultFailureMessage()
     {
-        var result = BackboneResult.Failure((IEnumerable<string>?)null!);
+        var result = GovernanceOperationResult.Failure((IEnumerable<string>?)null!);
 
         Assert.False(result.Succeeded);
         Assert.True(result.Failed);
@@ -158,7 +158,7 @@ public sealed class BackboneResultTests
     [Fact]
     public void FailureWithNullMessageUsesDefaultFailureMessage()
     {
-        var result = BackboneResult.Failure((string)null!);
+        var result = GovernanceOperationResult.Failure((string)null!);
 
         Assert.False(result.Succeeded);
         Assert.True(result.Failed);
@@ -177,7 +177,7 @@ public sealed class BackboneResultTests
             null!
         ];
 
-        var result = BackboneResult.Success(messages);
+        var result = GovernanceOperationResult.Success(messages);
 
         Assert.True(result.Succeeded);
         Assert.Equal("Operation completed.", Assert.Single(result.Messages));
@@ -195,7 +195,7 @@ public sealed class BackboneResultTests
             null!
         ];
 
-        var result = BackboneResult.Failure(messages);
+        var result = GovernanceOperationResult.Failure(messages);
 
         Assert.False(result.Succeeded);
         Assert.Equal("Operation failed for validation reasons.", Assert.Single(result.Messages));

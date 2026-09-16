@@ -6,9 +6,9 @@ The goal is to help hosts avoid accidental duplicate emissions when an ASP.NET C
 
 ## Summary decision
 
-Claim leasing is enabled by default. `AsiBackboneGovernanceOutboxOptions.UseClaimLeases` defaults to `true`, and `ClaimWorkerId` defaults to the machine name and process identifier so replicas of the same deployment do not share a claim owner. The previous default left two replicas free to select and emit the same envelope, which is not a safe default for a durable outbox.
+Claim leasing is enabled by default. `GovernanceOutboxOptions.UseClaimLeases` defaults to `true`, and `ClaimWorkerId` defaults to the machine name and process identifier so replicas of the same deployment do not share a claim owner. The previous default left two replicas free to select and emit the same envelope, which is not a safe default for a durable outbox.
 
-Enabling claim leases requires a store implementing `IAsiBackboneGovernanceOutboxClaimStore`. Both shipped stores do. A host supplying its own store that does not implement it must set `UseClaimLeases` to `false`; the drain throws rather than silently falling back, because falling back would restore the duplicate-emission behavior the default exists to prevent.
+Enabling claim leases requires a store implementing `IGovernanceOutboxClaimStore`. Both shipped stores do. A host supplying its own store that does not implement it must set `UseClaimLeases` to `false`; the drain throws rather than silently falling back, because falling back would restore the duplicate-emission behavior the default exists to prevent.
 
 Hosts that opt out keep the previous behavior: `FindPendingAsync` and `FindRetryReadyAsync` return candidate rows and do not claim, lease, lock, or hide rows from another worker. That path is safe for a single active worker and for local or test validation, and it requires partitioning, a single worker role, or provider-side idempotency when scaled.
 
@@ -43,10 +43,10 @@ See [EF Core Outbox Concurrency Validation](../quality/ef-core-outbox-concurrenc
 
 | Area | Current behavior | Multi-worker implication |
 | --- | --- | --- |
-| `IAsiBackboneGovernanceOutboxStore.FindPendingAsync` | Returns pending entries ordered for delivery. | Selection only. It does not claim, lease, lock, or hide rows from another worker. |
-| `IAsiBackboneGovernanceOutboxStore.FindRetryReadyAsync` | Returns retry-ready entries ordered for delivery. | Selection only. It does not prevent another worker from selecting the same entry. |
-| `IAsiBackboneGovernanceOutboxClaimStore` | Adds explicit `ClaimPendingAsync`, `ClaimRetryReadyAsync`, claim completion, save, and release operations. | Cooperating workers emit only after acquiring a claim lease. Completion verifies claim owner/token before final state transition. |
-| `AsiBackboneGovernanceOutboxDrain` | Uses the existing candidate path by default. When `UseClaimLeases = true`, it requires a claim-capable store and emits only after claim acquisition. | Hosts choose the behavior explicitly. Claim leasing reduces duplicate selection risk but does not create exactly-once provider delivery. |
+| `IGovernanceOutboxStore.FindPendingAsync` | Returns pending entries ordered for delivery. | Selection only. It does not claim, lease, lock, or hide rows from another worker. |
+| `IGovernanceOutboxStore.FindRetryReadyAsync` | Returns retry-ready entries ordered for delivery. | Selection only. It does not prevent another worker from selecting the same entry. |
+| `IGovernanceOutboxClaimStore` | Adds explicit `ClaimPendingAsync`, `ClaimRetryReadyAsync`, claim completion, save, and release operations. | Cooperating workers emit only after acquiring a claim lease. Completion verifies claim owner/token before final state transition. |
+| `GovernanceOutboxDrain` | Uses the existing candidate path by default. When `UseClaimLeases = true`, it requires a claim-capable store and emits only after claim acquisition. | Hosts choose the behavior explicitly. Claim leasing reduces duplicate selection risk but does not create exactly-once provider delivery. |
 | `EfCoreGovernanceOutboxStore` | Uses EF Core persistence and configured concurrency tokens for state updates. It also implements the claim-capable store contract with claim owner, token, claimed time, expiration, and attempt count fields. | Hosts must apply schema/migration changes before enabling claim leases. The baseline EF implementation is portable and optimistic-concurrency based; provider-specific SQL may be stronger for high throughput. |
 | `InMemoryGovernanceOutboxStore` | Intended for tests, samples, and local validation. Same-entry status transitions and claim updates use single-process compare-and-swap updates. | Useful for local validation and tests only. It is not durable and does not model cross-replica infrastructure behavior. |
 | Hosted drain worker | Runs wherever it is registered and enabled. | In scaled deployments, each replica may run a worker unless the host disables, partitions, or claim-coordinates it. |
@@ -87,7 +87,7 @@ For most hosts, the safest default is one active drain worker per shared durable
 
 Common deployment patterns include:
 
-- run the web/API replicas with `AsiBackboneGovernanceOutboxDrainWorkerOptions.Enabled = false`;
+- run the web/API replicas with `GovernanceOutboxDrainWorkerOptions.Enabled = false`;
 - run one dedicated worker process, job, container, or app service instance with the worker enabled;
 - use platform leader election or a singleton scheduler if the hosting platform provides it;
 - ensure only one replica has permission or configuration to drain a given outbox partition.
@@ -102,10 +102,10 @@ Partitioning must be enforced in the durable selection query or storage adapter.
 
 ### 3. Opt-in package claim leases before provider emission
 
-A multi-worker durable store can claim work before calling the provider when the configured store implements `IAsiBackboneGovernanceOutboxClaimStore`.
+A multi-worker durable store can claim work before calling the provider when the configured store implements `IGovernanceOutboxClaimStore`.
 
 ```csharp
-builder.Services.Configure<AsiBackboneGovernanceOutboxOptions>(options =>
+builder.Services.Configure<GovernanceOutboxOptions>(options =>
 {
     options.UseClaimLeases = true;
     options.ClaimWorkerId = "worker-1";
@@ -131,7 +131,7 @@ Use stable identifiers where available:
 
 - `GovernanceEmissionEnvelope.EnvelopeId`;
 - `GovernanceOutboxEntry.OutboxEntryId`;
-- source event or audit residue identifiers;
+- source event or decision receipt identifiers;
 - provider idempotency keys, when the provider supports them;
 - provider record IDs returned after delivery.
 
@@ -157,7 +157,7 @@ These patterns are useful, but they are not provider-neutral. They also require 
 Recommended single-worker configuration posture:
 
 ```csharp
-builder.Services.Configure<AsiBackboneGovernanceOutboxDrainWorkerOptions>(options =>
+builder.Services.Configure<GovernanceOutboxDrainWorkerOptions>(options =>
 {
     options.Enabled = builder.Configuration.GetValue<bool>("AsiBackbone:OutboxDrain:Enabled");
     options.BatchSize = 100;
@@ -170,7 +170,7 @@ Then set `AsiBackbone:OutboxDrain:Enabled` to `true` only for the selected worke
 Recommended claim-capable configuration posture:
 
 ```csharp
-builder.Services.Configure<AsiBackboneGovernanceOutboxOptions>(options =>
+builder.Services.Configure<GovernanceOutboxOptions>(options =>
 {
     options.UseClaimLeases = true;
     options.ClaimWorkerId = builder.Configuration["AsiBackbone:OutboxDrain:WorkerId"];

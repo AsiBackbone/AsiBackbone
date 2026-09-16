@@ -27,47 +27,47 @@ public sealed class EfCoreGovernanceOutboxSemanticsTests
         await EnsureCreatedAsync(options);
 
         await using HostOwnedGovernanceDbContext context = new(options);
-        IEntityType? entityType = context.Model.FindEntityType(typeof(AsiBackboneGovernanceOutboxEntryEntity));
+        IEntityType? entityType = context.Model.FindEntityType(typeof(GovernanceOutboxEntryEntity));
 
         Assert.NotNull(entityType);
 
         IIndex outboxEntryIdIndex = Assert.Single(entityType.GetIndexes(), index =>
             index.Properties.Count == 1 &&
-            index.Properties[0].Name == nameof(AsiBackboneGovernanceOutboxEntryEntity.OutboxEntryId));
+            index.Properties[0].Name == nameof(GovernanceOutboxEntryEntity.OutboxEntryId));
 
         Assert.True(outboxEntryIdIndex.IsUnique);
         Assert.Equal(6, entityType.GetIndexes().Count());
-        AssertHasIndex(entityType, nameof(AsiBackboneGovernanceOutboxEntryEntity.ClaimToken));
+        AssertHasIndex(entityType, nameof(GovernanceOutboxEntryEntity.ClaimToken));
         AssertHasIndex(
             entityType,
-            nameof(AsiBackboneGovernanceOutboxEntryEntity.Status),
-            nameof(AsiBackboneGovernanceOutboxEntryEntity.CreatedUtc),
-            nameof(AsiBackboneGovernanceOutboxEntryEntity.OutboxEntryId));
+            nameof(GovernanceOutboxEntryEntity.Status),
+            nameof(GovernanceOutboxEntryEntity.CreatedUtc),
+            nameof(GovernanceOutboxEntryEntity.OutboxEntryId));
         AssertHasIndex(
             entityType,
-            nameof(AsiBackboneGovernanceOutboxEntryEntity.Status),
-            nameof(AsiBackboneGovernanceOutboxEntryEntity.NextRetryUtc),
-            nameof(AsiBackboneGovernanceOutboxEntryEntity.UpdatedUtc),
-            nameof(AsiBackboneGovernanceOutboxEntryEntity.OutboxEntryId));
+            nameof(GovernanceOutboxEntryEntity.Status),
+            nameof(GovernanceOutboxEntryEntity.NextRetryUtc),
+            nameof(GovernanceOutboxEntryEntity.UpdatedUtc),
+            nameof(GovernanceOutboxEntryEntity.OutboxEntryId));
         AssertHasIndex(
             entityType,
-            nameof(AsiBackboneGovernanceOutboxEntryEntity.Status),
-            nameof(AsiBackboneGovernanceOutboxEntryEntity.ClaimExpiresUtc),
-            nameof(AsiBackboneGovernanceOutboxEntryEntity.CreatedUtc),
-            nameof(AsiBackboneGovernanceOutboxEntryEntity.OutboxEntryId));
+            nameof(GovernanceOutboxEntryEntity.Status),
+            nameof(GovernanceOutboxEntryEntity.ClaimExpiresUtc),
+            nameof(GovernanceOutboxEntryEntity.CreatedUtc),
+            nameof(GovernanceOutboxEntryEntity.OutboxEntryId));
         AssertHasIndex(
             entityType,
-            nameof(AsiBackboneGovernanceOutboxEntryEntity.Status),
-            nameof(AsiBackboneGovernanceOutboxEntryEntity.ClaimExpiresUtc),
-            nameof(AsiBackboneGovernanceOutboxEntryEntity.NextRetryUtc),
-            nameof(AsiBackboneGovernanceOutboxEntryEntity.UpdatedUtc),
-            nameof(AsiBackboneGovernanceOutboxEntryEntity.OutboxEntryId));
+            nameof(GovernanceOutboxEntryEntity.Status),
+            nameof(GovernanceOutboxEntryEntity.ClaimExpiresUtc),
+            nameof(GovernanceOutboxEntryEntity.NextRetryUtc),
+            nameof(GovernanceOutboxEntryEntity.UpdatedUtc),
+            nameof(GovernanceOutboxEntryEntity.OutboxEntryId));
 
-        Assert.Equal(4096, entityType.FindProperty(nameof(AsiBackboneGovernanceOutboxEntryEntity.DeadLetterReason))?.GetMaxLength());
-        Assert.Equal(4096, entityType.FindProperty(nameof(AsiBackboneGovernanceOutboxEntryEntity.LastErrorMessage))?.GetMaxLength());
-        Assert.Equal(65536, entityType.FindProperty(nameof(AsiBackboneGovernanceOutboxEntryEntity.MetadataJson))?.GetMaxLength());
-        Assert.Equal(65536, entityType.FindProperty(nameof(AsiBackboneGovernanceOutboxEntryEntity.EnvelopeMetadataJson))?.GetMaxLength());
-        Assert.Equal(65536, entityType.FindProperty(nameof(AsiBackboneGovernanceOutboxEntryEntity.EnvelopePayloadMetadataJson))?.GetMaxLength());
+        Assert.Equal(4096, entityType.FindProperty(nameof(GovernanceOutboxEntryEntity.DeadLetterReason))?.GetMaxLength());
+        Assert.Equal(4096, entityType.FindProperty(nameof(GovernanceOutboxEntryEntity.LastErrorMessage))?.GetMaxLength());
+        Assert.Equal(65536, entityType.FindProperty(nameof(GovernanceOutboxEntryEntity.MetadataJson))?.GetMaxLength());
+        Assert.Equal(65536, entityType.FindProperty(nameof(GovernanceOutboxEntryEntity.EnvelopeMetadataJson))?.GetMaxLength());
+        Assert.Equal(65536, entityType.FindProperty(nameof(GovernanceOutboxEntryEntity.EnvelopePayloadMetadataJson))?.GetMaxLength());
     }
 
     /// <summary>
@@ -154,7 +154,7 @@ public sealed class EfCoreGovernanceOutboxSemanticsTests
             schemaVersion: "1.0.0",
             correlationId: "outbox-semantics-validation",
             auditResidueId: "audit-outbox-semantics",
-            lifecycleStage: AuditResidueLifecycleStage.ExternalEmissionQueued,
+            lifecycleStage: DecisionReceiptLifecycleStage.ExternalEmissionQueued,
             policyVersion: "2026.07",
             policyHash: "policy-hash-semantics",
             traceId: "trace-outbox-semantics",
@@ -172,8 +172,8 @@ public sealed class EfCoreGovernanceOutboxSemanticsTests
     private sealed class HostOwnedGovernanceDbContext(DbContextOptions<HostOwnedGovernanceDbContext> options)
         : DbContext(options)
     {
-        public DbSet<AsiBackboneGovernanceOutboxEntryEntity> GovernanceOutboxEntries =>
-            Set<AsiBackboneGovernanceOutboxEntryEntity>();
+        public DbSet<GovernanceOutboxEntryEntity> GovernanceOutboxEntries =>
+            Set<GovernanceOutboxEntryEntity>();
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

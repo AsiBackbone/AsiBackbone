@@ -262,7 +262,7 @@ public sealed class GovernanceOutboxClaimMergeTests
 
     private static MergeClaimsDelegate CreateMergeClaimsDelegate()
     {
-        MethodInfo method = typeof(AsiBackboneGovernanceOutboxDrain).GetMethod(
+        MethodInfo method = typeof(GovernanceOutboxDrain).GetMethod(
             "MergeClaims",
             BindingFlags.NonPublic | BindingFlags.Static,
             binder: null,

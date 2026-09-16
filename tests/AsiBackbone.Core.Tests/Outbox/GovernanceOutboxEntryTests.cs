@@ -357,7 +357,7 @@ public sealed class GovernanceOutboxEntryTests
             envelopeId: "envelope-249",
             correlationId: "correlation-249",
             auditResidueId: "residue-249",
-            lifecycleStage: AuditResidueLifecycleStage.ExternalEmissionQueued,
+            lifecycleStage: DecisionReceiptLifecycleStage.ExternalEmissionQueued,
             policyVersion: "v1",
             policyHash: "hash-249",
             traceId: "trace-249",

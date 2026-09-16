@@ -290,7 +290,7 @@ public sealed class ManagedKeySigningServiceTests
         using ServiceProvider serviceProvider = services.BuildServiceProvider();
 
         Assert.NotNull(serviceProvider.GetRequiredService<ManagedKeySigningService>());
-        Assert.NotNull(serviceProvider.GetRequiredService<IAsiBackboneSigningService>());
+        Assert.NotNull(serviceProvider.GetRequiredService<IGovernanceSigningService>());
         Assert.False(serviceProvider.GetRequiredService<ManagedKeySigningOptions>().ReturnUnsignedOnFailure);
     }
 
@@ -314,7 +314,7 @@ public sealed class ManagedKeySigningServiceTests
         using ServiceProvider serviceProvider = services.BuildServiceProvider();
 
         Assert.NotNull(serviceProvider.GetRequiredService<ManagedKeySigningService>());
-        Assert.NotNull(serviceProvider.GetRequiredService<IAsiBackboneSigningService>());
+        Assert.NotNull(serviceProvider.GetRequiredService<IGovernanceSigningService>());
         Assert.True(serviceProvider.GetRequiredService<ManagedKeySigningOptions>().ReturnUnsignedOnFailure);
     }
 

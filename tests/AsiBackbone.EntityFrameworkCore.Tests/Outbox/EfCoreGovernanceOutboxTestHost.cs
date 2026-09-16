@@ -84,7 +84,7 @@ internal static class EfCoreGovernanceOutboxTestHost
             schemaVersion: "1.0.0",
             correlationId: $"correlation-{eventId}",
             auditResidueId: $"audit-{eventId}",
-            lifecycleStage: AuditResidueLifecycleStage.ExternalEmissionQueued,
+            lifecycleStage: DecisionReceiptLifecycleStage.ExternalEmissionQueued,
             policyVersion: "2026.07",
             policyHash: "policy-hash-issue-578",
             traceId: $"trace-{eventId}",
@@ -106,8 +106,8 @@ internal static class EfCoreGovernanceOutboxTestHost
 internal sealed class GovernanceOutboxTestDbContext(DbContextOptions<GovernanceOutboxTestDbContext> options)
     : DbContext(options)
 {
-    public DbSet<AsiBackboneGovernanceOutboxEntryEntity> GovernanceOutboxEntries =>
-        Set<AsiBackboneGovernanceOutboxEntryEntity>();
+    public DbSet<GovernanceOutboxEntryEntity> GovernanceOutboxEntries =>
+        Set<GovernanceOutboxEntryEntity>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

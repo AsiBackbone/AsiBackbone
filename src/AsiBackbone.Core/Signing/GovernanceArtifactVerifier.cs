@@ -13,7 +13,7 @@ public static class GovernanceArtifactVerifier
     /// </summary>
     public static async ValueTask<VerificationPolicyOutcome> VerifyAsync<TArtifact>(
         SignedGovernanceArtifact<TArtifact> artifact,
-        IAsiBackboneSignatureVerificationService verificationService,
+        IGovernanceSignatureVerificationService verificationService,
         VerificationPolicyOptions? options = null,
         VerificationPolicyContext? context = null,
         CancellationToken cancellationToken = default)

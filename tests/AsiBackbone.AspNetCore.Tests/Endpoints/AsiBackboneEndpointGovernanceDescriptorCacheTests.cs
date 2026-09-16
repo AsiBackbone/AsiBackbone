@@ -5,12 +5,12 @@ using Xunit;
 namespace AsiBackbone.AspNetCore.Tests.Endpoints;
 
 /// <summary>
-/// Tests for the <see cref="AsiBackboneEndpointGovernanceDescriptor"/> class, focusing on caching behavior of metadata generation.
+/// Tests for the <see cref="EndpointGovernanceDescriptor"/> class, focusing on caching behavior of metadata generation.
 /// </summary>
 public sealed class AsiBackboneEndpointGovernanceDescriptorCacheTests
 {
     /// <summary>
-    /// Tests that the <c>AsiBackboneEndpointGovernanceDescriptor.ToMetadata</c> method returns cached metadata for repeated calls, both for full and reduced metadata modes.
+    /// Tests that the <c>EndpointGovernanceDescriptor.ToMetadata</c> method returns cached metadata for repeated calls, both for full and reduced metadata modes.
     /// </summary>
     [Fact]
     public void ToMetadataReturnsCachedMetadataForRepeatedHotPathUse()
@@ -23,12 +23,12 @@ public sealed class AsiBackboneEndpointGovernanceDescriptorCacheTests
                 new RequireCapabilityGrantAttribute("robotics.execute"),
                 new EmitGovernanceAuditAttribute()),
             "sample.robotics.execute");
-        var descriptor = AsiBackboneEndpointGovernanceDescriptor.FromEndpoint(endpoint);
+        var descriptor = EndpointGovernanceDescriptor.FromEndpoint(endpoint);
 
         IReadOnlyDictionary<string, string> firstFullMetadata = descriptor.ToMetadata();
         IReadOnlyDictionary<string, string> secondFullMetadata = descriptor.ToMetadata();
-        IReadOnlyDictionary<string, string> firstReducedMetadata = descriptor.ToMetadata(AsiBackboneEndpointGovernanceMetadataMode.Reduced);
-        IReadOnlyDictionary<string, string> secondReducedMetadata = descriptor.ToMetadata(AsiBackboneEndpointGovernanceMetadataMode.Reduced);
+        IReadOnlyDictionary<string, string> firstReducedMetadata = descriptor.ToMetadata(EndpointGovernanceMetadataMode.Reduced);
+        IReadOnlyDictionary<string, string> secondReducedMetadata = descriptor.ToMetadata(EndpointGovernanceMetadataMode.Reduced);
 
         Assert.Same(firstFullMetadata, secondFullMetadata);
         Assert.Same(firstReducedMetadata, secondReducedMetadata);

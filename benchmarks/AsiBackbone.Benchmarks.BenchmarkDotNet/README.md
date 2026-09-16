@@ -35,7 +35,7 @@ dotnet run -c Release --project benchmarks/AsiBackbone.Benchmarks.BenchmarkDotNe
 Audit residue scenario:
 
 ```powershell
-dotnet run -c Release --project benchmarks/AsiBackbone.Benchmarks.BenchmarkDotNet -- --filter "*AuditResidue*"
+dotnet run -c Release --project benchmarks/AsiBackbone.Benchmarks.BenchmarkDotNet -- --filter "*DecisionReceipt*"
 ```
 
 ## Scenario coverage
@@ -65,7 +65,7 @@ Use BenchmarkDotNet output for trend comparison on the same machine, runtime, bu
 
 ### Audit residue metadata allocation shape
 
-The `audit_residue.builder_no_metadata`, `audit_residue.builder_one_metadata`, and `audit_residue.builder_many_metadata` scenarios intentionally exercise the fluent `AuditResidueBuilder` metadata path. The builder keeps its metadata storage lazy: the no-metadata path leaves the internal metadata dictionary unset, while the first metadata entry creates the builder dictionary. `Build()` then passes that metadata to `AuditResidue.Create`, where metadata is normalized, copied into a new ordinal dictionary, and wrapped as read-only residue metadata so the built value remains immutable and detached from later source or builder mutations.
+The `audit_residue.builder_no_metadata`, `audit_residue.builder_one_metadata`, and `audit_residue.builder_many_metadata` scenarios intentionally exercise the fluent `DecisionReceiptBuilder` metadata path. The builder keeps its metadata storage lazy: the no-metadata path leaves the internal metadata dictionary unset, while the first metadata entry creates the builder dictionary. `Build()` then passes that metadata to `DecisionReceipt.Create`, where metadata is normalized, copied into a new ordinal dictionary, and wrapped as read-only residue metadata so the built value remains immutable and detached from later source or builder mutations.
 
 Because of that shape, the first metadata item is expected to introduce a visible allocation step. A one-entry and small many-entry case may report the same allocated bytes on a given runtime because the builder dictionary and the normalized read-only metadata dictionary use small initial bucket/capacity sizes rather than allocating exactly one bucket per metadata item. Treat that plateau as expected unless repeated before/after BenchmarkDotNet runs show a meaningful reduction that preserves metadata normalization, immutability, and public API clarity.
 

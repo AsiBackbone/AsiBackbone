@@ -19,7 +19,7 @@ public sealed class GovernanceEmissionBranchTests
         _ = Assert.Throws<ArgumentOutOfRangeException>(() =>
             GovernanceEmissionEnvelope.Create(
                 GovernanceEmissionEventType.AuditLifecycle,
-                lifecycleStage: (AuditResidueLifecycleStage)999));
+                lifecycleStage: (DecisionReceiptLifecycleStage)999));
     }
 
     /// <summary>
@@ -63,8 +63,8 @@ public sealed class GovernanceEmissionBranchTests
     [Fact]
     public void FromResidueUsesCallerMetadataWhenKeysOverlapResidueMetadata()
     {
-        var residue = AuditResidue.Create(
-            AsiBackboneActorContext.Service("service-123"),
+        var residue = DecisionReceipt.Create(
+            GovernanceActorContext.Service("service-123"),
             "document.approve",
             "Allowed",
             eventId: "event-123",
@@ -95,8 +95,8 @@ public sealed class GovernanceEmissionBranchTests
     [Fact]
     public void FromLifecycleEventUsesCallerMetadataWhenKeysOverlapLifecycleMetadata()
     {
-        var lifecycleEvent = AuditResidueLifecycleEvent.Create(
-            AuditResidueLifecycleStage.ExternalEmissionQueued,
+        var lifecycleEvent = DecisionReceiptLifecycleEvent.Create(
+            DecisionReceiptLifecycleStage.ExternalEmissionQueued,
             "correlation-123",
             auditResidueId: "residue-123",
             eventId: "lifecycle-123",

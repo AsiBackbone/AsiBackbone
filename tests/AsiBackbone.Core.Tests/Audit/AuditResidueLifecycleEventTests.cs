@@ -15,17 +15,17 @@ public sealed class AuditResidueLifecycleEventTests
     [Fact]
     public void LifecycleStagesExposeStableProviderNeutralSequenceValues()
     {
-        Assert.Equal(100, (int)AuditResidueLifecycleStage.DecisionEvaluated);
-        Assert.Equal(200, (int)AuditResidueLifecycleStage.AcknowledgmentRequested);
-        Assert.Equal(210, (int)AuditResidueLifecycleStage.AcknowledgmentCompleted);
-        Assert.Equal(300, (int)AuditResidueLifecycleStage.CapabilityTokenIssued);
-        Assert.Equal(400, (int)AuditResidueLifecycleStage.GatewayExecutionStarted);
-        Assert.Equal(410, (int)AuditResidueLifecycleStage.GatewayExecutionCompleted);
-        Assert.Equal(420, (int)AuditResidueLifecycleStage.GatewayExecutionDenied);
-        Assert.Equal(500, (int)AuditResidueLifecycleStage.ExternalEmissionQueued);
-        Assert.Equal(510, (int)AuditResidueLifecycleStage.ExternalEmissionDelivered);
-        Assert.Equal(520, (int)AuditResidueLifecycleStage.ExternalEmissionFailed);
-        Assert.Equal(530, (int)AuditResidueLifecycleStage.ExternalEmissionDeadLettered);
+        Assert.Equal(100, (int)DecisionReceiptLifecycleStage.DecisionEvaluated);
+        Assert.Equal(200, (int)DecisionReceiptLifecycleStage.AcknowledgmentRequested);
+        Assert.Equal(210, (int)DecisionReceiptLifecycleStage.AcknowledgmentCompleted);
+        Assert.Equal(300, (int)DecisionReceiptLifecycleStage.CapabilityTokenIssued);
+        Assert.Equal(400, (int)DecisionReceiptLifecycleStage.GatewayExecutionStarted);
+        Assert.Equal(410, (int)DecisionReceiptLifecycleStage.GatewayExecutionCompleted);
+        Assert.Equal(420, (int)DecisionReceiptLifecycleStage.GatewayExecutionDenied);
+        Assert.Equal(500, (int)DecisionReceiptLifecycleStage.ExternalEmissionQueued);
+        Assert.Equal(510, (int)DecisionReceiptLifecycleStage.ExternalEmissionDelivered);
+        Assert.Equal(520, (int)DecisionReceiptLifecycleStage.ExternalEmissionFailed);
+        Assert.Equal(530, (int)DecisionReceiptLifecycleStage.ExternalEmissionDeadLettered);
     }
 
     /// <summary>
@@ -36,8 +36,8 @@ public sealed class AuditResidueLifecycleEventTests
     {
         DateTimeOffset occurredUtc = new(2026, 6, 13, 8, 30, 0, TimeSpan.FromHours(-5));
 
-        var lifecycleEvent = AuditResidueLifecycleEvent.Create(
-            AuditResidueLifecycleStage.AcknowledgmentRequested,
+        var lifecycleEvent = DecisionReceiptLifecycleEvent.Create(
+            DecisionReceiptLifecycleStage.AcknowledgmentRequested,
             " correlation-123 ",
             auditResidueId: " residue-456 ",
             eventId: " lifecycle-789 ",
@@ -52,7 +52,7 @@ public sealed class AuditResidueLifecycleEventTests
             });
 
         Assert.Equal("lifecycle-789", lifecycleEvent.EventId);
-        Assert.Equal(AuditResidueLifecycleStage.AcknowledgmentRequested, lifecycleEvent.Stage);
+        Assert.Equal(DecisionReceiptLifecycleStage.AcknowledgmentRequested, lifecycleEvent.Stage);
         Assert.Equal(200, lifecycleEvent.StageSequence);
         Assert.Equal(new DateTimeOffset(2026, 6, 13, 13, 30, 0, TimeSpan.Zero), lifecycleEvent.OccurredUtc);
         Assert.Equal("correlation-123", lifecycleEvent.CorrelationId);
@@ -71,8 +71,8 @@ public sealed class AuditResidueLifecycleEventTests
     [Fact]
     public void FromResidueCopiesDecisionContextWithoutRewritingOriginalResidue()
     {
-        var residue = AuditResidue.Create(
-            AsiBackboneActorContext.Human("user-123", "Chris"),
+        var residue = DecisionReceipt.Create(
+            GovernanceActorContext.Human("user-123", "Chris"),
             "document.approve",
             "RequireAcknowledgment",
             reasonCodes: ["ack.required"],
@@ -84,8 +84,8 @@ public sealed class AuditResidueLifecycleEventTests
                 [" workflow "] = " document-approval "
             });
 
-        var lifecycleEvent = AuditResidueLifecycleEvent.FromResidue(
-            AuditResidueLifecycleStage.AcknowledgmentCompleted,
+        var lifecycleEvent = DecisionReceiptLifecycleEvent.FromResidue(
+            DecisionReceiptLifecycleStage.AcknowledgmentCompleted,
             residue,
             eventId: "lifecycle-event-123",
             outcome: "Acknowledged",
@@ -95,7 +95,7 @@ public sealed class AuditResidueLifecycleEventTests
             });
 
         Assert.Equal("lifecycle-event-123", lifecycleEvent.EventId);
-        Assert.Equal(AuditResidueLifecycleStage.AcknowledgmentCompleted, lifecycleEvent.Stage);
+        Assert.Equal(DecisionReceiptLifecycleStage.AcknowledgmentCompleted, lifecycleEvent.Stage);
         Assert.Equal("correlation-123", lifecycleEvent.CorrelationId);
         Assert.Equal("audit-residue-123", lifecycleEvent.AuditResidueId);
         Assert.Equal("trace-456", lifecycleEvent.TraceId);
@@ -119,23 +119,23 @@ public sealed class AuditResidueLifecycleEventTests
         const string correlationId = "correlation-123";
         const string auditResidueId = "audit-residue-123";
 
-        AuditResidueLifecycleStage[] stages =
+        DecisionReceiptLifecycleStage[] stages =
         [
-            AuditResidueLifecycleStage.DecisionEvaluated,
-            AuditResidueLifecycleStage.AcknowledgmentRequested,
-            AuditResidueLifecycleStage.AcknowledgmentCompleted,
-            AuditResidueLifecycleStage.CapabilityTokenIssued,
-            AuditResidueLifecycleStage.GatewayExecutionStarted,
-            AuditResidueLifecycleStage.GatewayExecutionCompleted,
-            AuditResidueLifecycleStage.GatewayExecutionDenied,
-            AuditResidueLifecycleStage.ExternalEmissionQueued,
-            AuditResidueLifecycleStage.ExternalEmissionDelivered,
-            AuditResidueLifecycleStage.ExternalEmissionFailed,
-            AuditResidueLifecycleStage.ExternalEmissionDeadLettered
+            DecisionReceiptLifecycleStage.DecisionEvaluated,
+            DecisionReceiptLifecycleStage.AcknowledgmentRequested,
+            DecisionReceiptLifecycleStage.AcknowledgmentCompleted,
+            DecisionReceiptLifecycleStage.CapabilityTokenIssued,
+            DecisionReceiptLifecycleStage.GatewayExecutionStarted,
+            DecisionReceiptLifecycleStage.GatewayExecutionCompleted,
+            DecisionReceiptLifecycleStage.GatewayExecutionDenied,
+            DecisionReceiptLifecycleStage.ExternalEmissionQueued,
+            DecisionReceiptLifecycleStage.ExternalEmissionDelivered,
+            DecisionReceiptLifecycleStage.ExternalEmissionFailed,
+            DecisionReceiptLifecycleStage.ExternalEmissionDeadLettered
         ];
 
-        AuditResidueLifecycleEvent[] lifecycleEvents = [.. stages.Select(stage =>
-            AuditResidueLifecycleEvent.Create(
+        DecisionReceiptLifecycleEvent[] lifecycleEvents = [.. stages.Select(stage =>
+            DecisionReceiptLifecycleEvent.Create(
                 stage,
                 correlationId,
                 auditResidueId,
@@ -157,8 +157,8 @@ public sealed class AuditResidueLifecycleEventTests
     public void CreateThrowsForMissingCorrelationId(string? correlationId)
     {
         _ = Assert.ThrowsAny<ArgumentException>(() =>
-            AuditResidueLifecycleEvent.Create(
-                AuditResidueLifecycleStage.DecisionEvaluated,
+            DecisionReceiptLifecycleEvent.Create(
+                DecisionReceiptLifecycleStage.DecisionEvaluated,
                 correlationId!));
     }
 
@@ -169,8 +169,8 @@ public sealed class AuditResidueLifecycleEventTests
     public void CreateThrowsForUndefinedLifecycleStage()
     {
         _ = Assert.Throws<ArgumentOutOfRangeException>(() =>
-            AuditResidueLifecycleEvent.Create(
-                (AuditResidueLifecycleStage)9999,
+            DecisionReceiptLifecycleEvent.Create(
+                (DecisionReceiptLifecycleStage)9999,
                 "correlation-123"));
     }
 
@@ -180,19 +180,19 @@ public sealed class AuditResidueLifecycleEventTests
     [Fact]
     public void FromResidueRequiresCorrelationWhenResidueDoesNotContainOne()
     {
-        var residue = AuditResidue.Create(
-            AsiBackboneActorContext.System,
+        var residue = DecisionReceipt.Create(
+            GovernanceActorContext.System,
             "system.sync",
             "Allowed",
             eventId: "audit-residue-123");
 
         _ = Assert.Throws<ArgumentException>(() =>
-            AuditResidueLifecycleEvent.FromResidue(
-                AuditResidueLifecycleStage.DecisionEvaluated,
+            DecisionReceiptLifecycleEvent.FromResidue(
+                DecisionReceiptLifecycleStage.DecisionEvaluated,
                 residue));
 
-        var lifecycleEvent = AuditResidueLifecycleEvent.FromResidue(
-            AuditResidueLifecycleStage.DecisionEvaluated,
+        var lifecycleEvent = DecisionReceiptLifecycleEvent.FromResidue(
+            DecisionReceiptLifecycleStage.DecisionEvaluated,
             residue,
             correlationId: "correlation-override");
 

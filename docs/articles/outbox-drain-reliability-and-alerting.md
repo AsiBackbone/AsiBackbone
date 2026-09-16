@@ -152,7 +152,7 @@ A practical operations dashboard should answer:
 - Which reason code is most common?
 - Are any records close to max retry?
 - How many records are dead-lettered?
-- Can an operator pivot from outbox record to correlation ID, audit residue, provider event, and incident ticket?
+- Can an operator pivot from outbox record to correlation ID, decision receipt, provider event, and incident ticket?
 
 The dashboard can be built in any monitoring system. AsiBackbone should remain provider-neutral.
 

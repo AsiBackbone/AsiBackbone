@@ -12,12 +12,12 @@ using Xunit;
 namespace AsiBackbone.AspNetCore.Tests.Endpoints;
 
 /// <summary>
-/// Unit tests for the <see cref="AsiBackboneEndpointGovernanceRouteBuilderExtensions"/> class.
+/// Unit tests for the <see cref="EndpointGovernanceRouteBuilderExtensions"/> class.
 /// </summary>
 public sealed class AsiBackboneEndpointGovernanceRouteBuilderExtensionsTests
 {
     /// <summary>
-    /// Tests that the <see cref="AsiBackboneEndpointGovernanceRouteBuilderExtensions.MarkGovernancePolicy{TPolicy}(RouteHandlerBuilder)"/> method returns the same <see cref="RouteHandlerBuilder"/> instance.
+    /// Tests that the <see cref="EndpointGovernanceRouteBuilderExtensions.MarkGovernancePolicy{TPolicy}(RouteHandlerBuilder)"/> method returns the same <see cref="RouteHandlerBuilder"/> instance.
     /// </summary>
     [Fact]
     public void MarkGovernancePolicy_RouteHandlerBuilder_ReturnsSameBuilder()
@@ -62,7 +62,7 @@ public sealed class AsiBackboneEndpointGovernanceRouteBuilderExtensionsTests
     }
 
     /// <summary>
-    /// Tests that the <c>AsiBackboneEndpointGovernanceRouteBuilderExtensions.RequireLiabilityHandshake(IEndpointConventionBuilder)</c> method adds the correct metadata to the endpoint and returns the same <see cref="IEndpointConventionBuilder"/> instance.
+    /// Tests that the <c>EndpointGovernanceRouteBuilderExtensions.RequireLiabilityHandshake(IEndpointConventionBuilder)</c> method adds the correct metadata to the endpoint and returns the same <see cref="IEndpointConventionBuilder"/> instance.
     /// </summary>
     [Fact]
     public void RequireLiabilityHandshake_AddsMetadataAndReturnsSameBuilder()
@@ -81,7 +81,7 @@ public sealed class AsiBackboneEndpointGovernanceRouteBuilderExtensionsTests
     }
 
     /// <summary>
-    /// Tests that the <c>AsiBackboneEndpointGovernanceRouteBuilderExtensions.RequireCapabilityGrant(IEndpointConventionBuilder, string)</c> method adds the correct metadata to the endpoint and returns the same <see cref="IEndpointConventionBuilder"/> instance.
+    /// Tests that the <c>EndpointGovernanceRouteBuilderExtensions.RequireCapabilityGrant(IEndpointConventionBuilder, string)</c> method adds the correct metadata to the endpoint and returns the same <see cref="IEndpointConventionBuilder"/> instance.
     /// </summary>
     [Fact]
     public void RequireCapabilityGrant_AddsMetadataAndReturnsSameBuilder()
@@ -103,7 +103,7 @@ public sealed class AsiBackboneEndpointGovernanceRouteBuilderExtensionsTests
     }
 
     /// <summary>
-    /// Tests that the <c>AsiBackboneEndpointGovernanceRouteBuilderExtensions.EmitGovernanceAudit(IEndpointConventionBuilder)</c> method adds the correct metadata to the endpoint and returns the same <see cref="IEndpointConventionBuilder"/> instance.
+    /// Tests that the <c>EndpointGovernanceRouteBuilderExtensions.EmitGovernanceAudit(IEndpointConventionBuilder)</c> method adds the correct metadata to the endpoint and returns the same <see cref="IEndpointConventionBuilder"/> instance.
     /// </summary>
     [Fact]
     public void EmitGovernanceAudit_AddsMetadataAndReturnsSameBuilder()
@@ -136,7 +136,7 @@ public sealed class AsiBackboneEndpointGovernanceRouteBuilderExtensionsTests
     }
 
     /// <summary>
-    /// Tests that the <c>AsiBackboneEndpointGovernanceRouteBuilderExtensions.RequireLiabilityHandshake(IEndpointConventionBuilder)</c> method throws an <see cref="ArgumentNullException"/> when the builder is null.
+    /// Tests that the <c>EndpointGovernanceRouteBuilderExtensions.RequireLiabilityHandshake(IEndpointConventionBuilder)</c> method throws an <see cref="ArgumentNullException"/> when the builder is null.
     /// </summary>
     [Fact]
     public void MetadataExtensions_ThrowWhenBuilderIsNull()
@@ -150,12 +150,12 @@ public sealed class AsiBackboneEndpointGovernanceRouteBuilderExtensionsTests
     }
 
     /// <summary>
-    /// Tests that the <c>AsiBackboneEndpointGovernanceRouteBuilderExtensions.AddEndpointMetadata{TBuilder}(TBuilder, object)</c> method throws an <see cref="ArgumentNullException"/> when the metadata is null.
+    /// Tests that the <c>EndpointGovernanceRouteBuilderExtensions.AddEndpointMetadata{TBuilder}(TBuilder, object)</c> method throws an <see cref="ArgumentNullException"/> when the metadata is null.
     /// </summary>
     [Fact]
     public void AddEndpointMetadata_ThrowsWhenMetadataIsNull()
     {
-        MethodInfo method = typeof(AsiBackboneEndpointGovernanceRouteBuilderExtensions)
+        MethodInfo method = typeof(EndpointGovernanceRouteBuilderExtensions)
             .GetMethod("AddEndpointMetadata", BindingFlags.NonPublic | BindingFlags.Static)!
             .MakeGenericMethod(typeof(CapturingEndpointConventionBuilder));
 
@@ -171,7 +171,7 @@ public sealed class AsiBackboneEndpointGovernanceRouteBuilderExtensionsTests
     }
 
     /// <summary>
-    /// Tests that the <c>AsiBackboneEndpointGovernanceRouteBuilderExtensions.AllowMissingGovernanceMetadata(IEndpointConventionBuilder)</c> method adds the correct metadata to the endpoint and returns the same <see cref="IEndpointConventionBuilder"/> instance.
+    /// Tests that the <c>EndpointGovernanceRouteBuilderExtensions.AllowMissingGovernanceMetadata(IEndpointConventionBuilder)</c> method adds the correct metadata to the endpoint and returns the same <see cref="IEndpointConventionBuilder"/> instance.
     /// </summary>
     [Fact]
     public void AllowMissingGovernanceMetadata_AddsMetadataAndReturnsSameBuilder()
@@ -212,10 +212,10 @@ public sealed class AsiBackboneEndpointGovernanceRouteBuilderExtensionsTests
     {
     }
 
-    private sealed class TestDecisionPolicy : IAsiBackboneDecisionPolicy<AsiBackboneConstraintEvaluationContext>
+    private sealed class TestDecisionPolicy : IGovernanceDecisionPolicy<GovernanceEvaluationContext>
     {
         public ValueTask<GovernanceDecision> ApplyAsync(
-            AsiBackboneConstraintEvaluationContext context,
+            GovernanceEvaluationContext context,
             GovernanceDecision composedDecision,
             IReadOnlyList<ConstraintEvaluationResult> constraintResults,
             CancellationToken cancellationToken = default)

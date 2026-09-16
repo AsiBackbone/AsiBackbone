@@ -24,7 +24,7 @@ The Purview strategy should avoid turning every raw AsiBackbone decision into a 
 
 ```text
 Decision / acknowledgment / capability token / gateway result
-  -> Audit residue
+  -> Decision receipt
   -> Durable local store / outbox
   -> Optional observability or streaming emission
   -> Future optional Purview governance and lineage enrichment
@@ -43,7 +43,7 @@ Under this model, Purview integration should create or update governance enrichm
 | Compliance record | A decision is tied to a regulated workflow, retention requirement, approval policy, or high-risk action category. | Routine low-risk operational decisions. |
 | Custom governance asset | The host needs a durable catalog object for a policy-governed workflow, gateway, data product, or decision boundary. | One custom asset per raw event. |
 | Summarized governance record | The host wants aggregate policy/version/outcome context for a workflow, asset, or operation group. | Raw audit event replacement. |
-| Classification or lineage annotation | The decision should enrich an existing asset, lineage edge, data product, process, or policy domain. | Duplicating all local audit residue fields. |
+| Classification or lineage annotation | The decision should enrich an existing asset, lineage edge, data product, process, or policy domain. | Duplicating all local decision receipt fields. |
 
 The first implementation should favor summarized records and lineage annotations over cataloging every individual event.
 
@@ -79,7 +79,7 @@ Purview is not the preferred place for:
 | Operational query and alerting | OpenTelemetry, Azure Monitor, SIEM, logs, or stream processors | Optional catalog context for investigations. |
 | Streaming and replay | Event Hubs or other streaming provider | Optional downstream consumer/enrichment target. |
 | Classification and lineage context | Purview or host classifier/catalog | Primary enrichment value. |
-| Policy version and schema version context | Audit residue and envelope | Safe metadata copied into enrichment records. |
+| Policy version and schema version context | Decision receipt and envelope | Safe metadata copied into enrichment records. |
 
 This separation keeps Purview useful without making it noisy, expensive, or misleading as the system of record.
 
@@ -154,7 +154,7 @@ When in doubt, preserve the full governance record locally and emit only a summa
 Purview records should correlate with local audit, OpenTelemetry/Azure Monitor events, Event Hubs messages, and downstream governance processors through stable opaque identifiers.
 
 ```text
-Host-owned audit residue
+Host-owned decision receipt
   CorrelationId
   AuditResidueId
   SchemaVersion
@@ -298,7 +298,7 @@ Before implementation begins, confirm:
 | --- | --- |
 | #140 Durable outbox | Purview enrichment should happen after local durable audit/outbox persistence. |
 | #141 Lifecycle stages | Lifecycle stage and sequence can inform process lineage and compliance checkpoint records. |
-| #142 Audit residue telemetry | Trace, gateway, outbox, and PII-safe identifiers provide safe correlation fields. |
+| #142 Decision receipt telemetry | Trace, gateway, outbox, and PII-safe identifiers provide safe correlation fields. |
 | #144 OpenTelemetry provider | OpenTelemetry remains the released `1.1.0` governance emission provider; Purview remains governance/catalog enrichment strategy. |
 | #145 Event Hubs provider | Event Hubs can feed downstream processors that selectively summarize and enrich Purview records. |
 | #149 Observability architecture | This strategy follows the Core-neutral provider package architecture. |

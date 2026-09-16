@@ -8,7 +8,7 @@ using Xunit;
 namespace AsiBackbone.AspNetCore.Tests.Results;
 
 /// <summary>
-/// Unit tests for the <see cref="AsiBackboneHttpResultMappingExtensions"/> class, verifying the mapping of governance decisions and operation results to HTTP responses in an ASP.NET Core context.
+/// Unit tests for the <see cref="GovernanceHttpResultMappingExtensions"/> class, verifying the mapping of governance decisions and operation results to HTTP responses in an ASP.NET Core context.
 /// </summary>
 public sealed class AsiBackboneHttpResultMappingExtensionsTests
 {
@@ -41,7 +41,7 @@ public sealed class AsiBackboneHttpResultMappingExtensionsTests
     public async Task ToHttpResultMapsWarningDecisionToConfiguredWarningStatusCode()
     {
         var decision = GovernanceDecision.Warning("policy.warning", "Warning detail.");
-        var options = new AsiBackboneHttpResultMappingOptions { WarningStatusCode = StatusCodes.Status206PartialContent };
+        var options = new GovernanceHttpResultMappingOptions { WarningStatusCode = StatusCodes.Status206PartialContent };
 
         HttpResultCapture capture = await ExecuteAsync(decision.ToHttpResult(options));
 
@@ -148,7 +148,7 @@ public sealed class AsiBackboneHttpResultMappingExtensionsTests
             traceId: "trace-public",
             policyVersion: "v2",
             policyHash: "hash-public");
-        var options = new AsiBackboneHttpResultMappingOptions
+        var options = new GovernanceHttpResultMappingOptions
         {
             IncludeReasonMessages = true,
             IncludeTraceId = true,
@@ -173,7 +173,7 @@ public sealed class AsiBackboneHttpResultMappingExtensionsTests
     public async Task ToHttpResultOmitsMissingOptionalDecisionMetadataWhenDiagnosticsAreEnabled()
     {
         var decision = GovernanceDecision.Allow();
-        var options = new AsiBackboneHttpResultMappingOptions
+        var options = new GovernanceHttpResultMappingOptions
         {
             IncludeReasonMessages = true,
             IncludeTraceId = true,
@@ -256,7 +256,7 @@ public sealed class AsiBackboneHttpResultMappingExtensionsTests
     public async Task ToHttpResultCanExposeFailedOperationReasonMessagesWhenConfigured()
     {
         var result = OperationResult.Failure("operation.denied", "Public operation detail.");
-        var options = new AsiBackboneHttpResultMappingOptions
+        var options = new GovernanceHttpResultMappingOptions
         {
             IncludeReasonMessages = true,
             OperationFailureStatusCode = StatusCodes.Status409Conflict,
@@ -282,13 +282,13 @@ public sealed class AsiBackboneHttpResultMappingExtensionsTests
     }
 
     /// <summary>
-    /// Verifies that the ToHttpResult extension method throws an ArgumentNullException when a null AsiBackboneHttpResultMappingOptions is passed, ensuring that the method enforces non-null options for proper HTTP result mapping.
+    /// Verifies that the ToHttpResult extension method throws an ArgumentNullException when a null GovernanceHttpResultMappingOptions is passed, ensuring that the method enforces non-null options for proper HTTP result mapping.
     /// </summary>
     [Fact]
     public void ToHttpResultRejectsNullDecisionOptions()
     {
         var decision = GovernanceDecision.Allow();
-        AsiBackboneHttpResultMappingOptions? options = null;
+        GovernanceHttpResultMappingOptions? options = null;
 
         _ = Assert.Throws<ArgumentNullException>(() => decision.ToHttpResult(options!));
     }
@@ -305,34 +305,34 @@ public sealed class AsiBackboneHttpResultMappingExtensionsTests
     }
 
     /// <summary>
-    /// Verifies that the ToHttpResult extension method throws an ArgumentNullException when a null AsiBackboneHttpResultMappingOptions is passed for an OperationResult, ensuring that the method enforces non-null options for proper HTTP result mapping.
+    /// Verifies that the ToHttpResult extension method throws an ArgumentNullException when a null GovernanceHttpResultMappingOptions is passed for an OperationResult, ensuring that the method enforces non-null options for proper HTTP result mapping.
     /// </summary>
     [Fact]
     public void ToHttpResultRejectsNullOperationResultOptions()
     {
         var result = OperationResult.Success();
-        AsiBackboneHttpResultMappingOptions? options = null;
+        GovernanceHttpResultMappingOptions? options = null;
 
         _ = Assert.Throws<ArgumentNullException>(() => result.ToHttpResult(options!));
     }
 
     /// <summary>
-    /// Verifies that the AsiBackboneHttpResultMappingOptions class rejects invalid HTTP status codes for its properties, ensuring that only valid status codes are accepted and that an InvalidOperationException is thrown when an invalid code is set.
+    /// Verifies that the GovernanceHttpResultMappingOptions class rejects invalid HTTP status codes for its properties, ensuring that only valid status codes are accepted and that an InvalidOperationException is thrown when an invalid code is set.
     /// </summary>
     /// <param name="propertyName">
-    /// The name of the property in AsiBackboneHttpResultMappingOptions to test for invalid status code assignment.
+    /// The name of the property in GovernanceHttpResultMappingOptions to test for invalid status code assignment.
     /// </param>
     [Theory]
-    [InlineData(nameof(AsiBackboneHttpResultMappingOptions.SuccessStatusCode))]
-    [InlineData(nameof(AsiBackboneHttpResultMappingOptions.WarningStatusCode))]
-    [InlineData(nameof(AsiBackboneHttpResultMappingOptions.DeniedStatusCode))]
-    [InlineData(nameof(AsiBackboneHttpResultMappingOptions.DeferredStatusCode))]
-    [InlineData(nameof(AsiBackboneHttpResultMappingOptions.AcknowledgmentRequiredStatusCode))]
-    [InlineData(nameof(AsiBackboneHttpResultMappingOptions.EscalationRecommendedStatusCode))]
-    [InlineData(nameof(AsiBackboneHttpResultMappingOptions.OperationFailureStatusCode))]
+    [InlineData(nameof(GovernanceHttpResultMappingOptions.SuccessStatusCode))]
+    [InlineData(nameof(GovernanceHttpResultMappingOptions.WarningStatusCode))]
+    [InlineData(nameof(GovernanceHttpResultMappingOptions.DeniedStatusCode))]
+    [InlineData(nameof(GovernanceHttpResultMappingOptions.DeferredStatusCode))]
+    [InlineData(nameof(GovernanceHttpResultMappingOptions.AcknowledgmentRequiredStatusCode))]
+    [InlineData(nameof(GovernanceHttpResultMappingOptions.EscalationRecommendedStatusCode))]
+    [InlineData(nameof(GovernanceHttpResultMappingOptions.OperationFailureStatusCode))]
     public void ResultMappingOptionsRejectInvalidStatusCode(string propertyName)
     {
-        var options = new AsiBackboneHttpResultMappingOptions();
+        var options = new GovernanceHttpResultMappingOptions();
         SetStatusCode(options, propertyName, 99);
 
         InvalidOperationException exception = Assert.Throws<InvalidOperationException>(options.Validate);
@@ -341,17 +341,17 @@ public sealed class AsiBackboneHttpResultMappingExtensionsTests
     }
 
     /// <summary>
-    /// Verifies that the AsiBackboneHttpResultMappingOptions class rejects blank or whitespace-only safe messages for its properties, ensuring that meaningful messages are provided and that an InvalidOperationException is thrown when a blank message is set.
+    /// Verifies that the GovernanceHttpResultMappingOptions class rejects blank or whitespace-only safe messages for its properties, ensuring that meaningful messages are provided and that an InvalidOperationException is thrown when a blank message is set.
     /// </summary>
     /// <param name="propertyName">
-    /// The name of the property in AsiBackboneHttpResultMappingOptions to test for blank safe message assignment.
+    /// The name of the property in GovernanceHttpResultMappingOptions to test for blank safe message assignment.
     /// </param>
     [Theory]
-    [InlineData(nameof(AsiBackboneHttpResultMappingOptions.GovernanceDecisionNotAllowedMessage))]
-    [InlineData(nameof(AsiBackboneHttpResultMappingOptions.OperationFailureMessage))]
+    [InlineData(nameof(GovernanceHttpResultMappingOptions.GovernanceDecisionNotAllowedMessage))]
+    [InlineData(nameof(GovernanceHttpResultMappingOptions.OperationFailureMessage))]
     public void ResultMappingOptionsRejectBlankSafeMessages(string propertyName)
     {
-        var options = new AsiBackboneHttpResultMappingOptions();
+        var options = new GovernanceHttpResultMappingOptions();
         SetSafeMessage(options, propertyName, "   ");
 
         InvalidOperationException exception = Assert.Throws<InvalidOperationException>(options.Validate);
@@ -360,31 +360,31 @@ public sealed class AsiBackboneHttpResultMappingExtensionsTests
     }
 
     private static void SetStatusCode(
-        AsiBackboneHttpResultMappingOptions options,
+        GovernanceHttpResultMappingOptions options,
         string propertyName,
         int statusCode)
     {
         switch (propertyName)
         {
-            case nameof(AsiBackboneHttpResultMappingOptions.SuccessStatusCode):
+            case nameof(GovernanceHttpResultMappingOptions.SuccessStatusCode):
                 options.SuccessStatusCode = statusCode;
                 break;
-            case nameof(AsiBackboneHttpResultMappingOptions.WarningStatusCode):
+            case nameof(GovernanceHttpResultMappingOptions.WarningStatusCode):
                 options.WarningStatusCode = statusCode;
                 break;
-            case nameof(AsiBackboneHttpResultMappingOptions.DeniedStatusCode):
+            case nameof(GovernanceHttpResultMappingOptions.DeniedStatusCode):
                 options.DeniedStatusCode = statusCode;
                 break;
-            case nameof(AsiBackboneHttpResultMappingOptions.DeferredStatusCode):
+            case nameof(GovernanceHttpResultMappingOptions.DeferredStatusCode):
                 options.DeferredStatusCode = statusCode;
                 break;
-            case nameof(AsiBackboneHttpResultMappingOptions.AcknowledgmentRequiredStatusCode):
+            case nameof(GovernanceHttpResultMappingOptions.AcknowledgmentRequiredStatusCode):
                 options.AcknowledgmentRequiredStatusCode = statusCode;
                 break;
-            case nameof(AsiBackboneHttpResultMappingOptions.EscalationRecommendedStatusCode):
+            case nameof(GovernanceHttpResultMappingOptions.EscalationRecommendedStatusCode):
                 options.EscalationRecommendedStatusCode = statusCode;
                 break;
-            case nameof(AsiBackboneHttpResultMappingOptions.OperationFailureStatusCode):
+            case nameof(GovernanceHttpResultMappingOptions.OperationFailureStatusCode):
                 options.OperationFailureStatusCode = statusCode;
                 break;
             default:
@@ -393,16 +393,16 @@ public sealed class AsiBackboneHttpResultMappingExtensionsTests
     }
 
     private static void SetSafeMessage(
-        AsiBackboneHttpResultMappingOptions options,
+        GovernanceHttpResultMappingOptions options,
         string propertyName,
         string message)
     {
         switch (propertyName)
         {
-            case nameof(AsiBackboneHttpResultMappingOptions.GovernanceDecisionNotAllowedMessage):
+            case nameof(GovernanceHttpResultMappingOptions.GovernanceDecisionNotAllowedMessage):
                 options.GovernanceDecisionNotAllowedMessage = message;
                 break;
-            case nameof(AsiBackboneHttpResultMappingOptions.OperationFailureMessage):
+            case nameof(GovernanceHttpResultMappingOptions.OperationFailureMessage):
                 options.OperationFailureMessage = message;
                 break;
             default:

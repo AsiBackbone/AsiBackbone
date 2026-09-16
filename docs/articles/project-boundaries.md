@@ -22,7 +22,7 @@ It helps hosts model and preserve:
 - structured `GovernanceDecision` outcomes,
 - reason codes and policy metadata,
 - acknowledgment workflows,
-- audit residue and decision receipts,
+- decision receipt and decision receipts,
 - durable audit/outbox records where configured,
 - optional governance emission,
 - optional signing-ready or provider-signed artifacts,
@@ -84,7 +84,7 @@ Prefer implementation-grounded wording:
 | Accountable Systems Infrastructure | Artificial superintelligence |
 | Policy decision pipeline | Autonomous decision-maker |
 | Decision boundary | Physical or metaphysical collapse claim |
-| Audit residue or decision receipt | Legal non-repudiation by default |
+| Decision receipt or decision receipt | Legal non-repudiation by default |
 | Signing-ready or provider-signed artifact | Tamper-proof evidence without storage and key controls |
 | Host-owned execution boundary | Package-owned execution authority |
 | Optional provider emission | Mandatory cloud governance service |

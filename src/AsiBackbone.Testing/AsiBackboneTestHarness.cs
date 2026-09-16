@@ -25,7 +25,7 @@ public sealed class AsiBackboneTestingAssemblyMarker
 /// <summary>
 /// Configures deterministic services for exercising AsiBackbone-governed endpoints in tests.
 /// </summary>
-public sealed class AsiBackboneTestHarnessOptions
+public sealed class GovernanceTestHarnessOptions
 {
     private readonly Dictionary<string, GovernanceDecision> policyResults = new(StringComparer.Ordinal);
 
@@ -45,7 +45,7 @@ public sealed class AsiBackboneTestHarnessOptions
     public bool RequireExplicitPolicyResults { get; private set; }
 
     /// <summary>
-    /// Gets or sets a value indicating whether the harness registers <see cref="AsiBackboneTestAuditSink" /> as the host audit sink.
+    /// Gets or sets a value indicating whether the harness registers <see cref="GovernanceTestDecisionReceiptSink" /> as the host audit sink.
     /// </summary>
     public bool RegisterInMemoryAuditSink { get; set; } = true;
 
@@ -67,7 +67,7 @@ public sealed class AsiBackboneTestHarnessOptions
     /// <summary>
     /// Uses an allow decision as the default policy result.
     /// </summary>
-    public AsiBackboneTestHarnessOptions AllowAllPolicies()
+    public GovernanceTestHarnessOptions AllowAllPolicies()
     {
         DefaultPolicyDecision = GovernanceDecision.Allow(policyVersion: "test-harness");
         RequireExplicitPolicyResults = false;
@@ -77,7 +77,7 @@ public sealed class AsiBackboneTestHarnessOptions
     /// <summary>
     /// Uses a deny decision as the default policy result.
     /// </summary>
-    public AsiBackboneTestHarnessOptions DenyAllPolicies(
+    public GovernanceTestHarnessOptions DenyAllPolicies(
         string code = "test_harness.policy_denied",
         string message = "Denied by the AsiBackbone test harness.")
     {
@@ -92,7 +92,7 @@ public sealed class AsiBackboneTestHarnessOptions
     /// <summary>
     /// Uses an allow decision as the default capability-grant validation result.
     /// </summary>
-    public AsiBackboneTestHarnessOptions AllowCapabilityGrants()
+    public GovernanceTestHarnessOptions AllowCapabilityGrants()
     {
         DefaultCapabilityGrantDecision = GovernanceDecision.Allow(policyVersion: "test-harness");
         return this;
@@ -101,7 +101,7 @@ public sealed class AsiBackboneTestHarnessOptions
     /// <summary>
     /// Uses a deny decision as the default capability-grant validation result.
     /// </summary>
-    public AsiBackboneTestHarnessOptions DenyCapabilityGrants(
+    public GovernanceTestHarnessOptions DenyCapabilityGrants(
         string code = "test_harness.capability_denied",
         string message = "Capability grant denied by the AsiBackbone test harness.")
     {
@@ -115,7 +115,7 @@ public sealed class AsiBackboneTestHarnessOptions
     /// <summary>
     /// Sets a deterministic result for a policy marker type.
     /// </summary>
-    public AsiBackboneTestHarnessOptions SetPolicyResult<TPolicy>(GovernanceDecision decision)
+    public GovernanceTestHarnessOptions SetPolicyResult<TPolicy>(GovernanceDecision decision)
     {
         return SetPolicyResult(typeof(TPolicy), decision);
     }
@@ -133,7 +133,7 @@ public sealed class AsiBackboneTestHarnessOptions
     /// <param name="policyType">The policy marker type to configure a result for.</param>
     /// <param name="decision">The decision the harness returns for endpoints marked with that type.</param>
     /// <returns>The same options instance so calls can be chained.</returns>
-    public AsiBackboneTestHarnessOptions SetPolicyResult(Type policyType, GovernanceDecision decision)
+    public GovernanceTestHarnessOptions SetPolicyResult(Type policyType, GovernanceDecision decision)
     {
         ArgumentNullException.ThrowIfNull(policyType);
         ArgumentNullException.ThrowIfNull(decision);
@@ -146,7 +146,7 @@ public sealed class AsiBackboneTestHarnessOptions
     /// <summary>
     /// Requires explicit deterministic policy results and configures the supplied marker type.
     /// </summary>
-    public AsiBackboneTestHarnessOptions RequirePolicyResult<TPolicy>(GovernanceDecision decision)
+    public GovernanceTestHarnessOptions RequirePolicyResult<TPolicy>(GovernanceDecision decision)
     {
         return RequirePolicyResult(typeof(TPolicy), decision);
     }
@@ -154,7 +154,7 @@ public sealed class AsiBackboneTestHarnessOptions
     /// <summary>
     /// Requires explicit deterministic policy results and configures the supplied marker type.
     /// </summary>
-    public AsiBackboneTestHarnessOptions RequirePolicyResult(Type policyType, GovernanceDecision decision)
+    public GovernanceTestHarnessOptions RequirePolicyResult(Type policyType, GovernanceDecision decision)
     {
         RequireExplicitPolicyResults = true;
         return SetPolicyResult(policyType, decision);
@@ -175,7 +175,7 @@ public sealed class AsiBackboneTestHarnessOptions
 /// <summary>
 /// Provides service registration helpers for the test-only AsiBackbone harness.
 /// </summary>
-public static class AsiBackboneTestHarnessServiceCollectionExtensions
+public static class GovernanceTestHarnessServiceCollectionExtensions
 {
     /// <summary>
     /// Adds the AsiBackbone test harness using default allow-all policy and capability behavior.
@@ -190,36 +190,36 @@ public static class AsiBackboneTestHarnessServiceCollectionExtensions
     /// </summary>
     public static IServiceCollection AddAsiBackboneTestHarness(
         this IServiceCollection services,
-        Action<AsiBackboneTestHarnessOptions> configure)
+        Action<GovernanceTestHarnessOptions> configure)
     {
         ArgumentNullException.ThrowIfNull(services);
         ArgumentNullException.ThrowIfNull(configure);
 
-        AsiBackboneTestHarnessOptions options = new();
+        GovernanceTestHarnessOptions options = new();
         configure(options);
         options.Validate();
 
         _ = services.AddSingleton(options);
-        _ = services.AddSingleton<AsiBackboneTestAuditSink>();
-        _ = services.AddSingleton<IAsiBackbonePolicyEvaluator<AsiBackboneConstraintEvaluationContext>, AsiBackboneTestHarnessPolicyEvaluator>();
-        _ = services.AddSingleton<IAsiBackboneEndpointCapabilityGrantValidator, AsiBackboneTestHarnessEndpointCapabilityGrantValidator>();
+        _ = services.AddSingleton<GovernanceTestDecisionReceiptSink>();
+        _ = services.AddSingleton<IGovernancePolicyEvaluator<GovernanceEvaluationContext>, GovernanceTestHarnessPolicyEvaluator>();
+        _ = services.AddSingleton<IEndpointCapabilityGrantValidator, GovernanceTestHarnessEndpointCapabilityGrantValidator>();
 
         if (options.RegisterInMemoryAuditSink)
         {
-            _ = services.AddSingleton<IAsiBackboneAuditSink>(static serviceProvider =>
-                serviceProvider.GetRequiredService<AsiBackboneTestAuditSink>());
+            _ = services.AddSingleton<IDecisionReceiptSink>(static serviceProvider =>
+                serviceProvider.GetRequiredService<GovernanceTestDecisionReceiptSink>());
         }
 
         if (options.RegisterInMemoryOutboxStore)
         {
             services.TryAddSingleton<InMemoryGovernanceOutboxStore>();
-            services.TryAddSingleton<IAsiBackboneGovernanceOutboxStore>(static serviceProvider =>
+            services.TryAddSingleton<IGovernanceOutboxStore>(static serviceProvider =>
                 serviceProvider.GetRequiredService<InMemoryGovernanceOutboxStore>());
         }
 
         if (options.RegisterDeterministicSigningService)
         {
-            services.TryAddSingleton<IAsiBackboneSigningService, AsiBackboneTestSigningService>();
+            services.TryAddSingleton<IGovernanceSigningService, GovernanceTestSigningService>();
         }
 
         return services;
@@ -239,17 +239,17 @@ public static class AsiBackboneTestHarnessServiceCollectionExtensions
 /// provides. Without such a host decision policy, both endpoints evaluate identically in production.
 /// </para>
 /// <para>
-/// Initializes a new instance of the <see cref="AsiBackboneTestHarnessPolicyEvaluator" /> class.
+/// Initializes a new instance of the <see cref="GovernanceTestHarnessPolicyEvaluator" /> class.
 /// </para>
 /// </remarks>
-public sealed class AsiBackboneTestHarnessPolicyEvaluator(AsiBackboneTestHarnessOptions options) : IAsiBackbonePolicyEvaluator<AsiBackboneConstraintEvaluationContext>
+public sealed class GovernanceTestHarnessPolicyEvaluator(GovernanceTestHarnessOptions options) : IGovernancePolicyEvaluator<GovernanceEvaluationContext>
 {
     private const string PolicyTypesMetadataKey = "endpoint.policy_types";
-    private readonly AsiBackboneTestHarnessOptions options = options ?? throw new ArgumentNullException(nameof(options));
+    private readonly GovernanceTestHarnessOptions options = options ?? throw new ArgumentNullException(nameof(options));
 
     /// <inheritdoc />
     public ValueTask<GovernanceDecision> EvaluateAsync(
-        AsiBackboneConstraintEvaluationContext context,
+        GovernanceEvaluationContext context,
         CancellationToken cancellationToken = default)
     {
         ArgumentNullException.ThrowIfNull(context);
@@ -273,7 +273,7 @@ public sealed class AsiBackboneTestHarnessPolicyEvaluator(AsiBackboneTestHarness
             : ValueTask.FromResult(AsiBackboneTestHarnessDecisionFactory.WithTelemetry(options.DefaultPolicyDecision, context));
     }
 
-    private static IEnumerable<string> ResolvePolicyTokens(AsiBackboneConstraintEvaluationContext context)
+    private static IEnumerable<string> ResolvePolicyTokens(GovernanceEvaluationContext context)
     {
         if (!context.Metadata.TryGetValue(PolicyTypesMetadataKey, out string? policyTypesValue)
             || string.IsNullOrWhiteSpace(policyTypesValue))
@@ -295,16 +295,16 @@ public sealed class AsiBackboneTestHarnessPolicyEvaluator(AsiBackboneTestHarness
 /// Deterministic capability-grant validator used by the test harness.
 /// </summary>
 /// <remarks>
-/// Initializes a new instance of the <see cref="AsiBackboneTestHarnessEndpointCapabilityGrantValidator" /> class.
+/// Initializes a new instance of the <see cref="GovernanceTestHarnessEndpointCapabilityGrantValidator" /> class.
 /// </remarks>
-public sealed class AsiBackboneTestHarnessEndpointCapabilityGrantValidator(AsiBackboneTestHarnessOptions options) : IAsiBackboneEndpointCapabilityGrantValidator
+public sealed class GovernanceTestHarnessEndpointCapabilityGrantValidator(GovernanceTestHarnessOptions options) : IEndpointCapabilityGrantValidator
 {
-    private readonly AsiBackboneTestHarnessOptions options = options ?? throw new ArgumentNullException(nameof(options));
+    private readonly GovernanceTestHarnessOptions options = options ?? throw new ArgumentNullException(nameof(options));
 
     /// <inheritdoc />
     public ValueTask<GovernanceDecision> ValidateAsync(
         HttpContext httpContext,
-        AsiBackboneEndpointGovernanceDescriptor descriptor,
+        EndpointGovernanceDescriptor descriptor,
         GovernanceDecision currentDecision,
         CancellationToken cancellationToken = default)
     {
@@ -325,15 +325,15 @@ public sealed class AsiBackboneTestHarnessEndpointCapabilityGrantValidator(AsiBa
 /// <summary>
 /// In-memory audit sink with inspection helpers for tests.
 /// </summary>
-public sealed class AsiBackboneTestAuditSink : IAsiBackboneAuditSink
+public sealed class GovernanceTestDecisionReceiptSink : IDecisionReceiptSink
 {
     private readonly Lock gate = new();
-    private readonly List<IAsiBackboneAuditResidue> entries = [];
+    private readonly List<IDecisionReceipt> entries = [];
 
     /// <summary>
-    /// Gets a snapshot of audit residue captured by the test sink.
+    /// Gets a snapshot of decision receipt captured by the test sink.
     /// </summary>
-    public IReadOnlyList<IAsiBackboneAuditResidue> Entries
+    public IReadOnlyList<IDecisionReceipt> Entries
     {
         get
         {
@@ -345,7 +345,7 @@ public sealed class AsiBackboneTestAuditSink : IAsiBackboneAuditSink
     }
 
     /// <summary>
-    /// Clears captured audit residue.
+    /// Clears captured decision receipt.
     /// </summary>
     public void Clear()
     {
@@ -357,7 +357,7 @@ public sealed class AsiBackboneTestAuditSink : IAsiBackboneAuditSink
 
     /// <inheritdoc />
     public ValueTask WriteAsync(
-        IAsiBackboneAuditResidue residue,
+        IDecisionReceipt residue,
         CancellationToken cancellationToken = default)
     {
         ArgumentNullException.ThrowIfNull(residue);
@@ -375,7 +375,7 @@ public sealed class AsiBackboneTestAuditSink : IAsiBackboneAuditSink
 /// <summary>
 /// Deterministic no-signature signing service for tests.
 /// </summary>
-public sealed class AsiBackboneTestSigningService : IAsiBackboneSigningService
+public sealed class GovernanceTestSigningService : IGovernanceSigningService
 {
     /// <inheritdoc />
     public ValueTask<SigningResult> SignAsync(
@@ -393,7 +393,7 @@ internal static class AsiBackboneTestHarnessDecisionFactory
 {
     internal static GovernanceDecision WithTelemetry(
         GovernanceDecision decision,
-        AsiBackboneConstraintEvaluationContext context)
+        GovernanceEvaluationContext context)
     {
         ArgumentNullException.ThrowIfNull(context);
 

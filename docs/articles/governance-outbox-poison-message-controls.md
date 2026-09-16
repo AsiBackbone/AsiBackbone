@@ -6,7 +6,7 @@ In this software project, **ASI** means **Accountable Systems Infrastructure**. 
 
 ## Configuration
 
-`AsiBackboneGovernanceOutboxOptions` exposes the following controls:
+`GovernanceOutboxOptions` exposes the following controls:
 
 | Option | Default | Purpose |
 | --- | --- | --- |
@@ -18,7 +18,7 @@ In this software project, **ASI** means **Accountable Systems Infrastructure**. 
 Example:
 
 ```csharp
-services.Configure<AsiBackboneGovernanceOutboxOptions>(options =>
+services.Configure<GovernanceOutboxOptions>(options =>
 {
     options.MaxRetryAttempts = 8;
     options.DeadLetterOnMaxRetryAttempts = true;
@@ -34,8 +34,8 @@ services.Configure<AsiBackboneGovernanceOutboxOptions>(options =>
 
 The same threshold policy applies to both drain modes:
 
-- normal provider-neutral draining through `IAsiBackboneGovernanceOutboxStore`; and
-- claim/lease draining through `IAsiBackboneGovernanceOutboxClaimStore`.
+- normal provider-neutral draining through `IGovernanceOutboxStore`; and
+- claim/lease draining through `IGovernanceOutboxClaimStore`.
 
 A successful emission is marked delivered as usual. Provider-returned terminal dead-letter results remain terminal. Pending and deferred results remain deferred and do not consume the failed-attempt threshold because they do not increment `RetryCount`.
 
@@ -57,7 +57,7 @@ The threshold is deliberately enforced in the drain rather than delegated to a p
 
 ## Authoritative retry policy
 
-`AsiBackboneGovernanceOutboxOptions` is the authoritative retry and poison-message policy for the built-in drain:
+`GovernanceOutboxOptions` is the authoritative retry and poison-message policy for the built-in drain:
 
 - `MaxRetryAttempts` applies consistently to every attempted emission handled by the drain.
 - `DeadLetterOnMaxRetryAttempts` determines whether reaching that threshold creates a terminal dead-letter transition.
@@ -74,7 +74,7 @@ AsiBackbone records a stable terminal state; the host must make that state opera
 - emit a counter or event whenever an entry transitions to dead-lettered;
 - alert on increases in dead-letter count, especially repeated reason codes or provider paths;
 - alert before the threshold when retry counts approach `MaxRetryAttempts`;
-- correlate the incident with outbox entry ID, correlation ID, audit residue ID, provider, region, tenant, and workload using minimized metadata;
+- correlate the incident with outbox entry ID, correlation ID, decision receipt ID, provider, region, tenant, and workload using minimized metadata;
 - avoid placing raw prompts, protected content, credentials, access tokens, or secrets in alerts.
 
 A dead-letter transition should normally open an incident or review item for regulated or consequential workloads. It should never be treated as successful delivery.

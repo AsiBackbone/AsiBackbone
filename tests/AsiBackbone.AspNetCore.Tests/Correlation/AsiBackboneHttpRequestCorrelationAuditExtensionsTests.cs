@@ -8,17 +8,17 @@ using Xunit;
 namespace AsiBackbone.AspNetCore.Tests.Correlation;
 
 /// <summary>
-/// Unit tests for the <see cref="AsiBackboneHttpRequestCorrelationAuditExtensions"/> class.
+/// Unit tests for the <see cref="GovernanceHttpRequestCorrelationAuditExtensions"/> class.
 /// </summary>
 public sealed class AsiBackboneHttpRequestCorrelationAuditExtensionsTests
 {
     /// <summary>
-    /// Tests that the <c>AsiBackboneHttpRequestCorrelation.CreateAuditResidue"</c> method uses the request correlation ID and trace ID before falling back to the decision correlation ID and trace ID.
+    /// Tests that the <c>GovernanceHttpRequestCorrelation.CreateAuditResidue"</c> method uses the request correlation ID and trace ID before falling back to the decision correlation ID and trace ID.
     /// </summary>
     [Fact]
     public void CreateAuditResidueUsesRequestCorrelationBeforeDecisionCorrelation()
     {
-        AsiBackboneHttpRequestCorrelation correlation = new(
+        GovernanceHttpRequestCorrelation correlation = new(
             correlationId: "request-correlation",
             traceId: "request-trace");
         var decision = GovernanceDecision.Allow(
@@ -27,8 +27,8 @@ public sealed class AsiBackboneHttpRequestCorrelationAuditExtensionsTests
             policyVersion: "v1",
             policyHash: "hash-1");
 
-        AuditResidue residue = correlation.CreateAuditResidue(
-            AsiBackboneActorContext.System,
+        DecisionReceipt residue = correlation.CreateAuditResidue(
+            GovernanceActorContext.System,
             "operate",
             decision);
 
@@ -39,18 +39,18 @@ public sealed class AsiBackboneHttpRequestCorrelationAuditExtensionsTests
     }
 
     /// <summary>
-    /// Tests that the <c>AsiBackboneHttpRequestCorrelation.CreateAuditResidue</c> method falls back to the decision correlation ID and trace ID when the request correlation ID and trace ID are missing.
+    /// Tests that the <c>GovernanceHttpRequestCorrelation.CreateAuditResidue</c> method falls back to the decision correlation ID and trace ID when the request correlation ID and trace ID are missing.
     /// </summary>
     [Fact]
     public void CreateAuditResidueFallsBackToDecisionCorrelationWhenRequestCorrelationIsMissing()
     {
-        AsiBackboneHttpRequestCorrelation correlation = new();
+        GovernanceHttpRequestCorrelation correlation = new();
         var decision = GovernanceDecision.Allow(
             correlationId: "decision-correlation",
             traceId: "decision-trace");
 
-        AuditResidue residue = correlation.CreateAuditResidue(
-            AsiBackboneActorContext.System,
+        DecisionReceipt residue = correlation.CreateAuditResidue(
+            GovernanceActorContext.System,
             "operate",
             decision);
 
@@ -59,16 +59,16 @@ public sealed class AsiBackboneHttpRequestCorrelationAuditExtensionsTests
     }
 
     /// <summary>
-    /// Tests that the <c>AsiBackboneHttpRequestCorrelation.CreateAuditResidue</c> method merges safe request metadata with host metadata.
+    /// Tests that the <c>GovernanceHttpRequestCorrelation.CreateAuditResidue</c> method merges safe request metadata with host metadata.
     /// </summary>
     [Fact]
     public void CreateAuditResidueMergesSafeRequestMetadataWithHostMetadata()
     {
-        AsiBackboneHttpRequestCorrelation correlation = new(
+        GovernanceHttpRequestCorrelation correlation = new(
             metadata: new Dictionary<string, string>(StringComparer.Ordinal)
             {
-                [AsiBackboneHttpRequestMetadataKeys.Method] = "POST",
-                [AsiBackboneHttpRequestMetadataKeys.RoutePattern] = "/api/widgets/{id}",
+                [GovernanceHttpRequestMetadataKeys.Method] = "POST",
+                [GovernanceHttpRequestMetadataKeys.RoutePattern] = "/api/widgets/{id}",
             });
         var decision = GovernanceDecision.Allow();
         Dictionary<string, string> metadata = new(StringComparer.Ordinal)
@@ -76,32 +76,32 @@ public sealed class AsiBackboneHttpRequestCorrelationAuditExtensionsTests
             ["operation.scope"] = "test",
         };
 
-        AuditResidue residue = correlation.CreateAuditResidue(
-            AsiBackboneActorContext.System,
+        DecisionReceipt residue = correlation.CreateAuditResidue(
+            GovernanceActorContext.System,
             "operate",
             decision,
             metadata: metadata);
 
-        Assert.Equal("POST", residue.Metadata[AsiBackboneHttpRequestMetadataKeys.Method]);
-        Assert.Equal("/api/widgets/{id}", residue.Metadata[AsiBackboneHttpRequestMetadataKeys.RoutePattern]);
+        Assert.Equal("POST", residue.Metadata[GovernanceHttpRequestMetadataKeys.Method]);
+        Assert.Equal("/api/widgets/{id}", residue.Metadata[GovernanceHttpRequestMetadataKeys.RoutePattern]);
         Assert.Equal("test", residue.Metadata["operation.scope"]);
     }
 
     /// <summary>
-    /// Tests that the <see cref="AsiBackboneHttpRequestCorrelation.ToEvaluationContext"/> method propagates the correlation ID, policy version, policy hash, and safe request metadata to the evaluation context.
+    /// Tests that the <see cref="GovernanceHttpRequestCorrelation.ToEvaluationContext"/> method propagates the correlation ID, policy version, policy hash, and safe request metadata to the evaluation context.
     /// </summary>
     [Fact]
     public void ToEvaluationContextPropagatesCorrelationAndSafeMetadata()
     {
-        AsiBackboneHttpRequestCorrelation correlation = new(
+        GovernanceHttpRequestCorrelation correlation = new(
             correlationId: "request-correlation",
             traceId: "request-trace",
             metadata: new Dictionary<string, string>(StringComparer.Ordinal)
             {
-                [AsiBackboneHttpRequestMetadataKeys.Method] = "GET",
+                [GovernanceHttpRequestMetadataKeys.Method] = "GET",
             });
 
-        AsiBackboneConstraintEvaluationContext context = correlation.ToEvaluationContext(
+        GovernanceEvaluationContext context = correlation.ToEvaluationContext(
             policyVersion: "v2",
             policyHash: "hash-2",
             metadata: new Dictionary<string, string>(StringComparer.Ordinal)
@@ -112,7 +112,7 @@ public sealed class AsiBackboneHttpRequestCorrelationAuditExtensionsTests
         Assert.Equal("request-correlation", context.CorrelationId);
         Assert.Equal("v2", context.PolicyVersion);
         Assert.Equal("hash-2", context.PolicyHash);
-        Assert.Equal("GET", context.Metadata[AsiBackboneHttpRequestMetadataKeys.Method]);
+        Assert.Equal("GET", context.Metadata[GovernanceHttpRequestMetadataKeys.Method]);
         Assert.Equal("policy", context.Metadata["operation.scope"]);
     }
 }

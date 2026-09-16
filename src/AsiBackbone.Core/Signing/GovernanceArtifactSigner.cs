@@ -8,16 +8,16 @@ namespace AsiBackbone.Core.Signing;
 /// Provides provider-neutral helper methods for preparing and signing AsiBackbone governance artifacts.
 /// </summary>
 /// <remarks>
-/// The helpers canonicalize and hash artifacts before optionally invoking <see cref="IAsiBackboneSigningService" />.
+/// The helpers canonicalize and hash artifacts before optionally invoking <see cref="IGovernanceSigningService" />.
 /// They do not verify signatures, persist records, provide immutable storage, or make tamper-evidence claims.
 /// </remarks>
 public static class GovernanceArtifactSigner
 {
     /// <summary>
-    /// Creates an unsigned wrapper for audit residue.
+    /// Creates an unsigned wrapper for decision receipt.
     /// </summary>
-    public static SignedGovernanceArtifact<IAsiBackboneAuditResidue> CreateUnsignedAuditResidue(
-        IAsiBackboneAuditResidue residue,
+    public static SignedGovernanceArtifact<IDecisionReceipt> CreateUnsignedAuditResidue(
+        IDecisionReceipt residue,
         CanonicalPayloadOptions? options = null,
         string? hashAlgorithm = null)
     {
@@ -25,10 +25,10 @@ public static class GovernanceArtifactSigner
     }
 
     /// <summary>
-    /// Creates signing-ready metadata for audit residue without invoking a signing provider.
+    /// Creates signing-ready metadata for decision receipt without invoking a signing provider.
     /// </summary>
-    public static SignedGovernanceArtifact<IAsiBackboneAuditResidue> CreateSigningReadyAuditResidue(
-        IAsiBackboneAuditResidue residue,
+    public static SignedGovernanceArtifact<IDecisionReceipt> CreateSigningReadyAuditResidue(
+        IDecisionReceipt residue,
         CanonicalPayloadOptions? options = null,
         string? hashAlgorithm = null,
         IReadOnlyDictionary<string, string>? metadata = null)
@@ -37,11 +37,11 @@ public static class GovernanceArtifactSigner
     }
 
     /// <summary>
-    /// Signs audit residue after canonical payload hashing.
+    /// Signs decision receipt after canonical payload hashing.
     /// </summary>
-    public static ValueTask<SignedGovernanceArtifact<IAsiBackboneAuditResidue>> SignAuditResidueAsync(
-        IAsiBackboneAuditResidue residue,
-        IAsiBackboneSigningService signingService,
+    public static ValueTask<SignedGovernanceArtifact<IDecisionReceipt>> SignAuditResidueAsync(
+        IDecisionReceipt residue,
+        IGovernanceSigningService signingService,
         CanonicalPayloadOptions? options = null,
         string? hashAlgorithm = null,
         string? keyId = null,
@@ -90,7 +90,7 @@ public static class GovernanceArtifactSigner
     /// </summary>
     public static ValueTask<SignedGovernanceArtifact<AuditLedgerRecord>> SignAuditLedgerRecordAsync(
         AuditLedgerRecord record,
-        IAsiBackboneSigningService signingService,
+        IGovernanceSigningService signingService,
         CanonicalPayloadOptions? options = null,
         string? hashAlgorithm = null,
         string? keyId = null,
@@ -112,10 +112,10 @@ public static class GovernanceArtifactSigner
     }
 
     /// <summary>
-    /// Creates an unsigned wrapper for an audit residue lifecycle event.
+    /// Creates an unsigned wrapper for an decision receipt lifecycle event.
     /// </summary>
-    public static SignedGovernanceArtifact<AuditResidueLifecycleEvent> CreateUnsignedAuditResidueLifecycleEvent(
-        AuditResidueLifecycleEvent lifecycleEvent,
+    public static SignedGovernanceArtifact<DecisionReceiptLifecycleEvent> CreateUnsignedAuditResidueLifecycleEvent(
+        DecisionReceiptLifecycleEvent lifecycleEvent,
         CanonicalPayloadOptions? options = null,
         string? hashAlgorithm = null)
     {
@@ -123,10 +123,10 @@ public static class GovernanceArtifactSigner
     }
 
     /// <summary>
-    /// Creates signing-ready metadata for an audit residue lifecycle event without invoking a signing provider.
+    /// Creates signing-ready metadata for an decision receipt lifecycle event without invoking a signing provider.
     /// </summary>
-    public static SignedGovernanceArtifact<AuditResidueLifecycleEvent> CreateSigningReadyAuditResidueLifecycleEvent(
-        AuditResidueLifecycleEvent lifecycleEvent,
+    public static SignedGovernanceArtifact<DecisionReceiptLifecycleEvent> CreateSigningReadyAuditResidueLifecycleEvent(
+        DecisionReceiptLifecycleEvent lifecycleEvent,
         CanonicalPayloadOptions? options = null,
         string? hashAlgorithm = null,
         IReadOnlyDictionary<string, string>? metadata = null)
@@ -135,11 +135,11 @@ public static class GovernanceArtifactSigner
     }
 
     /// <summary>
-    /// Signs an audit residue lifecycle event after canonical payload hashing.
+    /// Signs an decision receipt lifecycle event after canonical payload hashing.
     /// </summary>
-    public static ValueTask<SignedGovernanceArtifact<AuditResidueLifecycleEvent>> SignAuditResidueLifecycleEventAsync(
-        AuditResidueLifecycleEvent lifecycleEvent,
-        IAsiBackboneSigningService signingService,
+    public static ValueTask<SignedGovernanceArtifact<DecisionReceiptLifecycleEvent>> SignAuditResidueLifecycleEventAsync(
+        DecisionReceiptLifecycleEvent lifecycleEvent,
+        IGovernanceSigningService signingService,
         CanonicalPayloadOptions? options = null,
         string? hashAlgorithm = null,
         string? keyId = null,
@@ -188,7 +188,7 @@ public static class GovernanceArtifactSigner
     /// </summary>
     public static ValueTask<SignedGovernanceArtifact<GovernanceEmissionEnvelope>> SignGovernanceEmissionEnvelopeAsync(
         GovernanceEmissionEnvelope envelope,
-        IAsiBackboneSigningService signingService,
+        IGovernanceSigningService signingService,
         CanonicalPayloadOptions? options = null,
         string? hashAlgorithm = null,
         string? keyId = null,
@@ -237,7 +237,7 @@ public static class GovernanceArtifactSigner
     /// </summary>
     public static ValueTask<SignedGovernanceArtifact<GovernanceOutboxEntry>> SignGovernanceOutboxEntryAsync(
         GovernanceOutboxEntry entry,
-        IAsiBackboneSigningService signingService,
+        IGovernanceSigningService signingService,
         CanonicalPayloadOptions? options = null,
         string? hashAlgorithm = null,
         string? keyId = null,
@@ -307,7 +307,7 @@ public static class GovernanceArtifactSigner
     private static async ValueTask<SignedGovernanceArtifact<TArtifact>> SignAsync<TArtifact>(
         TArtifact artifact,
         CanonicalPayload payload,
-        IAsiBackboneSigningService signingService,
+        IGovernanceSigningService signingService,
         string? hashAlgorithm,
         string? keyId,
         string? keyVersion,

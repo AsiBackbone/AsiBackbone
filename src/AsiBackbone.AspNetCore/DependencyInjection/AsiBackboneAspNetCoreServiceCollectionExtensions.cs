@@ -36,16 +36,16 @@ public static class AsiBackboneAspNetCoreServiceCollectionExtensions
     /// </exception>
     public static IServiceCollection AddAsiBackboneAspNetCore(
         this IServiceCollection services,
-        Action<AsiBackboneAspNetCoreOptions> configure)
+        Action<AspNetCoreGovernanceOptions> configure)
     {
         ArgumentNullException.ThrowIfNull(services);
         ArgumentNullException.ThrowIfNull(configure);
 
-        AsiBackboneAspNetCoreOptions options = new();
+        AspNetCoreGovernanceOptions options = new();
         configure(options);
         options.Validate();
 
-        _ = services.AddOptions<AsiBackboneAspNetCoreOptions>()
+        _ = services.AddOptions<AspNetCoreGovernanceOptions>()
             .Configure(configure)
             .Validate(static options =>
             {
@@ -61,7 +61,7 @@ public static class AsiBackboneAspNetCoreServiceCollectionExtensions
             }, "ASP.NET Core integration options must be valid.")
             .ValidateOnStart();
 
-        _ = services.AddOptions<AsiBackboneHttpActorContextOptions>()
+        _ = services.AddOptions<HttpGovernanceActorContextOptions>()
             .Validate(static options =>
             {
                 try
@@ -76,7 +76,7 @@ public static class AsiBackboneAspNetCoreServiceCollectionExtensions
             }, "HTTP actor context options must be valid.")
             .ValidateOnStart();
 
-        _ = services.AddOptions<AsiBackboneHttpResultMappingOptions>()
+        _ = services.AddOptions<GovernanceHttpResultMappingOptions>()
             .Validate(static options =>
             {
                 try
@@ -91,7 +91,7 @@ public static class AsiBackboneAspNetCoreServiceCollectionExtensions
             }, "HTTP result mapping options must be valid.")
             .ValidateOnStart();
 
-        _ = services.AddOptions<AsiBackboneAcknowledgmentChallengeOptions>()
+        _ = services.AddOptions<AcknowledgmentChallengeOptions>()
             .Validate(static options =>
             {
                 try
@@ -106,7 +106,7 @@ public static class AsiBackboneAspNetCoreServiceCollectionExtensions
             }, "Acknowledgment challenge options must be valid.")
             .ValidateOnStart();
 
-        _ = services.AddOptions<AsiBackboneEndpointGovernanceOptions>()
+        _ = services.AddOptions<EndpointGovernanceOptions>()
             .Validate(static options =>
             {
                 try
@@ -123,10 +123,10 @@ public static class AsiBackboneAspNetCoreServiceCollectionExtensions
 
         _ = services.AddLogging();
         _ = services.AddHttpContextAccessor();
-        _ = services.AddScoped<IAsiBackboneHttpActorContextResolver, HttpContextAsiBackboneActorContextResolver>();
-        _ = services.AddScoped<IAsiBackboneHttpRequestCorrelationResolver, HttpContextAsiBackboneRequestCorrelationResolver>();
-        _ = services.AddScoped<IAsiBackboneAcknowledgmentChallengeService, DefaultAsiBackboneAcknowledgmentChallengeService>();
-        _ = services.AddScoped<IAsiBackboneEndpointGovernanceService, DefaultAsiBackboneEndpointGovernanceService>();
+        _ = services.AddScoped<IHttpGovernanceActorContextResolver, HttpContextGovernanceActorContextResolver>();
+        _ = services.AddScoped<IHttpGovernanceRequestCorrelationResolver, HttpContextGovernanceRequestCorrelationResolver>();
+        _ = services.AddScoped<IAcknowledgmentChallengeService, DefaultAcknowledgmentChallengeService>();
+        _ = services.AddScoped<IEndpointGovernanceService, DefaultEndpointGovernanceService>();
 
         return services;
     }
@@ -137,8 +137,8 @@ public static class AsiBackboneAspNetCoreServiceCollectionExtensions
     /// <remarks>
     /// The worker is local to the process in which it is registered, so every replica of a horizontally scaled host runs
     /// its own worker against the same durable outbox. Coordination before provider emission comes from
-    /// <see cref="AsiBackboneGovernanceOutboxOptions.UseClaimLeases" />, which is enabled by default and requires a store
-    /// implementing <see cref="IAsiBackboneGovernanceOutboxClaimStore" />; the drain throws when it is enabled against a
+    /// <see cref="GovernanceOutboxOptions.UseClaimLeases" />, which is enabled by default and requires a store
+    /// implementing <see cref="IGovernanceOutboxClaimStore" />; the drain throws when it is enabled against a
     /// store that cannot claim. Disabling it allows two replicas to select and emit the same envelope, so a host that opts
     /// out should partition work, run the worker on a single role, or rely on provider-side idempotency.
     /// Claiming coordinates workers; it does not by itself create an exactly-once delivery guarantee.
@@ -156,8 +156,8 @@ public static class AsiBackboneAspNetCoreServiceCollectionExtensions
     /// <remarks>
     /// The worker is local to the process in which it is registered, so every replica of a horizontally scaled host runs
     /// its own worker against the same durable outbox. Coordination before provider emission comes from
-    /// <see cref="AsiBackboneGovernanceOutboxOptions.UseClaimLeases" />, which is enabled by default and requires a store
-    /// implementing <see cref="IAsiBackboneGovernanceOutboxClaimStore" />; the drain throws when it is enabled against a
+    /// <see cref="GovernanceOutboxOptions.UseClaimLeases" />, which is enabled by default and requires a store
+    /// implementing <see cref="IGovernanceOutboxClaimStore" />; the drain throws when it is enabled against a
     /// store that cannot claim. Disabling it allows two replicas to select and emit the same envelope, so a host that opts
     /// out should partition work, run the worker on a single role, or rely on provider-side idempotency.
     /// Claiming coordinates workers; it does not by itself create an exactly-once delivery guarantee.
@@ -170,16 +170,16 @@ public static class AsiBackboneAspNetCoreServiceCollectionExtensions
     /// </exception>
     public static IServiceCollection AddAsiBackboneGovernanceOutboxDrainWorker(
         this IServiceCollection services,
-        Action<AsiBackboneGovernanceOutboxDrainWorkerOptions> configure)
+        Action<GovernanceOutboxDrainWorkerOptions> configure)
     {
         ArgumentNullException.ThrowIfNull(services);
         ArgumentNullException.ThrowIfNull(configure);
 
-        AsiBackboneGovernanceOutboxDrainWorkerOptions options = new();
+        GovernanceOutboxDrainWorkerOptions options = new();
         configure(options);
         options.Validate();
 
-        _ = services.AddOptions<AsiBackboneGovernanceOutboxDrainWorkerOptions>()
+        _ = services.AddOptions<GovernanceOutboxDrainWorkerOptions>()
             .Configure(configure)
             .Validate(static options =>
             {
@@ -195,7 +195,7 @@ public static class AsiBackboneAspNetCoreServiceCollectionExtensions
             }, "Governance outbox drain worker options must be valid.")
             .ValidateOnStart();
 
-        _ = services.AddOptions<AsiBackboneGovernanceOutboxOptions>()
+        _ = services.AddOptions<GovernanceOutboxOptions>()
             .Validate(static options =>
             {
                 try
@@ -210,8 +210,8 @@ public static class AsiBackboneAspNetCoreServiceCollectionExtensions
             }, "Governance outbox options must be valid.")
             .ValidateOnStart();
 
-        services.TryAddScoped<AsiBackboneGovernanceOutboxDrain>();
-        _ = services.AddHostedService<AsiBackboneGovernanceOutboxDrainHostedService>();
+        services.TryAddScoped<GovernanceOutboxDrain>();
+        _ = services.AddHostedService<GovernanceOutboxDrainHostedService>();
 
         return services;
     }

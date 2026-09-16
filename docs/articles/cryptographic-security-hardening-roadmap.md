@@ -68,7 +68,7 @@ Concrete provider work should live in provider packages, host integrations, samp
 
 Child issue: #219. Status: released provider-neutral surface in the stable `1.1.x` line.
 
-Define how selected artifacts become deterministic payloads before hashing. Candidate artifacts include audit receipts, audit ledger records, audit residue lifecycle events, governance outbox entries, governance emission envelopes, and capability-token grants.
+Define how selected artifacts become deterministic payloads before hashing. Candidate artifacts include audit receipts, audit ledger records, decision receipt lifecycle events, governance outbox entries, governance emission envelopes, and capability-token grants.
 
 Minimum design decisions include canonical property order, UTC timestamp format, null handling, collection ordering, metadata allow-listing, schema version binding, artifact type binding, hash algorithm recording, and canonicalization version recording.
 
@@ -101,7 +101,7 @@ Recommended sequence:
 
 ```text
 Decision / acknowledgment / capability event
-  -> build audit residue or lifecycle event
+  -> build decision receipt or lifecycle event
   -> classify and minimize metadata
   -> canonicalize artifact
   -> compute artifact hash
@@ -209,7 +209,7 @@ The roadmap continues the existing governance-spine sequence:
 ```text
 Policy pipeline
   -> acknowledgment workflow
-  -> audit residue
+  -> decision receipt
   -> capability boundary
   -> durable local/outbox persistence
   -> optional provider emission

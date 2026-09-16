@@ -39,14 +39,14 @@ Configuration order still matters. Later `Configure<TOptions>(...)` calls can in
 
 | Option | Strict value | Reason |
 | --- | --- | --- |
-| `AsiBackbonePolicyEvaluatorOptions.DenyWhenNoConstraints` | `true` | Empty policy structure becomes a denied governance decision instead of an allowed decision. |
-| `AsiBackbonePolicyEvaluatorOptions.TreatConstraintExceptionAsDenial` | `true` | Eligible policy constraint exceptions become safe denied decisions with stable reason codes. Cancellation and critical host/runtime failures still propagate. |
-| `AsiBackbonePolicyEvaluatorOptions.TreatThreatContributorExceptionAsDenial` | `true` | Threat-model contributor failures fail closed when contributors are registered. |
-| `AsiBackbonePolicyEvaluatorOptions.PreventThreatAssessmentAllowDowngrade` | `true` | Actionable threat assessment outcomes remain protected from being downgraded to pure allow decisions. |
-| `AsiBackboneEndpointGovernanceOptions.FailClosedWhenPolicyEvaluatorMissing` | `true` | Endpoints that require policy evaluation fail closed when no evaluator is configured. |
-| `AsiBackboneEndpointGovernanceOptions.FailClosedWhenCapabilityValidatorMissing` | `true` | Capability-gated endpoints fail closed when no capability validator is configured. |
-| `AsiBackboneEndpointGovernanceOptions.FailClosedWhenAuditSinkMissing` | `true` | Audit-emitting endpoints fail closed when no host-owned audit sink is configured. |
-| `AsiBackboneEndpointGovernanceOptions.RequireGovernanceMetadata` | `true` | Selected endpoints without governance metadata are blocked unless explicitly marked as allowed to omit governance metadata. |
+| `GovernancePolicyOptions.DenyWhenNoConstraints` | `true` | Empty policy structure becomes a denied governance decision instead of an allowed decision. |
+| `GovernancePolicyOptions.TreatConstraintExceptionAsDenial` | `true` | Eligible policy constraint exceptions become safe denied decisions with stable reason codes. Cancellation and critical host/runtime failures still propagate. |
+| `GovernancePolicyOptions.TreatThreatContributorExceptionAsDenial` | `true` | Threat-model contributor failures fail closed when contributors are registered. |
+| `GovernancePolicyOptions.PreventThreatAssessmentAllowDowngrade` | `true` | Actionable threat assessment outcomes remain protected from being downgraded to pure allow decisions. |
+| `EndpointGovernanceOptions.FailClosedWhenPolicyEvaluatorMissing` | `true` | Endpoints that require policy evaluation fail closed when no evaluator is configured. |
+| `EndpointGovernanceOptions.FailClosedWhenCapabilityValidatorMissing` | `true` | Capability-gated endpoints fail closed when no capability validator is configured. |
+| `EndpointGovernanceOptions.FailClosedWhenAuditSinkMissing` | `true` | Audit-emitting endpoints fail closed when no host-owned audit sink is configured. |
+| `EndpointGovernanceOptions.RequireGovernanceMetadata` | `true` | Selected endpoints without governance metadata are blocked unless explicitly marked as allowed to omit governance metadata. |
 
 ## Empty-policy behavior
 
@@ -55,20 +55,20 @@ With the `3.x` defaults or the strict profile applied, empty-policy evaluation r
 If a host intentionally needs an unconstrained local validation flow, it must opt out explicitly with `DenyWhenNoConstraints = false`. That opt-out should be limited to tests, samples, migration steps, or separately protected local flows.
 
 ```csharp
-builder.Services.AddSingleton<IAsiBackbonePolicyEvaluator<AsiBackboneConstraintEvaluationContext>>(serviceProvider =>
+builder.Services.AddSingleton<IGovernancePolicyEvaluator<GovernanceEvaluationContext>>(serviceProvider =>
 {
     var options = serviceProvider
-        .GetRequiredService<IOptions<AsiBackbonePolicyEvaluatorOptions>>()
+        .GetRequiredService<IOptions<GovernancePolicyOptions>>()
         .Value;
 
-    return DefaultAsiBackbonePolicyEvaluator.CreateBuilder<AsiBackboneConstraintEvaluationContext>()
-        .AddConstraints(serviceProvider.GetServices<IAsiBackboneConstraint<AsiBackboneConstraintEvaluationContext>>())
+    return DefaultGovernancePolicyEvaluator.CreateBuilder<GovernanceEvaluationContext>()
+        .AddConstraints(serviceProvider.GetServices<IGovernanceConstraint<GovernanceEvaluationContext>>())
         .WithOptions(options)
         .Build();
 });
 ```
 
-If a host constructs `DefaultAsiBackbonePolicyEvaluator<TContext>` manually with `new AsiBackbonePolicyEvaluatorOptions`, that manually supplied object owns the behavior. The strict registration helper configures DI options; it does not rewrite explicitly constructed option instances.
+If a host constructs `DefaultGovernancePolicyEvaluator<TContext>` manually with `new GovernancePolicyOptions`, that manually supplied object owns the behavior. The strict registration helper configures DI options; it does not rewrite explicitly constructed option instances.
 
 ## Constraint-exception behavior
 
@@ -97,7 +97,7 @@ Hosts upgrading to or starting with `3.0.0` can use this path:
 1. Add `AddAsiBackboneStrictGovernance()` in non-production or staging first.
 2. Confirm every governed endpoint has policy, capability, and audit metadata where expected.
 3. Mark intentionally public endpoints with the explicit missing-governance-metadata opt-out.
-4. Make policy evaluator registrations consume `IOptions<AsiBackbonePolicyEvaluatorOptions>` instead of creating unrelated option instances.
+4. Make policy evaluator registrations consume `IOptions<GovernancePolicyOptions>` instead of creating unrelated option instances.
 5. Monitor denied decisions for `asibackbone.policy.no_constraints`, `asibackbone.policy.constraint_exception`, and `asibackbone.threat.contributor_exception` reason codes.
 6. Remove accidental empty-policy flows before enabling the profile in production.
 7. Keep the helper in production when the host wants the fail-closed posture to be visible in code review and startup configuration.

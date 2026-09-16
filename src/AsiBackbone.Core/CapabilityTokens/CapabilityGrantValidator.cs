@@ -7,7 +7,7 @@ public static class CapabilityGrantValidator
     public static async ValueTask<CapabilityGrantValidationResult> ValidateAsync(
         SignedGovernanceArtifact<CapabilityTokenGrant> signedGrant,
         CapabilityGrantValidationOptions? options = null,
-        IAsiBackboneSignatureVerificationService? verificationService = null,
+        IGovernanceSignatureVerificationService? verificationService = null,
         ICapabilityGrantUseStore? useStore = null,
         CancellationToken cancellationToken = default)
     {
@@ -76,7 +76,7 @@ public static class CapabilityGrantValidator
         SignedGovernanceArtifact<CapabilityTokenGrant> signedGrant,
         CapabilityTokenGrant grant,
         CapabilityGrantValidationOptions options,
-        IAsiBackboneSignatureVerificationService? verificationService,
+        IGovernanceSignatureVerificationService? verificationService,
         CancellationToken cancellationToken)
     {
         if (verificationService is null)

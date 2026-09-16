@@ -4,7 +4,7 @@ using Xunit;
 namespace AsiBackbone.Core.Tests.Actors;
 
 /// <summary>
-/// Tests for the <see cref="AsiBackboneActorContext"/> class, which represents the context of an actor in the AsiBackbone system.
+/// Tests for the <see cref="GovernanceActorContext"/> class, which represents the context of an actor in the AsiBackbone system.
 /// </summary>
 public sealed class AsiBackboneActorContextTests
 {
@@ -14,14 +14,14 @@ public sealed class AsiBackboneActorContextTests
     [Fact]
     public void UnknownRepresentsUnauthenticatedUnknownActor()
     {
-        AsiBackboneActorContext actorContext = AsiBackboneActorContext.Unknown;
+        GovernanceActorContext actorContext = GovernanceActorContext.Unknown;
 
-        Assert.Equal(AsiBackboneActorContext.UnknownActorId, actorContext.ActorId);
-        Assert.Equal(AsiBackboneActorType.Unknown, actorContext.ActorType);
+        Assert.Equal(GovernanceActorContext.UnknownActorId, actorContext.ActorId);
+        Assert.Equal(GovernanceActorType.Unknown, actorContext.ActorType);
         Assert.Null(actorContext.DisplayName);
         Assert.False(actorContext.IsKnown);
         Assert.False(actorContext.IsAuthenticated);
-        _ = Assert.IsAssignableFrom<IAsiBackboneActorContext>(actorContext);
+        _ = Assert.IsAssignableFrom<IGovernanceActorContext>(actorContext);
     }
 
     /// <summary>
@@ -30,10 +30,10 @@ public sealed class AsiBackboneActorContextTests
     [Fact]
     public void SystemRepresentsKnownAuthenticatedSystemActor()
     {
-        AsiBackboneActorContext actorContext = AsiBackboneActorContext.System;
+        GovernanceActorContext actorContext = GovernanceActorContext.System;
 
-        Assert.Equal(AsiBackboneActorContext.SystemActorId, actorContext.ActorId);
-        Assert.Equal(AsiBackboneActorType.System, actorContext.ActorType);
+        Assert.Equal(GovernanceActorContext.SystemActorId, actorContext.ActorId);
+        Assert.Equal(GovernanceActorType.System, actorContext.ActorType);
         Assert.Equal("System", actorContext.DisplayName);
         Assert.True(actorContext.IsKnown);
         Assert.True(actorContext.IsAuthenticated);
@@ -45,12 +45,12 @@ public sealed class AsiBackboneActorContextTests
     [Fact]
     public void HumanCreatesKnownHumanActorContext()
     {
-        var actorContext = AsiBackboneActorContext.Human(
+        var actorContext = GovernanceActorContext.Human(
             " user-123 ",
             " Test User ");
 
         Assert.Equal("user-123", actorContext.ActorId);
-        Assert.Equal(AsiBackboneActorType.Human, actorContext.ActorType);
+        Assert.Equal(GovernanceActorType.Human, actorContext.ActorType);
         Assert.Equal("Test User", actorContext.DisplayName);
         Assert.True(actorContext.IsKnown);
         Assert.True(actorContext.IsAuthenticated);
@@ -62,12 +62,12 @@ public sealed class AsiBackboneActorContextTests
     [Fact]
     public void HumanCanRepresentKnownUnauthenticatedActor()
     {
-        var actorContext = AsiBackboneActorContext.Human(
+        var actorContext = GovernanceActorContext.Human(
             "user-123",
             isAuthenticated: false);
 
         Assert.Equal("user-123", actorContext.ActorId);
-        Assert.Equal(AsiBackboneActorType.Human, actorContext.ActorType);
+        Assert.Equal(GovernanceActorType.Human, actorContext.ActorType);
         Assert.True(actorContext.IsKnown);
         Assert.False(actorContext.IsAuthenticated);
     }
@@ -78,12 +78,12 @@ public sealed class AsiBackboneActorContextTests
     [Fact]
     public void ServiceCreatesKnownAuthenticatedServiceActorContext()
     {
-        var actorContext = AsiBackboneActorContext.Service(
+        var actorContext = GovernanceActorContext.Service(
             " service-worker ",
             " Background Worker ");
 
         Assert.Equal("service-worker", actorContext.ActorId);
-        Assert.Equal(AsiBackboneActorType.Service, actorContext.ActorType);
+        Assert.Equal(GovernanceActorType.Service, actorContext.ActorType);
         Assert.Equal("Background Worker", actorContext.DisplayName);
         Assert.True(actorContext.IsKnown);
         Assert.True(actorContext.IsAuthenticated);
@@ -95,10 +95,10 @@ public sealed class AsiBackboneActorContextTests
     [Fact]
     public void AgentCreatesKnownAgentActorContext()
     {
-        var actorContext = AsiBackboneActorContext.Agent("agent-001");
+        var actorContext = GovernanceActorContext.Agent("agent-001");
 
         Assert.Equal("agent-001", actorContext.ActorId);
-        Assert.Equal(AsiBackboneActorType.Agent, actorContext.ActorType);
+        Assert.Equal(GovernanceActorType.Agent, actorContext.ActorType);
         Assert.Null(actorContext.DisplayName);
         Assert.True(actorContext.IsKnown);
         Assert.True(actorContext.IsAuthenticated);
@@ -110,9 +110,9 @@ public sealed class AsiBackboneActorContextTests
     [Fact]
     public void FactoryThrowsForBlankActorId()
     {
-        _ = Assert.Throws<ArgumentException>(() => AsiBackboneActorContext.Human(" "));
-        _ = Assert.Throws<ArgumentException>(() => AsiBackboneActorContext.Service(string.Empty));
-        _ = Assert.Throws<ArgumentException>(() => AsiBackboneActorContext.Agent("\t"));
+        _ = Assert.Throws<ArgumentException>(() => GovernanceActorContext.Human(" "));
+        _ = Assert.Throws<ArgumentException>(() => GovernanceActorContext.Service(string.Empty));
+        _ = Assert.Throws<ArgumentException>(() => GovernanceActorContext.Agent("\t"));
     }
 
     /// <summary>
@@ -121,7 +121,7 @@ public sealed class AsiBackboneActorContextTests
     [Fact]
     public void BlankDisplayNameNormalizesToNull()
     {
-        var actorContext = AsiBackboneActorContext.Human(
+        var actorContext = GovernanceActorContext.Human(
             "user-123",
             " ");
 

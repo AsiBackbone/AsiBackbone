@@ -116,12 +116,12 @@ public sealed class GovernedOperationExecutionReceiptTests
             completedUtc: new DateTimeOffset(2026, 7, 17, 12, 0, 0, TimeSpan.FromHours(-5)),
             decisionAuditRecordId: "decision-record-1");
 
-        AuditResidueLifecycleEvent lifecycleEvent = HostAccountabilityLifecycleEvent.FromExecutionReceipt(
+        DecisionReceiptLifecycleEvent lifecycleEvent = HostAccountabilityLifecycleEvent.FromExecutionReceipt(
             residue,
             receipt,
             eventId: "lifecycle-1");
 
-        Assert.Equal(AuditResidueLifecycleStage.GatewayExecutionCompleted, lifecycleEvent.Stage);
+        Assert.Equal(DecisionReceiptLifecycleStage.GatewayExecutionCompleted, lifecycleEvent.Stage);
         Assert.Equal("correlation-1", lifecycleEvent.CorrelationId);
         Assert.Equal("trace-1", lifecycleEvent.TraceId);
         Assert.Equal("audit-1", lifecycleEvent.AuditResidueId);
@@ -183,13 +183,13 @@ public sealed class GovernedOperationExecutionReceiptTests
             metadata: metadata);
     }
 
-    private sealed class TestAuditResidue : IAsiBackboneAuditResidue
+    private sealed class TestAuditResidue : IDecisionReceipt
     {
         public string EventId => "audit-1";
         public string? AuditResidueId => "audit-1";
         public DateTimeOffset OccurredUtc => DateTimeOffset.UtcNow;
         public string ActorId => "actor-1";
-        public AsiBackboneActorType ActorType => AsiBackboneActorType.Human;
+        public GovernanceActorType ActorType => GovernanceActorType.Human;
         public string? ActorDisplayName => "Actor";
         public string OperationName => "orders.approve";
         public string Outcome => "Allowed";

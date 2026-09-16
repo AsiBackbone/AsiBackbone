@@ -10,7 +10,7 @@ namespace AsiBackbone.OpenTelemetry;
 /// <remarks>
 /// This emitter records activity events, activity tags, and low-cardinality metrics. It does not configure exporters or depend on Azure, SIEM, Event Hubs, Purview, robotics, or cloud-provider SDKs.
 /// </remarks>
-public sealed class OpenTelemetryGovernanceEmitter : IAsiBackboneGovernanceEmitter
+public sealed class OpenTelemetryGovernanceEmitter : IGovernanceEmitter
 {
     private static readonly ActivitySource ActivitySource = new(OpenTelemetryGovernanceInstrumentation.ActivitySourceName);
     private static readonly Meter Meter = new(OpenTelemetryGovernanceInstrumentation.MeterName);

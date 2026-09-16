@@ -16,7 +16,7 @@ namespace AsiBackbone.EntityFrameworkCore.Outbox;
 /// <see cref="EfCoreGovernanceOutboxStore" /> and observes the scoped <see cref="DbContext" /> save boundary so callers do not
 /// infer write ownership from the returned durable status alone.
 /// </remarks>
-public sealed class EfCoreGovernanceOutboxOutcomeStore : IAsiBackboneGovernanceOutboxClaimOutcomeStore
+public sealed class EfCoreGovernanceOutboxOutcomeStore : IGovernanceOutboxClaimOutcomeStore
 {
     private static readonly Meter Meter = new("AsiBackbone.EntityFrameworkCore.Outbox", "1.0.0");
     private static readonly Counter<long> ClaimTransitionCounter = Meter.CreateCounter<long>(

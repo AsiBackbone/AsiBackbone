@@ -14,7 +14,7 @@ The governed API demonstrates:
 
 - policy evaluation through `GovernanceDecision`,
 - acknowledgment-required sample decisions,
-- in-memory audit residue,
+- in-memory decision receipt,
 - host-owned SQLite ledger persistence,
 - local-development signing and verification,
 - endpoint-governance metadata for Minimal API and controller routes.

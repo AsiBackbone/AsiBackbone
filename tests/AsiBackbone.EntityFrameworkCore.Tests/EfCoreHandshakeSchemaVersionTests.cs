@@ -21,12 +21,12 @@ public sealed class EfCoreHandshakeSchemaVersionTests
     {
         await using HostOwnedHandshakeDbContext context = CreateContext();
 
-        _ = context.HandshakeRequests.Add(new AsiBackboneHandshakeRequestEntity
+        _ = context.HandshakeRequests.Add(new HandshakeRequestEntity
         {
             HandshakeId = "handshake-123",
             SchemaVersion = "1.1-test",
             ActorId = "actor-123",
-            ActorType = AsiBackboneActorType.Human,
+            ActorType = GovernanceActorType.Human,
             ActorDisplayName = "Test Actor",
             OperationName = "document.approve",
             ReasonCode = "ack.required",
@@ -43,7 +43,7 @@ public sealed class EfCoreHandshakeSchemaVersionTests
 
         _ = await context.SaveChangesAsync(TestContext.Current.CancellationToken);
 
-        AsiBackboneHandshakeRequestEntity found = await context.HandshakeRequests
+        HandshakeRequestEntity found = await context.HandshakeRequests
             .AsNoTracking()
             .SingleAsync(request => request.HandshakeId == "handshake-123", TestContext.Current.CancellationToken);
 
@@ -59,13 +59,13 @@ public sealed class EfCoreHandshakeSchemaVersionTests
     {
         await using HostOwnedHandshakeDbContext context = CreateContext();
 
-        _ = context.HandshakeAcknowledgments.Add(new AsiBackboneHandshakeAcknowledgmentEntity
+        _ = context.HandshakeAcknowledgments.Add(new HandshakeAcknowledgmentEntity
         {
             AcknowledgmentId = "ack-123",
             SchemaVersion = "1.1-test",
             HandshakeId = "handshake-123",
             ActorId = "actor-123",
-            ActorType = AsiBackboneActorType.Human,
+            ActorType = GovernanceActorType.Human,
             ActorDisplayName = "Test Actor",
             AcknowledgmentCode = "ACK-001",
             Acknowledged = true,
@@ -76,7 +76,7 @@ public sealed class EfCoreHandshakeSchemaVersionTests
 
         _ = await context.SaveChangesAsync(TestContext.Current.CancellationToken);
 
-        AsiBackboneHandshakeAcknowledgmentEntity found = await context.HandshakeAcknowledgments
+        HandshakeAcknowledgmentEntity found = await context.HandshakeAcknowledgments
             .AsNoTracking()
             .SingleAsync(acknowledgment => acknowledgment.AcknowledgmentId == "ack-123", TestContext.Current.CancellationToken);
 
@@ -90,12 +90,12 @@ public sealed class EfCoreHandshakeSchemaVersionTests
     public void HandshakeEntitiesDefaultToStableSchemaVersion()
     {
         Assert.Equal(
-            AsiBackboneSchemaVersions.StableArtifactsV1,
-            new AsiBackboneHandshakeRequestEntity().SchemaVersion);
+            GovernanceSchemaVersions.StableArtifactsV1,
+            new HandshakeRequestEntity().SchemaVersion);
 
         Assert.Equal(
-            AsiBackboneSchemaVersions.StableArtifactsV1,
-            new AsiBackboneHandshakeAcknowledgmentEntity().SchemaVersion);
+            GovernanceSchemaVersions.StableArtifactsV1,
+            new HandshakeAcknowledgmentEntity().SchemaVersion);
     }
 
     private static HostOwnedHandshakeDbContext CreateContext()
@@ -110,11 +110,11 @@ public sealed class EfCoreHandshakeSchemaVersionTests
     private sealed class HostOwnedHandshakeDbContext(DbContextOptions<HostOwnedHandshakeDbContext> options)
         : DbContext(options)
     {
-        public DbSet<AsiBackboneHandshakeRequestEntity> HandshakeRequests =>
-            Set<AsiBackboneHandshakeRequestEntity>();
+        public DbSet<HandshakeRequestEntity> HandshakeRequests =>
+            Set<HandshakeRequestEntity>();
 
-        public DbSet<AsiBackboneHandshakeAcknowledgmentEntity> HandshakeAcknowledgments =>
-            Set<AsiBackboneHandshakeAcknowledgmentEntity>();
+        public DbSet<HandshakeAcknowledgmentEntity> HandshakeAcknowledgments =>
+            Set<HandshakeAcknowledgmentEntity>();
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

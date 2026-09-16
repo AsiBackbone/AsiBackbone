@@ -12,7 +12,7 @@ using Xunit;
 namespace AsiBackbone.AspNetCore.Tests.Outbox;
 
 /// <summary>
-/// Unit tests for <see cref="AsiBackboneGovernanceOutboxDrainHostedService"/> and related extension methods.
+/// Unit tests for <see cref="GovernanceOutboxDrainHostedService"/> and related extension methods.
 /// </summary>
 public sealed class AsiBackboneGovernanceOutboxDrainHostedServiceTests
 {
@@ -24,8 +24,8 @@ public sealed class AsiBackboneGovernanceOutboxDrainHostedServiceTests
     {
         ServiceCollection services = new();
         _ = services.AddLogging();
-        _ = services.AddSingleton<IAsiBackboneGovernanceOutboxStore, RecordingGovernanceOutboxStore>();
-        _ = services.AddSingleton<IAsiBackboneGovernanceEmitter>(_ => new RecordingGovernanceEmitter(_ => GovernanceEmissionResult.Delivered("test-sink")));
+        _ = services.AddSingleton<IGovernanceOutboxStore, RecordingGovernanceOutboxStore>();
+        _ = services.AddSingleton<IGovernanceEmitter>(_ => new RecordingGovernanceEmitter(_ => GovernanceEmissionResult.Delivered("test-sink")));
 
         _ = services.AddAsiBackboneGovernanceOutboxDrainWorker(options =>
         {
@@ -35,10 +35,10 @@ public sealed class AsiBackboneGovernanceOutboxDrainHostedServiceTests
         });
 
         using ServiceProvider provider = services.BuildServiceProvider();
-        AsiBackboneGovernanceOutboxDrainWorkerOptions options = provider.GetRequiredService<IOptions<AsiBackboneGovernanceOutboxDrainWorkerOptions>>().Value;
+        GovernanceOutboxDrainWorkerOptions options = provider.GetRequiredService<IOptions<GovernanceOutboxDrainWorkerOptions>>().Value;
         IHostedService hostedService = Assert.Single(provider.GetServices<IHostedService>());
 
-        _ = Assert.IsType<AsiBackboneGovernanceOutboxDrainHostedService>(hostedService);
+        _ = Assert.IsType<GovernanceOutboxDrainHostedService>(hostedService);
         Assert.True(options.Enabled);
         Assert.Equal(7, options.BatchSize);
         Assert.Equal(TimeSpan.FromSeconds(5), options.PollingInterval);
@@ -52,8 +52,8 @@ public sealed class AsiBackboneGovernanceOutboxDrainHostedServiceTests
     /// <param name="registerEmitter">Whether the governance emitter is registered.</param>
     /// <param name="missingServiceName">The missing service name expected in the dependency-resolution error.</param>
     [Theory]
-    [InlineData(false, true, "IAsiBackboneGovernanceOutboxStore")]
-    [InlineData(true, false, "IAsiBackboneGovernanceEmitter")]
+    [InlineData(false, true, "IGovernanceOutboxStore")]
+    [InlineData(true, false, "IGovernanceEmitter")]
     public async Task WorkerFailsStartupWhenRequiredDrainDependencyIsMissing(
         bool registerStore,
         bool registerEmitter,
@@ -64,12 +64,12 @@ public sealed class AsiBackboneGovernanceOutboxDrainHostedServiceTests
 
         if (registerStore)
         {
-            _ = services.AddSingleton<IAsiBackboneGovernanceOutboxStore, RecordingGovernanceOutboxStore>();
+            _ = services.AddSingleton<IGovernanceOutboxStore, RecordingGovernanceOutboxStore>();
         }
 
         if (registerEmitter)
         {
-            _ = services.AddSingleton<IAsiBackboneGovernanceEmitter>(
+            _ = services.AddSingleton<IGovernanceEmitter>(
                 new RecordingGovernanceEmitter(_ => GovernanceEmissionResult.Delivered("test-sink")));
         }
 
@@ -241,15 +241,15 @@ public sealed class AsiBackboneGovernanceOutboxDrainHostedServiceTests
     }
 
     private static ServiceProvider BuildProvider(
-        IAsiBackboneGovernanceOutboxStore store,
-        IAsiBackboneGovernanceEmitter emitter,
-        Action<AsiBackboneGovernanceOutboxDrainWorkerOptions> configure)
+        IGovernanceOutboxStore store,
+        IGovernanceEmitter emitter,
+        Action<GovernanceOutboxDrainWorkerOptions> configure)
     {
         ServiceCollection services = new();
         _ = services.AddLogging();
         _ = services.AddSingleton(store);
         _ = services.AddSingleton(emitter);
-        _ = services.Configure<AsiBackboneGovernanceOutboxOptions>(outboxOptions => outboxOptions.UseClaimLeases = false);
+        _ = services.Configure<GovernanceOutboxOptions>(outboxOptions => outboxOptions.UseClaimLeases = false);
         _ = services.AddAsiBackboneGovernanceOutboxDrainWorker(configure);
 
         return services.BuildServiceProvider();
@@ -264,7 +264,7 @@ public sealed class AsiBackboneGovernanceOutboxDrainHostedServiceTests
             envelopeId: $"envelope-{suffix}",
             correlationId: $"correlation-{suffix}",
             auditResidueId: $"residue-{suffix}",
-            lifecycleStage: AuditResidueLifecycleStage.ExternalEmissionQueued,
+            lifecycleStage: DecisionReceiptLifecycleStage.ExternalEmissionQueued,
             policyVersion: "v1",
             policyHash: $"hash-{suffix}",
             traceId: $"trace-{suffix}",
@@ -276,7 +276,7 @@ public sealed class AsiBackboneGovernanceOutboxDrainHostedServiceTests
             emitterProvider: "outbox");
     }
 
-    private sealed class RecordingGovernanceEmitter(Func<GovernanceEmissionEnvelope, GovernanceEmissionResult> emit) : IAsiBackboneGovernanceEmitter
+    private sealed class RecordingGovernanceEmitter(Func<GovernanceEmissionEnvelope, GovernanceEmissionResult> emit) : IGovernanceEmitter
     {
         private readonly Func<GovernanceEmissionEnvelope, GovernanceEmissionResult> emit = emit;
         private int emitCallCount;
@@ -295,7 +295,7 @@ public sealed class AsiBackboneGovernanceOutboxDrainHostedServiceTests
         }
     }
 
-    private sealed class ThrowingGovernanceEmitter : IAsiBackboneGovernanceEmitter
+    private sealed class ThrowingGovernanceEmitter : IGovernanceEmitter
     {
         public ValueTask<GovernanceEmissionResult> EmitAsync(
             GovernanceEmissionEnvelope envelope,
@@ -308,7 +308,7 @@ public sealed class AsiBackboneGovernanceOutboxDrainHostedServiceTests
         }
     }
 
-    private sealed class RecordingGovernanceOutboxStore : IAsiBackboneGovernanceOutboxStore
+    private sealed class RecordingGovernanceOutboxStore : IGovernanceOutboxStore
     {
         private readonly ConcurrentDictionary<string, GovernanceOutboxEntry> entries = new(StringComparer.Ordinal);
         private int findPendingCallCount;

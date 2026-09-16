@@ -16,7 +16,7 @@ public sealed class LiabilityHandshakeMutationTests
     [Fact]
     public void FromDecisionUsesFirstDecisionReasonAndPreservesTracePolicyMetadata()
     {
-        IAsiBackboneActorContext actor = AsiBackboneActorContext.Human(" user-123 ", " Chris ");
+        IGovernanceActorContext actor = GovernanceActorContext.Human(" user-123 ", " Chris ");
         OperationReason[] reasons =
         [
             OperationReason.Create("decision.first", "First decision reason."),
@@ -71,7 +71,7 @@ public sealed class LiabilityHandshakeMutationTests
     [Fact]
     public void AcknowledgmentUsesRespondingActorAndRequestHandshakeBoundary()
     {
-        IAsiBackboneActorContext requestActor = AsiBackboneActorContext.Human("request-user", "Request User");
+        IGovernanceActorContext requestActor = GovernanceActorContext.Human("request-user", "Request User");
         var request = LiabilityHandshakeRequest.Create(
             requestActor,
             "document.approve",
@@ -83,7 +83,7 @@ public sealed class LiabilityHandshakeMutationTests
             handshakeId: " handshake-777 ",
             correlationId: " corr-777 ",
             traceId: " trace-777 ");
-        IAsiBackboneActorContext respondingActor = AsiBackboneActorContext.Service(" service-456 ", " Approval Service ");
+        IGovernanceActorContext respondingActor = GovernanceActorContext.Service(" service-456 ", " Approval Service ");
 
         var acknowledgment = LiabilityHandshakeAcknowledgment.Accept(
             request,
@@ -94,7 +94,7 @@ public sealed class LiabilityHandshakeMutationTests
         Assert.Equal("ack-777", acknowledgment.AcknowledgmentId);
         Assert.Equal("handshake-777", acknowledgment.HandshakeId);
         Assert.Equal("service-456", acknowledgment.ActorId);
-        Assert.Equal(AsiBackboneActorType.Service, acknowledgment.ActorType);
+        Assert.Equal(GovernanceActorType.Service, acknowledgment.ActorType);
         Assert.Equal("Approval Service", acknowledgment.ActorDisplayName);
         Assert.Equal("ACK-777", acknowledgment.AcknowledgmentCode);
         Assert.True(acknowledgment.Acknowledged);

@@ -6,18 +6,18 @@ namespace AsiBackbone.Storage.InMemory.Audit;
 /// In-memory audit ledger intended for tests, samples, and local validation hosts.
 /// </summary>
 /// <remarks>
-/// This type is not durable storage. It records audit residue in process memory and is suitable only for local development,
+/// This type is not durable storage. It records decision receipt in process memory and is suitable only for local development,
 /// tests, examples, and non-production validation flows.
 /// </remarks>
-public sealed class InMemoryAuditLedger : IAsiBackboneAuditSink
+public sealed class InMemoryAuditLedger : IDecisionReceiptSink
 {
     private readonly Lock syncRoot = new();
-    private readonly List<IAsiBackboneAuditResidue> records = [];
+    private readonly List<IDecisionReceipt> records = [];
 
     /// <summary>
-    /// Gets a snapshot of all recorded audit residue values.
+    /// Gets a snapshot of all recorded decision receipt values.
     /// </summary>
-    public IReadOnlyList<IAsiBackboneAuditResidue> Records
+    public IReadOnlyList<IDecisionReceipt> Records
     {
         get
         {
@@ -30,14 +30,14 @@ public sealed class InMemoryAuditLedger : IAsiBackboneAuditSink
 
     /// <inheritdoc />
     public ValueTask WriteAsync(
-        IAsiBackboneAuditResidue residue,
+        IDecisionReceipt residue,
         CancellationToken cancellationToken = default)
     {
         return WriteCore(residue, cancellationToken);
     }
 
-    ValueTask IAsiBackboneAuditSink.WriteAsync(
-        IAsiBackboneAuditResidue residue,
+    ValueTask IDecisionReceiptSink.WriteAsync(
+        IDecisionReceipt residue,
         CancellationToken cancellationToken)
     {
         return WriteCore(residue, cancellationToken);
@@ -47,8 +47,8 @@ public sealed class InMemoryAuditLedger : IAsiBackboneAuditSink
     /// Gets a snapshot of records matching the supplied correlation identifier.
     /// </summary>
     /// <param name="correlationId">The correlation identifier to match.</param>
-    /// <returns>Audit residue values with the supplied correlation identifier.</returns>
-    public IReadOnlyList<IAsiBackboneAuditResidue> GetByCorrelationId(string correlationId)
+    /// <returns>Decision receipt values with the supplied correlation identifier.</returns>
+    public IReadOnlyList<IDecisionReceipt> GetByCorrelationId(string correlationId)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(correlationId);
 
@@ -69,8 +69,8 @@ public sealed class InMemoryAuditLedger : IAsiBackboneAuditSink
     /// Attempts to get a record by its audit event identifier.
     /// </summary>
     /// <param name="eventId">The audit event identifier.</param>
-    /// <returns>The matching audit residue, or <see langword="null"/> when none is found.</returns>
-    public IAsiBackboneAuditResidue? GetByEventId(string eventId)
+    /// <returns>The matching decision receipt, or <see langword="null"/> when none is found.</returns>
+    public IDecisionReceipt? GetByEventId(string eventId)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(eventId);
 
@@ -86,7 +86,7 @@ public sealed class InMemoryAuditLedger : IAsiBackboneAuditSink
     }
 
     private ValueTask WriteCore(
-        IAsiBackboneAuditResidue residue,
+        IDecisionReceipt residue,
         CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(residue);

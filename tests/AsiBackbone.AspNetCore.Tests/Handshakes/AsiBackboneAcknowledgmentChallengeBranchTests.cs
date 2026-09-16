@@ -7,27 +7,27 @@ using Xunit;
 namespace AsiBackbone.AspNetCore.Tests.Handshakes;
 
 /// <summary>
-/// Unit tests for the <see cref="AsiBackboneAcknowledgmentChallenge"/> and related classes.
+/// Unit tests for the <see cref="AcknowledgmentChallenge"/> and related classes.
 /// </summary>
 public sealed class AsiBackboneAcknowledgmentChallengeBranchTests
 {
     /// <summary>
-    /// Tests that the <c>AsiBackboneAcknowledgmentChallengeResult.Success(LiabilityHandshakeAcknowledgment)</c> method throws an <see cref="ArgumentNullException"/> when a null acknowledgment is provided.
+    /// Tests that the <c>AcknowledgmentChallengeResult.Success(LiabilityHandshakeAcknowledgment)</c> method throws an <see cref="ArgumentNullException"/> when a null acknowledgment is provided.
     /// </summary>
     [Fact]
     public void ChallengeResultSuccessRejectsNullAcknowledgment()
     {
         _ = Assert.Throws<ArgumentNullException>(() =>
-            AsiBackboneAcknowledgmentChallengeResult.Success(null!));
+            AcknowledgmentChallengeResult.Success(null!));
     }
 
     /// <summary>
-    /// Tests that the <see cref="AsiBackboneAcknowledgmentChallengeResult.Failure(string, string)"/> method correctly exposes the unacknowledged state without an acknowledgment.
+    /// Tests that the <see cref="AcknowledgmentChallengeResult.Failure(string, string)"/> method correctly exposes the unacknowledged state without an acknowledgment.
     /// </summary>
     [Fact]
     public void ChallengeResultFailureExposesUnacknowledgedStateWithoutAcknowledgment()
     {
-        var result = AsiBackboneAcknowledgmentChallengeResult.Failure(
+        var result = AcknowledgmentChallengeResult.Failure(
             "ack.failed",
             "Acknowledgment failed.");
 
@@ -39,71 +39,71 @@ public sealed class AsiBackboneAcknowledgmentChallengeBranchTests
     }
 
     /// <summary>
-    /// Tests that the <c>DefaultAsiBackboneAcknowledgmentChallengeService.CreateChallenge(IAsiBackboneActorContext, string, GovernanceDecision)</c> method throws an <see cref="ArgumentNullException"/> when a null actor is provided.
+    /// Tests that the <c>DefaultAcknowledgmentChallengeService.CreateChallenge(IGovernanceActorContext, string, GovernanceDecision)</c> method throws an <see cref="ArgumentNullException"/> when a null actor is provided.
     /// </summary>
     [Fact]
     public void CreateChallengeRejectsNullActor()
     {
-        DefaultAsiBackboneAcknowledgmentChallengeService service = CreateService();
+        DefaultAcknowledgmentChallengeService service = CreateService();
         var decision = GovernanceDecision.RequireAcknowledgment("ack.required", "Acknowledgment required.");
 
         _ = Assert.Throws<ArgumentNullException>(() => service.CreateChallenge(null!, "RunOperation", decision));
     }
 
     /// <summary>
-    /// Tests that the <c>DefaultAsiBackboneAcknowledgmentChallengeService.CreateChallenge(IAsiBackboneActorContext, string, GovernanceDecision)</c> method throws an <see cref="ArgumentNullException"/> when a null decision is provided.
+    /// Tests that the <c>DefaultAcknowledgmentChallengeService.CreateChallenge(IGovernanceActorContext, string, GovernanceDecision)</c> method throws an <see cref="ArgumentNullException"/> when a null decision is provided.
     /// </summary>
     [Fact]
     public void CreateChallengeRejectsNullDecision()
     {
-        DefaultAsiBackboneAcknowledgmentChallengeService service = CreateService();
-        IAsiBackboneActorContext actor = AsiBackboneActorContext.Human("user-123");
+        DefaultAcknowledgmentChallengeService service = CreateService();
+        IGovernanceActorContext actor = GovernanceActorContext.Human("user-123");
 
         _ = Assert.Throws<ArgumentNullException>(() => service.CreateChallenge(actor, "RunOperation", null!));
     }
 
     /// <summary>
-    /// Tests that the <c>DefaultAsiBackboneAcknowledgmentChallengeService.HandleResponse(AsiBackboneAcknowledgmentChallenge, IAsiBackboneActorContext, AsiBackboneAcknowledgmentChallengeRequest)</c> method throws an <see cref="ArgumentNullException"/> when a null challenge is provided.
+    /// Tests that the <c>DefaultAcknowledgmentChallengeService.HandleResponse(AcknowledgmentChallenge, IGovernanceActorContext, AcknowledgmentChallengeRequest)</c> method throws an <see cref="ArgumentNullException"/> when a null challenge is provided.
     /// </summary>
     [Fact]
     public void HandleResponseRejectsNullChallenge()
     {
-        DefaultAsiBackboneAcknowledgmentChallengeService service = CreateService();
-        IAsiBackboneActorContext actor = AsiBackboneActorContext.Human("user-123");
-        var response = new AsiBackboneAcknowledgmentChallengeRequest();
+        DefaultAcknowledgmentChallengeService service = CreateService();
+        IGovernanceActorContext actor = GovernanceActorContext.Human("user-123");
+        var response = new AcknowledgmentChallengeRequest();
 
         _ = Assert.Throws<ArgumentNullException>(() => service.HandleResponse(null!, actor, response));
     }
 
     /// <summary>
-    /// Tests that the <c>DefaultAsiBackboneAcknowledgmentChallengeService.HandleResponse(AsiBackboneAcknowledgmentChallenge, IAsiBackboneActorContext, AsiBackboneAcknowledgmentChallengeRequest)</c> method throws an <see cref="ArgumentNullException"/> when a null actor is provided.
+    /// Tests that the <c>DefaultAcknowledgmentChallengeService.HandleResponse(AcknowledgmentChallenge, IGovernanceActorContext, AcknowledgmentChallengeRequest)</c> method throws an <see cref="ArgumentNullException"/> when a null actor is provided.
     /// </summary>
     [Fact]
     public void HandleResponseRejectsNullActor()
     {
-        DefaultAsiBackboneAcknowledgmentChallengeService service = CreateService();
-        IAsiBackboneActorContext actor = AsiBackboneActorContext.Human("user-123");
-        AsiBackboneAcknowledgmentChallenge challenge = CreateChallenge(service, actor);
-        var response = new AsiBackboneAcknowledgmentChallengeRequest();
+        DefaultAcknowledgmentChallengeService service = CreateService();
+        IGovernanceActorContext actor = GovernanceActorContext.Human("user-123");
+        AcknowledgmentChallenge challenge = CreateChallenge(service, actor);
+        var response = new AcknowledgmentChallengeRequest();
 
         _ = Assert.Throws<ArgumentNullException>(() => service.HandleResponse(challenge, null!, response));
     }
 
     /// <summary>
-    /// Tests that the <c>DefaultAsiBackboneAcknowledgmentChallengeService.HandleResponse(AsiBackboneAcknowledgmentChallenge, IAsiBackboneActorContext, AsiBackboneAcknowledgmentChallengeRequest)</c> method throws an <see cref="ArgumentNullException"/> when a null response is provided.
+    /// Tests that the <c>DefaultAcknowledgmentChallengeService.HandleResponse(AcknowledgmentChallenge, IGovernanceActorContext, AcknowledgmentChallengeRequest)</c> method throws an <see cref="ArgumentNullException"/> when a null response is provided.
     /// </summary>
     [Fact]
     public void HandleResponseRejectsNullResponse()
     {
-        DefaultAsiBackboneAcknowledgmentChallengeService service = CreateService();
-        IAsiBackboneActorContext actor = AsiBackboneActorContext.Human("user-123");
-        AsiBackboneAcknowledgmentChallenge challenge = CreateChallenge(service, actor);
+        DefaultAcknowledgmentChallengeService service = CreateService();
+        IGovernanceActorContext actor = GovernanceActorContext.Human("user-123");
+        AcknowledgmentChallenge challenge = CreateChallenge(service, actor);
 
         _ = Assert.Throws<ArgumentNullException>(() => service.HandleResponse(challenge, actor, null!));
     }
 
     /// <summary>
-    /// Tests that the <c>DefaultAsiBackboneAcknowledgmentChallengeService.HandleResponse(AsiBackboneAcknowledgmentChallenge, IAsiBackboneActorContext, AsiBackboneAcknowledgmentChallengeRequest)</c> method fails when the handshake ID is missing or blank in the response.
+    /// Tests that the <c>DefaultAcknowledgmentChallengeService.HandleResponse(AcknowledgmentChallenge, IGovernanceActorContext, AcknowledgmentChallengeRequest)</c> method fails when the handshake ID is missing or blank in the response.
     /// </summary>
     /// <param name="handshakeId">
     /// The handshake ID to test, which can be null, empty, or whitespace.
@@ -114,24 +114,24 @@ public sealed class AsiBackboneAcknowledgmentChallengeBranchTests
     [InlineData("   ")]
     public void HandleResponseFailsWhenHandshakeIdIsMissingOrBlank(string? handshakeId)
     {
-        DefaultAsiBackboneAcknowledgmentChallengeService service = CreateService();
-        IAsiBackboneActorContext actor = AsiBackboneActorContext.Human("user-123");
-        AsiBackboneAcknowledgmentChallenge challenge = CreateChallenge(service, actor);
-        var response = new AsiBackboneAcknowledgmentChallengeRequest
+        DefaultAcknowledgmentChallengeService service = CreateService();
+        IGovernanceActorContext actor = GovernanceActorContext.Human("user-123");
+        AcknowledgmentChallenge challenge = CreateChallenge(service, actor);
+        var response = new AcknowledgmentChallengeRequest
         {
             HandshakeId = handshakeId,
             AcknowledgmentCode = challenge.RequiredAcknowledgmentCode,
             Acknowledged = true,
         };
 
-        AsiBackboneAcknowledgmentChallengeResult result = service.HandleResponse(challenge, actor, response);
+        AcknowledgmentChallengeResult result = service.HandleResponse(challenge, actor, response);
 
         Assert.False(result.Succeeded);
         Assert.Contains("acknowledgment.challenge.mismatch", result.Result.ReasonCodes);
     }
 
     /// <summary>
-    /// Tests that the <c>DefaultAsiBackboneAcknowledgmentChallengeService.HandleResponse(AsiBackboneAcknowledgmentChallenge, IAsiBackboneActorContext, AsiBackboneAcknowledgmentChallengeRequest)</c> method fails when the acknowledgment code is missing or blank in the response.
+    /// Tests that the <c>DefaultAcknowledgmentChallengeService.HandleResponse(AcknowledgmentChallenge, IGovernanceActorContext, AcknowledgmentChallengeRequest)</c> method fails when the acknowledgment code is missing or blank in the response.
     /// </summary>
     /// <param name="acknowledgmentCode">
     /// The acknowledgment code to test, which can be null, empty, or whitespace.
@@ -142,24 +142,24 @@ public sealed class AsiBackboneAcknowledgmentChallengeBranchTests
     [InlineData("   ")]
     public void HandleResponseFailsWhenAcknowledgmentCodeIsMissingOrBlank(string? acknowledgmentCode)
     {
-        DefaultAsiBackboneAcknowledgmentChallengeService service = CreateService();
-        IAsiBackboneActorContext actor = AsiBackboneActorContext.Human("user-123");
-        AsiBackboneAcknowledgmentChallenge challenge = CreateChallenge(service, actor);
-        var response = new AsiBackboneAcknowledgmentChallengeRequest
+        DefaultAcknowledgmentChallengeService service = CreateService();
+        IGovernanceActorContext actor = GovernanceActorContext.Human("user-123");
+        AcknowledgmentChallenge challenge = CreateChallenge(service, actor);
+        var response = new AcknowledgmentChallengeRequest
         {
             HandshakeId = challenge.HandshakeId,
             AcknowledgmentCode = acknowledgmentCode,
             Acknowledged = true,
         };
 
-        AsiBackboneAcknowledgmentChallengeResult result = service.HandleResponse(challenge, actor, response);
+        AcknowledgmentChallengeResult result = service.HandleResponse(challenge, actor, response);
 
         Assert.False(result.Succeeded);
         Assert.Contains("acknowledgment.challenge.code_mismatch", result.Result.ReasonCodes);
     }
 
     /// <summary>
-    /// Tests that the <see cref="AsiBackboneAcknowledgmentChallengeOptions.Validate"/> method throws an <see cref="InvalidOperationException"/> when the required acknowledgment text is missing or blank.
+    /// Tests that the <see cref="AcknowledgmentChallengeOptions.Validate"/> method throws an <see cref="InvalidOperationException"/> when the required acknowledgment text is missing or blank.
     /// </summary>
     /// <param name="text">
     /// The acknowledgment text to test, which can be null, empty, or whitespace.
@@ -170,7 +170,7 @@ public sealed class AsiBackboneAcknowledgmentChallengeBranchTests
     [InlineData("   ")]
     public void ChallengeOptionsRejectMissingAcknowledgmentText(string? text)
     {
-        var options = new AsiBackboneAcknowledgmentChallengeOptions
+        var options = new AcknowledgmentChallengeOptions
         {
             RequiredAcknowledgmentText = text!,
         };
@@ -181,42 +181,42 @@ public sealed class AsiBackboneAcknowledgmentChallengeBranchTests
     }
 
     /// <summary>
-    /// Tests that the <see cref="DefaultAsiBackboneAcknowledgmentChallengeService"/> constructor throws an <see cref="ArgumentNullException"/> when null options are provided.
+    /// Tests that the <see cref="DefaultAcknowledgmentChallengeService"/> constructor throws an <see cref="ArgumentNullException"/> when null options are provided.
     /// </summary>
     [Fact]
     public void ServiceConstructorRejectsNullOptions()
     {
-        _ = Assert.Throws<ArgumentNullException>(() => new DefaultAsiBackboneAcknowledgmentChallengeService(null!));
+        _ = Assert.Throws<ArgumentNullException>(() => new DefaultAcknowledgmentChallengeService(null!));
     }
 
     /// <summary>
-    /// Tests that the <see cref="DefaultAsiBackboneAcknowledgmentChallengeService"/> constructor throws an <see cref="InvalidOperationException"/> when invalid options are provided (e.g., missing required acknowledgment code).
+    /// Tests that the <see cref="DefaultAcknowledgmentChallengeService"/> constructor throws an <see cref="InvalidOperationException"/> when invalid options are provided (e.g., missing required acknowledgment code).
     /// </summary>
     [Fact]
     public void ServiceConstructorRejectsInvalidOptions()
     {
-        var options = new AsiBackboneAcknowledgmentChallengeOptions
+        var options = new AcknowledgmentChallengeOptions
         {
             RequiredAcknowledgmentCode = " ",
         };
 
         _ = Assert.Throws<InvalidOperationException>(() =>
-            new DefaultAsiBackboneAcknowledgmentChallengeService(Options.Create(options)));
+            new DefaultAcknowledgmentChallengeService(Options.Create(options)));
     }
 
-    private static AsiBackboneAcknowledgmentChallenge CreateChallenge(
-        DefaultAsiBackboneAcknowledgmentChallengeService service,
-        IAsiBackboneActorContext actor)
+    private static AcknowledgmentChallenge CreateChallenge(
+        DefaultAcknowledgmentChallengeService service,
+        IGovernanceActorContext actor)
     {
         var decision = GovernanceDecision.RequireAcknowledgment("ack.required", "Acknowledgment required.");
 
         return service.CreateChallenge(actor, "RunOperation", decision);
     }
 
-    private static DefaultAsiBackboneAcknowledgmentChallengeService CreateService(
-        AsiBackboneAcknowledgmentChallengeOptions? options = null)
+    private static DefaultAcknowledgmentChallengeService CreateService(
+        AcknowledgmentChallengeOptions? options = null)
     {
-        return new DefaultAsiBackboneAcknowledgmentChallengeService(
-            Options.Create(options ?? new AsiBackboneAcknowledgmentChallengeOptions()));
+        return new DefaultAcknowledgmentChallengeService(
+            Options.Create(options ?? new AcknowledgmentChallengeOptions()));
     }
 }

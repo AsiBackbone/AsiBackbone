@@ -4,7 +4,7 @@ using Xunit;
 namespace AsiBackbone.Core.Tests.Constraints;
 
 /// <summary>
-/// Unit tests for <see cref="AsiBackboneConstraintEvaluationContext"/> to verify that it correctly normalizes optional values and metadata.
+/// Unit tests for <see cref="GovernanceEvaluationContext"/> to verify that it correctly normalizes optional values and metadata.
 /// </summary>
 public sealed class AsiBackboneConstraintEvaluationContextTests
 {
@@ -14,7 +14,7 @@ public sealed class AsiBackboneConstraintEvaluationContextTests
     [Fact]
     public void ConstructorCreatesEmptyContextByDefault()
     {
-        var context = new AsiBackboneConstraintEvaluationContext();
+        var context = new GovernanceEvaluationContext();
 
         Assert.Null(context.CorrelationId);
         Assert.Null(context.PolicyVersion);
@@ -24,12 +24,12 @@ public sealed class AsiBackboneConstraintEvaluationContextTests
     }
 
     /// <summary>
-    /// Verifies that the constructor of <see cref="AsiBackboneConstraintEvaluationContext"/> correctly normalizes optional values by trimming whitespace and converting empty strings to null.
+    /// Verifies that the constructor of <see cref="GovernanceEvaluationContext"/> correctly normalizes optional values by trimming whitespace and converting empty strings to null.
     /// </summary>
     [Fact]
     public void ConstructorNormalizesOptionalValues()
     {
-        var context = new AsiBackboneConstraintEvaluationContext(
+        var context = new GovernanceEvaluationContext(
             correlationId: " correlation-123 ",
             policyVersion: " v1 ",
             policyHash: " hash-abc ");
@@ -40,12 +40,12 @@ public sealed class AsiBackboneConstraintEvaluationContextTests
     }
 
     /// <summary>
-    /// Verifies that the constructor of <see cref="AsiBackboneConstraintEvaluationContext"/> converts whitespace-only strings to null for optional values.
+    /// Verifies that the constructor of <see cref="GovernanceEvaluationContext"/> converts whitespace-only strings to null for optional values.
     /// </summary>
     [Fact]
     public void ConstructorConvertsWhitespaceValuesToNull()
     {
-        var context = new AsiBackboneConstraintEvaluationContext(
+        var context = new GovernanceEvaluationContext(
             correlationId: " ",
             policyVersion: "",
             policyHash: null);
@@ -61,7 +61,7 @@ public sealed class AsiBackboneConstraintEvaluationContextTests
     [Fact]
     public void ConstructorWithNullMetadataReturnsNoMetadata()
     {
-        var context = new AsiBackboneConstraintEvaluationContext(
+        var context = new GovernanceEvaluationContext(
             metadata: null);
 
         Assert.False(context.HasMetadata);
@@ -74,7 +74,7 @@ public sealed class AsiBackboneConstraintEvaluationContextTests
     [Fact]
     public void ConstructorWithEmptyMetadataReturnsNoMetadata()
     {
-        var context = new AsiBackboneConstraintEvaluationContext(
+        var context = new GovernanceEvaluationContext(
             metadata: new Dictionary<string, string>());
 
         Assert.False(context.HasMetadata);
@@ -82,12 +82,12 @@ public sealed class AsiBackboneConstraintEvaluationContextTests
     }
 
     /// <summary>
-    /// Verifies that the constructor of <see cref="AsiBackboneConstraintEvaluationContext"/> correctly normalizes metadata by trimming whitespace and ignoring blank keys.
+    /// Verifies that the constructor of <see cref="GovernanceEvaluationContext"/> correctly normalizes metadata by trimming whitespace and ignoring blank keys.
     /// </summary>
     [Fact]
     public void ConstructorNormalizesMetadata()
     {
-        var context = new AsiBackboneConstraintEvaluationContext(
+        var context = new GovernanceEvaluationContext(
             metadata: new Dictionary<string, string>
             {
                 [" region "] = " us-la ",
@@ -107,7 +107,7 @@ public sealed class AsiBackboneConstraintEvaluationContextTests
     [Fact]
     public void ConstructorWithOnlyBlankMetadataKeysReturnsNoMetadata()
     {
-        var context = new AsiBackboneConstraintEvaluationContext(
+        var context = new GovernanceEvaluationContext(
             metadata: new Dictionary<string, string>
             {
                 [" "] = "ignored",
@@ -124,7 +124,7 @@ public sealed class AsiBackboneConstraintEvaluationContextTests
     [Fact]
     public void ConstructorWithDuplicateTrimmedMetadataKeysUsesLastValue()
     {
-        var context = new AsiBackboneConstraintEvaluationContext(
+        var context = new GovernanceEvaluationContext(
             metadata: new Dictionary<string, string>
             {
                 [" region "] = " us-la ",
@@ -142,7 +142,7 @@ public sealed class AsiBackboneConstraintEvaluationContextTests
     [Fact]
     public void ConstructorWithNullMetadataValueStoresEmptyString()
     {
-        var context = new AsiBackboneConstraintEvaluationContext(
+        var context = new GovernanceEvaluationContext(
             metadata: new Dictionary<string, string>
             {
                 [" source "] = null!
@@ -163,7 +163,7 @@ public sealed class AsiBackboneConstraintEvaluationContextTests
             [" region "] = " us-la "
         };
 
-        var context = new AsiBackboneConstraintEvaluationContext(
+        var context = new GovernanceEvaluationContext(
             metadata: metadata);
 
         metadata[" region "] = " us-tx ";
@@ -180,7 +180,7 @@ public sealed class AsiBackboneConstraintEvaluationContextTests
     [Fact]
     public void MetadataCannotBeMutatedThroughDictionaryCasts()
     {
-        var context = new AsiBackboneConstraintEvaluationContext(
+        var context = new GovernanceEvaluationContext(
             metadata: new Dictionary<string, string>
             {
                 [" region "] = " us-la "
@@ -198,7 +198,7 @@ public sealed class AsiBackboneConstraintEvaluationContextTests
     [Fact]
     public void EmptyMetadataCannotBeMutatedThroughDictionaryCasts()
     {
-        var context = new AsiBackboneConstraintEvaluationContext();
+        var context = new GovernanceEvaluationContext();
 
         ReadOnlyMetadataAssert.CannotMutateThroughCasts(context.Metadata);
 

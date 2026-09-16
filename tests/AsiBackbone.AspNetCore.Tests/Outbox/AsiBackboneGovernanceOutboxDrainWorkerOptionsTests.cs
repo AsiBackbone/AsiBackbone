@@ -4,7 +4,7 @@ using Xunit;
 namespace AsiBackbone.AspNetCore.Tests.Outbox;
 
 /// <summary>
-/// Tests validation branches for <see cref="AsiBackboneGovernanceOutboxDrainWorkerOptions"/>.
+/// Tests validation branches for <see cref="GovernanceOutboxDrainWorkerOptions"/>.
 /// </summary>
 public sealed class AsiBackboneGovernanceOutboxDrainWorkerOptionsTests
 {
@@ -17,7 +17,7 @@ public sealed class AsiBackboneGovernanceOutboxDrainWorkerOptionsTests
     [InlineData(-1)]
     public void ValidateRejectsNonPositiveBatchSize(int batchSize)
     {
-        AsiBackboneGovernanceOutboxDrainWorkerOptions options = CreateValidOptions();
+        GovernanceOutboxDrainWorkerOptions options = CreateValidOptions();
         options.BatchSize = batchSize;
 
         InvalidOperationException exception = Assert.Throws<InvalidOperationException>(options.Validate);
@@ -34,7 +34,7 @@ public sealed class AsiBackboneGovernanceOutboxDrainWorkerOptionsTests
     [InlineData(-1L)]
     public void ValidateRejectsNonPositivePollingInterval(long ticks)
     {
-        AsiBackboneGovernanceOutboxDrainWorkerOptions options = CreateValidOptions();
+        GovernanceOutboxDrainWorkerOptions options = CreateValidOptions();
         options.PollingInterval = TimeSpan.FromTicks(ticks);
 
         InvalidOperationException exception = Assert.Throws<InvalidOperationException>(options.Validate);
@@ -51,7 +51,7 @@ public sealed class AsiBackboneGovernanceOutboxDrainWorkerOptionsTests
     [InlineData(-1L)]
     public void ValidateRejectsNonPositiveFailureDelay(long ticks)
     {
-        AsiBackboneGovernanceOutboxDrainWorkerOptions options = CreateValidOptions();
+        GovernanceOutboxDrainWorkerOptions options = CreateValidOptions();
         options.FailureDelay = TimeSpan.FromTicks(ticks);
 
         InvalidOperationException exception = Assert.Throws<InvalidOperationException>(options.Validate);
@@ -68,7 +68,7 @@ public sealed class AsiBackboneGovernanceOutboxDrainWorkerOptionsTests
     [InlineData(-1L)]
     public void ValidateRejectsNonPositiveShutdownDrainTimeout(long ticks)
     {
-        AsiBackboneGovernanceOutboxDrainWorkerOptions options = CreateValidOptions();
+        GovernanceOutboxDrainWorkerOptions options = CreateValidOptions();
         options.ShutdownDrainTimeout = TimeSpan.FromTicks(ticks);
 
         InvalidOperationException exception = Assert.Throws<InvalidOperationException>(options.Validate);
@@ -82,7 +82,7 @@ public sealed class AsiBackboneGovernanceOutboxDrainWorkerOptionsTests
     [Fact]
     public void ValidateRejectsNullRetryClock()
     {
-        AsiBackboneGovernanceOutboxDrainWorkerOptions options = CreateValidOptions();
+        GovernanceOutboxDrainWorkerOptions options = CreateValidOptions();
         options.RetryClock = null!;
 
         InvalidOperationException exception = Assert.Throws<InvalidOperationException>(options.Validate);
@@ -96,14 +96,14 @@ public sealed class AsiBackboneGovernanceOutboxDrainWorkerOptionsTests
     [Fact]
     public void ValidateAcceptsBoundaryValidValues()
     {
-        AsiBackboneGovernanceOutboxDrainWorkerOptions options = CreateValidOptions();
+        GovernanceOutboxDrainWorkerOptions options = CreateValidOptions();
 
         options.Validate();
     }
 
-    private static AsiBackboneGovernanceOutboxDrainWorkerOptions CreateValidOptions()
+    private static GovernanceOutboxDrainWorkerOptions CreateValidOptions()
     {
-        return new AsiBackboneGovernanceOutboxDrainWorkerOptions
+        return new GovernanceOutboxDrainWorkerOptions
         {
             BatchSize = 1,
             PollingInterval = TimeSpan.FromTicks(1),

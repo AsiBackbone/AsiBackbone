@@ -12,12 +12,12 @@ using Xunit;
 namespace AsiBackbone.AspNetCore.Tests.Correlation;
 
 /// <summary>
-/// Unit tests for <see cref="HttpContextAsiBackboneRequestCorrelationResolver"/> class.
+/// Unit tests for <see cref="HttpContextGovernanceRequestCorrelationResolver"/> class.
 /// </summary>
 public sealed class HttpContextAsiBackboneRequestCorrelationResolverTests
 {
     /// <summary>
-    /// Tests that <see cref="HttpContextAsiBackboneRequestCorrelationResolver.ResolveRequestCorrelation"/> ignores inbound correlation identifiers by default.
+    /// Tests that <see cref="HttpContextGovernanceRequestCorrelationResolver.ResolveRequestCorrelation"/> ignores inbound correlation identifiers by default.
     /// </summary>
     [Fact]
     public void ResolveRequestCorrelationIgnoresConfiguredHeaderByDefault()
@@ -28,13 +28,13 @@ public sealed class HttpContextAsiBackboneRequestCorrelationResolverTests
         };
         httpContext.Request.Headers["X-Correlation-ID"] = "  correlation-456  ";
 
-        HttpContextAsiBackboneRequestCorrelationResolver resolver = CreateResolver(httpContext);
+        HttpContextGovernanceRequestCorrelationResolver resolver = CreateResolver(httpContext);
 
-        AsiBackboneHttpRequestCorrelation correlation = resolver.ResolveRequestCorrelation();
+        GovernanceHttpRequestCorrelation correlation = resolver.ResolveRequestCorrelation();
 
         Assert.Equal("trace-123", correlation.CorrelationId);
         Assert.Equal("trace-123", correlation.TraceId);
-        Assert.Equal("trace-123", correlation.Metadata[AsiBackboneHttpRequestMetadataKeys.TraceIdentifier]);
+        Assert.Equal("trace-123", correlation.Metadata[GovernanceHttpRequestMetadataKeys.TraceIdentifier]);
     }
 
     /// <summary>
@@ -43,19 +43,19 @@ public sealed class HttpContextAsiBackboneRequestCorrelationResolverTests
     [Fact]
     public void ResolveRequestCorrelationPreservesMaximumLengthHeader()
     {
-        string maximumLengthValue = new('a', AsiBackboneIdentifierLimits.MaximumLength);
+        string maximumLengthValue = new('a', GovernanceIdentifierLimits.MaximumLength);
         DefaultHttpContext httpContext = new()
         {
             TraceIdentifier = "trace-maximum",
         };
         httpContext.Request.Headers["X-Correlation-ID"] = maximumLengthValue;
 
-        AsiBackboneHttpRequestCorrelation correlation = CreateResolver(
+        GovernanceHttpRequestCorrelation correlation = CreateResolver(
             httpContext,
             options => options.TrustInboundCorrelationIdHeaders = true).ResolveRequestCorrelation();
 
         Assert.Equal(maximumLengthValue, correlation.CorrelationId);
-        Assert.Equal("trace-maximum", correlation.Metadata[AsiBackboneHttpRequestMetadataKeys.TraceIdentifier]);
+        Assert.Equal("trace-maximum", correlation.Metadata[GovernanceHttpRequestMetadataKeys.TraceIdentifier]);
     }
 
     /// <summary>
@@ -70,9 +70,9 @@ public sealed class HttpContextAsiBackboneRequestCorrelationResolverTests
         };
         httpContext.Request.Headers["X-Correlation-ID"] = new string(
             'a',
-            AsiBackboneIdentifierLimits.MaximumLength + 1);
+            GovernanceIdentifierLimits.MaximumLength + 1);
 
-        AsiBackboneHttpRequestCorrelation correlation = CreateResolver(
+        GovernanceHttpRequestCorrelation correlation = CreateResolver(
             httpContext,
             options => options.TrustInboundCorrelationIdHeaders = true).ResolveRequestCorrelation();
 
@@ -98,7 +98,7 @@ public sealed class HttpContextAsiBackboneRequestCorrelationResolverTests
         };
         httpContext.Request.Headers["X-Correlation-ID"] = $"correlation{controlCharacter}forged";
 
-        AsiBackboneHttpRequestCorrelation correlation = CreateResolver(
+        GovernanceHttpRequestCorrelation correlation = CreateResolver(
             httpContext,
             options => options.TrustInboundCorrelationIdHeaders = true).ResolveRequestCorrelation();
 
@@ -122,7 +122,7 @@ public sealed class HttpContextAsiBackboneRequestCorrelationResolverTests
             "  valid-correlation  ",
         ]);
 
-        AsiBackboneHttpRequestCorrelation correlation = CreateResolver(
+        GovernanceHttpRequestCorrelation correlation = CreateResolver(
             httpContext,
             options => options.TrustInboundCorrelationIdHeaders = true).ResolveRequestCorrelation();
 
@@ -141,7 +141,7 @@ public sealed class HttpContextAsiBackboneRequestCorrelationResolverTests
         };
         httpContext.Request.Headers["X-Correlation-ID"] = "   ";
 
-        AsiBackboneHttpRequestCorrelation correlation = CreateResolver(
+        GovernanceHttpRequestCorrelation correlation = CreateResolver(
             httpContext,
             options => options.TrustInboundCorrelationIdHeaders = true).ResolveRequestCorrelation();
 
@@ -149,7 +149,7 @@ public sealed class HttpContextAsiBackboneRequestCorrelationResolverTests
     }
 
     /// <summary>
-    /// Tests that <see cref="HttpContextAsiBackboneRequestCorrelationResolver.ResolveRequestCorrelation"/> falls back to the trace identifier.
+    /// Tests that <see cref="HttpContextGovernanceRequestCorrelationResolver.ResolveRequestCorrelation"/> falls back to the trace identifier.
     /// </summary>
     [Fact]
     public void ResolveRequestCorrelationFallsBackToTraceIdentifierByDefault()
@@ -159,16 +159,16 @@ public sealed class HttpContextAsiBackboneRequestCorrelationResolverTests
             TraceIdentifier = "trace-789",
         };
 
-        HttpContextAsiBackboneRequestCorrelationResolver resolver = CreateResolver(httpContext);
+        HttpContextGovernanceRequestCorrelationResolver resolver = CreateResolver(httpContext);
 
-        AsiBackboneHttpRequestCorrelation correlation = resolver.ResolveRequestCorrelation();
+        GovernanceHttpRequestCorrelation correlation = resolver.ResolveRequestCorrelation();
 
         Assert.Equal("trace-789", correlation.CorrelationId);
         Assert.Equal("trace-789", correlation.TraceId);
     }
 
     /// <summary>
-    /// Tests that <see cref="HttpContextAsiBackboneRequestCorrelationResolver.ResolveRequestCorrelation"/> supports custom configured header names for correlation ID.
+    /// Tests that <see cref="HttpContextGovernanceRequestCorrelationResolver.ResolveRequestCorrelation"/> supports custom configured header names for correlation ID.
     /// </summary>
     [Fact]
     public void ResolveRequestCorrelationSupportsConfiguredHeaderNames()
@@ -179,7 +179,7 @@ public sealed class HttpContextAsiBackboneRequestCorrelationResolverTests
         };
         httpContext.Request.Headers["X-Tenant-Correlation"] = "tenant-correlation";
 
-        HttpContextAsiBackboneRequestCorrelationResolver resolver = CreateResolver(
+        HttpContextGovernanceRequestCorrelationResolver resolver = CreateResolver(
             httpContext,
             options =>
             {
@@ -187,13 +187,13 @@ public sealed class HttpContextAsiBackboneRequestCorrelationResolverTests
                 options.CorrelationIdHeaderNames = ["X-Tenant-Correlation"];
             });
 
-        AsiBackboneHttpRequestCorrelation correlation = resolver.ResolveRequestCorrelation();
+        GovernanceHttpRequestCorrelation correlation = resolver.ResolveRequestCorrelation();
 
         Assert.Equal("tenant-correlation", correlation.CorrelationId);
     }
 
     /// <summary>
-    /// Tests that <see cref="HttpContextAsiBackboneRequestCorrelationResolver.ResolveRequestCorrelation"/> adds safe request metadata such as HTTP method, route pattern, endpoint display name, and route values, while excluding sensitive data like query parameters and headers.
+    /// Tests that <see cref="HttpContextGovernanceRequestCorrelationResolver.ResolveRequestCorrelation"/> adds safe request metadata such as HTTP method, route pattern, endpoint display name, and route values, while excluding sensitive data like query parameters and headers.
     /// </summary>
     [Fact]
     public void ResolveRequestCorrelationAddsSafeRequestMetadata()
@@ -207,20 +207,20 @@ public sealed class HttpContextAsiBackboneRequestCorrelationResolverTests
         httpContext.Request.RouteValues["id"] = "42";
         httpContext.SetEndpoint(CreateRouteEndpoint("/api/widgets/{id}", "Widget endpoint"));
 
-        HttpContextAsiBackboneRequestCorrelationResolver resolver = CreateResolver(httpContext);
+        HttpContextGovernanceRequestCorrelationResolver resolver = CreateResolver(httpContext);
 
-        AsiBackboneHttpRequestCorrelation correlation = resolver.ResolveRequestCorrelation();
+        GovernanceHttpRequestCorrelation correlation = resolver.ResolveRequestCorrelation();
 
-        Assert.Equal(HttpMethods.Post, correlation.Metadata[AsiBackboneHttpRequestMetadataKeys.Method]);
-        Assert.Equal("trace-route", correlation.Metadata[AsiBackboneHttpRequestMetadataKeys.TraceIdentifier]);
-        Assert.Equal("/api/widgets/{id}", correlation.Metadata[AsiBackboneHttpRequestMetadataKeys.RoutePattern]);
-        Assert.Equal("Widget endpoint", correlation.Metadata[AsiBackboneHttpRequestMetadataKeys.EndpointDisplayName]);
-        Assert.Equal("42", correlation.Metadata[$"{AsiBackboneHttpRequestMetadataKeys.RouteValuePrefix}id"]);
-        Assert.False(correlation.Metadata.ContainsKey(AsiBackboneHttpRequestMetadataKeys.Path));
+        Assert.Equal(HttpMethods.Post, correlation.Metadata[GovernanceHttpRequestMetadataKeys.Method]);
+        Assert.Equal("trace-route", correlation.Metadata[GovernanceHttpRequestMetadataKeys.TraceIdentifier]);
+        Assert.Equal("/api/widgets/{id}", correlation.Metadata[GovernanceHttpRequestMetadataKeys.RoutePattern]);
+        Assert.Equal("Widget endpoint", correlation.Metadata[GovernanceHttpRequestMetadataKeys.EndpointDisplayName]);
+        Assert.Equal("42", correlation.Metadata[$"{GovernanceHttpRequestMetadataKeys.RouteValuePrefix}id"]);
+        Assert.False(correlation.Metadata.ContainsKey(GovernanceHttpRequestMetadataKeys.Path));
     }
 
     /// <summary>
-    /// Tests that <see cref="HttpContextAsiBackboneRequestCorrelationResolver.ResolveRequestCorrelation"/> includes the request path in the metadata when configured to do so.
+    /// Tests that <see cref="HttpContextGovernanceRequestCorrelationResolver.ResolveRequestCorrelation"/> includes the request path in the metadata when configured to do so.
     /// </summary>
     [Fact]
     public void ResolveRequestCorrelationCanIncludeRequestPathWhenConfigured()
@@ -231,17 +231,17 @@ public sealed class HttpContextAsiBackboneRequestCorrelationResolverTests
         };
         httpContext.Request.Path = "/api/widgets/42";
 
-        HttpContextAsiBackboneRequestCorrelationResolver resolver = CreateResolver(
+        HttpContextGovernanceRequestCorrelationResolver resolver = CreateResolver(
             httpContext,
             options => options.IncludeRequestPath = true);
 
-        AsiBackboneHttpRequestCorrelation correlation = resolver.ResolveRequestCorrelation();
+        GovernanceHttpRequestCorrelation correlation = resolver.ResolveRequestCorrelation();
 
-        Assert.Equal("/api/widgets/42", correlation.Metadata[AsiBackboneHttpRequestMetadataKeys.Path]);
+        Assert.Equal("/api/widgets/42", correlation.Metadata[GovernanceHttpRequestMetadataKeys.Path]);
     }
 
     /// <summary>
-    /// Tests that <see cref="HttpContextAsiBackboneRequestCorrelationResolver.ResolveRequestCorrelation"/> excludes sensitive request data such as query parameters and headers by default.
+    /// Tests that <see cref="HttpContextGovernanceRequestCorrelationResolver.ResolveRequestCorrelation"/> excludes sensitive request data such as query parameters and headers by default.
     /// </summary>
     [Fact]
     public void ResolveRequestCorrelationExcludesSensitiveRequestDataByDefault()
@@ -257,9 +257,9 @@ public sealed class HttpContextAsiBackboneRequestCorrelationResolverTests
         httpContext.Request.Headers.Cookie = "session=secret-cookie";
         httpContext.Request.Headers["X-Api-Key"] = "secret-key";
 
-        HttpContextAsiBackboneRequestCorrelationResolver resolver = CreateResolver(httpContext);
+        HttpContextGovernanceRequestCorrelationResolver resolver = CreateResolver(httpContext);
 
-        AsiBackboneHttpRequestCorrelation correlation = resolver.ResolveRequestCorrelation();
+        GovernanceHttpRequestCorrelation correlation = resolver.ResolveRequestCorrelation();
 
         Assert.DoesNotContain(correlation.Metadata.Keys, key => key.Contains("header", StringComparison.OrdinalIgnoreCase));
         Assert.DoesNotContain(correlation.Metadata.Keys, key => key.Contains("query", StringComparison.OrdinalIgnoreCase));
@@ -268,17 +268,17 @@ public sealed class HttpContextAsiBackboneRequestCorrelationResolverTests
     }
 
     /// <summary>
-    /// Tests that <see cref="HttpContextAsiBackboneRequestCorrelationResolver.ResolveRequestCorrelation"/> returns only the trace identifier.
+    /// Tests that <see cref="HttpContextGovernanceRequestCorrelationResolver.ResolveRequestCorrelation"/> returns only the trace identifier.
     /// </summary>
     [Fact]
     public void ResolveRequestCorrelationReturnsTraceOnlyForBackgroundScenario()
     {
         HttpContextAccessor httpContextAccessor = new();
-        HttpContextAsiBackboneRequestCorrelationResolver resolver = new(
+        HttpContextGovernanceRequestCorrelationResolver resolver = new(
             httpContextAccessor,
-            Options.Create(new AsiBackboneAspNetCoreOptions()));
+            Options.Create(new AspNetCoreGovernanceOptions()));
 
-        AsiBackboneHttpRequestCorrelation correlation = resolver.ResolveRequestCorrelation();
+        GovernanceHttpRequestCorrelation correlation = resolver.ResolveRequestCorrelation();
 
         Assert.Null(correlation.CorrelationId);
         Assert.Empty(correlation.Metadata);
@@ -297,21 +297,21 @@ public sealed class HttpContextAsiBackboneRequestCorrelationResolverTests
         using Activity activity = new("request");
         _ = activity.Start();
 
-        AsiBackboneHttpRequestCorrelation correlation = CreateResolver(httpContext).ResolveRequestCorrelation();
+        GovernanceHttpRequestCorrelation correlation = CreateResolver(httpContext).ResolveRequestCorrelation();
 
         Assert.Equal(activity.Id, correlation.TraceId);
         Assert.Equal("server-trace-123", correlation.CorrelationId);
-        Assert.Equal("server-trace-123", correlation.Metadata[AsiBackboneHttpRequestMetadataKeys.TraceIdentifier]);
+        Assert.Equal("server-trace-123", correlation.Metadata[GovernanceHttpRequestMetadataKeys.TraceIdentifier]);
     }
 
-    private static HttpContextAsiBackboneRequestCorrelationResolver CreateResolver(
+    private static HttpContextGovernanceRequestCorrelationResolver CreateResolver(
         HttpContext httpContext,
-        Action<AsiBackboneAspNetCoreOptions>? configure = null)
+        Action<AspNetCoreGovernanceOptions>? configure = null)
     {
-        AsiBackboneAspNetCoreOptions options = new();
+        AspNetCoreGovernanceOptions options = new();
         configure?.Invoke(options);
 
-        return new HttpContextAsiBackboneRequestCorrelationResolver(
+        return new HttpContextGovernanceRequestCorrelationResolver(
             new HttpContextAccessor { HttpContext = httpContext },
             Options.Create(options));
     }

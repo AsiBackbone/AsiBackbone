@@ -6,7 +6,7 @@ namespace AsiBackbone.Core.Signing;
 public static class CanonicalArtifactTypes
 {
     /// <summary>
-    /// Identifies a framework-neutral audit residue payload.
+    /// Identifies a framework-neutral decision receipt payload.
     /// </summary>
     public const string AuditResidue = "asibackbone.audit-residue";
 
@@ -16,7 +16,7 @@ public static class CanonicalArtifactTypes
     public const string AuditLedgerRecord = "asibackbone.audit-ledger-record";
 
     /// <summary>
-    /// Identifies an audit residue lifecycle event payload.
+    /// Identifies an decision receipt lifecycle event payload.
     /// </summary>
     public const string AuditResidueLifecycleEvent = "asibackbone.audit-residue-lifecycle-event";
 

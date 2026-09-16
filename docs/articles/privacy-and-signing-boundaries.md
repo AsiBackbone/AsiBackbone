@@ -13,11 +13,11 @@ The stable package family focuses on explicit governance records, host-owned int
 
 | Area | Current stable behavior | Still not provided by default |
 | --- | --- | --- |
-| Metadata | Host-provided dictionaries and values can flow into contexts, decisions, audit residue, and ledger records. Optional budget and sanitation helpers can normalize, classify through host-owned classifiers, redact, drop, warn, deny, and validate shape limits and reserved key fragments. | Automatic domain-specific classification, encryption, tokenization, external DLP scanning, or proof that sanitized metadata is non-sensitive. |
+| Metadata | Host-provided dictionaries and values can flow into contexts, decisions, decision receipt, and ledger records. Optional budget and sanitation helpers can normalize, classify through host-owned classifiers, redact, drop, warn, deny, and validate shape limits and reserved key fragments. | Automatic domain-specific classification, encryption, tokenization, external DLP scanning, or proof that sanitized metadata is non-sensitive. |
 | Identifiers | Correlation IDs, trace IDs, event IDs, record IDs, actor IDs, policy versions, and policy hashes are available for linking records. | Automatic pseudonymization, identity-proofing, cross-system identity governance, or secret handling. |
 | Signing and verification boundaries | Core records can carry signing-ready metadata and canonical hashing inputs. Released local-development signing and managed-key adapter packages support test/sample signing and host-owned managed-key integration. | Production key custody, automatic key rotation, concrete Azure Key Vault/HSM/KMS implementation, immutable storage, tamper-evidence, legal non-repudiation, or compliance guarantees. |
 | Persistence | EF Core integration supports host-owned persistence through the host application database. | Package-owned database lifecycle, retention policy, encryption-at-rest enforcement, backup policy, or immutable storage. |
-| Audit | Audit residue, ledger records, and provider-neutral integrity seams make decision flow easier to inspect. | Regulatory audit certification, legal evidence guarantees, automated compliance approval, or production tamper-evidence by default. |
+| Audit | Decision receipt, ledger records, and provider-neutral integrity seams make decision flow easier to inspect. | Regulatory audit certification, legal evidence guarantees, automated compliance approval, or production tamper-evidence by default. |
 
 ## Metadata privacy boundary
 

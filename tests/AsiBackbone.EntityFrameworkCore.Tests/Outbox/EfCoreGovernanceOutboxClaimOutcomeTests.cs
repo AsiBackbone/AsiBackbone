@@ -234,7 +234,7 @@ public sealed class EfCoreGovernanceOutboxClaimOutcomeTests
         interceptor.Arm(async callbackCancellationToken =>
         {
             await using GovernanceOutboxTestDbContext deletingContext = new(durableOptions);
-            AsiBackboneGovernanceOutboxEntryEntity entity = await deletingContext.GovernanceOutboxEntries
+            GovernanceOutboxEntryEntity entity = await deletingContext.GovernanceOutboxEntries
                 .SingleAsync(item => item.OutboxEntryId == claim.OutboxEntryId, callbackCancellationToken);
             _ = deletingContext.GovernanceOutboxEntries.Remove(entity);
             _ = await deletingContext.SaveChangesAsync(callbackCancellationToken);

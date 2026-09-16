@@ -64,7 +64,7 @@ public sealed class SigningAbstractionsTests
     [Fact]
     public async Task FakeSignerReturnsProviderNeutralSigningMetadata()
     {
-        IAsiBackboneSigningService signer = new FakeSigningService();
+        IGovernanceSigningService signer = new FakeSigningService();
         var request = new SigningRequest(
             "audit-hash-123",
             hashAlgorithm: "BLAKE3-test",
@@ -102,7 +102,7 @@ public sealed class SigningAbstractionsTests
             keyVersion: "v7",
             provider: "fake-signer");
 
-        IAsiBackboneSignatureVerificationService verifier = new FakeVerificationService();
+        IGovernanceSignatureVerificationService verifier = new FakeVerificationService();
         var request = new SignatureVerificationRequest("audit-hash-123", metadata);
 
         SignatureVerificationResult result = await verifier.VerifyAsync(request, TestContext.Current.CancellationToken);
@@ -118,9 +118,9 @@ public sealed class SigningAbstractionsTests
     [Fact]
     public void AuditLedgerRecordCarriesSigningMetadataAndCapabilityTokenReference()
     {
-        var actor = AsiBackboneActorContext.Service("system-1", "System");
+        var actor = GovernanceActorContext.Service("system-1", "System");
         DateTimeOffset signedUtc = new(2026, 6, 15, 9, 30, 0, TimeSpan.FromHours(-5));
-        var residue = AuditResidue.Create(
+        var residue = DecisionReceipt.Create(
             actor,
             "gateway.execute",
             "Allowed",
@@ -154,7 +154,7 @@ public sealed class SigningAbstractionsTests
         Assert.Equal(record.SignatureKeyVersion, record.SigningMetadata.KeyVersion);
     }
 
-    private sealed class FakeSigningService : IAsiBackboneSigningService
+    private sealed class FakeSigningService : IGovernanceSigningService
     {
         public ValueTask<SigningResult> SignAsync(SigningRequest request, CancellationToken cancellationToken = default)
         {
@@ -175,7 +175,7 @@ public sealed class SigningAbstractionsTests
         }
     }
 
-    private sealed class FakeVerificationService : IAsiBackboneSignatureVerificationService
+    private sealed class FakeVerificationService : IGovernanceSignatureVerificationService
     {
         public ValueTask<SignatureVerificationResult> VerifyAsync(SignatureVerificationRequest request, CancellationToken cancellationToken = default)
         {

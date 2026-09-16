@@ -37,7 +37,7 @@ public sealed class PolicyEvaluatorEndToEndTests
         Assert.Equal(context.PolicyVersion, decision.PolicyVersion);
         Assert.Equal(context.PolicyHash, decision.PolicyHash);
 
-        IAsiBackboneAuditResidue residue = Assert.Single(ledger.Records);
+        IDecisionReceipt residue = Assert.Single(ledger.Records);
         Assert.Equal(nameof(GovernanceDecisionOutcome.Allowed), residue.Outcome);
         Assert.Equal(context.CorrelationId, residue.CorrelationId);
         Assert.Same(residue, ledger.GetByEventId(residue.EventId));
@@ -63,7 +63,7 @@ public sealed class PolicyEvaluatorEndToEndTests
         Assert.False(decision.CanProceed);
         Assert.Contains("constraint.actor_not_authenticated", decision.ReasonCodes);
 
-        IAsiBackboneAuditResidue residue = Assert.Single(ledger.Records);
+        IDecisionReceipt residue = Assert.Single(ledger.Records);
         Assert.Equal(nameof(GovernanceDecisionOutcome.Denied), residue.Outcome);
         Assert.Contains("constraint.actor_not_authenticated", residue.ReasonCodes);
     }
@@ -105,7 +105,7 @@ public sealed class PolicyEvaluatorEndToEndTests
         Assert.False(decision.CanProceed);
         Assert.Contains("decision.acknowledgment_required", decision.ReasonCodes);
 
-        IAsiBackboneAuditResidue residue = Assert.Single(ledger.Records);
+        IDecisionReceipt residue = Assert.Single(ledger.Records);
         Assert.Equal(nameof(GovernanceDecisionOutcome.AcknowledgmentRequired), residue.Outcome);
     }
 
@@ -156,7 +156,7 @@ public sealed class PolicyEvaluatorEndToEndTests
             requesterIsOwner: true,
             authenticated: true);
 
-        var evaluator = new DefaultAsiBackbonePolicyEvaluator<DocumentApprovalContext>(
+        var evaluator = new DefaultGovernancePolicyEvaluator<DocumentApprovalContext>(
             [new NotApplicableConstraint()], threatModelContributors: null, decisionPolicy: null, options: null, logger: null);
 
         GovernanceDecision decision = await evaluator.EvaluateAsync(context, CancellationToken.None);
@@ -169,7 +169,7 @@ public sealed class PolicyEvaluatorEndToEndTests
 
     private static async Task<GovernanceDecision> EvaluateAsync(DocumentApprovalContext context)
     {
-        var evaluator = new DefaultAsiBackbonePolicyEvaluator<DocumentApprovalContext>(
+        var evaluator = new DefaultGovernancePolicyEvaluator<DocumentApprovalContext>(
             constraints:
             [
                 new AuthenticatedActorConstraint(),
@@ -186,7 +186,7 @@ public sealed class PolicyEvaluatorEndToEndTests
         DocumentApprovalContext context,
         GovernanceDecision decision)
     {
-        var residue = AuditResidue.Create(
+        var residue = DecisionReceipt.Create(
             actor: context.Actor,
             operationName: context.OperationName,
             outcome: decision.Outcome.ToString(),
@@ -203,7 +203,7 @@ public sealed class PolicyEvaluatorEndToEndTests
         bool requesterIsOwner,
         bool authenticated)
     {
-        IAsiBackboneActorContext actor = AsiBackboneActorContext.Human(
+        IGovernanceActorContext actor = GovernanceActorContext.Human(
             "user-42",
             "Test User",
             isAuthenticated: authenticated);
@@ -230,9 +230,9 @@ public sealed class PolicyEvaluatorEndToEndTests
         PendingPolicy = 4
     }
 
-    private sealed class DocumentApprovalContext : IAsiBackboneConstraintEvaluationContext
+    private sealed class DocumentApprovalContext : IGovernanceEvaluationContext
     {
-        public required IAsiBackboneActorContext Actor { get; init; }
+        public required IGovernanceActorContext Actor { get; init; }
 
         public required string OperationName { get; init; }
 
@@ -252,7 +252,7 @@ public sealed class PolicyEvaluatorEndToEndTests
             new Dictionary<string, string>(StringComparer.Ordinal);
     }
 
-    private sealed class AuthenticatedActorConstraint : IAsiBackboneConstraint<DocumentApprovalContext>
+    private sealed class AuthenticatedActorConstraint : IGovernanceConstraint<DocumentApprovalContext>
     {
         public string Name => "authenticated-actor";
 
@@ -270,7 +270,7 @@ public sealed class PolicyEvaluatorEndToEndTests
         }
     }
 
-    private sealed class OwnershipConstraint : IAsiBackboneConstraint<DocumentApprovalContext>
+    private sealed class OwnershipConstraint : IGovernanceConstraint<DocumentApprovalContext>
     {
         public string Name => "ownership";
 
@@ -288,7 +288,7 @@ public sealed class PolicyEvaluatorEndToEndTests
         }
     }
 
-    private sealed class ElevatedRiskConstraint : IAsiBackboneConstraint<DocumentApprovalContext>
+    private sealed class ElevatedRiskConstraint : IGovernanceConstraint<DocumentApprovalContext>
     {
         public string Name => "elevated-risk";
 
@@ -306,7 +306,7 @@ public sealed class PolicyEvaluatorEndToEndTests
         }
     }
 
-    private sealed class NotApplicableConstraint : IAsiBackboneConstraint<DocumentApprovalContext>
+    private sealed class NotApplicableConstraint : IGovernanceConstraint<DocumentApprovalContext>
     {
         public string Name => "not-applicable";
 
@@ -318,7 +318,7 @@ public sealed class PolicyEvaluatorEndToEndTests
         }
     }
 
-    private sealed class DocumentRiskDecisionPolicy : IAsiBackboneDecisionPolicy<DocumentApprovalContext>
+    private sealed class DocumentRiskDecisionPolicy : IGovernanceDecisionPolicy<DocumentApprovalContext>
     {
         public ValueTask<GovernanceDecision> ApplyAsync(
             DocumentApprovalContext context,

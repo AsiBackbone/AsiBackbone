@@ -35,4 +35,4 @@ The reason-selection rule does not change the established behavior for other out
 - A warning-only evaluation continues to retain all warning reasons in contributor order.
 - Non-actionable `ThreatAssessment.NoThreat()` results do not contribute reasons.
 
-The selected reason is intended to explain the outcome that actually blocked or redirected execution. Audit residue, telemetry, and API responses should therefore no longer associate a restrictive non-denial outcome with an unrelated earlier warning.
+The selected reason is intended to explain the outcome that actually blocked or redirected execution. Decision receipt, telemetry, and API responses should therefore no longer associate a restrictive non-denial outcome with an unrelated earlier warning.

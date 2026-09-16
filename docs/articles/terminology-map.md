@@ -29,20 +29,20 @@ This repository does not maintain a second organization-level teaching glossary.
 | Learning concept | Concrete AsiBackbone realization | Primary package / reference | Implementation note |
 | --- | --- | --- | --- |
 | Governance spine | Composition of constraints, evaluator, decision, audit, acknowledgment/capability surfaces, and host execution boundaries | `AsiBackbone.Core`; [Policy Evaluator Pipeline](policy-evaluator-pipeline.md) | No single public `GovernanceSpine` type exists. |
-| Intent / request | Proposed operation data carried into evaluation | [`AsiBackboneConstraintEvaluationContext`](xref:AsiBackbone.Core.Constraints.AsiBackboneConstraintEvaluationContext) | No universal `Intent` base type is required. |
-| Policy context | Host-supplied evaluation facts | [`IAsiBackboneConstraintEvaluationContext`](xref:AsiBackbone.Core.Constraints.IAsiBackboneConstraintEvaluationContext) | Host integrations remain responsible for authoritative identity/resource/context data. |
-| Constraint | Independently evaluated product rule | [`IAsiBackboneConstraint<TContext>`](xref:AsiBackbone.Core.Constraints.IAsiBackboneConstraint`1) | Constraint evaluation is separated from side-effect execution. |
-| Policy evaluation | Constraint composition into a governance decision | [`IAsiBackbonePolicyEvaluator<TContext>`](xref:AsiBackbone.Core.Evaluation.IAsiBackbonePolicyEvaluator`1) | Evaluator output is decision data, not execution. |
+| Intent / request | Proposed operation data carried into evaluation | [`GovernanceEvaluationContext`](xref:AsiBackbone.Core.Constraints.GovernanceEvaluationContext) | No universal `Intent` base type is required. |
+| Policy context | Host-supplied evaluation facts | [`IGovernanceEvaluationContext`](xref:AsiBackbone.Core.Constraints.IGovernanceEvaluationContext) | Host integrations remain responsible for authoritative identity/resource/context data. |
+| Constraint | Independently evaluated product rule | [`IGovernanceConstraint<TContext>`](xref:AsiBackbone.Core.Constraints.IGovernanceConstraint`1) | Constraint evaluation is separated from side-effect execution. |
+| Policy evaluation | Constraint composition into a governance decision | [`IGovernancePolicyEvaluator<TContext>`](xref:AsiBackbone.Core.Evaluation.IGovernancePolicyEvaluator`1) | Evaluator output is decision data, not execution. |
 | Decision outcome | Product decision plus enum outcome | [`GovernanceDecision`](xref:AsiBackbone.Core.Decisions.GovernanceDecision), [`GovernanceDecisionOutcome`](xref:AsiBackbone.Core.Decisions.GovernanceDecisionOutcome) | Product includes the `Warning` outcome in addition to the foundational Learning set. |
 | Acknowledgment | Handshake request/response plus host challenge integration | [`LiabilityHandshakeRequest`](xref:AsiBackbone.Core.Handshakes.LiabilityHandshakeRequest), [`LiabilityHandshakeAcknowledgment`](xref:AsiBackbone.Core.Handshakes.LiabilityHandshakeAcknowledgment) | Naming is retained for API compatibility; documentation does not claim legal protection. |
-| Audit residue | Structured product decision evidence | [`AuditResidue`](xref:AsiBackbone.Core.Audit.AuditResidue) | Storage and integrity guarantees depend on the configured host/provider path. |
+| Decision receipt | Structured product decision evidence | [`DecisionReceipt`](xref:AsiBackbone.Core.Audit.DecisionReceipt) | Storage and integrity guarantees depend on the configured host/provider path. |
 | Decision provenance | Correlated decision, audit, acknowledgment, capability, lifecycle, and execution records | Audit/lifecycle/outbox APIs | Provenance is a relationship across records, not one universal type. |
 | Scoped capability | Bounded grant plus validation | [`CapabilityTokenGrant`](xref:AsiBackbone.Core.CapabilityTokens.CapabilityTokenGrant), [`CapabilityGrantValidator`](xref:AsiBackbone.Core.CapabilityTokens.CapabilityGrantValidator) | The implementation uses a grant/token vocabulary; scope and validation semantics matter more than token format. |
 | Host-owned execution | Application or gateway performs the real side effect | [Host-Owned Execution Enforcement](host-owned-execution-enforcement.md) | Core intentionally does not own a universal executor. |
 | Operational gateway | Host mediation before an external tool/API/device/workflow side effect | [AI Agent Gateway Scenario](scenarios/ai-agent-gateway.md) | Pattern-level mapping; no mandatory universal gateway base type. |
 | Policy version | Readable policy generation | `GovernanceDecision.PolicyVersion` | Version is a label, not exact content identity. |
 | Policy fingerprint | Effective-policy fingerprint | `GovernanceDecision.PolicyHash` | Current product property name is `PolicyHash`. |
-| Correlation | Request/decision/audit linkage | [`AsiBackboneHttpRequestCorrelation`](xref:AsiBackbone.AspNetCore.Correlation.AsiBackboneHttpRequestCorrelation) and Core record fields | Correlation is diagnostic/provenance metadata, not authority. |
+| Correlation | Request/decision/audit linkage | [`GovernanceHttpRequestCorrelation`](xref:AsiBackbone.AspNetCore.Correlation.GovernanceHttpRequestCorrelation) and Core record fields | Correlation is diagnostic/provenance metadata, not authority. |
 | Governance outbox | Durable pending governance emission records | `AsiBackbone.EntityFrameworkCore` integration and outbox guides | Production persistence and concurrency semantics are product-owned. |
 | Governance emission | Projection to downstream observability or governance systems | `AsiBackbone.OpenTelemetry` and provider boundaries | Emission is optional and should not replace required local audit/outbox handling. |
 | Signing / verification | Product signing-ready records and configured signing providers | `AsiBackbone.Signing.LocalDevelopment`, `AsiBackbone.Signing.ManagedKey` | Key custody, verification policy, and production trust remain host responsibilities. |
@@ -84,7 +84,7 @@ These distinctions are enforced by the product documentation even when Learning 
 - `OperationResult` reports package operation success/failure and is not a governance outcome.
 - `LiabilityHandshakeAcknowledgment` records acknowledgment and does not override authorization.
 - `CapabilityTokenGrant` represents bounded authority but still requires execution-boundary validation.
-- `AuditResidue` does not promise durable, immutable, signed, or tamper-evident storage by itself.
+- `DecisionReceipt` does not promise durable, immutable, signed, or tamper-evident storage by itself.
 - `GovernanceDecision.PolicyVersion` and `GovernanceDecision.PolicyHash` are separate fields.
 - Host-owned execution and operational gateway are architectural relationships rather than one required class hierarchy.
 

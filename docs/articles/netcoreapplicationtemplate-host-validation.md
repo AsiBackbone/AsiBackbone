@@ -74,10 +74,10 @@ using Microsoft.EntityFrameworkCore;
 builder.Services.AddAsiBackboneAspNetCore();
 
 builder.Services.AddSingleton<InMemoryAuditLedger>();
-builder.Services.AddSingleton<IAsiBackboneAuditSink>(serviceProvider =>
+builder.Services.AddSingleton<IDecisionReceiptSink>(serviceProvider =>
     serviceProvider.GetRequiredService<InMemoryAuditLedger>());
 
-builder.Services.AddScoped<IAsiBackboneAuditLedgerStore, EfCoreAuditLedgerStore>();
+builder.Services.AddScoped<IGovernanceAuditLedgerStore, EfCoreAuditLedgerStore>();
 ```
 
 If the host already has a `DbContext`, either register that context as `DbContext` for the validation path or adapt the ledger store registration to resolve the host-owned context explicitly.
@@ -126,12 +126,12 @@ Use a temporary endpoint or controller action in the NetCoreApplicationTemplate 
 ```csharp
 app.MapGet("/asi-backbone/validation", async (
     HttpContext httpContext,
-    IAsiBackbonePolicyEvaluator<AsiBackboneConstraintEvaluationContext> evaluator,
-    IAsiBackboneAuditSink auditSink,
-    IAsiBackboneAuditLedgerStore ledgerStore,
+    IGovernancePolicyEvaluator<GovernanceEvaluationContext> evaluator,
+    IDecisionReceiptSink auditSink,
+    IGovernanceAuditLedgerStore ledgerStore,
     CancellationToken cancellationToken) =>
 {
-    var context = new AsiBackboneConstraintEvaluationContext(
+    var context = new GovernanceEvaluationContext(
         correlationId: httpContext.TraceIdentifier,
         policyVersion: "netcore-template-validation-v1",
         policyHash: "netcore-template-validation-hash",
@@ -144,8 +144,8 @@ app.MapGet("/asi-backbone/validation", async (
 
     GovernanceDecision decision = await evaluator.EvaluateAsync(context, cancellationToken);
 
-    AuditResidue residue = AuditResidue.FromDecision(
-        AsiBackboneActorContext.Human("validation-user", "Validation User"),
+    DecisionReceipt residue = DecisionReceipt.FromDecision(
+        GovernanceActorContext.Human("validation-user", "Validation User"),
         "netcore-template.validation",
         decision,
         metadata: context.Metadata);
@@ -168,7 +168,7 @@ app.MapGet("/asi-backbone/validation", async (
 });
 ```
 
-This sketch assumes the host already registered an `IAsiBackbonePolicyEvaluator<AsiBackboneConstraintEvaluationContext>` and any constraints or decision policy needed for the validation. The plain ASP.NET Core sample shows a minimal working pattern for those registrations.
+This sketch assumes the host already registered an `IGovernancePolicyEvaluator<GovernanceEvaluationContext>` and any constraints or decision policy needed for the validation. The plain ASP.NET Core sample shows a minimal working pattern for those registrations.
 
 ## Validation checklist
 
@@ -178,7 +178,7 @@ A successful NetCoreApplicationTemplate validation should prove:
 - `AddAsiBackboneAspNetCore()` can be called from the host startup path
 - the host can define or register policy constraints
 - the host can evaluate a governance decision
-- audit residue can be written to an in-memory validation ledger
+- decision receipt can be written to an in-memory validation ledger
 - EF Core audit ledger records can be persisted through the host-owned `DbContext`
 - the host owns database provider, migrations, and connection strings
 - no AsiBackbone project references NetCoreApplicationTemplate

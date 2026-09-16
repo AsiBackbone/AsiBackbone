@@ -542,7 +542,7 @@ public sealed class VerificationPolicyHandlingTests
 
     private sealed class StubVerificationService(
         SignatureVerificationResult result,
-        Exception? exception = null) : IAsiBackboneSignatureVerificationService
+        Exception? exception = null) : IGovernanceSignatureVerificationService
     {
         public bool WasCalled { get; private set; }
 

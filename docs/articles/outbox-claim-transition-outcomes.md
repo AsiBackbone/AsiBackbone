@@ -17,7 +17,7 @@ The outcome-aware contract keeps those questions separate.
 
 ## Additive API
 
-`IAsiBackboneGovernanceOutboxClaimOutcomeStore` extends the existing claim-capable store and adds:
+`IGovernanceOutboxClaimOutcomeStore` extends the existing claim-capable store and adds:
 
 ```csharp
 ValueTask<GovernanceOutboxClaimTransitionResult> TryMarkClaimDeliveredAsync(...);
@@ -47,9 +47,9 @@ A terminal entry returned with `ConcurrencyLost` must not be reclassified as `Ap
 `UseEfCoreGovernanceOutbox<TDbContext>()` registers one scoped `EfCoreGovernanceOutboxOutcomeStore` instance through all compatible contracts:
 
 ```text
-IAsiBackboneGovernanceOutboxStore
-IAsiBackboneGovernanceOutboxClaimStore
-IAsiBackboneGovernanceOutboxClaimOutcomeStore
+IGovernanceOutboxStore
+IGovernanceOutboxClaimStore
+IGovernanceOutboxClaimOutcomeStore
 ```
 
 The outcome-aware store delegates the existing persistence behavior to `EfCoreGovernanceOutboxStore` and observes the scoped `DbContext` save boundary. This keeps the original store behavior intact while making caller-owned persistence explicit.
@@ -80,7 +80,7 @@ Existing consumers may continue calling the original convenience methods when th
 Consumers that log delivery ownership, increment worker-success metrics, acknowledge downstream completion, or make another consequential decision must prefer the outcome-aware interface:
 
 ```csharp
-if (store is IAsiBackboneGovernanceOutboxClaimOutcomeStore outcomeStore)
+if (store is IGovernanceOutboxClaimOutcomeStore outcomeStore)
 {
     GovernanceOutboxClaimTransitionResult transition =
         await outcomeStore.TryMarkClaimDeliveredAsync(claim, emissionResult, cancellationToken);

@@ -44,14 +44,14 @@ public sealed class ApplicationDbContext : DbContext
     {
     }
 
-    public DbSet<AsiBackboneAuditLedgerRecordEntity> AsiBackboneAuditLedgerRecords =>
-        Set<AsiBackboneAuditLedgerRecordEntity>();
+    public DbSet<AuditLedgerRecordEntity> AsiBackboneAuditLedgerRecords =>
+        Set<AuditLedgerRecordEntity>();
 
-    public DbSet<AsiBackboneGovernanceOutboxEntryEntity> AsiBackboneGovernanceOutboxEntries =>
-        Set<AsiBackboneGovernanceOutboxEntryEntity>();
+    public DbSet<GovernanceOutboxEntryEntity> AsiBackboneGovernanceOutboxEntries =>
+        Set<GovernanceOutboxEntryEntity>();
 
-    public DbSet<AsiBackboneAuditResidueLifecycleEventEntity> AsiBackboneAuditResidueLifecycleEvents =>
-        Set<AsiBackboneAuditResidueLifecycleEventEntity>();
+    public DbSet<DecisionReceiptLifecycleEventEntity> AsiBackboneAuditResidueLifecycleEvents =>
+        Set<DecisionReceiptLifecycleEventEntity>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -139,7 +139,7 @@ If a host supplies an `ILogger<EfCoreAuditLedgerStore>`, exception details are l
 
 ## Durable governance outbox tables
 
-The EF Core adapter now includes durable local storage for provider-neutral governance outbox entries and audit residue lifecycle events. The durable tables are intended to prove local persistence before optional downstream provider emission is attempted.
+The EF Core adapter now includes durable local storage for provider-neutral governance outbox entries and decision receipt lifecycle events. The durable tables are intended to prove local persistence before optional downstream provider emission is attempted.
 
 The host migration generated from `ApplyAsiBackboneConfigurations()` should include, among the existing audit ledger and handshake tables:
 
@@ -148,7 +148,7 @@ The host migration generated from `ApplyAsiBackboneConfigurations()` should incl
 
 `AsiBackboneGovernanceOutboxEntries` stores the minimized governance emission envelope plus operational delivery state, including status, retry count, max retry count, next retry UTC, delivered UTC, provider name, provider record ID, last provider-neutral error fields, dead-letter reason, and safe metadata JSON.
 
-`AsiBackboneAuditResidueLifecycleEvents` stores append-oriented lifecycle progress such as decision evaluated, external emission queued, delivered, failed, or dead-lettered. These rows let hosts correlate the local outbox with original audit residue without rewriting the original decision residue.
+`AsiBackboneAuditResidueLifecycleEvents` stores append-oriented lifecycle progress such as decision evaluated, external emission queued, delivered, failed, or dead-lettered. These rows let hosts correlate the local outbox with original decision receipt without rewriting the original decision residue.
 
 ## Durable outbox and downstream providers
 
@@ -156,9 +156,9 @@ The EF Core adapter is durable storage. It is not a telemetry exporter, SIEM int
 
 A recommended production flow is:
 
-1. Create provider-neutral audit residue or lifecycle event in Core.
-2. Persist the lifecycle event through `IAsiBackboneAuditResidueLifecycleStore`.
-3. Enqueue the governance emission envelope through `IAsiBackboneGovernanceOutboxStore`.
+1. Create provider-neutral decision receipt or lifecycle event in Core.
+2. Persist the lifecycle event through `IDecisionReceiptLifecycleStore`.
+3. Enqueue the governance emission envelope through `IGovernanceOutboxStore`.
 4. Let a downstream provider drain pending or retry-ready entries.
 5. Mark entries as delivered, failed/retryable, deferred, or dead-lettered based on provider-neutral results.
 
@@ -182,7 +182,7 @@ The EF Core package contributes provider-neutral mappings for ASI Backbone accou
 - handshake acknowledgments
 - handshake acknowledgment metadata
 - governance outbox entries
-- audit residue lifecycle events
+- decision receipt lifecycle events
 
 These records are part of the governance spine. They are intended to preserve durable accountability snapshots such as actor identity, actor type, operation name, outcome, reason codes, metadata, correlation ID, trace ID, policy version, policy hash, handshake identifiers, acknowledgment identifiers, capability-token identifiers, signing hashes, key references, signature descriptors, outbox status, retry posture, lifecycle stage, and provider-neutral delivery diagnostics.
 

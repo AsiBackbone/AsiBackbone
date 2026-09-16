@@ -124,7 +124,7 @@ The wrapper performs provider-neutral preflight checks before calling the verifi
 - required provider mismatch;
 - expected policy version or policy hash mismatch.
 
-Provider-specific cryptographic verification still happens through `IAsiBackboneSignatureVerificationService`.
+Provider-specific cryptographic verification still happens through `IGovernanceSignatureVerificationService`.
 
 ## Recommended verification points
 

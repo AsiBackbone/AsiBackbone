@@ -131,8 +131,8 @@ public sealed class LocalDevelopmentSigningServiceTests
     [Fact]
     public async Task CanonicalAuditLedgerRecordCanBeSignedAndVerifiedEndToEnd()
     {
-        IAsiBackboneActorContext actor = AsiBackboneActorContext.Service("system-1", "System");
-        var residue = AuditResidue.Create(
+        IGovernanceActorContext actor = GovernanceActorContext.Service("system-1", "System");
+        var residue = DecisionReceipt.Create(
             actor,
             "sample.governed-operation",
             "Allowed",

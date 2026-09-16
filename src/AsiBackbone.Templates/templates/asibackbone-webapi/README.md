@@ -31,7 +31,7 @@ POST /sample/minimal/execute
 POST /sample/controller/execute
 ```
 
-The `/sample/decision` endpoint returns the decision outcome, reason codes, correlation ID, policy version/hash, and audit event ID. Use that correlation ID with `/sample/audit/{correlationId}` to inspect the in-memory audit residue produced by the generated host.
+The `/sample/decision` endpoint returns the decision outcome, reason codes, correlation ID, policy version/hash, and audit event ID. Use that correlation ID with `/sample/audit/{correlationId}` to inspect the in-memory decision receipt produced by the generated host.
 
 ## Host-style notes
 

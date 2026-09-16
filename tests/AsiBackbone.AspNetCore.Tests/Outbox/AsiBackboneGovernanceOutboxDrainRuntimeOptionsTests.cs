@@ -21,7 +21,7 @@ public sealed class AsiBackboneGovernanceOutboxDrainRuntimeOptionsTests
     [Fact]
     public async Task StartupDisabledWorkerCanEnableDisableAndReenableAtRuntime()
     {
-        AsiBackboneGovernanceOutboxDrainWorkerOptions disabled = CreateOptions(enabled: false);
+        GovernanceOutboxDrainWorkerOptions disabled = CreateOptions(enabled: false);
         using RuntimeHarness harness = CreateHarness(disabled);
 
         await harness.Service.StartAsync(TestContext.Current.CancellationToken);
@@ -68,9 +68,9 @@ public sealed class AsiBackboneGovernanceOutboxDrainRuntimeOptionsTests
         Assert.Equal(1, harness.ScopeFactory.CreateScopeCallCount);
     }
 
-    private static AsiBackboneGovernanceOutboxDrainWorkerOptions CreateOptions(bool enabled)
+    private static GovernanceOutboxDrainWorkerOptions CreateOptions(bool enabled)
     {
-        return new AsiBackboneGovernanceOutboxDrainWorkerOptions
+        return new GovernanceOutboxDrainWorkerOptions
         {
             Enabled = enabled,
             BatchSize = 1,
@@ -81,34 +81,34 @@ public sealed class AsiBackboneGovernanceOutboxDrainRuntimeOptionsTests
         };
     }
 
-    private static RuntimeHarness CreateHarness(AsiBackboneGovernanceOutboxDrainWorkerOptions initialOptions)
+    private static RuntimeHarness CreateHarness(GovernanceOutboxDrainWorkerOptions initialOptions)
     {
         var store = new RecordingOutboxStore();
         ServiceCollection services = new();
-        _ = services.AddSingleton<IAsiBackboneGovernanceOutboxStore>(store);
-        _ = services.AddSingleton<IAsiBackboneGovernanceEmitter>(NoOpGovernanceEmitter.Instance);
-        _ = services.AddSingleton(Options.Create(new AsiBackboneGovernanceOutboxOptions { UseClaimLeases = false }));
-        _ = services.AddScoped<AsiBackboneGovernanceOutboxDrain>();
+        _ = services.AddSingleton<IGovernanceOutboxStore>(store);
+        _ = services.AddSingleton<IGovernanceEmitter>(NoOpGovernanceEmitter.Instance);
+        _ = services.AddSingleton(Options.Create(new GovernanceOutboxOptions { UseClaimLeases = false }));
+        _ = services.AddScoped<GovernanceOutboxDrain>();
 
         ServiceProvider provider = services.BuildServiceProvider();
         var scopeFactory = new RecordingScopeFactory(provider.GetRequiredService<IServiceScopeFactory>());
         var options = new RuntimeOptionsMonitor(initialOptions);
-        var service = new AsiBackboneGovernanceOutboxDrainHostedService(
+        var service = new GovernanceOutboxDrainHostedService(
             scopeFactory,
             options,
-            NullLogger<AsiBackboneGovernanceOutboxDrainHostedService>.Instance);
+            NullLogger<GovernanceOutboxDrainHostedService>.Instance);
 
         return new RuntimeHarness(provider, service, scopeFactory, options, store);
     }
 
     private sealed class RuntimeHarness(
         ServiceProvider provider,
-        AsiBackboneGovernanceOutboxDrainHostedService service,
+        GovernanceOutboxDrainHostedService service,
         RecordingScopeFactory scopeFactory,
         RuntimeOptionsMonitor options,
         RecordingOutboxStore store) : IDisposable
     {
-        public AsiBackboneGovernanceOutboxDrainHostedService Service { get; } = service;
+        public GovernanceOutboxDrainHostedService Service { get; } = service;
 
         public RecordingScopeFactory ScopeFactory { get; } = scopeFactory;
 
@@ -123,13 +123,13 @@ public sealed class AsiBackboneGovernanceOutboxDrainRuntimeOptionsTests
         }
     }
 
-    private sealed class RuntimeOptionsMonitor(AsiBackboneGovernanceOutboxDrainWorkerOptions initialValue)
-        : IOptionsMonitor<AsiBackboneGovernanceOutboxDrainWorkerOptions>
+    private sealed class RuntimeOptionsMonitor(GovernanceOutboxDrainWorkerOptions initialValue)
+        : IOptionsMonitor<GovernanceOutboxDrainWorkerOptions>
     {
         private readonly Lock sync = new();
-        private readonly List<Action<AsiBackboneGovernanceOutboxDrainWorkerOptions, string?>> listeners = [];
+        private readonly List<Action<GovernanceOutboxDrainWorkerOptions, string?>> listeners = [];
 
-        public AsiBackboneGovernanceOutboxDrainWorkerOptions CurrentValue
+        public GovernanceOutboxDrainWorkerOptions CurrentValue
         {
             get
             {
@@ -142,12 +142,12 @@ public sealed class AsiBackboneGovernanceOutboxDrainRuntimeOptionsTests
             private set;
         } = initialValue;
 
-        public AsiBackboneGovernanceOutboxDrainWorkerOptions Get(string? name)
+        public GovernanceOutboxDrainWorkerOptions Get(string? name)
         {
             return CurrentValue;
         }
 
-        public IDisposable OnChange(Action<AsiBackboneGovernanceOutboxDrainWorkerOptions, string?> listener)
+        public IDisposable OnChange(Action<GovernanceOutboxDrainWorkerOptions, string?> listener)
         {
             ArgumentNullException.ThrowIfNull(listener);
 
@@ -165,10 +165,10 @@ public sealed class AsiBackboneGovernanceOutboxDrainRuntimeOptionsTests
             });
         }
 
-        public void Set(AsiBackboneGovernanceOutboxDrainWorkerOptions value)
+        public void Set(GovernanceOutboxDrainWorkerOptions value)
         {
             ArgumentNullException.ThrowIfNull(value);
-            Action<AsiBackboneGovernanceOutboxDrainWorkerOptions, string?>[] callbacks;
+            Action<GovernanceOutboxDrainWorkerOptions, string?>[] callbacks;
 
             lock (sync)
             {
@@ -176,7 +176,7 @@ public sealed class AsiBackboneGovernanceOutboxDrainRuntimeOptionsTests
                 callbacks = [.. listeners];
             }
 
-            foreach (Action<AsiBackboneGovernanceOutboxDrainWorkerOptions, string?> callback in callbacks)
+            foreach (Action<GovernanceOutboxDrainWorkerOptions, string?> callback in callbacks)
             {
                 callback(value, Options.DefaultName);
             }
@@ -241,7 +241,7 @@ public sealed class AsiBackboneGovernanceOutboxDrainRuntimeOptionsTests
         }
     }
 
-    private sealed class RecordingOutboxStore : IAsiBackboneGovernanceOutboxStore
+    private sealed class RecordingOutboxStore : IGovernanceOutboxStore
     {
         private readonly Lock sync = new();
         private readonly List<(int ExpectedCount, TaskCompletionSource Completion)> waiters = [];
@@ -352,7 +352,7 @@ public sealed class AsiBackboneGovernanceOutboxDrainRuntimeOptionsTests
         }
     }
 
-    private sealed class NoOpGovernanceEmitter : IAsiBackboneGovernanceEmitter
+    private sealed class NoOpGovernanceEmitter : IGovernanceEmitter
     {
         public static NoOpGovernanceEmitter Instance { get; } = new();
 

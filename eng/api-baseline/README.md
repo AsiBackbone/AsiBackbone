@@ -2,7 +2,7 @@
 
 These files are the reviewable public managed-API baseline for the stable
 AsiBackbone package family, including the intentional `6.0` removals on the
-`release/6.0.0` branch.
+`release/6.0.0` branch and the coordinated semantic type renames in issue #782.
 
 The initial baseline was generated from the DocFX managed-reference output for
 the published `v5.0.0` source at commit
@@ -52,8 +52,18 @@ Issue #783 removes exactly five obsolete partial evaluator constructors and two
 obsolete `RequireGovernancePolicy` route-builder extensions at the 6.0 major
 boundary. See `docs/articles/upgrade-500-to-600.md` for the complete inventory
 and replacements. The Core and ASP.NET Core package compatibility suppression
-files allow only these seven previous-release member removals; package
-validation remains enabled for all other compatibility changes.
+files allow these previous-release member removals; package validation remains
+enabled for all other compatibility changes.
+
+Issue #782 reviews all 232 public type entries and renames 103 entries with 102
+distinct simple names, preserving namespaces and generic arities. See
+`docs/articles/public-api-naming-600.md` for every retain/rename decision and
+`docs/articles/upgrade-500-to-600.md` for the complete migration table. Receipt
+validation diagnostic wording is also updated. Exact compatibility entries
+cover the resulting removed type identities, changed member signatures,
+implemented interfaces, and generic constraints. Package IDs, JSON keys,
+canonical tags, enum values, schema versions, and EF table/column names remain
+unchanged; the package compatibility gate is still enabled.
 
 A baseline update is an approval artifact, not an approval mechanism. First
 classify the API change under the project's Semantic Versioning policy. Additive

@@ -14,7 +14,7 @@ public sealed class AsiBackbonePolicyEvaluatorOptionsBranchCoverageTests
     [Fact]
     public void ValidateDefaultOptionsSucceeds()
     {
-        var options = new AsiBackbonePolicyEvaluatorOptions();
+        var options = new GovernancePolicyOptions();
 
         options.Validate();
 
@@ -31,7 +31,7 @@ public sealed class AsiBackbonePolicyEvaluatorOptionsBranchCoverageTests
     [Fact]
     public void ValidateRejectsBlankNoConstraintsReasonCode()
     {
-        var options = new AsiBackbonePolicyEvaluatorOptions
+        var options = new GovernancePolicyOptions
         {
             NoConstraintsReasonCode = " "
         };
@@ -45,7 +45,7 @@ public sealed class AsiBackbonePolicyEvaluatorOptionsBranchCoverageTests
     [Fact]
     public void ValidateRejectsBlankNoConstraintsReasonMessage()
     {
-        var options = new AsiBackbonePolicyEvaluatorOptions
+        var options = new GovernancePolicyOptions
         {
             NoConstraintsReasonMessage = " "
         };
@@ -59,7 +59,7 @@ public sealed class AsiBackbonePolicyEvaluatorOptionsBranchCoverageTests
     [Fact]
     public void ValidateRejectsBlankConstraintExceptionReasonCode()
     {
-        var options = new AsiBackbonePolicyEvaluatorOptions
+        var options = new GovernancePolicyOptions
         {
             ConstraintExceptionReasonCode = " "
         };
@@ -73,7 +73,7 @@ public sealed class AsiBackbonePolicyEvaluatorOptionsBranchCoverageTests
     [Fact]
     public void ValidateRejectsBlankConstraintExceptionReasonMessage()
     {
-        var options = new AsiBackbonePolicyEvaluatorOptions
+        var options = new GovernancePolicyOptions
         {
             ConstraintExceptionReasonMessage = " "
         };
@@ -87,7 +87,7 @@ public sealed class AsiBackbonePolicyEvaluatorOptionsBranchCoverageTests
     [Fact]
     public void ValidateRejectsBlankThreatContributorExceptionReasonCode()
     {
-        var options = new AsiBackbonePolicyEvaluatorOptions
+        var options = new GovernancePolicyOptions
         {
             ThreatContributorExceptionReasonCode = " "
         };
@@ -101,7 +101,7 @@ public sealed class AsiBackbonePolicyEvaluatorOptionsBranchCoverageTests
     [Fact]
     public void ValidateRejectsBlankThreatContributorExceptionReasonMessage()
     {
-        var options = new AsiBackbonePolicyEvaluatorOptions
+        var options = new GovernancePolicyOptions
         {
             ThreatContributorExceptionReasonMessage = " "
         };

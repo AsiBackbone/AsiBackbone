@@ -6,9 +6,9 @@ using SigningMetadataValue = AsiBackbone.Core.Signing.SigningMetadata;
 namespace AsiBackbone.Core.Audit;
 
 /// <summary>
-/// Represents a persistence-ready audit ledger record captured from AsiBackbone audit residue.
+/// Represents a persistence-ready audit ledger record captured from AsiBackbone decision receipt.
 /// </summary>
-public sealed class AuditLedgerRecord : IAsiBackboneAuditResidue
+public sealed class AuditLedgerRecord : IDecisionReceipt
 {
     private static readonly ReadOnlyCollection<string> EmptyReasonCodes =
         Array.AsReadOnly(Array.Empty<string>());
@@ -25,7 +25,7 @@ public sealed class AuditLedgerRecord : IAsiBackboneAuditResidue
         DateTimeOffset occurredUtc,
         DateTimeOffset recordedUtc,
         string actorId,
-        AsiBackboneActorType actorType,
+        GovernanceActorType actorType,
         string? actorDisplayName,
         string operationName,
         string outcome,
@@ -69,7 +69,7 @@ public sealed class AuditLedgerRecord : IAsiBackboneAuditResidue
         ArgumentException.ThrowIfNullOrWhiteSpace(outcome);
 
         RecordId = recordId.Trim();
-        SchemaVersion = AsiBackboneSchemaVersions.Normalize(schemaVersion);
+        SchemaVersion = GovernanceSchemaVersions.Normalize(schemaVersion);
         EventId = eventId.Trim();
         AuditResidueId = NormalizeOptional(auditResidueId) ?? EventId;
         OccurredUtc = occurredUtc.ToUniversalTime();
@@ -136,7 +136,7 @@ public sealed class AuditLedgerRecord : IAsiBackboneAuditResidue
 
     public string ActorId { get; }
 
-    public AsiBackboneActorType ActorType { get; }
+    public GovernanceActorType ActorType { get; }
 
     public string? ActorDisplayName { get; }
 
@@ -215,7 +215,7 @@ public sealed class AuditLedgerRecord : IAsiBackboneAuditResidue
     public bool HasMetadata => Metadata.Count > 0;
 
     public static AuditLedgerRecord FromResidue(
-        IAsiBackboneAuditResidue residue,
+        IDecisionReceipt residue,
         string? recordId = null,
         DateTimeOffset? recordedUtc = null,
         string? handshakeId = null,

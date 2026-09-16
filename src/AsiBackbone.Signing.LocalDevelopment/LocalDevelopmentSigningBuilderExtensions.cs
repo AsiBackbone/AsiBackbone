@@ -34,9 +34,9 @@ public static class LocalDevelopmentSigningBuilderExtensions
 
         _ = builder.Services.AddSingleton(options);
         _ = builder.Services.AddSingleton<LocalDevelopmentSigningService>();
-        _ = builder.Services.AddSingleton<IAsiBackboneSigningService>(serviceProvider =>
+        _ = builder.Services.AddSingleton<IGovernanceSigningService>(serviceProvider =>
             serviceProvider.GetRequiredService<LocalDevelopmentSigningService>());
-        _ = builder.Services.AddSingleton<IAsiBackboneSignatureVerificationService>(serviceProvider =>
+        _ = builder.Services.AddSingleton<IGovernanceSignatureVerificationService>(serviceProvider =>
             serviceProvider.GetRequiredService<LocalDevelopmentSigningService>());
 
         return builder;

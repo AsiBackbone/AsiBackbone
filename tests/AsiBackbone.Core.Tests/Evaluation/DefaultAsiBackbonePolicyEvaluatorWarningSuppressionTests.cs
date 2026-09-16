@@ -21,7 +21,7 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorWarningSuppressionTests
         TestPolicyContext context = CreateContext();
         var observedOrder = new List<string>();
 
-        var evaluator = new DefaultAsiBackbonePolicyEvaluator<TestPolicyContext>(
+        var evaluator = new DefaultGovernancePolicyEvaluator<TestPolicyContext>(
             [
                 new DelegateConstraint(
                     "pre-warning-constraint",
@@ -82,7 +82,7 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorWarningSuppressionTests
         TestPolicyContext context = CreateContext();
         var observedOrder = new List<string>();
 
-        var evaluator = new DefaultAsiBackbonePolicyEvaluator<TestPolicyContext>(
+        var evaluator = new DefaultGovernancePolicyEvaluator<TestPolicyContext>(
             [
                 new DelegateConstraint(
                     "pre-warning-constraint",
@@ -114,7 +114,7 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorWarningSuppressionTests
             ],
             [CreateWarningContributor()],
             decisionPolicy: null,
-            options: new AsiBackbonePolicyEvaluatorOptions
+            options: new GovernancePolicyOptions
             {
                 ShortCircuitOnFirstDenial = true
             }, logger: null);
@@ -137,7 +137,7 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorWarningSuppressionTests
     public async Task ThreatWarningRemainsProtectedFromAllowDowngradeWhenEvaluationCanProceed()
     {
         TestPolicyContext context = CreateContext();
-        var evaluator = new DefaultAsiBackbonePolicyEvaluator<TestPolicyContext>(
+        var evaluator = new DefaultGovernancePolicyEvaluator<TestPolicyContext>(
             [new StaticConstraint(ConstraintEvaluationResult.Allow())],
             [CreateWarningContributor()],
             new AlwaysAllowDecisionPolicy(), options: null, logger: null);
@@ -171,7 +171,7 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorWarningSuppressionTests
                 GovernanceDecisionOutcome.Warning));
     }
 
-    private sealed class TestPolicyContext : IAsiBackboneConstraintEvaluationContext
+    private sealed class TestPolicyContext : IGovernanceEvaluationContext
     {
         public string? CorrelationId { get; init; }
 
@@ -183,7 +183,7 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorWarningSuppressionTests
             new Dictionary<string, string>(StringComparer.Ordinal);
     }
 
-    private sealed class StaticConstraint(ConstraintEvaluationResult result) : IAsiBackboneConstraint<TestPolicyContext>
+    private sealed class StaticConstraint(ConstraintEvaluationResult result) : IGovernanceConstraint<TestPolicyContext>
     {
         private readonly ConstraintEvaluationResult result = result;
 
@@ -199,7 +199,7 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorWarningSuppressionTests
 
     private sealed class DelegateConstraint(
         string name,
-        Func<TestPolicyContext, CancellationToken, ConstraintEvaluationResult> evaluate) : IAsiBackboneConstraint<TestPolicyContext>
+        Func<TestPolicyContext, CancellationToken, ConstraintEvaluationResult> evaluate) : IGovernanceConstraint<TestPolicyContext>
     {
         private readonly Func<TestPolicyContext, CancellationToken, ConstraintEvaluationResult> evaluate = evaluate;
 
@@ -229,7 +229,7 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorWarningSuppressionTests
         }
     }
 
-    private sealed class AlwaysAllowDecisionPolicy : IAsiBackboneDecisionPolicy<TestPolicyContext>
+    private sealed class AlwaysAllowDecisionPolicy : IGovernanceDecisionPolicy<TestPolicyContext>
     {
         public ValueTask<GovernanceDecision> ApplyAsync(
             TestPolicyContext context,

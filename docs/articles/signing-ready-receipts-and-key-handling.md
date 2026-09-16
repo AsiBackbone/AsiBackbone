@@ -15,7 +15,7 @@ For released provider boundaries, see [Signing Provider Package Boundary](signin
 
 ## Purpose
 
-AsiBackbone audit residue, audit ledger records, capability-token references, outbox entries, and downstream governance emission envelopes need a stable way to construct deterministic payloads, compute provider-neutral hashes, and carry signing metadata without forcing Core to depend on one key provider.
+AsiBackbone decision receipt, audit ledger records, capability-token references, outbox entries, and downstream governance emission envelopes need a stable way to construct deterministic payloads, compute provider-neutral hashes, and carry signing metadata without forcing Core to depend on one key provider.
 
 The signing-ready model gives host applications and provider packages a neutral contract for building canonical payloads, hashing deterministic artifact bytes, signing precomputed hashes, recording signature metadata on audit receipts, carrying key identifier and key version references, and verifying signatures downstream.
 
@@ -36,7 +36,7 @@ The signing-ready model gives host applications and provider packages a neutral 
 | `CanonicalArtifactTypes` | Stable artifact type identifiers bound into canonical payloads before hashing. |
 | `CanonicalPayloadOptions` | Canonicalization version, hash algorithm, and metadata allow-list configuration. |
 | `CanonicalPayload` | Deterministic JSON payload envelope containing artifact type, artifact ID, payload schema version, canonicalization version, and artifact content. |
-| `CanonicalPayloadBuilder` | Provider-neutral builders for audit residue, audit ledger records, lifecycle events, governance emission envelopes, and governance outbox entries. |
+| `CanonicalPayloadBuilder` | Provider-neutral builders for decision receipt, audit ledger records, lifecycle events, governance emission envelopes, and governance outbox entries. |
 | `CanonicalPayloadHash` | Provider-neutral hash result metadata containing hash value, hash algorithm, canonicalization version, artifact type, artifact ID, and payload schema version. |
 | `CanonicalPayloadHasher` | Built-in SHA-256 hasher for canonical payload bytes. |
 | `SigningMetadata` | Provider-neutral signing metadata containing signing hash, hash algorithm, signature, signature algorithm, key ID, key version, provider descriptor, signed timestamp, and safe metadata. |
@@ -44,8 +44,8 @@ The signing-ready model gives host applications and provider packages a neutral 
 | `SigningResult` | Provider-neutral result containing signing metadata. |
 | `SignatureVerificationRequest` | Provider-neutral request to verify signing metadata against a precomputed artifact hash. |
 | `SignatureVerificationResult` | Provider-neutral verification result. |
-| `IAsiBackboneSigningService` | Async signing boundary implemented by host applications or provider packages. |
-| `IAsiBackboneSignatureVerificationService` | Async verification boundary implemented by host applications or provider packages. |
+| `IGovernanceSigningService` | Async signing boundary implemented by host applications or provider packages. |
+| `IGovernanceSignatureVerificationService` | Async verification boundary implemented by host applications or provider packages. |
 
 ## Canonical payload hashing
 
@@ -73,7 +73,7 @@ Canonicalization rules:
 * The built-in hasher computes the algorithm selected by `CanonicalPayloadOptions.HashAlgorithm` over the UTF-8 bytes of the canonical JSON payload. SHA-256 is the default; SHA-512 is also supported.
 * Unsupported algorithms fail explicitly. Host or provider packages may implement additional algorithms without changing the canonical bytes.
 
-`CanonicalPayloadHash.ToSigningMetadata()` can copy the hash into `SigningMetadata.SigningHash` and add descriptor metadata such as artifact type, artifact ID, canonicalization version, and payload schema version. This metadata is still unsigned until a host or provider uses `IAsiBackboneSigningService` and records a signature value, signature algorithm, key ID, and key version.
+`CanonicalPayloadHash.ToSigningMetadata()` can copy the hash into `SigningMetadata.SigningHash` and add descriptor metadata such as artifact type, artifact ID, canonicalization version, and payload schema version. This metadata is still unsigned until a host or provider uses `IGovernanceSigningService` and records a signature value, signature algorithm, key ID, and key version.
 
 ## Audit ledger metadata
 
@@ -104,7 +104,7 @@ Signing providers should:
 
 ## Verification strategy
 
-`IAsiBackboneSignatureVerificationService` verifies a `SignatureVerificationRequest` containing the expected signing hash and signing metadata.
+`IGovernanceSignatureVerificationService` verifies a `SignatureVerificationRequest` containing the expected signing hash and signing metadata.
 
 Core does not require a particular signing algorithm such as RSA, ECDSA, HMAC, EdDSA, or a provider-specific managed key operation.
 

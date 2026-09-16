@@ -93,7 +93,7 @@ When `AcknowledgmentRequired` is returned, the host can use ASP.NET Core acknowl
 - Hiding tool governance inside prompts.
 - Executing consequential tool calls before a human sees the risk.
 - Recording only the final tool result without the policy decision that allowed it.
-- Treating a click approval as separate from policy version, reason codes, and audit residue.
+- Treating a click approval as separate from policy version, reason codes, and decision receipt.
 
 ## Adoption note
 

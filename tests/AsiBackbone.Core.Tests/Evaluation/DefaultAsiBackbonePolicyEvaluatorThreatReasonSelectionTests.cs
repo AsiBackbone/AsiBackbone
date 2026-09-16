@@ -36,7 +36,7 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorThreatReasonSelectionTests
         string selectedReasonCode,
         string selectedReasonMessage)
     {
-        var evaluator = new DefaultAsiBackbonePolicyEvaluator<TestPolicyContext>(
+        var evaluator = new DefaultGovernancePolicyEvaluator<TestPolicyContext>(
             [new StaticConstraint(ConstraintEvaluationResult.Allow())],
             [
                 new StaticThreatContributor(
@@ -80,7 +80,7 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorThreatReasonSelectionTests
     public async Task EvaluateMultipleMatchingRestrictiveOutcomesUsesFirstMatchingReason(
         GovernanceDecisionOutcome selectedOutcome)
     {
-        var evaluator = new DefaultAsiBackbonePolicyEvaluator<TestPolicyContext>(
+        var evaluator = new DefaultGovernancePolicyEvaluator<TestPolicyContext>(
             [new StaticConstraint(ConstraintEvaluationResult.Allow())],
             [
                 new StaticThreatContributor(
@@ -130,7 +130,7 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorThreatReasonSelectionTests
         };
     }
 
-    private sealed class TestPolicyContext : IAsiBackboneConstraintEvaluationContext
+    private sealed class TestPolicyContext : IGovernanceEvaluationContext
     {
         public string? CorrelationId { get; init; }
 
@@ -143,7 +143,7 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorThreatReasonSelectionTests
     }
 
     private sealed class StaticConstraint(ConstraintEvaluationResult result) :
-        IAsiBackboneConstraint<TestPolicyContext>
+        IGovernanceConstraint<TestPolicyContext>
     {
         private readonly ConstraintEvaluationResult result = result;
 

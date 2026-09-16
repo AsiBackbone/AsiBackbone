@@ -21,7 +21,7 @@ AsiBackbone helps a host application evaluate a consequential request, return a 
 | Constraint | A small rule or guard used by the decision pipeline. | Which rule allowed or blocked the request? |
 | Evaluation context | A safe DTO of request facts such as operation, region, risk, policy version, and correlation ID. | What facts did the rules inspect? |
 | Governance decision | A structured allow, deny, warn, defer, acknowledgment-required, or escalation result. | What did the policy pipeline decide? |
-| Audit residue | A decision receipt or audit-log payload. | What record proves how the decision was made? |
+| Decision receipt | A decision receipt or audit-log payload. | What record proves how the decision was made? |
 | Acknowledgment handshake | An explicit acknowledgment workflow before a risky action. | Does the actor need to acknowledge risk before continuing? |
 | Capability grant | A short-lived, scoped permission after a decision. | Is continuation limited to a specific operation, actor, scope, and time window? |
 | Governance outbox | A durable outbox for governance events before external emission. | Can decision records survive restart and be retried safely? |
@@ -51,7 +51,7 @@ A minimal adopter should be able to answer these engineering questions without k
 - Which host-owned rule or constraint evaluated the request?
 - Which decision outcome was returned?
 - Which reason codes explain the result?
-- Where was the audit residue or decision receipt written?
+- Where was the decision receipt or decision receipt written?
 - Where would durable persistence be added?
 - Where would optional OpenTelemetry projection be added?
 - Where does the host execute, deny, defer, or escalate the actual operation?

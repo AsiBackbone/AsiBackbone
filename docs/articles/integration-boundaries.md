@@ -47,7 +47,7 @@ The host integrates AsiBackbone where governance is needed and leaves the rest o
 | Intent evaluation | Provides decision and policy primitives. | Builds the policy context and chooses when to evaluate. |
 | Constraint evaluation | Provides abstractions and decision outcome language. | Defines and registers domain-specific constraints. |
 | Acknowledgment flow | Provides acknowledgment and audit primitives. | Chooses UI, UX, authorization, and workflow behavior. |
-| Audit residue | Provides structured audit models and sinks/stores. | Chooses durability, retention, access controls, and operational review. |
+| Decision receipt | Provides structured audit models and sinks/stores. | Chooses durability, retention, access controls, and operational review. |
 | Capability tokens | Provides scoped grant concepts and package primitives where available. | Chooses when a grant is trusted and how execution is performed. |
 | Web application structure | Does not own routing, controllers, middleware, or UI. | Owns the host application shape and request pipeline. |
 | Persistence lifecycle | Contributes persistence shape/configuration where EF Core is used. | Owns `DbContext`, provider, connection strings, migrations, deployment, and operations. |
@@ -98,7 +98,7 @@ A team can adopt AsiBackbone incrementally:
 4. Build a policy context from existing host data.
 5. Register host-defined constraints.
 6. Evaluate the decision before execution.
-7. Persist audit residue using the host-owned persistence plan.
+7. Persist decision receipt using the host-owned persistence plan.
 8. Keep actual execution in the host application.
 
 This lets enterprise teams test the governance pattern without converting their application into a new template or reorganizing their entire persistence stack.
@@ -132,7 +132,7 @@ AsiBackbone should normally live at the decision boundary, not the execution bou
 Proposed action
   -> AsiBackbone policy decision
   -> optional acknowledgment
-  -> audit residue
+  -> decision receipt
   -> optional capability grant
   -> host-owned execution path
 ```

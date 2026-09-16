@@ -11,7 +11,7 @@ The governance emission contract is the seam between Core governance artifacts, 
 ```text
 Core governance artifacts
   -> GovernanceEmissionEnvelope
-  -> IAsiBackboneGovernanceEmitter
+  -> IGovernanceEmitter
   -> GovernanceEmissionResult
   -> durable outbox or optional provider adapter
 ```
@@ -24,7 +24,7 @@ The contract lives in `AsiBackbone.Core` under the provider-neutral emission lan
 
 Core owns:
 
-* `IAsiBackboneGovernanceEmitter`
+* `IGovernanceEmitter`
 * `GovernanceEmissionEnvelope`
 * `GovernanceEmissionPayload`
 * `GovernanceEmissionResult`
@@ -47,13 +47,13 @@ Provider packages and host-owned adapters depend on Core. Core must not depend o
 
 | Type | Role |
 | --- | --- |
-| `IAsiBackboneGovernanceEmitter` | Provider-neutral async emission boundary. Durable outbox workers and provider adapters can target this interface. |
-| `GovernanceEmissionEnvelope` | Versioned neutral envelope carrying event identity, correlation, audit residue ID, lifecycle stage, policy version/hash, trace fields, gateway/outbox hints, payload descriptor, and safe metadata. |
+| `IGovernanceEmitter` | Provider-neutral async emission boundary. Durable outbox workers and provider adapters can target this interface. |
+| `GovernanceEmissionEnvelope` | Versioned neutral envelope carrying event identity, correlation, decision receipt ID, lifecycle stage, policy version/hash, trace fields, gateway/outbox hints, payload descriptor, and safe metadata. |
 | `GovernanceEmissionPayload` | Minimized payload descriptor. It captures payload type, schema version, content type, content hash, size, and safe metadata without requiring raw protected content. |
 | `GovernanceEmissionResult` | Provider-neutral result shape for delivered, pending, deferred, failed, retryable, and dead-letter outcomes. |
 | `GovernanceEmissionStatus` | Stable status vocabulary for local/outbox/provider handoff. |
 | `GovernanceEmissionError` | Provider-neutral error code, message, retryability, provider name, and safe provider error code. |
-| `GovernanceEmissionEventType` | Stable event category vocabulary for decision, acknowledgment, capability token, gateway, audit residue, lifecycle, outbox, and provider emission events. |
+| `GovernanceEmissionEventType` | Stable event category vocabulary for decision, acknowledgment, capability token, gateway, decision receipt, lifecycle, outbox, and provider emission events. |
 
 ## Envelope guidance
 
@@ -98,9 +98,9 @@ Provider-specific exception types, HTTP codes, SDK error objects, and backend pa
 
 | Issue | Relationship |
 | --- | --- |
-| #140 Durable outbox | The outbox can store `GovernanceEmissionEnvelope` values and hand them to `IAsiBackboneGovernanceEmitter` when ready. |
-| #141 Lifecycle stages | `GovernanceEmissionEnvelope` can carry `AuditResidueLifecycleStage` and stable stage sequence values. |
-| #142 Audit residue telemetry | `GovernanceEmissionEnvelope.FromResidue` copies neutral telemetry, trace, outbox, gateway, and policy fields from audit residue. |
+| #140 Durable outbox | The outbox can store `GovernanceEmissionEnvelope` values and hand them to `IGovernanceEmitter` when ready. |
+| #141 Lifecycle stages | `GovernanceEmissionEnvelope` can carry `DecisionReceiptLifecycleStage` and stable stage sequence values. |
+| #142 Decision receipt telemetry | `GovernanceEmissionEnvelope.FromResidue` copies neutral telemetry, trace, outbox, gateway, and policy fields from decision receipt. |
 | #144 OpenTelemetry provider | The OpenTelemetry provider should adapt this contract into spans, events, logs, metrics, and attributes without changing Core semantics. |
 | #145 Event Hubs provider | The Event Hubs provider should adapt this contract into versioned stream messages with stable message properties, outbox-safe retry behavior, and no Core Azure dependency. |
 | #146 Purview enrichment | Purview enrichment should consume minimized envelopes or summaries as optional catalog, classification, lineage, and compliance context without becoming the raw audit store. |

@@ -1,6 +1,6 @@
 # Upgrade from 5.x to 6.0
 
-Version 6.0 removes seven public members whose obsolete compatibility windows have completed. These are intentional major-version API breaks. Rebuild consumers against the 6.0 packages after migrating.
+Version 6.0 renames public types and removes seven public members whose obsolete compatibility windows have completed. These are intentional major-version API breaks. Rebuild consumers against the 6.0 packages after migrating.
 
 ## Complete obsolete-member inventory
 
@@ -16,10 +16,10 @@ The repository-wide inventory of source attributes (`Obsolete` / `ObsoleteAttrib
 | `RequireGovernancePolicy<TPolicy>(RouteHandlerBuilder)` | `MarkGovernancePolicy<TPolicy>()` for decision-policy types; `MarkGovernancePolicy(typeof(TPolicy))` for plain marker types |
 | `RequireGovernancePolicy<TBuilder>(TBuilder, Type)` | `MarkGovernancePolicy(builder, policyType)` |
 
-Start manual construction with `DefaultAsiBackbonePolicyEvaluator.CreateBuilder<TContext>()`, configure the dependencies, and call `Build()`. For any removed evaluator constructor, direct construction and dependency injection can instead use the supported full-dependency constructor:
+Start manual construction with `DefaultGovernancePolicyEvaluator.CreateBuilder<TContext>()`, configure the dependencies, and call `Build()`. For any removed evaluator constructor, direct construction and dependency injection can instead use the supported full-dependency constructor:
 
 ```csharp
-var evaluator = new DefaultAsiBackbonePolicyEvaluator<MyPolicyContext>(
+var evaluator = new DefaultGovernancePolicyEvaluator<MyPolicyContext>(
     constraints,
     threatModelContributors: null,
     decisionPolicy: null,
@@ -29,7 +29,7 @@ var evaluator = new DefaultAsiBackbonePolicyEvaluator<MyPolicyContext>(
 
 Supply the host's actual contributors, decision policy, options, and logger wherever configured. Null optional dependencies retain the evaluator's defaults; empty constraints still deny by default.
 
-Type-based dependency injection registration now has only the full constructor to activate. It requires all five dependencies to be resolvable, including the concrete evaluator options object. Hosts using the options pattern should use a factory instead, passing `IOptions<AsiBackbonePolicyEvaluatorOptions>.Value` to `WithOptions` (or the full constructor), and resolving the other configured dependencies explicitly. The sample and template use this factory pattern so unregistered optional dependencies retain their defaults.
+Type-based dependency injection registration now has only the full constructor to activate. It requires all five dependencies to be resolvable, including the concrete evaluator options object. Hosts using the options pattern should use a factory instead, passing `IOptions<GovernancePolicyOptions>.Value` to `WithOptions` (or the full constructor), and resolving the other configured dependencies explicitly. The sample and template use this factory pattern so unregistered optional dependencies retain their defaults.
 
 `MarkGovernancePolicy` records the same policy metadata. It does not resolve the policy or select/enforce constraints solely from the marker. The non-obsolete `RequireGovernancePolicyAttribute` remains supported.
 
@@ -37,4 +37,116 @@ Type-based dependency injection registration now has only the full constructor t
 
 The internal `AsiBackboneObsoletions` helper and its ASIB900 message, ID, and URL constants existed solely for the removed constructors and were deleted. ASIB900 came from the compiler's obsolete attribute support, not a dedicated Roslyn analyzer; no analyzer diagnostic needed removal. Obsolete-only forwarding and attribute tests and ASIB900 project suppressions were removed. Behavioral evaluator tests now use the full constructor; builder and marker replacement tests remain.
 
-The managed API baselines intentionally remove only the seven inventoried members. Package compatibility validation retains its previous-release comparison, with narrowly scoped removal suppressions for the affected assemblies; other compatibility failures still fail packing. Historical 4.x/5.x release notes and migration guidance remain available.
+The managed API baselines intentionally remove the seven inventoried members and apply the public type renames below. Package compatibility validation retains its previous-release comparison, with exact exceptions for the intentional type, signature, interface, and generic-constraint changes; other compatibility failures still fail packing. Historical 4.x/5.x release notes and migration guidance remain available.
+
+## Public type renames
+
+See [6.0 public API naming convention](public-api-naming-600.md) for the complete inventory, qualifier decisions, namespace review, terminology coordination with #781, and retained names. No compatibility aliases are carried forward. Namespace and generic arity stay the same.
+
+| Package | 5.x type | 6.0 type |
+| --- | --- | --- |
+| `AsiBackbone.AspNetCore` | `AsiBackbone.AspNetCore.Actors.AsiBackboneHttpActorContextOptions` | `AsiBackbone.AspNetCore.Actors.HttpGovernanceActorContextOptions` |
+| `AsiBackbone.AspNetCore` | `AsiBackbone.AspNetCore.Actors.HttpContextAsiBackboneActorContextResolver` | `AsiBackbone.AspNetCore.Actors.HttpContextGovernanceActorContextResolver` |
+| `AsiBackbone.AspNetCore` | `AsiBackbone.AspNetCore.Actors.IAsiBackboneHttpActorContextResolver` | `AsiBackbone.AspNetCore.Actors.IHttpGovernanceActorContextResolver` |
+| `AsiBackbone.AspNetCore` | `AsiBackbone.AspNetCore.Correlation.AsiBackboneHttpRequestCorrelation` | `AsiBackbone.AspNetCore.Correlation.GovernanceHttpRequestCorrelation` |
+| `AsiBackbone.AspNetCore` | `AsiBackbone.AspNetCore.Correlation.AsiBackboneHttpRequestCorrelationAuditExtensions` | `AsiBackbone.AspNetCore.Correlation.GovernanceHttpRequestCorrelationAuditExtensions` |
+| `AsiBackbone.AspNetCore` | `AsiBackbone.AspNetCore.Correlation.AsiBackboneHttpRequestMetadataKeys` | `AsiBackbone.AspNetCore.Correlation.GovernanceHttpRequestMetadataKeys` |
+| `AsiBackbone.AspNetCore` | `AsiBackbone.AspNetCore.Correlation.HttpContextAsiBackboneRequestCorrelationResolver` | `AsiBackbone.AspNetCore.Correlation.HttpContextGovernanceRequestCorrelationResolver` |
+| `AsiBackbone.AspNetCore` | `AsiBackbone.AspNetCore.Correlation.IAsiBackboneHttpRequestCorrelationResolver` | `AsiBackbone.AspNetCore.Correlation.IHttpGovernanceRequestCorrelationResolver` |
+| `AsiBackbone.AspNetCore` | `AsiBackbone.AspNetCore.DependencyInjection.AsiBackboneAspNetCoreOptions` | `AsiBackbone.AspNetCore.DependencyInjection.AspNetCoreGovernanceOptions` |
+| `AsiBackbone.AspNetCore` | `AsiBackbone.AspNetCore.Endpoints.AsiBackboneEndpointGovernanceApplicationBuilderExtensions` | `AsiBackbone.AspNetCore.Endpoints.EndpointGovernanceApplicationBuilderExtensions` |
+| `AsiBackbone.AspNetCore` | `AsiBackbone.AspNetCore.Endpoints.AsiBackboneEndpointGovernanceDescriptor` | `AsiBackbone.AspNetCore.Endpoints.EndpointGovernanceDescriptor` |
+| `AsiBackbone.AspNetCore` | `AsiBackbone.AspNetCore.Endpoints.AsiBackboneEndpointGovernanceMetadataMode` | `AsiBackbone.AspNetCore.Endpoints.EndpointGovernanceMetadataMode` |
+| `AsiBackbone.AspNetCore` | `AsiBackbone.AspNetCore.Endpoints.AsiBackboneEndpointGovernanceMiddleware` | `AsiBackbone.AspNetCore.Endpoints.EndpointGovernanceMiddleware` |
+| `AsiBackbone.AspNetCore` | `AsiBackbone.AspNetCore.Endpoints.AsiBackboneEndpointGovernanceOptions` | `AsiBackbone.AspNetCore.Endpoints.EndpointGovernanceOptions` |
+| `AsiBackbone.AspNetCore` | `AsiBackbone.AspNetCore.Endpoints.AsiBackboneEndpointGovernanceResult` | `AsiBackbone.AspNetCore.Endpoints.EndpointGovernanceResult` |
+| `AsiBackbone.AspNetCore` | `AsiBackbone.AspNetCore.Endpoints.AsiBackboneEndpointGovernanceRouteBuilderExtensions` | `AsiBackbone.AspNetCore.Endpoints.EndpointGovernanceRouteBuilderExtensions` |
+| `AsiBackbone.AspNetCore` | `AsiBackbone.AspNetCore.Endpoints.DefaultAsiBackboneEndpointGovernanceService` | `AsiBackbone.AspNetCore.Endpoints.DefaultEndpointGovernanceService` |
+| `AsiBackbone.AspNetCore` | `AsiBackbone.AspNetCore.Endpoints.IAsiBackboneEndpointAuditEmissionMetadata` | `AsiBackbone.AspNetCore.Endpoints.IEndpointAuditEmissionMetadata` |
+| `AsiBackbone.AspNetCore` | `AsiBackbone.AspNetCore.Endpoints.IAsiBackboneEndpointCapabilityGrantMetadata` | `AsiBackbone.AspNetCore.Endpoints.IEndpointCapabilityGrantMetadata` |
+| `AsiBackbone.AspNetCore` | `AsiBackbone.AspNetCore.Endpoints.IAsiBackboneEndpointCapabilityGrantValidator` | `AsiBackbone.AspNetCore.Endpoints.IEndpointCapabilityGrantValidator` |
+| `AsiBackbone.AspNetCore` | `AsiBackbone.AspNetCore.Endpoints.IAsiBackboneEndpointGovernanceMetadata` | `AsiBackbone.AspNetCore.Endpoints.IEndpointGovernanceMetadata` |
+| `AsiBackbone.AspNetCore` | `AsiBackbone.AspNetCore.Endpoints.IAsiBackboneEndpointGovernancePolicyMetadata` | `AsiBackbone.AspNetCore.Endpoints.IEndpointGovernancePolicyMetadata` |
+| `AsiBackbone.AspNetCore` | `AsiBackbone.AspNetCore.Endpoints.IAsiBackboneEndpointGovernanceService` | `AsiBackbone.AspNetCore.Endpoints.IEndpointGovernanceService` |
+| `AsiBackbone.AspNetCore` | `AsiBackbone.AspNetCore.Endpoints.IAsiBackboneEndpointLiabilityHandshakeMetadata` | `AsiBackbone.AspNetCore.Endpoints.IEndpointLiabilityHandshakeMetadata` |
+| `AsiBackbone.AspNetCore` | `AsiBackbone.AspNetCore.Endpoints.IAsiBackboneEndpointPolicyEvaluationOptionsMetadata` | `AsiBackbone.AspNetCore.Endpoints.IEndpointPolicyEvaluationOptionsMetadata` |
+| `AsiBackbone.AspNetCore` | `AsiBackbone.AspNetCore.Handshakes.AsiBackboneAcknowledgmentChallenge` | `AsiBackbone.AspNetCore.Handshakes.AcknowledgmentChallenge` |
+| `AsiBackbone.AspNetCore` | `AsiBackbone.AspNetCore.Handshakes.AsiBackboneAcknowledgmentChallengeOptions` | `AsiBackbone.AspNetCore.Handshakes.AcknowledgmentChallengeOptions` |
+| `AsiBackbone.AspNetCore` | `AsiBackbone.AspNetCore.Handshakes.AsiBackboneAcknowledgmentChallengeRequest` | `AsiBackbone.AspNetCore.Handshakes.AcknowledgmentChallengeRequest` |
+| `AsiBackbone.AspNetCore` | `AsiBackbone.AspNetCore.Handshakes.AsiBackboneAcknowledgmentChallengeResult` | `AsiBackbone.AspNetCore.Handshakes.AcknowledgmentChallengeResult` |
+| `AsiBackbone.AspNetCore` | `AsiBackbone.AspNetCore.Handshakes.DefaultAsiBackboneAcknowledgmentChallengeService` | `AsiBackbone.AspNetCore.Handshakes.DefaultAcknowledgmentChallengeService` |
+| `AsiBackbone.AspNetCore` | `AsiBackbone.AspNetCore.Handshakes.IAsiBackboneAcknowledgmentChallengeService` | `AsiBackbone.AspNetCore.Handshakes.IAcknowledgmentChallengeService` |
+| `AsiBackbone.AspNetCore` | `AsiBackbone.AspNetCore.Outbox.AsiBackboneGovernanceOutboxDrainHostedService` | `AsiBackbone.AspNetCore.Outbox.GovernanceOutboxDrainHostedService` |
+| `AsiBackbone.AspNetCore` | `AsiBackbone.AspNetCore.Outbox.AsiBackboneGovernanceOutboxDrainWorkerOptions` | `AsiBackbone.AspNetCore.Outbox.GovernanceOutboxDrainWorkerOptions` |
+| `AsiBackbone.AspNetCore` | `AsiBackbone.AspNetCore.Results.AsiBackboneHttpResultMappingExtensions` | `AsiBackbone.AspNetCore.Results.GovernanceHttpResultMappingExtensions` |
+| `AsiBackbone.AspNetCore` | `AsiBackbone.AspNetCore.Results.AsiBackboneHttpResultMappingOptions` | `AsiBackbone.AspNetCore.Results.GovernanceHttpResultMappingOptions` |
+| `AsiBackbone.Core` | `AsiBackbone.Core.Actors.AsiBackboneActorContext` | `AsiBackbone.Core.Actors.GovernanceActorContext` |
+| `AsiBackbone.Core` | `AsiBackbone.Core.Actors.AsiBackboneActorType` | `AsiBackbone.Core.Actors.GovernanceActorType` |
+| `AsiBackbone.Core` | `AsiBackbone.Core.Actors.IAsiBackboneActorContext` | `AsiBackbone.Core.Actors.IGovernanceActorContext` |
+| `AsiBackbone.Core` | `AsiBackbone.Core.AsiBackboneIdentifierLimits` | `AsiBackbone.Core.GovernanceIdentifierLimits` |
+| `AsiBackbone.Core` | `AsiBackbone.Core.Audit.AuditResidue` | `AsiBackbone.Core.Audit.DecisionReceipt` |
+| `AsiBackbone.Core` | `AsiBackbone.Core.Audit.AuditResidueBuilder` | `AsiBackbone.Core.Audit.DecisionReceiptBuilder` |
+| `AsiBackbone.Core` | `AsiBackbone.Core.Audit.AuditResidueLifecycleEvent` | `AsiBackbone.Core.Audit.DecisionReceiptLifecycleEvent` |
+| `AsiBackbone.Core` | `AsiBackbone.Core.Audit.AuditResidueLifecycleStage` | `AsiBackbone.Core.Audit.DecisionReceiptLifecycleStage` |
+| `AsiBackbone.Core` | `AsiBackbone.Core.Audit.IAsiBackboneAuditLedgerStore` | `AsiBackbone.Core.Audit.IGovernanceAuditLedgerStore` |
+| `AsiBackbone.Core` | `AsiBackbone.Core.Audit.IAsiBackboneAuditResidue` | `AsiBackbone.Core.Audit.IDecisionReceipt` |
+| `AsiBackbone.Core` | `AsiBackbone.Core.Audit.IAsiBackboneAuditResidueLifecycleStore` | `AsiBackbone.Core.Audit.IDecisionReceiptLifecycleStore` |
+| `AsiBackbone.Core` | `AsiBackbone.Core.Audit.IAsiBackboneAuditSink` | `AsiBackbone.Core.Audit.IDecisionReceiptSink` |
+| `AsiBackbone.Core` | `AsiBackbone.Core.Classification.DefaultAsiBackboneDlpFailurePolicyResolver` | `AsiBackbone.Core.Classification.DefaultDlpFailurePolicyResolver` |
+| `AsiBackbone.Core` | `AsiBackbone.Core.Classification.IAsiBackboneDlpFailurePolicyResolver` | `AsiBackbone.Core.Classification.IDlpFailurePolicyResolver` |
+| `AsiBackbone.Core` | `AsiBackbone.Core.Constraints.AsiBackboneConstraintEvaluationContext` | `AsiBackbone.Core.Constraints.GovernanceEvaluationContext` |
+| `AsiBackbone.Core` | `AsiBackbone.Core.Constraints.IAsiBackboneConstraintEvaluationContext` | `AsiBackbone.Core.Constraints.IGovernanceEvaluationContext` |
+| `AsiBackbone.Core` | `AsiBackbone.Core.Constraints.IAsiBackboneConstraint`1` | `AsiBackbone.Core.Constraints.IGovernanceConstraint`1` |
+| `AsiBackbone.Core` | `AsiBackbone.Core.Emissions.IAsiBackboneGovernanceEmitter` | `AsiBackbone.Core.Emissions.IGovernanceEmitter` |
+| `AsiBackbone.Core` | `AsiBackbone.Core.Entities.AsiBackboneEntity` | `AsiBackbone.Core.Entities.GovernanceEntity` |
+| `AsiBackbone.Core` | `AsiBackbone.Core.Entities.IAsiBackboneEntity` | `AsiBackbone.Core.Entities.IGovernanceEntity` |
+| `AsiBackbone.Core` | `AsiBackbone.Core.Evaluation.AsiBackbonePolicyEvaluatorBuilder`1` | `AsiBackbone.Core.Evaluation.GovernancePolicyEvaluatorBuilder`1` |
+| `AsiBackbone.Core` | `AsiBackbone.Core.Evaluation.AsiBackbonePolicyEvaluatorOptions` | `AsiBackbone.Core.Evaluation.GovernancePolicyOptions` |
+| `AsiBackbone.Core` | `AsiBackbone.Core.Evaluation.DefaultAsiBackbonePolicyEvaluator` | `AsiBackbone.Core.Evaluation.DefaultGovernancePolicyEvaluator` |
+| `AsiBackbone.Core` | `AsiBackbone.Core.Evaluation.DefaultAsiBackbonePolicyEvaluator`1` | `AsiBackbone.Core.Evaluation.DefaultGovernancePolicyEvaluator`1` |
+| `AsiBackbone.Core` | `AsiBackbone.Core.Evaluation.IAsiBackboneDecisionPolicy`1` | `AsiBackbone.Core.Evaluation.IGovernanceDecisionPolicy`1` |
+| `AsiBackbone.Core` | `AsiBackbone.Core.Evaluation.IAsiBackbonePolicyEvaluator`1` | `AsiBackbone.Core.Evaluation.IGovernancePolicyEvaluator`1` |
+| `AsiBackbone.Core` | `AsiBackbone.Core.Outbox.AsiBackboneGovernanceOutboxDrain` | `AsiBackbone.Core.Outbox.GovernanceOutboxDrain` |
+| `AsiBackbone.Core` | `AsiBackbone.Core.Outbox.AsiBackboneGovernanceOutboxOptions` | `AsiBackbone.Core.Outbox.GovernanceOutboxOptions` |
+| `AsiBackbone.Core` | `AsiBackbone.Core.Outbox.IAsiBackboneGovernanceOutboxClaimOutcomeStore` | `AsiBackbone.Core.Outbox.IGovernanceOutboxClaimOutcomeStore` |
+| `AsiBackbone.Core` | `AsiBackbone.Core.Outbox.IAsiBackboneGovernanceOutboxClaimStore` | `AsiBackbone.Core.Outbox.IGovernanceOutboxClaimStore` |
+| `AsiBackbone.Core` | `AsiBackbone.Core.Outbox.IAsiBackboneGovernanceOutboxStore` | `AsiBackbone.Core.Outbox.IGovernanceOutboxStore` |
+| `AsiBackbone.Core` | `AsiBackbone.Core.Results.BackboneResult` | `AsiBackbone.Core.Results.GovernanceOperationResult` |
+| `AsiBackbone.Core` | `AsiBackbone.Core.Serialization.AsiBackboneSchemaVersions` | `AsiBackbone.Core.Serialization.GovernanceSchemaVersions` |
+| `AsiBackbone.Core` | `AsiBackbone.Core.Signing.IAsiBackboneSignatureVerificationService` | `AsiBackbone.Core.Signing.IGovernanceSignatureVerificationService` |
+| `AsiBackbone.Core` | `AsiBackbone.Core.Signing.IAsiBackboneSigningService` | `AsiBackbone.Core.Signing.IGovernanceSigningService` |
+| `AsiBackbone.EntityFrameworkCore` | `AsiBackbone.EntityFrameworkCore.Audit.EfCoreAuditResidueLifecycleStore` | `AsiBackbone.EntityFrameworkCore.Audit.EfCoreDecisionReceiptLifecycleStore` |
+| `AsiBackbone.EntityFrameworkCore` | `AsiBackbone.EntityFrameworkCore.Configurations.AsiBackboneAuditLedgerMetadataEntityConfiguration` | `AsiBackbone.EntityFrameworkCore.Configurations.AuditLedgerMetadataEntityConfiguration` |
+| `AsiBackbone.EntityFrameworkCore` | `AsiBackbone.EntityFrameworkCore.Configurations.AsiBackboneAuditLedgerReasonCodeEntityConfiguration` | `AsiBackbone.EntityFrameworkCore.Configurations.AuditLedgerReasonCodeEntityConfiguration` |
+| `AsiBackbone.EntityFrameworkCore` | `AsiBackbone.EntityFrameworkCore.Configurations.AsiBackboneAuditLedgerRecordEntityConfiguration` | `AsiBackbone.EntityFrameworkCore.Configurations.AuditLedgerRecordEntityConfiguration` |
+| `AsiBackbone.EntityFrameworkCore` | `AsiBackbone.EntityFrameworkCore.Configurations.AsiBackboneAuditResidueLifecycleEventEntityConfiguration` | `AsiBackbone.EntityFrameworkCore.Configurations.DecisionReceiptLifecycleEventEntityConfiguration` |
+| `AsiBackbone.EntityFrameworkCore` | `AsiBackbone.EntityFrameworkCore.Configurations.AsiBackboneGovernanceOutboxEntryEntityConfiguration` | `AsiBackbone.EntityFrameworkCore.Configurations.GovernanceOutboxEntryEntityConfiguration` |
+| `AsiBackbone.EntityFrameworkCore` | `AsiBackbone.EntityFrameworkCore.Configurations.AsiBackboneHandshakeAcknowledgmentEntityConfiguration` | `AsiBackbone.EntityFrameworkCore.Configurations.HandshakeAcknowledgmentEntityConfiguration` |
+| `AsiBackbone.EntityFrameworkCore` | `AsiBackbone.EntityFrameworkCore.Configurations.AsiBackboneHandshakeAcknowledgmentMetadataEntityConfiguration` | `AsiBackbone.EntityFrameworkCore.Configurations.HandshakeAcknowledgmentMetadataEntityConfiguration` |
+| `AsiBackbone.EntityFrameworkCore` | `AsiBackbone.EntityFrameworkCore.Configurations.AsiBackboneHandshakeRequestEntityConfiguration` | `AsiBackbone.EntityFrameworkCore.Configurations.HandshakeRequestEntityConfiguration` |
+| `AsiBackbone.EntityFrameworkCore` | `AsiBackbone.EntityFrameworkCore.Configurations.AsiBackboneHandshakeRequestMetadataEntityConfiguration` | `AsiBackbone.EntityFrameworkCore.Configurations.HandshakeRequestMetadataEntityConfiguration` |
+| `AsiBackbone.EntityFrameworkCore` | `AsiBackbone.EntityFrameworkCore.Persistence.AsiBackboneAuditLedgerMetadataEntity` | `AsiBackbone.EntityFrameworkCore.Persistence.AuditLedgerMetadataEntity` |
+| `AsiBackbone.EntityFrameworkCore` | `AsiBackbone.EntityFrameworkCore.Persistence.AsiBackboneAuditLedgerReasonCodeEntity` | `AsiBackbone.EntityFrameworkCore.Persistence.AuditLedgerReasonCodeEntity` |
+| `AsiBackbone.EntityFrameworkCore` | `AsiBackbone.EntityFrameworkCore.Persistence.AsiBackboneAuditLedgerRecordEntity` | `AsiBackbone.EntityFrameworkCore.Persistence.AuditLedgerRecordEntity` |
+| `AsiBackbone.EntityFrameworkCore` | `AsiBackbone.EntityFrameworkCore.Persistence.AsiBackboneAuditResidueLifecycleEventEntity` | `AsiBackbone.EntityFrameworkCore.Persistence.DecisionReceiptLifecycleEventEntity` |
+| `AsiBackbone.EntityFrameworkCore` | `AsiBackbone.EntityFrameworkCore.Persistence.AsiBackboneGovernanceOutboxEntryEntity` | `AsiBackbone.EntityFrameworkCore.Persistence.GovernanceOutboxEntryEntity` |
+| `AsiBackbone.EntityFrameworkCore` | `AsiBackbone.EntityFrameworkCore.Persistence.AsiBackboneHandshakeAcknowledgmentEntity` | `AsiBackbone.EntityFrameworkCore.Persistence.HandshakeAcknowledgmentEntity` |
+| `AsiBackbone.EntityFrameworkCore` | `AsiBackbone.EntityFrameworkCore.Persistence.AsiBackboneHandshakeAcknowledgmentMetadataEntity` | `AsiBackbone.EntityFrameworkCore.Persistence.HandshakeAcknowledgmentMetadataEntity` |
+| `AsiBackbone.EntityFrameworkCore` | `AsiBackbone.EntityFrameworkCore.Persistence.AsiBackboneHandshakeRequestEntity` | `AsiBackbone.EntityFrameworkCore.Persistence.HandshakeRequestEntity` |
+| `AsiBackbone.EntityFrameworkCore` | `AsiBackbone.EntityFrameworkCore.Persistence.AsiBackboneHandshakeRequestMetadataEntity` | `AsiBackbone.EntityFrameworkCore.Persistence.HandshakeRequestMetadataEntity` |
+| `AsiBackbone.Storage.InMemory` | `AsiBackbone.Storage.InMemory.Audit.InMemoryAuditResidueLifecycleStore` | `AsiBackbone.Storage.InMemory.Audit.InMemoryDecisionReceiptLifecycleStore` |
+| `AsiBackbone.Testing` | `AsiBackbone.Testing.AsiBackboneTestAuditSink` | `AsiBackbone.Testing.GovernanceTestDecisionReceiptSink` |
+| `AsiBackbone.Testing` | `AsiBackbone.Testing.AsiBackboneTestHarnessEndpointCapabilityGrantValidator` | `AsiBackbone.Testing.GovernanceTestHarnessEndpointCapabilityGrantValidator` |
+| `AsiBackbone.Testing` | `AsiBackbone.Testing.AsiBackboneTestHarnessOptions` | `AsiBackbone.Testing.GovernanceTestHarnessOptions` |
+| `AsiBackbone.Testing` | `AsiBackbone.Testing.AsiBackboneTestHarnessPolicyEvaluator` | `AsiBackbone.Testing.GovernanceTestHarnessPolicyEvaluator` |
+| `AsiBackbone.Testing` | `AsiBackbone.Testing.AsiBackboneTestHarnessServiceCollectionExtensions` | `AsiBackbone.Testing.GovernanceTestHarnessServiceCollectionExtensions` |
+| `AsiBackbone.Testing` | `AsiBackbone.Testing.AsiBackboneTestSigningService` | `AsiBackbone.Testing.GovernanceTestSigningService` |
+| `AsiBackbone.Testing` | `AsiBackbone.Testing.Contracts.AsiBackboneAuditSinkContract` | `AsiBackbone.Testing.Contracts.DecisionReceiptSinkContract` |
+| `AsiBackbone.Testing` | `AsiBackbone.Testing.Contracts.AsiBackboneConstraintContract`1` | `AsiBackbone.Testing.Contracts.GovernanceConstraintContract`1` |
+| `AsiBackbone.Testing` | `AsiBackbone.Testing.Contracts.AsiBackboneContractViolationException` | `AsiBackbone.Testing.Contracts.GovernanceContractViolationException` |
+| `AsiBackbone.Testing` | `AsiBackbone.Testing.Contracts.AsiBackboneDecisionContract` | `AsiBackbone.Testing.Contracts.GovernanceDecisionContract` |
+| `AsiBackbone.Testing` | `AsiBackbone.Testing.Contracts.AsiBackboneDecisionPolicyContract`1` | `AsiBackbone.Testing.Contracts.GovernanceDecisionPolicyContract`1` |
+| `AsiBackbone.Testing` | `AsiBackbone.Testing.Contracts.AsiBackboneEndpointCapabilityGrantValidatorContract` | `AsiBackbone.Testing.Contracts.EndpointCapabilityGrantValidatorContract` |
+| `AsiBackbone.Testing` | `AsiBackbone.Testing.Contracts.AsiBackbonePolicyEvaluatorContract`1` | `AsiBackbone.Testing.Contracts.GovernancePolicyEvaluatorContract`1` |
+
+Protocol/helper members such as AuditResidueId and ForAuditResidue retain their names and wire meaning. JSON keys, schema versions, canonical tags, signed bytes, and EF table/column names are unchanged. A type rename alone does not require a data migration. Type-based DI, reflection, custom receipt implementations, and host EF model configuration must reference the new CLR types. Rebuild all dependent assemblies.

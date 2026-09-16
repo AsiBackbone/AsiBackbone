@@ -48,7 +48,7 @@ If allowed or warning:
 | View protected record | actor type, purpose, resource classification, region | Allow normal access; defer if purpose or policy metadata is missing. |
 | Review protected report | data category, volume, destination, policy version | Require acknowledgment for sensitive review paths; deny prohibited combinations. |
 | Access cross-region information | jurisdiction, actor location, resource location, policy hash | Defer or escalate when regional policy needs review. |
-| Review exception request | exception reason, requester, target resource, correlation ID | Preserve reason codes and audit residue for later review. |
+| Review exception request | exception reason, requester, target resource, correlation ID | Preserve reason codes and decision receipt for later review. |
 
 ## Implementation notes
 

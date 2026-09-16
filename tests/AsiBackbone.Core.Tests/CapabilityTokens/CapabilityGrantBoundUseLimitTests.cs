@@ -19,10 +19,10 @@ public sealed class CapabilityGrantBoundUseLimitTests
     public void CanonicalPayloadBindsTheUseLimitForTheCurrentSchemaVersion()
     {
         CanonicalPayload withLimit = CanonicalPayloadBuilder.ForCapabilityTokenGrant(
-            CreateGrant(maxUseCount: 1, schemaVersion: AsiBackboneSchemaVersions.StableArtifactsV2));
+            CreateGrant(maxUseCount: 1, schemaVersion: GovernanceSchemaVersions.StableArtifactsV2));
 
         CanonicalPayload withWiderLimit = CanonicalPayloadBuilder.ForCapabilityTokenGrant(
-            CreateGrant(maxUseCount: 5, schemaVersion: AsiBackboneSchemaVersions.StableArtifactsV2));
+            CreateGrant(maxUseCount: 5, schemaVersion: GovernanceSchemaVersions.StableArtifactsV2));
 
         Assert.Contains("maxUseCount", withLimit.CanonicalJson, StringComparison.Ordinal);
         Assert.NotEqual(
@@ -40,7 +40,7 @@ public sealed class CapabilityGrantBoundUseLimitTests
     public void CanonicalPayloadOmitsTheUseLimitForTheEarlierSchemaVersion()
     {
         CanonicalPayload payload = CanonicalPayloadBuilder.ForCapabilityTokenGrant(
-            CreateGrant(maxUseCount: 3, schemaVersion: AsiBackboneSchemaVersions.StableArtifactsV1));
+            CreateGrant(maxUseCount: 3, schemaVersion: GovernanceSchemaVersions.StableArtifactsV1));
 
         Assert.DoesNotContain("maxUseCount", payload.CanonicalJson, StringComparison.Ordinal);
     }
@@ -52,7 +52,7 @@ public sealed class CapabilityGrantBoundUseLimitTests
     public async Task ValidationUsesTheIssuerLimitWhenTheCallerAsksForMore()
     {
         var useStore = new RecordingUseStore();
-        CapabilityTokenGrant grant = CreateGrant(maxUseCount: 1, schemaVersion: AsiBackboneSchemaVersions.StableArtifactsV2);
+        CapabilityTokenGrant grant = CreateGrant(maxUseCount: 1, schemaVersion: GovernanceSchemaVersions.StableArtifactsV2);
 
         _ = await CapabilityGrantValidator.ValidateAsync(
             CreateSignedGrant(grant),
@@ -74,7 +74,7 @@ public sealed class CapabilityGrantBoundUseLimitTests
     public async Task ValidationUsesTheCallerLimitWhenItIsNarrower()
     {
         var useStore = new RecordingUseStore();
-        CapabilityTokenGrant grant = CreateGrant(maxUseCount: 10, schemaVersion: AsiBackboneSchemaVersions.StableArtifactsV2);
+        CapabilityTokenGrant grant = CreateGrant(maxUseCount: 10, schemaVersion: GovernanceSchemaVersions.StableArtifactsV2);
 
         _ = await CapabilityGrantValidator.ValidateAsync(
             CreateSignedGrant(grant),

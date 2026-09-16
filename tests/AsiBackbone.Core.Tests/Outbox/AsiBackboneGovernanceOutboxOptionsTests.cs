@@ -4,7 +4,7 @@ using Xunit;
 namespace AsiBackbone.Core.Tests.Outbox;
 
 /// <summary>
-/// Unit tests for the <see cref="AsiBackboneGovernanceOutboxOptions"/> class.
+/// Unit tests for the <see cref="GovernanceOutboxOptions"/> class.
 /// </summary>
 public sealed class AsiBackboneGovernanceOutboxOptionsTests
 {
@@ -14,15 +14,15 @@ public sealed class AsiBackboneGovernanceOutboxOptionsTests
     [Fact]
     public void ValidateAcceptsDefaultOptions()
     {
-        var options = new AsiBackboneGovernanceOutboxOptions();
+        var options = new GovernanceOutboxOptions();
 
         options.Validate();
 
         Assert.True(options.UseClaimLeases);
-        Assert.Equal(AsiBackboneGovernanceOutboxOptions.DefaultClaimWorkerId, options.ClaimWorkerId);
+        Assert.Equal(GovernanceOutboxOptions.DefaultClaimWorkerId, options.ClaimWorkerId);
         Assert.True(options.ClaimLeaseDuration > TimeSpan.Zero);
-        Assert.Equal(AsiBackboneGovernanceOutboxOptions.DefaultClaimPageSize, options.ClaimPageSize);
-        Assert.Equal(AsiBackboneGovernanceOutboxOptions.DefaultMaxClaimAttempts, options.MaxClaimAttempts);
+        Assert.Equal(GovernanceOutboxOptions.DefaultClaimPageSize, options.ClaimPageSize);
+        Assert.Equal(GovernanceOutboxOptions.DefaultMaxClaimAttempts, options.MaxClaimAttempts);
         Assert.True(options.DeadLetterOnMaxClaimAttempts);
     }
 
@@ -34,7 +34,7 @@ public sealed class AsiBackboneGovernanceOutboxOptionsTests
     {
         Assert.Equal(
             $"{Environment.MachineName}:{Environment.ProcessId}",
-            AsiBackboneGovernanceOutboxOptions.DefaultClaimWorkerId);
+            GovernanceOutboxOptions.DefaultClaimWorkerId);
     }
 
     /// <summary>
@@ -43,11 +43,11 @@ public sealed class AsiBackboneGovernanceOutboxOptionsTests
     [Fact]
     public void ValidateRejectsNonPositiveClaimPageSize()
     {
-        var options = new AsiBackboneGovernanceOutboxOptions { ClaimPageSize = 0 };
+        var options = new GovernanceOutboxOptions { ClaimPageSize = 0 };
 
         InvalidOperationException exception = Assert.Throws<InvalidOperationException>(options.Validate);
 
-        Assert.Contains(nameof(AsiBackboneGovernanceOutboxOptions.ClaimPageSize), exception.Message, StringComparison.Ordinal);
+        Assert.Contains(nameof(GovernanceOutboxOptions.ClaimPageSize), exception.Message, StringComparison.Ordinal);
     }
 
     /// <summary>
@@ -56,11 +56,11 @@ public sealed class AsiBackboneGovernanceOutboxOptionsTests
     [Fact]
     public void ValidateRejectsNonPositiveMaxClaimAttempts()
     {
-        var options = new AsiBackboneGovernanceOutboxOptions { MaxClaimAttempts = 0 };
+        var options = new GovernanceOutboxOptions { MaxClaimAttempts = 0 };
 
         InvalidOperationException exception = Assert.Throws<InvalidOperationException>(options.Validate);
 
-        Assert.Contains(nameof(AsiBackboneGovernanceOutboxOptions.MaxClaimAttempts), exception.Message, StringComparison.Ordinal);
+        Assert.Contains(nameof(GovernanceOutboxOptions.MaxClaimAttempts), exception.Message, StringComparison.Ordinal);
     }
 
     /// <summary>
@@ -69,11 +69,11 @@ public sealed class AsiBackboneGovernanceOutboxOptionsTests
     [Fact]
     public void ValidateRejectsClearedClaimWorkerIdWhileClaimLeasesRemainEnabled()
     {
-        var options = new AsiBackboneGovernanceOutboxOptions { ClaimWorkerId = null };
+        var options = new GovernanceOutboxOptions { ClaimWorkerId = null };
 
         InvalidOperationException exception = Assert.Throws<InvalidOperationException>(options.Validate);
 
-        Assert.Contains(nameof(AsiBackboneGovernanceOutboxOptions.ClaimWorkerId), exception.Message, StringComparison.Ordinal);
+        Assert.Contains(nameof(GovernanceOutboxOptions.ClaimWorkerId), exception.Message, StringComparison.Ordinal);
     }
 
     /// <summary>
@@ -82,7 +82,7 @@ public sealed class AsiBackboneGovernanceOutboxOptionsTests
     [Fact]
     public void ValidateAcceptsClaimLeaseOptionsWithWorkerId()
     {
-        var options = new AsiBackboneGovernanceOutboxOptions
+        var options = new GovernanceOutboxOptions
         {
             UseClaimLeases = true,
             ClaimWorkerId = "worker-1",
@@ -98,17 +98,17 @@ public sealed class AsiBackboneGovernanceOutboxOptionsTests
     [Fact]
     public void ValidateRejectsInvalidTimingOptions()
     {
-        _ = Assert.Throws<InvalidOperationException>(() => new AsiBackboneGovernanceOutboxOptions
+        _ = Assert.Throws<InvalidOperationException>(() => new GovernanceOutboxOptions
         {
             RetryDelay = TimeSpan.FromTicks(-1)
         }.Validate());
 
-        _ = Assert.Throws<InvalidOperationException>(() => new AsiBackboneGovernanceOutboxOptions
+        _ = Assert.Throws<InvalidOperationException>(() => new GovernanceOutboxOptions
         {
             DeferredDelay = TimeSpan.FromTicks(-1)
         }.Validate());
 
-        _ = Assert.Throws<InvalidOperationException>(() => new AsiBackboneGovernanceOutboxOptions
+        _ = Assert.Throws<InvalidOperationException>(() => new GovernanceOutboxOptions
         {
             ClaimLeaseDuration = TimeSpan.Zero
         }.Validate());
@@ -120,7 +120,7 @@ public sealed class AsiBackboneGovernanceOutboxOptionsTests
     [Fact]
     public void ValidateRequiresWorkerIdWhenClaimLeasesAreEnabled()
     {
-        var options = new AsiBackboneGovernanceOutboxOptions
+        var options = new GovernanceOutboxOptions
         {
             UseClaimLeases = true,
             ClaimWorkerId = " "

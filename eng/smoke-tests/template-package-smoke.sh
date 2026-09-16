@@ -75,6 +75,9 @@ fi
 rm -rf "$work_root"
 mkdir -p "$work_root"
 
+# Use a fresh consumer cache: release-branch builds can share a version with published 5.x packages.
+export NUGET_PACKAGES="$(to_dotnet_path "$work_root/.nuget/packages")"
+
 cat > "$work_root/NuGet.config" <<NUGETCONFIG
 <?xml version="1.0" encoding="utf-8"?>
 <configuration>
@@ -83,6 +86,14 @@ cat > "$work_root/NuGet.config" <<NUGETCONFIG
     <add key="local-asi-backbone" value="$package_output" />
     <add key="nuget.org" value="https://api.nuget.org/v3/index.json" />
   </packageSources>
+  <packageSourceMapping>
+    <packageSource key="local-asi-backbone">
+      <package pattern="AsiBackbone.*" />
+    </packageSource>
+    <packageSource key="nuget.org">
+      <package pattern="*" />
+    </packageSource>
+  </packageSourceMapping>
 </configuration>
 NUGETCONFIG
 

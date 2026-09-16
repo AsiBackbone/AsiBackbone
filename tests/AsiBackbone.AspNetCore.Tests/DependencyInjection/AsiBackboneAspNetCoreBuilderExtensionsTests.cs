@@ -26,8 +26,8 @@ public sealed class AsiBackboneAspNetCoreBuilderExtensionsTests
         IAsiBackboneBuilder result = builder.UseAspNetCoreEndpointGovernance();
 
         using ServiceProvider provider = services.BuildServiceProvider();
-        AsiBackboneAspNetCoreOptions options = provider
-            .GetRequiredService<IOptions<AsiBackboneAspNetCoreOptions>>()
+        AspNetCoreGovernanceOptions options = provider
+            .GetRequiredService<IOptions<AspNetCoreGovernanceOptions>>()
             .Value;
 
         Assert.Same(builder, result);
@@ -35,7 +35,7 @@ public sealed class AsiBackboneAspNetCoreBuilderExtensionsTests
         Assert.False(options.IncludeRequestPath);
         Assert.Contains(
             services,
-            descriptor => descriptor.ServiceType == typeof(IAsiBackboneEndpointGovernanceService)
+            descriptor => descriptor.ServiceType == typeof(IEndpointGovernanceService)
                 && descriptor.Lifetime == ServiceLifetime.Scoped);
     }
 
@@ -55,8 +55,8 @@ public sealed class AsiBackboneAspNetCoreBuilderExtensionsTests
         });
 
         using ServiceProvider provider = services.BuildServiceProvider();
-        AsiBackboneAspNetCoreOptions options = provider
-            .GetRequiredService<IOptions<AsiBackboneAspNetCoreOptions>>()
+        AspNetCoreGovernanceOptions options = provider
+            .GetRequiredService<IOptions<AspNetCoreGovernanceOptions>>()
             .Value;
 
         Assert.Same(builder, result);
@@ -85,7 +85,7 @@ public sealed class AsiBackboneAspNetCoreBuilderExtensionsTests
     public void UseAspNetCoreEndpointGovernanceRejectsNullConfigureCallback()
     {
         IAsiBackboneBuilder builder = new AsiBackboneBuilder(new ServiceCollection());
-        Action<AsiBackboneAspNetCoreOptions>? configure = null;
+        Action<AspNetCoreGovernanceOptions>? configure = null;
 
         ArgumentNullException exception = Assert.Throws<ArgumentNullException>(
             () => builder.UseAspNetCoreEndpointGovernance(configure!));
@@ -105,8 +105,8 @@ public sealed class AsiBackboneAspNetCoreBuilderExtensionsTests
         IAsiBackboneBuilder result = builder.UseGovernanceOutboxDrain();
 
         using ServiceProvider provider = services.BuildServiceProvider();
-        AsiBackboneGovernanceOutboxDrainWorkerOptions options = provider
-            .GetRequiredService<IOptions<AsiBackboneGovernanceOutboxDrainWorkerOptions>>()
+        GovernanceOutboxDrainWorkerOptions options = provider
+            .GetRequiredService<IOptions<GovernanceOutboxDrainWorkerOptions>>()
             .Value;
 
         Assert.Same(builder, result);
@@ -116,7 +116,7 @@ public sealed class AsiBackboneAspNetCoreBuilderExtensionsTests
         Assert.Contains(
             services,
             descriptor => descriptor.ServiceType == typeof(IHostedService)
-                && descriptor.ImplementationType == typeof(AsiBackboneGovernanceOutboxDrainHostedService));
+                && descriptor.ImplementationType == typeof(GovernanceOutboxDrainHostedService));
     }
 
     /// <summary>
@@ -137,8 +137,8 @@ public sealed class AsiBackboneAspNetCoreBuilderExtensionsTests
         });
 
         using ServiceProvider provider = services.BuildServiceProvider();
-        AsiBackboneGovernanceOutboxDrainWorkerOptions options = provider
-            .GetRequiredService<IOptions<AsiBackboneGovernanceOutboxDrainWorkerOptions>>()
+        GovernanceOutboxDrainWorkerOptions options = provider
+            .GetRequiredService<IOptions<GovernanceOutboxDrainWorkerOptions>>()
             .Value;
 
         Assert.Same(builder, result);
@@ -169,7 +169,7 @@ public sealed class AsiBackboneAspNetCoreBuilderExtensionsTests
     public void UseGovernanceOutboxDrainRejectsNullConfigureCallback()
     {
         IAsiBackboneBuilder builder = new AsiBackboneBuilder(new ServiceCollection());
-        Action<AsiBackboneGovernanceOutboxDrainWorkerOptions>? configure = null;
+        Action<GovernanceOutboxDrainWorkerOptions>? configure = null;
 
         ArgumentNullException exception = Assert.Throws<ArgumentNullException>(
             () => builder.UseGovernanceOutboxDrain(configure!));

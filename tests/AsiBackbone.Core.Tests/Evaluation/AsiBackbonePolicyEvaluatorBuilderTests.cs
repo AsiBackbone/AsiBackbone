@@ -7,7 +7,7 @@ using Xunit;
 namespace AsiBackbone.Core.Tests.Evaluation;
 
 /// <summary>
-/// Coverage for <see cref="AsiBackbonePolicyEvaluatorBuilder{TContext}" />.
+/// Coverage for <see cref="GovernancePolicyEvaluatorBuilder{TContext}" />.
 /// </summary>
 public sealed class AsiBackbonePolicyEvaluatorBuilderTests
 {
@@ -18,13 +18,13 @@ public sealed class AsiBackbonePolicyEvaluatorBuilderTests
     [Fact]
     public async Task BuildWithNoConfigurationUsesFailClosedDefaults()
     {
-        DefaultAsiBackbonePolicyEvaluator<TestPolicyContext> evaluator =
-            DefaultAsiBackbonePolicyEvaluator.CreateBuilder<TestPolicyContext>().Build();
+        DefaultGovernancePolicyEvaluator<TestPolicyContext> evaluator =
+            DefaultGovernancePolicyEvaluator.CreateBuilder<TestPolicyContext>().Build();
 
         GovernanceDecision decision = await evaluator.EvaluateAsync(CreateContext(), TestContext.Current.CancellationToken);
 
         Assert.True(decision.IsDenied);
-        Assert.Contains(AsiBackbonePolicyEvaluatorOptions.DefaultNoConstraintsReasonCode, decision.ReasonCodes);
+        Assert.Contains(GovernancePolicyOptions.DefaultNoConstraintsReasonCode, decision.ReasonCodes);
     }
 
     /// <summary>
@@ -36,7 +36,7 @@ public sealed class AsiBackbonePolicyEvaluatorBuilderTests
     {
         var observedOrder = new List<string>();
 
-        DefaultAsiBackbonePolicyEvaluator<TestPolicyContext> evaluator = DefaultAsiBackbonePolicyEvaluator
+        DefaultGovernancePolicyEvaluator<TestPolicyContext> evaluator = DefaultGovernancePolicyEvaluator
             .CreateBuilder<TestPolicyContext>()
             .AddConstraint(new RecordingConstraint("first", observedOrder))
             .AddConstraints([new RecordingConstraint("second", observedOrder), new RecordingConstraint("third", observedOrder)])
@@ -55,18 +55,18 @@ public sealed class AsiBackbonePolicyEvaluatorBuilderTests
     [Fact]
     public async Task BuildAppliesContributorsDecisionPolicyAndOptions()
     {
-        DefaultAsiBackbonePolicyEvaluator<TestPolicyContext> permissiveEvaluator = DefaultAsiBackbonePolicyEvaluator
+        DefaultGovernancePolicyEvaluator<TestPolicyContext> permissiveEvaluator = DefaultGovernancePolicyEvaluator
             .CreateBuilder<TestPolicyContext>()
-            .WithOptions(new AsiBackbonePolicyEvaluatorOptions { DenyWhenNoConstraints = false })
+            .WithOptions(new GovernancePolicyOptions { DenyWhenNoConstraints = false })
             .Build();
 
-        DefaultAsiBackbonePolicyEvaluator<TestPolicyContext> threatEvaluator = DefaultAsiBackbonePolicyEvaluator
+        DefaultGovernancePolicyEvaluator<TestPolicyContext> threatEvaluator = DefaultGovernancePolicyEvaluator
             .CreateBuilder<TestPolicyContext>()
             .AddConstraint(new RecordingConstraint("allow", []))
             .AddThreatModelContributors([new DeferringThreatContributor()])
             .Build();
 
-        DefaultAsiBackbonePolicyEvaluator<TestPolicyContext> policyEvaluator = DefaultAsiBackbonePolicyEvaluator
+        DefaultGovernancePolicyEvaluator<TestPolicyContext> policyEvaluator = DefaultGovernancePolicyEvaluator
             .CreateBuilder<TestPolicyContext>()
             .AddConstraint(new RecordingConstraint("allow", []))
             .WithDecisionPolicy(new DenyingDecisionPolicy())
@@ -87,7 +87,7 @@ public sealed class AsiBackbonePolicyEvaluatorBuilderTests
     [Fact]
     public async Task WithMethodsReplacePreviousValues()
     {
-        DefaultAsiBackbonePolicyEvaluator<TestPolicyContext> evaluator = DefaultAsiBackbonePolicyEvaluator
+        DefaultGovernancePolicyEvaluator<TestPolicyContext> evaluator = DefaultGovernancePolicyEvaluator
             .CreateBuilder<TestPolicyContext>()
             .AddConstraint(new RecordingConstraint("allow", []))
             .WithDecisionPolicy(new DenyingDecisionPolicy())
@@ -107,12 +107,12 @@ public sealed class AsiBackbonePolicyEvaluatorBuilderTests
     [Fact]
     public async Task BuiltEvaluatorSnapshotsBuilderState()
     {
-        AsiBackbonePolicyEvaluatorBuilder<TestPolicyContext> builder = DefaultAsiBackbonePolicyEvaluator
+        GovernancePolicyEvaluatorBuilder<TestPolicyContext> builder = DefaultGovernancePolicyEvaluator
             .CreateBuilder<TestPolicyContext>()
             .AddConstraint(new RecordingConstraint("allow", []));
-        DefaultAsiBackbonePolicyEvaluator<TestPolicyContext> first = builder.Build();
+        DefaultGovernancePolicyEvaluator<TestPolicyContext> first = builder.Build();
 
-        DefaultAsiBackbonePolicyEvaluator<TestPolicyContext> second = builder
+        DefaultGovernancePolicyEvaluator<TestPolicyContext> second = builder
             .AddThreatModelContributor(new DeferringThreatContributor())
             .Build();
 
@@ -129,8 +129,8 @@ public sealed class AsiBackbonePolicyEvaluatorBuilderTests
     [Fact]
     public void AddMethodsRejectNull()
     {
-        AsiBackbonePolicyEvaluatorBuilder<TestPolicyContext> builder =
-            DefaultAsiBackbonePolicyEvaluator.CreateBuilder<TestPolicyContext>();
+        GovernancePolicyEvaluatorBuilder<TestPolicyContext> builder =
+            DefaultGovernancePolicyEvaluator.CreateBuilder<TestPolicyContext>();
 
         _ = Assert.Throws<ArgumentNullException>(() => builder.AddConstraint(null!));
         _ = Assert.Throws<ArgumentNullException>(() => builder.AddConstraints(null!));
@@ -150,7 +150,7 @@ public sealed class AsiBackbonePolicyEvaluatorBuilderTests
         };
     }
 
-    private sealed class TestPolicyContext : IAsiBackboneConstraintEvaluationContext
+    private sealed class TestPolicyContext : IGovernanceEvaluationContext
     {
         public string? CorrelationId { get; init; }
 
@@ -162,7 +162,7 @@ public sealed class AsiBackbonePolicyEvaluatorBuilderTests
             new Dictionary<string, string>(StringComparer.Ordinal);
     }
 
-    private sealed class RecordingConstraint(string name, List<string> observedOrder) : IAsiBackboneConstraint<TestPolicyContext>
+    private sealed class RecordingConstraint(string name, List<string> observedOrder) : IGovernanceConstraint<TestPolicyContext>
     {
         public string Name { get; } = name;
 
@@ -192,7 +192,7 @@ public sealed class AsiBackbonePolicyEvaluatorBuilderTests
         }
     }
 
-    private sealed class DenyingDecisionPolicy : IAsiBackboneDecisionPolicy<TestPolicyContext>
+    private sealed class DenyingDecisionPolicy : IGovernanceDecisionPolicy<TestPolicyContext>
     {
         public ValueTask<GovernanceDecision> ApplyAsync(
             TestPolicyContext context,

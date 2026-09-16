@@ -33,7 +33,7 @@ public static class OpenTelemetryGovernanceBuilderExtensions
 
         _ = builder.Services.AddSingleton(options);
         _ = builder.Services.AddSingleton<OpenTelemetryGovernanceEmitter>();
-        _ = builder.Services.AddSingleton<IAsiBackboneGovernanceEmitter>(serviceProvider =>
+        _ = builder.Services.AddSingleton<IGovernanceEmitter>(serviceProvider =>
             serviceProvider.GetRequiredService<OpenTelemetryGovernanceEmitter>());
 
         return builder;

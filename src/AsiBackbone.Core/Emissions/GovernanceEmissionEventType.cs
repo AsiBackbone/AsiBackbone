@@ -29,12 +29,12 @@ public enum GovernanceEmissionEventType
     Gateway = 400,
 
     /// <summary>
-    /// Audit residue or an audit ledger record is being emitted.
+    /// Decision receipt or an audit ledger record is being emitted.
     /// </summary>
     AuditResidue = 500,
 
     /// <summary>
-    /// An audit residue lifecycle event is being emitted.
+    /// An decision receipt lifecycle event is being emitted.
     /// </summary>
     AuditLifecycle = 510,
 

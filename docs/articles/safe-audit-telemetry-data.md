@@ -1,6 +1,6 @@
 # Safe Audit and Telemetry Data Guidance
 
-This article documents practical data-hygiene guidance for AsiBackbone audit residue, governance emission envelopes, outbox records, and telemetry attributes.
+This article documents practical data-hygiene guidance for AsiBackbone decision receipt, governance emission envelopes, outbox records, and telemetry attributes.
 
 In this software project, **ASI** means **Accountable Systems Infrastructure**. AsiBackbone provides governance-oriented decision-flow primitives, but the host application controls much of the context, metadata, reason text, storage configuration, and downstream telemetry/export behavior. That host-provided data must be reviewed before it is stored, emitted, retained, replicated, searched, or shared.
 
@@ -13,7 +13,7 @@ A safe implementation should assume:
 ```text
 host context
   -> governance decision
-  -> audit residue / lifecycle record
+  -> decision receipt / lifecycle record
   -> governance outbox entry
   -> optional telemetry or provider emission
   -> long-lived searchable operational data
@@ -27,7 +27,7 @@ AsiBackbone can provide safe metadata shapes and provider-neutral contracts. It 
 
 The host owns:
 
-- selecting which `TContext` fields are copied into audit residue or metadata;
+- selecting which `TContext` fields are copied into decision receipt or metadata;
 - deciding whether reason messages are curated or user-provided;
 - redacting, hashing, tokenizing, or omitting sensitive values;
 - deciding which telemetry attributes are exported;
@@ -110,7 +110,7 @@ Recommended pattern:
 1. Build `TContext` with only the facts needed for constraint evaluation.
 2. Keep raw request bodies, prompts, uploaded files, secrets, and protected records outside the context whenever possible.
 3. Use opaque identifiers or hashes to refer to source records.
-4. Map only safe fields from `TContext` into `AuditResidue`, `GovernanceEmissionEnvelope`, outbox metadata, or telemetry attributes.
+4. Map only safe fields from `TContext` into `DecisionReceipt`, `GovernanceEmissionEnvelope`, outbox metadata, or telemetry attributes.
 5. Review any free-form fields before they reach durable storage or export.
 
 Example safe context shape:
@@ -216,7 +216,7 @@ Budget validation is not privacy classification. A value can pass count and leng
 
 ## Before durable audit persistence
 
-Before writing audit residue, lifecycle events, or ledger records, hosts should verify that:
+Before writing decision receipt, lifecycle events, or ledger records, hosts should verify that:
 
 - reason codes are curated and bounded;
 - reason messages do not echo raw input;
@@ -267,7 +267,7 @@ This guidance does not implement a full DLP engine. It defines an operational ex
 Before enabling durable audit persistence or telemetry export, confirm:
 
 - [ ] `TContext` does not carry raw payloads unless strictly required.
-- [ ] Only safe fields are mapped into audit residue and outbox metadata.
+- [ ] Only safe fields are mapped into decision receipt and outbox metadata.
 - [ ] Reason codes are bounded and do not include user input.
 - [ ] Reason messages are curated and redacted.
 - [ ] Metadata dictionaries use allow-listed keys.

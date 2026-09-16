@@ -11,7 +11,7 @@ namespace AsiBackbone.Core.Tests.Audit;
 public sealed class AuditResidueHotPathTests
 {
     /// <summary>
-    /// Validates that the <see cref="AuditResidue.FromDecision"/> method correctly copies the decision outcome, trace, and reason codes into the resulting audit residue.
+    /// Validates that the <see cref="DecisionReceipt.FromDecision"/> method correctly copies the decision outcome, trace, and reason codes into the resulting audit residue.
     /// </summary>
     /// <param name="scenario">The scenario under test.</param>
     /// <param name="expectedOutcome">The expected outcome of the audit residue.</param>
@@ -28,10 +28,10 @@ public sealed class AuditResidueHotPathTests
         string expectedOutcome,
         string? expectedReasonCode)
     {
-        var actor = AsiBackboneActorContext.Service("benchmark-service");
+        var actor = GovernanceActorContext.Service("benchmark-service");
         GovernanceDecision decision = CreateDecision(scenario);
 
-        var residue = AuditResidue.FromDecision(
+        var residue = DecisionReceipt.FromDecision(
             actor,
             "benchmark.operation",
             decision,
@@ -48,7 +48,7 @@ public sealed class AuditResidueHotPathTests
     }
 
     /// <summary>
-    /// Validates that the <see cref="AuditResidue.FromDecision"/> method reuses the immutable reason codes from the decision to ensure audit fidelity and avoid unnecessary allocations.
+    /// Validates that the <see cref="DecisionReceipt.FromDecision"/> method reuses the immutable reason codes from the decision to ensure audit fidelity and avoid unnecessary allocations.
     /// </summary>
     [Fact]
     public void FromDecisionReusesImmutableDecisionReasonCodesForAuditFidelity()
@@ -61,8 +61,8 @@ public sealed class AuditResidueHotPathTests
             policyVersion: "benchmark-policy-v1",
             policyHash: "benchmark-policy-hash");
 
-        var residue = AuditResidue.FromDecision(
-            AsiBackboneActorContext.Service("benchmark-service"),
+        var residue = DecisionReceipt.FromDecision(
+            GovernanceActorContext.Service("benchmark-service"),
             "benchmark.operation",
             decision,
             eventId: "benchmark-event");
@@ -72,7 +72,7 @@ public sealed class AuditResidueHotPathTests
     }
 
     /// <summary>
-    /// Validates that the <see cref="AuditResidue.FromDecision"/> method defensively copies the metadata to ensure audit fidelity and avoid unnecessary allocations.
+    /// Validates that the <see cref="DecisionReceipt.FromDecision"/> method defensively copies the metadata to ensure audit fidelity and avoid unnecessary allocations.
     /// </summary>
     [Fact]
     public void FromDecisionStillDefensivelyCopiesMetadata()
@@ -86,8 +86,8 @@ public sealed class AuditResidueHotPathTests
             "policy.warning",
             "Policy produced a warning.");
 
-        var residue = AuditResidue.FromDecision(
-            AsiBackboneActorContext.Service("benchmark-service"),
+        var residue = DecisionReceipt.FromDecision(
+            GovernanceActorContext.Service("benchmark-service"),
             "benchmark.operation",
             decision,
             metadata: metadata,

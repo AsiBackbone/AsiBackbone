@@ -2,7 +2,7 @@
 
 Issue #134 tracks the first focused survivor-triage pass after the initial Core Stryker.NET baseline from Issue #121.
 
-The goal of this pass was not to chase a raw score. The goal was to strengthen tests around Core governance behavior that would matter if it changed: evaluator composition, decision outcomes, audit residue, and acknowledgment or responsibility-handshake flow.
+The goal of this pass was not to chase a raw score. The goal was to strengthen tests around Core governance behavior that would matter if it changed: evaluator composition, decision outcomes, decision receipt, and acknowledgment or responsibility-handshake flow.
 
 This page is now historical context for the first Core mutation survivor-triage pass. Post-`1.1.0` test hardening extends the broader Core coverage story into DLP/classification, provider-neutral governance emission, durable outbox contracts, signing and verification policy, canonical payload building, and capability grant validation. Those later xUnit coverage issues are coverage-hardening work unless a future issue explicitly expands mutation scope.
 
@@ -46,7 +46,7 @@ This page is now historical context for the first Core mutation survivor-triage 
    - Audit and handshake metadata must snapshot normalized values rather than reflecting later source-dictionary changes.
 
 7. **Audit and handshake boundary behavior**
-   - Audit residue must preserve full decision and constraint trace/policy data.
+   - Decision receipt must preserve full decision and constraint trace/policy data.
    - Handshake requests created from decisions must use the first decision reason as the display reason.
    - Acknowledgment responses must use the responding actor identity while preserving the request handshake boundary and acknowledgment code.
 

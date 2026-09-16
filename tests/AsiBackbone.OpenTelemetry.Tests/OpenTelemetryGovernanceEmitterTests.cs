@@ -132,7 +132,7 @@ public sealed class OpenTelemetryGovernanceEmitterTests
             schemaVersion: "1.0.0",
             correlationId: "correlation-197",
             auditResidueId: "audit-residue-197",
-            lifecycleStage: AuditResidueLifecycleStage.DecisionEvaluated,
+            lifecycleStage: DecisionReceiptLifecycleStage.DecisionEvaluated,
             policyVersion: "policy-v1",
             policyHash: "policy-hash-197",
             traceId: "trace-197",

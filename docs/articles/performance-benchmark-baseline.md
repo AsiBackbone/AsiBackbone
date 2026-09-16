@@ -38,8 +38,8 @@ dotnet run -c Release --project benchmarks/AsiBackbone.Benchmarks.BenchmarkDotNe
 dotnet run -c Release --project benchmarks/AsiBackbone.Benchmarks.BenchmarkDotNet -- --filter "*Policy*"
 dotnet run -c Release --project benchmarks/AsiBackbone.Benchmarks.BenchmarkDotNet -- --filter "*ConstraintException*"
 
-# Audit residue construction and metadata variants
-dotnet run -c Release --project benchmarks/AsiBackbone.Benchmarks.BenchmarkDotNet -- --filter "*AuditResidue*"
+# Decision receipt construction and metadata variants
+dotnet run -c Release --project benchmarks/AsiBackbone.Benchmarks.BenchmarkDotNet -- --filter "*DecisionReceipt*"
 ```
 
 The manual runner remains useful for quick checks while editing:
@@ -82,8 +82,8 @@ The BenchmarkDotNet runner captures latency and allocation measurements for repr
 | `outbox_drain.small_batch_25` | Provider-neutral drain processing for 25 pending entries. |
 | `outbox_drain.medium_batch_100` | Provider-neutral drain processing for 100 pending entries. |
 | `outbox_drain.scoped_medium_batch_100` | DI scope creation, scoped drain resolution, and medium-batch processing. |
-| `audit_residue.from_decision` | Audit residue creation from a governance decision. |
-| `audit_residue.builder_no_metadata` | Fluent audit residue builder with no metadata. |
+| `audit_residue.from_decision` | Decision receipt creation from a governance decision. |
+| `audit_residue.builder_no_metadata` | Fluent decision receipt builder with no metadata. |
 | `audit_residue.builder_one_metadata` | Fluent builder with one metadata entry. |
 | `audit_residue.builder_many_metadata` | Fluent builder with multiple metadata entries. |
 

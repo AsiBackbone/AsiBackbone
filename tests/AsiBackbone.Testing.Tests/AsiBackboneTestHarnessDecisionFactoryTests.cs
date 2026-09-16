@@ -82,7 +82,7 @@ public sealed class AsiBackboneTestHarnessDecisionFactoryTests
     [Fact]
     public void ContextOverloadProjectsContextTelemetry()
     {
-        var context = new AsiBackboneConstraintEvaluationContext(
+        var context = new GovernanceEvaluationContext(
             correlationId: "context-correlation",
             policyVersion: "context-policy",
             policyHash: "context-hash");

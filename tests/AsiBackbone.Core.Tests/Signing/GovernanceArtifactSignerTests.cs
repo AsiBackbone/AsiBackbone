@@ -46,7 +46,7 @@ public sealed class GovernanceArtifactSignerTests
     public async Task SignGovernanceOutboxEntryAsyncPreservesProviderMetadataAndCanonicalDescriptors()
     {
         GovernanceOutboxEntry entry = CreateGovernanceOutboxEntry();
-        IAsiBackboneSigningService signer = new FakeSigningService();
+        IGovernanceSigningService signer = new FakeSigningService();
 
         SignedGovernanceArtifact<GovernanceOutboxEntry> artifact = await GovernanceArtifactSigner.SignGovernanceOutboxEntryAsync(
             entry,
@@ -108,7 +108,7 @@ public sealed class GovernanceArtifactSignerTests
     public async Task SignAuditLedgerRecordAsyncPropagatesUnsignedFailureMetadata()
     {
         AuditLedgerRecord record = CreateAuditLedgerRecord();
-        IAsiBackboneSigningService signer = new FailingSigningService();
+        IGovernanceSigningService signer = new FailingSigningService();
 
         SignedGovernanceArtifact<AuditLedgerRecord> artifact = await GovernanceArtifactSigner.SignAuditLedgerRecordAsync(
             record,
@@ -133,7 +133,7 @@ public sealed class GovernanceArtifactSignerTests
     public async Task SignAuditLedgerRecordAsyncThrowsWhenTheProviderReturnsNoSignature()
     {
         AuditLedgerRecord record = CreateAuditLedgerRecord();
-        IAsiBackboneSigningService signer = new FailingSigningService();
+        IGovernanceSigningService signer = new FailingSigningService();
 
         _ = await Assert.ThrowsAsync<InvalidOperationException>(
             async () => await GovernanceArtifactSigner.SignAuditLedgerRecordAsync(
@@ -144,8 +144,8 @@ public sealed class GovernanceArtifactSignerTests
 
     private static AuditLedgerRecord CreateAuditLedgerRecord()
     {
-        IAsiBackboneActorContext actor = AsiBackboneActorContext.Service("system-1", "System");
-        var residue = AuditResidue.Create(
+        IGovernanceActorContext actor = GovernanceActorContext.Service("system-1", "System");
+        var residue = DecisionReceipt.Create(
             actor,
             "gateway.execute",
             "Allowed",
@@ -192,7 +192,7 @@ public sealed class GovernanceArtifactSignerTests
             createdUtc: new DateTimeOffset(2026, 6, 16, 12, 0, 2, TimeSpan.Zero));
     }
 
-    private sealed class FakeSigningService : IAsiBackboneSigningService
+    private sealed class FakeSigningService : IGovernanceSigningService
     {
         public ValueTask<SigningResult> SignAsync(SigningRequest request, CancellationToken cancellationToken = default)
         {
@@ -214,7 +214,7 @@ public sealed class GovernanceArtifactSignerTests
         }
     }
 
-    private sealed class FailingSigningService : IAsiBackboneSigningService
+    private sealed class FailingSigningService : IGovernanceSigningService
     {
         public ValueTask<SigningResult> SignAsync(SigningRequest request, CancellationToken cancellationToken = default)
         {

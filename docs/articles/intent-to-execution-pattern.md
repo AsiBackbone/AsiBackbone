@@ -12,7 +12,7 @@ This URL is retained for continuity and maps that pattern to current AsiBackbone
 | Constraint evaluation | Core constraint and policy-evaluator contracts |
 | Explicit decision | `GovernanceDecision` and its outcome/reason metadata |
 | Acknowledgment | Liability/responsibility handshake request and acknowledgment records |
-| Audit residue | Audit ledger, lifecycle events, correlation/policy metadata |
+| Decision receipt | Audit ledger, lifecycle events, correlation/policy metadata |
 | Scoped continuation authority | Capability-grant contracts and validation profiles |
 | Execution | Host-owned; not performed by Core |
 | Reconciliation / evidence | Host execution records plus audit/outbox/provider evidence |

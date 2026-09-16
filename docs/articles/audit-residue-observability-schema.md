@@ -1,23 +1,23 @@
 # Audit Residue Observability Schema
 
-This article documents the provider-neutral telemetry, traceability, and operational diagnostics fields added to the audit residue model for the `1.1.0 - Observability, Outbox, and Governance Emission Providers` milestone.
+This article documents the provider-neutral telemetry, traceability, and operational diagnostics fields added to the decision receipt model for the `1.1.0 - Observability, Outbox, and Governance Emission Providers` milestone.
 
 In this software project, **ASI** means **Accountable Systems Infrastructure**. These fields support observability and governance emission without making `AsiBackbone.Core` depend on OpenTelemetry, Azure Monitor, Event Hubs, Purview, SIEM products, or any provider-specific package.
 
 ## Design intent
 
-Audit residue should remain a framework-neutral governance record. The observability schema adds enough structure for hosts and provider adapters to correlate decisions across logs, traces, outbox records, gateways, dashboards, and governance enrichment systems.
+Decision receipt should remain a framework-neutral governance record. The observability schema adds enough structure for hosts and provider adapters to correlate decisions across logs, traces, outbox records, gateways, dashboards, and governance enrichment systems.
 
-The fields are additive. Existing hosts can keep creating audit residue with only the original identifiers, actor context, outcome, reason codes, policy fields, and metadata. New hosts can populate telemetry fields when the values are available.
+The fields are additive. Existing hosts can keep creating decision receipt with only the original identifiers, actor context, outcome, reason codes, policy fields, and metadata. New hosts can populate telemetry fields when the values are available.
 
 ## Construction guidance
 
-`AuditResidue.Create`, `AuditResidue.FromDecision`, and `AuditResidue.FromConstraint` remain supported direct factory paths. They are compact for simple records, but their optional telemetry, policy, outbox, and provider fields can become hard to scan when a host populates many values.
+`DecisionReceipt.Create`, `DecisionReceipt.FromDecision`, and `DecisionReceipt.FromConstraint` remain supported direct factory paths. They are compact for simple records, but their optional telemetry, policy, outbox, and provider fields can become hard to scan when a host populates many values.
 
-For richer records, prefer `AuditResidueBuilder` so each optional field is named at the call site while the resulting `AuditResidue` remains immutable:
+For richer records, prefer `DecisionReceiptBuilder` so each optional field is named at the call site while the resulting `DecisionReceipt` remains immutable:
 
 ```csharp
-AuditResidue residue = AuditResidueBuilder.FromDecision(
+DecisionReceipt residue = DecisionReceiptBuilder.FromDecision(
     actor,
     "payments.approve",
     decision)
@@ -39,7 +39,7 @@ The builder is an ergonomic construction helper, not a mutable audit record. `Bu
 
 | Field | Purpose | PII-safe guidance |
 | --- | --- | --- |
-| `AuditResidueId` | Stable identifier for the audit residue shape. Defaults to `EventId` when not supplied. | Use an opaque identifier. Do not embed actor names, email addresses, document names, or protected resource values. |
+| `AuditResidueId` | Stable identifier for the decision receipt shape. Defaults to `EventId` when not supplied. | Use an opaque identifier. Do not embed actor names, email addresses, document names, or protected resource values. |
 | `SchemaVersion` | Serialized schema version for forward-compatible envelopes. | Safe to emit when it contains only package schema identity. |
 | `TraceId` | Links the residue to host or distributed tracing context. | Use standard trace identifiers. Do not place user or resource information in trace IDs. |
 | `SpanId` | Links the residue to the active span or operation segment. | Use opaque span identifiers only. |
@@ -77,7 +77,7 @@ The correlation fields should be stable and opaque. They should not contain raw 
 
 ## Version awareness
 
-`SchemaVersion` is included on audit residue so serialized records can be interpreted safely as the package family evolves. The field is additive and defaults to the stable artifact schema version when the host does not provide one.
+`SchemaVersion` is included on decision receipt so serialized records can be interpreted safely as the package family evolves. The field is additive and defaults to the stable artifact schema version when the host does not provide one.
 
 Hosts and provider adapters should treat unknown schema versions conservatively. They may store the record locally, skip unsupported provider enrichment, or emit a minimized safe envelope according to host policy.
 
@@ -137,7 +137,7 @@ Hosts should prefer controlled values that are stable, short, and free of sensit
 
 ## Privacy and minimization checklist
 
-Before emitting audit residue outside the host boundary, verify that:
+Before emitting decision receipt outside the host boundary, verify that:
 
 * actor, tenant, organization, subject, and resource identifiers are opaque, hashed, tokenized, or minimized according to host policy;
 * raw tokens, secrets, prompts, document contents, protected records, and payload bodies are not placed in telemetry fields;

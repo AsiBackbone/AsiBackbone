@@ -2,7 +2,7 @@
 
 AsiBackbone can help a platform or operations host evaluate deployment and infrastructure-change requests before the host calls its own automation systems.
 
-This scenario is useful when a change is consequential enough that the host needs policy context, acknowledgment, escalation, or audit residue before continuing.
+This scenario is useful when a change is consequential enough that the host needs policy context, acknowledgment, escalation, or decision receipt before continuing.
 
 > [!IMPORTANT]
 > AsiBackbone is not a deployment engine, infrastructure automation tool, scheduler, cloud provider SDK, or change-management system. The host owns deployment logic, environment access, rollback, and operational safeguards. AsiBackbone provides a governance decision boundary before the host proceeds.
@@ -61,7 +61,7 @@ AsiBackbone can return a decision that the host maps into a pipeline status, app
 
 - Privileged automation that runs before policy context is evaluated.
 - Deployment decisions that cannot be tied back to reason codes or policy versions.
-- Approval steps disconnected from audit residue.
+- Approval steps disconnected from decision receipt.
 - Broad automation authority without a bounded governance decision.
 - Scattered one-off checks across scripts, pipelines, and service endpoints.
 

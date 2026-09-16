@@ -46,7 +46,7 @@ At the alpha planning stage, `AsiBackbone.Core` was responsible for defining the
 * operation result outcomes
 * reason codes
 * acknowledgment or responsibility-handshake workflows
-* audit residue and receipts
+* decision receipt and receipts
 * capability-token concepts
 * policy version and hash tracking
 * correlation IDs

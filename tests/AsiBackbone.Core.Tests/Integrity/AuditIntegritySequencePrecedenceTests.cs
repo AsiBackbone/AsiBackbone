@@ -124,7 +124,7 @@ public sealed class AuditIntegritySequencePrecedenceTests
             recordHash.HashValue,
             recordHash.HashAlgorithm,
             recordHash.CanonicalizationVersion,
-            AsiBackboneSchemaVersions.StableArtifactsV1,
+            GovernanceSchemaVersions.StableArtifactsV1,
             Now.AddSeconds(sequence));
 
         return AuditIntegrityLink.Rehydrate(
@@ -146,7 +146,7 @@ public sealed class AuditIntegritySequencePrecedenceTests
         var payload = CanonicalPayload.Create(
             CanonicalArtifactTypes.AuditLedgerRecord,
             recordId,
-            AsiBackboneSchemaVersions.StableArtifactsV1,
+            GovernanceSchemaVersions.StableArtifactsV1,
             CanonicalPayloadOptions.DefaultCanonicalizationVersion,
             new Dictionary<string, object?>
             {

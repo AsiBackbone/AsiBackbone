@@ -42,7 +42,7 @@ The current implementation direction is:
 2. Policy evaluator pipeline
 3. Decision result model
 4. Acknowledgment/handshake workflow
-5. Audit residue and audit ledger contracts
+5. Decision receipt and audit ledger contracts
 6. Capability token abstractions
 7. In-memory local validation storage
 8. EF Core host-owned persistence integration

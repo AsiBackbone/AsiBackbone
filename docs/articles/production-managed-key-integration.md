@@ -27,7 +27,7 @@ Do not collapse these concerns into one claim:
 | --- | --- | --- |
 | NuGet package signing | Whether published `.nupkg` files are signed release artifacts. | Deferred unless a reviewed package-signing process is adopted. See the consumer verification guide. |
 | GitHub provenance and SBOM | Source Link, repository metadata, package SBOMs, and workflow provenance where available. | Useful supply-chain evidence, but not package signing and not runtime audit signing. |
-| Runtime governance-residue signing | A host signs audit residue, outbox records, or decision receipts through configured signing infrastructure. | Supported through provider-neutral abstractions and the managed-key adapter boundary; production key custody remains host-owned. |
+| Runtime governance-residue signing | A host signs decision receipt, outbox records, or decision receipts through configured signing infrastructure. | Supported through provider-neutral abstractions and the managed-key adapter boundary; production key custody remains host-owned. |
 
 A package can have Source Link and SBOM provenance without being maintainer-signed. A governance record can be signed at runtime without proving legal non-repudiation. A signed governance record still requires verification, durable storage controls, key-retention policy, monitoring, and incident response before a host should make stronger integrity claims.
 
@@ -56,7 +56,7 @@ The consuming host owns the concrete client and operating environment.
 
 AsiBackbone provides:
 
-- `IAsiBackboneSigningService` and `IAsiBackboneSignatureVerificationService` abstractions in Core;
+- `IGovernanceSigningService` and `IGovernanceSignatureVerificationService` abstractions in Core;
 - canonical payload/hash contracts and signing-ready metadata fields;
 - `IManagedKeySigningClient` as the host-owned client boundary;
 - `ManagedKeySigningOptions` for provider descriptor, key ID, key version, hash/signature algorithm descriptors, retry settings, and failure behavior;

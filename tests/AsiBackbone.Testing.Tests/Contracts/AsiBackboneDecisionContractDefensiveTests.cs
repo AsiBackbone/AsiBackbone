@@ -22,8 +22,8 @@ public sealed class AsiBackboneDecisionContractDefensiveTests
         var decision = GovernanceDecision.Allow();
         SetAutoProperty(decision, nameof(GovernanceDecision.Outcome), (GovernanceDecisionOutcome)int.MaxValue);
 
-        AsiBackboneContractViolationException exception = Assert.Throws<AsiBackboneContractViolationException>(
-            () => AsiBackboneDecisionContract.VerifySafeDecision(decision, "unsupported decision"));
+        GovernanceContractViolationException exception = Assert.Throws<GovernanceContractViolationException>(
+            () => GovernanceDecisionContract.VerifySafeDecision(decision, "unsupported decision"));
 
         Assert.Contains("unsupported outcome", exception.Message, StringComparison.Ordinal);
     }
@@ -42,8 +42,8 @@ public sealed class AsiBackboneDecisionContractDefensiveTests
         var decision = GovernanceDecision.Allow();
         SetAutoProperty(decision, nameof(GovernanceDecision.Outcome), outcome);
 
-        AsiBackboneContractViolationException exception = Assert.Throws<AsiBackboneContractViolationException>(
-            () => AsiBackboneDecisionContract.VerifySafeDecision(decision, "reason-required decision"));
+        GovernanceContractViolationException exception = Assert.Throws<GovernanceContractViolationException>(
+            () => GovernanceDecisionContract.VerifySafeDecision(decision, "reason-required decision"));
 
         Assert.Contains("at least one reason code", exception.Message, StringComparison.Ordinal);
     }
@@ -57,8 +57,8 @@ public sealed class AsiBackboneDecisionContractDefensiveTests
         var decision = GovernanceDecision.Warning("contract.warning", "Warning.");
         SetAutoProperty(decision, nameof(GovernanceDecision.Reasons), new OperationReason?[] { null });
 
-        AsiBackboneContractViolationException exception = Assert.Throws<AsiBackboneContractViolationException>(
-            () => AsiBackboneDecisionContract.VerifySafeDecision(decision, "null-reason decision"));
+        GovernanceContractViolationException exception = Assert.Throws<GovernanceContractViolationException>(
+            () => GovernanceDecisionContract.VerifySafeDecision(decision, "null-reason decision"));
 
         Assert.Contains("null reason", exception.Message, StringComparison.Ordinal);
     }
@@ -77,8 +77,8 @@ public sealed class AsiBackboneDecisionContractDefensiveTests
         var decision = GovernanceDecision.Warning("contract.warning", "Warning.");
         SetAutoProperty(decision, nameof(GovernanceDecision.Reasons), new[] { reason });
 
-        AsiBackboneContractViolationException exception = Assert.Throws<AsiBackboneContractViolationException>(
-            () => AsiBackboneDecisionContract.VerifySafeDecision(decision, "malformed-reason decision"));
+        GovernanceContractViolationException exception = Assert.Throws<GovernanceContractViolationException>(
+            () => GovernanceDecisionContract.VerifySafeDecision(decision, "malformed-reason decision"));
 
         Assert.Contains(blankCode ? "empty code" : "empty message", exception.Message, StringComparison.Ordinal);
     }
@@ -89,8 +89,8 @@ public sealed class AsiBackboneDecisionContractDefensiveTests
     [Fact]
     public void VerifyInvalidCapabilityGrantRejectsAllow()
     {
-        AsiBackboneContractViolationException exception = Assert.Throws<AsiBackboneContractViolationException>(
-            () => AsiBackboneDecisionContract.VerifyInvalidCapabilityGrantDoesNotAllow(GovernanceDecision.Allow()));
+        GovernanceContractViolationException exception = Assert.Throws<GovernanceContractViolationException>(
+            () => GovernanceDecisionContract.VerifyInvalidCapabilityGrantDoesNotAllow(GovernanceDecision.Allow()));
 
         Assert.Contains("must not return Allow", exception.Message, StringComparison.Ordinal);
     }
@@ -101,11 +101,11 @@ public sealed class AsiBackboneDecisionContractDefensiveTests
     [Fact]
     public void VerifyTelemetryRejectsCorrelationMismatch()
     {
-        var context = new AsiBackboneConstraintEvaluationContext(correlationId: "expected-correlation");
+        var context = new GovernanceEvaluationContext(correlationId: "expected-correlation");
         var decision = GovernanceDecision.Allow(correlationId: "different-correlation");
 
-        AsiBackboneContractViolationException exception = Assert.Throws<AsiBackboneContractViolationException>(
-            () => AsiBackboneDecisionContract.VerifyTelemetryFromContext(decision, context));
+        GovernanceContractViolationException exception = Assert.Throws<GovernanceContractViolationException>(
+            () => GovernanceDecisionContract.VerifyTelemetryFromContext(decision, context));
 
         Assert.Contains("preserve the supplied correlation ID", exception.Message, StringComparison.Ordinal);
     }
@@ -118,12 +118,12 @@ public sealed class AsiBackboneDecisionContractDefensiveTests
     [InlineData(false)]
     public void VerifyTelemetryRejectsMissingRequiredPolicyTelemetry(bool requireVersion)
     {
-        var context = new AsiBackboneConstraintEvaluationContext(
+        var context = new GovernanceEvaluationContext(
             policyVersion: requireVersion ? "policy-v1" : null,
             policyHash: requireVersion ? null : "policy-hash");
 
-        AsiBackboneContractViolationException exception = Assert.Throws<AsiBackboneContractViolationException>(
-            () => AsiBackboneDecisionContract.VerifyTelemetryFromContext(GovernanceDecision.Allow(), context));
+        GovernanceContractViolationException exception = Assert.Throws<GovernanceContractViolationException>(
+            () => GovernanceDecisionContract.VerifyTelemetryFromContext(GovernanceDecision.Allow(), context));
 
         Assert.Contains(requireVersion ? "policy version" : "policy hash", exception.Message, StringComparison.Ordinal);
     }
@@ -134,10 +134,10 @@ public sealed class AsiBackboneDecisionContractDefensiveTests
     [Fact]
     public void VerifyTelemetryAcceptsAbsentOptionalTelemetry()
     {
-        var context = new AsiBackboneConstraintEvaluationContext();
+        var context = new GovernanceEvaluationContext();
         var decision = GovernanceDecision.Allow();
 
-        GovernanceDecision verified = AsiBackboneDecisionContract.VerifyTelemetryFromContext(decision, context);
+        GovernanceDecision verified = GovernanceDecisionContract.VerifyTelemetryFromContext(decision, context);
 
         Assert.Same(decision, verified);
     }
@@ -149,7 +149,7 @@ public sealed class AsiBackboneDecisionContractDefensiveTests
     public void VerifyTelemetryRejectsNullContext()
     {
         _ = Assert.Throws<ArgumentNullException>(() =>
-            AsiBackboneDecisionContract.VerifyTelemetryFromContext<AsiBackboneConstraintEvaluationContext>(
+            GovernanceDecisionContract.VerifyTelemetryFromContext<GovernanceEvaluationContext>(
                 GovernanceDecision.Allow(),
                 null!));
     }
@@ -160,8 +160,8 @@ public sealed class AsiBackboneDecisionContractDefensiveTests
     [Fact]
     public void VerifyAuditResidueRejectsNull()
     {
-        AsiBackboneContractViolationException exception = Assert.Throws<AsiBackboneContractViolationException>(
-            () => AsiBackboneDecisionContract.VerifyAuditResidue(null));
+        GovernanceContractViolationException exception = Assert.Throws<GovernanceContractViolationException>(
+            () => GovernanceDecisionContract.VerifyAuditResidue(null));
 
         Assert.Contains("must not be null", exception.Message, StringComparison.Ordinal);
     }
@@ -179,8 +179,8 @@ public sealed class AsiBackboneDecisionContractDefensiveTests
         var residue = new TestAuditResidue();
         typeof(TestAuditResidue).GetProperty(propertyName)!.SetValue(residue, " ");
 
-        AsiBackboneContractViolationException exception = Assert.Throws<AsiBackboneContractViolationException>(
-            () => AsiBackboneDecisionContract.VerifyAuditResidue(residue));
+        GovernanceContractViolationException exception = Assert.Throws<GovernanceContractViolationException>(
+            () => GovernanceDecisionContract.VerifyAuditResidue(residue));
 
         Assert.Contains(expectedMessagePart, exception.Message, StringComparison.Ordinal);
     }
@@ -193,8 +193,8 @@ public sealed class AsiBackboneDecisionContractDefensiveTests
     {
         var residue = new TestAuditResidue { ReasonCodes = null! };
 
-        AsiBackboneContractViolationException exception = Assert.Throws<AsiBackboneContractViolationException>(
-            () => AsiBackboneDecisionContract.VerifyAuditResidue(residue));
+        GovernanceContractViolationException exception = Assert.Throws<GovernanceContractViolationException>(
+            () => GovernanceDecisionContract.VerifyAuditResidue(residue));
 
         Assert.Contains("reason-code collection", exception.Message, StringComparison.Ordinal);
     }
@@ -207,8 +207,8 @@ public sealed class AsiBackboneDecisionContractDefensiveTests
     {
         var residue = new TestAuditResidue { ReasonCodes = new[] { "contract.reason", " " } };
 
-        AsiBackboneContractViolationException exception = Assert.Throws<AsiBackboneContractViolationException>(
-            () => AsiBackboneDecisionContract.VerifyAuditResidue(residue));
+        GovernanceContractViolationException exception = Assert.Throws<GovernanceContractViolationException>(
+            () => GovernanceDecisionContract.VerifyAuditResidue(residue));
 
         Assert.Contains("empty reason code at index 1", exception.Message, StringComparison.Ordinal);
     }
@@ -221,8 +221,8 @@ public sealed class AsiBackboneDecisionContractDefensiveTests
     {
         var residue = new TestAuditResidue { Metadata = null! };
 
-        AsiBackboneContractViolationException exception = Assert.Throws<AsiBackboneContractViolationException>(
-            () => AsiBackboneDecisionContract.VerifyAuditResidue(residue));
+        GovernanceContractViolationException exception = Assert.Throws<GovernanceContractViolationException>(
+            () => GovernanceDecisionContract.VerifyAuditResidue(residue));
 
         Assert.Contains("metadata collection", exception.Message, StringComparison.Ordinal);
     }
@@ -235,7 +235,7 @@ public sealed class AsiBackboneDecisionContractDefensiveTests
     {
         var residue = new TestAuditResidue();
 
-        IAsiBackboneAuditResidue verified = AsiBackboneDecisionContract.VerifyAuditResidue(residue);
+        IDecisionReceipt verified = GovernanceDecisionContract.VerifyAuditResidue(residue);
 
         Assert.Same(residue, verified);
     }
@@ -261,12 +261,12 @@ public sealed class AsiBackboneDecisionContractDefensiveTests
         field.SetValue(target, value);
     }
 
-    private sealed class TestAuditResidue : IAsiBackboneAuditResidue
+    private sealed class TestAuditResidue : IDecisionReceipt
     {
         public string EventId { get; set; } = "contract-event";
         public DateTimeOffset OccurredUtc { get; set; } = DateTimeOffset.UtcNow;
         public string ActorId { get; set; } = "contract-actor";
-        public AsiBackboneActorType ActorType { get; set; } = AsiBackboneActorType.System;
+        public GovernanceActorType ActorType { get; set; } = GovernanceActorType.System;
         public string? ActorDisplayName { get; set; } = "Contract Actor";
         public string OperationName { get; set; } = "contract.operation";
         public string Outcome { get; set; } = "Allowed";

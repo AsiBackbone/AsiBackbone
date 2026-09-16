@@ -37,7 +37,7 @@ The harness registers deterministic test substitutes for:
 
 - policy evaluation;
 - endpoint capability-grant validation;
-- in-memory audit residue inspection;
+- in-memory decision receipt inspection;
 - non-durable in-memory governance outbox storage;
 - deterministic no-signature signing.
 
@@ -54,7 +54,7 @@ builder.Services.AddAsiBackboneTestHarness(harness =>
 });
 ```
 
-> **`SetPolicyResult` simulates host policy, not framework behavior.** AsiBackbone does not select constraints or decisions from an endpoint's policy type; every registered constraint runs on every governed endpoint. Configuring different results for two policy types asserts against a host-supplied `IAsiBackboneDecisionPolicy` that reads `endpoint.policy_types`, which the application must actually implement. Without it, both endpoints evaluate identically at runtime. See [ASP.NET Core Endpoint Governance](aspnetcore-endpoint-governance.md).
+> **`SetPolicyResult` simulates host policy, not framework behavior.** AsiBackbone does not select constraints or decisions from an endpoint's policy type; every registered constraint runs on every governed endpoint. Configuring different results for two policy types asserts against a host-supplied `IGovernanceDecisionPolicy` that reads `endpoint.policy_types`, which the application must actually implement. Without it, both endpoints evaluate identically at runtime. See [ASP.NET Core Endpoint Governance](aspnetcore-endpoint-governance.md).
 
 For stricter tests, require every endpoint policy marker to be explicitly configured:
 
@@ -90,12 +90,12 @@ WebApplicationFactory<Program> factory = new WebApplicationFactory<Program>()
 
 This preserves production package behavior while making tests explicit about their deterministic governance path.
 
-## Inspecting audit residue
+## Inspecting decision receipt
 
-When an endpoint calls `.EmitGovernanceAudit()`, the harness captures audit residue in `AsiBackboneTestAuditSink`:
+When an endpoint calls `.EmitGovernanceAudit()`, the harness captures decision receipt in `GovernanceTestDecisionReceiptSink`:
 
 ```csharp
-AsiBackboneTestAuditSink auditSink = services.GetRequiredService<AsiBackboneTestAuditSink>();
+GovernanceTestDecisionReceiptSink auditSink = services.GetRequiredService<GovernanceTestDecisionReceiptSink>();
 
 Assert.Single(auditSink.Entries);
 Assert.Equal("robotics.execute", auditSink.Entries[0].OperationName);
