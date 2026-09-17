@@ -65,7 +65,7 @@ Use plain engineering translations first:
 
 The snippet below is an intentionally small README slice, not a complete `Program.cs`. It shows the primary governance path: build safe context, evaluate policy, write decision receipt, and let the host execute only after the decision allows it. The full compile-ready walkthrough lives in [First 15 Minutes: Standard API Gating](https://asibackbone.github.io/AsiBackbone/articles/quickstart-api-gating.html).
 
-> Note: it is recommended in production environments that reason codes stay in audit residue rather than client responses
+> Note: it is recommended in production environments that reason codes stay in decision receipt rather than client responses
 
 ```csharp
 // Registration: Core evaluator + one host-owned rule + local in-memory audit sink.
