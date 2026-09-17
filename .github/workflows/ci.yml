@@ -26,6 +26,7 @@ env:
   PACKAGE_COVERAGE_OUTPUT: artifacts/coverage/package-baselines
   CORE_TEST_PROJECT: tests/AsiBackbone.Core.Tests/AsiBackbone.Core.Tests.csproj
   CORE_COVERAGE_OUTPUT: artifacts/coverage/core
+  LINE_COVERAGE_THRESHOLD: 75
   CORE_BRANCH_COVERAGE_THRESHOLD: 90
 
 jobs:
@@ -125,7 +126,7 @@ jobs:
           -SolutionPath "$env:SOLUTION_PATH"
           -Configuration "$env:CONFIGURATION"
           -OutputRoot "${{ github.workspace }}/${{ env.COVERAGE_OUTPUT }}"
-          -LineThreshold 75
+          -LineThreshold "$env:LINE_COVERAGE_THRESHOLD"
           -NoBuild
           -NoRestore
 
@@ -245,6 +246,16 @@ jobs:
       contents: read
       security-events: write
 
+
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - language: actions
+            build-mode: none
+          - language: csharp
+            build-mode: manual
+
     steps:
       - name: Checkout source
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -254,6 +265,7 @@ jobs:
 
 
       - name: Setup .NET SDK
+        if: matrix.build-mode == 'manual'
         uses: actions/setup-dotnet@a98b56852c35b8e3190ac28c8c2271da59106c68 # v6.0.0
         with:
           global-json-file: global.json
@@ -261,14 +273,18 @@ jobs:
       - name: Initialize CodeQL
         uses: github/codeql-action/init@cdf488f595d80d6e07e03d4674febd5ab45fa938 # v4.37.9
         with:
-          languages: 'actions,csharp'
-          build-mode: none
+          languages: ${{ matrix.language }}
+          build-mode: ${{ matrix.build-mode }}
 
       - name: Restore dependencies
+        if: matrix.build-mode == 'manual'
         run: dotnet restore ${{ env.SOLUTION_PATH }} --locked-mode -p:Configuration=${{ env.CONFIGURATION }}
 
       - name: Build solution for CodeQL
+        if: matrix.build-mode == 'manual'
         run: dotnet build ${{ env.SOLUTION_PATH }} --configuration ${{ env.CONFIGURATION }} --no-restore /p:ContinuousIntegrationBuild=true
 
       - name: Perform CodeQL analysis
         uses: github/codeql-action/analyze@cdf488f595d80d6e07e03d4674febd5ab45fa938 # v4.37.9
+        with:
+          category: "/language:${{ matrix.language }}"
