@@ -6,10 +6,20 @@ namespace AsiBackbone.Storage.InMemory.CapabilityTokens;
 /// Provides a non-durable, in-process capability grant use store for tests, samples, and local validation.
 /// </summary>
 /// <remarks>
+/// <para>
 /// This store is thread-safe within a single process, but it is not durable, distributed, replicated, or suitable for
 /// production replay protection. Hosts that require production single-use or bounded-use guarantees should provide a
 /// durable implementation of <see cref="ICapabilityGrantUseStore" /> with documented transaction, locking, retention,
 /// and failure semantics.
+/// </para>
+/// <para>
+/// Use records are retained until a grant has been expired for longer than <see cref="EvictionGracePeriod" />, measured
+/// against the latest use time this store has observed. A grant past that retention horizon is refused with
+/// <c>capability.use-retention-elapsed</c> rather than given a fresh count, because its earlier uses may already have
+/// been evicted. Set <see cref="EvictionGracePeriod" /> to at least the largest
+/// <see cref="CapabilityGrantValidationOptions.AllowedClockSkew" /> any validator uses with this store; otherwise grants
+/// that are expired but still inside the validator's skew are denied (fail closed) instead of accepted.
+/// </para>
 /// </remarks>
 public sealed class InMemoryCapabilityGrantUseStore : ICapabilityGrantUseStore
 {
@@ -20,13 +30,42 @@ public sealed class InMemoryCapabilityGrantUseStore : ICapabilityGrantUseStore
 
     private readonly Lock syncRoot = new();
     private readonly Dictionary<string, GrantUseEntry> useCounts = new(StringComparer.Ordinal);
-    private readonly HashSet<string> stoppedGrantIds = new(StringComparer.Ordinal);
-    private readonly HashSet<string> cancelledGrantIds = new(StringComparer.Ordinal);
+    private readonly HashSet<string> stoppedGrantKeys = new(StringComparer.Ordinal);
+    private readonly HashSet<string> cancelledGrantKeys = new(StringComparer.Ordinal);
+    private readonly HashSet<string> stoppedGrantIdsForAllIssuers = new(StringComparer.Ordinal);
+    private readonly HashSet<string> cancelledGrantIdsForAllIssuers = new(StringComparer.Ordinal);
+    private TimeSpan evictionGracePeriod = TimeSpan.FromMinutes(5);
+    private DateTimeOffset? latestObservedUseUtc;
 
     /// <summary>
     /// Gets or sets the grace period retained after a grant expires before its use record may be evicted.
     /// </summary>
-    public TimeSpan EvictionGracePeriod { get; set; } = TimeSpan.FromMinutes(5);
+    /// <remarks>
+    /// Defaults to five minutes. This is also the retention horizon: a grant expired for longer than this period is refused
+    /// rather than consumed. Set it to at least the largest <see cref="CapabilityGrantValidationOptions.AllowedClockSkew" />
+    /// used with this store.
+    /// </remarks>
+    /// <exception cref="ArgumentOutOfRangeException">The value is negative.</exception>
+    public TimeSpan EvictionGracePeriod
+    {
+        get
+        {
+            lock (syncRoot)
+            {
+                return evictionGracePeriod;
+            }
+        }
+
+        set
+        {
+            ArgumentOutOfRangeException.ThrowIfLessThan(value, TimeSpan.Zero);
+
+            lock (syncRoot)
+            {
+                evictionGracePeriod = value;
+            }
+        }
+    }
 
     private sealed record GrantUseEntry(int Count, DateTimeOffset ExpiresUtc);
 
@@ -76,45 +115,88 @@ public sealed class InMemoryCapabilityGrantUseStore : ICapabilityGrantUseStore
     }
 
     /// <summary>
-    /// Marks a grant as stopped for subsequent local validation attempts.
+    /// Marks a grant identifier as stopped for every issuer, for subsequent local validation attempts.
     /// </summary>
     /// <param name="grantId">The stable capability grant identifier.</param>
+    /// <remarks>
+    /// Use records are keyed by issuer and token identifier, so this overload stops every issuer's grant that uses the
+    /// identifier. Call <see cref="StopGrant(string, string)" /> to stop one issuer's grant.
+    /// </remarks>
     public void StopGrant(string grantId)
     {
         string normalizedGrantId = NormalizeGrantId(grantId);
 
         lock (syncRoot)
         {
-            _ = stoppedGrantIds.Add(normalizedGrantId);
-            _ = cancelledGrantIds.Remove(normalizedGrantId);
+            _ = stoppedGrantIdsForAllIssuers.Add(normalizedGrantId);
+            _ = cancelledGrantIdsForAllIssuers.Remove(normalizedGrantId);
         }
     }
 
     /// <summary>
-    /// Marks a grant as cancelled for subsequent local validation attempts.
+    /// Marks one issuer's grant as stopped for subsequent local validation attempts.
+    /// </summary>
+    /// <param name="issuer">The grant issuer.</param>
+    /// <param name="grantId">The stable capability grant identifier.</param>
+    public void StopGrant(string issuer, string grantId)
+    {
+        string key = CreateKey(issuer, NormalizeGrantId(grantId));
+
+        lock (syncRoot)
+        {
+            _ = stoppedGrantKeys.Add(key);
+            _ = cancelledGrantKeys.Remove(key);
+        }
+    }
+
+    /// <summary>
+    /// Marks a grant identifier as cancelled for every issuer, for subsequent local validation attempts.
     /// </summary>
     /// <param name="grantId">The stable capability grant identifier.</param>
+    /// <remarks>
+    /// Use records are keyed by issuer and token identifier, so this overload cancels every issuer's grant that uses the
+    /// identifier. Call <see cref="CancelGrant(string, string)" /> to cancel one issuer's grant.
+    /// </remarks>
     public void CancelGrant(string grantId)
     {
         string normalizedGrantId = NormalizeGrantId(grantId);
 
         lock (syncRoot)
         {
-            _ = cancelledGrantIds.Add(normalizedGrantId);
-            _ = stoppedGrantIds.Remove(normalizedGrantId);
+            _ = cancelledGrantIdsForAllIssuers.Add(normalizedGrantId);
+            _ = stoppedGrantIdsForAllIssuers.Remove(normalizedGrantId);
         }
     }
 
     /// <summary>
-    /// Clears use-count and stopped/cancelled state from this in-memory store instance.
+    /// Marks one issuer's grant as cancelled for subsequent local validation attempts.
+    /// </summary>
+    /// <param name="issuer">The grant issuer.</param>
+    /// <param name="grantId">The stable capability grant identifier.</param>
+    public void CancelGrant(string issuer, string grantId)
+    {
+        string key = CreateKey(issuer, NormalizeGrantId(grantId));
+
+        lock (syncRoot)
+        {
+            _ = cancelledGrantKeys.Add(key);
+            _ = stoppedGrantKeys.Remove(key);
+        }
+    }
+
+    /// <summary>
+    /// Clears use-count, stopped/cancelled, and observed-time state from this in-memory store instance.
     /// </summary>
     public void Clear()
     {
         lock (syncRoot)
         {
             useCounts.Clear();
-            stoppedGrantIds.Clear();
-            cancelledGrantIds.Clear();
+            stoppedGrantKeys.Clear();
+            cancelledGrantKeys.Clear();
+            stoppedGrantIdsForAllIssuers.Clear();
+            cancelledGrantIdsForAllIssuers.Clear();
+            latestObservedUseUtc = null;
         }
     }
 
@@ -127,26 +209,38 @@ public sealed class InMemoryCapabilityGrantUseStore : ICapabilityGrantUseStore
     {
         ArgumentNullException.ThrowIfNull(grant);
         ArgumentOutOfRangeException.ThrowIfLessThan(maxUseCount, 1);
-        _ = usedUtc.ToUniversalTime();
         cancellationToken.ThrowIfCancellationRequested();
+
+        // Stop and cancel state was keyed by token identifier alone while use counts were keyed by issuer and token, so
+        // stopping one issuer's grant stopped every issuer's grant that shared the identifier.
+        string key = CreateKey(grant.Issuer, grant.TokenId);
 
         lock (syncRoot)
         {
-            if (stoppedGrantIds.Contains(grant.TokenId))
+            if (stoppedGrantKeys.Contains(key) || stoppedGrantIdsForAllIssuers.Contains(grant.TokenId))
             {
                 return ValueTask.FromResult(CapabilityGrantUseResult.Stopped("The in-memory capability grant use store marked this grant as stopped."));
             }
 
-            if (cancelledGrantIds.Contains(grant.TokenId))
+            if (cancelledGrantKeys.Contains(key) || cancelledGrantIdsForAllIssuers.Contains(grant.TokenId))
             {
                 return ValueTask.FromResult(CapabilityGrantUseResult.Cancelled("The in-memory capability grant use store marked this grant as cancelled."));
             }
 
-            EvictExpiredEntries(usedUtc);
+            DateTimeOffset retentionThreshold = AdvanceRetentionThreshold(usedUtc);
+            EvictExpiredEntries(retentionThreshold);
 
-            // Keying by token identifier alone let two issuers that happen to use the same identifier share one use
-            // budget, so one issuer's grant could exhaust another's.
-            string key = CreateKey(grant.Issuer, grant.TokenId);
+            // Eviction previously ran against the grace period alone, while the validator accepts an expired grant for as
+            // long as its clock skew allows. With skew above the grace period, a grant's record was evicted while the grant
+            // still validated, so the next use started a fresh count: a replay. A grant past the retention horizon may
+            // already have lost its record, so it is refused instead. The horizon only moves forward, so a record is never
+            // evicted while a grant it describes can still be accepted.
+            if (grant.ExpiresUtc < retentionThreshold)
+            {
+                return ValueTask.FromResult(CapabilityGrantUseResult.RetentionElapsed(
+                    "The grant is past the in-memory use store's retention horizon, so its earlier uses can no longer be proven."));
+            }
+
             _ = useCounts.TryGetValue(key, out GrantUseEntry? entry);
             int currentCount = entry?.Count ?? 0;
 
@@ -187,20 +281,39 @@ public sealed class InMemoryCapabilityGrantUseStore : ICapabilityGrantUseStore
     }
 
     /// <summary>
-    /// Removes use records for grants that expired longer ago than the configured grace period.
+    /// Records the use time and returns the retention threshold measured from the latest use time observed so far.
+    /// </summary>
+    /// <remarks>
+    /// Use times come from the caller, and validators may supply a fixed validation time. Measuring from each call's own
+    /// time let a later call with an earlier time find a record that an earlier call had already evicted, and start a fresh
+    /// count. Measuring from the latest observed time keeps the threshold monotonic. Must be called while holding the lock.
+    /// </remarks>
+    private DateTimeOffset AdvanceRetentionThreshold(DateTimeOffset usedUtc)
+    {
+        DateTimeOffset normalizedUsedUtc = usedUtc.ToUniversalTime();
+        DateTimeOffset latest = latestObservedUseUtc is { } observed && observed > normalizedUsedUtc
+            ? observed
+            : normalizedUsedUtc;
+
+        latestObservedUseUtc = latest;
+        return latest - evictionGracePeriod;
+    }
+
+    /// <summary>
+    /// Removes use records for grants that expired before the retention threshold.
     /// </summary>
     /// <remarks>
     /// Every consumed token identifier was previously retained for the lifetime of the process, so a long-running host
     /// accumulated a record per grant it ever validated with no way to reclaim the memory short of clearing the store.
+    /// Must be called while holding the lock.
     /// </remarks>
-    private void EvictExpiredEntries(DateTimeOffset usedUtc)
+    private void EvictExpiredEntries(DateTimeOffset retentionThreshold)
     {
-        DateTimeOffset threshold = usedUtc.ToUniversalTime() - EvictionGracePeriod;
         List<string>? expiredKeys = null;
 
         foreach (KeyValuePair<string, GrantUseEntry> item in useCounts)
         {
-            if (item.Value.ExpiresUtc < threshold)
+            if (item.Value.ExpiresUtc < retentionThreshold)
             {
                 (expiredKeys ??= []).Add(item.Key);
             }

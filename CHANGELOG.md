@@ -37,6 +37,16 @@ This project follows the spirit of [Keep a Changelog](https://keepachangelog.com
 * The local-development verifier rejects provider labels other than its own with
   `localdev.signature.provider-not-trusted`, because the provider label is not part of the signature input.
   See [Signature input](docs/articles/upgrade-500-to-600.md#signature-input).
+* `InMemoryCapabilityGrantUseStore` no longer permits replay of expired grants when a validator's `AllowedClockSkew`
+  exceeds the store's `EvictionGracePeriod`. Previously the store evicted a grant's use record while the grant still
+  validated within the skew, so the next use started a fresh count. A grant past the retention horizon, measured from
+  the latest observed use time, is now refused with `capability.use-retention-elapsed`
+  (new `CapabilityGrantUseResult.RetentionElapsed`). `EvictionGracePeriod` rejects negative values.
+* Added issuer-scoped `StopGrant(issuer, grantId)` and `CancelGrant(issuer, grantId)` to `InMemoryCapabilityGrantUseStore`.
+  Stop and cancel state was keyed by token ID alone while use counts were keyed by issuer and token ID, so stopping one
+  issuer's grant stopped every issuer's grant sharing the identifier. The identifier-only overloads keep that
+  all-issuer behavior and now document it.
+  See [In-memory capability grant use store](docs/articles/upgrade-500-to-600.md#in-memory-capability-grant-use-store).
 
 ## [5.2.0] - 2026-09-14
 

@@ -32,9 +32,11 @@ For production persistence, use a host-owned durable storage strategy such as `A
 
 ## In-memory capability grant use semantics
 
-`InMemoryCapabilityGrantUseStore` implements `ICapabilityGrantUseStore` for tests, samples, and local validation. It is keyed by the stable capability grant token ID, consumes one use when accepted, honors `maxUseCount`, and returns `capability.use-limit-exceeded` when the local in-process count reaches that limit.
+`InMemoryCapabilityGrantUseStore` implements `ICapabilityGrantUseStore` for tests, samples, and local validation. It is keyed by issuer and capability grant token ID, consumes one use when accepted, honors `maxUseCount`, and returns `capability.use-limit-exceeded` when the local in-process count reaches that limit.
 
-The store is thread-safe inside one process, and exposes local-validation helpers to mark grants as stopped or cancelled. It does not persist across process restarts, coordinate multiple replicas, provide distributed locks, or guarantee production replay protection.
+Use records are evicted once a grant has been expired for longer than `EvictionGracePeriod` (default five minutes), measured from the latest observed use time. A grant past that retention horizon is refused with `capability.use-retention-elapsed` rather than given a fresh count. Set `EvictionGracePeriod` to at least the largest `AllowedClockSkew` used with the store; otherwise expired grants still inside the skew are denied.
+
+The store is thread-safe inside one process, and exposes local-validation helpers to mark grants as stopped or cancelled, either for one issuer (`StopGrant(issuer, grantId)`, `CancelGrant(issuer, grantId)`) or for every issuer using an identifier (`StopGrant(grantId)`, `CancelGrant(grantId)`). It does not persist across process restarts, coordinate multiple replicas, provide distributed locks, or guarantee production replay protection.
 
 ## In-memory outbox concurrency semantics
 
