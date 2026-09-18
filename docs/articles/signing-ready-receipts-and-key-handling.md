@@ -104,7 +104,9 @@ Signing providers should:
 
 ## Verification strategy
 
-`IGovernanceSignatureVerificationService` verifies a `SignatureVerificationRequest` containing the expected signing hash and signing metadata.
+`IGovernanceSignatureVerificationService` verifies a `SignatureVerificationRequest` containing the expected signing hash, the signing metadata, and the exact `SignatureInput` bytes to verify. Providers sign and verify the signature input rather than the hash text; see [What the signature covers](cryptographic-security-posture.md#what-the-signature-covers).
+
+Hosts that sign a signing-ready artifact outside `GovernanceArtifactSigner` must sign `GovernanceSignatureInput.CreateV1(canonicalHash, signingMetadata)` using the same `policy_version` and `policy_hash` values they record, so `GovernanceArtifactVerifier` can rebuild the same input.
 
 Core does not require a particular signing algorithm such as RSA, ECDSA, HMAC, EdDSA, or a provider-specific managed key operation.
 

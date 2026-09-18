@@ -60,7 +60,8 @@ A host-owned concrete signing client should:
 
 A concrete verifier should:
 
-- verify a supplied signing hash against provider-neutral signing metadata;
+- verify `SignatureVerificationRequest.SignatureInput` against provider-neutral signing metadata, not the signing hash text;
+- reject a `Provider` label it does not own, because the provider label is not part of the signature input;
 - use key ID and key version whenever available;
 - distinguish invalid signatures, hash mismatches, missing signatures, unknown key versions, unsupported algorithms, provider unavailability, and revoked or disabled keys where the provider can detect them;
 - avoid silently treating unverifiable records as trusted.

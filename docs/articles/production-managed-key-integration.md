@@ -80,7 +80,9 @@ The consuming host provides:
 
 ## Minimal host-owned adapter shape
 
-A production host implements `IManagedKeySigningClient` around its selected provider. The client signs the precomputed AsiBackbone signing hash and returns provider-neutral metadata. It must not return private key material, tokens, secrets, or raw credential material.
+A production host implements `IManagedKeySigningClient` around its selected provider. The client signs `ManagedKeySignRequest.SignatureInput` and returns provider-neutral metadata. It must not return private key material, tokens, secrets, or raw credential material.
+
+Since 6.0 the signature input is the version 1 canonical JSON document described in [What the signature covers](cryptographic-security-posture.md#what-the-signature-covers), not the hash text. Pass the bytes as the message to a message-signing API, or hash them with the key's digest algorithm before calling a digest-signing API. A client that still signs `SigningHash` produces signatures that fail verification. The host's `IGovernanceSignatureVerificationService` must likewise verify `SignatureVerificationRequest.SignatureInput`, resolve its verification key from the recorded key ID and key version, and reject provider labels it does not own.
 
 ```csharp
 services.AddSingleton<IManagedKeySigningClient, HostOwnedManagedKeySigningClient>();

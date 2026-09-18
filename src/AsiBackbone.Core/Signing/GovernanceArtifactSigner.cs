@@ -277,7 +277,10 @@ public static class GovernanceArtifactSigner
             purpose: canonicalHash.ArtifactType,
             keyId: keyId,
             keyVersion: keyVersion,
-            metadata: signingReadyMetadata.Metadata);
+            metadata: signingReadyMetadata.Metadata)
+        {
+            SignatureInput = GovernanceSignatureInput.CreateV1(canonicalHash, signingReadyMetadata.Metadata)
+        };
     }
 
     private static SignedGovernanceArtifact<TArtifact> CreateUnsigned<TArtifact>(
@@ -319,8 +322,9 @@ public static class GovernanceArtifactSigner
         cancellationToken.ThrowIfCancellationRequested();
 
         CanonicalPayloadHash hash = CanonicalPayloadHasher.ComputeHash(payload, hashAlgorithm);
+        SigningRequest signingRequest = CreateSigningRequest(hash, keyId, keyVersion, metadata);
         SigningResult signingResult = await signingService
-            .SignAsync(CreateSigningRequest(hash, keyId, keyVersion, metadata), cancellationToken)
+            .SignAsync(signingRequest, cancellationToken)
             .ConfigureAwait(false);
 
         // A provider returning a failure or no-signature result previously produced an artifact with IsSigned false and
@@ -333,6 +337,50 @@ public static class GovernanceArtifactSigner
                 artifact,
                 payload,
                 hash,
-                signingResult.Metadata);
+                BindSignedPolicyContext(signingResult.Metadata, signingRequest.Metadata));
+    }
+
+    /// <summary>
+    /// Restores the signing policy context that was bound into the signature input.
+    /// </summary>
+    /// <remarks>
+    /// The version 1 signature input binds the policy version and policy hash the signer was asked to sign. A provider that
+    /// dropped, altered, or added either key in its returned metadata would otherwise produce an artifact whose recorded
+    /// policy context no longer rebuilds the signed input: it would fail verification, or carry a label that differs from
+    /// what was signed.
+    /// </remarks>
+    private static SigningMetadata BindSignedPolicyContext(
+        SigningMetadata providerMetadata,
+        IReadOnlyDictionary<string, string> requestMetadata)
+    {
+        Dictionary<string, string> metadata = new(providerMetadata.Metadata, StringComparer.Ordinal);
+        CopyBoundValue(requestMetadata, metadata, GovernanceSignatureInput.PolicyVersionMetadataKey);
+        CopyBoundValue(requestMetadata, metadata, GovernanceSignatureInput.PolicyHashMetadataKey);
+
+        return SigningMetadata.Create(
+            signingHash: providerMetadata.SigningHash,
+            hashAlgorithm: providerMetadata.HashAlgorithm,
+            signature: providerMetadata.Signature,
+            signatureAlgorithm: providerMetadata.SignatureAlgorithm,
+            keyId: providerMetadata.KeyId,
+            keyVersion: providerMetadata.KeyVersion,
+            provider: providerMetadata.Provider,
+            signedUtc: providerMetadata.SignedUtc,
+            metadata: metadata);
+    }
+
+    private static void CopyBoundValue(
+        IReadOnlyDictionary<string, string> source,
+        Dictionary<string, string> target,
+        string key)
+    {
+        if (source.TryGetValue(key, out string? value))
+        {
+            target[key] = value;
+        }
+        else
+        {
+            _ = target.Remove(key);
+        }
     }
 }

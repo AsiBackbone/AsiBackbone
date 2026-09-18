@@ -85,6 +85,41 @@ public sealed class VerificationPolicyContext
     public bool HasMetadata => Metadata.Count > 0;
 
     /// <summary>
+    /// Gets a value indicating whether verification may fall back to the pre-6.0 hash-only signature input.
+    /// </summary>
+    /// <remarks>
+    /// Defaults to <see langword="false" />. When enabled, an artifact whose version 1 verification fails as an invalid
+    /// signature is verified again against <see cref="GovernanceSignatureInput.CreateLegacy" />. A legacy signature
+    /// authenticates the canonical payload hash only, so it cannot satisfy <see cref="ExpectedPolicyVersion" /> or
+    /// <see cref="ExpectedPolicyHash" />; such pins deny with <c>signature.policy-context-not-authenticated</c>.
+    /// </remarks>
+    public bool AllowLegacySignatureInput { get; private init; }
+
+    /// <summary>
+    /// Creates a copy of this context that accepts artifacts signed with the pre-6.0 hash-only signature input.
+    /// </summary>
+    /// <remarks>
+    /// Use this only for reviewing or migrating artifacts signed before 6.0. Signing metadata labels on such artifacts,
+    /// including the policy version and policy hash, are not covered by the signature.
+    /// </remarks>
+    /// <returns>A context identical to this one with <see cref="AllowLegacySignatureInput" /> set.</returns>
+    public VerificationPolicyContext WithLegacySignatureInputAllowed()
+    {
+        return new VerificationPolicyContext(
+            Purpose,
+            ExpectedKeyId,
+            ExpectedKeyVersion,
+            ExpectedPolicyVersion,
+            ExpectedPolicyHash,
+            RequiredProvider,
+            RequiredHashAlgorithm,
+            Metadata)
+        {
+            AllowLegacySignatureInput = true
+        };
+    }
+
+    /// <summary>
     /// Creates a provider-neutral verification policy context.
     /// </summary>
     public static VerificationPolicyContext Create(

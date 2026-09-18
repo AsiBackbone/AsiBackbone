@@ -72,8 +72,9 @@ public sealed class LocalDevelopmentSigningService : IGovernanceSigningService, 
             {
                 ThrowIfDisposed();
 
-                byte[] data = SigningEncoding.GetBytes(request.SigningHash);
-                byte[] signature = rsa.SignData(data, HashAlgorithmName.SHA256, RSASignaturePadding.Pss);
+                // Sign the exact input Core supplied. For requests built by GovernanceArtifactSigner this is the version 1
+                // input that binds the signing policy context; for requests built without one it is the hash text.
+                byte[] signature = rsa.SignData(request.SignatureInput.Span, HashAlgorithmName.SHA256, RSASignaturePadding.Pss);
 
                 Dictionary<string, string> metadata = CreateBaseMetadata(request);
                 metadata["signing_status"] = "signed";
@@ -151,6 +152,16 @@ public sealed class LocalDevelopmentSigningService : IGovernanceSigningService, 
                 "The signature key reference does not match the configured local-development provider."));
         }
 
+        // The provider label is not part of the signature input, so it is authenticated only by this verifier refusing a
+        // label it does not own. Accepting any label let an artifact signed here claim another provider's identity.
+        if (!string.Equals(metadata.Provider, NormalizeRequired(options.ProviderName, LocalDevelopmentSigningOptions.DefaultProviderName), StringComparison.Ordinal))
+        {
+            return ValueTask.FromResult(SignatureVerificationResult.Failed(
+                "localdev.signature.provider-not-trusted",
+                SignatureVerificationCategory.UntrustedSigningContext,
+                "The signing provider does not match the configured local-development provider."));
+        }
+
         try
         {
             lock (rsaSync)
@@ -158,8 +169,7 @@ public sealed class LocalDevelopmentSigningService : IGovernanceSigningService, 
                 ThrowIfDisposed();
 
                 byte[] signature = Convert.FromBase64String(metadata.Signature!);
-                byte[] data = SigningEncoding.GetBytes(request.SigningHash);
-                bool verified = rsa.VerifyData(data, signature, HashAlgorithmName.SHA256, RSASignaturePadding.Pss);
+                bool verified = rsa.VerifyData(request.SignatureInput.Span, signature, HashAlgorithmName.SHA256, RSASignaturePadding.Pss);
 
                 return ValueTask.FromResult(verified
                     ? SignatureVerificationResult.Verified()

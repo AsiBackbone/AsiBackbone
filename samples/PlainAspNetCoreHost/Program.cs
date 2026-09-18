@@ -119,16 +119,14 @@ app.MapGet("/sample/decision", async (
     var unsignedRecord = AuditLedgerRecord.FromResidue(receipt);
     CanonicalPayload canonicalPayload = CanonicalPayloadBuilder.ForAuditLedgerRecord(unsignedRecord);
     CanonicalPayloadHash canonicalHash = CanonicalPayloadHasher.ComputeHash(canonicalPayload);
-    var hashMetadata = canonicalHash.ToSigningMetadata();
+    // CreateSigningRequest supplies the version 1 signature input, which binds the canonical descriptors, hash, and any
+    // signing policy context. Verification rebuilds the same input from the recorded signing metadata.
     SigningResult signingResult = await signingService
         .SignAsync(
-            new SigningRequest(
-                canonicalHash.HashValue,
-                canonicalHash.HashAlgorithm,
-                purpose: CanonicalArtifactTypes.AuditLedgerRecord,
+            GovernanceArtifactSigner.CreateSigningRequest(
+                canonicalHash,
                 keyId: "sample-local-dev-key",
-                keyVersion: "dev",
-                metadata: hashMetadata.Metadata),
+                keyVersion: "dev"),
             cancellationToken)
         .ConfigureAwait(false);
     SignatureVerificationResult verificationResult = await verificationService
@@ -136,7 +134,10 @@ app.MapGet("/sample/decision", async (
             new SignatureVerificationRequest(
                 canonicalHash.HashValue,
                 signingResult.Metadata,
-                purpose: CanonicalArtifactTypes.AuditLedgerRecord),
+                purpose: CanonicalArtifactTypes.AuditLedgerRecord)
+            {
+                SignatureInput = GovernanceSignatureInput.CreateV1(canonicalHash, signingResult.Metadata.Metadata)
+            },
             cancellationToken)
         .ConfigureAwait(false);
 

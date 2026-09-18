@@ -28,6 +28,8 @@ The default managed-key signature descriptor is `RSASSA-PSS-SHA256-MANAGED-KEY`.
 
 ## Dependency injection
 
+The host-owned `IManagedKeySigningClient` must sign `ManagedKeySignRequest.SignatureInput`, not `SigningHash`. Since 6.0 the signature input binds the canonical descriptors, hash, and signing policy context; a client that signs the hash text produces signatures that fail verification. See [What the signature covers](https://asibackbone.github.io/AsiBackbone/articles/cryptographic-security-posture.html#what-the-signature-covers).
+
 The production-oriented registration fails closed by default. Signing failures throw unless the host explicitly opts into unsigned failure metadata.
 
 ```csharp
