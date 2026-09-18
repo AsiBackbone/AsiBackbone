@@ -62,6 +62,19 @@ public sealed class CapabilityGrantUseResult
     }
 
     /// <summary>
+    /// Creates a result indicating the store can no longer prove the grant is within its use limit, because the grant is
+    /// past the store's use-record retention horizon and its record may already have been evicted.
+    /// </summary>
+    /// <remarks>
+    /// The state is <see cref="GrantUseState.UseLimitExceeded" />, so validation denies. Accepting the use instead would
+    /// start a fresh count for a grant whose earlier uses the store has discarded, which is a replay.
+    /// </remarks>
+    public static CapabilityGrantUseResult RetentionElapsed(string? failureMessage = null)
+    {
+        return new CapabilityGrantUseResult(GrantUseState.UseLimitExceeded, 0, "capability.use-retention-elapsed", failureMessage);
+    }
+
+    /// <summary>
     /// Creates a result indicating the grant was administratively stopped.
     /// </summary>
     public static CapabilityGrantUseResult Stopped(string? failureMessage = null)

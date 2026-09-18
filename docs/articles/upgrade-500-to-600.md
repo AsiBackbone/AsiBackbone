@@ -96,6 +96,18 @@ Migration actions:
 
 A provider that ignores `SignatureInput` and keeps signing or verifying the hash text fails closed against artifacts produced by the other side of the change, rather than silently accepting unauthenticated labels, as long as signer and verifier are not both left on the hash text. Update both together.
 
+## In-memory capability grant use store
+
+`InMemoryCapabilityGrantUseStore` evicted use records once a grant had been expired for longer than `EvictionGracePeriod`, while `CapabilityGrantValidator` still accepts an expired grant within `AllowedClockSkew`. With a skew above the grace period, a grant's record was evicted while the grant still validated, and the next use was accepted as a first use: a replay.
+
+6.0 changes the store as follows:
+
+- A grant expired for longer than `EvictionGracePeriod`, measured from the latest use time the store has observed, is refused with `ReuseLimitExceeded` and `capability.use-retention-elapsed` (new `CapabilityGrantUseResult.RetentionElapsed`). Measuring from the latest observed time prevents a caller-supplied earlier time from resurrecting an evicted grant.
+- `EvictionGracePeriod` rejects negative values.
+- New `StopGrant(issuer, grantId)` and `CancelGrant(issuer, grantId)` overloads affect one issuer's grant. The identifier-only overloads still affect every issuer's grant using the identifier, now documented as such.
+
+Migration action: set `EvictionGracePeriod` to at least the largest `AllowedClockSkew` used with the store. With the defaults (zero skew, five-minute grace period) no change is needed.
+
 ## Public type renames
 
 See [6.0 public API naming convention](public-api-naming-600.md) for the complete inventory, qualifier decisions, namespace review, terminology coordination with #781, and retained names. No compatibility aliases are carried forward. Namespace and generic arity stay the same.
