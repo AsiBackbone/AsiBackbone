@@ -126,6 +126,7 @@ FIELD | AsiBackbone.Core.Signing.SignatureVerificationCategory | UnknownKeyVersi
 FIELD | AsiBackbone.Core.Signing.SignatureVerificationCategory | Unspecified = 0
 FIELD | AsiBackbone.Core.Signing.SignatureVerificationCategory | UnsupportedAlgorithm = 8
 FIELD | AsiBackbone.Core.Signing.SignatureVerificationCategory | UntrustedKey = 10
+FIELD | AsiBackbone.Core.Signing.SignatureVerificationCategory | UntrustedSigningContext = 12
 FIELD | AsiBackbone.Core.Signing.SignatureVerificationCategory | Valid = 11
 FIELD | AsiBackbone.Core.Signing.VerificationPolicyAction | Allow = 7
 FIELD | AsiBackbone.Core.Signing.VerificationPolicyAction | DeadLetter = 6

@@ -58,9 +58,61 @@ public sealed class CapabilityGrantProofTrustPinTests
         Assert.False(verifier.WasCalled);
         AssertFailure(
             result,
-            CapabilityTokenValidationCategory.Failed,
-            VerificationPolicyAction.Defer,
-            "signature.provider-unavailable");
+            CapabilityTokenValidationCategory.InvalidProof,
+            VerificationPolicyAction.Deny,
+            "signature.provider-not-trusted");
+    }
+
+    /// <summary>
+    /// Verifies that a cryptographically valid grant is denied before provider verification when its proof policy version does not match the configured trust pin.
+    /// </summary>
+    [Fact]
+    public async Task ValidateAsyncDeniesCryptographicallyValidGrantWithUnexpectedProofPolicyVersion()
+    {
+        SignedGovernanceArtifact<CapabilityTokenGrant> signedGrant = CreateSignedGrant(
+            keyId: "key-1",
+            keyVersion: "v1",
+            provider: "fake-provider");
+        var verifier = new StubVerificationService(SignatureVerificationResult.Verified());
+
+        CapabilityGrantValidationResult result = await CapabilityGrantValidator.ValidateAsync(
+            signedGrant,
+            CreateOptions(expectedProofPolicyVersion: "policy-v2"),
+            verifier,
+            cancellationToken: TestContext.Current.CancellationToken);
+
+        Assert.False(verifier.WasCalled);
+        AssertFailure(
+            result,
+            CapabilityTokenValidationCategory.InvalidProof,
+            VerificationPolicyAction.Deny,
+            "signature.policy-context-not-trusted");
+    }
+
+    /// <summary>
+    /// Verifies that a cryptographically valid grant is denied before provider verification when its proof policy hash does not match the configured trust pin.
+    /// </summary>
+    [Fact]
+    public async Task ValidateAsyncDeniesCryptographicallyValidGrantWithUnexpectedProofPolicyHash()
+    {
+        SignedGovernanceArtifact<CapabilityTokenGrant> signedGrant = CreateSignedGrant(
+            keyId: "key-1",
+            keyVersion: "v1",
+            provider: "fake-provider");
+        var verifier = new StubVerificationService(SignatureVerificationResult.Verified());
+
+        CapabilityGrantValidationResult result = await CapabilityGrantValidator.ValidateAsync(
+            signedGrant,
+            CreateOptions(expectedProofPolicyHash: "policy-hash-v2"),
+            verifier,
+            cancellationToken: TestContext.Current.CancellationToken);
+
+        Assert.False(verifier.WasCalled);
+        AssertFailure(
+            result,
+            CapabilityTokenValidationCategory.InvalidProof,
+            VerificationPolicyAction.Deny,
+            "signature.policy-context-not-trusted");
     }
 
     /// <summary>
@@ -94,7 +146,9 @@ public sealed class CapabilityGrantProofTrustPinTests
         string? expectedProofKeyId = null,
         string? expectedProofKeyVersion = null,
         string? requiredProofProvider = null,
-        string? requiredProofHashAlgorithm = null)
+        string? requiredProofHashAlgorithm = null,
+        string? expectedProofPolicyVersion = null,
+        string? expectedProofPolicyHash = null)
     {
         return CapabilityGrantValidationOptions.Create(
             issuer: "issuer-1",
@@ -106,6 +160,8 @@ public sealed class CapabilityGrantProofTrustPinTests
             requireProof: true,
             expectedProofKeyId: expectedProofKeyId,
             expectedProofKeyVersion: expectedProofKeyVersion,
+            expectedProofPolicyVersion: expectedProofPolicyVersion,
+            expectedProofPolicyHash: expectedProofPolicyHash,
             requiredProofProvider: requiredProofProvider,
             requiredProofHashAlgorithm: requiredProofHashAlgorithm);
     }

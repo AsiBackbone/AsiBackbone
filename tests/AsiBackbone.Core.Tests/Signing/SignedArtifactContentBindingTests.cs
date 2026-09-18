@@ -90,6 +90,7 @@ public sealed class SignedArtifactContentBindingTests
         VerificationPolicyOutcome outcome = await GovernanceArtifactVerifier.VerifyAsync(artifact, verifier, cancellationToken: TestContext.Current.CancellationToken);
 
         Assert.False(outcome.ShouldAllow);
+        Assert.Equal(VerificationPolicyAction.Deny, outcome.Action);
         Assert.Equal(SignatureVerificationCategory.CanonicalizationMismatch, outcome.Category);
         Assert.Equal("signature.canonicalization-mismatch", outcome.FailureCode);
         Assert.False(verifier.WasCalled);

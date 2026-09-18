@@ -208,11 +208,12 @@ Retention and legal-hold requirements are jurisdictional and organizational matt
 | --- | --- | --- |
 | Signature and policy context verify | `Valid` | Mark verified for the specific review context; continue only if all non-signature policy checks also pass. |
 | Canonical or signing hash mismatch | `HashMismatch` | Deny trust, quarantine the artifact, preserve original bytes and metadata, alert, and investigate serialization drift or modification. |
-| Required signature is missing | `MissingSignature` | Fail closed, dead-letter, or require governed acknowledgment according to the documented assurance tier. Never relabel the artifact as verified. |
+| Required signature is missing | `MissingSignature` | Fail closed (the default), dead-letter, or, only on a documented lower-assurance tier, require governed acknowledgment. Never relabel the artifact as verified. |
 | Key ID or version cannot be resolved | `UnknownKeyVersion` | Escalate or retry key resolution; preserve the artifact and do not treat it as verified. |
 | Key version is revoked or compromised | `RevokedKey` | Deny or dead-letter new trust decisions, identify affected records, preserve forensic context, and execute compromised-key response. |
 | Verification provider is unavailable | `ProviderUnavailable` | Defer or retry lower-risk review; fail closed for high-risk execution according to host policy. |
-| Canonicalization or policy descriptors do not match | `CanonicalizationMismatch` | Escalate as schema, policy, or serialization drift before relying on the record. |
+| Canonical artifact descriptors do not match | `CanonicalizationMismatch` | Deny trust (the default), preserve the artifact, and investigate schema or serialization drift before relying on the record. |
+| Signing key, provider, policy version, or policy hash does not match the configured pin | `UntrustedKey` or `UntrustedSigningContext` | Deny trust (the default), alert, and investigate key, provider, or policy misrouting. Do not retry or approve past a pin mismatch. |
 | Signature algorithm is unsupported | `UnsupportedAlgorithm` | Deny new trust decisions and route historical review through the approved exception process. |
 
 ## Incident response checklist

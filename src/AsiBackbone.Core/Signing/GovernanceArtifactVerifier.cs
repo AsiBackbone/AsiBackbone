@@ -160,17 +160,20 @@ public static class GovernanceArtifactVerifier
                 "signature.key-not-trusted",
                 SignatureVerificationCategory.UntrustedKey,
                 "The signing key version does not match the verification policy expectation.")
+            // A provider or policy-context pin mismatch is a trust decision, not an outage. Reporting it as
+            // ProviderUnavailable (Defer) or CanonicalizationMismatch (formerly Escalate) gave an artifact signed under the
+            // wrong provider or policy a softer outcome than a bad signature, the same defect 5.0 corrected for key pins.
             : context.RequiredProvider is not null
             && !string.Equals(context.RequiredProvider, metadata.Provider, StringComparison.Ordinal)
             ? SignatureVerificationResult.Failed(
-                "signature.provider-unavailable",
-                SignatureVerificationCategory.ProviderUnavailable,
+                "signature.provider-not-trusted",
+                SignatureVerificationCategory.UntrustedSigningContext,
                 "The signing provider does not match the required verification policy provider.")
             : !MatchesOptionalPolicyMetadata(metadata, "policy_version", context.ExpectedPolicyVersion)
             || !MatchesOptionalPolicyMetadata(metadata, "policy_hash", context.ExpectedPolicyHash)
             ? SignatureVerificationResult.Failed(
-                "signature.canonicalization-mismatch",
-                SignatureVerificationCategory.CanonicalizationMismatch,
+                "signature.policy-context-not-trusted",
+                SignatureVerificationCategory.UntrustedSigningContext,
                 "The signing metadata policy context does not match the verification policy expectation.")
             : null;
     }

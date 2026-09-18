@@ -14,13 +14,14 @@ public sealed class VerificationPolicyOptions
                 [SignatureVerificationCategory.Valid] = VerificationPolicyAction.Allow,
                 [SignatureVerificationCategory.InvalidSignature] = VerificationPolicyAction.Deny,
                 [SignatureVerificationCategory.HashMismatch] = VerificationPolicyAction.Deny,
-                [SignatureVerificationCategory.MissingSignature] = VerificationPolicyAction.RequireAcknowledgment,
+                [SignatureVerificationCategory.MissingSignature] = VerificationPolicyAction.Deny,
                 [SignatureVerificationCategory.UnknownKeyVersion] = VerificationPolicyAction.Escalate,
                 [SignatureVerificationCategory.RevokedKey] = VerificationPolicyAction.Deny,
                 [SignatureVerificationCategory.ProviderUnavailable] = VerificationPolicyAction.Defer,
-                [SignatureVerificationCategory.CanonicalizationMismatch] = VerificationPolicyAction.Escalate,
+                [SignatureVerificationCategory.CanonicalizationMismatch] = VerificationPolicyAction.Deny,
                 [SignatureVerificationCategory.UnsupportedAlgorithm] = VerificationPolicyAction.Deny,
                 [SignatureVerificationCategory.UntrustedKey] = VerificationPolicyAction.Deny,
+                [SignatureVerificationCategory.UntrustedSigningContext] = VerificationPolicyAction.Deny,
                 [SignatureVerificationCategory.Failed] = VerificationPolicyAction.Escalate
             });
 
@@ -32,6 +33,14 @@ public sealed class VerificationPolicyOptions
     /// <summary>
     /// Gets the default verification policy action map.
     /// </summary>
+    /// <remarks>
+    /// Only <see cref="SignatureVerificationCategory.Valid" /> allows. Every category that reports an integrity or trust
+    /// failure denies: an invalid or missing signature, a hash, canonicalization, or algorithm mismatch, a revoked or
+    /// untrusted key, and an untrusted signing context. Only conditions that a retry or an operator could legitimately
+    /// resolve use softer actions: <see cref="SignatureVerificationCategory.ProviderUnavailable" /> defers, and
+    /// <see cref="SignatureVerificationCategory.UnknownKeyVersion" /> and <see cref="SignatureVerificationCategory.Failed" />
+    /// escalate.
+    /// </remarks>
     public static VerificationPolicyOptions Default { get; } = new(DefaultActionMap);
 
     /// <summary>
