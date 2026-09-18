@@ -6,6 +6,24 @@ This project follows the spirit of [Keep a Changelog](https://keepachangelog.com
 
 ## [Unreleased]
 
+### Security
+
+* **Breaking (behavior):** Signature-verification pin mismatches now deny by default instead of deferring or
+  escalating, extending the 5.0 key-pin correction to the remaining pins. A `RequiredProvider` mismatch previously
+  reported `ProviderUnavailable` (`signature.provider-unavailable`, default `Defer`), so an artifact signed by the wrong
+  provider was treated as a transient outage. An `ExpectedPolicyVersion` or `ExpectedPolicyHash` mismatch previously
+  reported `CanonicalizationMismatch` (default `Escalate`). Both now report the new
+  `SignatureVerificationCategory.UntrustedSigningContext` with `signature.provider-not-trusted` or
+  `signature.policy-context-not-trusted`, defaulting to `Deny`.
+* **Breaking (behavior):** `CanonicalizationMismatch` and `MissingSignature` now default to `Deny`. Signing metadata
+  describing a different artifact, or an artifact carrying no signature, is not evidence for the artifact presented.
+  Hosts can opt a lower-assurance path back into `RequireAcknowledgment` for `MissingSignature` through
+  `VerificationPolicyOptions.Create`.
+* Capability-grant proof validation reports provider and policy-context pin mismatches, and provider-reported
+  canonicalization mismatches, as `InvalidProof` with `Deny`.
+* Added a test that pins the complete default verification action map, so a future category cannot silently inherit a
+  soft default. See [Verification policy defaults](docs/articles/upgrade-500-to-600.md#verification-policy-defaults).
+
 ## [5.2.0] - 2026-09-14
 
 ### Release summary

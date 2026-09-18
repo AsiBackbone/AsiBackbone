@@ -118,7 +118,8 @@ public static class CapabilityGrantValidator
 
         // A grant whose signature was stripped is not a grant awaiting acknowledgment. Where proof is required, absent
         // proof denies, rather than inviting a host that treats RequireAcknowledgment as "proceed after a click" to
-        // continue on a grant carrying no proof at all.
+        // continue on a grant carrying no proof at all. The default verification policy now also denies a missing
+        // signature; this override is retained so grant validation cannot be weakened by a future default change.
         VerificationPolicyAction action = verificationOutcome.Category is SignatureVerificationCategory.MissingSignature
             ? VerificationPolicyAction.Deny
             : verificationOutcome.Action;
@@ -297,9 +298,10 @@ public static class CapabilityGrantValidator
             SignatureVerificationCategory.HashMismatch => CapabilityTokenValidationCategory.InvalidProof,
             SignatureVerificationCategory.RevokedKey => CapabilityTokenValidationCategory.Revoked,
             SignatureVerificationCategory.UntrustedKey => CapabilityTokenValidationCategory.InvalidProof,
+            SignatureVerificationCategory.UntrustedSigningContext => CapabilityTokenValidationCategory.InvalidProof,
             SignatureVerificationCategory.ProviderUnavailable => CapabilityTokenValidationCategory.Failed,
             SignatureVerificationCategory.UnknownKeyVersion => CapabilityTokenValidationCategory.Failed,
-            SignatureVerificationCategory.CanonicalizationMismatch => CapabilityTokenValidationCategory.Failed,
+            SignatureVerificationCategory.CanonicalizationMismatch => CapabilityTokenValidationCategory.InvalidProof,
             SignatureVerificationCategory.UnsupportedAlgorithm => CapabilityTokenValidationCategory.InvalidProof,
             SignatureVerificationCategory.Failed => CapabilityTokenValidationCategory.Failed,
             _ => CapabilityTokenValidationCategory.Failed

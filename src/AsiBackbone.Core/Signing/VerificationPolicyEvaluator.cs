@@ -13,6 +13,7 @@ public static class VerificationPolicyEvaluator
         new(SignatureVerificationCategory.UnsupportedAlgorithm, ["unsupported", "algorithm"]),
         new(SignatureVerificationCategory.RevokedKey, ["revoked", "disabled"]),
         new(SignatureVerificationCategory.UntrustedKey, ["key-not-trusted", "key.mismatch", "key-mismatch"]),
+        new(SignatureVerificationCategory.UntrustedSigningContext, ["provider-not-trusted", "policy-context-not-trusted", "signing-context-not-trusted"]),
         new(
             SignatureVerificationCategory.UnknownKeyVersion,
             ["key-version"],

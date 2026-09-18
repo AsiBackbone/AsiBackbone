@@ -1,6 +1,6 @@
 # Upgrade from 5.x to 6.0
 
-Version 6.0 renames public types and removes seven public members whose obsolete compatibility windows have completed. These are intentional major-version API breaks. Rebuild consumers against the 6.0 packages after migrating.
+Version 6.0 renames public types and removes seven public members whose obsolete compatibility windows have completed. It also makes signature-verification pin mismatches and missing signatures deny by default; see [Verification policy defaults](#verification-policy-defaults). These are intentional major-version breaks. Rebuild consumers against the 6.0 packages after migrating.
 
 ## Complete obsolete-member inventory
 
@@ -38,6 +38,37 @@ Type-based dependency injection registration now has only the full constructor t
 The internal `AsiBackboneObsoletions` helper and its ASIB900 message, ID, and URL constants existed solely for the removed constructors and were deleted. ASIB900 came from the compiler's obsolete attribute support, not a dedicated Roslyn analyzer; no analyzer diagnostic needed removal. Obsolete-only forwarding and attribute tests and ASIB900 project suppressions were removed. Behavioral evaluator tests now use the full constructor; builder and marker replacement tests remain.
 
 The managed API baselines intentionally remove the seven inventoried members and apply the public type renames below. Package compatibility validation retains its previous-release comparison, with exact exceptions for the intentional type, signature, interface, and generic-constraint changes; other compatibility failures still fail packing. Historical 4.x/5.x release notes and migration guidance remain available.
+
+## Verification policy defaults
+
+5.0 moved a signing-key pin mismatch from `Escalate` to `Deny`, because an artifact signed under the wrong key should not receive a softer outcome than one with a bad signature. 6.0 applies the same rule to the remaining pins and to missing signatures. These are runtime behavior changes with no public signature change, so they take the major-version boundary.
+
+| Condition | 5.x category / code / default action | 6.0 category / code / default action |
+| --- | --- | --- |
+| `VerificationPolicyContext.RequiredProvider` does not match the signing provider | `ProviderUnavailable` / `signature.provider-unavailable` / `Defer` | `UntrustedSigningContext` / `signature.provider-not-trusted` / `Deny` |
+| `ExpectedPolicyVersion` or `ExpectedPolicyHash` does not match signing metadata | `CanonicalizationMismatch` / `signature.canonicalization-mismatch` / `Escalate` | `UntrustedSigningContext` / `signature.policy-context-not-trusted` / `Deny` |
+| Canonical artifact descriptors in signing metadata do not match the artifact | `CanonicalizationMismatch` / `signature.canonicalization-mismatch` / `Escalate` | Unchanged category and code / `Deny` |
+| Signature metadata is missing | `MissingSignature` / `signature.missing` / `RequireAcknowledgment` | Unchanged category and code / `Deny` |
+
+`ProviderUnavailable` now describes only an operational failure, such as a provider exception or timeout, and still defaults to `Defer`. `UnknownKeyVersion` and `Failed` still default to `Escalate`. Only `Valid` allows.
+
+Capability-grant proof validation follows the same defaults. A provider or policy-context pin mismatch now reports `CapabilityTokenValidationCategory.InvalidProof` with `Deny` instead of `Failed` with `Defer` or `Escalate`, and a provider-reported `CanonicalizationMismatch` now reports `InvalidProof` with `Deny`. Grant validation already denied a missing signature.
+
+Migration actions:
+
+- Update alerting, dashboards, and log queries that match `signature.provider-unavailable` or `signature.canonicalization-mismatch` to also match `signature.provider-not-trusted` and `signature.policy-context-not-trusted`.
+- Hosts that persist `SignatureVerificationCategory` as an integer must accept the new value `UntrustedSigningContext = 12`. Existing numeric values are unchanged.
+- Hosts that deliberately accept unsigned artifacts on a lower-assurance path can restore the previous behavior for that path only:
+
+```csharp
+VerificationPolicyOptions lowerAssurance = VerificationPolicyOptions.Create(
+    new Dictionary<SignatureVerificationCategory, VerificationPolicyAction>
+    {
+        [SignatureVerificationCategory.MissingSignature] = VerificationPolicyAction.RequireAcknowledgment
+    });
+```
+
+Restoring `Defer` or `Escalate` for `UntrustedSigningContext` is possible through the same override but is not recommended: a retry or an approval cannot make an artifact signed under the wrong provider or policy context trustworthy.
 
 ## Public type renames
 
