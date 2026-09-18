@@ -44,7 +44,8 @@ Users should not expect:
 
 | Version line | Support expectation |
 |:---|:---|
-| `5.x` | Current stable line. Supported for reproducible defects, security fixes, compatible package corrections, and documentation fixes. Consumers should use the latest available `5.x` patch. |
+| `6.x` | Current stable line. Supported for reproducible defects, security fixes, compatible package corrections, and documentation fixes. Consumers should use the latest available `6.x` patch. |
+| `5.x` | Previous stable line. Best effort for migration-sensitive reports that also affect or inform the current stable line. |
 | Earlier stable lines | Best effort for migration-sensitive reports that also affect or inform the current stable line. Historical releases do not receive routine backports. |
 | Alpha, beta, preview, and other prerelease builds | Evaluation only unless a maintainer explicitly requests testing or reproduction details. |
 | Unreleased `main` branch | Development line only. Behavior may change before release. |
