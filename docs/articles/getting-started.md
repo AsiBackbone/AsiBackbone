@@ -2,7 +2,7 @@
 
 This guide explains the current direction of the AsiBackbone repository and how to begin working with the project.
 
-AsiBackbone is a stable `5.x` .NET package family for governance-oriented decision flow. The foundation package is `AsiBackbone.Core`, with optional integration packages for in-memory validation, EF Core host-owned persistence, ASP.NET Core host integration, analyzer guidance, OpenTelemetry projection, and signing-provider boundaries.
+AsiBackbone is a stable `6.x` .NET package family for governance-oriented decision flow. The foundation package is `AsiBackbone.Core`, with optional integration packages for in-memory validation, EF Core host-owned persistence, ASP.NET Core host integration, analyzer guidance, OpenTelemetry projection, and signing-provider boundaries.
 
 > [!IMPORTANT]
 > This project does not implement artificial superintelligence. It provides governance infrastructure: governance-oriented software building blocks inspired by broader Backbone framework concepts.

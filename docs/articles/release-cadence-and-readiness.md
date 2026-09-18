@@ -24,13 +24,13 @@ Minor releases should be paced enough to let additive surfaces be reviewed, docu
 
 Major releases should be rare. They should be reserved for identity, namespace, public API, durable artifact, binary identity, or package-boundary breaks that are strongly justified and documented in advance.
 
-## Current `5.x` stabilization posture
+## Current `6.x` stabilization posture
 
-`5.x` is the current stable package line, and `5.2.0` is the current release.
+`6.x` is the current stable package line, and `6.0.0` is the current release.
 
-The `5.2.0` release preserves the package IDs, namespaces, `net10.0` target, and `5.0.0.0` binary identity while adding a compatible evaluator builder, the `ASIB900` deprecation path, and stronger package-compatibility, release-evidence, quality, and stewardship controls.
+The `6.0.0` release preserves the package IDs, namespaces, and `net10.0` target while advancing the binary identity to `6.0.0.0`. It completes the `5.x` deprecation windows, renames the public API to plain-language semantic names, and ships verification, signature-input, and use-store corrections that could only change at a major boundary.
 
-Future `5.x` releases should prioritize compatibility, documentation clarity, patch-level release correction, and carefully scoped additive improvements. Additional breaking changes should be avoided unless strongly justified by consumer safety, correctness, maintainability, or a documented architectural boundary that cannot be preserved compatibly.
+`6.0.0` is a young major line. Future `6.x` releases should prioritize compatibility, documentation clarity, patch-level release correction, and carefully scoped additive improvements. Additional breaking changes should be avoided unless strongly justified by consumer safety, correctness, maintainability, or a documented architectural boundary that cannot be preserved compatibly.
 
 For cautious consumers, a young major line should be interpreted as canonical but still settling. The project should let that line stabilize through release validation, documentation currency, package metadata correction, consumer smoke testing, and real issue triage before introducing another broad breaking change.
 
@@ -112,9 +112,10 @@ Avoid:
 
 - [Governance](https://github.com/AsiBackbone/AsiBackbone/blob/main/GOVERNANCE.md)
 - [Release Validation](release-validation.md)
+- [6.0.0 Release Readiness Record](release-readiness-600.md)
+- [6.0.0 Release Notes](release-notes-600.md)
+- [6.0.0 Consumer Verification Guide](consumer-verification-600.md)
 - [5.2.0 Release Readiness Record](release-readiness-520.md)
-- [5.2.0 Release Notes](release-notes-520.md)
-- [5.2.0 Consumer Verification Guide](consumer-verification-520.md)
 - [4.0.0 Release Readiness Record](release-readiness-400.md)
 - [4.0.0 Release Notes](release-notes-400.md)
 - [4.0.0 Migration Guide](upgrade-323-to-400.md)

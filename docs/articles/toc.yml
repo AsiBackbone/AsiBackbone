@@ -217,14 +217,12 @@
 
 - name: Releases & Compatibility
   items:
-    - name: 5.2.0 Release Notes
-      href: release-notes-520.md
-    - name: 5.2.0 Release Readiness Record
-      href: release-readiness-520.md
-    - name: 5.2.0 Consumer Verification Guide
-      href: consumer-verification-520.md
-    - name: 5.0.0 Migration Guide
-      href: upgrade-400-to-500.md
+    - name: 6.0.0 Release Notes
+      href: release-notes-600.md
+    - name: 6.0.0 Release Readiness Record
+      href: release-readiness-600.md
+    - name: 6.0.0 Consumer Verification Guide
+      href: consumer-verification-600.md
     - name: Upgrade from 5.x to 6.0
       href: upgrade-500-to-600.md
     - name: API Compatibility and SemVer
