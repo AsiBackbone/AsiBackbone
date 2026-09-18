@@ -468,7 +468,7 @@ public sealed class AsiBackboneContractFixtureDefensiveTests
             return sink!;
         }
 
-        protected override IDecisionReceipt CreateAuditResidue()
+        protected override IDecisionReceipt CreateDecisionReceipt()
         {
             return residue!;
         }

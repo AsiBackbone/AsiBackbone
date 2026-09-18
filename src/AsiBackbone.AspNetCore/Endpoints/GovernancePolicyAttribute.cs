@@ -13,12 +13,17 @@ namespace AsiBackbone.AspNetCore.Endpoints;
 /// endpoints with different policy types does not by itself make them evaluate differently.
 /// </para>
 /// <para>
-/// Initializes a new instance of the <see cref="RequireGovernancePolicyAttribute" /> class.
+/// Named <c>RequireGovernancePolicyAttribute</c> before 6.0. The route-builder extension of the same name became
+/// <c>MarkGovernancePolicy</c> because "Require" overstated what the marker does; the attribute is renamed for the same
+/// reason, so the attribute and route-builder paths use consistent vocabulary.
+/// </para>
+/// <para>
+/// Initializes a new instance of the <see cref="GovernancePolicyAttribute" /> class.
 /// </para>
 /// </remarks>
 /// <param name="policyType">The host-defined policy marker or decision policy type associated with the endpoint.</param>
 [AttributeUsage(AttributeTargets.Class | AttributeTargets.Method, AllowMultiple = true, Inherited = true)]
-public sealed class RequireGovernancePolicyAttribute(Type policyType) : Attribute, IEndpointGovernancePolicyMetadata
+public sealed class GovernancePolicyAttribute(Type policyType) : Attribute, IEndpointGovernancePolicyMetadata
 {
 
     /// <inheritdoc />

@@ -132,7 +132,7 @@ using AsiBackbone.Core.Audit;
 
 GovernanceHttpRequestCorrelation correlation = correlationResolver.ResolveRequestCorrelation();
 
-DecisionReceipt receipt = correlation.CreateAuditResidue(
+DecisionReceipt receipt = correlation.CreateDecisionReceipt(
     actor,
     "ApproveWidget",
     decision);

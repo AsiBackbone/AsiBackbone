@@ -31,7 +31,7 @@ The `asibackbone-webapi` template includes:
 - `UseAsiBackboneEndpointGovernance()` middleware;
 - a sample governance constraint and decision policy;
 - a Minimal API endpoint with fluent endpoint-governance metadata;
-- a controller action with `[RequireGovernancePolicy]`, `[RequireCapabilityGrant]`, and `[EmitGovernanceAudit]` attributes;
+- a controller action with `[GovernancePolicy]`, `[RequireCapabilityGrant]`, and `[EmitGovernanceAudit]` attributes;
 - non-durable in-memory audit storage for local development and test-friendly inspection;
 - the AsiBackbone analyzer package reference;
 - a generated README with boundaries and next steps.

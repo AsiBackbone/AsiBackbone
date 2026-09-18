@@ -38,7 +38,7 @@ public sealed class AsiBackboneTestHarnessTests
         var endpoint = new Endpoint(
             static _ => Task.CompletedTask,
             new EndpointMetadataCollection(
-                new RequireGovernancePolicyAttribute(typeof(SamplePolicy)),
+                new GovernancePolicyAttribute(typeof(SamplePolicy)),
                 new RequireCapabilityGrantAttribute("robotics.execute"),
                 new EmitGovernanceAuditAttribute()),
             "testing.protected");
@@ -83,7 +83,7 @@ public sealed class AsiBackboneTestHarnessTests
         DefaultHttpContext httpContext = CreateHttpContext(scope.ServiceProvider, "trace-denied");
         var endpoint = new Endpoint(
             static _ => Task.CompletedTask,
-            new EndpointMetadataCollection(new RequireGovernancePolicyAttribute(typeof(StrictPolicy))),
+            new EndpointMetadataCollection(new GovernancePolicyAttribute(typeof(StrictPolicy))),
             "testing.denied");
         var descriptor = EndpointGovernanceDescriptor.FromEndpoint(endpoint);
         IEndpointGovernanceService service = scope.ServiceProvider.GetRequiredService<IEndpointGovernanceService>();
@@ -182,7 +182,7 @@ public sealed class AsiBackboneTestHarnessTests
         var endpoint = new Endpoint(
             static _ => Task.CompletedTask,
             new EndpointMetadataCollection(
-                new RequireGovernancePolicyAttribute(typeof(SamplePolicy)),
+                new GovernancePolicyAttribute(typeof(SamplePolicy)),
                 new RequireCapabilityGrantAttribute("robotics.execute")),
             "testing.capability");
         var descriptor = EndpointGovernanceDescriptor.FromEndpoint(endpoint);

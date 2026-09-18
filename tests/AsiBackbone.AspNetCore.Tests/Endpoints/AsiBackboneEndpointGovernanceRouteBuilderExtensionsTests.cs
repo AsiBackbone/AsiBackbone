@@ -33,8 +33,8 @@ public sealed class AsiBackboneEndpointGovernanceRouteBuilderExtensionsTests
         Assert.Same(routeBuilder, returned);
 
         Endpoint endpoint = Assert.Single(((IEndpointRouteBuilder)app).DataSources.SelectMany(source => source.Endpoints));
-        RequireGovernancePolicyAttribute metadata =
-            Assert.Single(endpoint.Metadata.OfType<RequireGovernancePolicyAttribute>());
+        GovernancePolicyAttribute metadata =
+            Assert.Single(endpoint.Metadata.OfType<GovernancePolicyAttribute>());
         Assert.Equal(typeof(TestDecisionPolicy), metadata.PolicyType);
     }
 
@@ -55,8 +55,8 @@ public sealed class AsiBackboneEndpointGovernanceRouteBuilderExtensionsTests
         Action<EndpointBuilder> convention = Assert.Single(builder.Conventions);
         convention(endpointBuilder);
 
-        RequireGovernancePolicyAttribute metadata =
-            Assert.Single(endpointBuilder.Metadata.OfType<RequireGovernancePolicyAttribute>());
+        GovernancePolicyAttribute metadata =
+            Assert.Single(endpointBuilder.Metadata.OfType<GovernancePolicyAttribute>());
 
         Assert.Equal(typeof(TestPolicy), metadata.PolicyType);
     }

@@ -414,7 +414,7 @@ internal static class Program
 
             var endpoint = new Endpoint(
                 static _ => Task.CompletedTask,
-                new EndpointMetadataCollection(new RequireGovernancePolicyAttribute(typeof(BenchmarkEndpointPolicy))),
+                new EndpointMetadataCollection(new GovernancePolicyAttribute(typeof(BenchmarkEndpointPolicy))),
                 name);
 
             descriptor = EndpointGovernanceDescriptor.FromEndpoint(endpoint);

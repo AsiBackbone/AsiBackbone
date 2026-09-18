@@ -10,7 +10,7 @@ Selected host style: `__HOST_STYLE__`
 - `UseAsiBackboneEndpointGovernance()` middleware.
 - A sample host-owned constraint and decision policy.
 - A Minimal API endpoint with fluent endpoint-governance metadata.
-- A controller action with `[RequireGovernancePolicy]`, `[RequireCapabilityGrant]`, and `[EmitGovernanceAudit]`.
+- A controller action with `[GovernancePolicy]`, `[RequireCapabilityGrant]`, and `[EmitGovernanceAudit]`.
 - Non-durable in-memory audit storage for local development and test-friendly inspection.
 - The AsiBackbone analyzer package reference.
 

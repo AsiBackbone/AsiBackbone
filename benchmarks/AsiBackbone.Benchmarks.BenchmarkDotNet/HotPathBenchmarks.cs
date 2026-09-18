@@ -576,7 +576,7 @@ public class AsiBackboneHotPathBenchmarks
 
             var endpoint = new Endpoint(
                 static _ => Task.CompletedTask,
-                new EndpointMetadataCollection(new RequireGovernancePolicyAttribute(typeof(BdnBenchmarkEndpointPolicy))),
+                new EndpointMetadataCollection(new GovernancePolicyAttribute(typeof(BdnBenchmarkEndpointPolicy))),
                 name);
 
             descriptor = EndpointGovernanceDescriptor.FromEndpoint(endpoint);

@@ -17,10 +17,10 @@ public sealed class CanonicalPayloadBuilderBranchTests
     private static readonly DateTimeOffset RetryUtc = new(2026, 6, 18, 12, 10, 0, TimeSpan.Zero);
 
     /// <summary>
-    /// Tests that the ForAuditResidue method uses the event identifier as the artifact ID when the audit residue ID is missing, and filters metadata based on the provided options.
+    /// Tests that the ForDecisionReceipt method uses the event identifier as the artifact ID when the audit residue ID is missing, and filters metadata based on the provided options.
     /// </summary>
     [Fact]
-    public void ForAuditResidueUsesEventIdentifierWhenResidueIdIsMissingAndFiltersMetadata()
+    public void ForDecisionReceiptUsesEventIdentifierWhenResidueIdIsMissingAndFiltersMetadata()
     {
         var options = CanonicalPayloadOptions.Create(["safe"]);
         var residue = DecisionReceipt.Create(
@@ -39,7 +39,7 @@ public sealed class CanonicalPayloadBuilderBranchTests
             },
             auditResidueId: " ");
 
-        CanonicalPayload payload = CanonicalPayloadBuilder.ForAuditResidue(residue, options);
+        CanonicalPayload payload = CanonicalPayloadBuilder.ForDecisionReceipt(residue, options);
 
         Assert.Equal(CanonicalArtifactTypes.AuditResidue, payload.ArtifactType);
         Assert.Equal("event-1", payload.ArtifactId);
@@ -50,10 +50,10 @@ public sealed class CanonicalPayloadBuilderBranchTests
     }
 
     /// <summary>
-    /// Tests that the ForAuditResidueLifecycleEvent method includes filtered metadata and the correct stage sequence in the canonical payload.
+    /// Tests that the ForDecisionReceiptLifecycleEvent method includes filtered metadata and the correct stage sequence in the canonical payload.
     /// </summary>
     [Fact]
-    public void ForAuditResidueLifecycleEventIncludesFilteredMetadataAndStageSequence()
+    public void ForDecisionReceiptLifecycleEventIncludesFilteredMetadataAndStageSequence()
     {
         var options = CanonicalPayloadOptions.Create(["safe"]);
         var lifecycleEvent = DecisionReceiptLifecycleEvent.Create(
@@ -71,7 +71,7 @@ public sealed class CanonicalPayloadBuilderBranchTests
                 ["ignored"] = " excluded "
             });
 
-        CanonicalPayload payload = CanonicalPayloadBuilder.ForAuditResidueLifecycleEvent(lifecycleEvent, options);
+        CanonicalPayload payload = CanonicalPayloadBuilder.ForDecisionReceiptLifecycleEvent(lifecycleEvent, options);
 
         Assert.Equal(CanonicalArtifactTypes.AuditResidueLifecycleEvent, payload.ArtifactType);
         Assert.Equal("lifecycle-1", payload.ArtifactId);

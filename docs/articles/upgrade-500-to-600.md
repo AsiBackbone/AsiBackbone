@@ -31,7 +31,7 @@ Supply the host's actual contributors, decision policy, options, and logger wher
 
 Type-based dependency injection registration now has only the full constructor to activate. It requires all five dependencies to be resolvable, including the concrete evaluator options object. Hosts using the options pattern should use a factory instead, passing `IOptions<GovernancePolicyOptions>.Value` to `WithOptions` (or the full constructor), and resolving the other configured dependencies explicitly. The sample and template use this factory pattern so unregistered optional dependencies retain their defaults.
 
-`MarkGovernancePolicy` records the same policy metadata. It does not resolve the policy or select/enforce constraints solely from the marker. The non-obsolete `RequireGovernancePolicyAttribute` remains supported.
+`MarkGovernancePolicy` records the same policy metadata. It does not resolve the policy or select/enforce constraints solely from the marker. The attribute formerly named `RequireGovernancePolicyAttribute` is renamed to `GovernancePolicyAttribute` for the same reason; see [Helper member renames](#helper-member-renames).
 
 ## Diagnostics and compatibility validation
 
@@ -95,6 +95,29 @@ Migration actions:
 - **Historical artifacts** signed by 5.x providers fail version 1 verification as `InvalidSignature`. Verify them with a context from `WithLegacySignatureInputAllowed()`. Such signatures authenticate the hash only and cannot satisfy a policy pin (`signature.policy-context-not-authenticated`).
 
 A provider that ignores `SignatureInput` and keeps signing or verifying the hash text fails closed against artifacts produced by the other side of the change, rather than silently accepting unauthenticated labels, as long as signer and verifier are not both left on the hash text. Update both together.
+
+## Helper member renames
+
+The 6.0 type review left helper members that operate on decision receipts named for the retired audit-residue vocabulary, and kept the endpoint attribute whose route-builder counterpart was renamed because "Require" overstated what it does. 6.0 renames them. Behavior, parameters, return types, canonical artifact tags, and signed bytes are unchanged.
+
+| 5.x / earlier 6.0 name | 6.0 name |
+| --- | --- |
+| `CanonicalPayloadBuilder.ForAuditResidue` | `CanonicalPayloadBuilder.ForDecisionReceipt` |
+| `CanonicalPayloadBuilder.ForAuditResidueLifecycleEvent` | `CanonicalPayloadBuilder.ForDecisionReceiptLifecycleEvent` |
+| `GovernanceArtifactSigner.CreateUnsignedAuditResidue` | `GovernanceArtifactSigner.CreateUnsignedDecisionReceipt` |
+| `GovernanceArtifactSigner.CreateSigningReadyAuditResidue` | `GovernanceArtifactSigner.CreateSigningReadyDecisionReceipt` |
+| `GovernanceArtifactSigner.SignAuditResidueAsync` | `GovernanceArtifactSigner.SignDecisionReceiptAsync` |
+| `GovernanceArtifactSigner.CreateUnsignedAuditResidueLifecycleEvent` | `GovernanceArtifactSigner.CreateUnsignedDecisionReceiptLifecycleEvent` |
+| `GovernanceArtifactSigner.CreateSigningReadyAuditResidueLifecycleEvent` | `GovernanceArtifactSigner.CreateSigningReadyDecisionReceiptLifecycleEvent` |
+| `GovernanceArtifactSigner.SignAuditResidueLifecycleEventAsync` | `GovernanceArtifactSigner.SignDecisionReceiptLifecycleEventAsync` |
+| `GovernanceHttpRequestCorrelationAuditExtensions.CreateAuditResidue` | `GovernanceHttpRequestCorrelationAuditExtensions.CreateDecisionReceipt` |
+| `GovernanceDecisionContract.VerifyAuditResidue` | `GovernanceDecisionContract.VerifyDecisionReceipt` |
+| `DecisionReceiptSinkContract.CreateAuditResidue()` (protected abstract) | `DecisionReceiptSinkContract.CreateDecisionReceipt()` |
+| `RequireGovernancePolicyAttribute` / `[RequireGovernancePolicy(...)]` | `GovernancePolicyAttribute` / `[GovernancePolicy(...)]` |
+
+Contract-test fixtures deriving from `DecisionReceiptSinkContract` must rename their `CreateAuditResidue` override.
+
+Retained deliberately: `AuditResidueId` properties and their related members (`DecisionReceiptBuilder.WithAuditResidueId`, `FindByAuditResidueIdAsync`, the OpenTelemetry `AuditResidueId` attribute constant), because the identifier is persisted and serialized, and the canonical artifact tags `CanonicalArtifactTypes.AuditResidue` and `AuditResidueLifecycleEvent`, because they are signed.
 
 ## In-memory capability grant use store
 
@@ -218,4 +241,4 @@ See [6.0 public API naming convention](public-api-naming-600.md) for the complet
 | `AsiBackbone.Testing` | `AsiBackbone.Testing.Contracts.AsiBackboneEndpointCapabilityGrantValidatorContract` | `AsiBackbone.Testing.Contracts.EndpointCapabilityGrantValidatorContract` |
 | `AsiBackbone.Testing` | `AsiBackbone.Testing.Contracts.AsiBackbonePolicyEvaluatorContract`1` | `AsiBackbone.Testing.Contracts.GovernancePolicyEvaluatorContract`1` |
 
-Protocol/helper members such as AuditResidueId and ForAuditResidue retain their names and wire meaning. JSON keys, schema versions, canonical tags, signed bytes, and EF table/column names are unchanged. A type rename alone does not require a data migration. Type-based DI, reflection, custom receipt implementations, and host EF model configuration must reference the new CLR types. Rebuild all dependent assemblies.
+Protocol members such as AuditResidueId retain their names and wire meaning; helper methods named for the audit-residue vocabulary are renamed as listed in [Helper member renames](#helper-member-renames). JSON keys, schema versions, canonical tags, signed bytes, and EF table/column names are unchanged. A type rename alone does not require a data migration. Type-based DI, reflection, custom receipt implementations, and host EF model configuration must reference the new CLR types. Rebuild all dependent assemblies.

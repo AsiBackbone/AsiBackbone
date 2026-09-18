@@ -159,7 +159,7 @@ Those endpoints demonstrate the ASP.NET Core integration shape:
 The controller version uses the equivalent attributes:
 
 ```csharp
-[RequireGovernancePolicy(typeof(SampleEndpointPolicy))]
+[GovernancePolicy(typeof(SampleEndpointPolicy))]
 [RequireLiabilityHandshake]
 [RequireCapabilityGrant("sample.high-risk.execute")]
 [EmitGovernanceAudit]

@@ -15,7 +15,7 @@ public static class CanonicalPayloadBuilder
     /// <summary>
     /// Builds a canonical payload for decision receipt.
     /// </summary>
-    public static CanonicalPayload ForAuditResidue(IDecisionReceipt residue, CanonicalPayloadOptions? options = null)
+    public static CanonicalPayload ForDecisionReceipt(IDecisionReceipt residue, CanonicalPayloadOptions? options = null)
     {
         ArgumentNullException.ThrowIfNull(residue);
         CanonicalPayloadOptions effectiveOptions = options ?? CanonicalPayloadOptions.Default;
@@ -58,7 +58,7 @@ public static class CanonicalPayloadBuilder
     /// <summary>
     /// Builds a canonical payload for an decision receipt lifecycle event.
     /// </summary>
-    public static CanonicalPayload ForAuditResidueLifecycleEvent(DecisionReceiptLifecycleEvent lifecycleEvent, CanonicalPayloadOptions? options = null)
+    public static CanonicalPayload ForDecisionReceiptLifecycleEvent(DecisionReceiptLifecycleEvent lifecycleEvent, CanonicalPayloadOptions? options = null)
     {
         ArgumentNullException.ThrowIfNull(lifecycleEvent);
         CanonicalPayloadOptions effectiveOptions = options ?? CanonicalPayloadOptions.Default;

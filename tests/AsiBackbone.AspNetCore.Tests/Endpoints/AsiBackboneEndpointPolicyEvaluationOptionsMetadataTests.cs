@@ -21,7 +21,7 @@ public sealed class AsiBackboneEndpointPolicyEvaluationOptionsMetadataTests
         var endpoint = new Endpoint(
             static context => Task.CompletedTask,
             new EndpointMetadataCollection(
-                new RequireGovernancePolicyAttribute(typeof(SamplePolicy)),
+                new GovernancePolicyAttribute(typeof(SamplePolicy)),
                 new ShortCircuitOnFirstDenialAttribute()),
             "sample.fast-abort");
 

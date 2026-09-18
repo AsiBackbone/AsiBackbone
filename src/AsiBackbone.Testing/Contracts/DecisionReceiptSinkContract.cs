@@ -17,7 +17,7 @@ public abstract class DecisionReceiptSinkContract
     /// Creates the decision receipt supplied to the audit sink implementation under test.
     /// </summary>
     /// <returns>The decision receipt to write.</returns>
-    protected abstract IDecisionReceipt CreateAuditResidue();
+    protected abstract IDecisionReceipt CreateDecisionReceipt();
 
     /// <summary>
     /// Verifies that an audit sink accepts a valid decision receipt value without weakening the residue shape.
@@ -28,10 +28,10 @@ public abstract class DecisionReceiptSinkContract
     {
         IDecisionReceiptSink auditSink = CreateAuditSink()
             ?? throw new GovernanceContractViolationException("Audit sink contract must provide an audit sink instance.");
-        IDecisionReceipt residue = CreateAuditResidue()
+        IDecisionReceipt residue = CreateDecisionReceipt()
             ?? throw new GovernanceContractViolationException("Audit sink contract must provide decision receipt.");
 
-        _ = GovernanceDecisionContract.VerifyAuditResidue(residue, "Audit sink residue");
+        _ = GovernanceDecisionContract.VerifyDecisionReceipt(residue, "Audit sink residue");
 
         try
         {

@@ -155,13 +155,13 @@ public sealed class AsiBackboneDecisionContractDefensiveTests
     }
 
     /// <summary>
-    /// Verifies that VerifyAuditResidue rejects null input.
+    /// Verifies that VerifyDecisionReceipt rejects null input.
     /// </summary>
     [Fact]
-    public void VerifyAuditResidueRejectsNull()
+    public void VerifyDecisionReceiptRejectsNull()
     {
         GovernanceContractViolationException exception = Assert.Throws<GovernanceContractViolationException>(
-            () => GovernanceDecisionContract.VerifyAuditResidue(null));
+            () => GovernanceDecisionContract.VerifyDecisionReceipt(null));
 
         Assert.Contains("must not be null", exception.Message, StringComparison.Ordinal);
     }
@@ -174,13 +174,13 @@ public sealed class AsiBackboneDecisionContractDefensiveTests
     [InlineData(nameof(TestAuditResidue.ActorId), "actor ID")]
     [InlineData(nameof(TestAuditResidue.OperationName), "operation name")]
     [InlineData(nameof(TestAuditResidue.Outcome), "outcome")]
-    public void VerifyAuditResidueRejectsMissingRequiredStrings(string propertyName, string expectedMessagePart)
+    public void VerifyDecisionReceiptRejectsMissingRequiredStrings(string propertyName, string expectedMessagePart)
     {
         var residue = new TestAuditResidue();
         typeof(TestAuditResidue).GetProperty(propertyName)!.SetValue(residue, " ");
 
         GovernanceContractViolationException exception = Assert.Throws<GovernanceContractViolationException>(
-            () => GovernanceDecisionContract.VerifyAuditResidue(residue));
+            () => GovernanceDecisionContract.VerifyDecisionReceipt(residue));
 
         Assert.Contains(expectedMessagePart, exception.Message, StringComparison.Ordinal);
     }
@@ -189,12 +189,12 @@ public sealed class AsiBackboneDecisionContractDefensiveTests
     /// Verifies audit residue rejects null reason-code collection.
     /// </summary>
     [Fact]
-    public void VerifyAuditResidueRejectsNullReasonCodes()
+    public void VerifyDecisionReceiptRejectsNullReasonCodes()
     {
         var residue = new TestAuditResidue { ReasonCodes = null! };
 
         GovernanceContractViolationException exception = Assert.Throws<GovernanceContractViolationException>(
-            () => GovernanceDecisionContract.VerifyAuditResidue(residue));
+            () => GovernanceDecisionContract.VerifyDecisionReceipt(residue));
 
         Assert.Contains("reason-code collection", exception.Message, StringComparison.Ordinal);
     }
@@ -203,12 +203,12 @@ public sealed class AsiBackboneDecisionContractDefensiveTests
     /// Verifies audit residue rejects blank reason codes.
     /// </summary>
     [Fact]
-    public void VerifyAuditResidueRejectsBlankReasonCode()
+    public void VerifyDecisionReceiptRejectsBlankReasonCode()
     {
         var residue = new TestAuditResidue { ReasonCodes = new[] { "contract.reason", " " } };
 
         GovernanceContractViolationException exception = Assert.Throws<GovernanceContractViolationException>(
-            () => GovernanceDecisionContract.VerifyAuditResidue(residue));
+            () => GovernanceDecisionContract.VerifyDecisionReceipt(residue));
 
         Assert.Contains("empty reason code at index 1", exception.Message, StringComparison.Ordinal);
     }
@@ -217,25 +217,25 @@ public sealed class AsiBackboneDecisionContractDefensiveTests
     /// Verifies audit residue rejects null metadata collection.
     /// </summary>
     [Fact]
-    public void VerifyAuditResidueRejectsNullMetadata()
+    public void VerifyDecisionReceiptRejectsNullMetadata()
     {
         var residue = new TestAuditResidue { Metadata = null! };
 
         GovernanceContractViolationException exception = Assert.Throws<GovernanceContractViolationException>(
-            () => GovernanceDecisionContract.VerifyAuditResidue(residue));
+            () => GovernanceDecisionContract.VerifyDecisionReceipt(residue));
 
         Assert.Contains("metadata collection", exception.Message, StringComparison.Ordinal);
     }
 
     /// <summary>
-    /// Verifies VerifyAuditResidue returns the original valid residue instance.
+    /// Verifies VerifyDecisionReceipt returns the original valid residue instance.
     /// </summary>
     [Fact]
-    public void VerifyAuditResidueReturnsOriginalValidResidue()
+    public void VerifyDecisionReceiptReturnsOriginalValidResidue()
     {
         var residue = new TestAuditResidue();
 
-        IDecisionReceipt verified = GovernanceDecisionContract.VerifyAuditResidue(residue);
+        IDecisionReceipt verified = GovernanceDecisionContract.VerifyDecisionReceipt(residue);
 
         Assert.Same(residue, verified);
     }

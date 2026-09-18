@@ -372,7 +372,7 @@ internal sealed class SampleEndpointCapabilityGrantValidator : IEndpointCapabili
 internal sealed class InternalSampleGovernanceController : ControllerBase
 {
     [HttpPost]
-    [RequireGovernancePolicy(typeof(SampleEndpointPolicy))]
+    [GovernancePolicy(typeof(SampleEndpointPolicy))]
     [RequireLiabilityHandshake]
     [RequireCapabilityGrant("sample.high-risk.execute")]
     [EmitGovernanceAudit]

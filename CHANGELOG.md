@@ -48,6 +48,19 @@ This project follows the spirit of [Keep a Changelog](https://keepachangelog.com
   all-issuer behavior and now document it.
   See [In-memory capability grant use store](docs/articles/upgrade-500-to-600.md#in-memory-capability-grant-use-store).
 
+### Changed
+
+* **Breaking:** Renamed helper members that operate on decision receipts but kept the retired audit-residue
+  vocabulary: `CanonicalPayloadBuilder.ForAuditResidue` and `ForAuditResidueLifecycleEvent`, the six
+  `GovernanceArtifactSigner` `*AuditResidue*` methods, `CreateAuditResidue` on the ASP.NET Core request-correlation
+  extensions, and `GovernanceDecisionContract.VerifyAuditResidue` and `DecisionReceiptSinkContract.CreateAuditResidue`
+  in the testing package now use `DecisionReceipt`. Canonical artifact tags, signed bytes, and the persisted
+  `AuditResidueId` members are unchanged.
+* **Breaking:** Renamed `RequireGovernancePolicyAttribute` to `GovernancePolicyAttribute`. The attribute records a
+  policy marker and never required or enforced the policy; the route-builder extension was renamed to
+  `MarkGovernancePolicy` for the same reason. The template and samples use `[GovernancePolicy]`.
+  See [Helper member renames](docs/articles/upgrade-500-to-600.md#helper-member-renames).
+
 ## [5.2.0] - 2026-09-14
 
 ### Release summary

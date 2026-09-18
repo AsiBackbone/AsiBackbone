@@ -20,7 +20,7 @@ public static class GovernanceHttpRequestCorrelationAuditExtensions
     /// <param name="occurredUtc">Optional event timestamp. When omitted, the current UTC timestamp is used.</param>
     /// <param name="metadata">Optional host-provided audit metadata to merge with safe request metadata.</param>
     /// <returns>An enriched decision receipt value.</returns>
-    public static DecisionReceipt CreateAuditResidue(
+    public static DecisionReceipt CreateDecisionReceipt(
         this GovernanceHttpRequestCorrelation correlation,
         IGovernanceActorContext actor,
         string operationName,

@@ -96,7 +96,7 @@ public static class GovernanceDecisionContract
     /// <param name="residue">The decision receipt to verify.</param>
     /// <param name="contractName">The human-readable contract name used in failure messages.</param>
     /// <returns>The verified decision receipt.</returns>
-    public static IDecisionReceipt VerifyAuditResidue(
+    public static IDecisionReceipt VerifyDecisionReceipt(
         IDecisionReceipt? residue,
         string contractName = "Decision receipt")
     {

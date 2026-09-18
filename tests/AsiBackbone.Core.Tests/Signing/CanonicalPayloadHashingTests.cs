@@ -118,7 +118,7 @@ public sealed class CanonicalPayloadHashingTests
             }
         };
 
-        CanonicalPayload payload = CanonicalPayloadBuilder.ForAuditResidue(residue, options);
+        CanonicalPayload payload = CanonicalPayloadBuilder.ForDecisionReceipt(residue, options);
 
         Assert.Equal(CanonicalArtifactTypes.AuditResidue, payload.ArtifactType);
         Assert.Equal("event-fallback", payload.ArtifactId);
@@ -158,7 +158,7 @@ public sealed class CanonicalPayloadHashingTests
                 ["unsafe"] = "ignored"
             });
 
-        CanonicalPayload payload = CanonicalPayloadBuilder.ForAuditResidueLifecycleEvent(lifecycleEvent, options);
+        CanonicalPayload payload = CanonicalPayloadBuilder.ForDecisionReceiptLifecycleEvent(lifecycleEvent, options);
 
         Assert.Equal(CanonicalArtifactTypes.AuditResidueLifecycleEvent, payload.ArtifactType);
         Assert.Equal("lifecycle-event-1", payload.ArtifactId);

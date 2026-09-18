@@ -13,10 +13,10 @@ namespace AsiBackbone.AspNetCore.Tests.Correlation;
 public sealed class AsiBackboneHttpRequestCorrelationAuditExtensionsTests
 {
     /// <summary>
-    /// Tests that the <c>GovernanceHttpRequestCorrelation.CreateAuditResidue"</c> method uses the request correlation ID and trace ID before falling back to the decision correlation ID and trace ID.
+    /// Tests that the <c>GovernanceHttpRequestCorrelation.CreateDecisionReceipt"</c> method uses the request correlation ID and trace ID before falling back to the decision correlation ID and trace ID.
     /// </summary>
     [Fact]
-    public void CreateAuditResidueUsesRequestCorrelationBeforeDecisionCorrelation()
+    public void CreateDecisionReceiptUsesRequestCorrelationBeforeDecisionCorrelation()
     {
         GovernanceHttpRequestCorrelation correlation = new(
             correlationId: "request-correlation",
@@ -27,7 +27,7 @@ public sealed class AsiBackboneHttpRequestCorrelationAuditExtensionsTests
             policyVersion: "v1",
             policyHash: "hash-1");
 
-        DecisionReceipt residue = correlation.CreateAuditResidue(
+        DecisionReceipt residue = correlation.CreateDecisionReceipt(
             GovernanceActorContext.System,
             "operate",
             decision);
@@ -39,17 +39,17 @@ public sealed class AsiBackboneHttpRequestCorrelationAuditExtensionsTests
     }
 
     /// <summary>
-    /// Tests that the <c>GovernanceHttpRequestCorrelation.CreateAuditResidue</c> method falls back to the decision correlation ID and trace ID when the request correlation ID and trace ID are missing.
+    /// Tests that the <c>GovernanceHttpRequestCorrelation.CreateDecisionReceipt</c> method falls back to the decision correlation ID and trace ID when the request correlation ID and trace ID are missing.
     /// </summary>
     [Fact]
-    public void CreateAuditResidueFallsBackToDecisionCorrelationWhenRequestCorrelationIsMissing()
+    public void CreateDecisionReceiptFallsBackToDecisionCorrelationWhenRequestCorrelationIsMissing()
     {
         GovernanceHttpRequestCorrelation correlation = new();
         var decision = GovernanceDecision.Allow(
             correlationId: "decision-correlation",
             traceId: "decision-trace");
 
-        DecisionReceipt residue = correlation.CreateAuditResidue(
+        DecisionReceipt residue = correlation.CreateDecisionReceipt(
             GovernanceActorContext.System,
             "operate",
             decision);
@@ -59,10 +59,10 @@ public sealed class AsiBackboneHttpRequestCorrelationAuditExtensionsTests
     }
 
     /// <summary>
-    /// Tests that the <c>GovernanceHttpRequestCorrelation.CreateAuditResidue</c> method merges safe request metadata with host metadata.
+    /// Tests that the <c>GovernanceHttpRequestCorrelation.CreateDecisionReceipt</c> method merges safe request metadata with host metadata.
     /// </summary>
     [Fact]
-    public void CreateAuditResidueMergesSafeRequestMetadataWithHostMetadata()
+    public void CreateDecisionReceiptMergesSafeRequestMetadataWithHostMetadata()
     {
         GovernanceHttpRequestCorrelation correlation = new(
             metadata: new Dictionary<string, string>(StringComparer.Ordinal)
@@ -76,7 +76,7 @@ public sealed class AsiBackboneHttpRequestCorrelationAuditExtensionsTests
             ["operation.scope"] = "test",
         };
 
-        DecisionReceipt residue = correlation.CreateAuditResidue(
+        DecisionReceipt residue = correlation.CreateDecisionReceipt(
             GovernanceActorContext.System,
             "operate",
             decision,
