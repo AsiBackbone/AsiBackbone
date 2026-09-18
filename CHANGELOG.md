@@ -23,6 +23,20 @@ This project follows the spirit of [Keep a Changelog](https://keepachangelog.com
   canonicalization mismatches, as `InvalidProof` with `Deny`.
 * Added a test that pins the complete default verification action map, so a future category cannot silently inherit a
   soft default. See [Verification policy defaults](docs/articles/upgrade-500-to-600.md#verification-policy-defaults).
+* **Breaking (wire format):** Signing providers now sign, and verification providers verify, a versioned signature
+  input instead of the canonical hash text. `GovernanceSignatureInput.CreateV1` binds the format identifier, canonical
+  descriptors, hash algorithm, hash value, and the `policy_version` and `policy_hash` signing metadata. Previously
+  every `SigningMetadata` value was an unauthenticated label, so a validly signed artifact could be relabeled with a
+  different policy context and still verify, and policy pins checked values the signature did not cover. Added
+  `SigningRequest.SignatureInput`, `SignatureVerificationRequest.SignatureInput`, and
+  `ManagedKeySignRequest.SignatureInput`; host managed-key clients and verification services must sign and verify
+  these bytes.
+* Artifacts signed before 6.0 fail version 1 verification. `VerificationPolicyContext.WithLegacySignatureInputAllowed()`
+  opts a review path into a single hash-only retry; a signature accepted that way cannot satisfy a policy pin and
+  denies with `signature.policy-context-not-authenticated`.
+* The local-development verifier rejects provider labels other than its own with
+  `localdev.signature.provider-not-trusted`, because the provider label is not part of the signature input.
+  See [Signature input](docs/articles/upgrade-500-to-600.md#signature-input).
 
 ## [5.2.0] - 2026-09-14
 

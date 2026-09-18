@@ -32,15 +32,29 @@ public static class GovernanceArtifactVerifier
 
         try
         {
+            // The version 1 input binds the canonical descriptors, hash, and signing policy context, so a relabeled
+            // policy_version or policy_hash no longer verifies. Previously the provider was asked to verify the hash text
+            // alone and every signing metadata label was unauthenticated.
             SignatureVerificationResult verificationResult = await verificationService
                 .VerifyAsync(
-                    new SignatureVerificationRequest(
-                        artifact.SigningHash,
-                        artifact.SigningMetadata,
-                        purpose: effectiveContext.Purpose ?? artifact.ArtifactType,
-                        metadata: effectiveContext.Metadata),
+                    CreateVerificationRequest(
+                        artifact,
+                        effectiveContext,
+                        GovernanceSignatureInput.CreateV1(artifact.CanonicalHash, artifact.SigningMetadata.Metadata)),
                     cancellationToken)
                 .ConfigureAwait(false);
+
+            if (!verificationResult.IsValid
+                && effectiveContext.AllowLegacySignatureInput
+                && VerificationPolicyEvaluator.Categorize(verificationResult) is SignatureVerificationCategory.InvalidSignature)
+            {
+                verificationResult = await VerifyLegacySignatureInputAsync(
+                    artifact,
+                    verificationService,
+                    effectiveContext,
+                    verificationResult,
+                    cancellationToken).ConfigureAwait(false);
+            }
 
             return VerificationPolicyEvaluator.Evaluate(artifact, verificationResult, options);
         }
@@ -56,6 +70,56 @@ public static class GovernanceArtifactVerifier
         {
             return CreateProviderUnavailableOutcome(artifact, options, exception);
         }
+    }
+
+    /// <summary>
+    /// Verifies a pre-6.0 artifact against the hash-only signature input after version 1 verification failed.
+    /// </summary>
+    /// <remarks>
+    /// Runs only when the host opted in through <see cref="VerificationPolicyContext.WithLegacySignatureInputAllowed" />
+    /// and the version 1 attempt failed as an invalid signature. A legacy signature authenticates the canonical payload hash
+    /// only, so the policy labels it carries are unauthenticated and cannot satisfy a policy pin. If the legacy attempt
+    /// also fails, the version 1 failure is reported, because it describes the current format.
+    /// </remarks>
+    private static async ValueTask<SignatureVerificationResult> VerifyLegacySignatureInputAsync<TArtifact>(
+        SignedGovernanceArtifact<TArtifact> artifact,
+        IGovernanceSignatureVerificationService verificationService,
+        VerificationPolicyContext context,
+        SignatureVerificationResult versionOneResult,
+        CancellationToken cancellationToken)
+    {
+        SignatureVerificationResult legacyResult = await verificationService
+            .VerifyAsync(
+                CreateVerificationRequest(
+                    artifact,
+                    context,
+                    GovernanceSignatureInput.CreateLegacy(artifact.SigningHash)),
+                cancellationToken)
+            .ConfigureAwait(false);
+
+        return !legacyResult.IsValid
+            ? versionOneResult
+            : context.ExpectedPolicyVersion is not null || context.ExpectedPolicyHash is not null
+            ? SignatureVerificationResult.Failed(
+                "signature.policy-context-not-authenticated",
+                SignatureVerificationCategory.UntrustedSigningContext,
+                "The artifact carries a pre-6.0 signature that does not cover the signing policy context, so it cannot satisfy a policy pin.")
+            : legacyResult;
+    }
+
+    private static SignatureVerificationRequest CreateVerificationRequest<TArtifact>(
+        SignedGovernanceArtifact<TArtifact> artifact,
+        VerificationPolicyContext context,
+        ReadOnlyMemory<byte> signatureInput)
+    {
+        return new SignatureVerificationRequest(
+            artifact.SigningHash,
+            artifact.SigningMetadata,
+            purpose: context.Purpose ?? artifact.ArtifactType,
+            metadata: context.Metadata)
+        {
+            SignatureInput = signatureInput
+        };
     }
 
     private static VerificationPolicyOutcome CreateProviderUnavailableOutcome<TArtifact>(

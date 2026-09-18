@@ -150,7 +150,10 @@ public sealed class ManagedKeySigningService : IGovernanceSigningService
             ResolveKeyId(request),
             ResolveKeyVersion(request),
             request.Purpose,
-            request.Metadata);
+            request.Metadata)
+        {
+            SignatureInput = request.SignatureInput
+        };
     }
 
     /// <summary>

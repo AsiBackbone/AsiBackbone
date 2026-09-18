@@ -1,6 +1,6 @@
 # Upgrade from 5.x to 6.0
 
-Version 6.0 renames public types and removes seven public members whose obsolete compatibility windows have completed. It also makes signature-verification pin mismatches and missing signatures deny by default; see [Verification policy defaults](#verification-policy-defaults). These are intentional major-version breaks. Rebuild consumers against the 6.0 packages after migrating.
+Version 6.0 renames public types and removes seven public members whose obsolete compatibility windows have completed. It also makes signature-verification pin mismatches and missing signatures deny by default, and changes providers to sign a versioned signature input that covers the signing policy context; see [Verification policy defaults](#verification-policy-defaults) and [Signature input](#signature-input). These are intentional major-version breaks. Rebuild consumers against the 6.0 packages after migrating.
 
 ## Complete obsolete-member inventory
 
@@ -69,6 +69,32 @@ VerificationPolicyOptions lowerAssurance = VerificationPolicyOptions.Create(
 ```
 
 Restoring `Defer` or `Escalate` for `UntrustedSigningContext` is possible through the same override but is not recommended: a retry or an approval cannot make an artifact signed under the wrong provider or policy context trustworthy.
+
+## Signature input
+
+Before 6.0, providers signed only the UTF-8 text of the canonical payload hash, so every value in `SigningMetadata` was an unauthenticated label. A holder of a validly signed artifact could change `policy_version` or `policy_hash` and verification still succeeded, which also meant `ExpectedPolicyVersion` and `ExpectedPolicyHash` pins checked values the signature did not cover.
+
+6.0 signs and verifies a versioned signature input instead. See [What the signature covers](cryptographic-security-posture.md#what-the-signature-covers) for the exact format and trust model.
+
+| Surface | 6.0 change |
+| --- | --- |
+| `GovernanceSignatureInput` | New. `CreateV1(hash, metadata)` builds the version 1 input; `CreateLegacy(signingHash)` builds the pre-6.0 hash-only input. |
+| `SigningRequest.SignatureInput`, `SignatureVerificationRequest.SignatureInput` | New. The exact bytes to sign or verify. Falls back to the hash-only input when not supplied; `UsesLegacySignatureInput` reports the fallback. |
+| `GovernanceArtifactSigner` | Supplies the version 1 input and restores the signed `policy_version` and `policy_hash` in the stored metadata. |
+| `GovernanceArtifactVerifier` | Rebuilds and verifies the version 1 input. |
+| `VerificationPolicyContext.WithLegacySignatureInputAllowed()` | New opt-in for artifacts signed before 6.0. |
+| `ManagedKeySignRequest.SignatureInput` | New. The managed-key client must sign these bytes. |
+| Local-development provider | Signs and verifies the supplied input, and rejects provider labels it does not own (`localdev.signature.provider-not-trusted`, `UntrustedSigningContext`, `Deny`). |
+
+Migration actions:
+
+- **Host managed-key clients** (`IManagedKeySigningClient`) must sign `ManagedKeySignRequest.SignatureInput` instead of `SigningHash`. Pass the bytes as the message to a message-signing API, or hash them with the key's digest algorithm before calling a digest-signing API.
+- **Host verification services** (`IGovernanceSignatureVerificationService`) must verify `SignatureVerificationRequest.SignatureInput` instead of `SigningHash`, resolve the verification key from the recorded key ID and key version, and reject provider labels they do not own.
+- **Custom signing flows** that sign signing-ready artifacts outside `GovernanceArtifactSigner` must sign `GovernanceSignatureInput.CreateV1(canonicalHash, signingMetadata)` with the same policy metadata they record.
+- **Persistence** that rehydrates signed artifacts must retain the `policy_version` and `policy_hash` signing metadata values that were signed. The EF Core audit ledger store persists the individual signature fields but not the signing metadata dictionary, so a ledger record signed with policy metadata does not re-verify after an EF Core round trip. Records signed without policy metadata are unaffected. Hosts that need both should persist the signed policy metadata in a host-owned column.
+- **Historical artifacts** signed by 5.x providers fail version 1 verification as `InvalidSignature`. Verify them with a context from `WithLegacySignatureInputAllowed()`. Such signatures authenticate the hash only and cannot satisfy a policy pin (`signature.policy-context-not-authenticated`).
+
+A provider that ignores `SignatureInput` and keeps signing or verifying the hash text fails closed against artifacts produced by the other side of the change, rather than silently accepting unauthenticated labels, as long as signer and verifier are not both left on the hash text. Update both together.
 
 ## Public type renames
 
