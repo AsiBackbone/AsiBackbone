@@ -16,30 +16,30 @@ public static class GovernanceArtifactSigner
     /// <summary>
     /// Creates an unsigned wrapper for decision receipt.
     /// </summary>
-    public static SignedGovernanceArtifact<IDecisionReceipt> CreateUnsignedAuditResidue(
+    public static SignedGovernanceArtifact<IDecisionReceipt> CreateUnsignedDecisionReceipt(
         IDecisionReceipt residue,
         CanonicalPayloadOptions? options = null,
         string? hashAlgorithm = null)
     {
-        return CreateUnsigned(residue, CanonicalPayloadBuilder.ForAuditResidue(residue, options), hashAlgorithm);
+        return CreateUnsigned(residue, CanonicalPayloadBuilder.ForDecisionReceipt(residue, options), hashAlgorithm);
     }
 
     /// <summary>
     /// Creates signing-ready metadata for decision receipt without invoking a signing provider.
     /// </summary>
-    public static SignedGovernanceArtifact<IDecisionReceipt> CreateSigningReadyAuditResidue(
+    public static SignedGovernanceArtifact<IDecisionReceipt> CreateSigningReadyDecisionReceipt(
         IDecisionReceipt residue,
         CanonicalPayloadOptions? options = null,
         string? hashAlgorithm = null,
         IReadOnlyDictionary<string, string>? metadata = null)
     {
-        return CreateSigningReady(residue, CanonicalPayloadBuilder.ForAuditResidue(residue, options), hashAlgorithm, metadata);
+        return CreateSigningReady(residue, CanonicalPayloadBuilder.ForDecisionReceipt(residue, options), hashAlgorithm, metadata);
     }
 
     /// <summary>
     /// Signs decision receipt after canonical payload hashing.
     /// </summary>
-    public static ValueTask<SignedGovernanceArtifact<IDecisionReceipt>> SignAuditResidueAsync(
+    public static ValueTask<SignedGovernanceArtifact<IDecisionReceipt>> SignDecisionReceiptAsync(
         IDecisionReceipt residue,
         IGovernanceSigningService signingService,
         CanonicalPayloadOptions? options = null,
@@ -52,7 +52,7 @@ public static class GovernanceArtifactSigner
     {
         return SignAsync(
             residue,
-            CanonicalPayloadBuilder.ForAuditResidue(residue, options),
+            CanonicalPayloadBuilder.ForDecisionReceipt(residue, options),
             signingService,
             hashAlgorithm,
             keyId,
@@ -114,30 +114,30 @@ public static class GovernanceArtifactSigner
     /// <summary>
     /// Creates an unsigned wrapper for an decision receipt lifecycle event.
     /// </summary>
-    public static SignedGovernanceArtifact<DecisionReceiptLifecycleEvent> CreateUnsignedAuditResidueLifecycleEvent(
+    public static SignedGovernanceArtifact<DecisionReceiptLifecycleEvent> CreateUnsignedDecisionReceiptLifecycleEvent(
         DecisionReceiptLifecycleEvent lifecycleEvent,
         CanonicalPayloadOptions? options = null,
         string? hashAlgorithm = null)
     {
-        return CreateUnsigned(lifecycleEvent, CanonicalPayloadBuilder.ForAuditResidueLifecycleEvent(lifecycleEvent, options), hashAlgorithm);
+        return CreateUnsigned(lifecycleEvent, CanonicalPayloadBuilder.ForDecisionReceiptLifecycleEvent(lifecycleEvent, options), hashAlgorithm);
     }
 
     /// <summary>
     /// Creates signing-ready metadata for an decision receipt lifecycle event without invoking a signing provider.
     /// </summary>
-    public static SignedGovernanceArtifact<DecisionReceiptLifecycleEvent> CreateSigningReadyAuditResidueLifecycleEvent(
+    public static SignedGovernanceArtifact<DecisionReceiptLifecycleEvent> CreateSigningReadyDecisionReceiptLifecycleEvent(
         DecisionReceiptLifecycleEvent lifecycleEvent,
         CanonicalPayloadOptions? options = null,
         string? hashAlgorithm = null,
         IReadOnlyDictionary<string, string>? metadata = null)
     {
-        return CreateSigningReady(lifecycleEvent, CanonicalPayloadBuilder.ForAuditResidueLifecycleEvent(lifecycleEvent, options), hashAlgorithm, metadata);
+        return CreateSigningReady(lifecycleEvent, CanonicalPayloadBuilder.ForDecisionReceiptLifecycleEvent(lifecycleEvent, options), hashAlgorithm, metadata);
     }
 
     /// <summary>
     /// Signs an decision receipt lifecycle event after canonical payload hashing.
     /// </summary>
-    public static ValueTask<SignedGovernanceArtifact<DecisionReceiptLifecycleEvent>> SignAuditResidueLifecycleEventAsync(
+    public static ValueTask<SignedGovernanceArtifact<DecisionReceiptLifecycleEvent>> SignDecisionReceiptLifecycleEventAsync(
         DecisionReceiptLifecycleEvent lifecycleEvent,
         IGovernanceSigningService signingService,
         CanonicalPayloadOptions? options = null,
@@ -150,7 +150,7 @@ public static class GovernanceArtifactSigner
     {
         return SignAsync(
             lifecycleEvent,
-            CanonicalPayloadBuilder.ForAuditResidueLifecycleEvent(lifecycleEvent, options),
+            CanonicalPayloadBuilder.ForDecisionReceiptLifecycleEvent(lifecycleEvent, options),
             signingService,
             hashAlgorithm,
             keyId,

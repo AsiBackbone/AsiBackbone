@@ -108,7 +108,7 @@ public sealed class AsiBackboneContractFixtureTests
         };
 
         GovernanceContractViolationException exception = Assert.Throws<GovernanceContractViolationException>(
-            () => GovernanceDecisionContract.VerifyAuditResidue(residue));
+            () => GovernanceDecisionContract.VerifyDecisionReceipt(residue));
 
         Assert.Contains("event ID", exception.Message, StringComparison.Ordinal);
     }
@@ -148,7 +148,7 @@ public sealed class AsiBackboneContractFixtureTests
             return auditSink;
         }
 
-        protected override IDecisionReceipt CreateAuditResidue()
+        protected override IDecisionReceipt CreateDecisionReceipt()
         {
             return new TestAuditResidue();
         }

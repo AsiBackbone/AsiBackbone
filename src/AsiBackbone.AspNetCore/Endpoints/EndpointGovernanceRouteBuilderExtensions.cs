@@ -46,7 +46,7 @@ public static class EndpointGovernanceRouteBuilderExtensions
         where TBuilder : IEndpointConventionBuilder
     {
         ArgumentNullException.ThrowIfNull(policyType);
-        return AddEndpointMetadata(builder, new RequireGovernancePolicyAttribute(policyType));
+        return AddEndpointMetadata(builder, new GovernancePolicyAttribute(policyType));
     }
 
     /// <summary>

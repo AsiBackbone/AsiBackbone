@@ -91,7 +91,7 @@ public sealed class PolicyAwareDecisionPolicy : IGovernanceDecisionPolicy<Govern
 
 `endpoint.policy_types` is retained under `EndpointGovernanceMetadataMode.Reduced` for exactly this reason: dropping it would let a metadata setting silently disable a host decision policy that depends on it.
 
-`RequireGovernancePolicy` is the former name of this method and was obsolete in 4.x/5.x. It never resolved the policy type either; the name overstated what it did. The route-builder extensions were removed in 6.0 and must be replaced with `MarkGovernancePolicy` without behavior change.
+`RequireGovernancePolicy` is the former name of this method and was obsolete in 4.x/5.x. It never resolved the policy type either; the name overstated what it did. The route-builder extensions were removed in 6.0 and must be replaced with `MarkGovernancePolicy` without behavior change. For the same reason, the controller attribute formerly named `[RequireGovernancePolicy]` is `[GovernancePolicy]` in 6.0.
 
 Endpoints that intentionally prefer a latency-optimized first-block fast-abort policy path can add endpoint metadata:
 
@@ -106,7 +106,7 @@ The descriptor exposes this as `ShortCircuitOnFirstDenial` and includes `endpoin
 ## Controller/action attribute path
 
 ```csharp
-[RequireGovernancePolicy(typeof(MyStrictPolicy))]
+[GovernancePolicy(typeof(MyStrictPolicy))]
 [RequireLiabilityHandshake]
 [RequireCapabilityGrant("robotics.execute")]
 [EmitGovernanceAudit]
@@ -121,7 +121,7 @@ The attribute model is designed to feel familiar to ASP.NET Core developers who 
 Endpoint-scoped fast-abort metadata is also available as an attribute:
 
 ```csharp
-[RequireGovernancePolicy(typeof(MyStrictPolicy))]
+[GovernancePolicy(typeof(MyStrictPolicy))]
 [ShortCircuitOnFirstDenial]
 public IActionResult ExecuteLatencySensitiveAction()
 {

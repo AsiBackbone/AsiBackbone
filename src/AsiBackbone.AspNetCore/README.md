@@ -56,7 +56,7 @@ app.MapPost("/high-risk-action", handler)
 Controller/action attributes are also available:
 
 ```csharp
-[RequireGovernancePolicy(typeof(MyStrictPolicy))]
+[GovernancePolicy(typeof(MyStrictPolicy))]
 [RequireLiabilityHandshake]
 [RequireCapabilityGrant("robotics.execute")]
 [EmitGovernanceAudit]
@@ -121,7 +121,7 @@ using AsiBackbone.Core.Audit;
 
 GovernanceHttpRequestCorrelation correlation = correlationResolver.ResolveRequestCorrelation();
 
-DecisionReceipt receipt = correlation.CreateAuditResidue(
+DecisionReceipt receipt = correlation.CreateDecisionReceipt(
     actor,
     "ApproveWidget",
     decision);

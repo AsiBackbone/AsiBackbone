@@ -9,7 +9,7 @@ namespace Company.AsibackboneTemplate.Controllers;
 public sealed class SampleGovernanceController : ControllerBase
 {
     [HttpPost("execute")]
-    [RequireGovernancePolicy(typeof(SampleEndpointPolicy))]
+    [GovernancePolicy(typeof(SampleEndpointPolicy))]
     [RequireCapabilityGrant("sample.execute")]
     [EmitGovernanceAudit]
     public IActionResult ExecuteGovernedAction()

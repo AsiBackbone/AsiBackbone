@@ -81,7 +81,7 @@ public sealed class AsiBackboneEndpointGovernanceMetadataModeTests
         var endpoint = new Endpoint(
             static _ => Task.CompletedTask,
             new EndpointMetadataCollection(
-                new RequireGovernancePolicyAttribute(typeof(SamplePolicy)),
+                new GovernancePolicyAttribute(typeof(SamplePolicy)),
                 new RequireLiabilityHandshakeAttribute()),
             "sample.metadata.reduced");
         var descriptor = EndpointGovernanceDescriptor.FromEndpoint(endpoint);
@@ -134,8 +134,8 @@ public sealed class AsiBackboneEndpointGovernanceMetadataModeTests
         var endpoint = new Endpoint(
             static _ => Task.CompletedTask,
             new EndpointMetadataCollection(
-                new RequireGovernancePolicyAttribute(typeof(SamplePolicy)),
-                new RequireGovernancePolicyAttribute(typeof(SecondSamplePolicy))),
+                new GovernancePolicyAttribute(typeof(SamplePolicy)),
+                new GovernancePolicyAttribute(typeof(SecondSamplePolicy))),
             "sample.metadata.reduced.multi");
         var descriptor = EndpointGovernanceDescriptor.FromEndpoint(endpoint);
 
@@ -200,7 +200,7 @@ public sealed class AsiBackboneEndpointGovernanceMetadataModeTests
         var endpoint = new Endpoint(
             static _ => Task.CompletedTask,
             new EndpointMetadataCollection(
-                new RequireGovernancePolicyAttribute(typeof(SamplePolicy)),
+                new GovernancePolicyAttribute(typeof(SamplePolicy)),
                 new RequireLiabilityHandshakeAttribute(),
                 new RequireCapabilityGrantAttribute("robotics.execute"),
                 new EmitGovernanceAuditAttribute()),

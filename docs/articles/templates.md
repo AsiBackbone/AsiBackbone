@@ -50,7 +50,7 @@ The generated project includes:
 - `UseAsiBackboneEndpointGovernance()` middleware;
 - a sample governance constraint and decision policy;
 - a Minimal API endpoint using fluent endpoint-governance metadata;
-- a controller action using `[RequireGovernancePolicy]`, `[RequireCapabilityGrant]`, and `[EmitGovernanceAudit]`;
+- a controller action using `[GovernancePolicy]`, `[RequireCapabilityGrant]`, and `[EmitGovernanceAudit]`;
 - non-durable `InMemoryAuditLedger` storage for local inspection;
 - `AsiBackbone.Analyzers` as a development-time analyzer reference;
 - a generated README with next steps and production-boundary notes.

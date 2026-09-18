@@ -90,7 +90,7 @@ public sealed class RegulatedGovernanceProfileTests
 
         var endpoint = new Endpoint(
             static _ => Task.CompletedTask,
-            new EndpointMetadataCollection(new RequireGovernancePolicyAttribute(typeof(RegulatedPolicy))),
+            new EndpointMetadataCollection(new GovernancePolicyAttribute(typeof(RegulatedPolicy))),
             "regulated.operation");
         var descriptor = EndpointGovernanceDescriptor.FromEndpoint(endpoint);
         IEndpointGovernanceService governanceService = scope.ServiceProvider

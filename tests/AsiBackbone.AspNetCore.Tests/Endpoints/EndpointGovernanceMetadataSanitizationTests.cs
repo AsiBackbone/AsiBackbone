@@ -143,7 +143,7 @@ public sealed class EndpointGovernanceMetadataSanitizationTests
 
         var endpoint = new Endpoint(
             static _ => Task.CompletedTask,
-            new EndpointMetadataCollection(new RequireGovernancePolicyAttribute(typeof(SanitizationPolicy))),
+            new EndpointMetadataCollection(new GovernancePolicyAttribute(typeof(SanitizationPolicy))),
             "sample.sanitization");
         var descriptor = EndpointGovernanceDescriptor.FromEndpoint(endpoint);
         IEndpointGovernanceService service =

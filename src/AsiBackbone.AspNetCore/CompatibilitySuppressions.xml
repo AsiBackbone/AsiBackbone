@@ -292,7 +292,7 @@
     <IsBaselineSuppression>true</IsBaselineSuppression>
   </Suppression>
   <Suppression>
-    <DiagnosticId>CP0008</DiagnosticId>
+    <DiagnosticId>CP0001</DiagnosticId>
     <Target>T:AsiBackbone.AspNetCore.Endpoints.RequireGovernancePolicyAttribute</Target>
     <Left>lib/net10.0/AsiBackbone.AspNetCore.dll</Left>
     <Right>lib/net10.0/AsiBackbone.AspNetCore.dll</Right>

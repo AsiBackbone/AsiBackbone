@@ -360,7 +360,7 @@ public sealed class AsiBackboneContractCoverageTests
             return auditSink;
         }
 
-        protected override IDecisionReceipt CreateAuditResidue()
+        protected override IDecisionReceipt CreateDecisionReceipt()
         {
             return new TestAuditResidue();
         }

@@ -26,7 +26,7 @@ public sealed class AsiBackboneEndpointGovernanceTests
         var endpoint = new Endpoint(
             static context => Task.CompletedTask,
             new EndpointMetadataCollection(
-                new RequireGovernancePolicyAttribute(typeof(SamplePolicy)),
+                new GovernancePolicyAttribute(typeof(SamplePolicy)),
                 new RequireLiabilityHandshakeAttribute(),
                 new RequireCapabilityGrantAttribute("robotics.execute"),
                 new EmitGovernanceAuditAttribute()),
@@ -156,7 +156,7 @@ public sealed class AsiBackboneEndpointGovernanceTests
         httpContext.SetEndpoint(new Endpoint(
             static _ => Task.CompletedTask,
             new EndpointMetadataCollection(
-                new RequireGovernancePolicyAttribute(typeof(SamplePolicy)),
+                new GovernancePolicyAttribute(typeof(SamplePolicy)),
                 new RequireCapabilityGrantAttribute("robotics.execute")),
             "blocked.diagnostics"));
         bool nextCalled = false;
@@ -207,7 +207,7 @@ public sealed class AsiBackboneEndpointGovernanceTests
         httpContext.Response.Body = new MemoryStream();
         httpContext.SetEndpoint(new Endpoint(
             static _ => Task.CompletedTask,
-            new EndpointMetadataCollection(new RequireGovernancePolicyAttribute(typeof(SamplePolicy))),
+            new EndpointMetadataCollection(new GovernancePolicyAttribute(typeof(SamplePolicy))),
             "blocked.default.development"));
         bool nextCalled = false;
         EndpointGovernanceMiddleware middleware = CreateMiddleware(_ =>
@@ -245,7 +245,7 @@ public sealed class AsiBackboneEndpointGovernanceTests
         httpContext.Response.Body = new MemoryStream();
         httpContext.SetEndpoint(new Endpoint(
             static _ => Task.CompletedTask,
-            new EndpointMetadataCollection(new RequireGovernancePolicyAttribute(typeof(SamplePolicy))),
+            new EndpointMetadataCollection(new GovernancePolicyAttribute(typeof(SamplePolicy))),
             "blocked.production"));
         bool nextCalled = false;
         EndpointGovernanceMiddleware middleware = CreateMiddleware(
@@ -455,7 +455,7 @@ public sealed class AsiBackboneEndpointGovernanceTests
         scope.ServiceProvider.GetRequiredService<IHttpContextAccessor>().HttpContext = httpContext;
         var endpoint = new Endpoint(
             static _ => Task.CompletedTask,
-            new EndpointMetadataCollection(new RequireGovernancePolicyAttribute(typeof(SamplePolicy))),
+            new EndpointMetadataCollection(new GovernancePolicyAttribute(typeof(SamplePolicy))),
             "policy.denied");
         var descriptor = EndpointGovernanceDescriptor.FromEndpoint(endpoint);
         IEndpointGovernanceService service = scope.ServiceProvider.GetRequiredService<IEndpointGovernanceService>();

@@ -18,16 +18,16 @@ public sealed class GovernanceArtifactSignerLineCoverageTests
     [Fact]
     public async Task AuditResidueHelpersCoverUnsignedSigningReadyAndSignedPaths()
     {
-        DecisionReceipt residue = CreateAuditResidue();
+        DecisionReceipt residue = CreateDecisionReceipt();
 
-        SignedGovernanceArtifact<IDecisionReceipt> unsigned = GovernanceArtifactSigner.CreateUnsignedAuditResidue(residue);
-        SignedGovernanceArtifact<IDecisionReceipt> signingReady = GovernanceArtifactSigner.CreateSigningReadyAuditResidue(
+        SignedGovernanceArtifact<IDecisionReceipt> unsigned = GovernanceArtifactSigner.CreateUnsignedDecisionReceipt(residue);
+        SignedGovernanceArtifact<IDecisionReceipt> signingReady = GovernanceArtifactSigner.CreateSigningReadyDecisionReceipt(
             residue,
             metadata: new Dictionary<string, string>
             {
                 ["workflow"] = "audit-residue-ready"
             });
-        SignedGovernanceArtifact<IDecisionReceipt> signed = await GovernanceArtifactSigner.SignAuditResidueAsync(
+        SignedGovernanceArtifact<IDecisionReceipt> signed = await GovernanceArtifactSigner.SignDecisionReceiptAsync(
             residue,
             new FakeSigningService(),
             keyId: "residue-key",
@@ -62,14 +62,14 @@ public sealed class GovernanceArtifactSignerLineCoverageTests
     {
         DecisionReceiptLifecycleEvent lifecycleEvent = CreateLifecycleEvent();
 
-        SignedGovernanceArtifact<DecisionReceiptLifecycleEvent> unsigned = GovernanceArtifactSigner.CreateUnsignedAuditResidueLifecycleEvent(lifecycleEvent);
-        SignedGovernanceArtifact<DecisionReceiptLifecycleEvent> signingReady = GovernanceArtifactSigner.CreateSigningReadyAuditResidueLifecycleEvent(
+        SignedGovernanceArtifact<DecisionReceiptLifecycleEvent> unsigned = GovernanceArtifactSigner.CreateUnsignedDecisionReceiptLifecycleEvent(lifecycleEvent);
+        SignedGovernanceArtifact<DecisionReceiptLifecycleEvent> signingReady = GovernanceArtifactSigner.CreateSigningReadyDecisionReceiptLifecycleEvent(
             lifecycleEvent,
             metadata: new Dictionary<string, string>
             {
                 ["workflow"] = "lifecycle-ready"
             });
-        SignedGovernanceArtifact<DecisionReceiptLifecycleEvent> signed = await GovernanceArtifactSigner.SignAuditResidueLifecycleEventAsync(
+        SignedGovernanceArtifact<DecisionReceiptLifecycleEvent> signed = await GovernanceArtifactSigner.SignDecisionReceiptLifecycleEventAsync(
             lifecycleEvent,
             new FakeSigningService(),
             keyId: "lifecycle-key",
@@ -195,7 +195,7 @@ public sealed class GovernanceArtifactSignerLineCoverageTests
         Assert.False(request.Metadata.ContainsKey(string.Empty));
     }
 
-    private static DecisionReceipt CreateAuditResidue()
+    private static DecisionReceipt CreateDecisionReceipt()
     {
         IGovernanceActorContext actor = GovernanceActorContext.Service("system-1", "System");
 

@@ -31,7 +31,7 @@ Supply the host's actual contributors, decision policy, options, and logger wher
 
 Type-based dependency injection registration now has only the full constructor to activate. It requires all five dependencies to be resolvable, including the concrete evaluator options object. Hosts using the options pattern should use a factory instead, passing `IOptions<GovernancePolicyOptions>.Value` to `WithOptions` (or the full constructor), and resolving the other configured dependencies explicitly. The sample and template use this factory pattern so unregistered optional dependencies retain their defaults.
 
-`MarkGovernancePolicy` records the same policy metadata. It does not resolve the policy or select/enforce constraints solely from the marker. The non-obsolete `RequireGovernancePolicyAttribute` remains supported.
+`MarkGovernancePolicy` records the same policy metadata. It does not resolve the policy or select/enforce constraints solely from the marker. The attribute formerly named `RequireGovernancePolicyAttribute` is renamed to `GovernancePolicyAttribute` for the same reason; see [Helper member renames](#helper-member-renames).
 
 ## Diagnostics and compatibility validation
 
@@ -218,4 +218,4 @@ See [6.0 public API naming convention](public-api-naming-600.md) for the complet
 | `AsiBackbone.Testing` | `AsiBackbone.Testing.Contracts.AsiBackboneEndpointCapabilityGrantValidatorContract` | `AsiBackbone.Testing.Contracts.EndpointCapabilityGrantValidatorContract` |
 | `AsiBackbone.Testing` | `AsiBackbone.Testing.Contracts.AsiBackbonePolicyEvaluatorContract`1` | `AsiBackbone.Testing.Contracts.GovernancePolicyEvaluatorContract`1` |
 
-Protocol/helper members such as AuditResidueId and ForAuditResidue retain their names and wire meaning. JSON keys, schema versions, canonical tags, signed bytes, and EF table/column names are unchanged. A type rename alone does not require a data migration. Type-based DI, reflection, custom receipt implementations, and host EF model configuration must reference the new CLR types. Rebuild all dependent assemblies.
+Protocol members such as AuditResidueId retain their names and wire meaning; helper methods named for the audit-residue vocabulary are renamed as listed in [Helper member renames](#helper-member-renames). JSON keys, schema versions, canonical tags, signed bytes, and EF table/column names are unchanged. A type rename alone does not require a data migration. Type-based DI, reflection, custom receipt implementations, and host EF model configuration must reference the new CLR types. Rebuild all dependent assemblies.
