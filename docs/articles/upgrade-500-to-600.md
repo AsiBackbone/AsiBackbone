@@ -96,29 +96,6 @@ Migration actions:
 
 A provider that ignores `SignatureInput` and keeps signing or verifying the hash text fails closed against artifacts produced by the other side of the change, rather than silently accepting unauthenticated labels, as long as signer and verifier are not both left on the hash text. Update both together.
 
-## Helper member renames
-
-The 6.0 type review left helper members that operate on decision receipts named for the retired audit-residue vocabulary, and kept the endpoint attribute whose route-builder counterpart was renamed because "Require" overstated what it does. 6.0 renames them. Behavior, parameters, return types, canonical artifact tags, and signed bytes are unchanged.
-
-| 5.x / earlier 6.0 name | 6.0 name |
-| --- | --- |
-| `CanonicalPayloadBuilder.ForAuditResidue` | `CanonicalPayloadBuilder.ForDecisionReceipt` |
-| `CanonicalPayloadBuilder.ForAuditResidueLifecycleEvent` | `CanonicalPayloadBuilder.ForDecisionReceiptLifecycleEvent` |
-| `GovernanceArtifactSigner.CreateUnsignedAuditResidue` | `GovernanceArtifactSigner.CreateUnsignedDecisionReceipt` |
-| `GovernanceArtifactSigner.CreateSigningReadyAuditResidue` | `GovernanceArtifactSigner.CreateSigningReadyDecisionReceipt` |
-| `GovernanceArtifactSigner.SignAuditResidueAsync` | `GovernanceArtifactSigner.SignDecisionReceiptAsync` |
-| `GovernanceArtifactSigner.CreateUnsignedAuditResidueLifecycleEvent` | `GovernanceArtifactSigner.CreateUnsignedDecisionReceiptLifecycleEvent` |
-| `GovernanceArtifactSigner.CreateSigningReadyAuditResidueLifecycleEvent` | `GovernanceArtifactSigner.CreateSigningReadyDecisionReceiptLifecycleEvent` |
-| `GovernanceArtifactSigner.SignAuditResidueLifecycleEventAsync` | `GovernanceArtifactSigner.SignDecisionReceiptLifecycleEventAsync` |
-| `GovernanceHttpRequestCorrelationAuditExtensions.CreateAuditResidue` | `GovernanceHttpRequestCorrelationAuditExtensions.CreateDecisionReceipt` |
-| `GovernanceDecisionContract.VerifyAuditResidue` | `GovernanceDecisionContract.VerifyDecisionReceipt` |
-| `DecisionReceiptSinkContract.CreateAuditResidue()` (protected abstract) | `DecisionReceiptSinkContract.CreateDecisionReceipt()` |
-| `RequireGovernancePolicyAttribute` / `[RequireGovernancePolicy(...)]` | `GovernancePolicyAttribute` / `[GovernancePolicy(...)]` |
-
-Contract-test fixtures deriving from `DecisionReceiptSinkContract` must rename their `CreateAuditResidue` override.
-
-Retained deliberately: `AuditResidueId` properties and their related members (`DecisionReceiptBuilder.WithAuditResidueId`, `FindByAuditResidueIdAsync`, the OpenTelemetry `AuditResidueId` attribute constant), because the identifier is persisted and serialized, and the canonical artifact tags `CanonicalArtifactTypes.AuditResidue` and `AuditResidueLifecycleEvent`, because they are signed.
-
 ## In-memory capability grant use store
 
 `InMemoryCapabilityGrantUseStore` evicted use records once a grant had been expired for longer than `EvictionGracePeriod`, while `CapabilityGrantValidator` still accepts an expired grant within `AllowedClockSkew`. With a skew above the grace period, a grant's record was evicted while the grant still validated, and the next use was accepted as a first use: a replay.
