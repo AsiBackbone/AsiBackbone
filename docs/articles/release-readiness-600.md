@@ -42,9 +42,12 @@ commit.
   in locked mode.
 - [ ] Package validation compares `6.0.0` against the configured
   `AsiBackbonePackageValidationBaselineVersion`, with every intentional break
-  recorded as an exact suppression. The baseline is `5.1.0`; renames of API
-  introduced in `5.2.0`, such as the policy-evaluator builder, are documented in
-  the migration guide rather than detected by package validation.
+  recorded as an exact suppression. The baseline remains `5.1.0`, the latest
+  published package family; `5.2.0` was not published and therefore cannot be a
+  package-validation baseline. API introduced during the unreleased 5.2
+  development stage, such as the policy-evaluator builder, is covered by the
+  reviewed public API baseline and documented in the migration guide rather
+  than detected by NuGet package validation.
 - [ ] Public API baselines are regenerated and reviewed.
 - [ ] `CHANGELOG.md` and release notes describe the same change set and
   compatibility boundary.

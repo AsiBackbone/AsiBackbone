@@ -72,8 +72,9 @@ Consumers moving from `5.x` must follow the
   every `SigningMetadata` value was an unauthenticated label, so a validly signed artifact could be relabeled with a
   different policy context and still verify, and policy pins checked values the signature did not cover. Added
   `SigningRequest.SignatureInput`, `SignatureVerificationRequest.SignatureInput`, and
-  `ManagedKeySignRequest.SignatureInput`; host managed-key clients and verification services must sign and verify
-  these bytes.
+  `ManagedKeySignRequest.SignatureInput`; `SigningRequest.UsesLegacySignatureInput` and
+  `SignatureVerificationRequest.UsesLegacySignatureInput` identify requests using the hash-only fallback. Host
+  managed-key clients and verification services must sign and verify the supplied signature-input bytes.
 * Artifacts signed before 6.0 fail version 1 verification. `VerificationPolicyContext.WithLegacySignatureInputAllowed()`
   opts a review path into a single hash-only retry; a signature accepted that way cannot satisfy a policy pin and
   denies with `signature.policy-context-not-authenticated`.
