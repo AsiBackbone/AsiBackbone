@@ -87,7 +87,7 @@ public sealed class AsiBackboneContractFixtureTests
         var auditSink = new GovernanceTestDecisionReceiptSink();
         var contract = new TestAuditSinkContract(auditSink);
 
-        await contract.VerifyAuditSinkAcceptsValidResidueAsync(TestContext.Current.CancellationToken);
+        await contract.VerifyDecisionReceiptSinkAcceptsValidReceiptAsync(TestContext.Current.CancellationToken);
 
         _ = Assert.Single(auditSink.Entries);
         Assert.Equal("contract-event", auditSink.Entries[0].EventId);
@@ -143,7 +143,7 @@ public sealed class AsiBackboneContractFixtureTests
 
     private sealed class TestAuditSinkContract(GovernanceTestDecisionReceiptSink auditSink) : DecisionReceiptSinkContract
     {
-        protected override IDecisionReceiptSink CreateAuditSink()
+        protected override IDecisionReceiptSink CreateDecisionReceiptSink()
         {
             return auditSink;
         }

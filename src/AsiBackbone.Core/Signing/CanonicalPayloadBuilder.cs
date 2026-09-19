@@ -15,19 +15,19 @@ public static class CanonicalPayloadBuilder
     /// <summary>
     /// Builds a canonical payload for decision receipt.
     /// </summary>
-    public static CanonicalPayload ForDecisionReceipt(IDecisionReceipt residue, CanonicalPayloadOptions? options = null)
+    public static CanonicalPayload ForDecisionReceipt(IDecisionReceipt receipt, CanonicalPayloadOptions? options = null)
     {
-        ArgumentNullException.ThrowIfNull(residue);
+        ArgumentNullException.ThrowIfNull(receipt);
         CanonicalPayloadOptions effectiveOptions = options ?? CanonicalPayloadOptions.Default;
-        string auditResidueId = GetAuditResidueId(residue);
+        string auditResidueId = GetAuditResidueId(receipt);
 
         return CanonicalPayload.Create(
             CanonicalArtifactTypes.AuditResidue,
             auditResidueId,
-            residue.SchemaVersion,
+            receipt.SchemaVersion,
             effectiveOptions.CanonicalizationVersion,
             effectiveOptions.HashAlgorithm,
-            BuildAuditResidueContent(residue, effectiveOptions, auditResidueId));
+            BuildDecisionReceiptContent(receipt, effectiveOptions, auditResidueId));
     }
 
     /// <summary>
@@ -38,7 +38,7 @@ public static class CanonicalPayloadBuilder
         ArgumentNullException.ThrowIfNull(record);
         CanonicalPayloadOptions effectiveOptions = options ?? CanonicalPayloadOptions.Default;
 
-        SortedDictionary<string, object?> content = BuildAuditResidueContent(record, effectiveOptions, record.AuditResidueId);
+        SortedDictionary<string, object?> content = BuildDecisionReceiptContent(record, effectiveOptions, record.AuditResidueId);
         content["acknowledgmentId"] = record.AcknowledgmentId;
         content["capabilityGrantId"] = record.CapabilityTokenId;
         content["handshakeId"] = record.HandshakeId;
@@ -201,42 +201,42 @@ public static class CanonicalPayloadBuilder
             content);
     }
 
-    private static SortedDictionary<string, object?> BuildAuditResidueContent(
-        IDecisionReceipt residue,
+    private static SortedDictionary<string, object?> BuildDecisionReceiptContent(
+        IDecisionReceipt receipt,
         CanonicalPayloadOptions options,
         string auditResidueId)
     {
         return new SortedDictionary<string, object?>(StringComparer.Ordinal)
         {
-            ["actorDisplayName"] = residue.ActorDisplayName,
-            ["actorId"] = residue.ActorId,
-            ["actorType"] = residue.ActorType.ToString(),
+            ["actorDisplayName"] = receipt.ActorDisplayName,
+            ["actorId"] = receipt.ActorId,
+            ["actorType"] = receipt.ActorType.ToString(),
             ["auditResidueId"] = auditResidueId,
-            ["constraintCount"] = residue.ConstraintCount,
-            ["constraintSetHash"] = residue.ConstraintSetHash,
-            ["correlationId"] = residue.CorrelationId,
-            ["decisionLatencyMs"] = residue.DecisionLatencyMs,
-            ["decisionStage"] = residue.DecisionStage,
-            ["emitterProvider"] = residue.EmitterProvider,
-            ["emitterStatus"] = residue.EmitterStatus,
-            ["eventId"] = residue.EventId,
-            ["gatewayExecutionId"] = residue.GatewayExecutionId,
-            ["metadata"] = FilterMetadata(residue.Metadata, options),
-            ["occurredUtc"] = FormatUtc(residue.OccurredUtc),
-            ["operationName"] = residue.OperationName,
-            ["organizationHash"] = residue.OrganizationHash,
-            ["outboxSequence"] = residue.OutboxSequence,
-            ["outcome"] = residue.Outcome,
-            ["parentSpanId"] = residue.ParentSpanId,
-            ["policyHash"] = residue.PolicyHash,
-            ["policyScope"] = residue.PolicyScope,
-            ["policyVersion"] = residue.PolicyVersion,
-            ["reasonCodes"] = NormalizeStringSet(residue.ReasonCodes),
-            ["riskScore"] = residue.RiskScore,
-            ["schemaVersion"] = residue.SchemaVersion,
-            ["spanId"] = residue.SpanId,
-            ["tenantHash"] = residue.TenantHash,
-            ["traceId"] = residue.TraceId
+            ["constraintCount"] = receipt.ConstraintCount,
+            ["constraintSetHash"] = receipt.ConstraintSetHash,
+            ["correlationId"] = receipt.CorrelationId,
+            ["decisionLatencyMs"] = receipt.DecisionLatencyMs,
+            ["decisionStage"] = receipt.DecisionStage,
+            ["emitterProvider"] = receipt.EmitterProvider,
+            ["emitterStatus"] = receipt.EmitterStatus,
+            ["eventId"] = receipt.EventId,
+            ["gatewayExecutionId"] = receipt.GatewayExecutionId,
+            ["metadata"] = FilterMetadata(receipt.Metadata, options),
+            ["occurredUtc"] = FormatUtc(receipt.OccurredUtc),
+            ["operationName"] = receipt.OperationName,
+            ["organizationHash"] = receipt.OrganizationHash,
+            ["outboxSequence"] = receipt.OutboxSequence,
+            ["outcome"] = receipt.Outcome,
+            ["parentSpanId"] = receipt.ParentSpanId,
+            ["policyHash"] = receipt.PolicyHash,
+            ["policyScope"] = receipt.PolicyScope,
+            ["policyVersion"] = receipt.PolicyVersion,
+            ["reasonCodes"] = NormalizeStringSet(receipt.ReasonCodes),
+            ["riskScore"] = receipt.RiskScore,
+            ["schemaVersion"] = receipt.SchemaVersion,
+            ["spanId"] = receipt.SpanId,
+            ["tenantHash"] = receipt.TenantHash,
+            ["traceId"] = receipt.TraceId
         };
     }
 
@@ -354,10 +354,10 @@ public static class CanonicalPayloadBuilder
         return timestamp.ToUniversalTime().ToString("yyyy-MM-dd'T'HH:mm:ss.fffffff'Z'", CultureInfo.InvariantCulture);
     }
 
-    private static string GetAuditResidueId(IDecisionReceipt residue)
+    private static string GetAuditResidueId(IDecisionReceipt receipt)
     {
-        return string.IsNullOrWhiteSpace(residue.AuditResidueId)
-            ? residue.EventId
-            : residue.AuditResidueId;
+        return string.IsNullOrWhiteSpace(receipt.AuditResidueId)
+            ? receipt.EventId
+            : receipt.AuditResidueId;
     }
 }

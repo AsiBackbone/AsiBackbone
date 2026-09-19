@@ -222,9 +222,9 @@ public sealed class AsiBackboneContractCoverageTests
         var contract = new AuditSinkContract(new ThrowingAuditSink());
 
         GovernanceContractViolationException exception = await Assert.ThrowsAsync<GovernanceContractViolationException>(
-            async () => await contract.VerifyAuditSinkAcceptsValidResidueAsync(TestContext.Current.CancellationToken));
+            async () => await contract.VerifyDecisionReceiptSinkAcceptsValidReceiptAsync(TestContext.Current.CancellationToken));
 
-        Assert.Contains("Audit sink implementations", exception.Message, StringComparison.Ordinal);
+        Assert.Contains("Decision receipt sink implementations", exception.Message, StringComparison.Ordinal);
         _ = Assert.IsType<InvalidOperationException>(exception.InnerException);
     }
 
@@ -355,7 +355,7 @@ public sealed class AsiBackboneContractCoverageTests
 
     private sealed class AuditSinkContract(IDecisionReceiptSink auditSink) : DecisionReceiptSinkContract
     {
-        protected override IDecisionReceiptSink CreateAuditSink()
+        protected override IDecisionReceiptSink CreateDecisionReceiptSink()
         {
             return auditSink;
         }

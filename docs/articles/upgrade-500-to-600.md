@@ -108,6 +108,46 @@ A provider that ignores `SignatureInput` and keeps signing or verifying the hash
 
 Migration action: set `EvictionGracePeriod` to at least the largest `AllowedClockSkew` used with the store. With the defaults (zero skew, five-minute grace period) no change is needed.
 
+## Helper member renames
+
+The 6.0 terminology change also renames public helpers that operate on decision
+receipts. Apart from the explicitly documented `residue` to `receipt` parameter
+rename below, parameter types, return types, behavior, canonical artifact tags,
+signed bytes, JSON keys, and EF table and column names are unchanged.
+
+| 5.x member | 6.0 member |
+| --- | --- |
+| `CanonicalPayloadBuilder.ForAuditResidue` | `ForDecisionReceipt` |
+| `CanonicalPayloadBuilder.ForAuditResidueLifecycleEvent` | `ForDecisionReceiptLifecycleEvent` |
+| `GovernanceArtifactSigner.CreateUnsignedAuditResidue` | `CreateUnsignedDecisionReceipt` |
+| `GovernanceArtifactSigner.CreateSigningReadyAuditResidue` | `CreateSigningReadyDecisionReceipt` |
+| `GovernanceArtifactSigner.SignAuditResidueAsync` | `SignDecisionReceiptAsync` |
+| `GovernanceArtifactSigner.CreateUnsignedAuditResidueLifecycleEvent` | `CreateUnsignedDecisionReceiptLifecycleEvent` |
+| `GovernanceArtifactSigner.CreateSigningReadyAuditResidueLifecycleEvent` | `CreateSigningReadyDecisionReceiptLifecycleEvent` |
+| `GovernanceArtifactSigner.SignAuditResidueLifecycleEventAsync` | `SignDecisionReceiptLifecycleEventAsync` |
+| `AsiBackboneHttpRequestCorrelationAuditExtensions.CreateAuditResidue` | `GovernanceHttpRequestCorrelationDecisionReceiptExtensions.CreateDecisionReceipt` |
+| `GovernanceDecisionContract.VerifyAuditResidue` | `VerifyDecisionReceipt` |
+| `AsiBackboneAuditSinkContract.CreateAuditResidue()` | `DecisionReceiptSinkContract.CreateDecisionReceipt()` |
+| `AsiBackboneAuditSinkContract.CreateAuditSink()` | `DecisionReceiptSinkContract.CreateDecisionReceiptSink()` |
+| `AsiBackboneAuditSinkContract.VerifyAuditSinkAcceptsValidResidueAsync()` | `DecisionReceiptSinkContract.VerifyDecisionReceiptSinkAcceptsValidReceiptAsync()` |
+| `RequireGovernancePolicyAttribute` / `[RequireGovernancePolicy(...)]` | `GovernancePolicyAttribute` / `[GovernancePolicy(...)]` |
+
+Contract-test fixtures derived from `DecisionReceiptSinkContract` must rename
+their protected `CreateAuditResidue` and `CreateAuditSink` overrides to
+`CreateDecisionReceipt` and `CreateDecisionReceiptSink`, respectively. Calls to
+the contract verification method must use
+`VerifyDecisionReceiptSinkAcceptsValidReceiptAsync`.
+
+The public `IDecisionReceipt` parameter on `ForDecisionReceipt`,
+`CreateUnsignedDecisionReceipt`, `CreateSigningReadyDecisionReceipt`,
+`SignDecisionReceiptAsync`, and `VerifyDecisionReceipt` is named `receipt` in
+6.0. Named-argument callers must update `residue:` to `receipt:`.
+
+Protocol and persisted names remain unchanged: the `AuditResidueId` member
+family, `CanonicalArtifactTypes.AuditResidue`, and
+`CanonicalArtifactTypes.AuditResidueLifecycleEvent` retain their established
+wire meaning.
+
 ## Public type renames
 
 See [6.0 public API naming convention](public-api-naming-600.md) for the complete inventory, qualifier decisions, namespace review, terminology coordination with #781, and retained names. No compatibility aliases are carried forward. Namespace and generic arity stay the same.
@@ -118,7 +158,7 @@ See [6.0 public API naming convention](public-api-naming-600.md) for the complet
 | `AsiBackbone.AspNetCore` | `AsiBackbone.AspNetCore.Actors.HttpContextAsiBackboneActorContextResolver` | `AsiBackbone.AspNetCore.Actors.HttpContextGovernanceActorContextResolver` |
 | `AsiBackbone.AspNetCore` | `AsiBackbone.AspNetCore.Actors.IAsiBackboneHttpActorContextResolver` | `AsiBackbone.AspNetCore.Actors.IHttpGovernanceActorContextResolver` |
 | `AsiBackbone.AspNetCore` | `AsiBackbone.AspNetCore.Correlation.AsiBackboneHttpRequestCorrelation` | `AsiBackbone.AspNetCore.Correlation.GovernanceHttpRequestCorrelation` |
-| `AsiBackbone.AspNetCore` | `AsiBackbone.AspNetCore.Correlation.AsiBackboneHttpRequestCorrelationAuditExtensions` | `AsiBackbone.AspNetCore.Correlation.GovernanceHttpRequestCorrelationAuditExtensions` |
+| `AsiBackbone.AspNetCore` | `AsiBackbone.AspNetCore.Correlation.AsiBackboneHttpRequestCorrelationAuditExtensions` | `AsiBackbone.AspNetCore.Correlation.GovernanceHttpRequestCorrelationDecisionReceiptExtensions` |
 | `AsiBackbone.AspNetCore` | `AsiBackbone.AspNetCore.Correlation.AsiBackboneHttpRequestMetadataKeys` | `AsiBackbone.AspNetCore.Correlation.GovernanceHttpRequestMetadataKeys` |
 | `AsiBackbone.AspNetCore` | `AsiBackbone.AspNetCore.Correlation.HttpContextAsiBackboneRequestCorrelationResolver` | `AsiBackbone.AspNetCore.Correlation.HttpContextGovernanceRequestCorrelationResolver` |
 | `AsiBackbone.AspNetCore` | `AsiBackbone.AspNetCore.Correlation.IAsiBackboneHttpRequestCorrelationResolver` | `AsiBackbone.AspNetCore.Correlation.IHttpGovernanceRequestCorrelationResolver` |

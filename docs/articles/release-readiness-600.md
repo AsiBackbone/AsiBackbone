@@ -1,6 +1,6 @@
 # AsiBackbone 6.0.0 Release Readiness Record
 
-Release candidate date: 2026-09-18
+Release candidate date: 2026-09-19
 
 ## Release intent
 
@@ -32,13 +32,13 @@ commit.
 
 ## Version and metadata checklist
 
-- [ ] `Directory.Build.props` resolves package version `6.0.0`.
-- [ ] `AssemblyVersion` is `6.0.0.0`.
-- [ ] `FileVersion` is `6.0.0.0`.
-- [ ] `CITATION.cff` reports `6.0.0` and the final release date.
-- [ ] `.zenodo.json` reports `6.0.0` and the major-release scope.
-- [ ] Template fallback package references use `6.0.0`.
-- [ ] NuGet lock files reference `6.0.0` for in-repository projects and restore
+- [x] `Directory.Build.props` resolves package version `6.0.0`.
+- [x] `AssemblyVersion` is `6.0.0.0`.
+- [x] `FileVersion` is `6.0.0.0`.
+- [x] `CITATION.cff` reports `6.0.0` and the final release date.
+- [x] `.zenodo.json` reports `6.0.0` and the major-release scope.
+- [x] Template fallback package references use `6.0.0`.
+- [x] NuGet lock files reference `6.0.0` for in-repository projects and restore
   in locked mode.
 - [ ] Package validation compares `6.0.0` against the configured
   `AsiBackbonePackageValidationBaselineVersion`, with every intentional break

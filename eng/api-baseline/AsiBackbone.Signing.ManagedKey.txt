@@ -1,5 +1,5 @@
 # AsiBackbone stable public API baseline
-# Baseline release: 5.0.0
+# Baseline release: 6.0.0
 # Assembly: AsiBackbone.Signing.ManagedKey.dll
 # Format: KIND | UID | C# declaration (or enum field display)
 # Update only after explicit API/SemVer review.
@@ -12,6 +12,7 @@ MEMBER | AsiBackbone.Signing.ManagedKey.ManagedKeySignRequest.KeyVersion | publi
 MEMBER | AsiBackbone.Signing.ManagedKey.ManagedKeySignRequest.Metadata | public IReadOnlyDictionary<string, string> Metadata { get; }
 MEMBER | AsiBackbone.Signing.ManagedKey.ManagedKeySignRequest.Purpose | public string? Purpose { get; }
 MEMBER | AsiBackbone.Signing.ManagedKey.ManagedKeySignRequest.SignatureAlgorithm | public string SignatureAlgorithm { get; }
+MEMBER | AsiBackbone.Signing.ManagedKey.ManagedKeySignRequest.SignatureInput | public ReadOnlyMemory<byte> SignatureInput { get; init; }
 MEMBER | AsiBackbone.Signing.ManagedKey.ManagedKeySignRequest.SigningHash | public string SigningHash { get; }
 MEMBER | AsiBackbone.Signing.ManagedKey.ManagedKeySignResult.Create(System.String,System.String,System.String,System.String,System.DateTimeOffset,System.String,System.Collections.Generic.IReadOnlyDictionary{System.String,System.String}) | public static ManagedKeySignResult Create(string signature, string signatureAlgorithm, string keyId, string? keyVersion, DateTimeOffset signedUtc, string? providerOperationId = null, IReadOnlyDictionary<string, string>? metadata = null)
 MEMBER | AsiBackbone.Signing.ManagedKey.ManagedKeySignResult.KeyId | public string KeyId { get; }

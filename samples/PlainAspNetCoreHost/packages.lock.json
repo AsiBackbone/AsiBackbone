@@ -103,7 +103,7 @@
           "AsiBackbone.Core": "[6.0.0, )",
           "AsiBackbone.DependencyInjection": "[6.0.0, )",
           "Microsoft.EntityFrameworkCore": "[10.0.12, )",
-          "Microsoft.EntityFrameworkCore.Relational": "[10.0.12, )",
+          "Microsoft.EntityFrameworkCore.Relational": "[10.0.12, )"
         }
       },
       "asibackbone.signing.localdevelopment": {

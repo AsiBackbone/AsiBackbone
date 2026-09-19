@@ -17,30 +17,30 @@ public static class GovernanceArtifactSigner
     /// Creates an unsigned wrapper for decision receipt.
     /// </summary>
     public static SignedGovernanceArtifact<IDecisionReceipt> CreateUnsignedDecisionReceipt(
-        IDecisionReceipt residue,
+        IDecisionReceipt receipt,
         CanonicalPayloadOptions? options = null,
         string? hashAlgorithm = null)
     {
-        return CreateUnsigned(residue, CanonicalPayloadBuilder.ForDecisionReceipt(residue, options), hashAlgorithm);
+        return CreateUnsigned(receipt, CanonicalPayloadBuilder.ForDecisionReceipt(receipt, options), hashAlgorithm);
     }
 
     /// <summary>
     /// Creates signing-ready metadata for decision receipt without invoking a signing provider.
     /// </summary>
     public static SignedGovernanceArtifact<IDecisionReceipt> CreateSigningReadyDecisionReceipt(
-        IDecisionReceipt residue,
+        IDecisionReceipt receipt,
         CanonicalPayloadOptions? options = null,
         string? hashAlgorithm = null,
         IReadOnlyDictionary<string, string>? metadata = null)
     {
-        return CreateSigningReady(residue, CanonicalPayloadBuilder.ForDecisionReceipt(residue, options), hashAlgorithm, metadata);
+        return CreateSigningReady(receipt, CanonicalPayloadBuilder.ForDecisionReceipt(receipt, options), hashAlgorithm, metadata);
     }
 
     /// <summary>
     /// Signs decision receipt after canonical payload hashing.
     /// </summary>
     public static ValueTask<SignedGovernanceArtifact<IDecisionReceipt>> SignDecisionReceiptAsync(
-        IDecisionReceipt residue,
+        IDecisionReceipt receipt,
         IGovernanceSigningService signingService,
         CanonicalPayloadOptions? options = null,
         string? hashAlgorithm = null,
@@ -51,8 +51,8 @@ public static class GovernanceArtifactSigner
         CancellationToken cancellationToken = default)
     {
         return SignAsync(
-            residue,
-            CanonicalPayloadBuilder.ForDecisionReceipt(residue, options),
+            receipt,
+            CanonicalPayloadBuilder.ForDecisionReceipt(receipt, options),
             signingService,
             hashAlgorithm,
             keyId,

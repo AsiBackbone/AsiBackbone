@@ -93,39 +93,39 @@ public static class GovernanceDecisionContract
     /// <summary>
     /// Verifies that decision receipt contains the minimum identity, operation, outcome, and policy telemetry shape.
     /// </summary>
-    /// <param name="residue">The decision receipt to verify.</param>
+    /// <param name="receipt">The decision receipt to verify.</param>
     /// <param name="contractName">The human-readable contract name used in failure messages.</param>
     /// <returns>The verified decision receipt.</returns>
     public static IDecisionReceipt VerifyDecisionReceipt(
-        IDecisionReceipt? residue,
+        IDecisionReceipt? receipt,
         string contractName = "Decision receipt")
     {
-        if (residue is null)
+        if (receipt is null)
         {
             throw new GovernanceContractViolationException($"{contractName} must not be null.");
         }
 
-        VerifyRequiredString(residue.EventId, "event ID", contractName);
-        VerifyRequiredString(residue.ActorId, "actor ID", contractName);
-        VerifyRequiredString(residue.OperationName, "operation name", contractName);
-        VerifyRequiredString(residue.Outcome, "outcome", contractName);
+        VerifyRequiredString(receipt.EventId, "event ID", contractName);
+        VerifyRequiredString(receipt.ActorId, "actor ID", contractName);
+        VerifyRequiredString(receipt.OperationName, "operation name", contractName);
+        VerifyRequiredString(receipt.Outcome, "outcome", contractName);
 
-        if (residue.ReasonCodes is null)
+        if (receipt.ReasonCodes is null)
         {
             throw new GovernanceContractViolationException($"{contractName} reason-code collection must not be null.");
         }
 
-        for (int index = 0; index < residue.ReasonCodes.Count; index++)
+        for (int index = 0; index < receipt.ReasonCodes.Count; index++)
         {
-            if (string.IsNullOrWhiteSpace(residue.ReasonCodes[index]))
+            if (string.IsNullOrWhiteSpace(receipt.ReasonCodes[index]))
             {
                 throw new GovernanceContractViolationException($"{contractName} contains an empty reason code at index {index}.");
             }
         }
 
-        return residue.Metadata is null
+        return receipt.Metadata is null
             ? throw new GovernanceContractViolationException($"{contractName} metadata collection must not be null.")
-            : residue;
+            : receipt;
     }
 
     private static void VerifySupportedOutcome(GovernanceDecision decision, string contractName)

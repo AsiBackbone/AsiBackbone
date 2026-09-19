@@ -1,12 +1,12 @@
 # AsiBackbone stable public API baseline
-# Baseline release: 5.0.0
+# Baseline release: 6.0.0
 # Assembly: AsiBackbone.Testing.dll
 # Format: KIND | UID | C# declaration (or enum field display)
 # Update only after explicit API/SemVer review.
 
-MEMBER | AsiBackbone.Testing.Contracts.DecisionReceiptSinkContract.CreateAuditResidue | protected abstract IDecisionReceipt CreateAuditResidue()
-MEMBER | AsiBackbone.Testing.Contracts.DecisionReceiptSinkContract.CreateAuditSink | protected abstract IDecisionReceiptSink CreateAuditSink()
-MEMBER | AsiBackbone.Testing.Contracts.DecisionReceiptSinkContract.VerifyAuditSinkAcceptsValidResidueAsync(System.Threading.CancellationToken) | public ValueTask VerifyAuditSinkAcceptsValidResidueAsync(CancellationToken cancellationToken = default)
+MEMBER | AsiBackbone.Testing.Contracts.DecisionReceiptSinkContract.CreateDecisionReceipt | protected abstract IDecisionReceipt CreateDecisionReceipt()
+MEMBER | AsiBackbone.Testing.Contracts.DecisionReceiptSinkContract.CreateDecisionReceiptSink | protected abstract IDecisionReceiptSink CreateDecisionReceiptSink()
+MEMBER | AsiBackbone.Testing.Contracts.DecisionReceiptSinkContract.VerifyDecisionReceiptSinkAcceptsValidReceiptAsync(System.Threading.CancellationToken) | public ValueTask VerifyDecisionReceiptSinkAcceptsValidReceiptAsync(CancellationToken cancellationToken = default)
 MEMBER | AsiBackbone.Testing.Contracts.EndpointCapabilityGrantValidatorContract.ConfigureKnownInvalidCapabilityGrant(Microsoft.AspNetCore.Http.HttpContext,AsiBackbone.AspNetCore.Endpoints.EndpointGovernanceDescriptor) | protected virtual void ConfigureKnownInvalidCapabilityGrant(HttpContext httpContext, EndpointGovernanceDescriptor descriptor)
 MEMBER | AsiBackbone.Testing.Contracts.EndpointCapabilityGrantValidatorContract.CreateCapabilityDescriptor | protected virtual EndpointGovernanceDescriptor CreateCapabilityDescriptor()
 MEMBER | AsiBackbone.Testing.Contracts.EndpointCapabilityGrantValidatorContract.CreateCurrentDecision | protected virtual GovernanceDecision CreateCurrentDecision()
@@ -18,7 +18,7 @@ MEMBER | AsiBackbone.Testing.Contracts.GovernanceConstraintContract`1.CreateEval
 MEMBER | AsiBackbone.Testing.Contracts.GovernanceConstraintContract`1.VerifyConstraintReturnsSafeResultAsync(System.Threading.CancellationToken) | public ValueTask<ConstraintEvaluationResult> VerifyConstraintReturnsSafeResultAsync(CancellationToken cancellationToken = default)
 MEMBER | AsiBackbone.Testing.Contracts.GovernanceContractViolationException.#ctor(System.String) | public GovernanceContractViolationException(string message)
 MEMBER | AsiBackbone.Testing.Contracts.GovernanceContractViolationException.#ctor(System.String,System.Exception) | public GovernanceContractViolationException(string message, Exception innerException)
-MEMBER | AsiBackbone.Testing.Contracts.GovernanceDecisionContract.VerifyAuditResidue(AsiBackbone.Core.Audit.IDecisionReceipt,System.String) | public static IDecisionReceipt VerifyAuditResidue(IDecisionReceipt? residue, string contractName = "Decision receipt")
+MEMBER | AsiBackbone.Testing.Contracts.GovernanceDecisionContract.VerifyDecisionReceipt(AsiBackbone.Core.Audit.IDecisionReceipt,System.String) | public static IDecisionReceipt VerifyDecisionReceipt(IDecisionReceipt? receipt, string contractName = "Decision receipt")
 MEMBER | AsiBackbone.Testing.Contracts.GovernanceDecisionContract.VerifyInvalidCapabilityGrantDoesNotAllow(AsiBackbone.Core.Decisions.GovernanceDecision,System.String) | public static GovernanceDecision VerifyInvalidCapabilityGrantDoesNotAllow(GovernanceDecision? decision, string contractName = "Invalid capability grant")
 MEMBER | AsiBackbone.Testing.Contracts.GovernanceDecisionContract.VerifySafeDecision(AsiBackbone.Core.Decisions.GovernanceDecision,System.String) | public static GovernanceDecision VerifySafeDecision(GovernanceDecision? decision, string contractName = "Governance decision")
 MEMBER | AsiBackbone.Testing.Contracts.GovernanceDecisionContract.VerifyTelemetryFromContext``1(AsiBackbone.Core.Decisions.GovernanceDecision,``0,System.String) | public static GovernanceDecision VerifyTelemetryFromContext<TContext>(GovernanceDecision? decision, TContext context, string contractName = "Governance decision") where TContext : IGovernanceEvaluationContext

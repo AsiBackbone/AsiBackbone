@@ -264,14 +264,14 @@ public sealed class AsiBackboneContractFixtureDefensiveTests
         var nullResidue = new AuditSinkContract(new AcceptingAuditSink(), residue: null);
 
         Assert.Contains(
-            "provide an audit sink instance",
+            "provide a sink instance",
             (await Assert.ThrowsAsync<GovernanceContractViolationException>(
-                async () => await nullSink.VerifyAuditSinkAcceptsValidResidueAsync(TestContext.Current.CancellationToken))).Message,
+                async () => await nullSink.VerifyDecisionReceiptSinkAcceptsValidReceiptAsync(TestContext.Current.CancellationToken))).Message,
             StringComparison.Ordinal);
         Assert.Contains(
-            "provide decision receipt",
+            "provide a decision receipt",
             (await Assert.ThrowsAsync<GovernanceContractViolationException>(
-                async () => await nullResidue.VerifyAuditSinkAcceptsValidResidueAsync(TestContext.Current.CancellationToken))).Message,
+                async () => await nullResidue.VerifyDecisionReceiptSinkAcceptsValidReceiptAsync(TestContext.Current.CancellationToken))).Message,
             StringComparison.Ordinal);
     }
 
@@ -283,12 +283,12 @@ public sealed class AsiBackboneContractFixtureDefensiveTests
     {
         var canceling = new AuditSinkContract(new CancelingAuditSink(), new TestAuditResidue());
         _ = await Assert.ThrowsAsync<OperationCanceledException>(
-            async () => await canceling.VerifyAuditSinkAcceptsValidResidueAsync(TestContext.Current.CancellationToken));
+            async () => await canceling.VerifyDecisionReceiptSinkAcceptsValidReceiptAsync(TestContext.Current.CancellationToken));
 
         var expected = new GovernanceContractViolationException("audit contract failure");
         var violating = new AuditSinkContract(new ContractViolatingAuditSink(expected), new TestAuditResidue());
         GovernanceContractViolationException actual = await Assert.ThrowsAsync<GovernanceContractViolationException>(
-            async () => await violating.VerifyAuditSinkAcceptsValidResidueAsync(TestContext.Current.CancellationToken));
+            async () => await violating.VerifyDecisionReceiptSinkAcceptsValidReceiptAsync(TestContext.Current.CancellationToken));
 
         Assert.Same(expected, actual);
     }
@@ -463,7 +463,7 @@ public sealed class AsiBackboneContractFixtureDefensiveTests
     private sealed class AuditSinkContract(IDecisionReceiptSink? sink, IDecisionReceipt? residue)
         : DecisionReceiptSinkContract
     {
-        protected override IDecisionReceiptSink CreateAuditSink()
+        protected override IDecisionReceiptSink CreateDecisionReceiptSink()
         {
             return sink!;
         }

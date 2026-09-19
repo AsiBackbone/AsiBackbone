@@ -8,9 +8,9 @@ using Xunit;
 namespace AsiBackbone.AspNetCore.Tests.Correlation;
 
 /// <summary>
-/// Unit tests for the <see cref="GovernanceHttpRequestCorrelationAuditExtensions"/> class.
+/// Unit tests for the <see cref="GovernanceHttpRequestCorrelationDecisionReceiptExtensions"/> class.
 /// </summary>
-public sealed class AsiBackboneHttpRequestCorrelationAuditExtensionsTests
+public sealed class GovernanceHttpRequestCorrelationDecisionReceiptExtensionsTests
 {
     /// <summary>
     /// Tests that the <c>GovernanceHttpRequestCorrelation.CreateDecisionReceipt"</c> method uses the request correlation ID and trace ID before falling back to the decision correlation ID and trace ID.

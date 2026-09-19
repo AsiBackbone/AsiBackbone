@@ -148,7 +148,7 @@ function New-BaselineContent {
 
     $header = @(
         '# AsiBackbone stable public API baseline',
-        '# Baseline release: 5.0.0',
+        '# Baseline release: 6.0.0',
         "# Assembly: $Assembly",
         '# Format: KIND | UID | C# declaration (or enum field display)',
         '# Update only after explicit API/SemVer review.',

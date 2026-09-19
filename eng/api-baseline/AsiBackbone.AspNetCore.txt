@@ -1,5 +1,5 @@
 # AsiBackbone stable public API baseline
-# Baseline release: 5.0.0
+# Baseline release: 6.0.0
 # Assembly: AsiBackbone.AspNetCore.dll
 # Format: KIND | UID | C# declaration (or enum field display)
 # Update only after explicit API/SemVer review.
@@ -26,7 +26,7 @@ MEMBER | AsiBackbone.AspNetCore.Correlation.GovernanceHttpRequestCorrelation.Mer
 MEMBER | AsiBackbone.AspNetCore.Correlation.GovernanceHttpRequestCorrelation.Metadata | public IReadOnlyDictionary<string, string> Metadata { get; }
 MEMBER | AsiBackbone.AspNetCore.Correlation.GovernanceHttpRequestCorrelation.ToEvaluationContext(System.String,System.String,System.Collections.Generic.IReadOnlyDictionary{System.String,System.String},System.Boolean) | public GovernanceEvaluationContext ToEvaluationContext(string? policyVersion = null, string? policyHash = null, IReadOnlyDictionary<string, string>? metadata = null, bool mergeRequestMetadata = true)
 MEMBER | AsiBackbone.AspNetCore.Correlation.GovernanceHttpRequestCorrelation.TraceId | public string? TraceId { get; }
-MEMBER | AsiBackbone.AspNetCore.Correlation.GovernanceHttpRequestCorrelationAuditExtensions.CreateAuditResidue(AsiBackbone.AspNetCore.Correlation.GovernanceHttpRequestCorrelation,AsiBackbone.Core.Actors.IGovernanceActorContext,System.String,AsiBackbone.Core.Decisions.GovernanceDecision,System.String,System.Nullable{System.DateTimeOffset},System.Collections.Generic.IReadOnlyDictionary{System.String,System.String}) | public static DecisionReceipt CreateAuditResidue(this GovernanceHttpRequestCorrelation correlation, IGovernanceActorContext actor, string operationName, GovernanceDecision decision, string? eventId = null, DateTimeOffset? occurredUtc = null, IReadOnlyDictionary<string, string>? metadata = null)
+MEMBER | AsiBackbone.AspNetCore.Correlation.GovernanceHttpRequestCorrelationDecisionReceiptExtensions.CreateDecisionReceipt(AsiBackbone.AspNetCore.Correlation.GovernanceHttpRequestCorrelation,AsiBackbone.Core.Actors.IGovernanceActorContext,System.String,AsiBackbone.Core.Decisions.GovernanceDecision,System.String,System.Nullable{System.DateTimeOffset},System.Collections.Generic.IReadOnlyDictionary{System.String,System.String}) | public static DecisionReceipt CreateDecisionReceipt(this GovernanceHttpRequestCorrelation correlation, IGovernanceActorContext actor, string operationName, GovernanceDecision decision, string? eventId = null, DateTimeOffset? occurredUtc = null, IReadOnlyDictionary<string, string>? metadata = null)
 MEMBER | AsiBackbone.AspNetCore.Correlation.GovernanceHttpRequestMetadataKeys.EndpointDisplayName | public const string EndpointDisplayName = "http.endpoint.display_name"
 MEMBER | AsiBackbone.AspNetCore.Correlation.GovernanceHttpRequestMetadataKeys.Method | public const string Method = "http.method"
 MEMBER | AsiBackbone.AspNetCore.Correlation.GovernanceHttpRequestMetadataKeys.Path | public const string Path = "http.path"
@@ -108,6 +108,8 @@ MEMBER | AsiBackbone.AspNetCore.Endpoints.EndpointGovernanceRouteBuilderExtensio
 MEMBER | AsiBackbone.AspNetCore.Endpoints.EndpointGovernanceRouteBuilderExtensions.RequireCapabilityGrant``1(``0,System.String) | public static TBuilder RequireCapabilityGrant<TBuilder>(this TBuilder builder, string scope) where TBuilder : IEndpointConventionBuilder
 MEMBER | AsiBackbone.AspNetCore.Endpoints.EndpointGovernanceRouteBuilderExtensions.RequireLiabilityHandshake``1(``0) | public static TBuilder RequireLiabilityHandshake<TBuilder>(this TBuilder builder) where TBuilder : IEndpointConventionBuilder
 MEMBER | AsiBackbone.AspNetCore.Endpoints.EndpointGovernanceRouteBuilderExtensions.ShortCircuitOnFirstDenial``1(``0,System.Boolean) | public static TBuilder ShortCircuitOnFirstDenial<TBuilder>(this TBuilder builder, bool enabled = true) where TBuilder : IEndpointConventionBuilder
+MEMBER | AsiBackbone.AspNetCore.Endpoints.GovernancePolicyAttribute.#ctor(System.Type) | public GovernancePolicyAttribute(Type policyType)
+MEMBER | AsiBackbone.AspNetCore.Endpoints.GovernancePolicyAttribute.PolicyType | public Type PolicyType { get; }
 MEMBER | AsiBackbone.AspNetCore.Endpoints.IEndpointAuditEmissionMetadata.EmitGovernanceAudit | bool EmitGovernanceAudit { get; }
 MEMBER | AsiBackbone.AspNetCore.Endpoints.IEndpointCapabilityGrantMetadata.Scope | string Scope { get; }
 MEMBER | AsiBackbone.AspNetCore.Endpoints.IEndpointCapabilityGrantValidator.ValidateAsync(Microsoft.AspNetCore.Http.HttpContext,AsiBackbone.AspNetCore.Endpoints.EndpointGovernanceDescriptor,AsiBackbone.Core.Decisions.GovernanceDecision,System.Threading.CancellationToken) | ValueTask<GovernanceDecision> ValidateAsync(HttpContext httpContext, EndpointGovernanceDescriptor descriptor, GovernanceDecision currentDecision, CancellationToken cancellationToken = default)
@@ -117,8 +119,6 @@ MEMBER | AsiBackbone.AspNetCore.Endpoints.IEndpointLiabilityHandshakeMetadata.Re
 MEMBER | AsiBackbone.AspNetCore.Endpoints.IEndpointPolicyEvaluationOptionsMetadata.ShortCircuitOnFirstDenial | bool? ShortCircuitOnFirstDenial { get; }
 MEMBER | AsiBackbone.AspNetCore.Endpoints.RequireCapabilityGrantAttribute.#ctor(System.String) | public RequireCapabilityGrantAttribute(string scope)
 MEMBER | AsiBackbone.AspNetCore.Endpoints.RequireCapabilityGrantAttribute.Scope | public string Scope { get; }
-MEMBER | AsiBackbone.AspNetCore.Endpoints.RequireGovernancePolicyAttribute.#ctor(System.Type) | public RequireGovernancePolicyAttribute(Type policyType)
-MEMBER | AsiBackbone.AspNetCore.Endpoints.RequireGovernancePolicyAttribute.PolicyType | public Type PolicyType { get; }
 MEMBER | AsiBackbone.AspNetCore.Endpoints.RequireLiabilityHandshakeAttribute.RequiresLiabilityHandshake | public bool RequiresLiabilityHandshake { get; }
 MEMBER | AsiBackbone.AspNetCore.Endpoints.ShortCircuitOnFirstDenialAttribute.#ctor(System.Boolean) | public ShortCircuitOnFirstDenialAttribute(bool enabled = true)
 MEMBER | AsiBackbone.AspNetCore.Endpoints.ShortCircuitOnFirstDenialAttribute.ShortCircuitOnFirstDenial | public bool? ShortCircuitOnFirstDenial { get; }
@@ -195,7 +195,7 @@ TYPE | AsiBackbone.AspNetCore.Actors.HttpGovernanceActorContextOptions | public 
 TYPE | AsiBackbone.AspNetCore.Actors.IHttpGovernanceActorContextResolver | public interface IHttpGovernanceActorContextResolver
 TYPE | AsiBackbone.AspNetCore.AssemblyMarker | public static class AssemblyMarker
 TYPE | AsiBackbone.AspNetCore.Correlation.GovernanceHttpRequestCorrelation | public sealed class GovernanceHttpRequestCorrelation
-TYPE | AsiBackbone.AspNetCore.Correlation.GovernanceHttpRequestCorrelationAuditExtensions | public static class GovernanceHttpRequestCorrelationAuditExtensions
+TYPE | AsiBackbone.AspNetCore.Correlation.GovernanceHttpRequestCorrelationDecisionReceiptExtensions | public static class GovernanceHttpRequestCorrelationDecisionReceiptExtensions
 TYPE | AsiBackbone.AspNetCore.Correlation.GovernanceHttpRequestMetadataKeys | public static class GovernanceHttpRequestMetadataKeys
 TYPE | AsiBackbone.AspNetCore.Correlation.HttpContextGovernanceRequestCorrelationResolver | public sealed class HttpContextGovernanceRequestCorrelationResolver : IHttpGovernanceRequestCorrelationResolver
 TYPE | AsiBackbone.AspNetCore.Correlation.IHttpGovernanceRequestCorrelationResolver | public interface IHttpGovernanceRequestCorrelationResolver
@@ -214,6 +214,7 @@ TYPE | AsiBackbone.AspNetCore.Endpoints.EndpointGovernanceMiddleware | public se
 TYPE | AsiBackbone.AspNetCore.Endpoints.EndpointGovernanceOptions | public sealed class EndpointGovernanceOptions
 TYPE | AsiBackbone.AspNetCore.Endpoints.EndpointGovernanceResult | public sealed class EndpointGovernanceResult
 TYPE | AsiBackbone.AspNetCore.Endpoints.EndpointGovernanceRouteBuilderExtensions | public static class EndpointGovernanceRouteBuilderExtensions
+TYPE | AsiBackbone.AspNetCore.Endpoints.GovernancePolicyAttribute | [AttributeUsage(AttributeTargets.Class|AttributeTargets.Method, AllowMultiple = true, Inherited = true)] public sealed class GovernancePolicyAttribute : Attribute, IEndpointGovernancePolicyMetadata, IEndpointGovernanceMetadata
 TYPE | AsiBackbone.AspNetCore.Endpoints.IEndpointAuditEmissionMetadata | public interface IEndpointAuditEmissionMetadata : IEndpointGovernanceMetadata
 TYPE | AsiBackbone.AspNetCore.Endpoints.IEndpointCapabilityGrantMetadata | public interface IEndpointCapabilityGrantMetadata : IEndpointGovernanceMetadata
 TYPE | AsiBackbone.AspNetCore.Endpoints.IEndpointCapabilityGrantValidator | public interface IEndpointCapabilityGrantValidator
@@ -223,7 +224,6 @@ TYPE | AsiBackbone.AspNetCore.Endpoints.IEndpointGovernanceService | public inte
 TYPE | AsiBackbone.AspNetCore.Endpoints.IEndpointLiabilityHandshakeMetadata | public interface IEndpointLiabilityHandshakeMetadata : IEndpointGovernanceMetadata
 TYPE | AsiBackbone.AspNetCore.Endpoints.IEndpointPolicyEvaluationOptionsMetadata | public interface IEndpointPolicyEvaluationOptionsMetadata : IEndpointGovernanceMetadata
 TYPE | AsiBackbone.AspNetCore.Endpoints.RequireCapabilityGrantAttribute | [AttributeUsage(AttributeTargets.Class|AttributeTargets.Method, AllowMultiple = true, Inherited = true)] public sealed class RequireCapabilityGrantAttribute : Attribute, IEndpointCapabilityGrantMetadata, IEndpointGovernanceMetadata
-TYPE | AsiBackbone.AspNetCore.Endpoints.RequireGovernancePolicyAttribute | [AttributeUsage(AttributeTargets.Class|AttributeTargets.Method, AllowMultiple = true, Inherited = true)] public sealed class RequireGovernancePolicyAttribute : Attribute, IEndpointGovernancePolicyMetadata, IEndpointGovernanceMetadata
 TYPE | AsiBackbone.AspNetCore.Endpoints.RequireLiabilityHandshakeAttribute | [AttributeUsage(AttributeTargets.Class|AttributeTargets.Method, AllowMultiple = false, Inherited = true)] public sealed class RequireLiabilityHandshakeAttribute : Attribute, IEndpointLiabilityHandshakeMetadata, IEndpointGovernanceMetadata
 TYPE | AsiBackbone.AspNetCore.Endpoints.ShortCircuitOnFirstDenialAttribute | [AttributeUsage(AttributeTargets.Class|AttributeTargets.Method, AllowMultiple = false, Inherited = true)] public sealed class ShortCircuitOnFirstDenialAttribute : Attribute, IEndpointPolicyEvaluationOptionsMetadata, IEndpointGovernanceMetadata
 TYPE | AsiBackbone.AspNetCore.Handshakes.AcknowledgmentChallenge | public sealed class AcknowledgmentChallenge

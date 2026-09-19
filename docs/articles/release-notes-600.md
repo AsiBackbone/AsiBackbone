@@ -1,6 +1,6 @@
 # AsiBackbone 6.0.0 Release Notes
 
-Release date: 2026-09-18
+Release date: 2026-09-19
 
 ## Summary
 
@@ -31,6 +31,13 @@ Consumers moving from `5.x` must follow the
 - Helper members that operate on decision receipts use the same vocabulary, for
   example `CanonicalPayloadBuilder.ForDecisionReceipt` and
   `GovernanceArtifactSigner.SignDecisionReceiptAsync`.
+- The request-correlation extension container is now
+  `GovernanceHttpRequestCorrelationDecisionReceiptExtensions`, and
+  `DecisionReceiptSinkContract` uses `CreateDecisionReceiptSink` and
+  `VerifyDecisionReceiptSinkAcceptsValidReceiptAsync`.
+- Public decision-receipt parameters on the renamed canonicalization, signing,
+  and contract helpers use `receipt` instead of `residue`; named-argument
+  callers must update accordingly.
 - `RequireGovernancePolicyAttribute` is renamed to `GovernancePolicyAttribute`.
   It records a policy marker and never required or enforced the policy.
 - Documentation and diagnostics use the
@@ -88,6 +95,13 @@ Consumers moving from `5.x` must follow the
 - Stop and cancel state in the in-memory use store can be scoped to one issuer,
   consistent with issuer-scoped use counts.
 - The local-development verifier rejects provider labels other than its own.
+
+## Maintenance updates
+
+- Updated the Entity Framework Core and Microsoft Extensions packages to
+  `10.0.12` and Microsoft.NET.Test.Sdk to `18.10.0`.
+- Updated dotnet-stryker to `5.0.0` and refreshed pinned GitHub Actions used by
+  CodeQL and workflow-security checks.
 
 ## Compatibility
 

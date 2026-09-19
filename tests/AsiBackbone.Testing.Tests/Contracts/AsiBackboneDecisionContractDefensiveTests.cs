@@ -235,7 +235,7 @@ public sealed class AsiBackboneDecisionContractDefensiveTests
     {
         var residue = new TestAuditResidue();
 
-        IDecisionReceipt verified = GovernanceDecisionContract.VerifyDecisionReceipt(residue);
+        IDecisionReceipt verified = GovernanceDecisionContract.VerifyDecisionReceipt(receipt: residue);
 
         Assert.Same(residue, verified);
     }

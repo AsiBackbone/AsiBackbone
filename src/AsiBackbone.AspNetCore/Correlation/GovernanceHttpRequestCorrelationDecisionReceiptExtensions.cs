@@ -7,7 +7,7 @@ namespace AsiBackbone.AspNetCore.Correlation;
 /// <summary>
 /// Provides helpers for applying ASP.NET Core request correlation data to framework-neutral decision receipt.
 /// </summary>
-public static class GovernanceHttpRequestCorrelationAuditExtensions
+public static class GovernanceHttpRequestCorrelationDecisionReceiptExtensions
 {
     /// <summary>
     /// Creates decision receipt from a governance decision and enriches it with safe ASP.NET Core request correlation data.

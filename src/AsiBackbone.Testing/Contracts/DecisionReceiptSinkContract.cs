@@ -8,34 +8,34 @@ namespace AsiBackbone.Testing.Contracts;
 public abstract class DecisionReceiptSinkContract
 {
     /// <summary>
-    /// Creates the audit sink implementation under test.
+    /// Creates the decision receipt sink implementation under test.
     /// </summary>
-    /// <returns>The audit sink implementation to validate.</returns>
-    protected abstract IDecisionReceiptSink CreateAuditSink();
+    /// <returns>The decision receipt sink implementation to validate.</returns>
+    protected abstract IDecisionReceiptSink CreateDecisionReceiptSink();
 
     /// <summary>
-    /// Creates the decision receipt supplied to the audit sink implementation under test.
+    /// Creates the decision receipt supplied to the sink implementation under test.
     /// </summary>
     /// <returns>The decision receipt to write.</returns>
     protected abstract IDecisionReceipt CreateDecisionReceipt();
 
     /// <summary>
-    /// Verifies that an audit sink accepts a valid decision receipt value without weakening the residue shape.
+    /// Verifies that a decision receipt sink accepts a valid decision receipt value without weakening its required shape.
     /// </summary>
     /// <param name="cancellationToken">A token that can cancel the contract validation.</param>
     /// <returns>A task that completes when the contract validation succeeds.</returns>
-    public async ValueTask VerifyAuditSinkAcceptsValidResidueAsync(CancellationToken cancellationToken = default)
+    public async ValueTask VerifyDecisionReceiptSinkAcceptsValidReceiptAsync(CancellationToken cancellationToken = default)
     {
-        IDecisionReceiptSink auditSink = CreateAuditSink()
-            ?? throw new GovernanceContractViolationException("Audit sink contract must provide an audit sink instance.");
-        IDecisionReceipt residue = CreateDecisionReceipt()
-            ?? throw new GovernanceContractViolationException("Audit sink contract must provide decision receipt.");
+        IDecisionReceiptSink receiptSink = CreateDecisionReceiptSink()
+            ?? throw new GovernanceContractViolationException("Decision receipt sink contract must provide a sink instance.");
+        IDecisionReceipt receipt = CreateDecisionReceipt()
+            ?? throw new GovernanceContractViolationException("Decision receipt sink contract must provide a decision receipt.");
 
-        _ = GovernanceDecisionContract.VerifyDecisionReceipt(residue, "Audit sink residue");
+        _ = GovernanceDecisionContract.VerifyDecisionReceipt(receipt, "Decision receipt sink receipt");
 
         try
         {
-            await auditSink.WriteAsync(residue, cancellationToken).ConfigureAwait(false);
+            await receiptSink.WriteAsync(receipt, cancellationToken).ConfigureAwait(false);
         }
         catch (OperationCanceledException)
         {
@@ -48,7 +48,7 @@ public abstract class DecisionReceiptSinkContract
         catch (Exception exception)
         {
             throw new GovernanceContractViolationException(
-                "Audit sink implementations must accept valid decision receipt during normal contract validation or document a fail-closed/degraded behavior.",
+                "Decision receipt sink implementations must accept a valid decision receipt during normal contract validation or document a fail-closed/degraded behavior.",
                 exception);
         }
     }

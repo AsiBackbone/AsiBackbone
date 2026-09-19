@@ -10,6 +10,9 @@ the published `v5.0.0` source at commit
 type/member UID together with the rendered C# declaration. Enum values are also
 recorded with their displayed numeric value.
 
+The committed files now describe the reviewed `6.0.0` public API after the
+intentional major-version changes documented below.
+
 ## Included stable managed assemblies
 
 - `AsiBackbone.Analyzers.dll`
@@ -64,6 +67,11 @@ cover the resulting removed type identities, changed member signatures,
 implemented interfaces, and generic constraints. Package IDs, JSON keys,
 canonical tags, enum values, schema versions, and EF table/column names remain
 unchanged; the package compatibility gate is still enabled.
+
+Issue #794 completes the decision-receipt terminology pass for the signing and
+contract-test helpers, including their named-argument parameter names and the
+ASP.NET Core correlation extension class. These intentional 6.0 breaks and
+their replacements are recorded in the upgrade guide.
 
 A baseline update is an approval artifact, not an approval mechanism. First
 classify the API change under the project's Semantic Versioning policy. Additive

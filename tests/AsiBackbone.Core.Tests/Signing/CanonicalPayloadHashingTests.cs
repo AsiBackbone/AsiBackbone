@@ -118,7 +118,9 @@ public sealed class CanonicalPayloadHashingTests
             }
         };
 
-        CanonicalPayload payload = CanonicalPayloadBuilder.ForDecisionReceipt(residue, options);
+        CanonicalPayload payload = CanonicalPayloadBuilder.ForDecisionReceipt(
+            receipt: residue,
+            options: options);
 
         Assert.Equal(CanonicalArtifactTypes.AuditResidue, payload.ArtifactType);
         Assert.Equal("event-fallback", payload.ArtifactId);

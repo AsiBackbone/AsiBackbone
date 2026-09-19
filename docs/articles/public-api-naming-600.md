@@ -34,7 +34,7 @@ The inventory reviews 232 public type entries across all ten managed package bas
 | `AsiBackbone.AspNetCore` | `AsiBackbone.AspNetCore.Actors.IAsiBackboneHttpActorContextResolver` | `IHttpGovernanceActorContextResolver` |
 | `AsiBackbone.AspNetCore` | `AsiBackbone.AspNetCore.AssemblyMarker` | Retain: existing domain/host role is clear. |
 | `AsiBackbone.AspNetCore` | `AsiBackbone.AspNetCore.Correlation.AsiBackboneHttpRequestCorrelation` | `GovernanceHttpRequestCorrelation` |
-| `AsiBackbone.AspNetCore` | `AsiBackbone.AspNetCore.Correlation.AsiBackboneHttpRequestCorrelationAuditExtensions` | `GovernanceHttpRequestCorrelationAuditExtensions` |
+| `AsiBackbone.AspNetCore` | `AsiBackbone.AspNetCore.Correlation.AsiBackboneHttpRequestCorrelationAuditExtensions` | `GovernanceHttpRequestCorrelationDecisionReceiptExtensions` |
 | `AsiBackbone.AspNetCore` | `AsiBackbone.AspNetCore.Correlation.AsiBackboneHttpRequestMetadataKeys` | `GovernanceHttpRequestMetadataKeys` |
 | `AsiBackbone.AspNetCore` | `AsiBackbone.AspNetCore.Correlation.HttpContextAsiBackboneRequestCorrelationResolver` | `HttpContextGovernanceRequestCorrelationResolver` |
 | `AsiBackbone.AspNetCore` | `AsiBackbone.AspNetCore.Correlation.IAsiBackboneHttpRequestCorrelationResolver` | `IHttpGovernanceRequestCorrelationResolver` |

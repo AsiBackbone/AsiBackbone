@@ -20,6 +20,9 @@
 
 > AI may provide the intellect. AsiBackbone provides the accountable spine.
 
+AsiBackbone is the implementation package family for Accountable Systems Infrastructure.
+Stable `6.0.x` package family.
+
 ## Documentation ownership
 
 `AsiBackbone/AsiBackbone` is the source of truth for the concrete product: package installation and configuration, public APIs and type behavior, runtime semantics, integration boundaries, security posture, operations, compatibility, releases, and maintainer evidence.

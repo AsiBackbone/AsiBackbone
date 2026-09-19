@@ -1,5 +1,5 @@
 # AsiBackbone stable public API baseline
-# Baseline release: 5.0.0
+# Baseline release: 6.0.0
 # Assembly: AsiBackbone.Storage.InMemory.dll
 # Format: KIND | UID | C# declaration (or enum field display)
 # Update only after explicit API/SemVer review.
@@ -13,11 +13,13 @@ MEMBER | AsiBackbone.Storage.InMemory.Audit.InMemoryDecisionReceiptLifecycleStor
 MEMBER | AsiBackbone.Storage.InMemory.Audit.InMemoryDecisionReceiptLifecycleStore.FindByCorrelationIdAsync(System.String,System.Threading.CancellationToken) | public ValueTask<IReadOnlyList<DecisionReceiptLifecycleEvent>> FindByCorrelationIdAsync(string correlationId, CancellationToken cancellationToken = default)
 MEMBER | AsiBackbone.Storage.InMemory.Audit.InMemoryDecisionReceiptLifecycleStore.FindByEventIdAsync(System.String,System.Threading.CancellationToken) | public ValueTask<DecisionReceiptLifecycleEvent?> FindByEventIdAsync(string eventId, CancellationToken cancellationToken = default)
 MEMBER | AsiBackbone.Storage.InMemory.CapabilityTokens.InMemoryCapabilityGrantUseStore.CancelGrant(System.String) | public void CancelGrant(string grantId)
+MEMBER | AsiBackbone.Storage.InMemory.CapabilityTokens.InMemoryCapabilityGrantUseStore.CancelGrant(System.String,System.String) | public void CancelGrant(string issuer, string grantId)
 MEMBER | AsiBackbone.Storage.InMemory.CapabilityTokens.InMemoryCapabilityGrantUseStore.Clear | public void Clear()
 MEMBER | AsiBackbone.Storage.InMemory.CapabilityTokens.InMemoryCapabilityGrantUseStore.EvictionGracePeriod | public TimeSpan EvictionGracePeriod { get; set; }
 MEMBER | AsiBackbone.Storage.InMemory.CapabilityTokens.InMemoryCapabilityGrantUseStore.GetUseCount(System.String) | public int GetUseCount(string grantId)
 MEMBER | AsiBackbone.Storage.InMemory.CapabilityTokens.InMemoryCapabilityGrantUseStore.GetUseCount(System.String,System.String) | public int GetUseCount(string issuer, string grantId)
 MEMBER | AsiBackbone.Storage.InMemory.CapabilityTokens.InMemoryCapabilityGrantUseStore.StopGrant(System.String) | public void StopGrant(string grantId)
+MEMBER | AsiBackbone.Storage.InMemory.CapabilityTokens.InMemoryCapabilityGrantUseStore.StopGrant(System.String,System.String) | public void StopGrant(string issuer, string grantId)
 MEMBER | AsiBackbone.Storage.InMemory.CapabilityTokens.InMemoryCapabilityGrantUseStore.TryConsumeAsync(AsiBackbone.Core.CapabilityTokens.CapabilityTokenGrant,System.Int32,System.DateTimeOffset,System.Threading.CancellationToken) | public ValueTask<CapabilityGrantUseResult> TryConsumeAsync(CapabilityTokenGrant grant, int maxUseCount, DateTimeOffset usedUtc, CancellationToken cancellationToken = default)
 MEMBER | AsiBackbone.Storage.InMemory.InMemoryStorageBuilderExtensions.UseInMemoryAuditLedger(AsiBackbone.DependencyInjection.IAsiBackboneBuilder) | public static IAsiBackboneBuilder UseInMemoryAuditLedger(this IAsiBackboneBuilder builder)
 MEMBER | AsiBackbone.Storage.InMemory.InMemoryStorageBuilderExtensions.UseInMemoryAuditLifecycle(AsiBackbone.DependencyInjection.IAsiBackboneBuilder) | public static IAsiBackboneBuilder UseInMemoryAuditLifecycle(this IAsiBackboneBuilder builder)

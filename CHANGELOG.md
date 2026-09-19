@@ -6,6 +6,49 @@ This project follows the spirit of [Keep a Changelog](https://keepachangelog.com
 
 ## [Unreleased]
 
+## [6.0.0] - 2026-09-19
+
+### Release summary
+
+`6.0.0` is a major release for the AsiBackbone package family. It adopts
+plain-language semantic names across the public API, removes members whose
+`5.x` deprecation windows completed, and corrects security-sensitive signature
+verification and capability-grant behavior.
+
+Package IDs, public namespaces, and the `net10.0` target remain unchanged.
+`AssemblyVersion` advances to `6.0.0.0`; package and file versions advance to
+`6.0.0` and `6.0.0.0` respectively.
+
+Consumers moving from `5.x` must follow the
+[5.x to 6.0 migration guide](docs/articles/upgrade-500-to-600.md).
+
+### Changed
+
+* **Breaking (source and binary):** Renamed public types and helper members to
+  plain-language semantic names, including decision receipts, governance
+  constraints, policy evaluators, result types, endpoint governance, outbox,
+  persistence, and testing APIs. The complete inventory is recorded in the
+  [6.0 public API naming convention](docs/articles/public-api-naming-600.md).
+  Decision-receipt helper parameters now use `receipt`; the request-correlation
+  extension container and decision-receipt sink contract members use the same
+  vocabulary.
+* **Breaking (source and binary):** Renamed
+  `RequireGovernancePolicyAttribute` to `GovernancePolicyAttribute` to reflect
+  that the attribute marks policy metadata but does not itself enforce policy.
+* Updated the Entity Framework Core and Microsoft Extensions packages to
+  `10.0.12`, Microsoft.NET.Test.Sdk to `18.10.0`, dotnet-stryker to `5.0.0`,
+  and pinned GitHub Actions to their current reviewed revisions.
+
+### Removed
+
+* **Breaking (source and binary):** Removed the five partial-argument policy
+  evaluator constructors deprecated under `ASIB900` in `5.2.0`. Use
+  `DefaultGovernancePolicyEvaluator.CreateBuilder<TContext>()` or the
+  all-dependencies constructor.
+* **Breaking (source and binary):** Removed the obsolete
+  `RequireGovernancePolicy` route-builder extensions. Use
+  `MarkGovernancePolicy`.
+
 ### Security
 
 * **Breaking (behavior):** Signature-verification pin mismatches now deny by default instead of deferring or

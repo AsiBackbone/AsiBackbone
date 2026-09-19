@@ -13,23 +13,23 @@ namespace AsiBackbone.Core.Tests.Signing;
 public sealed class GovernanceArtifactSignerLineCoverageTests
 {
     /// <summary>
-    /// Covers unsigned, signing-ready, and signed audit residue helper overloads.
+    /// Covers unsigned, signing-ready, and signed decision receipt helper overloads.
     /// </summary>
     [Fact]
-    public async Task AuditResidueHelpersCoverUnsignedSigningReadyAndSignedPaths()
+    public async Task DecisionReceiptHelpersCoverUnsignedSigningReadyAndSignedPaths()
     {
-        DecisionReceipt residue = CreateDecisionReceipt();
+        DecisionReceipt receipt = CreateDecisionReceipt();
 
-        SignedGovernanceArtifact<IDecisionReceipt> unsigned = GovernanceArtifactSigner.CreateUnsignedDecisionReceipt(residue);
+        SignedGovernanceArtifact<IDecisionReceipt> unsigned = GovernanceArtifactSigner.CreateUnsignedDecisionReceipt(receipt: receipt);
         SignedGovernanceArtifact<IDecisionReceipt> signingReady = GovernanceArtifactSigner.CreateSigningReadyDecisionReceipt(
-            residue,
+            receipt: receipt,
             metadata: new Dictionary<string, string>
             {
                 ["workflow"] = "audit-residue-ready"
             });
         SignedGovernanceArtifact<IDecisionReceipt> signed = await GovernanceArtifactSigner.SignDecisionReceiptAsync(
-            residue,
-            new FakeSigningService(),
+            receipt: receipt,
+            signingService: new FakeSigningService(),
             keyId: "residue-key",
             keyVersion: "v1",
             metadata: new Dictionary<string, string>
@@ -55,10 +55,10 @@ public sealed class GovernanceArtifactSignerLineCoverageTests
     }
 
     /// <summary>
-    /// Covers unsigned, signing-ready, and signed audit residue lifecycle event helper overloads.
+    /// Covers unsigned, signing-ready, and signed decision receipt lifecycle event helper overloads.
     /// </summary>
     [Fact]
-    public async Task AuditResidueLifecycleEventHelpersCoverUnsignedSigningReadyAndSignedPaths()
+    public async Task DecisionReceiptLifecycleEventHelpersCoverUnsignedSigningReadyAndSignedPaths()
     {
         DecisionReceiptLifecycleEvent lifecycleEvent = CreateLifecycleEvent();
 
