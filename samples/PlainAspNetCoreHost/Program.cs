@@ -7,6 +7,7 @@ using AsiBackbone.Core.Constraints;
 using AsiBackbone.Core.Decisions;
 using AsiBackbone.Core.Evaluation;
 using AsiBackbone.Core.Signing;
+using AsiBackbone.Core.ThreatModeling;
 using AsiBackbone.EntityFrameworkCore;
 using AsiBackbone.EntityFrameworkCore.Audit;
 using AsiBackbone.Signing.LocalDevelopment;
@@ -24,26 +25,33 @@ builder.Services.AddSingleton(LocalDevelopmentSigningOptions.Create(
     keyId: "sample-local-dev-key",
     keyVersion: "dev"));
 builder.Services.AddSingleton<LocalDevelopmentSigningService>();
-builder.Services.AddSingleton<IAsiBackboneSigningService>(serviceProvider =>
+builder.Services.AddSingleton<IGovernanceSigningService>(serviceProvider =>
     serviceProvider.GetRequiredService<LocalDevelopmentSigningService>());
-builder.Services.AddSingleton<IAsiBackboneSignatureVerificationService>(serviceProvider =>
+builder.Services.AddSingleton<IGovernanceSignatureVerificationService>(serviceProvider =>
     serviceProvider.GetRequiredService<LocalDevelopmentSigningService>());
 
 builder.Services.AddDbContext<PlainHostAsiBackboneDbContext>(options => options.UseSqlite(builder.Configuration.GetConnectionString("AsiBackbone") ?? "Data Source=asi-backbone-sample.db"));
 
 builder.Services.AddScoped<DbContext>(serviceProvider =>
     serviceProvider.GetRequiredService<PlainHostAsiBackboneDbContext>());
-builder.Services.AddScoped<IAsiBackboneAuditLedgerStore, EfCoreAuditLedgerStore>();
+builder.Services.AddScoped<IGovernanceAuditLedgerStore, EfCoreAuditLedgerStore>();
 
 builder.Services.AddSingleton<InMemoryAuditLedger>();
-builder.Services.AddSingleton<IAsiBackboneAuditSink>(serviceProvider =>
+builder.Services.AddSingleton<IDecisionReceiptSink>(serviceProvider =>
     serviceProvider.GetRequiredService<InMemoryAuditLedger>());
-builder.Services.AddSingleton<IAsiBackboneEndpointCapabilityGrantValidator, SampleEndpointCapabilityGrantValidator>();
+builder.Services.AddSingleton<IEndpointCapabilityGrantValidator, SampleEndpointCapabilityGrantValidator>();
 builder.Services.AddSingleton<SampleAcknowledgmentChallengeStore>();
 
-builder.Services.AddSingleton<IAsiBackboneConstraint<AsiBackboneConstraintEvaluationContext>, RegionConstraint>();
-builder.Services.AddSingleton<IAsiBackboneDecisionPolicy<AsiBackboneConstraintEvaluationContext>, ConsequentialActionDecisionPolicy>();
-builder.Services.AddSingleton<IAsiBackbonePolicyEvaluator<AsiBackboneConstraintEvaluationContext>, DefaultAsiBackbonePolicyEvaluator<AsiBackboneConstraintEvaluationContext>>();
+builder.Services.AddSingleton<IGovernanceConstraint<GovernanceEvaluationContext>, RegionConstraint>();
+builder.Services.AddSingleton<IGovernanceDecisionPolicy<GovernanceEvaluationContext>, ConsequentialActionDecisionPolicy>();
+builder.Services.AddSingleton<IGovernancePolicyEvaluator<GovernanceEvaluationContext>>(serviceProvider =>
+    DefaultGovernancePolicyEvaluator.CreateBuilder<GovernanceEvaluationContext>()
+        .AddConstraints(serviceProvider.GetServices<IGovernanceConstraint<GovernanceEvaluationContext>>())
+        .AddThreatModelContributors(serviceProvider.GetServices<IThreatModelContributor<GovernanceEvaluationContext>>())
+        .WithDecisionPolicy(serviceProvider.GetService<IGovernanceDecisionPolicy<GovernanceEvaluationContext>>())
+        .WithOptions(serviceProvider.GetRequiredService<IOptions<GovernancePolicyOptions>>().Value)
+        .WithLogger(serviceProvider.GetService<ILogger<DefaultGovernancePolicyEvaluator<GovernanceEvaluationContext>>>())
+        .Build());
 
 WebApplication app = builder.Build();
 
@@ -72,16 +80,16 @@ app.MapPost("/sample/ergonomic/minimal", () => Results.Ok(new
 
 app.MapGet("/sample/decision", async (
     HttpContext httpContext,
-    IAsiBackbonePolicyEvaluator<AsiBackboneConstraintEvaluationContext> evaluator,
-    IAsiBackboneAuditSink auditSink,
-    IAsiBackboneAuditLedgerStore ledgerStore,
-    IAsiBackboneSigningService signingService,
-    IAsiBackboneSignatureVerificationService verificationService,
+    IGovernancePolicyEvaluator<GovernanceEvaluationContext> evaluator,
+    IDecisionReceiptSink auditSink,
+    IGovernanceAuditLedgerStore ledgerStore,
+    IGovernanceSigningService signingService,
+    IGovernanceSignatureVerificationService verificationService,
     CancellationToken cancellationToken) =>
 {
     string correlationId = httpContext.TraceIdentifier;
 
-    var context = new AsiBackboneConstraintEvaluationContext(
+    var context = new GovernanceEvaluationContext(
         correlationId: correlationId,
         policyVersion: "sample-policy-v1",
         policyHash: "sample-policy-hash",
@@ -96,31 +104,29 @@ app.MapGet("/sample/decision", async (
         .EvaluateAsync(context, cancellationToken)
         .ConfigureAwait(false);
 
-    var actor = AsiBackboneActorContext.Human(
+    var actor = GovernanceActorContext.Human(
         actorId: "sample-user",
         displayName: "Sample User");
 
-    var residue = AuditResidue.FromDecision(
+    var receipt = DecisionReceipt.FromDecision(
         actor,
         "sample.external-api-call",
         decision,
         metadata: context.Metadata);
 
-    await auditSink.WriteAsync(residue, cancellationToken).ConfigureAwait(false);
+    await auditSink.WriteAsync(receipt, cancellationToken).ConfigureAwait(false);
 
-    var unsignedRecord = AuditLedgerRecord.FromResidue(residue);
+    var unsignedRecord = AuditLedgerRecord.FromDecisionReceipt(receipt);
     CanonicalPayload canonicalPayload = CanonicalPayloadBuilder.ForAuditLedgerRecord(unsignedRecord);
     CanonicalPayloadHash canonicalHash = CanonicalPayloadHasher.ComputeHash(canonicalPayload);
-    var hashMetadata = canonicalHash.ToSigningMetadata();
+    // CreateSigningRequest supplies the version 1 signature input, which binds the canonical descriptors, hash, and any
+    // signing policy context. Verification rebuilds the same input from the recorded signing metadata.
     SigningResult signingResult = await signingService
         .SignAsync(
-            new SigningRequest(
-                canonicalHash.HashValue,
-                canonicalHash.HashAlgorithm,
-                purpose: CanonicalArtifactTypes.AuditLedgerRecord,
+            GovernanceArtifactSigner.CreateSigningRequest(
+                canonicalHash,
                 keyId: "sample-local-dev-key",
-                keyVersion: "dev",
-                metadata: hashMetadata.Metadata),
+                keyVersion: "dev"),
             cancellationToken)
         .ConfigureAwait(false);
     SignatureVerificationResult verificationResult = await verificationService
@@ -128,12 +134,15 @@ app.MapGet("/sample/decision", async (
             new SignatureVerificationRequest(
                 canonicalHash.HashValue,
                 signingResult.Metadata,
-                purpose: CanonicalArtifactTypes.AuditLedgerRecord),
+                purpose: CanonicalArtifactTypes.AuditLedgerRecord)
+            {
+                SignatureInput = GovernanceSignatureInput.CreateV1(canonicalHash, signingResult.Metadata.Metadata)
+            },
             cancellationToken)
         .ConfigureAwait(false);
 
-    var record = AuditLedgerRecord.FromResidue(
-        residue,
+    var record = AuditLedgerRecord.FromDecisionReceipt(
+        receipt,
         recordId: unsignedRecord.RecordId,
         recordedUtc: unsignedRecord.RecordedUtc,
         signingHash: signingResult.Metadata.SigningHash,
@@ -159,7 +168,7 @@ app.MapGet("/sample/decision", async (
         decision.CorrelationId,
         decision.PolicyVersion,
         decision.PolicyHash,
-        auditEventId = residue.EventId,
+        auditEventId = receipt.EventId,
         ledgerRecordId = record.RecordId,
         canonicalHash = canonicalHash.HashValue,
         signing = new
@@ -185,10 +194,10 @@ app.MapGet("/sample/audit/{correlationId}", (
     InMemoryAuditLedger auditLedger) => Results.Ok(auditLedger.GetByCorrelationId(correlationId)));
 
 app.MapPost("/sample/acknowledgments/challenges", (
-    IAsiBackboneAcknowledgmentChallengeService challengeService,
+    IAcknowledgmentChallengeService challengeService,
     SampleAcknowledgmentChallengeStore challengeStore) =>
 {
-    var actor = AsiBackboneActorContext.Human("sample-user", "Sample User");
+    var actor = GovernanceActorContext.Human("sample-user", "Sample User");
     var decision = GovernanceDecision.RequireAcknowledgment(
         "sample.acknowledgment.required",
         "The sample operation requires an explicit acknowledgment before the host proceeds.",
@@ -196,7 +205,7 @@ app.MapPost("/sample/acknowledgments/challenges", (
         policyVersion: "sample-policy-v1",
         policyHash: "sample-policy-hash");
 
-    AsiBackboneAcknowledgmentChallenge challenge = challengeService.CreateChallenge(
+    AcknowledgmentChallenge challenge = challengeService.CreateChallenge(
         actor,
         "sample.acknowledgment.execute",
         decision);
@@ -207,18 +216,18 @@ app.MapPost("/sample/acknowledgments/challenges", (
 .WithDisplayName("sample.acknowledgments.create");
 
 app.MapPost("/sample/acknowledgments/responses", (
-    AsiBackboneAcknowledgmentChallengeRequest response,
-    IAsiBackboneAcknowledgmentChallengeService challengeService,
+    AcknowledgmentChallengeRequest response,
+    IAcknowledgmentChallengeService challengeService,
     SampleAcknowledgmentChallengeStore challengeStore) =>
 {
     if (string.IsNullOrWhiteSpace(response.HandshakeId)
-        || !challengeStore.TryTake(response.HandshakeId, out AsiBackboneAcknowledgmentChallenge? challenge))
+        || !challengeStore.TryTake(response.HandshakeId, out AcknowledgmentChallenge? challenge))
     {
         return Results.NotFound(new { reasonCode = "sample.acknowledgment.challenge_not_found" });
     }
 
-    var actor = AsiBackboneActorContext.Human("sample-user", "Sample User");
-    AsiBackboneAcknowledgmentChallengeResult result = challengeService.HandleResponse(challenge!, actor, response);
+    var actor = GovernanceActorContext.Human("sample-user", "Sample User");
+    AcknowledgmentChallengeResult result = challengeService.HandleResponse(challenge!, actor, response);
 
     return result.Acknowledged
         ? Results.Ok(new
@@ -232,7 +241,7 @@ app.MapPost("/sample/acknowledgments/responses", (
 
 app.MapGet("/sample/ledger/{correlationId}", async (
     string correlationId,
-    IAsiBackboneAuditLedgerStore ledgerStore,
+    IGovernanceAuditLedgerStore ledgerStore,
     CancellationToken cancellationToken) =>
 {
     IReadOnlyList<AuditLedgerRecord> records = await ledgerStore
@@ -245,7 +254,7 @@ app.MapGet("/sample/ledger/{correlationId}", async (
 app.MapControllers();
 
 // At startup, after building configuration:
-IOptions<AsiBackboneEndpointGovernanceOptions> endpointOptions = builder.Services.BuildServiceProvider().GetRequiredService<IOptions<AsiBackboneEndpointGovernanceOptions>>();
+IOptions<EndpointGovernanceOptions> endpointOptions = builder.Services.BuildServiceProvider().GetRequiredService<IOptions<EndpointGovernanceOptions>>();
 endpointOptions.Value.Validate(); // run once at startup and remove per-request Validate() calls
 
 app.Run();
@@ -260,12 +269,12 @@ internal sealed class PlainHostAsiBackboneDbContext(DbContextOptions<PlainHostAs
     }
 }
 
-internal sealed class RegionConstraint : IAsiBackboneConstraint<AsiBackboneConstraintEvaluationContext>
+internal sealed class RegionConstraint : IGovernanceConstraint<GovernanceEvaluationContext>
 {
     public string Name => "sample.region";
 
     public ValueTask<ConstraintEvaluationResult> EvaluateAsync(
-        AsiBackboneConstraintEvaluationContext context,
+        GovernanceEvaluationContext context,
         CancellationToken cancellationToken = default)
     {
         cancellationToken.ThrowIfCancellationRequested();
@@ -283,10 +292,10 @@ internal sealed class RegionConstraint : IAsiBackboneConstraint<AsiBackboneConst
     }
 }
 
-internal sealed class ConsequentialActionDecisionPolicy : IAsiBackboneDecisionPolicy<AsiBackboneConstraintEvaluationContext>
+internal sealed class ConsequentialActionDecisionPolicy : IGovernanceDecisionPolicy<GovernanceEvaluationContext>
 {
     public ValueTask<GovernanceDecision> ApplyAsync(
-        AsiBackboneConstraintEvaluationContext context,
+        GovernanceEvaluationContext context,
         GovernanceDecision composedDecision,
         IReadOnlyList<ConstraintEvaluationResult> constraintResults,
         CancellationToken cancellationToken = default)
@@ -318,27 +327,27 @@ internal sealed class SampleEndpointPolicy
 
 internal sealed class SampleAcknowledgmentChallengeStore
 {
-    private readonly System.Collections.Concurrent.ConcurrentDictionary<string, AsiBackboneAcknowledgmentChallenge> challenges =
+    private readonly System.Collections.Concurrent.ConcurrentDictionary<string, AcknowledgmentChallenge> challenges =
         new(StringComparer.Ordinal);
 
-    public void Add(AsiBackboneAcknowledgmentChallenge challenge)
+    public void Add(AcknowledgmentChallenge challenge)
     {
         ArgumentNullException.ThrowIfNull(challenge);
         _ = challenges.TryAdd(challenge.HandshakeId, challenge);
     }
 
-    public bool TryTake(string handshakeId, out AsiBackboneAcknowledgmentChallenge? challenge)
+    public bool TryTake(string handshakeId, out AcknowledgmentChallenge? challenge)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(handshakeId);
         return challenges.TryRemove(handshakeId.Trim(), out challenge);
     }
 }
 
-internal sealed class SampleEndpointCapabilityGrantValidator : IAsiBackboneEndpointCapabilityGrantValidator
+internal sealed class SampleEndpointCapabilityGrantValidator : IEndpointCapabilityGrantValidator
 {
     public ValueTask<GovernanceDecision> ValidateAsync(
         HttpContext httpContext,
-        AsiBackboneEndpointGovernanceDescriptor descriptor,
+        EndpointGovernanceDescriptor descriptor,
         GovernanceDecision currentDecision,
         CancellationToken cancellationToken = default)
     {
@@ -363,7 +372,7 @@ internal sealed class SampleEndpointCapabilityGrantValidator : IAsiBackboneEndpo
 internal sealed class InternalSampleGovernanceController : ControllerBase
 {
     [HttpPost]
-    [RequireGovernancePolicy(typeof(SampleEndpointPolicy))]
+    [GovernancePolicy(typeof(SampleEndpointPolicy))]
     [RequireLiabilityHandshake]
     [RequireCapabilityGrant("sample.high-risk.execute")]
     [EmitGovernanceAudit]

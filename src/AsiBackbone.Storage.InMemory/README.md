@@ -1,6 +1,6 @@
 # AsiBackbone.Storage.InMemory
 
-Non-durable in-memory storage helpers for Accountable Systems Infrastructure local validation, samples, and tests.
+Non-durable in-memory storage helpers for AsiBackbone local validation, samples, and tests.
 
 This package provides non-durable storage implementations that make it easy to exercise ASI Backbone governance flows without requiring a database, EF Core provider, or host infrastructure.
 
@@ -12,7 +12,7 @@ This package provides non-durable storage implementations that make it easy to e
 ## What this package provides
 
 - In-memory audit ledger behavior for local validation and tests.
-- In-memory governance outbox behavior for local validation, samples, and integration tests.
+- In-memory outbox behavior for local validation, samples, and integration tests.
 - In-memory capability grant use tracking for local validation, samples, and integration tests.
 - Storage implementations that depend on `AsiBackbone.Core` only.
 - A simple bridge for samples that need audit, outbox, or bounded-use capability grant records without introducing EF Core or a database.
@@ -23,8 +23,8 @@ Use this package when:
 
 - writing unit tests or integration tests around policy evaluation;
 - building sample applications;
-- validating audit residue and audit ledger behavior locally;
-- validating governance outbox state transitions locally;
+- validating decision receipt and audit ledger behavior locally;
+- validating outbox state transitions locally;
 - validating first-use and replay-denied capability grant flows locally;
 - demonstrating host-neutral ASI Backbone flows before adding durable storage.
 
@@ -32,9 +32,11 @@ For production persistence, use a host-owned durable storage strategy such as `A
 
 ## In-memory capability grant use semantics
 
-`InMemoryCapabilityGrantUseStore` implements `ICapabilityGrantUseStore` for tests, samples, and local validation. It is keyed by the stable capability grant token ID, consumes one use when accepted, honors `maxUseCount`, and returns `capability.use-limit-exceeded` when the local in-process count reaches that limit.
+`InMemoryCapabilityGrantUseStore` implements `ICapabilityGrantUseStore` for tests, samples, and local validation. It is keyed by issuer and capability grant token ID, consumes one use when accepted, honors `maxUseCount`, and returns `capability.use-limit-exceeded` when the local in-process count reaches that limit.
 
-The store is thread-safe inside one process, and exposes local-validation helpers to mark grants as stopped or cancelled. It does not persist across process restarts, coordinate multiple replicas, provide distributed locks, or guarantee production replay protection.
+Use records are evicted once a grant has been expired for longer than `EvictionGracePeriod` (default five minutes), measured from the latest observed use time. A grant past that retention horizon is refused with `capability.use-retention-elapsed` rather than given a fresh count. Set `EvictionGracePeriod` to at least the largest `AllowedClockSkew` used with the store; otherwise expired grants still inside the skew are denied.
+
+The store is thread-safe inside one process, and exposes local-validation helpers to mark grants as stopped or cancelled, either for one issuer (`StopGrant(issuer, grantId)`, `CancelGrant(issuer, grantId)`) or for every issuer using an identifier (`StopGrant(grantId)`, `CancelGrant(grantId)`). It does not persist across process restarts, coordinate multiple replicas, provide distributed locks, or guarantee production replay protection.
 
 ## In-memory outbox concurrency semantics
 

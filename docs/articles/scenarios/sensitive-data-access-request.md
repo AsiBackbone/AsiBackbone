@@ -15,7 +15,7 @@ This scenario applies to systems where access depends on more than identity alon
 | Host application | Owns identity, authorization, classification, retrieval, presentation, and final response. |
 | AsiBackbone | Evaluates the host-provided policy context and returns a governance decision. |
 | Acknowledgment layer | Handles responsibility acknowledgment when the decision requires it. |
-| Audit sink or ledger | Preserves reason codes, policy metadata, correlation identifiers, and decision residue. |
+| Audit sink or ledger | Preserves reason codes, policy metadata, correlation identifiers, and decision receipt. |
 
 ## Sequence
 
@@ -27,17 +27,17 @@ Requesting actor
   -> Host application: receives governance decision
 
 If denied, deferred, or escalation-recommended:
-  -> Host application persists decision residue
+  -> Host application persists decision receipt
   -> Host application returns governed outcome without continuing through the data path
 
 If acknowledgment-required:
   -> Host application presents acknowledgment challenge
   -> Acknowledgment layer returns accepted or rejected response
-  -> Host application persists decision and acknowledgment residue
+  -> Host application persists decision receipt and acknowledgment record
   -> Host application continues only if accepted and host policy permits access
 
 If allowed or warning:
-  -> Host application persists decision residue
+  -> Host application persists decision receipt
   -> Host application decides whether and how to continue through the host-owned data path
 ```
 
@@ -48,7 +48,7 @@ If allowed or warning:
 | View protected record | actor type, purpose, resource classification, region | Allow normal access; defer if purpose or policy metadata is missing. |
 | Review protected report | data category, volume, destination, policy version | Require acknowledgment for sensitive review paths; deny prohibited combinations. |
 | Access cross-region information | jurisdiction, actor location, resource location, policy hash | Defer or escalate when regional policy needs review. |
-| Review exception request | exception reason, requester, target resource, correlation ID | Preserve reason codes and audit residue for later review. |
+| Review exception request | exception reason, requester, target resource, correlation ID | Preserve reason codes and decision receipt for later review. |
 
 ## Implementation notes
 
@@ -66,4 +66,4 @@ AsiBackbone can return a decision that the host maps to its own API response, UI
 
 ## Adoption note
 
-A good first adoption is one protected report or record-view workflow. The host can evaluate the request, persist decision residue, and return a governed response before any broader data-access pattern is changed.
+A good first adoption is one protected report or record-view workflow. The host can evaluate the request, persist decision receipt, and return a governed response before any broader data-access pattern is changed.

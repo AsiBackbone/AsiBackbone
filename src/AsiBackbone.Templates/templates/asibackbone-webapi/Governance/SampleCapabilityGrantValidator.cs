@@ -7,11 +7,11 @@ namespace Company.AsibackboneTemplate.Governance;
 /// <summary>
 /// Sample endpoint capability validator. Production hosts should replace this with host-owned scope, expiry, replay, actor, and downstream authorization checks.
 /// </summary>
-public sealed class SampleCapabilityGrantValidator : IAsiBackboneEndpointCapabilityGrantValidator
+public sealed class SampleCapabilityGrantValidator : IEndpointCapabilityGrantValidator
 {
     public ValueTask<GovernanceDecision> ValidateAsync(
         HttpContext httpContext,
-        AsiBackboneEndpointGovernanceDescriptor descriptor,
+        EndpointGovernanceDescriptor descriptor,
         GovernanceDecision currentDecision,
         CancellationToken cancellationToken = default)
     {

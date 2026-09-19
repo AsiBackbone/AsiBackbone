@@ -13,23 +13,23 @@ namespace AsiBackbone.Core.Tests.Signing;
 public sealed class GovernanceArtifactSignerLineCoverageTests
 {
     /// <summary>
-    /// Covers unsigned, signing-ready, and signed audit residue helper overloads.
+    /// Covers unsigned, signing-ready, and signed decision receipt helper overloads.
     /// </summary>
     [Fact]
-    public async Task AuditResidueHelpersCoverUnsignedSigningReadyAndSignedPaths()
+    public async Task DecisionReceiptHelpersCoverUnsignedSigningReadyAndSignedPaths()
     {
-        AuditResidue residue = CreateAuditResidue();
+        DecisionReceipt receipt = CreateDecisionReceipt();
 
-        SignedGovernanceArtifact<IAsiBackboneAuditResidue> unsigned = GovernanceArtifactSigner.CreateUnsignedAuditResidue(residue);
-        SignedGovernanceArtifact<IAsiBackboneAuditResidue> signingReady = GovernanceArtifactSigner.CreateSigningReadyAuditResidue(
-            residue,
+        SignedGovernanceArtifact<IDecisionReceipt> unsigned = GovernanceArtifactSigner.CreateUnsignedDecisionReceipt(receipt: receipt);
+        SignedGovernanceArtifact<IDecisionReceipt> signingReady = GovernanceArtifactSigner.CreateSigningReadyDecisionReceipt(
+            receipt: receipt,
             metadata: new Dictionary<string, string>
             {
                 ["workflow"] = "audit-residue-ready"
             });
-        SignedGovernanceArtifact<IAsiBackboneAuditResidue> signed = await GovernanceArtifactSigner.SignAuditResidueAsync(
-            residue,
-            new FakeSigningService(),
+        SignedGovernanceArtifact<IDecisionReceipt> signed = await GovernanceArtifactSigner.SignDecisionReceiptAsync(
+            receipt: receipt,
+            signingService: new FakeSigningService(),
             keyId: "residue-key",
             keyVersion: "v1",
             metadata: new Dictionary<string, string>
@@ -55,21 +55,21 @@ public sealed class GovernanceArtifactSignerLineCoverageTests
     }
 
     /// <summary>
-    /// Covers unsigned, signing-ready, and signed audit residue lifecycle event helper overloads.
+    /// Covers unsigned, signing-ready, and signed decision receipt lifecycle event helper overloads.
     /// </summary>
     [Fact]
-    public async Task AuditResidueLifecycleEventHelpersCoverUnsignedSigningReadyAndSignedPaths()
+    public async Task DecisionReceiptLifecycleEventHelpersCoverUnsignedSigningReadyAndSignedPaths()
     {
-        AuditResidueLifecycleEvent lifecycleEvent = CreateLifecycleEvent();
+        DecisionReceiptLifecycleEvent lifecycleEvent = CreateLifecycleEvent();
 
-        SignedGovernanceArtifact<AuditResidueLifecycleEvent> unsigned = GovernanceArtifactSigner.CreateUnsignedAuditResidueLifecycleEvent(lifecycleEvent);
-        SignedGovernanceArtifact<AuditResidueLifecycleEvent> signingReady = GovernanceArtifactSigner.CreateSigningReadyAuditResidueLifecycleEvent(
+        SignedGovernanceArtifact<DecisionReceiptLifecycleEvent> unsigned = GovernanceArtifactSigner.CreateUnsignedDecisionReceiptLifecycleEvent(lifecycleEvent);
+        SignedGovernanceArtifact<DecisionReceiptLifecycleEvent> signingReady = GovernanceArtifactSigner.CreateSigningReadyDecisionReceiptLifecycleEvent(
             lifecycleEvent,
             metadata: new Dictionary<string, string>
             {
                 ["workflow"] = "lifecycle-ready"
             });
-        SignedGovernanceArtifact<AuditResidueLifecycleEvent> signed = await GovernanceArtifactSigner.SignAuditResidueLifecycleEventAsync(
+        SignedGovernanceArtifact<DecisionReceiptLifecycleEvent> signed = await GovernanceArtifactSigner.SignDecisionReceiptLifecycleEventAsync(
             lifecycleEvent,
             new FakeSigningService(),
             keyId: "lifecycle-key",
@@ -195,11 +195,11 @@ public sealed class GovernanceArtifactSignerLineCoverageTests
         Assert.False(request.Metadata.ContainsKey(string.Empty));
     }
 
-    private static AuditResidue CreateAuditResidue()
+    private static DecisionReceipt CreateDecisionReceipt()
     {
-        IAsiBackboneActorContext actor = AsiBackboneActorContext.Service("system-1", "System");
+        IGovernanceActorContext actor = GovernanceActorContext.Service("system-1", "System");
 
-        return AuditResidue.Create(
+        return DecisionReceipt.Create(
             actor,
             "gateway.execute",
             "Allowed",
@@ -212,10 +212,10 @@ public sealed class GovernanceArtifactSignerLineCoverageTests
             auditResidueId: "residue-1");
     }
 
-    private static AuditResidueLifecycleEvent CreateLifecycleEvent()
+    private static DecisionReceiptLifecycleEvent CreateLifecycleEvent()
     {
-        return AuditResidueLifecycleEvent.Create(
-            AuditResidueLifecycleStage.ExternalEmissionQueued,
+        return DecisionReceiptLifecycleEvent.Create(
+            DecisionReceiptLifecycleStage.ExternalEmissionQueued,
             "correlation-1",
             auditResidueId: "residue-1",
             eventId: "lifecycle-1",
@@ -254,7 +254,7 @@ public sealed class GovernanceArtifactSignerLineCoverageTests
             createdUtc: new DateTimeOffset(2026, 6, 16, 12, 0, 2, TimeSpan.Zero));
     }
 
-    private sealed class FakeSigningService : IAsiBackboneSigningService
+    private sealed class FakeSigningService : IGovernanceSigningService
     {
         public ValueTask<SigningResult> SignAsync(SigningRequest request, CancellationToken cancellationToken = default)
         {

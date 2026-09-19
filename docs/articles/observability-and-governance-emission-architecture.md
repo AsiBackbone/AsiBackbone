@@ -13,7 +13,7 @@ AsiBackbone is a governance spine for consequential software decision flow. It i
 
 ## Purpose
 
-The `3.1.0` integration direction preserves AsiBackbone's neutral governance spine while allowing host applications to emit structured decision records into operational and governance systems.
+The `3.1.0` integration direction preserves AsiBackbone's neutral policy decision pipeline while allowing host applications to emit structured decision records into operational and governance systems.
 
 The primary architecture path is:
 
@@ -22,7 +22,7 @@ Decision
   -> Acknowledgment
   -> Capability token
   -> Gateway execution boundary
-  -> Audit residue
+  -> Decision receipt
   -> Durable local/outbox record
   -> Optional provider emission
 ```
@@ -53,7 +53,7 @@ AsiBackbone.Core
   | evaluates policy and returns governance decision
   | creates acknowledgment challenge when required
   | creates scoped capability token when allowed
-  | creates audit residue / decision receipt shape
+  | creates decision receipt / decision receipt shape
   v
 Durable local store / outbox
   |
@@ -83,7 +83,7 @@ Core may define:
 - actor, policy, operation, acknowledgment, capability, gateway, and audit identifiers;
 - correlation, trace, event, record, schema, policy-version, and policy-hash fields;
 - acknowledgment and capability result shapes;
-- audit residue and decision-receipt contracts;
+- decision receipt and decision-receipt contracts;
 - governance-emission envelopes and provider-neutral results;
 - durable outbox contracts and drain primitives; and
 - signing-ready and verification-policy abstractions.
@@ -102,17 +102,17 @@ Core must not contain:
 External emission should follow an outbox-style pattern so host applications do not lose governance records when downstream providers are unavailable.
 
 ```text
-Audit residue / lifecycle event
+Decision receipt / lifecycle event
   -> host-owned durable store
   -> GovernanceEmissionEnvelope
-  -> IAsiBackboneGovernanceOutboxStore
-  -> AsiBackboneGovernanceOutboxDrain
-  -> IAsiBackboneGovernanceEmitter
+  -> IGovernanceOutboxStore
+  -> GovernanceOutboxDrain
+  -> IGovernanceEmitter
   -> provider result
   -> delivered / failed / retryable / deferred / dead-letter state
 ```
 
-A process crash, provider outage, network failure, rate limit, or DLP failure should not erase the original decision residue.
+A process crash, provider outage, network failure, rate limit, or DLP failure should not erase the original decision receipt.
 
 ## OpenTelemetry as the released provider
 
@@ -181,7 +181,7 @@ Production tamper-evidence requires deployed signing, verification, protected ke
 
 | Boundary | Current status | Role |
 | --- | --- | --- |
-| `AsiBackbone.Core` | Released | Neutral governance primitives, decision contracts, acknowledgment, capability, audit residue, emission contracts, outbox contracts, signing-ready seams, and verification policy. |
+| `AsiBackbone.Core` | Released | Neutral governance primitives, decision contracts, acknowledgment, capability, decision receipt, emission contracts, outbox contracts, signing-ready seams, and verification policy. |
 | `AsiBackbone.Storage.InMemory` | Released | Development, test, sample, and local-validation storage. |
 | `AsiBackbone.EntityFrameworkCore` | Released | Host-owned EF Core persistence and durable local storage support. |
 | `AsiBackbone.AspNetCore` | Released | ASP.NET Core host integration and hosted outbox drain support. |

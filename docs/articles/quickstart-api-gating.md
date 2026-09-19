@@ -4,7 +4,7 @@ This quickstart is the shortest practical path for a developer who wants to answ
 
 > Should this API request continue, and can I leave an audit trail showing how that decision was made?
 
-In this project, **ASI** means **Accountable Systems Infrastructure**. AsiBackbone is a governance spine for decision flow. It does not host AI models, make autonomous choices, or implement artificial superintelligence. Your application still owns authentication, authorization, persistence, business logic, and execution.
+AsiBackbone is a policy decision pipeline for decision flow. It does not host AI models, make autonomous choices, or implement artificial superintelligence. Your application still owns authentication, authorization, persistence, business logic, and execution.
 
 ## The 80% mental model
 
@@ -13,7 +13,7 @@ For a normal ASP.NET Core API, think about AsiBackbone as four small steps aroun
 1. The request arrives.
 2. The host builds a small evaluation context from safe request data.
 3. One or more constraints decide whether the request is allowed, warned, denied, deferred, or needs acknowledgment.
-4. The host records audit residue, then either continues or returns a safe response.
+4. The host records decision receipt, then either continues or returns a safe response.
 
 In plain application terms:
 
@@ -22,7 +22,7 @@ In plain application terms:
 | Constraint | A small rule checked before the endpoint performs work. |
 | Evaluation context | Safe request facts passed to the rule, such as correlation ID, policy version, region, operation name, and risk. |
 | Governance decision | The result of the rule check: allow, deny, warning, defer, acknowledgment required, or escalation recommended. |
-| Audit residue | The record that says who attempted what, what decision was reached, and which policy context was used. |
+| Decision receipt | The record that says who attempted what, what decision was reached, and which policy context was used. |
 | Governance metadata | Endpoint metadata that names the governance intent for route-based orchestration. |
 
 The example below keeps the first run explicit so each moving part is visible.
@@ -46,7 +46,7 @@ Package roles:
 
 | Package | Why it is used here |
 | --- | --- |
-| `AsiBackbone.Core` | Defines constraints, evaluation context, decisions, and audit residue. |
+| `AsiBackbone.Core` | Defines constraints, evaluation context, decisions, and decision receipt. |
 | `AsiBackbone.AspNetCore` | Provides ASP.NET Core registration helpers, result mapping, and endpoint metadata helpers. |
 | `AsiBackbone.Storage.InMemory` | Gives the sample a non-durable local audit sink so you can see records immediately. |
 
@@ -73,17 +73,17 @@ builder.Services.AddAsiBackboneAspNetCore();
 // In-memory storage is useful for a first run, tests, and samples.
 // It is not durable production audit storage.
 builder.Services.AddSingleton<InMemoryAuditLedger>();
-builder.Services.AddSingleton<IAsiBackboneAuditSink>(serviceProvider =>
+builder.Services.AddSingleton<IDecisionReceiptSink>(serviceProvider =>
     serviceProvider.GetRequiredService<InMemoryAuditLedger>());
 
 // Register one host-owned rule. In real applications, this is where your policy rules begin.
-builder.Services.AddSingleton<IAsiBackboneConstraint<AsiBackboneConstraintEvaluationContext>, AllowedRegionConstraint>();
+builder.Services.AddSingleton<IGovernanceConstraint<GovernanceEvaluationContext>, AllowedRegionConstraint>();
 
 // Register the Core evaluator. It composes constraint results into a GovernanceDecision.
-builder.Services.AddSingleton<IAsiBackbonePolicyEvaluator<AsiBackboneConstraintEvaluationContext>>(serviceProvider =>
-    DefaultAsiBackbonePolicyEvaluator.CreateBuilder<AsiBackboneConstraintEvaluationContext>()
-        .AddConstraints(serviceProvider.GetServices<IAsiBackboneConstraint<AsiBackboneConstraintEvaluationContext>>())
-        .WithOptions(new AsiBackbonePolicyEvaluatorOptions
+builder.Services.AddSingleton<IGovernancePolicyEvaluator<GovernanceEvaluationContext>>(serviceProvider =>
+    DefaultGovernancePolicyEvaluator.CreateBuilder<GovernanceEvaluationContext>()
+        .AddConstraints(serviceProvider.GetServices<IGovernanceConstraint<GovernanceEvaluationContext>>())
+        .WithOptions(new GovernancePolicyOptions
         {
             // For real API gating, fail closed if the host expected constraints but none were registered.
             DenyWhenNoConstraints = true,
@@ -102,8 +102,8 @@ app.MapGet("/", () => Results.Redirect("/api/audit"));
 app.MapPost("/api/orders/{region}/approve", async (
     string region,
     HttpContext httpContext,
-    IAsiBackbonePolicyEvaluator<AsiBackboneConstraintEvaluationContext> evaluator,
-    IAsiBackboneAuditSink auditSink,
+    IGovernancePolicyEvaluator<GovernanceEvaluationContext> evaluator,
+    IDecisionReceiptSink auditSink,
     CancellationToken cancellationToken) =>
 {
     const string operationName = "orders.approve";
@@ -117,7 +117,7 @@ app.MapPost("/api/orders/{region}/approve", async (
         ["risk"] = "routine-api-write"
     };
 
-    var context = new AsiBackboneConstraintEvaluationContext(
+    var context = new GovernanceEvaluationContext(
         correlationId: httpContext.TraceIdentifier,
         policyVersion: "quickstart-policy-v1",
         policyHash: "quickstart-policy-hash-v1",
@@ -127,18 +127,18 @@ app.MapPost("/api/orders/{region}/approve", async (
         .EvaluateAsync(context, cancellationToken)
         .ConfigureAwait(false);
 
-    var actor = AsiBackboneActorContext.Human(
+    var actor = GovernanceActorContext.Human(
         actorId: "quickstart-user",
         displayName: "Quickstart API caller");
 
-    // Audit residue records the decision context whether the request is allowed or denied.
-    AuditResidue residue = AuditResidue.FromDecision(
+    // Decision receipt records the decision context whether the request is allowed or denied.
+    DecisionReceipt receipt = DecisionReceipt.FromDecision(
         actor,
         operationName,
         decision,
         metadata: context.Metadata);
 
-    await auditSink.WriteAsync(residue, cancellationToken).ConfigureAwait(false);
+    await auditSink.WriteAsync(receipt, cancellationToken).ConfigureAwait(false);
 
     if (!decision.CanProceed)
     {
@@ -149,7 +149,7 @@ app.MapPost("/api/orders/{region}/approve", async (
                 decision = decision.Outcome.ToString(),
                 decision.ReasonCodes,
                 decision.CorrelationId,
-                auditEventId = residue.EventId
+                auditEventId = receipt.EventId
             },
             statusCode: StatusCodes.Status403Forbidden);
     }
@@ -162,7 +162,7 @@ app.MapPost("/api/orders/{region}/approve", async (
         message = "Order approval would run here after governance evaluation.",
         decision = decision.Outcome.ToString(),
         decision.CorrelationId,
-        auditEventId = residue.EventId
+        auditEventId = receipt.EventId
     });
 })
 // Endpoint metadata gives the route a governance identity for later middleware-based orchestration.
@@ -185,12 +185,12 @@ internal sealed class OrderApprovalPolicy
 }
 
 // A single simple rule: allow normal regions, deny the intentionally blocked region.
-internal sealed class AllowedRegionConstraint : IAsiBackboneConstraint<AsiBackboneConstraintEvaluationContext>
+internal sealed class AllowedRegionConstraint : IGovernanceConstraint<GovernanceEvaluationContext>
 {
     public string Name => "quickstart.region.allowed";
 
     public ValueTask<ConstraintEvaluationResult> EvaluateAsync(
-        AsiBackboneConstraintEvaluationContext context,
+        GovernanceEvaluationContext context,
         CancellationToken cancellationToken = default)
     {
         cancellationToken.ThrowIfCancellationRequested();
@@ -280,7 +280,7 @@ POST /api/orders/{region}/approve
   -> build safe evaluation context
   -> run AllowedRegionConstraint
   -> compose GovernanceDecision
-  -> write AuditResidue to InMemoryAuditLedger
+  -> write DecisionReceipt to InMemoryAuditLedger
   -> continue only when decision.CanProceed is true
 ```
 
@@ -310,7 +310,7 @@ For standard APIs that want the package to read endpoint metadata before executi
 
 ## Where OpenTelemetry fits
 
-OpenTelemetry is not required for the first run. The quickstart writes audit residue into an in-memory ledger so you can inspect the decision locally.
+OpenTelemetry is not required for the first run. The quickstart writes decision receipt into an in-memory ledger so you can inspect the decision locally.
 
 In a production-style host, the usual progression is:
 

@@ -15,7 +15,7 @@ public sealed class LiabilityHandshakeAcknowledgmentTests
     [Fact]
     public void AcceptCreatesAcknowledgedResponse()
     {
-        var actor = AsiBackboneActorContext.Human("user-123", "Chris");
+        var actor = GovernanceActorContext.Human("user-123", "Chris");
         LiabilityHandshakeRequest request = CreateRequest(actor);
 
         var acknowledgment = LiabilityHandshakeAcknowledgment.Accept(
@@ -27,7 +27,7 @@ public sealed class LiabilityHandshakeAcknowledgmentTests
         Assert.Equal("acknowledgment-123", acknowledgment.AcknowledgmentId);
         Assert.Equal("handshake-123", acknowledgment.HandshakeId);
         Assert.Equal("user-123", acknowledgment.ActorId);
-        Assert.Equal(AsiBackboneActorType.Human, acknowledgment.ActorType);
+        Assert.Equal(GovernanceActorType.Human, acknowledgment.ActorType);
         Assert.Equal("Chris", acknowledgment.ActorDisplayName);
         Assert.Equal("ACK-001", acknowledgment.AcknowledgmentCode);
         Assert.True(acknowledgment.Acknowledged);
@@ -43,7 +43,7 @@ public sealed class LiabilityHandshakeAcknowledgmentTests
     [Fact]
     public void RejectCreatesRejectedResponse()
     {
-        var actor = AsiBackboneActorContext.Human("user-123", "Chris");
+        var actor = GovernanceActorContext.Human("user-123", "Chris");
         LiabilityHandshakeRequest request = CreateRequest(actor);
 
         var acknowledgment = LiabilityHandshakeAcknowledgment.Reject(
@@ -62,7 +62,7 @@ public sealed class LiabilityHandshakeAcknowledgmentTests
     [Fact]
     public void CreateGeneratesAcknowledgmentIdWhenMissing()
     {
-        AsiBackboneActorContext actor = AsiBackboneActorContext.System;
+        GovernanceActorContext actor = GovernanceActorContext.System;
         LiabilityHandshakeRequest request = CreateRequest(actor);
 
         var acknowledgment = LiabilityHandshakeAcknowledgment.Accept(
@@ -78,7 +78,7 @@ public sealed class LiabilityHandshakeAcknowledgmentTests
     [Fact]
     public void CreateGeneratesAcknowledgmentIdWhenIdentifierIsWhitespace()
     {
-        AsiBackboneActorContext actor = AsiBackboneActorContext.System;
+        GovernanceActorContext actor = GovernanceActorContext.System;
         LiabilityHandshakeRequest request = CreateRequest(actor);
 
         var acknowledgment = LiabilityHandshakeAcknowledgment.Accept(
@@ -95,7 +95,7 @@ public sealed class LiabilityHandshakeAcknowledgmentTests
     [Fact]
     public void CreateTrimsAcknowledgmentId()
     {
-        AsiBackboneActorContext actor = AsiBackboneActorContext.System;
+        GovernanceActorContext actor = GovernanceActorContext.System;
         LiabilityHandshakeRequest request = CreateRequest(actor);
 
         var acknowledgment = LiabilityHandshakeAcknowledgment.Accept(
@@ -112,7 +112,7 @@ public sealed class LiabilityHandshakeAcknowledgmentTests
     [Fact]
     public void CreateNormalizesTimestampToUtc()
     {
-        AsiBackboneActorContext actor = AsiBackboneActorContext.System;
+        GovernanceActorContext actor = GovernanceActorContext.System;
         LiabilityHandshakeRequest request = CreateRequest(actor);
 
         var acknowledgment = LiabilityHandshakeAcknowledgment.Accept(
@@ -129,7 +129,7 @@ public sealed class LiabilityHandshakeAcknowledgmentTests
     [Fact]
     public void CreateNormalizesMissingOptionalValuesToNull()
     {
-        var actor = AsiBackboneActorContext.Human("user-123");
+        var actor = GovernanceActorContext.Human("user-123");
         LiabilityHandshakeRequest request = CreateRequestWithoutTrace(actor);
 
         var acknowledgment = LiabilityHandshakeAcknowledgment.Accept(
@@ -147,7 +147,7 @@ public sealed class LiabilityHandshakeAcknowledgmentTests
     [Fact]
     public void CreateNormalizesMetadata()
     {
-        var actor = AsiBackboneActorContext.Service("service-123");
+        var actor = GovernanceActorContext.Service("service-123");
         LiabilityHandshakeRequest request = CreateRequest(actor);
 
         var acknowledgment = LiabilityHandshakeAcknowledgment.Accept(
@@ -170,7 +170,7 @@ public sealed class LiabilityHandshakeAcknowledgmentTests
     [Fact]
     public void CreateWithNullMetadataReturnsNoMetadata()
     {
-        var actor = AsiBackboneActorContext.Service("service-123");
+        var actor = GovernanceActorContext.Service("service-123");
         LiabilityHandshakeRequest request = CreateRequest(actor);
 
         var acknowledgment = LiabilityHandshakeAcknowledgment.Accept(
@@ -188,7 +188,7 @@ public sealed class LiabilityHandshakeAcknowledgmentTests
     [Fact]
     public void CreateWithEmptyMetadataReturnsNoMetadata()
     {
-        var actor = AsiBackboneActorContext.Service("service-123");
+        var actor = GovernanceActorContext.Service("service-123");
         LiabilityHandshakeRequest request = CreateRequest(actor);
 
         var acknowledgment = LiabilityHandshakeAcknowledgment.Accept(
@@ -206,7 +206,7 @@ public sealed class LiabilityHandshakeAcknowledgmentTests
     [Fact]
     public void CreateWithOnlyBlankMetadataKeysReturnsNoMetadata()
     {
-        var actor = AsiBackboneActorContext.Service("service-123");
+        var actor = GovernanceActorContext.Service("service-123");
         LiabilityHandshakeRequest request = CreateRequest(actor);
 
         var acknowledgment = LiabilityHandshakeAcknowledgment.Accept(
@@ -228,7 +228,7 @@ public sealed class LiabilityHandshakeAcknowledgmentTests
     [Fact]
     public void CreateWithDuplicateTrimmedMetadataKeysUsesLastValue()
     {
-        var actor = AsiBackboneActorContext.Service("service-123");
+        var actor = GovernanceActorContext.Service("service-123");
         LiabilityHandshakeRequest request = CreateRequest(actor);
 
         var acknowledgment = LiabilityHandshakeAcknowledgment.Accept(
@@ -251,7 +251,7 @@ public sealed class LiabilityHandshakeAcknowledgmentTests
     [Fact]
     public void CreateWithNullMetadataValueStoresEmptyString()
     {
-        var actor = AsiBackboneActorContext.Service("service-123");
+        var actor = GovernanceActorContext.Service("service-123");
         LiabilityHandshakeRequest request = CreateRequest(actor);
 
         var acknowledgment = LiabilityHandshakeAcknowledgment.Accept(
@@ -275,7 +275,7 @@ public sealed class LiabilityHandshakeAcknowledgmentTests
         _ = Assert.Throws<ArgumentNullException>(() =>
             LiabilityHandshakeAcknowledgment.Accept(
                 request: null!,
-                actor: AsiBackboneActorContext.System));
+                actor: GovernanceActorContext.System));
     }
 
     /// <summary>
@@ -284,7 +284,7 @@ public sealed class LiabilityHandshakeAcknowledgmentTests
     [Fact]
     public void CreateThrowsForMissingActor()
     {
-        LiabilityHandshakeRequest request = CreateRequest(AsiBackboneActorContext.System);
+        LiabilityHandshakeRequest request = CreateRequest(GovernanceActorContext.System);
 
         _ = Assert.Throws<ArgumentNullException>(() =>
             LiabilityHandshakeAcknowledgment.Accept(
@@ -298,7 +298,7 @@ public sealed class LiabilityHandshakeAcknowledgmentTests
     [Fact]
     public void AcceptWithoutTimestampUsesCurrentUtcTimestamp()
     {
-        AsiBackboneActorContext actor = AsiBackboneActorContext.System;
+        GovernanceActorContext actor = GovernanceActorContext.System;
         LiabilityHandshakeRequest request = CreateRequest(actor);
         DateTimeOffset beforeCreate = DateTimeOffset.UtcNow;
 
@@ -318,7 +318,7 @@ public sealed class LiabilityHandshakeAcknowledgmentTests
     [Fact]
     public void CreateDoesNotAliasSourceMetadata()
     {
-        AsiBackboneActorContext actor = AsiBackboneActorContext.System;
+        GovernanceActorContext actor = GovernanceActorContext.System;
         LiabilityHandshakeRequest request = CreateRequest(actor);
         Dictionary<string, string> metadata = new(StringComparer.Ordinal)
         {
@@ -344,7 +344,7 @@ public sealed class LiabilityHandshakeAcknowledgmentTests
     [Fact]
     public void MetadataCannotBeMutatedThroughDictionaryCasts()
     {
-        AsiBackboneActorContext actor = AsiBackboneActorContext.System;
+        GovernanceActorContext actor = GovernanceActorContext.System;
         LiabilityHandshakeRequest request = CreateRequest(actor);
 
         var acknowledgment = LiabilityHandshakeAcknowledgment.Accept(
@@ -367,7 +367,7 @@ public sealed class LiabilityHandshakeAcknowledgmentTests
     [Fact]
     public void EmptyMetadataCannotBeMutatedThroughDictionaryCasts()
     {
-        AsiBackboneActorContext actor = AsiBackboneActorContext.System;
+        GovernanceActorContext actor = GovernanceActorContext.System;
         LiabilityHandshakeRequest request = CreateRequest(actor);
 
         var acknowledgment = LiabilityHandshakeAcknowledgment.Accept(
@@ -380,7 +380,7 @@ public sealed class LiabilityHandshakeAcknowledgmentTests
         Assert.Empty(acknowledgment.Metadata);
     }
 
-    private static LiabilityHandshakeRequest CreateRequest(IAsiBackboneActorContext actor)
+    private static LiabilityHandshakeRequest CreateRequest(IGovernanceActorContext actor)
     {
         return LiabilityHandshakeRequest.Create(
             actor,
@@ -395,7 +395,7 @@ public sealed class LiabilityHandshakeAcknowledgmentTests
             traceId: "trace-456");
     }
 
-    private static LiabilityHandshakeRequest CreateRequestWithoutTrace(IAsiBackboneActorContext actor)
+    private static LiabilityHandshakeRequest CreateRequestWithoutTrace(IGovernanceActorContext actor)
     {
         return LiabilityHandshakeRequest.Create(
             actor,

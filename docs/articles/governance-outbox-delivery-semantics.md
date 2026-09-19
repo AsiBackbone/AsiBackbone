@@ -1,6 +1,6 @@
 # Governance Outbox Delivery Semantics
 
-This article defines the production semantics for governance outbox entries: identity, persistence, retry, idempotency, ordering, and host responsibilities.
+This article defines the production semantics for outbox entries: identity, persistence, retry, idempotency, ordering, and host responsibilities.
 
 AsiBackbone remains a governance and policy spine. It provides durable local outbox records and provider-neutral drain primitives; it is not an distributed queue, SIEM product, immutable ledger, or exactly-once delivery system.
 
@@ -10,7 +10,7 @@ AsiBackbone remains a governance and policy spine. It provides durable local out
 | --- | --- | --- |
 | Local persistence | Save a provider-neutral `GovernanceOutboxEntry` before optional downstream emission. | Choose a durable store, migration strategy, retention policy, backup policy, and operational monitoring. |
 | Entry identity | `OutboxEntryId` is the stable outbox record identifier. The EF Core model enforces a unique index for this value. | Treat `OutboxEntryId` as an idempotency boundary when replaying, reconciling, or manually recovering records. |
-| Append vs update | Outbox entries are **state records**, not an append-only event stream. The same outbox entry moves through pending, delivered, failed, retryable, deferred, or dead-lettered state. | Use audit residue and lifecycle event stores when an append-only evidence trail is required. |
+| Append vs update | Outbox entries are **state records**, not an append-only event stream. The same outbox entry moves through pending, delivered, failed, retryable, deferred, or dead-lettered state. | Use decision receipt and lifecycle event stores when an append-only evidence trail is required. |
 | Delivery | Provider emission is **at-least-once / best-effort** unless the host and provider add stronger idempotency or transaction semantics. | Do not assume exactly-once provider delivery. Supply provider idempotency keys where supported. |
 | Selection | `FindPendingAsync` and `FindRetryReadyAsync` return ordered delivery candidates. | Add claim/lease, partitioning, singleton workers, or provider-side idempotency before scaling workers against the same rows. |
 | Ordering | Pending rows are ordered by `CreatedUtc` then `OutboxEntryId`; retry-ready rows are ordered by retry timestamp then `OutboxEntryId`. | Do not treat this as a global, per-correlation, or per-aggregate ordering guarantee unless the host enforces partitioned processing. |
@@ -30,7 +30,7 @@ The chosen semantics are:
 5. **Host-owned scale-out safety**: the package does not silently claim rows, lease rows, lock rows, or create a distributed singleton.
 6. **Provider-neutral failure vocabulary**: retries, deferrals, failures, and dead letters are represented without binding Core to a provider SDK.
 
-This fits AsiBackbone's role as a governance spine: it preserves local decision and emission state, but it does not pretend to own the entire distributed delivery path.
+This fits AsiBackbone's role as a policy decision pipeline: it preserves local decision and emission state, but it does not pretend to own the entire distributed delivery path.
 
 ## Identity and idempotency fields
 
@@ -41,7 +41,7 @@ Use these identifiers when designing provider delivery and recovery:
 | `GovernanceOutboxEntry.OutboxEntryId` | Stable local outbox record identifier and primary package-level idempotency boundary. |
 | `GovernanceEmissionEnvelope.EnvelopeId` | Stable provider-neutral emission envelope identifier. Useful as a provider idempotency key when accepted by the provider. |
 | `GovernanceEmissionEnvelope.EventId` | Source governance event identifier, when available. Useful for reconciling source events to outbox records. |
-| `GovernanceEmissionEnvelope.AuditResidueId` | Links provider emission back to local audit residue. |
+| `GovernanceEmissionEnvelope.AuditResidueId` | Links provider emission back to local decision receipt. |
 | `GovernanceEmissionEnvelope.CorrelationId` | Cross-request or operation correlation. Useful for diagnostics, not by itself a uniqueness guarantee. |
 | `GovernanceEmissionEnvelope.OutboxSequence` | Optional host-supplied sequence hint. Useful for diagnostics or host-owned ordering, but not a package-owned ordering guarantee. |
 | `GovernanceOutboxEntry.ProviderRecordId` | Provider-returned delivery identifier, when safe to store. Useful for reconciliation after provider acceptance. |
@@ -76,7 +76,7 @@ The outbox state model uses `GovernanceEmissionStatus`:
 | `RetryableFailure` | Delivery failed and is expected to be retryable. |
 | `DeadLettered` | Terminal failure/quarantine state. |
 
-`RetryCount` and `NextRetryUtc` provide provider-neutral retry scheduling. `MaxRetryCount` is retained for persisted-record compatibility; the built-in drain uses `AsiBackboneGovernanceOutboxOptions.MaxRetryAttempts` as its authoritative threshold. `LastError`, `ProviderName`, `ProviderRecordId`, and `DeadLetterReason` preserve safe diagnostic state for operations and recovery.
+`RetryCount` and `NextRetryUtc` provide provider-neutral retry scheduling. `MaxRetryCount` is retained for persisted-record compatibility; the built-in drain uses `GovernanceOutboxOptions.MaxRetryAttempts` as its authoritative threshold. `LastError`, `ProviderName`, `ProviderRecordId`, and `DeadLetterReason` preserve safe diagnostic state for operations and recovery.
 
 Poison-message handling remains host policy. A host may dead-letter immediately for known permanent failures, use the drain's configured maximum retry attempts, disable automatic threshold dead-lettering, or route records to a manual review process before retrying. Dead-lettering should not erase the local audit context.
 

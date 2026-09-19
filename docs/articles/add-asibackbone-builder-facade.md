@@ -63,7 +63,7 @@ builder.Services.AddAsiBackbone(backbone =>
 Manual EF Core audit ledger registration:
 
 ```csharp
-builder.Services.AddScoped<IAsiBackboneAuditLedgerStore>(provider =>
+builder.Services.AddScoped<IGovernanceAuditLedgerStore>(provider =>
     ActivatorUtilities.CreateInstance<EfCoreAuditLedgerStore>(
         provider,
         provider.GetRequiredService<ApplicationDbContext>()));
@@ -85,7 +85,7 @@ Manual OpenTelemetry emission provider registration:
 ```csharp
 builder.Services.AddSingleton(new OpenTelemetryGovernanceEmitterOptions());
 builder.Services.AddSingleton<OpenTelemetryGovernanceEmitter>();
-builder.Services.AddSingleton<IAsiBackboneGovernanceEmitter>(provider =>
+builder.Services.AddSingleton<IGovernanceEmitter>(provider =>
     provider.GetRequiredService<OpenTelemetryGovernanceEmitter>());
 ```
 

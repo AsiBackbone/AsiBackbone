@@ -1,6 +1,6 @@
 # Durable Audit and Outbox Persistence
 
-This article documents the provider-neutral durable persistence seam for audit residue, lifecycle events, and governance emission outbox entries.
+This article documents the provider-neutral durable persistence seam for decision receipt, lifecycle events, and governance emission outbox entries.
 
 AsiBackbone remains a governance spine for consequential software decision flow. It is not an AI model host, observability backend, SIEM product, cloud provider, or completed ASI implementation.
 
@@ -12,10 +12,10 @@ The durable persistence seam preserves a local accountability artifact before an
 
 ```text
 Governed decision
-  -> AuditResidue / AuditResidueLifecycleEvent
+  -> DecisionReceipt / DecisionReceiptLifecycleEvent
   -> local audit/lifecycle store
   -> GovernanceEmissionEnvelope
-  -> governance outbox
+  -> outbox
   -> optional provider emitter
 ```
 
@@ -27,24 +27,24 @@ Core defines provider-neutral contracts and models only:
 
 | Type | Purpose |
 | --- | --- |
-| `IAsiBackboneAuditLedgerStore` | Existing neutral audit ledger abstraction for `AuditLedgerRecord` records. |
-| `IAsiBackboneAuditResidueLifecycleStore` | Neutral lifecycle event store for append-only audit residue lifecycle events. |
-| `IAsiBackboneGovernanceOutboxStore` | Neutral outbox store for pending governance emission envelopes. |
+| `IGovernanceAuditLedgerStore` | Existing neutral audit ledger abstraction for `AuditLedgerRecord` records. |
+| `IDecisionReceiptLifecycleStore` | Neutral lifecycle event store for append-only decision receipt lifecycle events. |
+| `IGovernanceOutboxStore` | Neutral outbox store for pending governance emission envelopes. |
 | `GovernanceOutboxEntry` | Neutral outbox entry state model with status, retry count, last error, next retry time, provider identifiers, and dead-letter reason. |
-| `AsiBackboneGovernanceOutboxDrain` | Provider-neutral drain path that hands pending or retry-ready outbox entries to an `IAsiBackboneGovernanceEmitter` and persists the resulting state transition. |
+| `GovernanceOutboxDrain` | Provider-neutral drain path that hands pending or retry-ready outbox entries to an `IGovernanceEmitter` and persists the resulting state transition. |
 | `NoOpGovernanceEmitter` | No-op test/dev emitter that acknowledges envelopes as delivered without sending data to an external provider. |
 
 Core does not reference Azure Monitor, Event Hubs, Purview, OpenTelemetry, SIEM SDKs, robotics packages, AI model packages, or cloud-provider SDKs.
 
 ## Outbox semantic contract
 
-The governance outbox is a **durable local state record**, not a package-owned distributed queue and not an append-only event stream.
+The outbox is a **durable local state record**, not a package-owned distributed queue and not an append-only event stream.
 
 The current contract is:
 
 | Question | Current answer |
 | --- | --- |
-| Are outbox entries append-only? | No. One `GovernanceOutboxEntry` changes status over its lifecycle. Use audit residue and lifecycle event stores for append-style evidence. |
+| Are outbox entries append-only? | No. One `GovernanceOutboxEntry` changes status over its lifecycle. Use decision receipt and lifecycle event stores for append-style evidence. |
 | What is the local idempotency key? | `OutboxEntryId`. The EF Core model enforces a unique index for it. |
 | What does `SaveAsync` do for an existing id? | It updates the existing row for that `OutboxEntryId` rather than appending another row. |
 | What delivery guarantee is provided? | Durable local record plus at-least-once / best-effort provider emission semantics. Exactly-once is not claimed. |
@@ -60,8 +60,8 @@ See [Governance Outbox Delivery Semantics](governance-outbox-delivery-semantics.
 
 | Type | Purpose |
 | --- | --- |
-| `InMemoryAuditResidueLifecycleStore` | Stores lifecycle events in memory for tests, samples, and local development. |
-| `InMemoryGovernanceOutboxStore` | Stores governance outbox entries in memory for tests, samples, and local development. |
+| `InMemoryDecisionReceiptLifecycleStore` | Stores lifecycle events in memory for tests, samples, and local development. |
+| `InMemoryGovernanceOutboxStore` | Stores outbox entries in memory for tests, samples, and local development. |
 
 These stores are intentionally not durable across process restarts. Production hosts should use EF Core or another host-owned durable storage adapter.
 
@@ -73,8 +73,8 @@ The no-op drain path exists to prove the outbox handoff before a real provider i
 
 ```text
 GovernanceEmissionEnvelope
-  -> IAsiBackboneGovernanceOutboxStore
-  -> AsiBackboneGovernanceOutboxDrain
+  -> IGovernanceOutboxStore
+  -> GovernanceOutboxDrain
   -> NoOpGovernanceEmitter
   -> GovernanceEmissionResult.Delivered
   -> delivered outbox state
@@ -117,7 +117,7 @@ The EF Core outbox store pushes common drain selection work into the provider qu
 * `FindPendingAsync` filters to `Pending`, orders by `CreatedUtc` and `OutboxEntryId`, and applies `Take(maxCount)` in the database query.
 * `FindRetryReadyAsync` filters to deferred, failed, or retryable-failure rows that have not exhausted retry count and have no future `NextRetryUtc`, orders by retry timestamp and `OutboxEntryId`, and applies `Take(maxCount)` in the database query.
 
-The built-in EF Core model includes provider-neutral indexes for common drain paths, including status, retry timestamp, created/updated timestamps, deterministic outbox identifiers, correlation identifiers, audit residue identifiers, and envelope identifiers. Hosts remain responsible for reviewing the generated model against their database provider, migration strategy, workload, retention policy, and horizontal-worker pattern.
+The built-in EF Core model includes provider-neutral indexes for common drain paths, including status, retry timestamp, created/updated timestamps, deterministic outbox identifiers, correlation identifiers, decision receipt identifiers, and envelope identifiers. Hosts remain responsible for reviewing the generated model against their database provider, migration strategy, workload, retention policy, and horizontal-worker pattern.
 
 Provider-specific filtered indexes, partial indexes, table partitioning, claim/lease columns, lock hints, or queue-specific SQL are intentionally host-owned migration decisions. AsiBackbone supplies the portable model and selection semantics; production hosts decide whether to add provider-specific optimization beyond that portable baseline.
 
@@ -141,10 +141,10 @@ Provider failures should be normalized into `GovernanceEmissionError` before upd
 
 Recommended sequence:
 
-1. Save the audit residue or lifecycle event locally.
+1. Save the decision receipt or lifecycle event locally.
 2. Create a `GovernanceEmissionEnvelope`.
-3. Enqueue the envelope into `IAsiBackboneGovernanceOutboxStore`.
-4. Attempt optional provider emission through `AsiBackboneGovernanceOutboxDrain`.
+3. Enqueue the envelope into `IGovernanceOutboxStore`.
+4. Attempt optional provider emission through `GovernanceOutboxDrain`.
 5. Mark the outbox entry delivered, failed, retryable, deferred, or dead-lettered.
 
 This avoids losing the local accountability record when external sinks are unavailable.
@@ -176,5 +176,5 @@ See [Safe Audit and Telemetry Data Guidance](safe-audit-telemetry-data.md) for p
 - [Outbox Drain Reliability and Alerting](outbox-drain-reliability-and-alerting.md)
 - [Outbox Multi-Worker Concurrency](outbox-multi-worker-concurrency.md)
 - [Safe Audit and Telemetry Data Guidance](safe-audit-telemetry-data.md)
-- [Audit Residue Observability Schema](audit-residue-observability-schema.md)
+- [Decision Receipt Observability Schema](decision-receipt-observability-schema.md)
 - [EF Core Integration Boundary](ef-core-integration-boundary.md)

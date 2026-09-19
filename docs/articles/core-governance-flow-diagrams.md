@@ -1,17 +1,17 @@
 # Core Governance Flow Diagrams
 
-This page provides lightweight Mermaid diagrams for the main AsiBackbone governance flows. The diagrams are intentionally implementation-facing: they show where the package family can help structure policy evaluation, acknowledgment, audit residue, capability boundaries, and optional governance emission without claiming that AsiBackbone owns the host application's execution path.
+This page provides lightweight Mermaid diagrams for the main AsiBackbone governance flows. The diagrams are intentionally implementation-facing: they show where the package family can help structure policy evaluation, acknowledgment, decision receipt, capability boundaries, and optional governance emission without claiming that AsiBackbone owns the host application's execution path.
 
 ## How to read these diagrams
 
 - **Host-owned execution** means the consumer application still owns authorization, business rules, side effects, infrastructure access, database provider choices, retries, and operational safeguards.
 - **Released provider** means a package exists in the stable package family.
 - **Design-only** or **strategy-only** means the surface is documentation or future-provider strategy unless a later stable release explicitly ships it.
-- **Audit residue** and **outbox records** are governance records. They do not replace host security controls, legal review, operational monitoring, or production key custody.
+- **Decision receipt** and **outbox records** are governance records. They do not replace host security controls, legal review, operational monitoring, or production key custody.
 
 ## Intent-to-execution spine
 
-This diagram shows the highest-level flow: a request enters the governance spine, receives a decision, may require acknowledgment, may produce audit residue or outbox records, and only reaches execution through a host-owned boundary.
+This diagram shows the highest-level flow: a request enters the policy decision pipeline, receives a decision, may require acknowledgment, may produce decision receipt or outbox records, and only reaches execution through a host-owned boundary.
 
 ```mermaid
 flowchart LR
@@ -19,7 +19,7 @@ flowchart LR
     Context --> Constraints["Evaluate constraints"]
     Constraints --> Decision["GovernanceDecision"]
 
-    Decision -->|"Allowed or Warning"| PersistBeforeExecution["Persist audit residue or outbox before execution"]
+    Decision -->|"Allowed or Warning"| PersistBeforeExecution["Persist decision receipt or outbox before execution"]
     Decision -->|"AcknowledgmentRequired"| Ack["Host-owned acknowledgment challenge"]
     Ack -->|"Accepted and host policy permits"| PersistBeforeExecution
     Ack -->|"Rejected or incomplete"| PersistNoExecution["Persist governed outcome and do not execute"]
@@ -49,8 +49,8 @@ flowchart LR
     DecisionPolicy --> Composition
     Composition --> GovernanceDecision["GovernanceDecision"]
 
-    GovernanceDecision -->|"Can proceed"| ProceedPath["Host persists residue and may continue"]
-    GovernanceDecision -->|"Cannot proceed"| StopPath["Host persists residue and stops, defers, or escalates"]
+    GovernanceDecision -->|"Can proceed"| ProceedPath["Host persists receipt and may continue"]
+    GovernanceDecision -->|"Cannot proceed"| StopPath["Host persists receipt and stops, defers, or escalates"]
     GovernanceDecision -->|"Requires acknowledgment"| AckPath["Host presents acknowledgment before continuation"]
 ```
 
@@ -69,7 +69,7 @@ flowchart LR
     Handshake -->|"Present consequences and acknowledgment text"| Actor
     Actor -->|"Accepts or rejects challenge"| Handshake
     Handshake -->|"Acknowledgment result"| Host
-    Host -->|"Persist decision and acknowledgment residue"| Audit["Audit sink or outbox"]
+    Host -->|"Persist decision receipt and acknowledgment record"| Audit["Audit sink or outbox"]
     Host -->|"Accepted and host policy permits"| Execute["Continue through host-owned execution boundary"]
     Host -->|"Missing, rejected, expired, or host policy blocks"| Stop["Do not execute governed action"]
 ```
@@ -101,7 +101,7 @@ This diagram separates local durable governance records from optional external o
 
 ```mermaid
 flowchart LR
-    Decision["GovernanceDecision"] --> Residue["Audit residue"]
+    Decision["GovernanceDecision"] --> Residue["Decision receipt"]
     Residue --> LocalDurable["Host-owned durable audit ledger or outbox"]
     LocalDurable --> Drain["Hosted outbox drain with retry policy"]
     Drain --> OTel["Released OpenTelemetry provider"]

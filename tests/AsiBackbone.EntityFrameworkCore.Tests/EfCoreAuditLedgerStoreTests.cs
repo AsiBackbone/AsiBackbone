@@ -193,8 +193,8 @@ public sealed class EfCoreAuditLedgerStoreTests
         IEnumerable<string>? reasonCodes = null,
         IReadOnlyDictionary<string, string>? metadata = null)
     {
-        var actor = AsiBackboneActorContext.Human(actorId, "Test Actor");
-        var residue = AuditResidue.Create(
+        var actor = GovernanceActorContext.Human(actorId, "Test Actor");
+        var residue = DecisionReceipt.Create(
             actor,
             "system.sync",
             "Allowed",
@@ -207,7 +207,7 @@ public sealed class EfCoreAuditLedgerStoreTests
             policyHash: "policy-hash",
             metadata: metadata);
 
-        return AuditLedgerRecord.FromResidue(
+        return AuditLedgerRecord.FromDecisionReceipt(
             residue,
             recordId: recordId,
             recordedUtc: recordedUtc,
@@ -228,14 +228,14 @@ public sealed class EfCoreAuditLedgerStoreTests
     private sealed class HostOwnedAuditDbContext(DbContextOptions<HostOwnedAuditDbContext> options)
         : DbContext(options)
     {
-        public DbSet<AsiBackboneAuditLedgerRecordEntity> AuditLedgerRecords =>
-            Set<AsiBackboneAuditLedgerRecordEntity>();
+        public DbSet<AuditLedgerRecordEntity> AuditLedgerRecords =>
+            Set<AuditLedgerRecordEntity>();
 
-        public DbSet<AsiBackboneAuditLedgerReasonCodeEntity> AuditLedgerReasonCodes =>
-            Set<AsiBackboneAuditLedgerReasonCodeEntity>();
+        public DbSet<AuditLedgerReasonCodeEntity> AuditLedgerReasonCodes =>
+            Set<AuditLedgerReasonCodeEntity>();
 
-        public DbSet<AsiBackboneAuditLedgerMetadataEntity> AuditLedgerMetadata =>
-            Set<AsiBackboneAuditLedgerMetadataEntity>();
+        public DbSet<AuditLedgerMetadataEntity> AuditLedgerMetadata =>
+            Set<AuditLedgerMetadataEntity>();
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -248,14 +248,14 @@ public sealed class EfCoreAuditLedgerStoreTests
     private sealed class ThrowingAuditDbContext(DbContextOptions<ThrowingAuditDbContext> options)
         : DbContext(options)
     {
-        public DbSet<AsiBackboneAuditLedgerRecordEntity> AuditLedgerRecords =>
-            Set<AsiBackboneAuditLedgerRecordEntity>();
+        public DbSet<AuditLedgerRecordEntity> AuditLedgerRecords =>
+            Set<AuditLedgerRecordEntity>();
 
-        public DbSet<AsiBackboneAuditLedgerReasonCodeEntity> AuditLedgerReasonCodes =>
-            Set<AsiBackboneAuditLedgerReasonCodeEntity>();
+        public DbSet<AuditLedgerReasonCodeEntity> AuditLedgerReasonCodes =>
+            Set<AuditLedgerReasonCodeEntity>();
 
-        public DbSet<AsiBackboneAuditLedgerMetadataEntity> AuditLedgerMetadata =>
-            Set<AsiBackboneAuditLedgerMetadataEntity>();
+        public DbSet<AuditLedgerMetadataEntity> AuditLedgerMetadata =>
+            Set<AuditLedgerMetadataEntity>();
 
         public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
         {

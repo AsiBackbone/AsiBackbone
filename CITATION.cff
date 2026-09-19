@@ -1,8 +1,8 @@
 cff-version: 1.2.0
 message: "If you use this software, please cite it using the metadata below."
 title: "ASI Backbone"
-version: "5.2.0"
-date-released: "2026-09-14"
+version: "6.0.0"
+date-released: "2026-09-19"
 repository-code: "https://github.com/AsiBackbone/AsiBackbone"
 url: "https://asibackbone.github.io/AsiBackbone/"
 type: software
@@ -15,7 +15,7 @@ authors:
   - family-names: "Cavell"
     given-names: "Christopher D."
     orcid: "https://orcid.org/0009-0002-2113-0245"
-abstract: "AsiBackbone 5.2.0 is a backward-compatible minor release for the stable 5.x line. It adds a fluent policy-evaluator builder, begins the ASIB900 deprecation window for partial evaluator constructors planned for removal in 6.0, and strengthens package compatibility, durable release evidence, quality gates, and project stewardship. Package IDs, public namespaces, the net10.0 target, and AssemblyVersion 5.0.0.0 remain unchanged."
+abstract: "AsiBackbone 6.0.0 is a major release of the Accountable Systems Infrastructure package family for .NET. It renames the public API to plain-language semantic names, including decision receipts in place of audit residue, removes the obsolete members whose 5.x deprecation windows completed, makes signature-verification trust failures deny by default, binds the signing policy context into a versioned signature input, and closes a replay window in the reference in-memory capability-grant use store. Package IDs, public namespaces, and the net10.0 target remain unchanged; AssemblyVersion advances to 6.0.0.0."
 keywords:
   - asi-backbone
   - dotnet
@@ -24,6 +24,7 @@ keywords:
   - decision-flow
   - constraint-evaluation
   - threat-modeling
+  - decision-receipt
   - audit-residue
   - acknowledgment
   - outbox

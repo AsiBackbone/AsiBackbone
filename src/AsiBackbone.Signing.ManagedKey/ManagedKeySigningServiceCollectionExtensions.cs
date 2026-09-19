@@ -108,7 +108,7 @@ public static class ManagedKeySigningServiceCollectionExtensions
         _ = services.AddSingleton(options);
         _ = services.AddSingleton(clientFactory);
         _ = services.AddSingleton<ManagedKeySigningService>();
-        _ = services.AddSingleton<IAsiBackboneSigningService>(serviceProvider =>
+        _ = services.AddSingleton<IGovernanceSigningService>(serviceProvider =>
             serviceProvider.GetRequiredService<ManagedKeySigningService>());
 
         return services;
@@ -120,7 +120,7 @@ public static class ManagedKeySigningServiceCollectionExtensions
     {
         _ = services.AddSingleton(options);
         _ = services.AddSingleton<ManagedKeySigningService>();
-        _ = services.AddSingleton<IAsiBackboneSigningService>(serviceProvider =>
+        _ = services.AddSingleton<IGovernanceSigningService>(serviceProvider =>
             serviceProvider.GetRequiredService<ManagedKeySigningService>());
 
         return services;

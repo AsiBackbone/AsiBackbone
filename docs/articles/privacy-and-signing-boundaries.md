@@ -1,11 +1,11 @@
 # Privacy, Metadata, and Signing Boundaries
 
-This article documents the current stable `5.x` boundary for metadata privacy, identifier handling, signing-ready fields, released signing providers, host responsibilities, and future provider work.
+This article documents the current stable `6.x` boundary for metadata privacy, identifier handling, signing-ready fields, released signing providers, host responsibilities, and future provider work.
 
 AsiBackbone provides governance-oriented software building blocks. It does not provide legal, compliance, privacy, security, or cryptographic guarantees by itself.
 
 > [!IMPORTANT]
-> The stable `5.x` package family includes metadata budget and sanitation primitives, signing-ready Core metadata, released local-development signing, and a managed-key adapter boundary. These surfaces do not provide production key custody, tamper-evidence, immutable storage, automatic privacy classification, legal non-repudiation, or compliance certification by themselves.
+> The stable `6.x` package family includes metadata budget and sanitation primitives, signing-ready Core metadata, released local-development signing, and a managed-key adapter boundary. These surfaces do not provide production key custody, tamper-evidence, immutable storage, automatic privacy classification, legal non-repudiation, or compliance certification by themselves.
 
 ## Current stable boundary summary
 
@@ -13,11 +13,11 @@ The stable package family focuses on explicit governance records, host-owned int
 
 | Area | Current stable behavior | Still not provided by default |
 | --- | --- | --- |
-| Metadata | Host-provided dictionaries and values can flow into contexts, decisions, audit residue, and ledger records. Optional budget and sanitation helpers can normalize, classify through host-owned classifiers, redact, drop, warn, deny, and validate shape limits and reserved key fragments. | Automatic domain-specific classification, encryption, tokenization, external DLP scanning, or proof that sanitized metadata is non-sensitive. |
+| Metadata | Host-provided dictionaries and values can flow into contexts, decisions, decision receipt, and ledger records. Optional budget and sanitation helpers can normalize, classify through host-owned classifiers, redact, drop, warn, deny, and validate shape limits and reserved key fragments. | Automatic domain-specific classification, encryption, tokenization, external DLP scanning, or proof that sanitized metadata is non-sensitive. |
 | Identifiers | Correlation IDs, trace IDs, event IDs, record IDs, actor IDs, policy versions, and policy hashes are available for linking records. | Automatic pseudonymization, identity-proofing, cross-system identity governance, or secret handling. |
 | Signing and verification boundaries | Core records can carry signing-ready metadata and canonical hashing inputs. Released local-development signing and managed-key adapter packages support test/sample signing and host-owned managed-key integration. | Production key custody, automatic key rotation, concrete Azure Key Vault/HSM/KMS implementation, immutable storage, tamper-evidence, legal non-repudiation, or compliance guarantees. |
 | Persistence | EF Core integration supports host-owned persistence through the host application database. | Package-owned database lifecycle, retention policy, encryption-at-rest enforcement, backup policy, or immutable storage. |
-| Audit | Audit residue, ledger records, and provider-neutral integrity seams make decision flow easier to inspect. | Regulatory audit certification, legal evidence guarantees, automated compliance approval, or production tamper-evidence by default. |
+| Audit | Decision receipt, ledger records, and provider-neutral integrity seams make decision flow easier to inspect. | Regulatory audit certification, legal evidence guarantees, automated compliance approval, or production tamper-evidence by default. |
 
 ## Metadata privacy boundary
 
@@ -189,7 +189,7 @@ The host must decide which requests are allowed to reach AsiBackbone and which a
 
 ## Released, host-owned, and future provider work
 
-The stable `5.x` package family includes released provider or provider-adjacent surfaces for OpenTelemetry governance emission, local-development signing, and managed-key signing adapter boundaries.
+The stable `6.x` package family includes released provider or provider-adjacent surfaces for OpenTelemetry governance emission, local-development signing, and managed-key signing adapter boundaries.
 
 Other provider areas remain host-owned, strategy-only, design-only, sample-only, preview, or future-provider work unless a later stable release explicitly ships them.
 
@@ -205,7 +205,7 @@ Provider documentation should state whether a provider is:
 
 Use this checklist when preparing stable release notes or documentation:
 
-- State that AsiBackbone provides Accountable Systems Infrastructure, not artificial superintelligence.
+- State that AsiBackbone provides governance infrastructure, not artificial superintelligence.
 - State that metadata is host-owned.
 - State that hosts must classify, minimize, redact, or omit sensitive metadata before passing it into package APIs.
 - State that metadata budgets and sanitation helpers are policy guardrails, not automatic DLP, privacy certification, or compliance certification.

@@ -118,7 +118,7 @@ Build audit ledger record
 Recommended write order when chaining outbox entries:
 
 ```text
-Build governance outbox entry
+Build outbox entry
   -> canonicalize outbox entry
   -> hash outbox entry
   -> load previous chain tip for outbox chain ID

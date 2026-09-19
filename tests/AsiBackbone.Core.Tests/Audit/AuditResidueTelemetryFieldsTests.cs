@@ -20,15 +20,15 @@ public sealed class AuditResidueTelemetryFieldsTests
     [Fact]
     public void CreateDefaultsTelemetryFieldsToNullAndUsesStableSchemaVersion()
     {
-        var residue = AuditResidue.Create(
-            AsiBackboneActorContext.System,
+        var residue = DecisionReceipt.Create(
+            GovernanceActorContext.System,
             "system.sync",
             "Allowed",
             eventId: "event-123");
 
         Assert.Equal("event-123", residue.EventId);
         Assert.Equal("event-123", residue.AuditResidueId);
-        Assert.Equal(AsiBackboneSchemaVersions.StableArtifactsV1, residue.SchemaVersion);
+        Assert.Equal(GovernanceSchemaVersions.StableArtifactsV1, residue.SchemaVersion);
         Assert.Null(residue.SpanId);
         Assert.Null(residue.ParentSpanId);
         Assert.Null(residue.DecisionLatencyMs);
@@ -51,8 +51,8 @@ public sealed class AuditResidueTelemetryFieldsTests
     [Fact]
     public void CreateNormalizesAndSerializesTelemetryFields()
     {
-        var residue = AuditResidue.Create(
-            AsiBackboneActorContext.Service("service-123"),
+        var residue = DecisionReceipt.Create(
+            GovernanceActorContext.Service("service-123"),
             "gateway.execute",
             "Allowed",
             eventId: " event-123 ",
@@ -121,7 +121,7 @@ public sealed class AuditResidueTelemetryFieldsTests
     }
 
     /// <summary>
-    /// Verifies that governance decision residue can carry neutral telemetry without changing decision correlation behavior.
+    /// Verifies that a decision receipt can carry neutral telemetry without changing decision correlation behavior.
     /// </summary>
     [Fact]
     public void FromDecisionPreservesCorrelationAndCarriesTelemetryFieldsIntoLedgerRecord()
@@ -132,8 +132,8 @@ public sealed class AuditResidueTelemetryFieldsTests
             policyVersion: "v1",
             policyHash: "policy-hash");
 
-        var residue = AuditResidue.FromDecision(
-            AsiBackboneActorContext.Human("user-123", "Chris"),
+        var residue = DecisionReceipt.FromDecision(
+            GovernanceActorContext.Human("user-123", "Chris"),
             "document.approve",
             decision,
             eventId: "event-123",
@@ -153,7 +153,7 @@ public sealed class AuditResidueTelemetryFieldsTests
             gatewayExecutionId: "gateway-123",
             decisionStage: "DecisionEvaluated");
 
-        var record = AuditLedgerRecord.FromResidue(
+        var record = AuditLedgerRecord.FromDecisionReceipt(
             residue,
             recordId: "record-123");
 
@@ -174,7 +174,7 @@ public sealed class AuditResidueTelemetryFieldsTests
         Assert.Equal(9, record.OutboxSequence);
         Assert.Equal("gateway-123", record.GatewayExecutionId);
         Assert.Equal("DecisionEvaluated", record.DecisionStage);
-        Assert.Equal(AsiBackboneSchemaVersions.StableArtifactsV1, record.SchemaVersion);
+        Assert.Equal(GovernanceSchemaVersions.StableArtifactsV1, record.SchemaVersion);
     }
 
     /// <summary>
@@ -196,8 +196,8 @@ public sealed class AuditResidueTelemetryFieldsTests
         long? outboxSequence)
     {
         _ = Assert.Throws<ArgumentOutOfRangeException>(() =>
-            AuditResidue.Create(
-                AsiBackboneActorContext.System,
+            DecisionReceipt.Create(
+                GovernanceActorContext.System,
                 "system.sync",
                 "Allowed",
                 decisionLatencyMs: decisionLatencyMs,

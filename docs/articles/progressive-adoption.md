@@ -14,8 +14,8 @@ Most new users should start with one of these paths:
 | Goal | First page | Packages |
 | --- | --- | --- |
 | Understand the absolute Core-only decision shape | This page, [Level 1](#level-1-core-decision-pipeline-only) | `AsiBackbone.Core` |
-| Gate one ASP.NET Core endpoint and inspect audit residue locally | [First 15 Minutes: Standard API Gating](quickstart-api-gating.md) | `Core`, `AspNetCore`, `Storage.InMemory` |
-| Review the current stable package family before broader adoption | [5.2.0 Release Notes](release-notes-520.md) | Install only the packages required by the selected boundary |
+| Gate one ASP.NET Core endpoint and inspect decision receipt locally | [First 15 Minutes: Standard API Gating](quickstart-api-gating.md) | `Core`, `AspNetCore`, `Storage.InMemory` |
+| Review the current stable package family before broader adoption | [6.0.0 Release Notes](release-notes-600.md) | Install only the packages required by the selected boundary |
 
 Everything else is an add-on.
 
@@ -24,10 +24,10 @@ Everything else is an add-on.
 | Level | Capability | Use when | Typical packages |
 | --- | --- | --- | --- |
 | 1 | Core decision pipeline only | You need to ask whether a proposed action can proceed. | `AsiBackbone.Core` |
-| 2 | Acknowledgment / handshake and audit residue | You need a human/system responsibility checkpoint or local decision evidence. | `Core`; optionally `Storage.InMemory` for samples/tests |
+| 2 | Acknowledgment / handshake and decision receipt | You need a human/system responsibility checkpoint or local decision evidence. | `Core`; optionally `Storage.InMemory` for samples/tests |
 | 3 | Durable audit and outbox persistence | Governance records must survive restarts, provider outages, or retries. | `Core`, `EntityFrameworkCore` or a host-owned store |
 | 4 | Hosted drain worker and provider emission | You want local outbox entries delivered to a provider after local persistence. | `Core`, `AspNetCore`, durable store, one emitter |
-| 5 | OpenTelemetry / Azure Monitor / Purview-style integration | You want dashboards, diagnostics, alerting, or governance enrichment downstream. | `OpenTelemetry` for released provider projection; host OpenTelemetry exporters; Purview remains strategy-only in the stable `5.x` package family |
+| 5 | OpenTelemetry / Azure Monitor / Purview-style integration | You want dashboards, diagnostics, alerting, or governance enrichment downstream. | `OpenTelemetry` for released provider projection; host OpenTelemetry exporters; Purview remains strategy-only in the stable `6.x` package family |
 | 6 | Signing-ready or managed-key host integration | You need signed or verified governance artifacts and have key-management responsibilities defined. | `Core`, `Signing.LocalDevelopment` for local proof paths, `Signing.ManagedKey` for host-owned managed-key clients |
 
 Cross-cutting add-ons:
@@ -61,14 +61,14 @@ using AsiBackbone.Core.Constraints;
 using AsiBackbone.Core.Decisions;
 using AsiBackbone.Core.Evaluation;
 
-IAsiBackboneConstraint<AsiBackboneConstraintEvaluationContext>[] constraints =
+IGovernanceConstraint<GovernanceEvaluationContext>[] constraints =
 [
     new AllowedOperationConstraint()
 ];
 
-var evaluator = DefaultAsiBackbonePolicyEvaluator.CreateBuilder<AsiBackboneConstraintEvaluationContext>()
+var evaluator = DefaultGovernancePolicyEvaluator.CreateBuilder<GovernanceEvaluationContext>()
     .AddConstraints(constraints)
-    .WithOptions(new AsiBackbonePolicyEvaluatorOptions
+    .WithOptions(new GovernancePolicyOptions
     {
         DenyWhenNoConstraints = true
     })
@@ -80,7 +80,7 @@ var metadata = new Dictionary<string, string>(StringComparer.Ordinal)
     ["risk"] = "routine-api-write"
 };
 
-var context = new AsiBackboneConstraintEvaluationContext(
+var context = new GovernanceEvaluationContext(
     correlationId: Guid.NewGuid().ToString("n"),
     policyVersion: "core-only-policy-v1",
     policyHash: "core-only-policy-hash-v1",
@@ -88,11 +88,11 @@ var context = new AsiBackboneConstraintEvaluationContext(
 
 GovernanceDecision decision = await evaluator.EvaluateAsync(context);
 
-var actor = AsiBackboneActorContext.Human(
+var actor = GovernanceActorContext.Human(
     actorId: "demo-user",
     displayName: "Demo User");
 
-AuditResidue residue = AuditResidue.FromDecision(
+DecisionReceipt receipt = DecisionReceipt.FromDecision(
     actor,
     operationName: "orders.approve",
     decision,
@@ -100,14 +100,14 @@ AuditResidue residue = AuditResidue.FromDecision(
 
 Console.WriteLine($"Decision: {decision.Outcome}");
 Console.WriteLine($"Can proceed: {decision.CanProceed}");
-Console.WriteLine($"Audit event: {residue.EventId}");
+Console.WriteLine($"Audit event: {receipt.EventId}");
 
-internal sealed class AllowedOperationConstraint : IAsiBackboneConstraint<AsiBackboneConstraintEvaluationContext>
+internal sealed class AllowedOperationConstraint : IGovernanceConstraint<GovernanceEvaluationContext>
 {
     public string Name => "demo.operation.allowed";
 
     public ValueTask<ConstraintEvaluationResult> EvaluateAsync(
-        AsiBackboneConstraintEvaluationContext context,
+        GovernanceEvaluationContext context,
         CancellationToken cancellationToken = default)
     {
         cancellationToken.ThrowIfCancellationRequested();
@@ -128,10 +128,10 @@ What this proves:
 
 - Core can evaluate a host-owned rule.
 - Core can produce a `GovernanceDecision`.
-- The host can create audit residue without a web host, EF Core, outbox, OpenTelemetry, signing, or analyzers.
+- The host can create decision receipt without a web host, EF Core, outbox, OpenTelemetry, signing, or analyzers.
 - The host still owns execution. The sample only decides whether the proposed action can continue.
 
-## Level 2: acknowledgment / handshake and audit residue
+## Level 2: acknowledgment / handshake and decision receipt
 
 Add Level 2 when a decision needs responsibility acknowledgment or when the host needs local evidence of the decision.
 
@@ -201,7 +201,7 @@ Start with:
 - [Observability and Governance Emission Architecture](observability-and-governance-emission-architecture.md)
 - [Strategy-Only: Purview Governance and Lineage Enrichment](purview-governance-lineage-enrichment-strategy.md)
 
-In the stable `5.x` package family, OpenTelemetry is the concrete released governance emission provider. Azure Monitor is reached through host-configured OpenTelemetry exporters. Purview remains strategy-only unless a later release ships a concrete provider package.
+In the stable `6.x` package family, OpenTelemetry is the concrete released governance emission provider. Azure Monitor is reached through host-configured OpenTelemetry exporters. Purview remains strategy-only unless a later release ships a concrete provider package.
 
 ## Level 6: signing-ready or managed-key host integration
 
@@ -226,7 +226,7 @@ Signing does not mean production tamper-evidence. Production claims require conc
 
 | Package | Install when | Do not install just because |
 | --- | --- | --- |
-| `AsiBackbone.Core` | You need decisions, constraints, audit residue, capability abstractions, provider-neutral outbox/emission/signing seams, or DLP failure-policy primitives. | You only want to read conceptual docs. |
+| `AsiBackbone.Core` | You need decisions, constraints, decision receipt, capability abstractions, provider-neutral outbox/emission/signing seams, or DLP failure-policy primitives. | You only want to read conceptual docs. |
 | `AsiBackbone.AspNetCore` | You are integrating with ASP.NET Core endpoint metadata, request correlation, result mapping, acknowledgment challenge helpers, endpoint governance, or hosted outbox drain. | You are writing a console, worker, or library-only proof path. |
 | `AsiBackbone.Storage.InMemory` | You need non-durable sample/test/local validation storage. | You need production audit durability. |
 | `AsiBackbone.EntityFrameworkCore` | You want host-owned EF Core persistence for audit/outbox/lifecycle records. | You are not ready to own migrations and database lifecycle. |
@@ -245,7 +245,7 @@ A good first success is simply:
 Proposed action
   -> host-owned constraint
   -> GovernanceDecision
-  -> AuditResidue
+  -> DecisionReceipt
   -> host checks decision.CanProceed
 ```
 

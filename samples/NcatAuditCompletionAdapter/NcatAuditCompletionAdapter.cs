@@ -20,20 +20,20 @@ public sealed class NcatAuditCompletionAdapter
     private const string SourceAdapterMetadataValue = "NCAT";
     private const string LifecycleEventPrefix = "ncat-completion-";
 
-    private readonly IAsiBackboneAuditResidueLifecycleStore lifecycleStore;
-    private readonly INcatDecisionResidueResolver decisionResidueResolver;
+    private readonly IDecisionReceiptLifecycleStore lifecycleStore;
+    private readonly INcatDecisionReceiptResolver decisionReceiptResolver;
     private readonly NcatAuditCompletionAdapterOptions options;
 
     /// <summary>
     /// Initializes a new optional NCAT audit-completion adapter.
     /// </summary>
     public NcatAuditCompletionAdapter(
-        IAsiBackboneAuditResidueLifecycleStore lifecycleStore,
-        INcatDecisionResidueResolver decisionResidueResolver,
+        IDecisionReceiptLifecycleStore lifecycleStore,
+        INcatDecisionReceiptResolver decisionReceiptResolver,
         NcatAuditCompletionAdapterOptions? options = null)
     {
         this.lifecycleStore = lifecycleStore ?? throw new ArgumentNullException(nameof(lifecycleStore));
-        this.decisionResidueResolver = decisionResidueResolver ?? throw new ArgumentNullException(nameof(decisionResidueResolver));
+        this.decisionReceiptResolver = decisionReceiptResolver ?? throw new ArgumentNullException(nameof(decisionReceiptResolver));
         this.options = options ?? new NcatAuditCompletionAdapterOptions();
         this.options.Validate();
     }
@@ -59,28 +59,28 @@ public sealed class NcatAuditCompletionAdapter
             return Terminal("unsupported-persistence-outcome");
         }
 
-        IAsiBackboneAuditResidue? residue = await decisionResidueResolver.ResolveAsync(
+        IDecisionReceipt? decisionReceipt = await decisionReceiptResolver.ResolveAsync(
             handoff.DecisionAuditRecordId!.Trim(),
             NormalizeOptional(handoff.CorrelationId),
             cancellationToken).ConfigureAwait(false);
 
-        if (residue is null)
+        if (decisionReceipt is null)
         {
             return new NcatAuditCompletionDeliveryResult(
                 NcatAuditCompletionDeliveryDisposition.Deferred,
                 "decision-residue-not-available");
         }
 
-        NcatAuditCompletionDeliveryResult? correlationFailure = ValidateDecisionCorrelation(handoff, residue);
+        NcatAuditCompletionDeliveryResult? correlationFailure = ValidateDecisionCorrelation(handoff, decisionReceipt);
         if (correlationFailure is not null)
         {
             return correlationFailure;
         }
 
-        GovernedOperationExecutionReceipt receipt;
+        GovernedOperationExecutionReceipt executionReceipt;
         try
         {
-            receipt = GovernedOperationExecutionReceipt.Create(
+            executionReceipt = GovernedOperationExecutionReceipt.Create(
                 operationExecutionId: handoff.OperationExecutionId!,
                 persistenceOutcome: persistenceOutcome,
                 executionAttemptId: handoff.ExecutionAttemptId,
@@ -104,13 +104,13 @@ public sealed class NcatAuditCompletionAdapter
             [SourceAdapterMetadataKey] = SourceAdapterMetadataValue
         };
 
-        AuditResidueLifecycleEvent lifecycleEvent = HostAccountabilityLifecycleEvent.FromExecutionReceipt(
-            residue,
-            receipt,
+        DecisionReceiptLifecycleEvent lifecycleEvent = HostAccountabilityLifecycleEvent.FromExecutionReceipt(
+            decisionReceipt,
+            executionReceipt,
             eventId: lifecycleEventId,
             metadata: metadata);
 
-        AuditResidueLifecycleEvent? existing = await lifecycleStore.FindByEventIdAsync(
+        DecisionReceiptLifecycleEvent? existing = await lifecycleStore.FindByEventIdAsync(
             lifecycleEventId,
             cancellationToken).ConfigureAwait(false);
 
@@ -121,14 +121,14 @@ public sealed class NcatAuditCompletionAdapter
                     NcatAuditCompletionDeliveryDisposition.Duplicate,
                     "completion-already-delivered",
                     lifecycleEventId,
-                    receipt,
+                    executionReceipt,
                     existing)
                 : Terminal("idempotency-conflict", lifecycleEventId: lifecycleEventId);
         }
 
         try
         {
-            AuditResidueLifecycleEvent appended = await lifecycleStore.AppendAsync(
+            DecisionReceiptLifecycleEvent appended = await lifecycleStore.AppendAsync(
                 lifecycleEvent,
                 cancellationToken).ConfigureAwait(false);
 
@@ -136,7 +136,7 @@ public sealed class NcatAuditCompletionAdapter
                 NcatAuditCompletionDeliveryDisposition.Delivered,
                 "lifecycle-event-appended",
                 appended.EventId,
-                receipt,
+                executionReceipt,
                 appended);
         }
         catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
@@ -145,7 +145,7 @@ public sealed class NcatAuditCompletionAdapter
         }
         catch (Exception exception)
         {
-            return PersistenceFailure(handoff, lifecycleEventId, receipt, lifecycleEvent, exception);
+            return PersistenceFailure(handoff, lifecycleEventId, executionReceipt, lifecycleEvent, exception);
         }
     }
 
@@ -168,18 +168,18 @@ public sealed class NcatAuditCompletionAdapter
 
     private static NcatAuditCompletionDeliveryResult? ValidateDecisionCorrelation(
         NcatAuditCompletionHandoff handoff,
-        IAsiBackboneAuditResidue residue)
+        IDecisionReceipt decisionReceipt)
     {
         string? correlationId = NormalizeOptional(handoff.CorrelationId);
         if (correlationId is not null &&
-            !string.Equals(correlationId, residue.CorrelationId, StringComparison.Ordinal))
+            !string.Equals(correlationId, decisionReceipt.CorrelationId, StringComparison.Ordinal))
         {
             return Terminal("correlation-id-mismatch");
         }
 
         string? traceId = NormalizeOptional(handoff.TraceId);
         return traceId is not null &&
-            !string.Equals(traceId, residue.TraceId, StringComparison.Ordinal)
+            !string.Equals(traceId, decisionReceipt.TraceId, StringComparison.Ordinal)
             ? Terminal("trace-id-mismatch")
             : null;
     }
@@ -187,8 +187,8 @@ public sealed class NcatAuditCompletionAdapter
     private NcatAuditCompletionDeliveryResult PersistenceFailure(
         NcatAuditCompletionHandoff handoff,
         string lifecycleEventId,
-        GovernedOperationExecutionReceipt receipt,
-        AuditResidueLifecycleEvent lifecycleEvent,
+        GovernedOperationExecutionReceipt executionReceipt,
+        DecisionReceiptLifecycleEvent lifecycleEvent,
         Exception exception)
     {
         bool deadLettered = options.DeadLetterAfterAttempts is int threshold &&
@@ -202,7 +202,7 @@ public sealed class NcatAuditCompletionAdapter
                 ? "lifecycle-persistence-dead-lettered"
                 : "lifecycle-persistence-failed",
             lifecycleEventId,
-            receipt,
+            executionReceipt,
             lifecycleEvent,
             exception.GetType().Name);
     }
@@ -234,8 +234,8 @@ public sealed class NcatAuditCompletionAdapter
     }
 
     private static bool Equivalent(
-        AuditResidueLifecycleEvent existing,
-        AuditResidueLifecycleEvent candidate)
+        DecisionReceiptLifecycleEvent existing,
+        DecisionReceiptLifecycleEvent candidate)
     {
         if (existing.Stage != candidate.Stage ||
             !string.Equals(existing.CorrelationId, candidate.CorrelationId, StringComparison.Ordinal) ||

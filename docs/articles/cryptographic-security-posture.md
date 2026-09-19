@@ -122,7 +122,8 @@ Build audit receipt
   -> classify and minimize metadata
   -> canonicalize receipt payload
   -> compute artifact hash
-  -> sign artifact hash through IAsiBackboneSigningService
+  -> build the version 1 signature input (hash + descriptors + policy context)
+  -> sign the signature input through IGovernanceSigningService
   -> attach SigningMetadata to the receipt or ledger record
   -> persist receipt and signing metadata durably
 ```
@@ -141,14 +142,14 @@ var hash = canonicalHasher.Hash(payload);
 var signingResult = await signingService.SignAsync(
     SigningRequest.Create(
         artifactId: payload.ArtifactId,
-        artifactType: "audit-receipt",
+        artifactType: "audit-residue",
         signingHash: hash.Value,
         hashAlgorithm: hash.Algorithm,
         metadata: payload.SafeMetadata),
     cancellationToken);
 
-var signedRecord = AuditLedgerRecord.FromResidue(
-    residue,
+var signedRecord = AuditLedgerRecord.FromDecisionReceipt(
+    receipt,
     signingHash: signingResult.Metadata.SigningHash,
     signatureKeyId: signingResult.Metadata.KeyId,
     signatureKeyVersion: signingResult.Metadata.KeyVersion,
@@ -170,7 +171,8 @@ Conceptual flow:
 Load receipt
   -> rebuild canonical payload using the recorded schema version
   -> recompute artifact hash
-  -> verify hash and signature metadata through IAsiBackboneSignatureVerificationService
+  -> rebuild the version 1 signature input from the hash and signing metadata
+  -> verify the signature input through IGovernanceSignatureVerificationService
   -> apply host verification policy
 ```
 
@@ -185,6 +187,36 @@ Recommended verification outcomes:
 | Key revoked or disabled | Apply incident policy; do not silently accept the record. |
 | Canonicalization mismatch | Treat as schema or serialization drift; escalate before relying on the record. |
 | Verification provider unavailable | Follow policy: defer, retry, require acknowledgment, escalate, or fail closed for high-risk workflows. |
+
+## What the signature covers
+
+Since 6.0, signing providers sign and verification providers verify a versioned **signature input**, not the hash text alone. `GovernanceSignatureInput.CreateV1` builds it as canonical JSON (the same serializer and ordinal key order as canonical payload JSON v1) with these properties:
+
+| Property | Source |
+| --- | --- |
+| `artifactId`, `artifactType`, `canonicalizationVersion`, `payloadSchemaVersion` | Canonical payload descriptors. |
+| `format` | Always `asibackbone.signature-input.v1`. |
+| `hashAlgorithm`, `hashValue` | The canonical payload hash. |
+| `policyVersion`, `policyHash` | The `policy_version` and `policy_hash` signing metadata values, trimmed. A missing or blank value is bound as JSON `null`. |
+
+Consequences:
+
+- Relabeling `policy_version` or `policy_hash` after signing, or adding either label to an artifact signed without it, invalidates the signature. Policy pins in `VerificationPolicyContext` therefore check authenticated values.
+- `KeyId`, `KeyVersion`, `Provider`, and `SignedUtc` are **not** in the input, because managed-key services commonly resolve the key version and timestamp during signing. They are authenticated only to the extent that the verification service resolves its verification key from `KeyId` and `KeyVersion` and rejects a `Provider` label it does not own. The local-development provider does both. Host verification services must do the same, or key and provider pins check labels the signature does not cover.
+- `SignedUtc` is provider-asserted. Hosts that need an authenticated signing time must obtain it from a trusted timestamping or anchoring service.
+- Other signing metadata keys are diagnostic labels and are not covered by the signature.
+
+`GovernanceArtifactSigner` supplies the version 1 input on `SigningRequest.SignatureInput` and, after signing, restores the signed `policy_version` and `policy_hash` values in the stored metadata. `GovernanceArtifactVerifier` rebuilds the same input from the artifact and its signing metadata and passes it on `SignatureVerificationRequest.SignatureInput`. Hosts that persist and rehydrate signed artifacts must persist the `policy_version` and `policy_hash` signing metadata values they signed; otherwise the rebuilt input differs and verification fails closed.
+
+### Artifacts signed before 6.0
+
+Artifacts signed by 5.x providers carry signatures over the hash text only. Version 1 verification reports them as `InvalidSignature` and denies. To review or migrate such artifacts, opt in explicitly:
+
+```csharp
+VerificationPolicyContext historicalReview = VerificationPolicyContext.Default.WithLegacySignatureInputAllowed();
+```
+
+With the opt-in, an invalid-signature result is retried once against the hash-only input. A signature accepted that way authenticates the canonical payload hash only, so it cannot satisfy `ExpectedPolicyVersion` or `ExpectedPolicyHash`; such pins deny with `UntrustedSigningContext` and `signature.policy-context-not-authenticated`. Use the opt-in for historical review paths, not for new execution decisions.
 
 ## Audit chains and anchoring
 
@@ -212,7 +244,7 @@ Chaining is not the same as external anchoring.
 
 Use the phrase "tamper-evident" only when the deployed design includes signing, verification, durable storage controls, and a tested audit-chain or anchoring process.
 
-## Governance outbox emission
+## Outbox emission
 
 Governance emission should preserve local accountability before downstream projection.
 
@@ -220,10 +252,10 @@ Recommended secure sequence:
 
 ```text
 Decision / acknowledgment / capability event
-  -> build audit residue or lifecycle event
+  -> build decision receipt or lifecycle event
   -> persist durable local audit record
   -> optionally sign the local artifact or outbox envelope
-  -> enqueue governance outbox entry
+  -> enqueue outbox entry
   -> drain through configured provider
   -> verify delivery result
   -> preserve delivery status and failure reason

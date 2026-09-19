@@ -1,4 +1,5 @@
 using System.Collections.ObjectModel;
+using AsiBackbone.Core.Signing;
 
 namespace AsiBackbone.Signing.ManagedKey;
 
@@ -7,6 +8,8 @@ namespace AsiBackbone.Signing.ManagedKey;
 /// </summary>
 public sealed class ManagedKeySignRequest
 {
+    private readonly byte[]? signatureInput;
+
     private static readonly ReadOnlyDictionary<string, string> EmptyMetadata =
         new(new Dictionary<string, string>(StringComparer.Ordinal));
 
@@ -70,6 +73,23 @@ public sealed class ManagedKeySignRequest
     /// Gets provider-neutral request metadata.
     /// </summary>
     public IReadOnlyDictionary<string, string> Metadata { get; }
+
+    /// <summary>
+    /// Gets the exact bytes the managed key must sign.
+    /// </summary>
+    /// <remarks>
+    /// <see cref="ManagedKeySigningService" /> copies <see cref="SigningRequest.SignatureInput" /> here. For artifacts
+    /// signed through <see cref="GovernanceArtifactSigner" /> this is the version 1 input that binds the canonical
+    /// descriptors, hash, and signing policy context. Clients must sign these bytes, not <see cref="SigningHash" />: pass
+    /// them as the message to a message-signing API, or hash them with the key's digest algorithm before calling a
+    /// digest-signing API. A client that signs the hash text produces signatures that fail version 1 verification. When no
+    /// input was supplied, this returns the pre-6.0 hash-only input. The supplied value is copied.
+    /// </remarks>
+    public ReadOnlyMemory<byte> SignatureInput
+    {
+        get => signatureInput ?? GovernanceSignatureInput.CreateLegacy(SigningHash);
+        init => signatureInput = value.IsEmpty ? null : [.. value.Span];
+    }
 
     private static string NormalizeRequired(string value)
     {

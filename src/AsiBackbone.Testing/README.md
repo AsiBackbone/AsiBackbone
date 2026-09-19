@@ -9,11 +9,11 @@
 
 `AddAsiBackboneTestHarness(...)` registers deterministic test-only substitutions for common host-owned seams:
 
-- `IAsiBackbonePolicyEvaluator<AsiBackboneConstraintEvaluationContext>`
-- `IAsiBackboneEndpointCapabilityGrantValidator`
-- `IAsiBackboneAuditSink` backed by `AsiBackboneTestAuditSink`
-- `IAsiBackboneGovernanceOutboxStore` backed by the non-durable in-memory outbox store
-- `IAsiBackboneSigningService` backed by a deterministic no-signature service
+- `IGovernancePolicyEvaluator<GovernanceEvaluationContext>`
+- `IEndpointCapabilityGrantValidator`
+- `IDecisionReceiptSink` backed by `GovernanceTestDecisionReceiptSink`
+- `IGovernanceOutboxStore` backed by the non-durable in-memory outbox store
+- `IGovernanceSigningService` backed by a deterministic no-signature service
 
 The package does not change production package defaults. ASP.NET Core endpoint governance remains fail-closed when host-owned services are missing unless tests explicitly register this harness.
 
@@ -54,10 +54,10 @@ builder.Services.AddAsiBackboneTestHarness(harness =>
 
 When `RequirePolicyResult<TPolicy>(...)` is used and the selected endpoint has an unconfigured policy marker, the harness returns a deterministic denied decision with reason code `test_harness.policy_result.missing`.
 
-## Inspecting audit residue
+## Inspecting decision receipt
 
 ```csharp
-AsiBackboneTestAuditSink auditSink = services.GetRequiredService<AsiBackboneTestAuditSink>();
+GovernanceTestDecisionReceiptSink auditSink = services.GetRequiredService<GovernanceTestDecisionReceiptSink>();
 
 Assert.Single(auditSink.Entries);
 ```
@@ -66,16 +66,16 @@ The audit sink is in-memory and process-local. It is intended for assertion-frie
 
 ## Reusable contract fixtures
 
-`AsiBackbone.Testing.Contracts` contains framework-neutral contract fixtures and assertions for extension authors. The helpers throw `AsiBackboneContractViolationException` instead of depending on xUnit, NUnit, or MSTest directly, so test projects can reuse the same safe-collapse invariants from any test runner.
+`AsiBackbone.Testing.Contracts` contains framework-neutral contract fixtures and assertions for extension authors. The helpers throw `GovernanceContractViolationException` instead of depending on xUnit, NUnit, or MSTest directly, so test projects can reuse the same safe-collapse invariants from any test runner.
 
 Available fixtures include:
 
-- `AsiBackbonePolicyEvaluatorContract<TContext>`
-- `AsiBackboneDecisionPolicyContract<TContext>`
-- `AsiBackboneConstraintContract<TContext>`
-- `AsiBackboneEndpointCapabilityGrantValidatorContract`
-- `AsiBackboneAuditSinkContract`
-- `AsiBackboneDecisionContract` assertion helpers
+- `GovernancePolicyEvaluatorContract<TContext>`
+- `GovernanceDecisionPolicyContract<TContext>`
+- `GovernanceConstraintContract<TContext>`
+- `EndpointCapabilityGrantValidatorContract`
+- `DecisionReceiptSinkContract`
+- `GovernanceDecisionContract` assertion helpers
 
 Example xUnit usage for a custom policy evaluator:
 
@@ -96,16 +96,16 @@ public sealed class MyPolicyEvaluatorContractTests
     }
 
     private sealed class MyPolicyEvaluatorContract
-        : AsiBackbonePolicyEvaluatorContract<AsiBackboneConstraintEvaluationContext>
+        : GovernancePolicyEvaluatorContract<GovernanceEvaluationContext>
     {
-        protected override IAsiBackbonePolicyEvaluator<AsiBackboneConstraintEvaluationContext> CreateEvaluator()
+        protected override IGovernancePolicyEvaluator<GovernanceEvaluationContext> CreateEvaluator()
         {
             return new MyPolicyEvaluator();
         }
 
-        protected override AsiBackboneConstraintEvaluationContext CreateEvaluationContext()
+        protected override GovernanceEvaluationContext CreateEvaluationContext()
         {
-            return new AsiBackboneConstraintEvaluationContext(
+            return new GovernanceEvaluationContext(
                 correlationId: "contract-correlation",
                 policyVersion: "policy-v1",
                 policyHash: "policy-hash");
@@ -114,7 +114,7 @@ public sealed class MyPolicyEvaluatorContractTests
 }
 ```
 
-The default contract assertions verify portable invariants such as non-null decisions, reason codes for denied/deferred/acknowledgment/escalation paths, correlation propagation, policy telemetry presence when supplied or resolved by the implementation, invalid capability-grant scenarios not returning `Allow`, and valid audit residue shape.
+The default contract assertions verify portable invariants such as non-null decisions, reason codes for denied/deferred/acknowledgment/escalation paths, correlation propagation, policy telemetry presence when supplied or resolved by the implementation, invalid capability-grant scenarios not returning `Allow`, and valid decision receipt shape.
 
 ## WebApplicationFactory-style usage
 
@@ -132,7 +132,7 @@ factory.WithWebHostBuilder(builder =>
 });
 ```
 
-Use this pattern when a host application already calls `AddAsiBackboneAspNetCore()` and exposes endpoints with metadata such as `.RequireGovernancePolicy<TPolicy>()`, `.RequireCapabilityGrant(...)`, or `.EmitGovernanceAudit()`.
+Use this pattern when a host application already calls `AddAsiBackboneAspNetCore()` and exposes endpoints with metadata such as `.MarkGovernancePolicy<TPolicy>()`, `.RequireCapabilityGrant(...)`, or `.EmitGovernanceAudit()`.
 
 ## Production boundary
 

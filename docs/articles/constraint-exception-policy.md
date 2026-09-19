@@ -1,14 +1,14 @@
 # Constraint Exception Policy
 
-This design note defines the intended behavior when an `IAsiBackboneConstraint<TContext>` throws during policy evaluation.
+This design note defines the intended behavior when an `IGovernanceConstraint<TContext>` throws during policy evaluation.
 
-AsiBackbone is audit-first governance infrastructure. For the `3.x` stable line, ordinary policy constraint exceptions fail closed by default so a governed attempt can still produce a `GovernanceDecision`, stable reason code, policy metadata, and downstream audit residue. Hosts can still opt out when they intentionally want exceptions to propagate to an existing host error boundary.
+AsiBackbone is audit-first governance infrastructure. For the `3.x` stable line, ordinary policy constraint exceptions fail closed by default so a governed attempt can still produce a `GovernanceDecision`, stable reason code, policy metadata, and downstream decision receipt. Hosts can still opt out when they intentionally want exceptions to propagate to an existing host error boundary.
 
 ## Default behavior: fail closed as a denied decision
 
 The `3.x` stable default is fail-closed conversion for eligible ordinary constraint exceptions.
 
-When a constraint throws and `AsiBackbonePolicyEvaluatorOptions.TreatConstraintExceptionAsDenial` is `true`, an expected non-cancellation, non-critical exception thrown by a constraint becomes a denied `GovernanceDecision` with reason code:
+When a constraint throws and `GovernancePolicyOptions.TreatConstraintExceptionAsDenial` is `true`, an expected non-cancellation, non-critical exception thrown by a constraint becomes a denied `GovernanceDecision` with reason code:
 
 ```text
 asibackbone.policy.constraint_exception
@@ -30,7 +30,7 @@ A constraint should return `ConstraintEvaluationResult.Deny(...)` when the reque
 
 ```csharp
 public ValueTask<ConstraintEvaluationResult> EvaluateAsync(
-    IAsiBackboneConstraintEvaluationContext context,
+    IGovernanceEvaluationContext context,
     CancellationToken cancellationToken = default)
 {
     if (context.Metadata.TryGetValue("region", out string? region) &&
@@ -49,7 +49,7 @@ Do **not** intentionally throw exceptions to express routine policy denial:
 
 ```csharp
 public ValueTask<ConstraintEvaluationResult> EvaluateAsync(
-    IAsiBackboneConstraintEvaluationContext context,
+    IGovernanceEvaluationContext context,
     CancellationToken cancellationToken = default)
 {
     // Avoid this pattern for expected policy outcomes.
@@ -77,10 +77,10 @@ This distinction lets a host say whether a request was denied by policy or denie
 Hosts that need fail-fast exception propagation can opt out explicitly:
 
 ```csharp
-var evaluator = DefaultAsiBackbonePolicyEvaluator.CreateBuilder<MyPolicyContext>()
+var evaluator = DefaultGovernancePolicyEvaluator.CreateBuilder<MyPolicyContext>()
     .AddConstraints(constraintsFromConfiguration)
     .WithDecisionPolicy(decisionPolicy)
-    .WithOptions(new AsiBackbonePolicyEvaluatorOptions
+    .WithOptions(new GovernancePolicyOptions
     {
         TreatConstraintExceptionAsDenial = false
     })
@@ -125,7 +125,7 @@ A policy constraint failed during evaluation. The operation was denied by the ev
 
 Hosts may override the reason code and message, but should keep them curated, bounded, and free of sensitive data.
 
-When a logger is supplied to `DefaultAsiBackbonePolicyEvaluator<TContext>`, the converted exception is logged at error level with the exception object attached to the log entry. This is host-owned operational telemetry, not public decision output. Hosts should apply their normal log redaction, retention, and access-control policy.
+When a logger is supplied to `DefaultGovernancePolicyEvaluator<TContext>`, the converted exception is logged at error level with the exception object attached to the log entry. This is host-owned operational telemetry, not public decision output. Hosts should apply their normal log redaction, retention, and access-control policy.
 
 The log event for a converted constraint exception is:
 

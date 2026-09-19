@@ -6,9 +6,9 @@ using SigningMetadataValue = AsiBackbone.Core.Signing.SigningMetadata;
 namespace AsiBackbone.Core.Audit;
 
 /// <summary>
-/// Represents a persistence-ready audit ledger record captured from AsiBackbone audit residue.
+/// Represents a persistence-ready audit ledger record captured from AsiBackbone decision receipt.
 /// </summary>
-public sealed class AuditLedgerRecord : IAsiBackboneAuditResidue
+public sealed class AuditLedgerRecord : IDecisionReceipt
 {
     private static readonly ReadOnlyCollection<string> EmptyReasonCodes =
         Array.AsReadOnly(Array.Empty<string>());
@@ -25,7 +25,7 @@ public sealed class AuditLedgerRecord : IAsiBackboneAuditResidue
         DateTimeOffset occurredUtc,
         DateTimeOffset recordedUtc,
         string actorId,
-        AsiBackboneActorType actorType,
+        GovernanceActorType actorType,
         string? actorDisplayName,
         string operationName,
         string outcome,
@@ -69,7 +69,7 @@ public sealed class AuditLedgerRecord : IAsiBackboneAuditResidue
         ArgumentException.ThrowIfNullOrWhiteSpace(outcome);
 
         RecordId = recordId.Trim();
-        SchemaVersion = AsiBackboneSchemaVersions.Normalize(schemaVersion);
+        SchemaVersion = GovernanceSchemaVersions.Normalize(schemaVersion);
         EventId = eventId.Trim();
         AuditResidueId = NormalizeOptional(auditResidueId) ?? EventId;
         OccurredUtc = occurredUtc.ToUniversalTime();
@@ -136,7 +136,7 @@ public sealed class AuditLedgerRecord : IAsiBackboneAuditResidue
 
     public string ActorId { get; }
 
-    public AsiBackboneActorType ActorType { get; }
+    public GovernanceActorType ActorType { get; }
 
     public string? ActorDisplayName { get; }
 
@@ -214,8 +214,8 @@ public sealed class AuditLedgerRecord : IAsiBackboneAuditResidue
 
     public bool HasMetadata => Metadata.Count > 0;
 
-    public static AuditLedgerRecord FromResidue(
-        IAsiBackboneAuditResidue residue,
+    public static AuditLedgerRecord FromDecisionReceipt(
+        IDecisionReceipt receipt,
         string? recordId = null,
         DateTimeOffset? recordedUtc = null,
         string? handshakeId = null,
@@ -233,39 +233,39 @@ public sealed class AuditLedgerRecord : IAsiBackboneAuditResidue
         IReadOnlyDictionary<string, string>? metadata = null,
         string? schemaVersion = null)
     {
-        ArgumentNullException.ThrowIfNull(residue);
+        ArgumentNullException.ThrowIfNull(receipt);
 
         return new AuditLedgerRecord(
             NormalizeIdentifier(recordId),
-            schemaVersion ?? residue.SchemaVersion,
-            residue.EventId,
-            residue.AuditResidueId,
-            residue.OccurredUtc,
+            schemaVersion ?? receipt.SchemaVersion,
+            receipt.EventId,
+            receipt.AuditResidueId,
+            receipt.OccurredUtc,
             recordedUtc ?? DateTimeOffset.UtcNow,
-            residue.ActorId,
-            residue.ActorType,
-            residue.ActorDisplayName,
-            residue.OperationName,
-            residue.Outcome,
-            NormalizeReasonCodes(residue.ReasonCodes),
-            residue.CorrelationId,
-            residue.TraceId,
-            residue.SpanId,
-            residue.ParentSpanId,
-            residue.DecisionLatencyMs,
-            residue.ConstraintSetHash,
-            residue.ConstraintCount,
-            residue.RiskScore,
-            residue.PolicyScope,
-            residue.TenantHash,
-            residue.OrganizationHash,
-            residue.EmitterStatus,
-            residue.EmitterProvider,
-            residue.OutboxSequence,
-            residue.GatewayExecutionId,
-            residue.DecisionStage,
-            residue.PolicyVersion,
-            residue.PolicyHash,
+            receipt.ActorId,
+            receipt.ActorType,
+            receipt.ActorDisplayName,
+            receipt.OperationName,
+            receipt.Outcome,
+            NormalizeReasonCodes(receipt.ReasonCodes),
+            receipt.CorrelationId,
+            receipt.TraceId,
+            receipt.SpanId,
+            receipt.ParentSpanId,
+            receipt.DecisionLatencyMs,
+            receipt.ConstraintSetHash,
+            receipt.ConstraintCount,
+            receipt.RiskScore,
+            receipt.PolicyScope,
+            receipt.TenantHash,
+            receipt.OrganizationHash,
+            receipt.EmitterStatus,
+            receipt.EmitterProvider,
+            receipt.OutboxSequence,
+            receipt.GatewayExecutionId,
+            receipt.DecisionStage,
+            receipt.PolicyVersion,
+            receipt.PolicyHash,
             handshakeId,
             acknowledgmentId,
             capabilityTokenId,
@@ -278,7 +278,7 @@ public sealed class AuditLedgerRecord : IAsiBackboneAuditResidue
             signatureKeyVersion,
             signatureProvider,
             signedUtc,
-            NormalizeMetadata(residue.Metadata, metadata));
+            NormalizeMetadata(receipt.Metadata, metadata));
     }
 
     private static string NormalizeIdentifier(string? identifier)

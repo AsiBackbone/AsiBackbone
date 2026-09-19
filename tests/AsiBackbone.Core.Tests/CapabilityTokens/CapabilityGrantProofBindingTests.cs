@@ -192,7 +192,7 @@ public sealed class CapabilityGrantProofBindingTests
             signedUtc: IssuedUtc);
     }
 
-    private sealed class AlwaysValidVerificationService : IAsiBackboneSignatureVerificationService
+    private sealed class AlwaysValidVerificationService : IGovernanceSignatureVerificationService
     {
         public bool WasCalled { get; private set; }
 

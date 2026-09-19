@@ -20,15 +20,15 @@ public class FirstDenialShortCircuitBenchmarks
     private readonly BdnBenchmarkPolicyContext fullEvaluationContext = CreateContext("policy_evaluator.first_denial_expensive_tail_full");
     private readonly BdnBenchmarkPolicyContext shortCircuitContext = CreateContext("policy_evaluator.first_denial_expensive_tail_short_circuit");
 
-    private readonly IAsiBackbonePolicyEvaluator<BdnBenchmarkPolicyContext> fullEvaluationEvaluator =
-        DefaultAsiBackbonePolicyEvaluator.CreateBuilder<BdnBenchmarkPolicyContext>()
+    private readonly IGovernancePolicyEvaluator<BdnBenchmarkPolicyContext> fullEvaluationEvaluator =
+        DefaultGovernancePolicyEvaluator.CreateBuilder<BdnBenchmarkPolicyContext>()
             .AddConstraints(CreateExpensiveTailConstraints())
             .Build();
 
-    private readonly IAsiBackbonePolicyEvaluator<BdnBenchmarkPolicyContext> shortCircuitEvaluator =
-        DefaultAsiBackbonePolicyEvaluator.CreateBuilder<BdnBenchmarkPolicyContext>()
+    private readonly IGovernancePolicyEvaluator<BdnBenchmarkPolicyContext> shortCircuitEvaluator =
+        DefaultGovernancePolicyEvaluator.CreateBuilder<BdnBenchmarkPolicyContext>()
             .AddConstraints(CreateExpensiveTailConstraints())
-            .WithOptions(new AsiBackbonePolicyEvaluatorOptions { ShortCircuitOnFirstDenial = true })
+            .WithOptions(new GovernancePolicyOptions { ShortCircuitOnFirstDenial = true })
             .Build();
 
     /// <summary>
@@ -81,7 +81,7 @@ public class FirstDenialShortCircuitBenchmarks
         };
     }
 
-    private static IAsiBackboneConstraint<BdnBenchmarkPolicyContext>[] CreateExpensiveTailConstraints()
+    private static IGovernanceConstraint<BdnBenchmarkPolicyContext>[] CreateExpensiveTailConstraints()
     {
         return
         [
@@ -94,7 +94,7 @@ public class FirstDenialShortCircuitBenchmarks
         ];
     }
 
-    private sealed class BdnStaticConstraint(string name, ConstraintEvaluationResult result) : IAsiBackboneConstraint<BdnBenchmarkPolicyContext>
+    private sealed class BdnStaticConstraint(string name, ConstraintEvaluationResult result) : IGovernanceConstraint<BdnBenchmarkPolicyContext>
     {
         public string Name { get; } = name;
 
@@ -105,7 +105,7 @@ public class FirstDenialShortCircuitBenchmarks
         }
     }
 
-    private sealed class BdnCpuBoundConstraint(string name, int iterations, ConstraintEvaluationResult result) : IAsiBackboneConstraint<BdnBenchmarkPolicyContext>
+    private sealed class BdnCpuBoundConstraint(string name, int iterations, ConstraintEvaluationResult result) : IGovernanceConstraint<BdnBenchmarkPolicyContext>
     {
         public string Name { get; } = name;
 
@@ -125,7 +125,7 @@ public class FirstDenialShortCircuitBenchmarks
         }
     }
 
-    private sealed class BdnBenchmarkPolicyContext : IAsiBackboneConstraintEvaluationContext
+    private sealed class BdnBenchmarkPolicyContext : IGovernanceEvaluationContext
     {
         public string? CorrelationId { get; init; }
         public string? PolicyVersion { get; init; }

@@ -10,6 +10,8 @@ namespace AsiBackbone.Core.Signing;
 /// </remarks>
 public sealed class SigningRequest
 {
+    private readonly byte[]? signatureInput;
+
     private static readonly IReadOnlyDictionary<string, string> EmptyMetadata =
         new ReadOnlyDictionary<string, string>(
             new Dictionary<string, string>(StringComparer.Ordinal));
@@ -69,6 +71,28 @@ public sealed class SigningRequest
     /// Gets a value indicating whether metadata is present.
     /// </summary>
     public bool HasMetadata => Metadata.Count > 0;
+
+    /// <summary>
+    /// Gets the exact bytes the signing provider must sign.
+    /// </summary>
+    /// <remarks>
+    /// <see cref="GovernanceArtifactSigner" /> sets this to the version 1 input from
+    /// <see cref="GovernanceSignatureInput.CreateV1" />, which binds the canonical descriptors, hash, and signing policy
+    /// context. Providers must sign these bytes rather than <see cref="SigningHash" />; a provider that signs the hash text
+    /// produces a signature that fails version 1 verification. When no input was supplied, this returns the pre-6.0 input
+    /// from <see cref="GovernanceSignatureInput.CreateLegacy" />. The supplied value is copied.
+    /// </remarks>
+    public ReadOnlyMemory<byte> SignatureInput
+    {
+        get => signatureInput ?? GovernanceSignatureInput.CreateLegacy(SigningHash);
+        init => signatureInput = value.IsEmpty ? null : [.. value.Span];
+    }
+
+    /// <summary>
+    /// Gets a value indicating whether no explicit signature input was supplied, so <see cref="SignatureInput" /> is the
+    /// pre-6.0 hash-only input.
+    /// </summary>
+    public bool UsesLegacySignatureInput => signatureInput is null;
 
     private static string? NormalizeOptional(string? value)
     {

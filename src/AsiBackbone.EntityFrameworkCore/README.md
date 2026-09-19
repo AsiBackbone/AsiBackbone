@@ -1,8 +1,8 @@
 # AsiBackbone.EntityFrameworkCore
 
-Entity Framework Core model configuration and host-owned persistence helpers for Accountable Systems Infrastructure records.
+Entity Framework Core model configuration and host-owned persistence helpers for AsiBackbone records.
 
-This package contributes provider-neutral EF Core model configuration, persistence entities, EF Core-backed audit ledger storage, EF Core-backed audit residue lifecycle storage, and EF Core-backed durable governance outbox storage while preserving host ownership of the application database.
+This package contributes provider-neutral EF Core model configuration, persistence entities, EF Core-backed audit ledger storage, EF Core-backed decision receipt lifecycle storage, and EF Core-backed durable outbox storage while preserving host ownership of the application database.
 
 > **New to AsiBackbone?** Start with the concept, not this package: [Intent to Execution: An Accountability Pattern](https://asibackbone.github.io/AsiBackbone/articles/intent-to-execution-pattern.html) and the [documentation site](https://asibackbone.github.io/AsiBackbone/). This README covers one package in the family.
 
@@ -12,9 +12,9 @@ This package contributes provider-neutral EF Core model configuration, persisten
 ## What this package provides
 
 - `ApplyAsiBackboneConfigurations(this ModelBuilder modelBuilder)` for applying ASI Backbone persistence mappings from a host-owned `DbContext`.
-- Persistence entities for audit ledger records, audit reason codes, audit metadata, handshake requests, handshake acknowledgments, governance outbox entries, audit residue lifecycle events, and related metadata rows.
+- Persistence entities for audit ledger records, audit reason codes, audit metadata, handshake requests, handshake acknowledgments, outbox entries, decision receipt lifecycle events, and related metadata rows.
 - `EfCoreAuditLedgerStore`, an append-oriented audit ledger implementation that uses a host-owned `DbContext`.
-- `EfCoreAuditResidueLifecycleStore`, an append-oriented lifecycle event implementation for durable progress records.
+- `EfCoreDecisionReceiptLifecycleStore`, an append-oriented lifecycle event implementation for durable progress records.
 - `EfCoreGovernanceOutboxStore`, a durable local outbox implementation for provider-neutral governance emission envelopes.
 - Provider-neutral configuration where practical.
 
@@ -32,11 +32,11 @@ public sealed class ApplicationDbContext : DbContext
     {
     }
 
-    public DbSet<AsiBackboneGovernanceOutboxEntryEntity> GovernanceOutboxEntries =>
-        Set<AsiBackboneGovernanceOutboxEntryEntity>();
+    public DbSet<GovernanceOutboxEntryEntity> GovernanceOutboxEntries =>
+        Set<GovernanceOutboxEntryEntity>();
 
-    public DbSet<AsiBackboneAuditResidueLifecycleEventEntity> AuditResidueLifecycleEvents =>
-        Set<AsiBackboneAuditResidueLifecycleEventEntity>();
+    public DbSet<DecisionReceiptLifecycleEventEntity> AuditResidueLifecycleEvents =>
+        Set<DecisionReceiptLifecycleEventEntity>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -87,7 +87,7 @@ Hosts upgrading an existing database should generate a host-owned migration afte
 
 When a host supplies an `ILogger<EfCoreAuditLedgerStore>`, exception details are logged inside the host-controlled diagnostics boundary. Hosts own log routing, redaction, access control, retention, and any decision to forward detailed persistence diagnostics outside the application boundary.
 
-## Durable governance outbox storage
+## Durable outbox storage
 
 `EfCoreGovernanceOutboxStore` persists provider-neutral `GovernanceEmissionEnvelope` records before optional downstream provider delivery is attempted. It stores the envelope, status, retry count, next retry UTC, delivered timestamp, provider name, provider record ID, last provider-neutral error fields, dead-letter reason, and safe metadata.
 
@@ -124,9 +124,9 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 builder.Services.AddScoped<DbContext>(provider =>
     provider.GetRequiredService<ApplicationDbContext>());
 
-builder.Services.AddScoped<IAsiBackboneAuditLedgerStore, EfCoreAuditLedgerStore>();
-builder.Services.AddScoped<IAsiBackboneAuditResidueLifecycleStore, EfCoreAuditResidueLifecycleStore>();
-builder.Services.AddScoped<IAsiBackboneGovernanceOutboxStore, EfCoreGovernanceOutboxStore>();
+builder.Services.AddScoped<IGovernanceAuditLedgerStore, EfCoreAuditLedgerStore>();
+builder.Services.AddScoped<IDecisionReceiptLifecycleStore, EfCoreDecisionReceiptLifecycleStore>();
+builder.Services.AddScoped<IGovernanceOutboxStore, EfCoreGovernanceOutboxStore>();
 ```
 
 Provider-specific behavior belongs in the host application. For example, SQLite hosts may need provider-specific `DateTimeOffset` conversions for ordering or range queries. Multi-worker claiming patterns such as skip-locked row selection, update locks, read-past hints, or claim-lease columns also belong in the host/provider layer unless a future provider-specific package explicitly implements them.

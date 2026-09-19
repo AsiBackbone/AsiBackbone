@@ -90,11 +90,11 @@ public sealed class ReplayThreatContributor : IThreatModelContributor<MyPolicyCo
 Threat contributors are supplied explicitly to the default evaluator. Multiple contributors run in deterministic order before normal constraint composition.
 
 ```csharp
-var evaluator = DefaultAsiBackbonePolicyEvaluator.CreateBuilder<MyPolicyContext>()
+var evaluator = DefaultGovernancePolicyEvaluator.CreateBuilder<MyPolicyContext>()
     .AddConstraints(constraints)
     .AddThreatModelContributors(threatModelContributors)
     .WithDecisionPolicy(decisionPolicy)
-    .WithOptions(new AsiBackbonePolicyEvaluatorOptions
+    .WithOptions(new GovernancePolicyOptions
     {
         TreatThreatContributorExceptionAsDenial = true,
         PreventThreatAssessmentAllowDowngrade = true
@@ -163,7 +163,7 @@ These examples are illustrative. Hosts should define exact thresholds and outcom
 | Prompt-injection-like text appears in a tool or agent command request | `PromptInjectionLikeInput` | `AcknowledgmentRequired`, `EscalationRecommended`, or `Denied` | The host decides whether review, acknowledgment, or denial is appropriate for the action class. |
 | Region-specific rule cannot be resolved or conflicts with the requested action | `RegionPolicyMismatch` | `Deferred` or `EscalationRecommended` | Deferral is useful when another resolver or policy version may be needed. |
 | External-system command is not in an allowlist or exceeds a declared operational boundary | `UnsafeExternalCommand` | `AcknowledgmentRequired`, `EscalationRecommended`, or `Denied` | External execution should remain host-owned and capability-gated. |
-| Audit receipt, signing context, or outbox metadata is missing for an operation that requires it | `AuditIntegrityRisk` | `Denied` or `Deferred` | Consequential actions should not proceed without required accountability residue. |
+| Audit receipt, signing context, or outbox metadata is missing for an operation that requires it | `AuditIntegrityRisk` | `Denied` or `Deferred` | Consequential actions should not proceed without required accountability receipt. |
 
 ## Fail-closed behavior
 
@@ -191,7 +191,7 @@ Disable this only for a deliberate host-owned policy design, and cover that desi
 
 ## Audit and decision receipt expectations
 
-Threat assessments should leave enough residue for later review without leaking sensitive data. At minimum, a consequential threat finding should preserve:
+Threat assessments should leave enough receipt for later review without leaking sensitive data. At minimum, a consequential threat finding should preserve:
 
 - the final governance outcome;
 - stable reason codes;

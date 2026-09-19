@@ -6,12 +6,12 @@ namespace Company.AsibackboneTemplate.Governance;
 /// Sample host-owned constraint that requires a region for manually evaluated operations.
 /// Endpoint-governance middleware also passes endpoint metadata, so the template allows endpoints that carry explicit policy metadata.
 /// </summary>
-public sealed class SampleRegionConstraint : IAsiBackboneConstraint<AsiBackboneConstraintEvaluationContext>
+public sealed class SampleRegionConstraint : IGovernanceConstraint<GovernanceEvaluationContext>
 {
     public string Name => "sample.region";
 
     public ValueTask<ConstraintEvaluationResult> EvaluateAsync(
-        AsiBackboneConstraintEvaluationContext context,
+        GovernanceEvaluationContext context,
         CancellationToken cancellationToken = default)
     {
         cancellationToken.ThrowIfCancellationRequested();

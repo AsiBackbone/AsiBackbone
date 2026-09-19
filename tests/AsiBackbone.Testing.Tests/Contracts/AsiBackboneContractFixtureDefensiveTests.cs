@@ -24,7 +24,7 @@ public sealed class AsiBackboneContractFixtureDefensiveTests
     {
         var contract = new PolicyEvaluatorContract(evaluator: null, context: CreateContext());
 
-        AsiBackboneContractViolationException exception = await Assert.ThrowsAsync<AsiBackboneContractViolationException>(
+        GovernanceContractViolationException exception = await Assert.ThrowsAsync<GovernanceContractViolationException>(
             async () => await contract.VerifyEvaluatorReturnsSafeDecisionAsync(TestContext.Current.CancellationToken));
 
         Assert.Contains("provide an evaluator instance", exception.Message, StringComparison.Ordinal);
@@ -38,7 +38,7 @@ public sealed class AsiBackboneContractFixtureDefensiveTests
     {
         var contract = new PolicyEvaluatorContract(new AllowingPolicyEvaluator(), context: null);
 
-        AsiBackboneContractViolationException exception = await Assert.ThrowsAsync<AsiBackboneContractViolationException>(
+        GovernanceContractViolationException exception = await Assert.ThrowsAsync<GovernanceContractViolationException>(
             async () => await contract.VerifyEvaluatorReturnsSafeDecisionAsync(TestContext.Current.CancellationToken));
 
         Assert.Contains("provide an evaluation context", exception.Message, StringComparison.Ordinal);
@@ -62,10 +62,10 @@ public sealed class AsiBackboneContractFixtureDefensiveTests
     [Fact]
     public async Task PolicyEvaluatorDoesNotDoubleWrapContractViolation()
     {
-        var expected = new AsiBackboneContractViolationException("contract evaluator failure");
+        var expected = new GovernanceContractViolationException("contract evaluator failure");
         var contract = new PolicyEvaluatorContract(new ContractViolatingPolicyEvaluator(expected), CreateContext());
 
-        AsiBackboneContractViolationException actual = await Assert.ThrowsAsync<AsiBackboneContractViolationException>(
+        GovernanceContractViolationException actual = await Assert.ThrowsAsync<GovernanceContractViolationException>(
             async () => await contract.VerifyEvaluatorReturnsSafeDecisionAsync(TestContext.Current.CancellationToken));
 
         Assert.Same(expected, actual);
@@ -90,22 +90,22 @@ public sealed class AsiBackboneContractFixtureDefensiveTests
 
         Assert.Contains(
             "provide a decision policy instance",
-            (await Assert.ThrowsAsync<AsiBackboneContractViolationException>(
+            (await Assert.ThrowsAsync<GovernanceContractViolationException>(
                 async () => await nullPolicy.VerifyDecisionPolicyReturnsSafeDecisionAsync(TestContext.Current.CancellationToken))).Message,
             StringComparison.Ordinal);
         Assert.Contains(
             "provide an evaluation context",
-            (await Assert.ThrowsAsync<AsiBackboneContractViolationException>(
+            (await Assert.ThrowsAsync<GovernanceContractViolationException>(
                 async () => await nullContext.VerifyDecisionPolicyReturnsSafeDecisionAsync(TestContext.Current.CancellationToken))).Message,
             StringComparison.Ordinal);
         Assert.Contains(
             "provide a composed decision",
-            (await Assert.ThrowsAsync<AsiBackboneContractViolationException>(
+            (await Assert.ThrowsAsync<GovernanceContractViolationException>(
                 async () => await nullDecision.VerifyDecisionPolicyReturnsSafeDecisionAsync(TestContext.Current.CancellationToken))).Message,
             StringComparison.Ordinal);
         Assert.Contains(
             "provide a constraint-result collection",
-            (await Assert.ThrowsAsync<AsiBackboneContractViolationException>(
+            (await Assert.ThrowsAsync<GovernanceContractViolationException>(
                 async () => await nullResults.VerifyDecisionPolicyReturnsSafeDecisionAsync(TestContext.Current.CancellationToken))).Message,
             StringComparison.Ordinal);
     }
@@ -120,9 +120,9 @@ public sealed class AsiBackboneContractFixtureDefensiveTests
         _ = await Assert.ThrowsAsync<OperationCanceledException>(
             async () => await canceling.VerifyDecisionPolicyReturnsSafeDecisionAsync(TestContext.Current.CancellationToken));
 
-        var expected = new AsiBackboneContractViolationException("contract policy failure");
+        var expected = new GovernanceContractViolationException("contract policy failure");
         var violating = new DecisionPolicyContract(new ContractViolatingDecisionPolicy(expected), CreateContext());
-        AsiBackboneContractViolationException actual = await Assert.ThrowsAsync<AsiBackboneContractViolationException>(
+        GovernanceContractViolationException actual = await Assert.ThrowsAsync<GovernanceContractViolationException>(
             async () => await violating.VerifyDecisionPolicyReturnsSafeDecisionAsync(TestContext.Current.CancellationToken));
 
         Assert.Same(expected, actual);
@@ -136,7 +136,7 @@ public sealed class AsiBackboneContractFixtureDefensiveTests
     {
         var contract = new DecisionPolicyContract(new ThrowingDecisionPolicy(), CreateContext());
 
-        AsiBackboneContractViolationException exception = await Assert.ThrowsAsync<AsiBackboneContractViolationException>(
+        GovernanceContractViolationException exception = await Assert.ThrowsAsync<GovernanceContractViolationException>(
             async () => await contract.VerifyDecisionPolicyReturnsSafeDecisionAsync(TestContext.Current.CancellationToken));
 
         Assert.Contains("must return safe decisions", exception.Message, StringComparison.Ordinal);
@@ -154,12 +154,12 @@ public sealed class AsiBackboneContractFixtureDefensiveTests
 
         Assert.Contains(
             "provide a constraint instance",
-            (await Assert.ThrowsAsync<AsiBackboneContractViolationException>(
+            (await Assert.ThrowsAsync<GovernanceContractViolationException>(
                 async () => await nullConstraint.VerifyConstraintReturnsSafeResultAsync(TestContext.Current.CancellationToken))).Message,
             StringComparison.Ordinal);
         Assert.Contains(
             "provide an evaluation context",
-            (await Assert.ThrowsAsync<AsiBackboneContractViolationException>(
+            (await Assert.ThrowsAsync<GovernanceContractViolationException>(
                 async () => await nullContext.VerifyConstraintReturnsSafeResultAsync(TestContext.Current.CancellationToken))).Message,
             StringComparison.Ordinal);
     }
@@ -174,7 +174,7 @@ public sealed class AsiBackboneContractFixtureDefensiveTests
     {
         var contract = new ConstraintContract(new MalformedConstraint(CreateConstraintResult(outcome, Array.Empty<OperationReason>())), CreateContext());
 
-        AsiBackboneContractViolationException exception = await Assert.ThrowsAsync<AsiBackboneContractViolationException>(
+        GovernanceContractViolationException exception = await Assert.ThrowsAsync<GovernanceContractViolationException>(
             async () => await contract.VerifyConstraintReturnsSafeResultAsync(TestContext.Current.CancellationToken));
 
         Assert.Contains("without a reason code", exception.Message, StringComparison.Ordinal);
@@ -204,7 +204,7 @@ public sealed class AsiBackboneContractFixtureDefensiveTests
 
         Assert.Contains(
             "null reason",
-            (await Assert.ThrowsAsync<AsiBackboneContractViolationException>(
+            (await Assert.ThrowsAsync<GovernanceContractViolationException>(
                 async () => await nullReason.VerifyConstraintReturnsSafeResultAsync(
                     TestContext.Current.CancellationToken))).Message,
             StringComparison.Ordinal);
@@ -217,7 +217,7 @@ public sealed class AsiBackboneContractFixtureDefensiveTests
 
         Assert.Contains(
             "empty reason code",
-            (await Assert.ThrowsAsync<AsiBackboneContractViolationException>(
+            (await Assert.ThrowsAsync<GovernanceContractViolationException>(
                 async () => await blankCode.VerifyConstraintReturnsSafeResultAsync(
                     TestContext.Current.CancellationToken))).Message,
             StringComparison.Ordinal);
@@ -230,7 +230,7 @@ public sealed class AsiBackboneContractFixtureDefensiveTests
 
         Assert.Contains(
             "empty reason message",
-            (await Assert.ThrowsAsync<AsiBackboneContractViolationException>(
+            (await Assert.ThrowsAsync<GovernanceContractViolationException>(
                 async () => await blankMessage.VerifyConstraintReturnsSafeResultAsync(
                     TestContext.Current.CancellationToken))).Message,
             StringComparison.Ordinal);
@@ -246,9 +246,9 @@ public sealed class AsiBackboneContractFixtureDefensiveTests
         _ = await Assert.ThrowsAsync<OperationCanceledException>(
             async () => await canceling.VerifyConstraintReturnsSafeResultAsync(TestContext.Current.CancellationToken));
 
-        var expected = new AsiBackboneContractViolationException("constraint contract failure");
+        var expected = new GovernanceContractViolationException("constraint contract failure");
         var violating = new ConstraintContract(new ContractViolatingConstraint(expected), CreateContext());
-        AsiBackboneContractViolationException actual = await Assert.ThrowsAsync<AsiBackboneContractViolationException>(
+        GovernanceContractViolationException actual = await Assert.ThrowsAsync<GovernanceContractViolationException>(
             async () => await violating.VerifyConstraintReturnsSafeResultAsync(TestContext.Current.CancellationToken));
 
         Assert.Same(expected, actual);
@@ -264,14 +264,14 @@ public sealed class AsiBackboneContractFixtureDefensiveTests
         var nullResidue = new AuditSinkContract(new AcceptingAuditSink(), residue: null);
 
         Assert.Contains(
-            "provide an audit sink instance",
-            (await Assert.ThrowsAsync<AsiBackboneContractViolationException>(
-                async () => await nullSink.VerifyAuditSinkAcceptsValidResidueAsync(TestContext.Current.CancellationToken))).Message,
+            "provide a sink instance",
+            (await Assert.ThrowsAsync<GovernanceContractViolationException>(
+                async () => await nullSink.VerifyDecisionReceiptSinkAcceptsValidReceiptAsync(TestContext.Current.CancellationToken))).Message,
             StringComparison.Ordinal);
         Assert.Contains(
-            "provide audit residue",
-            (await Assert.ThrowsAsync<AsiBackboneContractViolationException>(
-                async () => await nullResidue.VerifyAuditSinkAcceptsValidResidueAsync(TestContext.Current.CancellationToken))).Message,
+            "provide a decision receipt",
+            (await Assert.ThrowsAsync<GovernanceContractViolationException>(
+                async () => await nullResidue.VerifyDecisionReceiptSinkAcceptsValidReceiptAsync(TestContext.Current.CancellationToken))).Message,
             StringComparison.Ordinal);
     }
 
@@ -283,12 +283,12 @@ public sealed class AsiBackboneContractFixtureDefensiveTests
     {
         var canceling = new AuditSinkContract(new CancelingAuditSink(), new TestAuditResidue());
         _ = await Assert.ThrowsAsync<OperationCanceledException>(
-            async () => await canceling.VerifyAuditSinkAcceptsValidResidueAsync(TestContext.Current.CancellationToken));
+            async () => await canceling.VerifyDecisionReceiptSinkAcceptsValidReceiptAsync(TestContext.Current.CancellationToken));
 
-        var expected = new AsiBackboneContractViolationException("audit contract failure");
+        var expected = new GovernanceContractViolationException("audit contract failure");
         var violating = new AuditSinkContract(new ContractViolatingAuditSink(expected), new TestAuditResidue());
-        AsiBackboneContractViolationException actual = await Assert.ThrowsAsync<AsiBackboneContractViolationException>(
-            async () => await violating.VerifyAuditSinkAcceptsValidResidueAsync(TestContext.Current.CancellationToken));
+        GovernanceContractViolationException actual = await Assert.ThrowsAsync<GovernanceContractViolationException>(
+            async () => await violating.VerifyDecisionReceiptSinkAcceptsValidReceiptAsync(TestContext.Current.CancellationToken));
 
         Assert.Same(expected, actual);
     }
@@ -306,22 +306,22 @@ public sealed class AsiBackboneContractFixtureDefensiveTests
 
         Assert.Contains(
             "provide a validator instance",
-            (await Assert.ThrowsAsync<AsiBackboneContractViolationException>(
+            (await Assert.ThrowsAsync<GovernanceContractViolationException>(
                 async () => await nullValidator.VerifyKnownInvalidCapabilityGrantDoesNotAllowAsync(TestContext.Current.CancellationToken))).Message,
             StringComparison.Ordinal);
         Assert.Contains(
             "provide an HTTP context",
-            (await Assert.ThrowsAsync<AsiBackboneContractViolationException>(
+            (await Assert.ThrowsAsync<GovernanceContractViolationException>(
                 async () => await nullContext.VerifyKnownInvalidCapabilityGrantDoesNotAllowAsync(TestContext.Current.CancellationToken))).Message,
             StringComparison.Ordinal);
         Assert.Contains(
             "provide an endpoint descriptor",
-            (await Assert.ThrowsAsync<AsiBackboneContractViolationException>(
+            (await Assert.ThrowsAsync<GovernanceContractViolationException>(
                 async () => await nullDescriptor.VerifyKnownInvalidCapabilityGrantDoesNotAllowAsync(TestContext.Current.CancellationToken))).Message,
             StringComparison.Ordinal);
         Assert.Contains(
             "provide a current decision",
-            (await Assert.ThrowsAsync<AsiBackboneContractViolationException>(
+            (await Assert.ThrowsAsync<GovernanceContractViolationException>(
                 async () => await nullDecision.VerifyKnownInvalidCapabilityGrantDoesNotAllowAsync(TestContext.Current.CancellationToken))).Message,
             StringComparison.Ordinal);
     }
@@ -336,9 +336,9 @@ public sealed class AsiBackboneContractFixtureDefensiveTests
         _ = await Assert.ThrowsAsync<OperationCanceledException>(
             async () => await canceling.VerifyKnownInvalidCapabilityGrantDoesNotAllowAsync(TestContext.Current.CancellationToken));
 
-        var expected = new AsiBackboneContractViolationException("capability contract failure");
+        var expected = new GovernanceContractViolationException("capability contract failure");
         var violating = new CapabilityContract(new ContractViolatingCapabilityValidator(expected));
-        AsiBackboneContractViolationException actual = await Assert.ThrowsAsync<AsiBackboneContractViolationException>(
+        GovernanceContractViolationException actual = await Assert.ThrowsAsync<GovernanceContractViolationException>(
             async () => await violating.VerifyKnownInvalidCapabilityGrantDoesNotAllowAsync(TestContext.Current.CancellationToken));
 
         Assert.Same(expected, actual);
@@ -352,14 +352,14 @@ public sealed class AsiBackboneContractFixtureDefensiveTests
     {
         var contract = new CapabilityContract(new ThrowingCapabilityValidator());
 
-        AsiBackboneContractViolationException exception = await Assert.ThrowsAsync<AsiBackboneContractViolationException>(
+        GovernanceContractViolationException exception = await Assert.ThrowsAsync<GovernanceContractViolationException>(
             async () => await contract.VerifyKnownInvalidCapabilityGrantDoesNotAllowAsync(TestContext.Current.CancellationToken));
 
         Assert.Contains("must fail closed", exception.Message, StringComparison.Ordinal);
         _ = Assert.IsType<InvalidOperationException>(exception.InnerException);
     }
 
-    private static AsiBackboneConstraintEvaluationContext CreateContext()
+    private static GovernanceEvaluationContext CreateContext()
     {
         return new(correlationId: "contract-correlation", policyVersion: "policy-v1", policyHash: "policy-hash");
     }
@@ -401,39 +401,39 @@ public sealed class AsiBackboneContractFixtureDefensiveTests
     }
 
     private sealed class PolicyEvaluatorContract(
-        IAsiBackbonePolicyEvaluator<AsiBackboneConstraintEvaluationContext>? evaluator,
-        AsiBackboneConstraintEvaluationContext? context)
-        : AsiBackbonePolicyEvaluatorContract<AsiBackboneConstraintEvaluationContext>
+        IGovernancePolicyEvaluator<GovernanceEvaluationContext>? evaluator,
+        GovernanceEvaluationContext? context)
+        : GovernancePolicyEvaluatorContract<GovernanceEvaluationContext>
     {
-        protected override IAsiBackbonePolicyEvaluator<AsiBackboneConstraintEvaluationContext> CreateEvaluator()
+        protected override IGovernancePolicyEvaluator<GovernanceEvaluationContext> CreateEvaluator()
         {
             return evaluator!;
         }
 
-        protected override AsiBackboneConstraintEvaluationContext CreateEvaluationContext()
+        protected override GovernanceEvaluationContext CreateEvaluationContext()
         {
             return context!;
         }
     }
 
     private sealed class DecisionPolicyContract(
-        IAsiBackboneDecisionPolicy<AsiBackboneConstraintEvaluationContext>? policy,
-        AsiBackboneConstraintEvaluationContext? context,
+        IGovernanceDecisionPolicy<GovernanceEvaluationContext>? policy,
+        GovernanceEvaluationContext? context,
         bool returnNullDecision = false,
         bool returnNullResults = false)
-        : AsiBackboneDecisionPolicyContract<AsiBackboneConstraintEvaluationContext>
+        : GovernanceDecisionPolicyContract<GovernanceEvaluationContext>
     {
-        protected override IAsiBackboneDecisionPolicy<AsiBackboneConstraintEvaluationContext> CreateDecisionPolicy()
+        protected override IGovernanceDecisionPolicy<GovernanceEvaluationContext> CreateDecisionPolicy()
         {
             return policy!;
         }
 
-        protected override AsiBackboneConstraintEvaluationContext CreateEvaluationContext()
+        protected override GovernanceEvaluationContext CreateEvaluationContext()
         {
             return context!;
         }
 
-        protected override GovernanceDecision CreateComposedDecision(AsiBackboneConstraintEvaluationContext evaluationContext)
+        protected override GovernanceDecision CreateComposedDecision(GovernanceEvaluationContext evaluationContext)
         {
             return returnNullDecision ? null! : base.CreateComposedDecision(evaluationContext);
         }
@@ -445,43 +445,43 @@ public sealed class AsiBackboneContractFixtureDefensiveTests
     }
 
     private sealed class ConstraintContract(
-        IAsiBackboneConstraint<AsiBackboneConstraintEvaluationContext>? constraint,
-        AsiBackboneConstraintEvaluationContext? context)
-        : AsiBackboneConstraintContract<AsiBackboneConstraintEvaluationContext>
+        IGovernanceConstraint<GovernanceEvaluationContext>? constraint,
+        GovernanceEvaluationContext? context)
+        : GovernanceConstraintContract<GovernanceEvaluationContext>
     {
-        protected override IAsiBackboneConstraint<AsiBackboneConstraintEvaluationContext> CreateConstraint()
+        protected override IGovernanceConstraint<GovernanceEvaluationContext> CreateConstraint()
         {
             return constraint!;
         }
 
-        protected override AsiBackboneConstraintEvaluationContext CreateEvaluationContext()
+        protected override GovernanceEvaluationContext CreateEvaluationContext()
         {
             return context!;
         }
     }
 
-    private sealed class AuditSinkContract(IAsiBackboneAuditSink? sink, IAsiBackboneAuditResidue? residue)
-        : AsiBackboneAuditSinkContract
+    private sealed class AuditSinkContract(IDecisionReceiptSink? sink, IDecisionReceipt? residue)
+        : DecisionReceiptSinkContract
     {
-        protected override IAsiBackboneAuditSink CreateAuditSink()
+        protected override IDecisionReceiptSink CreateDecisionReceiptSink()
         {
             return sink!;
         }
 
-        protected override IAsiBackboneAuditResidue CreateAuditResidue()
+        protected override IDecisionReceipt CreateDecisionReceipt()
         {
             return residue!;
         }
     }
 
     private sealed class CapabilityContract(
-        IAsiBackboneEndpointCapabilityGrantValidator? validator,
+        IEndpointCapabilityGrantValidator? validator,
         bool returnNullContext = false,
         bool returnNullDescriptor = false,
         bool returnNullDecision = false)
-        : AsiBackboneEndpointCapabilityGrantValidatorContract
+        : EndpointCapabilityGrantValidatorContract
     {
-        protected override IAsiBackboneEndpointCapabilityGrantValidator CreateValidator()
+        protected override IEndpointCapabilityGrantValidator CreateValidator()
         {
             return validator!;
         }
@@ -491,7 +491,7 @@ public sealed class AsiBackboneContractFixtureDefensiveTests
             return returnNullContext ? null! : base.CreateHttpContext();
         }
 
-        protected override AsiBackboneEndpointGovernanceDescriptor CreateCapabilityDescriptor()
+        protected override EndpointGovernanceDescriptor CreateCapabilityDescriptor()
         {
             return returnNullDescriptor ? null! : base.CreateCapabilityDescriptor();
         }
@@ -502,41 +502,41 @@ public sealed class AsiBackboneContractFixtureDefensiveTests
         }
     }
 
-    private sealed class AllowingPolicyEvaluator : IAsiBackbonePolicyEvaluator<AsiBackboneConstraintEvaluationContext>
+    private sealed class AllowingPolicyEvaluator : IGovernancePolicyEvaluator<GovernanceEvaluationContext>
     {
         public ValueTask<GovernanceDecision> EvaluateAsync(
-            AsiBackboneConstraintEvaluationContext context,
+            GovernanceEvaluationContext context,
             CancellationToken cancellationToken = default)
         {
             return ValueTask.FromResult(GovernanceDecision.Allow(context.CorrelationId, policyVersion: context.PolicyVersion, policyHash: context.PolicyHash));
         }
     }
 
-    private sealed class CancelingPolicyEvaluator : IAsiBackbonePolicyEvaluator<AsiBackboneConstraintEvaluationContext>
+    private sealed class CancelingPolicyEvaluator : IGovernancePolicyEvaluator<GovernanceEvaluationContext>
     {
         public ValueTask<GovernanceDecision> EvaluateAsync(
-            AsiBackboneConstraintEvaluationContext context,
+            GovernanceEvaluationContext context,
             CancellationToken cancellationToken = default)
         {
             return ValueTask.FromException<GovernanceDecision>(new OperationCanceledException());
         }
     }
 
-    private sealed class ContractViolatingPolicyEvaluator(AsiBackboneContractViolationException exception)
-        : IAsiBackbonePolicyEvaluator<AsiBackboneConstraintEvaluationContext>
+    private sealed class ContractViolatingPolicyEvaluator(GovernanceContractViolationException exception)
+        : IGovernancePolicyEvaluator<GovernanceEvaluationContext>
     {
         public ValueTask<GovernanceDecision> EvaluateAsync(
-            AsiBackboneConstraintEvaluationContext context,
+            GovernanceEvaluationContext context,
             CancellationToken cancellationToken = default)
         {
             return ValueTask.FromException<GovernanceDecision>(exception);
         }
     }
 
-    private sealed class PassthroughDecisionPolicy : IAsiBackboneDecisionPolicy<AsiBackboneConstraintEvaluationContext>
+    private sealed class PassthroughDecisionPolicy : IGovernanceDecisionPolicy<GovernanceEvaluationContext>
     {
         public ValueTask<GovernanceDecision> ApplyAsync(
-            AsiBackboneConstraintEvaluationContext context,
+            GovernanceEvaluationContext context,
             GovernanceDecision composedDecision,
             IReadOnlyList<ConstraintEvaluationResult> constraintResults,
             CancellationToken cancellationToken = default)
@@ -545,10 +545,10 @@ public sealed class AsiBackboneContractFixtureDefensiveTests
         }
     }
 
-    private sealed class CancelingDecisionPolicy : IAsiBackboneDecisionPolicy<AsiBackboneConstraintEvaluationContext>
+    private sealed class CancelingDecisionPolicy : IGovernanceDecisionPolicy<GovernanceEvaluationContext>
     {
         public ValueTask<GovernanceDecision> ApplyAsync(
-            AsiBackboneConstraintEvaluationContext context,
+            GovernanceEvaluationContext context,
             GovernanceDecision composedDecision,
             IReadOnlyList<ConstraintEvaluationResult> constraintResults,
             CancellationToken cancellationToken = default)
@@ -557,11 +557,11 @@ public sealed class AsiBackboneContractFixtureDefensiveTests
         }
     }
 
-    private sealed class ContractViolatingDecisionPolicy(AsiBackboneContractViolationException exception)
-        : IAsiBackboneDecisionPolicy<AsiBackboneConstraintEvaluationContext>
+    private sealed class ContractViolatingDecisionPolicy(GovernanceContractViolationException exception)
+        : IGovernanceDecisionPolicy<GovernanceEvaluationContext>
     {
         public ValueTask<GovernanceDecision> ApplyAsync(
-            AsiBackboneConstraintEvaluationContext context,
+            GovernanceEvaluationContext context,
             GovernanceDecision composedDecision,
             IReadOnlyList<ConstraintEvaluationResult> constraintResults,
             CancellationToken cancellationToken = default)
@@ -570,10 +570,10 @@ public sealed class AsiBackboneContractFixtureDefensiveTests
         }
     }
 
-    private sealed class ThrowingDecisionPolicy : IAsiBackboneDecisionPolicy<AsiBackboneConstraintEvaluationContext>
+    private sealed class ThrowingDecisionPolicy : IGovernanceDecisionPolicy<GovernanceEvaluationContext>
     {
         public ValueTask<GovernanceDecision> ApplyAsync(
-            AsiBackboneConstraintEvaluationContext context,
+            GovernanceEvaluationContext context,
             GovernanceDecision composedDecision,
             IReadOnlyList<ConstraintEvaluationResult> constraintResults,
             CancellationToken cancellationToken = default)
@@ -582,12 +582,12 @@ public sealed class AsiBackboneContractFixtureDefensiveTests
         }
     }
 
-    private sealed class AllowingConstraint : IAsiBackboneConstraint<AsiBackboneConstraintEvaluationContext>
+    private sealed class AllowingConstraint : IGovernanceConstraint<GovernanceEvaluationContext>
     {
         public string Name => "contract.allow";
 
         public ValueTask<ConstraintEvaluationResult> EvaluateAsync(
-            AsiBackboneConstraintEvaluationContext context,
+            GovernanceEvaluationContext context,
             CancellationToken cancellationToken = default)
         {
             return ValueTask.FromResult(ConstraintEvaluationResult.Allow());
@@ -595,71 +595,71 @@ public sealed class AsiBackboneContractFixtureDefensiveTests
     }
 
     private sealed class MalformedConstraint(ConstraintEvaluationResult result)
-        : IAsiBackboneConstraint<AsiBackboneConstraintEvaluationContext>
+        : IGovernanceConstraint<GovernanceEvaluationContext>
     {
         public string Name => "contract.malformed";
         public ValueTask<ConstraintEvaluationResult> EvaluateAsync(
-            AsiBackboneConstraintEvaluationContext context,
+            GovernanceEvaluationContext context,
             CancellationToken cancellationToken = default)
         {
             return ValueTask.FromResult(result);
         }
     }
 
-    private sealed class CancelingConstraint : IAsiBackboneConstraint<AsiBackboneConstraintEvaluationContext>
+    private sealed class CancelingConstraint : IGovernanceConstraint<GovernanceEvaluationContext>
     {
         public string Name => "contract.cancel";
 
         public ValueTask<ConstraintEvaluationResult> EvaluateAsync(
-            AsiBackboneConstraintEvaluationContext context,
+            GovernanceEvaluationContext context,
             CancellationToken cancellationToken = default)
         {
             return ValueTask.FromException<ConstraintEvaluationResult>(new OperationCanceledException());
         }
     }
 
-    private sealed class ContractViolatingConstraint(AsiBackboneContractViolationException exception)
-        : IAsiBackboneConstraint<AsiBackboneConstraintEvaluationContext>
+    private sealed class ContractViolatingConstraint(GovernanceContractViolationException exception)
+        : IGovernanceConstraint<GovernanceEvaluationContext>
     {
         public string Name => "contract.violation";
 
         public ValueTask<ConstraintEvaluationResult> EvaluateAsync(
-            AsiBackboneConstraintEvaluationContext context,
+            GovernanceEvaluationContext context,
             CancellationToken cancellationToken = default)
         {
             return ValueTask.FromException<ConstraintEvaluationResult>(exception);
         }
     }
 
-    private sealed class AcceptingAuditSink : IAsiBackboneAuditSink
+    private sealed class AcceptingAuditSink : IDecisionReceiptSink
     {
-        public ValueTask WriteAsync(IAsiBackboneAuditResidue residue, CancellationToken cancellationToken = default)
+        public ValueTask WriteAsync(IDecisionReceipt residue, CancellationToken cancellationToken = default)
         {
             return ValueTask.CompletedTask;
         }
     }
 
-    private sealed class CancelingAuditSink : IAsiBackboneAuditSink
+    private sealed class CancelingAuditSink : IDecisionReceiptSink
     {
-        public ValueTask WriteAsync(IAsiBackboneAuditResidue residue, CancellationToken cancellationToken = default)
+        public ValueTask WriteAsync(IDecisionReceipt residue, CancellationToken cancellationToken = default)
         {
             return ValueTask.FromException(new OperationCanceledException());
         }
     }
 
-    private sealed class ContractViolatingAuditSink(AsiBackboneContractViolationException exception) : IAsiBackboneAuditSink
+    private sealed class ContractViolatingAuditSink(GovernanceContractViolationException exception) : IDecisionReceiptSink
     {
-        public ValueTask WriteAsync(IAsiBackboneAuditResidue residue, CancellationToken cancellationToken = default)
+        public ValueTask WriteAsync(IDecisionReceipt residue, CancellationToken cancellationToken = default)
         {
             return ValueTask.FromException(exception);
         }
     }
 
-    private sealed class DenyingCapabilityValidator : IAsiBackboneEndpointCapabilityGrantValidator
+    private sealed class DenyingCapabilityValidator : IEndpointCapabilityGrantValidator
     {
         public ValueTask<GovernanceDecision> ValidateAsync(
             HttpContext httpContext,
-            AsiBackboneEndpointGovernanceDescriptor descriptor,
+            EndpointGovernanceDescriptor descriptor,
             GovernanceDecision currentDecision,
             CancellationToken cancellationToken = default)
         {
@@ -667,11 +667,11 @@ public sealed class AsiBackboneContractFixtureDefensiveTests
         }
     }
 
-    private sealed class CancelingCapabilityValidator : IAsiBackboneEndpointCapabilityGrantValidator
+    private sealed class CancelingCapabilityValidator : IEndpointCapabilityGrantValidator
     {
         public ValueTask<GovernanceDecision> ValidateAsync(
             HttpContext httpContext,
-            AsiBackboneEndpointGovernanceDescriptor descriptor,
+            EndpointGovernanceDescriptor descriptor,
             GovernanceDecision currentDecision,
             CancellationToken cancellationToken = default)
         {
@@ -679,12 +679,12 @@ public sealed class AsiBackboneContractFixtureDefensiveTests
         }
     }
 
-    private sealed class ContractViolatingCapabilityValidator(AsiBackboneContractViolationException exception)
-        : IAsiBackboneEndpointCapabilityGrantValidator
+    private sealed class ContractViolatingCapabilityValidator(GovernanceContractViolationException exception)
+        : IEndpointCapabilityGrantValidator
     {
         public ValueTask<GovernanceDecision> ValidateAsync(
             HttpContext httpContext,
-            AsiBackboneEndpointGovernanceDescriptor descriptor,
+            EndpointGovernanceDescriptor descriptor,
             GovernanceDecision currentDecision,
             CancellationToken cancellationToken = default)
         {
@@ -692,11 +692,11 @@ public sealed class AsiBackboneContractFixtureDefensiveTests
         }
     }
 
-    private sealed class ThrowingCapabilityValidator : IAsiBackboneEndpointCapabilityGrantValidator
+    private sealed class ThrowingCapabilityValidator : IEndpointCapabilityGrantValidator
     {
         public ValueTask<GovernanceDecision> ValidateAsync(
             HttpContext httpContext,
-            AsiBackboneEndpointGovernanceDescriptor descriptor,
+            EndpointGovernanceDescriptor descriptor,
             GovernanceDecision currentDecision,
             CancellationToken cancellationToken = default)
         {
@@ -704,12 +704,12 @@ public sealed class AsiBackboneContractFixtureDefensiveTests
         }
     }
 
-    private sealed class TestAuditResidue : IAsiBackboneAuditResidue
+    private sealed class TestAuditResidue : IDecisionReceipt
     {
         public string EventId => "contract-event";
         public DateTimeOffset OccurredUtc => DateTimeOffset.UtcNow;
         public string ActorId => "contract-actor";
-        public AsiBackboneActorType ActorType => AsiBackboneActorType.System;
+        public GovernanceActorType ActorType => GovernanceActorType.System;
         public string? ActorDisplayName => "Contract Actor";
         public string OperationName => "contract.operation";
         public string Outcome => "Allowed";

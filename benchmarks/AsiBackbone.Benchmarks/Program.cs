@@ -37,26 +37,26 @@ internal static class Program
             new PolicyEvaluationScenario(
                 "policy.zero_constraints",
                 "Evaluate with no registered constraints.",
-                DefaultAsiBackbonePolicyEvaluator.CreateBuilder<BenchmarkPolicyContext>()
+                DefaultGovernancePolicyEvaluator.CreateBuilder<BenchmarkPolicyContext>()
                     .Build()),
             new PolicyEvaluationScenario(
                 "policy.all_allow_8",
                 "Evaluate eight allow constraints.",
-                DefaultAsiBackbonePolicyEvaluator.CreateBuilder<BenchmarkPolicyContext>()
+                DefaultGovernancePolicyEvaluator.CreateBuilder<BenchmarkPolicyContext>()
                     .AddConstraints(CreateStaticConstraints(8, ConstraintEvaluationResult.Allow()))
                     .Build()),
             new PolicyEvaluationScenario(
                 "policy.warning_and_denial_full",
                 "Evaluate mixed allow, warning, and denial constraints with full aggregation.",
-                DefaultAsiBackbonePolicyEvaluator.CreateBuilder<BenchmarkPolicyContext>()
+                DefaultGovernancePolicyEvaluator.CreateBuilder<BenchmarkPolicyContext>()
                     .AddConstraints(CreateMixedConstraints())
                     .Build()),
             new PolicyEvaluationScenario(
                 "policy.first_denial_short_circuit",
                 "Evaluate mixed constraints with first-denial short-circuit enabled.",
-                DefaultAsiBackbonePolicyEvaluator.CreateBuilder<BenchmarkPolicyContext>()
+                DefaultGovernancePolicyEvaluator.CreateBuilder<BenchmarkPolicyContext>()
                     .AddConstraints(CreateMixedConstraints())
-                    .WithOptions(new AsiBackbonePolicyEvaluatorOptions
+                    .WithOptions(new GovernancePolicyOptions
                     {
                         ShortCircuitOnFirstDenial = true
                     })
@@ -64,28 +64,28 @@ internal static class Program
             new PolicyEvaluationScenario(
                 "policy.acknowledgment_required",
                 "Evaluate allow constraints followed by acknowledgment-required decision policy.",
-                DefaultAsiBackbonePolicyEvaluator.CreateBuilder<BenchmarkPolicyContext>()
+                DefaultGovernancePolicyEvaluator.CreateBuilder<BenchmarkPolicyContext>()
                     .AddConstraints(CreateStaticConstraints(4, ConstraintEvaluationResult.Allow()))
                     .WithDecisionPolicy(new RequireAcknowledgmentPolicy())
                     .Build()),
             new PolicyEvaluationScenario(
                 "policy.escalation_recommended",
                 "Evaluate allow constraints followed by escalation-recommended decision policy.",
-                DefaultAsiBackbonePolicyEvaluator.CreateBuilder<BenchmarkPolicyContext>()
+                DefaultGovernancePolicyEvaluator.CreateBuilder<BenchmarkPolicyContext>()
                     .AddConstraints(CreateStaticConstraints(4, ConstraintEvaluationResult.Allow()))
                     .WithDecisionPolicy(new EscalatePolicy())
                     .Build()),
             new EndpointGovernanceScenario(
                 "endpoint_governance.policy_allow",
-                "Evaluate DefaultAsiBackboneEndpointGovernanceService with a host policy evaluator returning allow.",
+                "Evaluate DefaultEndpointGovernanceService with a host policy evaluator returning allow.",
                 EndpointDecisionKind.Allow),
             new EndpointGovernanceScenario(
                 "endpoint_governance.policy_warning",
-                "Evaluate DefaultAsiBackboneEndpointGovernanceService with a host policy evaluator returning warning.",
+                "Evaluate DefaultEndpointGovernanceService with a host policy evaluator returning warning.",
                 EndpointDecisionKind.Warning),
             new EndpointGovernanceScenario(
                 "endpoint_governance.policy_deny",
-                "Evaluate DefaultAsiBackboneEndpointGovernanceService with a host policy evaluator returning deny.",
+                "Evaluate DefaultEndpointGovernanceService with a host policy evaluator returning deny.",
                 EndpointDecisionKind.Deny),
             new OutboxDrainScenario(
                 "outbox_drain.small_batch_25",
@@ -97,7 +97,7 @@ internal static class Program
                 batchSize: 100),
             new ScopedOutboxDrainScenario(
                 "outbox_drain.scoped_medium_batch_100",
-                "Create a DI scope, resolve AsiBackboneGovernanceOutboxDrain, and drain 100 pending entries.",
+                "Create a DI scope, resolve GovernanceOutboxDrain, and drain 100 pending entries.",
                 batchSize: 100),
             new AuditResidueFromDecisionScenario()
         ];
@@ -202,11 +202,11 @@ internal static class Program
         return builder.ToString();
     }
 
-    private static IAsiBackboneConstraint<BenchmarkPolicyContext>[] CreateStaticConstraints(
+    private static IGovernanceConstraint<BenchmarkPolicyContext>[] CreateStaticConstraints(
         int count,
         ConstraintEvaluationResult result)
     {
-        var constraints = new IAsiBackboneConstraint<BenchmarkPolicyContext>[count];
+        var constraints = new IGovernanceConstraint<BenchmarkPolicyContext>[count];
 
         for (int index = 0; index < constraints.Length; index++)
         {
@@ -216,7 +216,7 @@ internal static class Program
         return constraints;
     }
 
-    private static IAsiBackboneConstraint<BenchmarkPolicyContext>[] CreateMixedConstraints()
+    private static IGovernanceConstraint<BenchmarkPolicyContext>[] CreateMixedConstraints()
     {
         return
         [
@@ -240,7 +240,7 @@ internal static class Program
             envelopeId: $"envelope-{suffix}",
             correlationId: $"correlation-{suffix}",
             auditResidueId: $"residue-{suffix}",
-            lifecycleStage: AuditResidueLifecycleStage.ExternalEmissionQueued,
+            lifecycleStage: DecisionReceiptLifecycleStage.ExternalEmissionQueued,
             policyVersion: "benchmark-policy-v1",
             policyHash: "benchmark-policy-hash",
             traceId: $"trace-{suffix}",
@@ -358,7 +358,7 @@ internal static class Program
     private sealed class PolicyEvaluationScenario(
         string name,
         string description,
-        IAsiBackbonePolicyEvaluator<BenchmarkPolicyContext> evaluator) : IBenchmarkScenario
+        IGovernancePolicyEvaluator<BenchmarkPolicyContext> evaluator) : IBenchmarkScenario
     {
         private readonly BenchmarkPolicyContext context = new()
         {
@@ -387,8 +387,8 @@ internal static class Program
     {
         private readonly IServiceScope serviceScope;
         private readonly HttpContext httpContext;
-        private readonly AsiBackboneEndpointGovernanceDescriptor descriptor;
-        private readonly IAsiBackboneEndpointGovernanceService service;
+        private readonly EndpointGovernanceDescriptor descriptor;
+        private readonly IEndpointGovernanceService service;
 
         public EndpointGovernanceScenario(
             string name,
@@ -400,7 +400,7 @@ internal static class Program
 
             ServiceProvider services = new ServiceCollection()
                 .AddAsiBackboneAspNetCore()
-                .AddSingleton<IAsiBackbonePolicyEvaluator<AsiBackboneConstraintEvaluationContext>>(new FixedEndpointPolicyEvaluator(decisionKind))
+                .AddSingleton<IGovernancePolicyEvaluator<GovernanceEvaluationContext>>(new FixedEndpointPolicyEvaluator(decisionKind))
                 .BuildServiceProvider(validateScopes: true);
 
             serviceScope = services.CreateScope();
@@ -414,11 +414,11 @@ internal static class Program
 
             var endpoint = new Endpoint(
                 static _ => Task.CompletedTask,
-                new EndpointMetadataCollection(new RequireGovernancePolicyAttribute(typeof(BenchmarkEndpointPolicy))),
+                new EndpointMetadataCollection(new GovernancePolicyAttribute(typeof(BenchmarkEndpointPolicy))),
                 name);
 
-            descriptor = AsiBackboneEndpointGovernanceDescriptor.FromEndpoint(endpoint);
-            service = serviceScope.ServiceProvider.GetRequiredService<IAsiBackboneEndpointGovernanceService>();
+            descriptor = EndpointGovernanceDescriptor.FromEndpoint(endpoint);
+            service = serviceScope.ServiceProvider.GetRequiredService<IEndpointGovernanceService>();
         }
 
         public string Name { get; }
@@ -427,7 +427,7 @@ internal static class Program
 
         public async ValueTask<int> ExecuteAsync(CancellationToken cancellationToken)
         {
-            AsiBackboneEndpointGovernanceResult result = await service
+            EndpointGovernanceResult result = await service
                 .EvaluateAsync(httpContext, descriptor, cancellationToken)
                 .ConfigureAwait(false);
 
@@ -439,7 +439,7 @@ internal static class Program
     private sealed class OutboxDrainScenario : IBenchmarkScenario
     {
         private readonly int batchSize;
-        private readonly AsiBackboneGovernanceOutboxDrain drain;
+        private readonly GovernanceOutboxDrain drain;
 
         public OutboxDrainScenario(
             string name,
@@ -451,7 +451,7 @@ internal static class Program
             Name = name;
             Description = description;
             this.batchSize = batchSize;
-            drain = new AsiBackboneGovernanceOutboxDrain(
+            drain = new GovernanceOutboxDrain(
                 new BenchmarkOutboxStore(batchSize),
                 NoOpGovernanceEmitter.Instance);
         }
@@ -487,9 +487,9 @@ internal static class Program
             this.batchSize = batchSize;
             services = new ServiceCollection()
                 .AddLogging()
-                .AddSingleton<IAsiBackboneGovernanceOutboxStore>(_ => new BenchmarkOutboxStore(batchSize))
-                .AddSingleton<IAsiBackboneGovernanceEmitter>(NoOpGovernanceEmitter.Instance)
-                .AddScoped<AsiBackboneGovernanceOutboxDrain>()
+                .AddSingleton<IGovernanceOutboxStore>(_ => new BenchmarkOutboxStore(batchSize))
+                .AddSingleton<IGovernanceEmitter>(NoOpGovernanceEmitter.Instance)
+                .AddScoped<GovernanceOutboxDrain>()
                 .BuildServiceProvider(validateScopes: true);
         }
 
@@ -500,7 +500,7 @@ internal static class Program
         public async ValueTask<int> ExecuteAsync(CancellationToken cancellationToken)
         {
             using IServiceScope scope = services.CreateScope();
-            AsiBackboneGovernanceOutboxDrain drain = scope.ServiceProvider.GetRequiredService<AsiBackboneGovernanceOutboxDrain>();
+            GovernanceOutboxDrain drain = scope.ServiceProvider.GetRequiredService<GovernanceOutboxDrain>();
             IReadOnlyList<GovernanceOutboxEntry> entries = await drain
                 .DrainAsync(BenchmarkDrainUtc, batchSize, cancellationToken)
                 .ConfigureAwait(false);
@@ -511,7 +511,7 @@ internal static class Program
 
     private sealed class AuditResidueFromDecisionScenario : IBenchmarkScenario
     {
-        private readonly IAsiBackboneActorContext actor = AsiBackboneActorContext.Service("benchmark-service");
+        private readonly IGovernanceActorContext actor = GovernanceActorContext.Service("benchmark-service");
 
         private readonly GovernanceDecision decision = GovernanceDecision.Deny(
             "policy.denied",
@@ -535,7 +535,7 @@ internal static class Program
         {
             cancellationToken.ThrowIfCancellationRequested();
 
-            var residue = AuditResidue.FromDecision(
+            var residue = DecisionReceipt.FromDecision(
                 actor,
                 "benchmark.operation",
                 decision,
@@ -553,7 +553,7 @@ internal static class Program
         }
     }
 
-    private sealed class BenchmarkPolicyContext : IAsiBackboneConstraintEvaluationContext
+    private sealed class BenchmarkPolicyContext : IGovernanceEvaluationContext
     {
         public string? CorrelationId { get; init; }
 
@@ -567,7 +567,7 @@ internal static class Program
 
     private sealed class StaticConstraint(
         string name,
-        ConstraintEvaluationResult result) : IAsiBackboneConstraint<BenchmarkPolicyContext>
+        ConstraintEvaluationResult result) : IGovernanceConstraint<BenchmarkPolicyContext>
     {
         public string Name { get; } = name;
 
@@ -581,10 +581,10 @@ internal static class Program
     }
 
     private sealed class FixedEndpointPolicyEvaluator(EndpointDecisionKind decisionKind)
-        : IAsiBackbonePolicyEvaluator<AsiBackboneConstraintEvaluationContext>
+        : IGovernancePolicyEvaluator<GovernanceEvaluationContext>
     {
         public ValueTask<GovernanceDecision> EvaluateAsync(
-            AsiBackboneConstraintEvaluationContext context,
+            GovernanceEvaluationContext context,
             CancellationToken cancellationToken = default)
         {
             cancellationToken.ThrowIfCancellationRequested();
@@ -614,7 +614,7 @@ internal static class Program
         }
     }
 
-    private sealed class BenchmarkOutboxStore : IAsiBackboneGovernanceOutboxStore
+    private sealed class BenchmarkOutboxStore : IGovernanceOutboxStore
     {
         private readonly GovernanceOutboxEntry[] pendingEntries;
         private readonly Dictionary<string, GovernanceOutboxEntry> entriesById;
@@ -721,7 +721,7 @@ internal static class Program
         }
     }
 
-    private sealed class RequireAcknowledgmentPolicy : IAsiBackboneDecisionPolicy<BenchmarkPolicyContext>
+    private sealed class RequireAcknowledgmentPolicy : IGovernanceDecisionPolicy<BenchmarkPolicyContext>
     {
         public ValueTask<GovernanceDecision> ApplyAsync(
             BenchmarkPolicyContext context,
@@ -740,7 +740,7 @@ internal static class Program
         }
     }
 
-    private sealed class EscalatePolicy : IAsiBackboneDecisionPolicy<BenchmarkPolicyContext>
+    private sealed class EscalatePolicy : IGovernanceDecisionPolicy<BenchmarkPolicyContext>
     {
         public ValueTask<GovernanceDecision> ApplyAsync(
             BenchmarkPolicyContext context,

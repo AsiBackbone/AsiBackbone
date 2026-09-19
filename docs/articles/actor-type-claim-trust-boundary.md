@@ -1,10 +1,10 @@
 # Actor-Type Claim Trust Boundary
 
-`HttpContextAsiBackboneActorContextResolver` can map an authenticated principal into an AsiBackbone actor context. That mapping is an audit and governance classification aid; it does not authenticate the caller, authorize an operation, or prove that the caller is a trusted system, service, or agent.
+`HttpContextGovernanceActorContextResolver` can map an authenticated principal into an AsiBackbone actor context. That mapping is an audit and governance classification aid; it does not authenticate the caller, authorize an operation, or prove that the caller is a trusted system, service, or agent.
 
 ## Trust requirement
 
-`AsiBackboneHttpActorContextOptions.ActorTypeClaimType` must reference a claim that is protected by the host identity boundary.
+`HttpGovernanceActorContextOptions.ActorTypeClaimType` must reference a claim that is protected by the host identity boundary.
 
 Appropriate sources include:
 
@@ -46,9 +46,9 @@ builder.Services.AddAsiBackboneAspNetCore(options =>
     options.ActorTypeClaimType = "trusted_actor_type";
     options.AllowedActorTypesFromClaims =
     [
-        AsiBackboneActorType.Human,
-        AsiBackboneActorType.Service,
-        AsiBackboneActorType.Agent,
+        GovernanceActorType.Human,
+        GovernanceActorType.Service,
+        GovernanceActorType.Agent,
     ];
 });
 ```

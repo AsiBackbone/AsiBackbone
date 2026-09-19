@@ -1,6 +1,6 @@
 # AsiBackbone.Analyzers
 
-Roslyn analyzer safety rails for Accountable Systems Infrastructure governance flows.
+Roslyn analyzer safety rails for AsiBackbone governance flows.
 
 > **New to AsiBackbone?** Start with the concept, not this package: [Intent to Execution: An Accountability Pattern](https://asibackbone.github.io/AsiBackbone/articles/intent-to-execution-pattern.html) and the [documentation site](https://asibackbone.github.io/AsiBackbone/). This README covers one package in the family.
 
@@ -20,7 +20,7 @@ Analyzer warnings are advisory by default. Hosts can keep exploratory rules as w
 
 `ASIB001` warns when an AsiBackbone governance artifact is created or returned and then discarded.
 
-Examples include discarded governance decisions, audit residue, outbox entries, capability grants, handshake acknowledgments, and governance emission results.
+Examples include discarded governance decisions, decision receipt, outbox entries, capability grants, handshake acknowledgments, and governance emission results.
 
 ```csharp
 GovernanceDecision.Allow(); // ASIB001

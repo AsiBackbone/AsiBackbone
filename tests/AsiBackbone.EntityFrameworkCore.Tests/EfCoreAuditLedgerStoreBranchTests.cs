@@ -101,14 +101,14 @@ public sealed class EfCoreAuditLedgerStoreBranchTests
         await using HostOwnedAuditDbContext context = CreateInMemoryContext();
         var store = new EfCoreAuditLedgerStore(context);
 
-        _ = context.AuditLedgerRecords.Add(new AsiBackboneAuditLedgerRecordEntity
+        _ = context.AuditLedgerRecords.Add(new AuditLedgerRecordEntity
         {
             RecordId = "empty-json-record",
             EventId = "empty-json-event",
             OccurredUtc = new DateTimeOffset(2026, 6, 1, 0, 0, 0, TimeSpan.Zero),
             RecordedUtc = new DateTimeOffset(2026, 6, 1, 1, 0, 0, TimeSpan.Zero),
             ActorId = "empty-json-actor",
-            ActorType = AsiBackboneActorType.Service,
+            ActorType = GovernanceActorType.Service,
             OperationName = "empty-json.operation",
             Outcome = "Allowed",
             ReasonCodesJson = " ",
@@ -136,8 +136,8 @@ public sealed class EfCoreAuditLedgerStoreBranchTests
 
     private static AuditLedgerRecord CreateRecord(string recordId, string eventId)
     {
-        var actor = AsiBackboneActorContext.Human("actor-branch", "Branch Actor");
-        var residue = AuditResidue.Create(
+        var actor = GovernanceActorContext.Human("actor-branch", "Branch Actor");
+        var residue = DecisionReceipt.Create(
             actor,
             "branch.operation",
             "Allowed",
@@ -153,7 +153,7 @@ public sealed class EfCoreAuditLedgerStoreBranchTests
                 ["branch"] = "true",
             });
 
-        return AuditLedgerRecord.FromResidue(
+        return AuditLedgerRecord.FromDecisionReceipt(
             residue,
             recordId: recordId,
             recordedUtc: new DateTimeOffset(2026, 6, 1, 10, 0, 0, TimeSpan.Zero));
@@ -162,8 +162,8 @@ public sealed class EfCoreAuditLedgerStoreBranchTests
     private sealed class HostOwnedAuditDbContext(DbContextOptions<HostOwnedAuditDbContext> options)
         : DbContext(options)
     {
-        public DbSet<AsiBackboneAuditLedgerRecordEntity> AuditLedgerRecords =>
-            Set<AsiBackboneAuditLedgerRecordEntity>();
+        public DbSet<AuditLedgerRecordEntity> AuditLedgerRecords =>
+            Set<AuditLedgerRecordEntity>();
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

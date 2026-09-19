@@ -10,7 +10,7 @@ namespace AsiBackbone.Signing.ManagedKey;
 /// <remarks>
 /// This service signs precomputed hashes only. It never requests or handles raw private key material.
 /// </remarks>
-public sealed class ManagedKeySigningService : IAsiBackboneSigningService
+public sealed class ManagedKeySigningService : IGovernanceSigningService
 {
     private const string ProviderKind = "managed-key";
 
@@ -150,7 +150,10 @@ public sealed class ManagedKeySigningService : IAsiBackboneSigningService
             ResolveKeyId(request),
             ResolveKeyVersion(request),
             request.Purpose,
-            request.Metadata);
+            request.Metadata)
+        {
+            SignatureInput = request.SignatureInput
+        };
     }
 
     /// <summary>

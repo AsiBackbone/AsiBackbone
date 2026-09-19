@@ -13,7 +13,7 @@ namespace AsiBackbone.AspNetCore.Tests.Endpoints;
 public sealed class AsiBackboneEndpointPolicyEvaluationOptionsMetadataTests
 {
     /// <summary>
-    /// Tests that the AsiBackboneEndpointGovernanceDescriptor correctly reads the ShortCircuitOnFirstDenial metadata from an endpoint and short-circuits on the first denial.
+    /// Tests that the EndpointGovernanceDescriptor correctly reads the ShortCircuitOnFirstDenial metadata from an endpoint and short-circuits on the first denial.
     /// </summary>
     [Fact]
     public void DescriptorReadsShortCircuitOnFirstDenialMetadataFromEndpoint()
@@ -21,11 +21,11 @@ public sealed class AsiBackboneEndpointPolicyEvaluationOptionsMetadataTests
         var endpoint = new Endpoint(
             static context => Task.CompletedTask,
             new EndpointMetadataCollection(
-                new RequireGovernancePolicyAttribute(typeof(SamplePolicy)),
+                new GovernancePolicyAttribute(typeof(SamplePolicy)),
                 new ShortCircuitOnFirstDenialAttribute()),
             "sample.fast-abort");
 
-        var descriptor = AsiBackboneEndpointGovernanceDescriptor.FromEndpoint(endpoint);
+        var descriptor = EndpointGovernanceDescriptor.FromEndpoint(endpoint);
         IReadOnlyDictionary<string, string> metadata = descriptor.ToMetadata();
 
         Assert.True(descriptor.HasGovernanceMetadata);
@@ -35,7 +35,7 @@ public sealed class AsiBackboneEndpointPolicyEvaluationOptionsMetadataTests
     }
 
     /// <summary>
-    /// Tests that the AsiBackboneEndpointGovernanceDescriptor correctly reads the ShortCircuitOnFirstDenial metadata from an endpoint and uses the last value when multiple attributes are present.
+    /// Tests that the EndpointGovernanceDescriptor correctly reads the ShortCircuitOnFirstDenial metadata from an endpoint and uses the last value when multiple attributes are present.
     /// </summary>
     [Fact]
     public void DescriptorUsesLastShortCircuitOnFirstDenialMetadataValue()
@@ -47,7 +47,7 @@ public sealed class AsiBackboneEndpointPolicyEvaluationOptionsMetadataTests
                 new ShortCircuitOnFirstDenialAttribute(enabled: false)),
             "sample.fast-abort.override");
 
-        var descriptor = AsiBackboneEndpointGovernanceDescriptor.FromEndpoint(endpoint);
+        var descriptor = EndpointGovernanceDescriptor.FromEndpoint(endpoint);
         IReadOnlyDictionary<string, string> metadata = descriptor.ToMetadata();
 
         Assert.True(descriptor.HasGovernanceMetadata);

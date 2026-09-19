@@ -121,8 +121,8 @@ public sealed class EfCoreGovernanceOutboxRoundTripTests
         Assert.Equal(new DateTimeOffset(2026, 7, 12, 11, 0, 1, TimeSpan.Zero), persistedEnvelope.CreatedUtc);
         Assert.Equal("correlation-full-round-trip", persistedEnvelope.CorrelationId);
         Assert.Equal("audit-full-round-trip", persistedEnvelope.AuditResidueId);
-        Assert.Equal(AuditResidueLifecycleStage.ExternalEmissionQueued, persistedEnvelope.LifecycleStage);
-        Assert.Equal((int)AuditResidueLifecycleStage.ExternalEmissionQueued, persistedEnvelope.LifecycleStageSequence);
+        Assert.Equal(DecisionReceiptLifecycleStage.ExternalEmissionQueued, persistedEnvelope.LifecycleStage);
+        Assert.Equal((int)DecisionReceiptLifecycleStage.ExternalEmissionQueued, persistedEnvelope.LifecycleStageSequence);
         Assert.Equal("2026.07", persistedEnvelope.PolicyVersion);
         Assert.Equal("policy-hash-issue-578", persistedEnvelope.PolicyHash);
         Assert.Equal("trace-full-round-trip", persistedEnvelope.TraceId);
@@ -172,7 +172,7 @@ public sealed class EfCoreGovernanceOutboxRoundTripTests
         _ = await store.SaveAsync(entry, cancellationToken);
         context.ChangeTracker.Clear();
 
-        AsiBackboneGovernanceOutboxEntryEntity entity = await context.GovernanceOutboxEntries
+        GovernanceOutboxEntryEntity entity = await context.GovernanceOutboxEntries
             .SingleAsync(item => item.OutboxEntryId == entry.OutboxEntryId, cancellationToken);
         entity.MetadataJson = "null";
         entity.EnvelopeMetadataJson = string.Empty;

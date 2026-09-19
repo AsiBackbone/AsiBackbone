@@ -17,7 +17,7 @@ public sealed class SampleGovernanceController : ControllerBase
     /// An IActionResult indicating the result of the action execution, including a message confirming successful execution after governance evaluation.
     /// </returns>
     [HttpPost]
-    [RequireGovernancePolicy(typeof(SampleControllerEndpointPolicy))]
+    [GovernancePolicy(typeof(SampleControllerEndpointPolicy))]
     [RequireLiabilityHandshake]
     [RequireCapabilityGrant("sample.high-risk.execute")]
     [EmitGovernanceAudit]

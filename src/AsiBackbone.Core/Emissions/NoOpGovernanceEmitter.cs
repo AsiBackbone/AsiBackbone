@@ -8,7 +8,7 @@ namespace AsiBackbone.Core.Emissions;
 /// <remarks>
 /// This emitter does not send data to an external provider. It acknowledges the envelope as delivered so hosts can validate outbox drain behavior before wiring a real provider such as OpenTelemetry.
 /// </remarks>
-public sealed class NoOpGovernanceEmitter : IAsiBackboneGovernanceEmitter
+public sealed class NoOpGovernanceEmitter : IGovernanceEmitter
 {
     /// <summary>
     /// Gets the provider name used by the no-op emitter.

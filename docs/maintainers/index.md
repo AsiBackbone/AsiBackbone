@@ -6,7 +6,7 @@ These records are public for traceability, but they are not part of the normal c
 
 ## Current release evidence
 
-- [5.2.0 Release Readiness Record](../articles/release-readiness-520.md)
+- [6.0.0 Release Readiness Record](../articles/release-readiness-600.md)
 - [Release Cadence and Readiness](../articles/release-cadence-and-readiness.md)
 - [Stable Release Validation](../articles/release-validation.md)
 - [Quality Reports](../quality/index.md)
@@ -29,6 +29,7 @@ These records are public for traceability, but they are not part of the normal c
 
 The records below preserve the release gate and audit trail for prior stable versions. They are not current release status.
 
+- [5.2.0 Release Readiness Record](../articles/release-readiness-520.md)
 - [5.1.0 Release Readiness Record](../articles/release-readiness-510.md)
 - [5.0.0 Release Readiness Record](../articles/release-readiness-500.md)
 - [4.0.0 Release Readiness Record](../articles/release-readiness-400.md)

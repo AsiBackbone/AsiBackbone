@@ -16,7 +16,7 @@ app.UseAsiBackboneEndpointGovernance();
 
 Place `UseAsiBackboneEndpointGovernance()` after routing has selected an endpoint and before the protected endpoint executes. In a typical minimal host this means before `MapControllers()` and before mapped endpoints are executed by endpoint routing.
 
-Hosts that use policy metadata should register an `IAsiBackbonePolicyEvaluator<AsiBackboneConstraintEvaluationContext>`. Hosts that use capability metadata should register an `IAsiBackboneEndpointCapabilityGrantValidator`. Hosts that request audit emission should register a host-owned `IAsiBackboneAuditSink`.
+Hosts that use policy metadata should register an `IGovernancePolicyEvaluator<GovernanceEvaluationContext>`. Hosts that use capability metadata should register an `IEndpointCapabilityGrantValidator`. Hosts that request audit emission should register a host-owned `IDecisionReceiptSink`.
 
 Because those services may run before the protected endpoint executes, their implementation choices affect request throughput. Keep request-time evaluators, validators, and audit sinks async, cancellable, bounded, and free of blocking calls such as `.Result`, `.Wait()`, `Thread.Sleep`, synchronous network calls, synchronous database calls, or unbounded `Task.Run` work. See [High-Throughput Host Service Guidance](high-throughput-host-services.md) for request hot-path examples, anti-patterns, queue/backpressure guidance, and the framework/host responsibility boundary.
 
@@ -50,7 +50,7 @@ When `RequireGovernanceMetadata` is enabled, a request with no selected endpoint
 
 `AddAsiBackboneAspNetCore()` registers endpoint-governance options validation with startup validation. Invalid endpoint-governance options fail through the configured options validation path instead of being revalidated on every request.
 
-The middleware reads the validated `IOptions<AsiBackboneEndpointGovernanceOptions>.Value` and avoids repeating `Validate()` in the request hot path. This keeps invalid configuration fail-closed through startup/configured-options validation while avoiding per-request validation overhead for stable host options.
+The middleware reads the validated `IOptions<EndpointGovernanceOptions>.Value` and avoids repeating `Validate()` in the request hot path. This keeps invalid configuration fail-closed through startup/configured-options validation while avoiding per-request validation overhead for stable host options.
 
 Hosts that intentionally mutate options at runtime should validate their mutation path before applying it. The endpoint-governance middleware does not treat live option mutation as the normal production path.
 
@@ -64,21 +64,21 @@ app.MapPost("/high-risk-action", handler)
     .EmitGovernanceAudit();
 ```
 
-The fluent methods add endpoint metadata. The middleware resolves that metadata into an `AsiBackboneEndpointGovernanceDescriptor`, builds a framework-neutral evaluation context, and delegates policy evaluation, capability validation, handshake creation, and audit emission to registered host-owned services.
+The fluent methods add endpoint metadata. The middleware resolves that metadata into an `EndpointGovernanceDescriptor`, builds a framework-neutral evaluation context, and delegates policy evaluation, capability validation, handshake creation, and audit emission to registered host-owned services.
 
 ### What the policy marker does, and what it does not
 
 `MarkGovernancePolicy<TPolicy>()` records a marker. It does not select an evaluation path.
 
-The framework does not resolve the marked type or derive a constraint set from it. The registered `IAsiBackbonePolicyEvaluator` evaluates **every** registered constraint on **every** governed endpoint, whichever policy type an endpoint carries. What the marker controls is whether policy evaluation runs at all: an endpoint with no policy marker skips the policy stage.
+The framework does not resolve the marked type or derive a constraint set from it. The registered `IGovernancePolicyEvaluator` evaluates **every** registered constraint on **every** governed endpoint, whichever policy type an endpoint carries. What the marker controls is whether policy evaluation runs at all: an endpoint with no policy marker skips the policy stage.
 
-Two endpoints marked with different policy types therefore evaluate identically unless the host makes them differ. The marker reaches evaluation as the `endpoint.policy_types` metadata entry, so the supported way to vary behavior by policy is a host-supplied `IAsiBackboneDecisionPolicy<AsiBackboneConstraintEvaluationContext>` that reads that entry and adjusts the composed decision:
+Two endpoints marked with different policy types therefore evaluate identically unless the host makes them differ. The marker reaches evaluation as the `endpoint.policy_types` metadata entry, so the supported way to vary behavior by policy is a host-supplied `IGovernanceDecisionPolicy<GovernanceEvaluationContext>` that reads that entry and adjusts the composed decision:
 
 ```csharp
-public sealed class PolicyAwareDecisionPolicy : IAsiBackboneDecisionPolicy<AsiBackboneConstraintEvaluationContext>
+public sealed class PolicyAwareDecisionPolicy : IGovernanceDecisionPolicy<GovernanceEvaluationContext>
 {
     public ValueTask<GovernanceDecision> ApplyAsync(
-        AsiBackboneConstraintEvaluationContext context,
+        GovernanceEvaluationContext context,
         GovernanceDecision composedDecision,
         IReadOnlyList<ConstraintEvaluationResult> constraintResults,
         CancellationToken cancellationToken = default)
@@ -89,9 +89,9 @@ public sealed class PolicyAwareDecisionPolicy : IAsiBackboneDecisionPolicy<AsiBa
 }
 ```
 
-`endpoint.policy_types` is retained under `AsiBackboneEndpointGovernanceMetadataMode.Reduced` for exactly this reason: dropping it would let a metadata setting silently disable a host decision policy that depends on it.
+`endpoint.policy_types` is retained under `EndpointGovernanceMetadataMode.Reduced` for exactly this reason: dropping it would let a metadata setting silently disable a host decision policy that depends on it.
 
-`RequireGovernancePolicy` is the former name of this method and is obsolete. It never resolved the policy type either; the name overstated what it did. It still records the same metadata and can be replaced with `MarkGovernancePolicy` without behavior change.
+`RequireGovernancePolicy` is the former name of this method and was obsolete in 4.x/5.x. It never resolved the policy type either; the name overstated what it did. The route-builder extensions were removed in 6.0 and must be replaced with `MarkGovernancePolicy` without behavior change. For the same reason, the controller attribute formerly named `[RequireGovernancePolicy]` is `[GovernancePolicy]` in 6.0.
 
 Endpoints that intentionally prefer a latency-optimized first-block fast-abort policy path can add endpoint metadata:
 
@@ -101,12 +101,12 @@ app.MapPost("/high-risk-action", handler)
     .ShortCircuitOnFirstDenial();
 ```
 
-The descriptor exposes this as `ShortCircuitOnFirstDenial` and includes `endpoint.short_circuit_on_first_denial` in descriptor metadata. Host-owned policy wiring remains responsible for mapping that endpoint preference into `AsiBackbonePolicyEvaluatorOptions.ShortCircuitOnFirstDenial` when constructing or resolving the evaluator.
+The descriptor exposes this as `ShortCircuitOnFirstDenial` and includes `endpoint.short_circuit_on_first_denial` in descriptor metadata. Host-owned policy wiring remains responsible for mapping that endpoint preference into `GovernancePolicyOptions.ShortCircuitOnFirstDenial` when constructing or resolving the evaluator.
 
 ## Controller/action attribute path
 
 ```csharp
-[RequireGovernancePolicy(typeof(MyStrictPolicy))]
+[GovernancePolicy(typeof(MyStrictPolicy))]
 [RequireLiabilityHandshake]
 [RequireCapabilityGrant("robotics.execute")]
 [EmitGovernanceAudit]
@@ -121,7 +121,7 @@ The attribute model is designed to feel familiar to ASP.NET Core developers who 
 Endpoint-scoped fast-abort metadata is also available as an attribute:
 
 ```csharp
-[RequireGovernancePolicy(typeof(MyStrictPolicy))]
+[GovernancePolicy(typeof(MyStrictPolicy))]
 [ShortCircuitOnFirstDenial]
 public IActionResult ExecuteLatencySensitiveAction()
 {
@@ -134,10 +134,10 @@ public IActionResult ExecuteLatencySensitiveAction()
 When endpoint governance metadata is present, the middleware can:
 
 1. Resolve the selected endpoint metadata.
-2. Build a safe `AsiBackboneConstraintEvaluationContext` using HTTP request correlation data.
+2. Build a safe `GovernanceEvaluationContext` using HTTP request correlation data.
 3. Invoke the host-registered policy evaluator when policy metadata exists.
 4. Invoke the host-registered capability validator when capability scopes exist.
-5. Emit `AuditResidue` through the host-owned audit sink when audit emission is requested.
+5. Emit `DecisionReceipt` through the host-owned audit sink when audit emission is requested.
 6. Return an acknowledgment challenge when the governance decision requires acknowledgment and the endpoint requested liability-handshake support.
 7. Block execution with a safe HTTP result when policy, capability, or configuration checks fail closed.
 
@@ -149,7 +149,7 @@ The ergonomic endpoint layer deliberately does not own persistence. Durable audi
 | --- | --- |
 | Endpoint metadata and middleware orchestration | `AsiBackbone.AspNetCore` |
 | Policy constraints and decision policy | Host/Core evaluator registration |
-| Capability-grant source, proof validation, and replay handling | Host-owned `IAsiBackboneEndpointCapabilityGrantValidator` |
+| Capability-grant source, proof validation, and replay handling | Host-owned `IEndpointCapabilityGrantValidator` |
 | Audit sink, ledger store, outbox store, and transactions | Host-owned storage/integration layer |
 | Legal/compliance interpretation | Host governance process |
 
@@ -157,10 +157,10 @@ High-throughput hosts should treat every host-owned row in this table as product
 
 ## Failure behavior
 
-`AsiBackboneEndpointGovernanceOptions` controls fail-closed behavior for missing host services:
+`EndpointGovernanceOptions` controls fail-closed behavior for missing host services:
 
 ```csharp
-builder.Services.Configure<AsiBackboneEndpointGovernanceOptions>(options =>
+builder.Services.Configure<EndpointGovernanceOptions>(options =>
 {
     options.FailClosedWhenPolicyEvaluatorMissing = true;
     options.FailClosedWhenCapabilityValidatorMissing = true;
@@ -177,7 +177,7 @@ The default endpoint governance service uses this generic 403 path for ordinary 
 Custom failure results remain supported. A host-owned governance service can return an explicit `FailureResult`, and that result is executed instead of the generic default. Hosts that prefer richer API responses for generic 403 denials can configure a safe factory:
 
 ```csharp
-builder.Services.Configure<AsiBackboneEndpointGovernanceOptions>(options =>
+builder.Services.Configure<EndpointGovernanceOptions>(options =>
 {
     options.DefaultForbiddenResultFactory = _ => Results.Problem(
         title: "Forbidden.",
@@ -190,7 +190,7 @@ Use richer ProblemDetails responses only when the response body is safe for the 
 
 ## Endpoint metadata mode
 
-Endpoint governance builds a normalized metadata dictionary for policy evaluation, audit residue, acknowledgment challenges, and development diagnostics. The default `Full` mode preserves the existing traceability behavior and includes values such as:
+Endpoint governance builds a normalized metadata dictionary for policy evaluation, decision receipt, acknowledgment challenges, and development diagnostics. The default `Full` mode preserves the existing traceability behavior and includes values such as:
 
 - `endpoint.operation_name`
 - `endpoint.requires_liability_handshake`
@@ -202,13 +202,13 @@ Endpoint governance builds a normalized metadata dictionary for policy evaluatio
 High-throughput production hosts that have measured endpoint metadata creation as meaningful overhead can opt into reduced metadata:
 
 ```csharp
-builder.Services.Configure<AsiBackboneEndpointGovernanceOptions>(options =>
+builder.Services.Configure<EndpointGovernanceOptions>(options =>
 {
-    options.MetadataMode = AsiBackboneEndpointGovernanceMetadataMode.Reduced;
+    options.MetadataMode = EndpointGovernanceMetadataMode.Reduced;
 });
 ```
 
-`Reduced` mode forwards only `endpoint.operation_name` through the metadata dictionary. The descriptor still uses the full ASP.NET Core endpoint metadata internally to decide whether policy evaluation, capability validation, audit emission, or acknowledgment handling should run. The tradeoff is that host policy evaluators, audit sinks, acknowledgment stores, and development diagnostics will not receive the omitted metadata values through `AsiBackboneConstraintEvaluationContext.Metadata` or related metadata payloads.
+`Reduced` mode forwards only `endpoint.operation_name` through the metadata dictionary. The descriptor still uses the full ASP.NET Core endpoint metadata internally to decide whether policy evaluation, capability validation, audit emission, or acknowledgment handling should run. The tradeoff is that host policy evaluators, audit sinks, acknowledgment stores, and development diagnostics will not receive the omitted metadata values through `GovernanceEvaluationContext.Metadata` or related metadata payloads.
 
 Do not enable reduced metadata if host policies depend on `endpoint.policy_types`, `endpoint.capability_scopes`, or other endpoint metadata values. Prefer the default `Full` mode until benchmark output shows that the reduced path is worth the loss of diagnostic context.
 
@@ -217,7 +217,7 @@ Do not enable reduced metadata if host policies depend on `endpoint.policy_types
 Local development hosts can opt into richer ProblemDetails diagnostics for endpoint governance failures:
 
 ```csharp
-builder.Services.Configure<AsiBackboneEndpointGovernanceOptions>(options =>
+builder.Services.Configure<EndpointGovernanceOptions>(options =>
 {
     options.EnableDevelopmentDiagnostics = builder.Environment.IsDevelopment();
     options.DevelopmentDiagnosticsDocumentationBaseUrl = "https://asibackbone.github.io/AsiBackbone/articles/";
@@ -237,7 +237,7 @@ By default, endpoint governance remains opt-in. Endpoints without AsiBackbone go
 Regulated or governance-sensitive hosts can enable fail-closed metadata enforcement:
 
 ```csharp
-builder.Services.Configure<AsiBackboneEndpointGovernanceOptions>(options =>
+builder.Services.Configure<EndpointGovernanceOptions>(options =>
 {
     options.RequireGovernanceMetadata = true;
 });
@@ -249,4 +249,4 @@ When enabled, selected endpoints without governance metadata are blocked before 
 
 Manual wire-up remains the most explicit path for complex flows. Use manual integration when the endpoint requires a custom transaction boundary, multiple persistence stores, custom signing, outbox enqueue-before-execution semantics, or workflow-specific acknowledgment handling.
 
-Use the ergonomic layer when the endpoint follows the common pattern: read metadata, evaluate policy, validate capability, optionally emit audit residue, and either continue or return a safe governance response.
+Use the ergonomic layer when the endpoint follows the common pattern: read metadata, evaluate policy, validate capability, optionally emit decision receipt, and either continue or return a safe governance response.

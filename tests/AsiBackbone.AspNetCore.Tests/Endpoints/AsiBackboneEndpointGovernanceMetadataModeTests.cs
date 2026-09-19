@@ -13,17 +13,17 @@ using Xunit;
 namespace AsiBackbone.AspNetCore.Tests.Endpoints;
 
 /// <summary>
-/// Tests for the AsiBackboneEndpointGovernanceMetadataMode enumeration and its effects on endpoint governance metadata generation and evaluation.
+/// Tests for the EndpointGovernanceMetadataMode enumeration and its effects on endpoint governance metadata generation and evaluation.
 /// </summary>
 public sealed class AsiBackboneEndpointGovernanceMetadataModeTests
 {
     /// <summary>
-    /// Tests that the default behavior of converting an AsiBackboneEndpointGovernanceDescriptor to metadata includes all expected metadata entries when using the full metadata mode.
+    /// Tests that the default behavior of converting an EndpointGovernanceDescriptor to metadata includes all expected metadata entries when using the full metadata mode.
     /// </summary>
     [Fact]
     public void DescriptorToMetadataDefaultsToFullMetadata()
     {
-        AsiBackboneEndpointGovernanceDescriptor descriptor = CreateDescriptor();
+        EndpointGovernanceDescriptor descriptor = CreateDescriptor();
 
         IReadOnlyDictionary<string, string> metadata = descriptor.ToMetadata();
 
@@ -40,9 +40,9 @@ public sealed class AsiBackboneEndpointGovernanceMetadataModeTests
     [Fact]
     public void DescriptorToMetadataCanUseReducedMode()
     {
-        AsiBackboneEndpointGovernanceDescriptor descriptor = CreateDescriptor();
+        EndpointGovernanceDescriptor descriptor = CreateDescriptor();
 
-        IReadOnlyDictionary<string, string> metadata = descriptor.ToMetadata(AsiBackboneEndpointGovernanceMetadataMode.Reduced);
+        IReadOnlyDictionary<string, string> metadata = descriptor.ToMetadata(EndpointGovernanceMetadataMode.Reduced);
 
         Assert.Equal("sample.metadata", metadata["endpoint.operation_name"]);
 
@@ -67,9 +67,9 @@ public sealed class AsiBackboneEndpointGovernanceMetadataModeTests
     {
         var evaluator = new CapturingPolicyEvaluator();
         using ServiceProvider services = new ServiceCollection()
-            .Configure<AsiBackboneEndpointGovernanceOptions>(options => options.MetadataMode = AsiBackboneEndpointGovernanceMetadataMode.Reduced)
+            .Configure<EndpointGovernanceOptions>(options => options.MetadataMode = EndpointGovernanceMetadataMode.Reduced)
             .AddAsiBackboneAspNetCore()
-            .AddSingleton<IAsiBackbonePolicyEvaluator<AsiBackboneConstraintEvaluationContext>>(evaluator)
+            .AddSingleton<IGovernancePolicyEvaluator<GovernanceEvaluationContext>>(evaluator)
             .BuildServiceProvider(validateScopes: true);
         using IServiceScope scope = services.CreateScope();
         var httpContext = new DefaultHttpContext
@@ -81,13 +81,13 @@ public sealed class AsiBackboneEndpointGovernanceMetadataModeTests
         var endpoint = new Endpoint(
             static _ => Task.CompletedTask,
             new EndpointMetadataCollection(
-                new RequireGovernancePolicyAttribute(typeof(SamplePolicy)),
+                new GovernancePolicyAttribute(typeof(SamplePolicy)),
                 new RequireLiabilityHandshakeAttribute()),
             "sample.metadata.reduced");
-        var descriptor = AsiBackboneEndpointGovernanceDescriptor.FromEndpoint(endpoint);
-        IAsiBackboneEndpointGovernanceService service = scope.ServiceProvider.GetRequiredService<IAsiBackboneEndpointGovernanceService>();
+        var descriptor = EndpointGovernanceDescriptor.FromEndpoint(endpoint);
+        IEndpointGovernanceService service = scope.ServiceProvider.GetRequiredService<IEndpointGovernanceService>();
 
-        AsiBackboneEndpointGovernanceResult result = await service.EvaluateAsync(httpContext, descriptor, TestContext.Current.CancellationToken);
+        EndpointGovernanceResult result = await service.EvaluateAsync(httpContext, descriptor, TestContext.Current.CancellationToken);
 
         Assert.True(result.CanExecute);
         Assert.NotNull(evaluator.CapturedMetadata);
@@ -98,9 +98,9 @@ public sealed class AsiBackboneEndpointGovernanceMetadataModeTests
         Assert.Equal("sample.metadata.reduced", evaluator.CapturedMetadata["endpoint.operation_name"]);
         Assert.Equal(
             "trace-reduced-metadata",
-            evaluator.CapturedMetadata[AsiBackboneHttpRequestMetadataKeys.TraceIdentifier]);
+            evaluator.CapturedMetadata[GovernanceHttpRequestMetadataKeys.TraceIdentifier]);
         Assert.Equal(
-            descriptor.ToMetadata(AsiBackboneEndpointGovernanceMetadataMode.Full)["endpoint.policy_types"],
+            descriptor.ToMetadata(EndpointGovernanceMetadataMode.Full)["endpoint.policy_types"],
             evaluator.CapturedMetadata["endpoint.policy_types"]);
         Assert.DoesNotContain("endpoint.requires_liability_handshake", evaluator.CapturedMetadata.Keys, StringComparer.Ordinal);
     }
@@ -115,10 +115,10 @@ public sealed class AsiBackboneEndpointGovernanceMetadataModeTests
             static _ => Task.CompletedTask,
             new EndpointMetadataCollection(new EmitGovernanceAuditAttribute()),
             "sample.metadata.reduced.nopolicy");
-        var descriptor = AsiBackboneEndpointGovernanceDescriptor.FromEndpoint(endpoint);
+        var descriptor = EndpointGovernanceDescriptor.FromEndpoint(endpoint);
 
         IReadOnlyDictionary<string, string> reduced =
-            descriptor.ToMetadata(AsiBackboneEndpointGovernanceMetadataMode.Reduced);
+            descriptor.ToMetadata(EndpointGovernanceMetadataMode.Reduced);
 
         KeyValuePair<string, string> item = Assert.Single(reduced);
         Assert.Equal("endpoint.operation_name", item.Key);
@@ -134,16 +134,16 @@ public sealed class AsiBackboneEndpointGovernanceMetadataModeTests
         var endpoint = new Endpoint(
             static _ => Task.CompletedTask,
             new EndpointMetadataCollection(
-                new RequireGovernancePolicyAttribute(typeof(SamplePolicy)),
-                new RequireGovernancePolicyAttribute(typeof(SecondSamplePolicy))),
+                new GovernancePolicyAttribute(typeof(SamplePolicy)),
+                new GovernancePolicyAttribute(typeof(SecondSamplePolicy))),
             "sample.metadata.reduced.multi");
-        var descriptor = AsiBackboneEndpointGovernanceDescriptor.FromEndpoint(endpoint);
+        var descriptor = EndpointGovernanceDescriptor.FromEndpoint(endpoint);
 
         IReadOnlyDictionary<string, string> reduced =
-            descriptor.ToMetadata(AsiBackboneEndpointGovernanceMetadataMode.Reduced);
+            descriptor.ToMetadata(EndpointGovernanceMetadataMode.Reduced);
 
         Assert.Equal(
-            descriptor.ToMetadata(AsiBackboneEndpointGovernanceMetadataMode.Full)["endpoint.policy_types"],
+            descriptor.ToMetadata(EndpointGovernanceMetadataMode.Full)["endpoint.policy_types"],
             reduced["endpoint.policy_types"]);
     }
 
@@ -162,10 +162,10 @@ public sealed class AsiBackboneEndpointGovernanceMetadataModeTests
     {
         using ServiceProvider services = new ServiceCollection()
             .AddSingleton<IWebHostEnvironment>(new TestWebHostEnvironment("Development"))
-            .Configure<AsiBackboneEndpointGovernanceOptions>(options =>
+            .Configure<EndpointGovernanceOptions>(options =>
             {
                 options.EnableDevelopmentDiagnostics = true;
-                options.MetadataMode = AsiBackboneEndpointGovernanceMetadataMode.Reduced;
+                options.MetadataMode = EndpointGovernanceMetadataMode.Reduced;
             })
             .AddAsiBackboneAspNetCore()
             .BuildServiceProvider(validateScopes: true);
@@ -181,10 +181,10 @@ public sealed class AsiBackboneEndpointGovernanceMetadataModeTests
             static _ => Task.CompletedTask,
             new EndpointMetadataCollection(new RequireCapabilityGrantAttribute("robotics.execute")),
             "sample.metadata.diagnostics");
-        var descriptor = AsiBackboneEndpointGovernanceDescriptor.FromEndpoint(endpoint);
-        IAsiBackboneEndpointGovernanceService service = scope.ServiceProvider.GetRequiredService<IAsiBackboneEndpointGovernanceService>();
+        var descriptor = EndpointGovernanceDescriptor.FromEndpoint(endpoint);
+        IEndpointGovernanceService service = scope.ServiceProvider.GetRequiredService<IEndpointGovernanceService>();
 
-        AsiBackboneEndpointGovernanceResult result = await service.EvaluateAsync(httpContext, descriptor, TestContext.Current.CancellationToken);
+        EndpointGovernanceResult result = await service.EvaluateAsync(httpContext, descriptor, TestContext.Current.CancellationToken);
         Assert.NotNull(result.FailureResult);
         await result.FailureResult.ExecuteAsync(httpContext);
 
@@ -195,18 +195,18 @@ public sealed class AsiBackboneEndpointGovernanceMetadataModeTests
         Assert.DoesNotContain("endpoint.emit_governance_audit", body, StringComparison.Ordinal);
     }
 
-    private static AsiBackboneEndpointGovernanceDescriptor CreateDescriptor()
+    private static EndpointGovernanceDescriptor CreateDescriptor()
     {
         var endpoint = new Endpoint(
             static _ => Task.CompletedTask,
             new EndpointMetadataCollection(
-                new RequireGovernancePolicyAttribute(typeof(SamplePolicy)),
+                new GovernancePolicyAttribute(typeof(SamplePolicy)),
                 new RequireLiabilityHandshakeAttribute(),
                 new RequireCapabilityGrantAttribute("robotics.execute"),
                 new EmitGovernanceAuditAttribute()),
             "sample.metadata");
 
-        return AsiBackboneEndpointGovernanceDescriptor.FromEndpoint(endpoint);
+        return EndpointGovernanceDescriptor.FromEndpoint(endpoint);
     }
 
     private static async Task<string> ReadResponseBodyAsync(HttpContext httpContext)
@@ -221,12 +221,12 @@ public sealed class AsiBackboneEndpointGovernanceMetadataModeTests
     {
     }
 
-    private sealed class CapturingPolicyEvaluator : IAsiBackbonePolicyEvaluator<AsiBackboneConstraintEvaluationContext>
+    private sealed class CapturingPolicyEvaluator : IGovernancePolicyEvaluator<GovernanceEvaluationContext>
     {
         public IReadOnlyDictionary<string, string>? CapturedMetadata { get; private set; }
 
         public ValueTask<GovernanceDecision> EvaluateAsync(
-            AsiBackboneConstraintEvaluationContext context,
+            GovernanceEvaluationContext context,
             CancellationToken cancellationToken = default)
         {
             cancellationToken.ThrowIfCancellationRequested();

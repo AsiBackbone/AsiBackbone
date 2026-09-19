@@ -2,7 +2,7 @@
 
 Issue: #512.
 
-This guide documents the production runtime signing path for AsiBackbone governance residue when a host wants managed-key signing without making AsiBackbone responsible for key custody or cloud/provider-specific key-management behavior.
+This guide documents the production runtime signing path for AsiBackbone governance receipt when a host wants managed-key signing without making AsiBackbone responsible for key custody or cloud/provider-specific key-management behavior.
 
 AsiBackbone is a governance spine for accountable decision flow. It is not a key-management platform, HSM appliance, cloud KMS wrapper, compliance certification service, immutable ledger, or legal non-repudiation product by itself.
 
@@ -27,7 +27,7 @@ Do not collapse these concerns into one claim:
 | --- | --- | --- |
 | NuGet package signing | Whether published `.nupkg` files are signed release artifacts. | Deferred unless a reviewed package-signing process is adopted. See the consumer verification guide. |
 | GitHub provenance and SBOM | Source Link, repository metadata, package SBOMs, and workflow provenance where available. | Useful supply-chain evidence, but not package signing and not runtime audit signing. |
-| Runtime governance-residue signing | A host signs audit residue, outbox records, or decision receipts through configured signing infrastructure. | Supported through provider-neutral abstractions and the managed-key adapter boundary; production key custody remains host-owned. |
+| Runtime decision-receipt signing | A host signs decision receipts, audit ledger records, or outbox records through configured signing infrastructure. | Supported through provider-neutral abstractions and the managed-key adapter boundary; production key custody remains host-owned. |
 
 A package can have Source Link and SBOM provenance without being maintainer-signed. A governance record can be signed at runtime without proving legal non-repudiation. A signed governance record still requires verification, durable storage controls, key-retention policy, monitoring, and incident response before a host should make stronger integrity claims.
 
@@ -56,7 +56,7 @@ The consuming host owns the concrete client and operating environment.
 
 AsiBackbone provides:
 
-- `IAsiBackboneSigningService` and `IAsiBackboneSignatureVerificationService` abstractions in Core;
+- `IGovernanceSigningService` and `IGovernanceSignatureVerificationService` abstractions in Core;
 - canonical payload/hash contracts and signing-ready metadata fields;
 - `IManagedKeySigningClient` as the host-owned client boundary;
 - `ManagedKeySigningOptions` for provider descriptor, key ID, key version, hash/signature algorithm descriptors, retry settings, and failure behavior;
@@ -80,7 +80,9 @@ The consuming host provides:
 
 ## Minimal host-owned adapter shape
 
-A production host implements `IManagedKeySigningClient` around its selected provider. The client signs the precomputed AsiBackbone signing hash and returns provider-neutral metadata. It must not return private key material, tokens, secrets, or raw credential material.
+A production host implements `IManagedKeySigningClient` around its selected provider. The client signs `ManagedKeySignRequest.SignatureInput` and returns provider-neutral metadata. It must not return private key material, tokens, secrets, or raw credential material.
+
+Since 6.0 the signature input is the version 1 canonical JSON document described in [What the signature covers](cryptographic-security-posture.md#what-the-signature-covers), not the hash text. Pass the bytes as the message to a message-signing API, or hash them with the key's digest algorithm before calling a digest-signing API. A client that still signs `SigningHash` produces signatures that fail verification. The host's `IGovernanceSignatureVerificationService` must likewise verify `SignatureVerificationRequest.SignatureInput`, resolve its verification key from the recorded key ID and key version, and reject provider labels it does not own.
 
 ```csharp
 services.AddSingleton<IManagedKeySigningClient, HostOwnedManagedKeySigningClient>();
@@ -124,7 +126,7 @@ Production-oriented managed-key registration fails closed by default because `Re
 
 When signing is required for a governed operation, a host should usually treat provider unavailability, unsupported algorithms, key mismatch, missing required key version, or verification failure as a denial, deferral, escalation, or dead-letter condition according to host policy.
 
-Unsigned failure metadata is useful for local validation, diagnostics, and explicitly policy-routed fallback. It is not a successful signature and must not be described as signed governance residue.
+Unsigned failure metadata is useful for local validation, diagnostics, and explicitly policy-routed fallback. It is not a successful signature and must not be described as signed governance receipt.
 
 ## Verification path
 

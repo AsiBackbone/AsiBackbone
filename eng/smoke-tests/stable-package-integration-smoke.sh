@@ -62,6 +62,9 @@ for project in "${package_projects[@]}"; do
   echo
 done
 
+# Use a fresh consumer cache: release-branch builds can share a version with published 5.x packages.
+export NUGET_PACKAGES="$(to_dotnet_path "$work_root/.nuget/packages")"
+
 cat > "$work_root/NuGet.config" <<NUGETCONFIG
 <?xml version="1.0" encoding="utf-8"?>
 <configuration>
@@ -70,6 +73,14 @@ cat > "$work_root/NuGet.config" <<NUGETCONFIG
     <add key="local-asi-backbone" value="$package_output" />
     <add key="nuget.org" value="https://api.nuget.org/v3/index.json" />
   </packageSources>
+  <packageSourceMapping>
+    <packageSource key="local-asi-backbone">
+      <package pattern="AsiBackbone.*" />
+    </packageSource>
+    <packageSource key="nuget.org">
+      <package pattern="*" />
+    </packageSource>
+  </packageSourceMapping>
 </configuration>
 NUGETCONFIG
 
@@ -168,11 +179,11 @@ public sealed class StablePackageIntegrationSmokeTests
     [Fact]
     public async Task CoreAndInMemoryAuditPackagesComposeDecisionAndStoreResidue()
     {
-        var evaluator = new DefaultAsiBackbonePolicyEvaluator<AsiBackboneConstraintEvaluationContext>(
-            [new StableRegionConstraint()]);
+        var evaluator = new DefaultGovernancePolicyEvaluator<GovernanceEvaluationContext>(
+            [new StableRegionConstraint()], threatModelContributors: null, decisionPolicy: null, options: null, logger: null);
 
         string correlationId = $"stable-core-{Guid.NewGuid():N}";
-        var context = new AsiBackboneConstraintEvaluationContext(
+        var context = new GovernanceEvaluationContext(
             correlationId: correlationId,
             policyVersion: "stable-package-policy-v1",
             policyHash: "stable-package-policy-hash",
@@ -190,8 +201,8 @@ public sealed class StablePackageIntegrationSmokeTests
         Assert.True(decision.CanProceed);
         Assert.Equal(correlationId, decision.CorrelationId);
 
-        IAsiBackboneActorContext actor = AsiBackboneActorContext.Human("stable-user", "Stable User");
-        AuditResidue residue = AuditResidue.FromDecision(
+        IGovernanceActorContext actor = GovernanceActorContext.Human("stable-user", "Stable User");
+        DecisionReceipt residue = DecisionReceipt.FromDecision(
             actor,
             "stable.core.allow",
             decision,
@@ -203,7 +214,7 @@ public sealed class StablePackageIntegrationSmokeTests
             residue,
             TestContext.Current.CancellationToken);
 
-        IAsiBackboneAuditResidue stored = Assert.Single(ledger.Records);
+        IDecisionReceipt stored = Assert.Single(ledger.Records);
         Assert.Equal(residue.EventId, stored.EventId);
         Assert.Equal(correlationId, stored.CorrelationId);
         Assert.Single(ledger.GetByCorrelationId(correlationId));
@@ -249,7 +260,7 @@ public sealed class StablePackageIntegrationSmokeTests
     public async Task StubbedAuditSinkCapturesResidueUsingPublicContract()
     {
         var sink = new CapturingAuditSink();
-        IAsiBackboneAuditSink auditSink = sink;
+        IDecisionReceiptSink auditSink = sink;
         string correlationId = $"stable-stub-{Guid.NewGuid():N}";
 
         GovernanceDecision decision = GovernanceDecision.RequireAcknowledgment(
@@ -259,8 +270,8 @@ public sealed class StablePackageIntegrationSmokeTests
             policyVersion: "stable-package-policy-v1",
             policyHash: "stable-package-policy-hash");
 
-        AuditResidue residue = AuditResidue.FromDecision(
-            AsiBackboneActorContext.Service("stable-service", "Stable Service"),
+        DecisionReceipt residue = DecisionReceipt.FromDecision(
+            GovernanceActorContext.Service("stable-service", "Stable Service"),
             "stable.stubbed-sink.acknowledgment",
             decision,
             metadata: new Dictionary<string, string>(StringComparer.Ordinal)
@@ -273,7 +284,7 @@ public sealed class StablePackageIntegrationSmokeTests
             residue,
             TestContext.Current.CancellationToken);
 
-        IAsiBackboneAuditResidue captured = Assert.Single(sink.Records);
+        IDecisionReceipt captured = Assert.Single(sink.Records);
         Assert.Equal(residue.EventId, captured.EventId);
         Assert.Equal(correlationId, captured.CorrelationId);
         Assert.Equal(nameof(GovernanceDecisionOutcome.AcknowledgmentRequired), captured.Outcome);
@@ -361,7 +372,7 @@ internal static class StableSmokeHost
             options.UseSqlite($"Data Source={databasePath}"));
         builder.Services.AddScoped<DbContext>(serviceProvider =>
             serviceProvider.GetRequiredService<StableSmokeDbContext>());
-        builder.Services.AddScoped<IAsiBackboneAuditLedgerStore, EfCoreAuditLedgerStore>();
+        builder.Services.AddScoped<IGovernanceAuditLedgerStore, EfCoreAuditLedgerStore>();
 
         WebApplication app = builder.Build();
 
@@ -372,10 +383,10 @@ internal static class StableSmokeHost
         }
 
         app.MapGet("/stable-smoke", async (
-            IAsiBackboneHttpActorContextResolver actorResolver,
-            IAsiBackboneHttpRequestCorrelationResolver correlationResolver,
-            IAsiBackboneAcknowledgmentChallengeService challengeService,
-            IAsiBackboneAuditLedgerStore ledgerStore,
+            IHttpGovernanceActorContextResolver actorResolver,
+            IHttpGovernanceRequestCorrelationResolver correlationResolver,
+            IAcknowledgmentChallengeService challengeService,
+            IGovernanceAuditLedgerStore ledgerStore,
             CancellationToken cancellationToken) =>
         {
             string correlationId = $"stable-http-{Guid.NewGuid():N}";
@@ -385,8 +396,8 @@ internal static class StableSmokeHost
                 policyVersion: "stable-http-policy-v1",
                 policyHash: "stable-http-policy-hash");
 
-            AuditResidue residue = AuditResidue.FromDecision(
-                AsiBackboneActorContext.Service("stable-http-host", "Stable HTTP Host"),
+            DecisionReceipt residue = DecisionReceipt.FromDecision(
+                GovernanceActorContext.Service("stable-http-host", "Stable HTTP Host"),
                 "stable.http.allow",
                 decision,
                 metadata: new Dictionary<string, string>(StringComparer.Ordinal)
@@ -395,7 +406,7 @@ internal static class StableSmokeHost
                     ["storage"] = "sqlite"
                 });
 
-            AuditLedgerRecord record = AuditLedgerRecord.FromResidue(residue);
+            AuditLedgerRecord record = AuditLedgerRecord.FromDecisionReceipt(residue);
             OperationResult<AuditLedgerRecord> appendResult = await ledgerStore
                 .AppendAsync(record, cancellationToken)
                 .ConfigureAwait(false);
@@ -431,12 +442,12 @@ internal sealed class StableSmokeDbContext(DbContextOptions<StableSmokeDbContext
     }
 }
 
-internal sealed class StableRegionConstraint : IAsiBackboneConstraint<AsiBackboneConstraintEvaluationContext>
+internal sealed class StableRegionConstraint : IGovernanceConstraint<GovernanceEvaluationContext>
 {
     public string Name => "stable.region";
 
     public ValueTask<ConstraintEvaluationResult> EvaluateAsync(
-        AsiBackboneConstraintEvaluationContext context,
+        GovernanceEvaluationContext context,
         CancellationToken cancellationToken = default)
     {
         cancellationToken.ThrowIfCancellationRequested();
@@ -452,14 +463,14 @@ internal sealed class StableRegionConstraint : IAsiBackboneConstraint<AsiBackbon
     }
 }
 
-internal sealed class CapturingAuditSink : IAsiBackboneAuditSink
+internal sealed class CapturingAuditSink : IDecisionReceiptSink
 {
-    private readonly List<IAsiBackboneAuditResidue> records = [];
+    private readonly List<IDecisionReceipt> records = [];
 
-    public IReadOnlyList<IAsiBackboneAuditResidue> Records => records.AsReadOnly();
+    public IReadOnlyList<IDecisionReceipt> Records => records.AsReadOnly();
 
     public ValueTask WriteAsync(
-        IAsiBackboneAuditResidue residue,
+        IDecisionReceipt residue,
         CancellationToken cancellationToken = default)
     {
         ArgumentNullException.ThrowIfNull(residue);

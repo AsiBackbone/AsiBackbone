@@ -17,7 +17,7 @@ For a governance package, these views all matter. Coverage helps show that polic
 
 ## Current quality posture
 
-The `3.x` stable package family keeps the repository bounded as Accountable Systems Infrastructure for governed .NET decision flow. The current quality posture combines broad repository gates with targeted hardening for high-risk surfaces:
+The `3.x` stable package family keeps the repository bounded as governance infrastructure for governed .NET decision flow. The current quality posture combines broad repository gates with targeted hardening for high-risk surfaces:
 
 - repository-wide 75% line coverage for the full solution;
 - Core-only 90% branch coverage for the framework-neutral governance engine;

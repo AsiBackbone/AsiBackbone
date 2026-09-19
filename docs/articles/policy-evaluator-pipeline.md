@@ -2,14 +2,14 @@
 
 This article documents the host-neutral policy evaluation loop for `AsiBackbone.Core`.
 
-The Core evaluator proves the governance spine without requiring ASP.NET Core, Entity Framework Core, a database, a web host, robotics integration, or an AI model runtime.
+The Core evaluator proves the policy decision pipeline without requiring ASP.NET Core, Entity Framework Core, a database, a web host, robotics integration, or an AI model runtime.
 
 ```text
 intent or request
   -> policy evaluation context
   -> constraint evaluation
   -> governance decision
-  -> audit residue
+  -> decision receipt
   -> optional in-memory audit ledger
 ```
 
@@ -19,7 +19,7 @@ The current stable package-family ownership model is:
 
 | Area | Responsibility |
 | --- | --- |
-| `AsiBackbone.Core` | Policy evaluator contracts, the default evaluator, decision composition, constraint contracts, decisions, audit residue, and audit sink contracts. |
+| `AsiBackbone.Core` | Policy evaluator contracts, the default evaluator, decision composition, constraint contracts, decisions, decision receipt, and audit sink contracts. |
 | `AsiBackbone.Storage.InMemory` | In-process audit ledger support for tests, samples, and local validation hosts. |
 | `AsiBackbone.AspNetCore` | Thin HTTP host adapters for service registration, current actor resolution, request correlation, audit enrichment, HTTP result mapping, and acknowledgment challenge helpers. |
 | `AsiBackbone.EntityFrameworkCore` | EF Core model configuration and durable accountability persistence while preserving host-owned `DbContext`, provider, migrations, and database lifecycle. |
@@ -28,7 +28,7 @@ A future package split may move shared contracts into a dedicated abstractions p
 
 ## Default evaluator
 
-`DefaultAsiBackbonePolicyEvaluator<TContext>` accepts a framework-neutral context and a collection of `IAsiBackboneConstraint<TContext>` instances.
+`DefaultGovernancePolicyEvaluator<TContext>` accepts a framework-neutral context and a collection of `IGovernanceConstraint<TContext>` instances.
 
 The evaluator runs each constraint and composes the resulting `ConstraintEvaluationResult` values into a single `GovernanceDecision`.
 
@@ -38,48 +38,37 @@ Composition rules are intentionally conservative:
 2. Warning is returned when no constraint blocks but at least one constraint warns.
 3. Allow is returned when constraints exist and no constraint blocks or warns.
 4. Not-applicable constraint results do not block the request.
-5. An optional `IAsiBackboneDecisionPolicy<TContext>` can raise the composed decision to deferred, acknowledgment-required, or escalation-recommended.
-6. When the supplied constraint collection is empty and `AsiBackbonePolicyEvaluatorOptions.DenyWhenNoConstraints` remains at its `3.x` default of `true`, the evaluator returns a denied decision with reason code `asibackbone.policy.no_constraints`.
-7. When `AsiBackbonePolicyEvaluatorOptions.ShortCircuitOnFirstDenial` is enabled, the evaluator stops after the first blocked constraint result and preserves reasons produced up to that point.
+5. An optional `IGovernanceDecisionPolicy<TContext>` can raise the composed decision to deferred, acknowledgment-required, or escalation-recommended.
+6. When the supplied constraint collection is empty and `GovernancePolicyOptions.DenyWhenNoConstraints` remains at its `3.x` default of `true`, the evaluator returns a denied decision with reason code `asibackbone.policy.no_constraints`.
+7. When `GovernancePolicyOptions.ShortCircuitOnFirstDenial` is enabled, the evaluator stops after the first blocked constraint result and preserves reasons produced up to that point.
 8. When full evaluation finds a denial, warning-only reasons are not copied into the final denied decision; the denied decision remains focused on blocking rationale.
-9. When `AsiBackbonePolicyEvaluatorOptions.TreatConstraintExceptionAsDenial` remains at its `3.x` default of `true`, an eligible non-cancellation, non-critical exception thrown by a constraint becomes a denied decision with reason code `asibackbone.policy.constraint_exception`.
+9. When `GovernancePolicyOptions.TreatConstraintExceptionAsDenial` remains at its `3.x` default of `true`, an eligible non-cancellation, non-critical exception thrown by a constraint becomes a denied decision with reason code `asibackbone.policy.constraint_exception`.
 10. Threat-model contributor exceptions also fail closed by default with reason code `asibackbone.threat.contributor_exception`.
 
 The evaluator propagates correlation, policy version, and policy hash metadata from the evaluation context into the composed governance decision.
 
-When an optional `ILogger<DefaultAsiBackbonePolicyEvaluator<TContext>>` is supplied and evaluation runs with zero constraints while `DenyWhenNoConstraints` is explicitly set to `false`, the evaluator emits a warning. This makes the intentional permissive empty-policy path visible in operational logs.
+When an optional `ILogger<DefaultGovernancePolicyEvaluator<TContext>>` is supplied and evaluation runs with zero constraints while `DenyWhenNoConstraints` is explicitly set to `false`, the evaluator emits a warning. This makes the intentional permissive empty-policy path visible in operational logs.
 
-## Constructor overload selection
+## Evaluator construction
 
-`DefaultAsiBackbonePolicyEvaluator<TContext>` keeps several constructor overloads so simple hosts, compatibility callers, and fully wired dependency-injection hosts can all create the evaluator. Pick the smallest overload that honestly represents the host posture, but do not drop configured options or diagnostics just to make registration shorter.
-
-| Overload group | Use when | Guidance |
-| --- | --- | --- |
-| Constraints only | The host accepts the `3.x` fail-closed defaults and has no custom decision policy, explicit evaluator options, threat contributors, or logger. | This is the simplest path. Empty policies deny, eligible constraint exceptions deny, and threat contributor exceptions deny. |
-| Constraints plus decision policy | The host wants normal constraint composition followed by a custom `IAsiBackboneDecisionPolicy<TContext>` that can raise or reshape the composed decision. | Use this when the policy needs outcomes such as defer, acknowledgment-required, or escalation-recommended after base composition. |
-| Constraints plus evaluator options | The host needs explicit settings for empty-policy denial, constraint-exception denial, fast-abort behavior, or threat-assessment downgrade protection. | Use this when the host intentionally overrides a default, such as setting `TreatConstraintExceptionAsDenial = false`. |
-| Constraints plus threat model contributors | The host wants pre-constraint threat contributors to inspect the context and emit actionable warnings or blocking decisions. | Use one of the overloads that accepts `IEnumerable<IThreatModelContributor<TContext>>`; include evaluator options when contributor exception behavior matters. |
-| Logger overloads | The host wants operational diagnostics for permissive empty policies, converted constraint exceptions, or converted threat-contributor exceptions. | Prefer the logger overload in production-style DI wiring so warnings and fail-closed conversions become visible in normal logging. |
-| Full overload | The host has constraints, threat contributors, an optional decision policy, configured options, and a logger. | This is the most explicit DI path and is usually the clearest choice for production registrations. |
-
-Strict or fail-closed hosts should pass configured options into the evaluator rather than constructing unrelated option instances at the call site. This is especially important with `AddAsiBackboneStrictGovernance()` or `UseStrictGovernanceProfile()`: those helpers configure `IOptions<AsiBackbonePolicyEvaluatorOptions>`, but they cannot rewrite a manually constructed options object that the host passes directly to the evaluator.
+In 6.0, use the evaluator builder for manual construction or the single constructor accepting constraints, threat contributors, decision policy, options, and logger. Pass null for optional dependencies that the host does not supply. Preserve configured options and diagnostics when wiring dependency injection. See [Upgrade from 5.x to 6.0](upgrade-500-to-600.md) for removed overloads.
 
 A DI registration that preserves the configured profile and operational diagnostics should resolve options and logger from the service provider:
 
 ```csharp
-builder.Services.AddSingleton<IAsiBackbonePolicyEvaluator<AsiBackboneConstraintEvaluationContext>>(serviceProvider =>
+builder.Services.AddSingleton<IGovernancePolicyEvaluator<GovernanceEvaluationContext>>(serviceProvider =>
 {
     var options = serviceProvider
-        .GetRequiredService<IOptions<AsiBackbonePolicyEvaluatorOptions>>()
+        .GetRequiredService<IOptions<GovernancePolicyOptions>>()
         .Value;
 
     var logger = serviceProvider
-        .GetService<ILogger<DefaultAsiBackbonePolicyEvaluator<AsiBackboneConstraintEvaluationContext>>>();
+        .GetService<ILogger<DefaultGovernancePolicyEvaluator<GovernanceEvaluationContext>>>();
 
-    return new DefaultAsiBackbonePolicyEvaluator<AsiBackboneConstraintEvaluationContext>(
-        serviceProvider.GetServices<IAsiBackboneConstraint<AsiBackboneConstraintEvaluationContext>>(),
-        serviceProvider.GetServices<IThreatModelContributor<AsiBackboneConstraintEvaluationContext>>(),
-        decisionPolicy: serviceProvider.GetService<IAsiBackboneDecisionPolicy<AsiBackboneConstraintEvaluationContext>>(),
+    return new DefaultGovernancePolicyEvaluator<GovernanceEvaluationContext>(
+        serviceProvider.GetServices<IGovernanceConstraint<GovernanceEvaluationContext>>(),
+        serviceProvider.GetServices<IThreatModelContributor<GovernanceEvaluationContext>>(),
+        decisionPolicy: serviceProvider.GetService<IGovernanceDecisionPolicy<GovernanceEvaluationContext>>(),
         options: options,
         logger: logger);
 });
@@ -90,7 +79,7 @@ For intentionally permissive local samples, tests, or migration flows, using exp
 ## Minimal usage example
 
 ```csharp
-var evaluator = DefaultAsiBackbonePolicyEvaluator.CreateBuilder<MyPolicyContext>()
+var evaluator = DefaultGovernancePolicyEvaluator.CreateBuilder<MyPolicyContext>()
     .AddConstraint(new AuthenticatedActorConstraint())
     .AddConstraint(new OwnershipConstraint())
     .AddConstraint(new RiskConstraint())
@@ -106,7 +95,7 @@ For host-owned orchestration examples, see [Custom Decision Policy Examples](cus
 
 ## Empty-policy behavior
 
-The `3.x` default keeps `AsiBackbonePolicyEvaluatorOptions.DenyWhenNoConstraints` set to `true`. That means an evaluator created with an empty constraint collection produces a denied decision with reason code:
+The `3.x` default keeps `GovernancePolicyOptions.DenyWhenNoConstraints` set to `true`. That means an evaluator created with an empty constraint collection produces a denied decision with reason code:
 
 ```text
 asibackbone.policy.no_constraints
@@ -117,8 +106,8 @@ This default exists because an empty collection may mean dependency-injection, c
 Hosts that intentionally run an unconstrained local validation flow can opt out:
 
 ```csharp
-var evaluator = DefaultAsiBackbonePolicyEvaluator.CreateBuilder<MyPolicyContext>()
-    .WithOptions(new AsiBackbonePolicyEvaluatorOptions
+var evaluator = DefaultGovernancePolicyEvaluator.CreateBuilder<MyPolicyContext>()
+    .WithOptions(new GovernancePolicyOptions
     {
         DenyWhenNoConstraints = false
     })
@@ -150,7 +139,7 @@ Exception-as-denial exists so the evaluator can fail closed when a constraint un
 
 ## Constraint exception behavior
 
-The `3.x` default keeps `AsiBackbonePolicyEvaluatorOptions.TreatConstraintExceptionAsDenial` set to `true`. When enabled, a non-cancellation, non-critical exception thrown by a constraint becomes a denied `GovernanceDecision` with reason code:
+The `3.x` default keeps `GovernancePolicyOptions.TreatConstraintExceptionAsDenial` set to `true`. When enabled, a non-cancellation, non-critical exception thrown by a constraint becomes a denied `GovernanceDecision` with reason code:
 
 ```text
 asibackbone.policy.constraint_exception
@@ -163,10 +152,10 @@ Public reason messages intentionally do not include exception messages, stack tr
 Hosts that intentionally require fail-fast exception propagation can opt out:
 
 ```csharp
-var evaluator = DefaultAsiBackbonePolicyEvaluator.CreateBuilder<MyPolicyContext>()
+var evaluator = DefaultGovernancePolicyEvaluator.CreateBuilder<MyPolicyContext>()
     .AddConstraints(constraintsFromConfiguration)
     .WithDecisionPolicy(new HighRiskDecisionPolicy())
-    .WithOptions(new AsiBackbonePolicyEvaluatorOptions
+    .WithOptions(new GovernancePolicyOptions
     {
         TreatConstraintExceptionAsDenial = false
     })
@@ -181,7 +170,7 @@ See [Constraint Exception Policy](constraint-exception-policy.md) for the design
 
 ## Warning-only reason handling when denial occurs
 
-`DefaultAsiBackbonePolicyEvaluator<TContext>` treats warning-only reasons as advisory audit context and denial reasons as the blocking rationale. When `ShortCircuitOnFirstDenial` is `false`, the evaluator keeps running after a denied constraint so it can aggregate every denial reason produced by the full active constraint structure. As soon as a denial appears in this full-evaluation mode, accumulated warning-only reasons are cleared from the composed decision and later warnings are ignored.
+`DefaultGovernancePolicyEvaluator<TContext>` treats warning-only reasons as advisory audit context and denial reasons as the blocking rationale. When `ShortCircuitOnFirstDenial` is `false`, the evaluator keeps running after a denied constraint so it can aggregate every denial reason produced by the full active constraint structure. As soon as a denial appears in this full-evaluation mode, accumulated warning-only reasons are cleared from the composed decision and later warnings are ignored.
 
 This differs from `ShortCircuitOnFirstDenial = true`. In fast-abort mode, the evaluator stops as soon as the first denial is seen. Warnings produced before that abort point remain in the denied decision because they are part of the evaluated path, while later constraints are intentionally skipped and cannot add denial or warning reasons.
 
@@ -192,10 +181,10 @@ By default, the evaluator runs every registered constraint so the resulting deci
 Latency-sensitive hosts can opt into first-denial fast-abort behavior:
 
 ```csharp
-var evaluator = DefaultAsiBackbonePolicyEvaluator.CreateBuilder<MyPolicyContext>()
+var evaluator = DefaultGovernancePolicyEvaluator.CreateBuilder<MyPolicyContext>()
     .AddConstraints(constraintsFromConfiguration)
     .WithDecisionPolicy(new HighRiskDecisionPolicy())
-    .WithOptions(new AsiBackbonePolicyEvaluatorOptions
+    .WithOptions(new GovernancePolicyOptions
     {
         ShortCircuitOnFirstDenial = true
     })
@@ -204,10 +193,10 @@ var evaluator = DefaultAsiBackbonePolicyEvaluator.CreateBuilder<MyPolicyContext>
 
 Use this mode only when the host explicitly prefers latency or throughput over complete constraint visibility. Keep the default full-evaluation mode for audit-heavy, diagnostic, or reviewer-facing paths.
 
-After the decision is produced, a host or gateway can create audit residue and write it through an audit sink:
+After the decision is produced, a host or gateway can create decision receipt and write it through an audit sink:
 
 ```csharp
-AuditResidue residue = AuditResidue.FromDecision(
+DecisionReceipt receipt = DecisionReceipt.FromDecision(
     actor,
     operationName,
     decision,

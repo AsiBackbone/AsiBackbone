@@ -22,7 +22,7 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorThreatModelingTests
     {
         TestPolicyContext context = CreateContext();
         bool contributorRan = false;
-        var evaluator = new DefaultAsiBackbonePolicyEvaluator<TestPolicyContext>(
+        var evaluator = new DefaultGovernancePolicyEvaluator<TestPolicyContext>(
             [new StaticConstraint(ConstraintEvaluationResult.Allow())],
             [new DelegateThreatContributor(
                 "no-threat-contributor",
@@ -30,7 +30,7 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorThreatModelingTests
                 {
                     contributorRan = true;
                     return ThreatAssessment.NoThreat();
-                })]);
+                })], decisionPolicy: null, options: null, logger: null);
 
         GovernanceDecision decision = await evaluator.EvaluateAsync(context, TestContext.Current.CancellationToken);
 
@@ -50,9 +50,9 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorThreatModelingTests
     public async Task EvaluateNullThreatAssessmentIsIgnored()
     {
         TestPolicyContext context = CreateContext();
-        var evaluator = new DefaultAsiBackbonePolicyEvaluator<TestPolicyContext>(
+        var evaluator = new DefaultGovernancePolicyEvaluator<TestPolicyContext>(
             [new StaticConstraint(ConstraintEvaluationResult.Allow())],
-            [new DelegateThreatContributor("null-threat-contributor", (_, _) => null!)]);
+            [new DelegateThreatContributor("null-threat-contributor", (_, _) => null!)], decisionPolicy: null, options: null, logger: null);
 
         GovernanceDecision decision = await evaluator.EvaluateAsync(context, TestContext.Current.CancellationToken);
 
@@ -71,7 +71,7 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorThreatModelingTests
     {
         TestPolicyContext context = CreateContext();
         bool constraintRan = false;
-        var evaluator = new DefaultAsiBackbonePolicyEvaluator<TestPolicyContext>(
+        var evaluator = new DefaultGovernancePolicyEvaluator<TestPolicyContext>(
             [new DelegateConstraint(
                 (_, _) =>
                 {
@@ -85,7 +85,7 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorThreatModelingTests
                     ThreatCategories.InputOversized,
                     "threat.input_oversized",
                     "Oversized input indicator was reported.",
-                    GovernanceDecisionOutcome.Allowed))]);
+                    GovernanceDecisionOutcome.Allowed))], decisionPolicy: null, options: null, logger: null);
 
         InvalidOperationException exception = await Assert.ThrowsAsync<InvalidOperationException>(
             async () => await evaluator.EvaluateAsync(context, TestContext.Current.CancellationToken));
@@ -105,7 +105,7 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorThreatModelingTests
     public async Task EvaluateDeferredThreatRecommendationReturnsDeferredDecision()
     {
         TestPolicyContext context = CreateContext();
-        var evaluator = new DefaultAsiBackbonePolicyEvaluator<TestPolicyContext>(
+        var evaluator = new DefaultGovernancePolicyEvaluator<TestPolicyContext>(
             [new StaticConstraint(ConstraintEvaluationResult.Allow())],
             [new StaticThreatContributor(
                 "deferred-threat-contributor",
@@ -114,7 +114,7 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorThreatModelingTests
                     ThreatCategories.RegionPolicyMismatch,
                     "threat.region_policy_mismatch",
                     "Region policy mismatch was reported.",
-                    GovernanceDecisionOutcome.Deferred))]);
+                    GovernanceDecisionOutcome.Deferred))], decisionPolicy: null, options: null, logger: null);
 
         GovernanceDecision decision = await evaluator.EvaluateAsync(context, TestContext.Current.CancellationToken);
 
@@ -133,7 +133,7 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorThreatModelingTests
     public async Task EvaluateAcknowledgmentThreatRecommendationReturnsAcknowledgmentRequiredDecision()
     {
         TestPolicyContext context = CreateContext();
-        var evaluator = new DefaultAsiBackbonePolicyEvaluator<TestPolicyContext>(
+        var evaluator = new DefaultGovernancePolicyEvaluator<TestPolicyContext>(
             [new StaticConstraint(ConstraintEvaluationResult.Allow())],
             [new StaticThreatContributor(
                 "ack-threat-contributor",
@@ -142,7 +142,7 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorThreatModelingTests
                     ThreatCategories.AuditIntegrityRisk,
                     "threat.audit_ack_required",
                     "Audit acknowledgment was requested.",
-                    GovernanceDecisionOutcome.AcknowledgmentRequired))]);
+                    GovernanceDecisionOutcome.AcknowledgmentRequired))], decisionPolicy: null, options: null, logger: null);
 
         GovernanceDecision decision = await evaluator.EvaluateAsync(context, TestContext.Current.CancellationToken);
 
@@ -162,7 +162,7 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorThreatModelingTests
     {
         TestPolicyContext context = CreateContext();
         var observedOrder = new List<string>();
-        var evaluator = new DefaultAsiBackbonePolicyEvaluator<TestPolicyContext>(
+        var evaluator = new DefaultGovernancePolicyEvaluator<TestPolicyContext>(
             [new StaticConstraint(ConstraintEvaluationResult.Allow())],
             [
                 new DelegateThreatContributor(
@@ -189,7 +189,7 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorThreatModelingTests
                             "Capability token mismatch was reported.",
                             GovernanceDecisionOutcome.Denied);
                     })
-            ]);
+            ], decisionPolicy: null, options: null, logger: null);
 
         GovernanceDecision decision = await evaluator.EvaluateAsync(context, TestContext.Current.CancellationToken);
 
@@ -220,16 +220,16 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorThreatModelingTests
     public async Task EvaluateThreatContributorExceptionFailsClosedByDefault()
     {
         TestPolicyContext context = CreateContext();
-        var evaluator = new DefaultAsiBackbonePolicyEvaluator<TestPolicyContext>(
+        var evaluator = new DefaultGovernancePolicyEvaluator<TestPolicyContext>(
             [new StaticConstraint(ConstraintEvaluationResult.Allow())],
-            [new ThrowingThreatContributor("throwing-threat-contributor")]);
+            [new ThrowingThreatContributor("throwing-threat-contributor")], decisionPolicy: null, options: null, logger: null);
 
         GovernanceDecision decision = await evaluator.EvaluateAsync(context, TestContext.Current.CancellationToken);
 
         Assert.True(decision.IsDenied);
         Assert.False(decision.CanProceed);
         Assert.Equal(
-            AsiBackbonePolicyEvaluatorOptions.DefaultThreatContributorExceptionReasonCode,
+            GovernancePolicyOptions.DefaultThreatContributorExceptionReasonCode,
             Assert.Single(decision.ReasonCodes));
         Assert.Equal(
             "throwing-threat-contributor",
@@ -246,14 +246,14 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorThreatModelingTests
     public async Task EvaluateThreatContributorExceptionPropagatesWhenFailClosedDisabled()
     {
         TestPolicyContext context = CreateContext();
-        var evaluator = new DefaultAsiBackbonePolicyEvaluator<TestPolicyContext>(
+        var evaluator = new DefaultGovernancePolicyEvaluator<TestPolicyContext>(
             [new StaticConstraint(ConstraintEvaluationResult.Allow())],
             [new ThrowingThreatContributor("throwing-threat-contributor")],
             decisionPolicy: null,
-            new AsiBackbonePolicyEvaluatorOptions
+            new GovernancePolicyOptions
             {
                 TreatThreatContributorExceptionAsDenial = false
-            });
+            }, logger: null);
 
         _ = await Assert.ThrowsAsync<InvalidOperationException>(
             async () => await evaluator.EvaluateAsync(context, TestContext.Current.CancellationToken));
@@ -269,7 +269,7 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorThreatModelingTests
     public async Task EvaluateThreatWarningCannotBeDowngradedToAllowByDecisionPolicyByDefault()
     {
         TestPolicyContext context = CreateContext();
-        var evaluator = new DefaultAsiBackbonePolicyEvaluator<TestPolicyContext>(
+        var evaluator = new DefaultGovernancePolicyEvaluator<TestPolicyContext>(
             [new StaticConstraint(ConstraintEvaluationResult.Allow())],
             [new StaticThreatContributor(
                 "warning-threat-contributor",
@@ -279,7 +279,7 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorThreatModelingTests
                     "threat.input_malformed",
                     "Malformed input indicator was reported.",
                     GovernanceDecisionOutcome.Warning))],
-            new AlwaysAllowDecisionPolicy());
+            new AlwaysAllowDecisionPolicy(), options: null, logger: null);
 
         GovernanceDecision decision = await evaluator.EvaluateAsync(context, TestContext.Current.CancellationToken);
 
@@ -298,7 +298,7 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorThreatModelingTests
     public async Task EvaluateThreatWarningCanBeDowngradedWhenProtectionDisabled()
     {
         TestPolicyContext context = CreateContext();
-        var evaluator = new DefaultAsiBackbonePolicyEvaluator<TestPolicyContext>(
+        var evaluator = new DefaultGovernancePolicyEvaluator<TestPolicyContext>(
             [new StaticConstraint(ConstraintEvaluationResult.Allow())],
             [new StaticThreatContributor(
                 "warning-threat-contributor",
@@ -309,10 +309,10 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorThreatModelingTests
                     "Malformed input indicator was reported.",
                     GovernanceDecisionOutcome.Warning))],
             new AlwaysAllowDecisionPolicy(),
-            new AsiBackbonePolicyEvaluatorOptions
+            new GovernancePolicyOptions
             {
                 PreventThreatAssessmentAllowDowngrade = false
-            });
+            }, logger: null);
 
         GovernanceDecision decision = await evaluator.EvaluateAsync(context, TestContext.Current.CancellationToken);
 
@@ -330,7 +330,7 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorThreatModelingTests
     public async Task EvaluateThreatWarningWithoutConstraintsReturnsWarningWhenEmptyPolicyExplicitlyAllows()
     {
         TestPolicyContext context = CreateContext();
-        var evaluator = new DefaultAsiBackbonePolicyEvaluator<TestPolicyContext>(
+        var evaluator = new DefaultGovernancePolicyEvaluator<TestPolicyContext>(
             [],
             [new StaticThreatContributor(
                 "warning-threat-contributor",
@@ -341,10 +341,10 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorThreatModelingTests
                     "Audit integrity risk was reported.",
                     GovernanceDecisionOutcome.Warning))],
             decisionPolicy: null,
-            new AsiBackbonePolicyEvaluatorOptions
+            new GovernancePolicyOptions
             {
                 DenyWhenNoConstraints = false
-            });
+            }, logger: null);
 
         GovernanceDecision decision = await evaluator.EvaluateAsync(context, TestContext.Current.CancellationToken);
 
@@ -362,7 +362,7 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorThreatModelingTests
     public async Task EvaluateThreatWarningWithoutConstraintsReturnsNoConstraintDenialWhenEmptyPolicyDenies()
     {
         TestPolicyContext context = CreateContext();
-        var evaluator = new DefaultAsiBackbonePolicyEvaluator<TestPolicyContext>(
+        var evaluator = new DefaultGovernancePolicyEvaluator<TestPolicyContext>(
             [],
             [new StaticThreatContributor(
                 "warning-threat-contributor",
@@ -373,16 +373,16 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorThreatModelingTests
                     "Audit integrity risk was reported.",
                     GovernanceDecisionOutcome.Warning))],
             decisionPolicy: null,
-            new AsiBackbonePolicyEvaluatorOptions
+            new GovernancePolicyOptions
             {
                 DenyWhenNoConstraints = true
-            });
+            }, logger: null);
 
         GovernanceDecision decision = await evaluator.EvaluateAsync(context, TestContext.Current.CancellationToken);
 
         Assert.True(decision.IsDenied);
         Assert.Equal(
-            AsiBackbonePolicyEvaluatorOptions.DefaultNoConstraintsReasonCode,
+            GovernancePolicyOptions.DefaultNoConstraintsReasonCode,
             Assert.Single(decision.ReasonCodes));
     }
 
@@ -436,7 +436,7 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorThreatModelingTests
         };
     }
 
-    private sealed class TestPolicyContext : IAsiBackboneConstraintEvaluationContext
+    private sealed class TestPolicyContext : IGovernanceEvaluationContext
     {
         public string? CorrelationId { get; init; }
 
@@ -448,7 +448,7 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorThreatModelingTests
             new Dictionary<string, string>(StringComparer.Ordinal);
     }
 
-    private sealed class StaticConstraint(ConstraintEvaluationResult result) : IAsiBackboneConstraint<TestPolicyContext>
+    private sealed class StaticConstraint(ConstraintEvaluationResult result) : IGovernanceConstraint<TestPolicyContext>
     {
         private readonly ConstraintEvaluationResult result = result;
 
@@ -463,7 +463,7 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorThreatModelingTests
     }
 
     private sealed class DelegateConstraint(
-        Func<TestPolicyContext, CancellationToken, ConstraintEvaluationResult> evaluate) : IAsiBackboneConstraint<TestPolicyContext>
+        Func<TestPolicyContext, CancellationToken, ConstraintEvaluationResult> evaluate) : IGovernanceConstraint<TestPolicyContext>
     {
         private readonly Func<TestPolicyContext, CancellationToken, ConstraintEvaluationResult> evaluate = evaluate;
 
@@ -521,7 +521,7 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorThreatModelingTests
         }
     }
 
-    private sealed class AlwaysAllowDecisionPolicy : IAsiBackboneDecisionPolicy<TestPolicyContext>
+    private sealed class AlwaysAllowDecisionPolicy : IGovernanceDecisionPolicy<TestPolicyContext>
     {
         public ValueTask<GovernanceDecision> ApplyAsync(
             TestPolicyContext context,

@@ -128,7 +128,7 @@ Successful signing returns `SigningMetadata` with:
 
 | Field | Source |
 | --- | --- |
-| Signing hash | Original `SigningRequest.SigningHash`. |
+| Signing hash | Original `SigningRequest.SigningHash`. The client signs `SigningRequest.SignatureInput`, which binds this hash, the canonical descriptors, and the signing policy context. |
 | Hash algorithm | Request or configured hash algorithm. |
 | Signature | Managed-key client result. |
 | Signature algorithm | Managed-key client result. |

@@ -38,7 +38,7 @@ public static class GovernedOperationExecutionReceiptCanonicalPayload
         return CanonicalPayload.Create(
             CanonicalArtifactTypes.GovernedOperationExecutionReceipt,
             BuildArtifactId(receipt),
-            AsiBackboneSchemaVersions.StableArtifactsV1,
+            GovernanceSchemaVersions.StableArtifactsV1,
             effectiveOptions.CanonicalizationVersion,
             content);
     }

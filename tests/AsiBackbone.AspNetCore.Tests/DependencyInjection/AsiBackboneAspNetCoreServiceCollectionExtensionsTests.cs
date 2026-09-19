@@ -31,7 +31,7 @@ public sealed class AsiBackboneAspNetCoreServiceCollectionExtensionsTests
         _ = services.AddAsiBackboneAspNetCore();
 
         using ServiceProvider provider = services.BuildServiceProvider();
-        AsiBackboneAspNetCoreOptions options = provider.GetRequiredService<IOptions<AsiBackboneAspNetCoreOptions>>().Value;
+        AspNetCoreGovernanceOptions options = provider.GetRequiredService<IOptions<AspNetCoreGovernanceOptions>>().Value;
 
         Assert.True(options.IncludeRouteValues);
         Assert.True(options.IncludeEndpointMetadata);
@@ -58,8 +58,8 @@ public sealed class AsiBackboneAspNetCoreServiceCollectionExtensionsTests
         using IServiceScope scope = provider.CreateScope();
 
         _ = scope.ServiceProvider.GetRequiredService<IHttpContextAccessor>();
-        _ = scope.ServiceProvider.GetRequiredService<IAsiBackboneHttpActorContextResolver>();
-        AsiBackboneHttpActorContextOptions options = scope.ServiceProvider.GetRequiredService<IOptions<AsiBackboneHttpActorContextOptions>>().Value;
+        _ = scope.ServiceProvider.GetRequiredService<IHttpGovernanceActorContextResolver>();
+        HttpGovernanceActorContextOptions options = scope.ServiceProvider.GetRequiredService<IOptions<HttpGovernanceActorContextOptions>>().Value;
 
         Assert.Contains("sub", options.ActorIdClaimTypes);
         Assert.Contains("name", options.DisplayNameClaimTypes);
@@ -79,7 +79,7 @@ public sealed class AsiBackboneAspNetCoreServiceCollectionExtensionsTests
         using ServiceProvider provider = services.BuildServiceProvider();
         using IServiceScope scope = provider.CreateScope();
 
-        _ = scope.ServiceProvider.GetRequiredService<IAsiBackboneHttpRequestCorrelationResolver>();
+        _ = scope.ServiceProvider.GetRequiredService<IHttpGovernanceRequestCorrelationResolver>();
     }
 
     /// <summary>
@@ -93,7 +93,7 @@ public sealed class AsiBackboneAspNetCoreServiceCollectionExtensionsTests
         _ = services.AddAsiBackboneAspNetCore();
 
         using ServiceProvider provider = services.BuildServiceProvider();
-        AsiBackboneHttpResultMappingOptions options = provider.GetRequiredService<IOptions<AsiBackboneHttpResultMappingOptions>>().Value;
+        GovernanceHttpResultMappingOptions options = provider.GetRequiredService<IOptions<GovernanceHttpResultMappingOptions>>().Value;
 
         Assert.Equal(StatusCodes.Status200OK, options.SuccessStatusCode);
         Assert.Equal(StatusCodes.Status403Forbidden, options.DeniedStatusCode);
@@ -117,10 +117,10 @@ public sealed class AsiBackboneAspNetCoreServiceCollectionExtensionsTests
 
         using ServiceProvider provider = services.BuildServiceProvider();
         using IServiceScope scope = provider.CreateScope();
-        AsiBackboneAcknowledgmentChallengeOptions options =
-            scope.ServiceProvider.GetRequiredService<IOptions<AsiBackboneAcknowledgmentChallengeOptions>>().Value;
+        AcknowledgmentChallengeOptions options =
+            scope.ServiceProvider.GetRequiredService<IOptions<AcknowledgmentChallengeOptions>>().Value;
 
-        _ = scope.ServiceProvider.GetRequiredService<IAsiBackboneAcknowledgmentChallengeService>();
+        _ = scope.ServiceProvider.GetRequiredService<IAcknowledgmentChallengeService>();
         Assert.Equal("ACKNOWLEDGE_RESPONSIBILITY", options.RequiredAcknowledgmentCode);
         Assert.True(options.IncludeReasonMessage);
         Assert.False(options.IncludeTraceId);
@@ -128,7 +128,7 @@ public sealed class AsiBackboneAspNetCoreServiceCollectionExtensionsTests
     }
 
     /// <summary>
-    /// Tests that the <see cref="AsiBackboneAspNetCoreServiceCollectionExtensions.AddAsiBackboneAspNetCore(IServiceCollection, Action{AsiBackboneAspNetCoreOptions})"/> method applies the configured options correctly.
+    /// Tests that the <see cref="AsiBackboneAspNetCoreServiceCollectionExtensions.AddAsiBackboneAspNetCore(IServiceCollection, Action{AspNetCoreGovernanceOptions})"/> method applies the configured options correctly.
     /// </summary>
     [Fact]
     public void AddAsiBackboneAspNetCoreAppliesConfiguredOptions()
@@ -147,7 +147,7 @@ public sealed class AsiBackboneAspNetCoreServiceCollectionExtensionsTests
         });
 
         using ServiceProvider provider = services.BuildServiceProvider();
-        AsiBackboneAspNetCoreOptions options = provider.GetRequiredService<IOptions<AsiBackboneAspNetCoreOptions>>().Value;
+        AspNetCoreGovernanceOptions options = provider.GetRequiredService<IOptions<AspNetCoreGovernanceOptions>>().Value;
 
         Assert.False(options.IncludeRouteValues);
         Assert.False(options.IncludeEndpointMetadata);
@@ -168,8 +168,8 @@ public sealed class AsiBackboneAspNetCoreServiceCollectionExtensionsTests
 
         _ = services.AddAsiBackboneStrictGovernance();
 
-        AsiBackbonePolicyEvaluatorOptions evaluatorOptions = ResolveOptions<AsiBackbonePolicyEvaluatorOptions>(services);
-        AsiBackboneEndpointGovernanceOptions endpointOptions = ResolveOptions<AsiBackboneEndpointGovernanceOptions>(services);
+        GovernancePolicyOptions evaluatorOptions = ResolveOptions<GovernancePolicyOptions>(services);
+        EndpointGovernanceOptions endpointOptions = ResolveOptions<EndpointGovernanceOptions>(services);
 
         Assert.True(evaluatorOptions.DenyWhenNoConstraints);
         Assert.True(evaluatorOptions.TreatConstraintExceptionAsDenial);
@@ -191,8 +191,8 @@ public sealed class AsiBackboneAspNetCoreServiceCollectionExtensionsTests
 
         _ = services.AddAsiBackbone(backbone => backbone.UseStrictGovernanceProfile());
 
-        AsiBackbonePolicyEvaluatorOptions evaluatorOptions = ResolveOptions<AsiBackbonePolicyEvaluatorOptions>(services);
-        AsiBackboneEndpointGovernanceOptions endpointOptions = ResolveOptions<AsiBackboneEndpointGovernanceOptions>(services);
+        GovernancePolicyOptions evaluatorOptions = ResolveOptions<GovernancePolicyOptions>(services);
+        EndpointGovernanceOptions endpointOptions = ResolveOptions<EndpointGovernanceOptions>(services);
 
         Assert.True(evaluatorOptions.DenyWhenNoConstraints);
         Assert.True(evaluatorOptions.TreatConstraintExceptionAsDenial);
@@ -210,18 +210,18 @@ public sealed class AsiBackboneAspNetCoreServiceCollectionExtensionsTests
     {
         ServiceCollection services = new();
         _ = services.AddAsiBackboneStrictGovernance();
-        AsiBackbonePolicyEvaluatorOptions options = ResolveOptions<AsiBackbonePolicyEvaluatorOptions>(services);
-        var evaluator = new DefaultAsiBackbonePolicyEvaluator<AsiBackboneConstraintEvaluationContext>(
+        GovernancePolicyOptions options = ResolveOptions<GovernancePolicyOptions>(services);
+        var evaluator = new DefaultGovernancePolicyEvaluator<GovernanceEvaluationContext>(
             [],
             decisionPolicy: null,
-            options);
+            options: options, threatModelContributors: null, logger: null);
 
         GovernanceDecision decision = await evaluator.EvaluateAsync(CreateContext(), TestContext.Current.CancellationToken);
 
         Assert.True(decision.IsDenied);
         Assert.False(decision.CanProceed);
         Assert.Equal(
-            AsiBackbonePolicyEvaluatorOptions.DefaultNoConstraintsReasonCode,
+            GovernancePolicyOptions.DefaultNoConstraintsReasonCode,
             Assert.Single(decision.ReasonCodes));
     }
 
@@ -236,18 +236,18 @@ public sealed class AsiBackboneAspNetCoreServiceCollectionExtensionsTests
     {
         ServiceCollection services = new();
         _ = services.AddAsiBackboneStrictGovernance();
-        AsiBackbonePolicyEvaluatorOptions options = ResolveOptions<AsiBackbonePolicyEvaluatorOptions>(services);
-        var evaluator = new DefaultAsiBackbonePolicyEvaluator<AsiBackboneConstraintEvaluationContext>(
+        GovernancePolicyOptions options = ResolveOptions<GovernancePolicyOptions>(services);
+        var evaluator = new DefaultGovernancePolicyEvaluator<GovernanceEvaluationContext>(
             [new ThrowingConstraint(new InvalidOperationException("sensitive host failure detail"))],
             decisionPolicy: null,
-            options);
+            options: options, threatModelContributors: null, logger: null);
 
         GovernanceDecision decision = await evaluator.EvaluateAsync(CreateContext(), TestContext.Current.CancellationToken);
 
         Assert.True(decision.IsDenied);
         Assert.False(decision.CanProceed);
         Assert.Equal(
-            AsiBackbonePolicyEvaluatorOptions.DefaultConstraintExceptionReasonCode,
+            GovernancePolicyOptions.DefaultConstraintExceptionReasonCode,
             Assert.Single(decision.ReasonCodes));
         Assert.DoesNotContain("sensitive", Assert.Single(decision.Reasons).Message, StringComparison.OrdinalIgnoreCase);
     }
@@ -264,7 +264,7 @@ public sealed class AsiBackboneAspNetCoreServiceCollectionExtensionsTests
     }
 
     /// <summary>
-    /// Tests that the <c>AsiBackboneAspNetCoreServiceCollectionExtensions.AddAsiBackboneAspNetCore(IServiceCollection, Action{AsiBackboneAspNetCoreOptions})</c> method throws an <see cref="ArgumentNullException"/> when the <c>configureOptions</c> callback is null.
+    /// Tests that the <c>AsiBackboneAspNetCoreServiceCollectionExtensions.AddAsiBackboneAspNetCore(IServiceCollection, Action{AspNetCoreGovernanceOptions})</c> method throws an <see cref="ArgumentNullException"/> when the <c>configureOptions</c> callback is null.
     /// </summary>
     [Fact]
     public void AddAsiBackboneAspNetCoreRejectsNullConfigureCallback()
@@ -275,7 +275,7 @@ public sealed class AsiBackboneAspNetCoreServiceCollectionExtensionsTests
     }
 
     /// <summary>
-    /// Tests that the <see cref="AsiBackboneAspNetCoreServiceCollectionExtensions.AddAsiBackboneAspNetCore(IServiceCollection, Action{AsiBackboneAspNetCoreOptions})"/> method throws an <see cref="InvalidOperationException"/> when the <see cref="AsiBackboneAspNetCoreOptions.CorrelationIdHeaderName"/> is null, empty, or whitespace.
+    /// Tests that the <see cref="AsiBackboneAspNetCoreServiceCollectionExtensions.AddAsiBackboneAspNetCore(IServiceCollection, Action{AspNetCoreGovernanceOptions})"/> method throws an <see cref="InvalidOperationException"/> when the <see cref="AspNetCoreGovernanceOptions.CorrelationIdHeaderName"/> is null, empty, or whitespace.
     /// </summary>
     /// <param name="headerName">
     /// The name of the correlation identifier header.
@@ -295,56 +295,56 @@ public sealed class AsiBackboneAspNetCoreServiceCollectionExtensionsTests
     }
 
     /// <summary>
-    /// Tests that the <see cref="AsiBackboneAspNetCoreServiceCollectionExtensions.AddAsiBackboneAspNetCore(IServiceCollection, Action{AsiBackboneAspNetCoreOptions})"/> method throws an <see cref="OptionsValidationException"/> when the <see cref="AsiBackboneHttpActorContextOptions"/> are configured with invalid values.
+    /// Tests that the <see cref="AsiBackboneAspNetCoreServiceCollectionExtensions.AddAsiBackboneAspNetCore(IServiceCollection, Action{AspNetCoreGovernanceOptions})"/> method throws an <see cref="OptionsValidationException"/> when the <see cref="HttpGovernanceActorContextOptions"/> are configured with invalid values.
     /// </summary>
     [Fact]
     public void ActorContextOptionsRegistrationRejectsInvalidConfiguredOptions()
     {
         ServiceCollection services = new();
         _ = services.AddAsiBackboneAspNetCore();
-        _ = services.Configure<AsiBackboneHttpActorContextOptions>(options => options.ActorIdClaimTypes = []);
+        _ = services.Configure<HttpGovernanceActorContextOptions>(options => options.ActorIdClaimTypes = []);
 
         OptionsValidationException exception = Assert.Throws<OptionsValidationException>(() =>
-            ResolveOptions<AsiBackboneHttpActorContextOptions>(services));
+            ResolveOptions<HttpGovernanceActorContextOptions>(services));
 
         Assert.Contains("HTTP actor context options", exception.Message, StringComparison.Ordinal);
     }
 
     /// <summary>
-    /// Tests that the <see cref="AsiBackboneAspNetCoreServiceCollectionExtensions.AddAsiBackboneAspNetCore(IServiceCollection, Action{AsiBackboneAspNetCoreOptions})"/> method throws an <see cref="OptionsValidationException"/> when the <see cref="AsiBackboneHttpResultMappingOptions"/> are configured with invalid values.
+    /// Tests that the <see cref="AsiBackboneAspNetCoreServiceCollectionExtensions.AddAsiBackboneAspNetCore(IServiceCollection, Action{AspNetCoreGovernanceOptions})"/> method throws an <see cref="OptionsValidationException"/> when the <see cref="GovernanceHttpResultMappingOptions"/> are configured with invalid values.
     /// </summary>
     [Fact]
     public void ResultMappingOptionsRegistrationRejectsInvalidConfiguredOptions()
     {
         ServiceCollection services = new();
         _ = services.AddAsiBackboneAspNetCore();
-        _ = services.Configure<AsiBackboneHttpResultMappingOptions>(options => options.DeniedStatusCode = 99);
+        _ = services.Configure<GovernanceHttpResultMappingOptions>(options => options.DeniedStatusCode = 99);
 
         OptionsValidationException exception = Assert.Throws<OptionsValidationException>(() =>
-            ResolveOptions<AsiBackboneHttpResultMappingOptions>(services));
+            ResolveOptions<GovernanceHttpResultMappingOptions>(services));
 
         Assert.Contains("HTTP result mapping options", exception.Message, StringComparison.Ordinal);
     }
 
     /// <summary>
-    /// Tests that the <see cref="AsiBackboneAspNetCoreServiceCollectionExtensions.AddAsiBackboneAspNetCore(IServiceCollection, Action{AsiBackboneAspNetCoreOptions})"/> method throws an <see cref="OptionsValidationException"/> when the <see cref="AsiBackboneAcknowledgmentChallengeOptions"/> are configured with invalid values.
+    /// Tests that the <see cref="AsiBackboneAspNetCoreServiceCollectionExtensions.AddAsiBackboneAspNetCore(IServiceCollection, Action{AspNetCoreGovernanceOptions})"/> method throws an <see cref="OptionsValidationException"/> when the <see cref="AcknowledgmentChallengeOptions"/> are configured with invalid values.
     /// </summary>
     [Fact]
     public void AcknowledgmentChallengeOptionsRegistrationRejectsInvalidConfiguredOptions()
     {
         ServiceCollection services = new();
         _ = services.AddAsiBackboneAspNetCore();
-        _ = services.Configure<AsiBackboneAcknowledgmentChallengeOptions>(options => options.RequiredAcknowledgmentText = " ");
+        _ = services.Configure<AcknowledgmentChallengeOptions>(options => options.RequiredAcknowledgmentText = " ");
 
         OptionsValidationException exception = Assert.Throws<OptionsValidationException>(() =>
-            ResolveOptions<AsiBackboneAcknowledgmentChallengeOptions>(services));
+            ResolveOptions<AcknowledgmentChallengeOptions>(services));
 
         Assert.Contains("Acknowledgment challenge options", exception.Message, StringComparison.Ordinal);
     }
 
-    private static AsiBackboneConstraintEvaluationContext CreateContext()
+    private static GovernanceEvaluationContext CreateContext()
     {
-        return new AsiBackboneConstraintEvaluationContext(
+        return new GovernanceEvaluationContext(
             correlationId: "strict-governance-correlation",
             policyVersion: "strict-governance-v1",
             policyHash: "strict-governance-hash");
@@ -358,12 +358,12 @@ public sealed class AsiBackboneAspNetCoreServiceCollectionExtensionsTests
         return provider.GetRequiredService<IOptions<TOptions>>().Value;
     }
 
-    private sealed class ThrowingConstraint(Exception exception) : IAsiBackboneConstraint<AsiBackboneConstraintEvaluationContext>
+    private sealed class ThrowingConstraint(Exception exception) : IGovernanceConstraint<GovernanceEvaluationContext>
     {
         public string Name => "strict-governance.throwing";
 
         public ValueTask<ConstraintEvaluationResult> EvaluateAsync(
-            AsiBackboneConstraintEvaluationContext context,
+            GovernanceEvaluationContext context,
             CancellationToken cancellationToken = default)
         {
             throw exception;

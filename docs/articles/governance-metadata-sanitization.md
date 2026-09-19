@@ -89,8 +89,8 @@ Use curated reason codes and messages. Do not place the detected secret, persona
 
 Apply sanitation before the first durable or external boundary. Typical locations include:
 
-1. metadata construction for audit residue or an audit ledger record;
-2. governance outbox envelope creation;
+1. metadata construction for decision receipt or an audit ledger record;
+2. outbox envelope creation;
 3. OpenTelemetry or other governance emission;
 4. ASP.NET Core endpoint-governance metadata mapping;
 5. regulated templates or host composition roots.

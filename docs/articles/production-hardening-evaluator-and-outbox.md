@@ -3,7 +3,7 @@
 This article gives production-oriented guidance for two areas that can otherwise be easy to misread:
 
 - evaluator exception handling, especially `TreatConstraintExceptionAsDenial`;
-- EF Core governance outbox persistence, especially durable local writes, metadata storage, and host-owned delivery responsibilities.
+- EF Core outbox persistence, especially durable local writes, metadata storage, and host-owned delivery responsibilities.
 
 AsiBackbone is a governance and policy spine for accountable software decision flow. It is not a SIEM product, a distributed queue, a compliance product, or an immutable ledger.
 
@@ -25,7 +25,7 @@ A governed production host should start from this posture and then intentionally
 A typical explicit evaluator configuration for a governed production surface is:
 
 ```csharp
-var evaluatorOptions = new AsiBackbonePolicyEvaluatorOptions
+var evaluatorOptions = new GovernancePolicyOptions
 {
     // Production governance surfaces should fail closed if expected constraints are missing.
     DenyWhenNoConstraints = true,
@@ -43,7 +43,7 @@ var evaluatorOptions = new AsiBackbonePolicyEvaluatorOptions
 When the host intentionally opts out of exception-as-denial behavior, document the reason and make sure the host still records the failed governed attempt through its central failure path:
 
 ```csharp
-var evaluatorOptions = new AsiBackbonePolicyEvaluatorOptions
+var evaluatorOptions = new GovernancePolicyOptions
 {
     DenyWhenNoConstraints = true,
     TreatConstraintExceptionAsDenial = false
@@ -87,7 +87,7 @@ asibackbone.policy.constraint_exception
 
 The public decision message is intentionally curated and must not include stack traces, connection strings, raw request bodies, secrets, tokens, protected data, raw prompts, or arbitrary user input.
 
-When the evaluator has an `ILogger<DefaultAsiBackbonePolicyEvaluator<TContext>>`, the exception-as-denial path writes an error-level log entry with:
+When the evaluator has an `ILogger<DefaultGovernancePolicyEvaluator<TContext>>`, the exception-as-denial path writes an error-level log entry with:
 
 - event id `4120`;
 - event name `ConstraintExceptionDeniedError`;
@@ -113,7 +113,7 @@ Production hosts should alert or review trends for:
 - sudden changes in deny, warning, defer, acknowledgment, or escalation rates after policy deployment;
 - missing or stale policy version/hash values in emitted decisions and audit records.
 
-## EF Core governance outbox persistence
+## EF Core outbox persistence
 
 The EF Core outbox adapter is a durable local storage adapter for provider-neutral governance emission envelopes. It is intentionally not a distributed queue, workflow engine, cloud emitter, SIEM adapter, immutable ledger, or exactly-once delivery mechanism.
 
@@ -144,7 +144,7 @@ This is a provider-neutral compatibility choice. It keeps the package portable a
 
 Production query guidance:
 
-- prefer first-class indexed columns such as status, outbox id, envelope id, correlation id, audit residue id, policy version, policy hash, trace id, timestamps, provider name, provider record id, and error code;
+- prefer first-class indexed columns such as status, outbox id, envelope id, correlation id, decision receipt id, policy version, policy hash, trace id, timestamps, provider name, provider record id, and error code;
 - do not build primary operational behavior around parsing arbitrary metadata JSON;
 - add host-owned computed columns, generated columns, JSON indexes, views, or provider-specific SQL only when the host has a documented provider and migration strategy;
 - keep JSON metadata minimized and safe to store.

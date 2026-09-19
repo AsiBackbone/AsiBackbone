@@ -13,12 +13,12 @@ using Xunit;
 namespace AsiBackbone.AspNetCore.Tests.Endpoints;
 
 /// <summary>
-/// Contains unit tests for the AsiBackboneEndpointGovernanceMiddleware and related classes, verifying that endpoint governance metadata is correctly read, that middleware behaves as expected under various conditions, and that configuration options are validated properly.
+/// Contains unit tests for the EndpointGovernanceMiddleware and related classes, verifying that endpoint governance metadata is correctly read, that middleware behaves as expected under various conditions, and that configuration options are validated properly.
 /// </summary>
 public sealed class AsiBackboneEndpointGovernanceTests
 {
     /// <summary>
-    /// Verifies that the AsiBackboneEndpointGovernanceDescriptor correctly reads governance metadata from an endpoint, including policy types, liability handshake requirement, capability scopes, and audit emission settings.
+    /// Verifies that the EndpointGovernanceDescriptor correctly reads governance metadata from an endpoint, including policy types, liability handshake requirement, capability scopes, and audit emission settings.
     /// </summary>
     [Fact]
     public void DescriptorReadsAttributeMetadataFromEndpoint()
@@ -26,13 +26,13 @@ public sealed class AsiBackboneEndpointGovernanceTests
         var endpoint = new Endpoint(
             static context => Task.CompletedTask,
             new EndpointMetadataCollection(
-                new RequireGovernancePolicyAttribute(typeof(SamplePolicy)),
+                new GovernancePolicyAttribute(typeof(SamplePolicy)),
                 new RequireLiabilityHandshakeAttribute(),
                 new RequireCapabilityGrantAttribute("robotics.execute"),
                 new EmitGovernanceAuditAttribute()),
             "sample.robotics.execute");
 
-        var descriptor = AsiBackboneEndpointGovernanceDescriptor.FromEndpoint(endpoint);
+        var descriptor = EndpointGovernanceDescriptor.FromEndpoint(endpoint);
 
         Assert.True(descriptor.HasGovernanceMetadata);
         Assert.Equal("sample.robotics.execute", descriptor.OperationName);
@@ -53,7 +53,7 @@ public sealed class AsiBackboneEndpointGovernanceTests
         var httpContext = new DefaultHttpContext();
         httpContext.SetEndpoint(new Endpoint(static _ => Task.CompletedTask, new EndpointMetadataCollection(), "plain"));
         bool nextCalled = false;
-        AsiBackboneEndpointGovernanceMiddleware middleware = CreateMiddleware(_ =>
+        EndpointGovernanceMiddleware middleware = CreateMiddleware(_ =>
         {
             nextCalled = true;
             return Task.CompletedTask;
@@ -86,7 +86,7 @@ public sealed class AsiBackboneEndpointGovernanceTests
             new EndpointMetadataCollection(new RequireCapabilityGrantAttribute("robotics.execute")),
             "blocked"));
         bool nextCalled = false;
-        AsiBackboneEndpointGovernanceMiddleware middleware = CreateMiddleware(_ =>
+        EndpointGovernanceMiddleware middleware = CreateMiddleware(_ =>
         {
             nextCalled = true;
             return Task.CompletedTask;
@@ -120,7 +120,7 @@ public sealed class AsiBackboneEndpointGovernanceTests
             new EndpointMetadataCollection(new RequireCapabilityGrantAttribute("robotics.execute")),
             "blocked.default"));
         bool nextCalled = false;
-        AsiBackboneEndpointGovernanceMiddleware middleware = CreateMiddleware(_ =>
+        EndpointGovernanceMiddleware middleware = CreateMiddleware(_ =>
         {
             nextCalled = true;
             return Task.CompletedTask;
@@ -156,17 +156,17 @@ public sealed class AsiBackboneEndpointGovernanceTests
         httpContext.SetEndpoint(new Endpoint(
             static _ => Task.CompletedTask,
             new EndpointMetadataCollection(
-                new RequireGovernancePolicyAttribute(typeof(SamplePolicy)),
+                new GovernancePolicyAttribute(typeof(SamplePolicy)),
                 new RequireCapabilityGrantAttribute("robotics.execute")),
             "blocked.diagnostics"));
         bool nextCalled = false;
-        AsiBackboneEndpointGovernanceMiddleware middleware = CreateMiddleware(
+        EndpointGovernanceMiddleware middleware = CreateMiddleware(
             _ =>
             {
                 nextCalled = true;
                 return Task.CompletedTask;
             },
-            new AsiBackboneEndpointGovernanceOptions
+            new EndpointGovernanceOptions
             {
                 EnableDevelopmentDiagnostics = true,
                 DevelopmentDiagnosticsDocumentationBaseUrl = "https://asibackbone.github.io/AsiBackbone/articles/"
@@ -207,10 +207,10 @@ public sealed class AsiBackboneEndpointGovernanceTests
         httpContext.Response.Body = new MemoryStream();
         httpContext.SetEndpoint(new Endpoint(
             static _ => Task.CompletedTask,
-            new EndpointMetadataCollection(new RequireGovernancePolicyAttribute(typeof(SamplePolicy))),
+            new EndpointMetadataCollection(new GovernancePolicyAttribute(typeof(SamplePolicy))),
             "blocked.default.development"));
         bool nextCalled = false;
-        AsiBackboneEndpointGovernanceMiddleware middleware = CreateMiddleware(_ =>
+        EndpointGovernanceMiddleware middleware = CreateMiddleware(_ =>
         {
             nextCalled = true;
             return Task.CompletedTask;
@@ -245,16 +245,16 @@ public sealed class AsiBackboneEndpointGovernanceTests
         httpContext.Response.Body = new MemoryStream();
         httpContext.SetEndpoint(new Endpoint(
             static _ => Task.CompletedTask,
-            new EndpointMetadataCollection(new RequireGovernancePolicyAttribute(typeof(SamplePolicy))),
+            new EndpointMetadataCollection(new GovernancePolicyAttribute(typeof(SamplePolicy))),
             "blocked.production"));
         bool nextCalled = false;
-        AsiBackboneEndpointGovernanceMiddleware middleware = CreateMiddleware(
+        EndpointGovernanceMiddleware middleware = CreateMiddleware(
             _ =>
             {
                 nextCalled = true;
                 return Task.CompletedTask;
             },
-            new AsiBackboneEndpointGovernanceOptions
+            new EndpointGovernanceOptions
             {
                 EnableDevelopmentDiagnostics = true
             });
@@ -288,13 +288,13 @@ public sealed class AsiBackboneEndpointGovernanceTests
             new EndpointMetadataCollection(new RequireCapabilityGrantAttribute("robotics.execute")),
             "blocked.configured"));
         bool nextCalled = false;
-        AsiBackboneEndpointGovernanceMiddleware middleware = CreateMiddleware(
+        EndpointGovernanceMiddleware middleware = CreateMiddleware(
             _ =>
             {
                 nextCalled = true;
                 return Task.CompletedTask;
             },
-            new AsiBackboneEndpointGovernanceOptions
+            new EndpointGovernanceOptions
             {
                 DefaultForbiddenResultFactory = _ => Microsoft.AspNetCore.Http.Results.Text(
                     "rich failure response",
@@ -330,13 +330,13 @@ public sealed class AsiBackboneEndpointGovernanceTests
             new EndpointMetadataCollection(new RequireCapabilityGrantAttribute("robotics.execute")),
             "blocked.custom"));
         bool nextCalled = false;
-        AsiBackboneEndpointGovernanceMiddleware middleware = CreateMiddleware(
+        EndpointGovernanceMiddleware middleware = CreateMiddleware(
             _ =>
             {
                 nextCalled = true;
                 return Task.CompletedTask;
             },
-            new AsiBackboneEndpointGovernanceOptions
+            new EndpointGovernanceOptions
             {
                 DefaultForbiddenResultFactory = _ => Microsoft.AspNetCore.Http.Results.Text(
                     "default factory response",
@@ -375,10 +375,10 @@ public sealed class AsiBackboneEndpointGovernanceTests
             static _ => Task.CompletedTask,
             new EndpointMetadataCollection(new RequireCapabilityGrantAttribute("robotics.execute")),
             "robotics.execute");
-        var descriptor = AsiBackboneEndpointGovernanceDescriptor.FromEndpoint(endpoint);
-        IAsiBackboneEndpointGovernanceService service = scope.ServiceProvider.GetRequiredService<IAsiBackboneEndpointGovernanceService>();
+        var descriptor = EndpointGovernanceDescriptor.FromEndpoint(endpoint);
+        IEndpointGovernanceService service = scope.ServiceProvider.GetRequiredService<IEndpointGovernanceService>();
 
-        AsiBackboneEndpointGovernanceResult result = await service.EvaluateAsync(httpContext, descriptor, TestContext.Current.CancellationToken);
+        EndpointGovernanceResult result = await service.EvaluateAsync(httpContext, descriptor, TestContext.Current.CancellationToken);
 
         Assert.False(result.CanExecute);
         Assert.NotNull(result.FailureResult);
@@ -397,7 +397,7 @@ public sealed class AsiBackboneEndpointGovernanceTests
     {
         using ServiceProvider services = new ServiceCollection()
             .AddSingleton<IWebHostEnvironment>(new TestWebHostEnvironment("Development"))
-            .Configure<AsiBackboneEndpointGovernanceOptions>(options =>
+            .Configure<EndpointGovernanceOptions>(options =>
             {
                 options.EnableDevelopmentDiagnostics = true;
                 options.DevelopmentDiagnosticsDocumentationBaseUrl = "https://asibackbone.github.io/AsiBackbone/articles";
@@ -416,10 +416,10 @@ public sealed class AsiBackboneEndpointGovernanceTests
             static _ => Task.CompletedTask,
             new EndpointMetadataCollection(new RequireCapabilityGrantAttribute("robotics.execute")),
             "robotics.execute");
-        var descriptor = AsiBackboneEndpointGovernanceDescriptor.FromEndpoint(endpoint);
-        IAsiBackboneEndpointGovernanceService service = scope.ServiceProvider.GetRequiredService<IAsiBackboneEndpointGovernanceService>();
+        var descriptor = EndpointGovernanceDescriptor.FromEndpoint(endpoint);
+        IEndpointGovernanceService service = scope.ServiceProvider.GetRequiredService<IEndpointGovernanceService>();
 
-        AsiBackboneEndpointGovernanceResult result = await service.EvaluateAsync(httpContext, descriptor, TestContext.Current.CancellationToken);
+        EndpointGovernanceResult result = await service.EvaluateAsync(httpContext, descriptor, TestContext.Current.CancellationToken);
         Assert.NotNull(result.FailureResult);
         await result.FailureResult.ExecuteAsync(httpContext);
 
@@ -444,7 +444,7 @@ public sealed class AsiBackboneEndpointGovernanceTests
     {
         using ServiceProvider services = new ServiceCollection()
             .AddAsiBackboneAspNetCore()
-            .AddSingleton<IAsiBackbonePolicyEvaluator<AsiBackboneConstraintEvaluationContext>>(new DenyingPolicyEvaluator())
+            .AddSingleton<IGovernancePolicyEvaluator<GovernanceEvaluationContext>>(new DenyingPolicyEvaluator())
             .BuildServiceProvider(validateScopes: true);
         using IServiceScope scope = services.CreateScope();
         var httpContext = new DefaultHttpContext
@@ -455,12 +455,12 @@ public sealed class AsiBackboneEndpointGovernanceTests
         scope.ServiceProvider.GetRequiredService<IHttpContextAccessor>().HttpContext = httpContext;
         var endpoint = new Endpoint(
             static _ => Task.CompletedTask,
-            new EndpointMetadataCollection(new RequireGovernancePolicyAttribute(typeof(SamplePolicy))),
+            new EndpointMetadataCollection(new GovernancePolicyAttribute(typeof(SamplePolicy))),
             "policy.denied");
-        var descriptor = AsiBackboneEndpointGovernanceDescriptor.FromEndpoint(endpoint);
-        IAsiBackboneEndpointGovernanceService service = scope.ServiceProvider.GetRequiredService<IAsiBackboneEndpointGovernanceService>();
+        var descriptor = EndpointGovernanceDescriptor.FromEndpoint(endpoint);
+        IEndpointGovernanceService service = scope.ServiceProvider.GetRequiredService<IEndpointGovernanceService>();
 
-        AsiBackboneEndpointGovernanceResult result = await service.EvaluateAsync(httpContext, descriptor, TestContext.Current.CancellationToken);
+        EndpointGovernanceResult result = await service.EvaluateAsync(httpContext, descriptor, TestContext.Current.CancellationToken);
 
         Assert.False(result.CanExecute);
         Assert.Null(result.FailureResult);
@@ -494,13 +494,13 @@ public sealed class AsiBackboneEndpointGovernanceTests
             "plain"));
 
         bool nextCalled = false;
-        AsiBackboneEndpointGovernanceMiddleware middleware = CreateMiddleware(
+        EndpointGovernanceMiddleware middleware = CreateMiddleware(
             _ =>
             {
                 nextCalled = true;
                 return Task.CompletedTask;
             },
-            new AsiBackboneEndpointGovernanceOptions
+            new EndpointGovernanceOptions
             {
                 RequireGovernanceMetadata = true
             });
@@ -530,13 +530,13 @@ public sealed class AsiBackboneEndpointGovernanceTests
             "public"));
 
         bool nextCalled = false;
-        AsiBackboneEndpointGovernanceMiddleware middleware = CreateMiddleware(
+        EndpointGovernanceMiddleware middleware = CreateMiddleware(
             _ =>
             {
                 nextCalled = true;
                 return Task.CompletedTask;
             },
-            new AsiBackboneEndpointGovernanceOptions
+            new EndpointGovernanceOptions
             {
                 RequireGovernanceMetadata = true
             });
@@ -549,45 +549,45 @@ public sealed class AsiBackboneEndpointGovernanceTests
     }
 
     /// <summary>
-    /// Verifies that the AsiBackboneEndpointGovernanceOptions.Validate method throws an InvalidOperationException when an invalid status code is configured for ConfigurationFailureStatusCode, and that the exception message contains the property name.
+    /// Verifies that the EndpointGovernanceOptions.Validate method throws an InvalidOperationException when an invalid status code is configured for ConfigurationFailureStatusCode, and that the exception message contains the property name.
     /// </summary>
     [Fact]
     public void EndpointGovernanceOptionsValidateRejectsInvalidStatusCode()
     {
-        var options = new AsiBackboneEndpointGovernanceOptions
+        var options = new EndpointGovernanceOptions
         {
             ConfigurationFailureStatusCode = 99
         };
 
         InvalidOperationException exception = Assert.Throws<InvalidOperationException>(options.Validate);
 
-        Assert.Contains(nameof(AsiBackboneEndpointGovernanceOptions.ConfigurationFailureStatusCode), exception.Message, StringComparison.Ordinal);
+        Assert.Contains(nameof(EndpointGovernanceOptions.ConfigurationFailureStatusCode), exception.Message, StringComparison.Ordinal);
     }
 
     /// <summary>
-    /// Verifies that the AsiBackboneEndpointGovernanceOptions validation rejects post-configured invalid options, throwing an OptionsValidationException when the CapabilityFailureStatusCode is set to an invalid value, and that the exception message contains the expected text.
+    /// Verifies that the EndpointGovernanceOptions validation rejects post-configured invalid options, throwing an OptionsValidationException when the CapabilityFailureStatusCode is set to an invalid value, and that the exception message contains the expected text.
     /// </summary>
     [Fact]
     public void EndpointGovernanceOptionsValidationRejectsPostConfiguredInvalidOptions()
     {
         using ServiceProvider services = new ServiceCollection()
             .AddAsiBackboneAspNetCore()
-            .Configure<AsiBackboneEndpointGovernanceOptions>(options => options.CapabilityFailureStatusCode = 700)
+            .Configure<EndpointGovernanceOptions>(options => options.CapabilityFailureStatusCode = 700)
             .BuildServiceProvider(validateScopes: true);
 
         OptionsValidationException exception = Assert.Throws<OptionsValidationException>(() =>
-            _ = services.GetRequiredService<IOptions<AsiBackboneEndpointGovernanceOptions>>().Value);
+            _ = services.GetRequiredService<IOptions<EndpointGovernanceOptions>>().Value);
 
         Assert.Contains("Endpoint governance options must be valid.", exception.Message, StringComparison.Ordinal);
     }
 
-    private static AsiBackboneEndpointGovernanceMiddleware CreateMiddleware(
+    private static EndpointGovernanceMiddleware CreateMiddleware(
         RequestDelegate next,
-        AsiBackboneEndpointGovernanceOptions? options = null)
+        EndpointGovernanceOptions? options = null)
     {
-        return new AsiBackboneEndpointGovernanceMiddleware(
+        return new EndpointGovernanceMiddleware(
             next,
-            Options.Create(options ?? new AsiBackboneEndpointGovernanceOptions()));
+            Options.Create(options ?? new EndpointGovernanceOptions()));
     }
 
     private static async Task<string> ReadResponseBodyAsync(HttpContext httpContext)
@@ -602,48 +602,48 @@ public sealed class AsiBackboneEndpointGovernanceTests
     {
     }
 
-    private sealed class ThrowingEndpointGovernanceService : IAsiBackboneEndpointGovernanceService
+    private sealed class ThrowingEndpointGovernanceService : IEndpointGovernanceService
     {
-        public ValueTask<AsiBackboneEndpointGovernanceResult> EvaluateAsync(
+        public ValueTask<EndpointGovernanceResult> EvaluateAsync(
             HttpContext httpContext,
-            AsiBackboneEndpointGovernanceDescriptor descriptor,
+            EndpointGovernanceDescriptor descriptor,
             CancellationToken cancellationToken = default)
         {
             throw new InvalidOperationException("Governance service should not be invoked for endpoints without governance metadata.");
         }
     }
 
-    private sealed class BlockingEndpointGovernanceService : IAsiBackboneEndpointGovernanceService
+    private sealed class BlockingEndpointGovernanceService : IEndpointGovernanceService
     {
-        public ValueTask<AsiBackboneEndpointGovernanceResult> EvaluateAsync(
+        public ValueTask<EndpointGovernanceResult> EvaluateAsync(
             HttpContext httpContext,
-            AsiBackboneEndpointGovernanceDescriptor descriptor,
+            EndpointGovernanceDescriptor descriptor,
             CancellationToken cancellationToken = default)
         {
-            return ValueTask.FromResult(AsiBackboneEndpointGovernanceResult.Block(
+            return ValueTask.FromResult(EndpointGovernanceResult.Block(
                 Microsoft.AspNetCore.Http.Results.StatusCode(StatusCodes.Status403Forbidden)));
         }
     }
 
-    private sealed class DefaultBlockingEndpointGovernanceService : IAsiBackboneEndpointGovernanceService
+    private sealed class DefaultBlockingEndpointGovernanceService : IEndpointGovernanceService
     {
-        public ValueTask<AsiBackboneEndpointGovernanceResult> EvaluateAsync(
+        public ValueTask<EndpointGovernanceResult> EvaluateAsync(
             HttpContext httpContext,
-            AsiBackboneEndpointGovernanceDescriptor descriptor,
+            EndpointGovernanceDescriptor descriptor,
             CancellationToken cancellationToken = default)
         {
-            return ValueTask.FromResult(AsiBackboneEndpointGovernanceResult.BlockWithDefaultFailure());
+            return ValueTask.FromResult(EndpointGovernanceResult.BlockWithDefaultFailure());
         }
     }
 
-    private sealed class DecisionDefaultBlockingEndpointGovernanceService : IAsiBackboneEndpointGovernanceService
+    private sealed class DecisionDefaultBlockingEndpointGovernanceService : IEndpointGovernanceService
     {
-        public ValueTask<AsiBackboneEndpointGovernanceResult> EvaluateAsync(
+        public ValueTask<EndpointGovernanceResult> EvaluateAsync(
             HttpContext httpContext,
-            AsiBackboneEndpointGovernanceDescriptor descriptor,
+            EndpointGovernanceDescriptor descriptor,
             CancellationToken cancellationToken = default)
         {
-            return ValueTask.FromResult(AsiBackboneEndpointGovernanceResult.BlockWithDefaultFailure(
+            return ValueTask.FromResult(EndpointGovernanceResult.BlockWithDefaultFailure(
                 GovernanceDecision.Deny(
                     "policy.denied",
                     "The policy denied execution.",
@@ -654,22 +654,22 @@ public sealed class AsiBackboneEndpointGovernanceTests
         }
     }
 
-    private sealed class TextBlockingEndpointGovernanceService(string body, int statusCode) : IAsiBackboneEndpointGovernanceService
+    private sealed class TextBlockingEndpointGovernanceService(string body, int statusCode) : IEndpointGovernanceService
     {
-        public ValueTask<AsiBackboneEndpointGovernanceResult> EvaluateAsync(
+        public ValueTask<EndpointGovernanceResult> EvaluateAsync(
             HttpContext httpContext,
-            AsiBackboneEndpointGovernanceDescriptor descriptor,
+            EndpointGovernanceDescriptor descriptor,
             CancellationToken cancellationToken = default)
         {
-            return ValueTask.FromResult(AsiBackboneEndpointGovernanceResult.Block(
+            return ValueTask.FromResult(EndpointGovernanceResult.Block(
                 Microsoft.AspNetCore.Http.Results.Text(body, statusCode: statusCode)));
         }
     }
 
-    private sealed class DenyingPolicyEvaluator : IAsiBackbonePolicyEvaluator<AsiBackboneConstraintEvaluationContext>
+    private sealed class DenyingPolicyEvaluator : IGovernancePolicyEvaluator<GovernanceEvaluationContext>
     {
         public ValueTask<GovernanceDecision> EvaluateAsync(
-            AsiBackboneConstraintEvaluationContext context,
+            GovernanceEvaluationContext context,
             CancellationToken cancellationToken = default)
         {
             return new ValueTask<GovernanceDecision>(GovernanceDecision.Deny(

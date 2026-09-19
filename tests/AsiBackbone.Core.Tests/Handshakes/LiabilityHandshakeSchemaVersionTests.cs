@@ -21,8 +21,8 @@ public sealed class LiabilityHandshakeSchemaVersionTests
     {
         LiabilityHandshakeRequest request = CreateRequest();
 
-        Assert.Equal(AsiBackboneSchemaVersions.StableArtifactsV1, request.SchemaVersion);
-        Assert.Equal(AsiBackboneSchemaVersions.StableArtifactsV1, ReadSerializedSchemaVersion(request));
+        Assert.Equal(GovernanceSchemaVersions.StableArtifactsV1, request.SchemaVersion);
+        Assert.Equal(GovernanceSchemaVersions.StableArtifactsV1, ReadSerializedSchemaVersion(request));
     }
 
     /// <summary>
@@ -45,8 +45,8 @@ public sealed class LiabilityHandshakeSchemaVersionTests
     {
         LiabilityHandshakeAcknowledgment acknowledgment = CreateAcknowledgment();
 
-        Assert.Equal(AsiBackboneSchemaVersions.StableArtifactsV1, acknowledgment.SchemaVersion);
-        Assert.Equal(AsiBackboneSchemaVersions.StableArtifactsV1, ReadSerializedSchemaVersion(acknowledgment));
+        Assert.Equal(GovernanceSchemaVersions.StableArtifactsV1, acknowledgment.SchemaVersion);
+        Assert.Equal(GovernanceSchemaVersions.StableArtifactsV1, ReadSerializedSchemaVersion(acknowledgment));
     }
 
     /// <summary>
@@ -64,7 +64,7 @@ public sealed class LiabilityHandshakeSchemaVersionTests
     private static LiabilityHandshakeRequest CreateRequest(string? schemaVersion = null)
     {
         return LiabilityHandshakeRequest.Create(
-            AsiBackboneActorContext.Human("actor-123", "Test Actor"),
+            GovernanceActorContext.Human("actor-123", "Test Actor"),
             "document.approve",
             "ack.required",
             "Acknowledgment is required.",
@@ -86,7 +86,7 @@ public sealed class LiabilityHandshakeSchemaVersionTests
 
         return LiabilityHandshakeAcknowledgment.Accept(
             request,
-            AsiBackboneActorContext.Human("actor-123", "Test Actor"),
+            GovernanceActorContext.Human("actor-123", "Test Actor"),
             acknowledgmentId: "ack-123",
             occurredUtc: new DateTimeOffset(2026, 6, 1, 9, 0, 0, TimeSpan.Zero),
             schemaVersion: schemaVersion);

@@ -28,6 +28,8 @@ The default managed-key signature descriptor is `RSASSA-PSS-SHA256-MANAGED-KEY`.
 
 ## Dependency injection
 
+The host-owned `IManagedKeySigningClient` must sign `ManagedKeySignRequest.SignatureInput`, not `SigningHash`. Since 6.0 the signature input binds the canonical descriptors, hash, and signing policy context; a client that signs the hash text produces signatures that fail verification. See [What the signature covers](https://asibackbone.github.io/AsiBackbone/articles/cryptographic-security-posture.html#what-the-signature-covers).
+
 The production-oriented registration fails closed by default. Signing failures throw unless the host explicitly opts into unsigned failure metadata.
 
 ```csharp
@@ -62,7 +64,7 @@ services.AddAsiBackboneManagedKeySigningForLocalValidation(
     serviceProvider => new HostOwnedManagedKeySigningClient());
 ```
 
-The registration wires `ManagedKeySigningService` as `IAsiBackboneSigningService`. Verification remains a separate provider or host responsibility.
+The registration wires `ManagedKeySigningService` as `IGovernanceSigningService`. Verification remains a separate provider or host responsibility.
 
 ## Failure behavior
 
@@ -107,7 +109,7 @@ Provider-supplied retry timing is not accepted from the general provider metadat
 
 ## Safe metadata
 
-Provider metadata is an untrusted external input and is minimized before it can reach signing metadata, logs, governance residue, or audit records. The managed-key result boundary retains only these provider-neutral diagnostic keys:
+Provider metadata is an untrusted external input and is minimized before it can reach signing metadata, logs, decision receipts, or audit records. The managed-key result boundary retains only these provider-neutral diagnostic keys:
 
 - `provider_region`
 - `provider_zone`

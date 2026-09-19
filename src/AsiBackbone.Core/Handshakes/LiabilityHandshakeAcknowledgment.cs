@@ -18,7 +18,7 @@ public sealed class LiabilityHandshakeAcknowledgment
         string? schemaVersion,
         string handshakeId,
         string actorId,
-        AsiBackboneActorType actorType,
+        GovernanceActorType actorType,
         string? actorDisplayName,
         string acknowledgmentCode,
         bool acknowledged,
@@ -33,7 +33,7 @@ public sealed class LiabilityHandshakeAcknowledgment
         ArgumentException.ThrowIfNullOrWhiteSpace(acknowledgmentCode);
 
         AcknowledgmentId = acknowledgmentId.Trim();
-        SchemaVersion = AsiBackboneSchemaVersions.Normalize(schemaVersion);
+        SchemaVersion = GovernanceSchemaVersions.Normalize(schemaVersion);
         HandshakeId = handshakeId.Trim();
         ActorId = actorId.Trim();
         ActorType = actorType;
@@ -69,7 +69,7 @@ public sealed class LiabilityHandshakeAcknowledgment
     /// <summary>
     /// Gets the actor type associated with the acknowledgment.
     /// </summary>
-    public AsiBackboneActorType ActorType { get; }
+    public GovernanceActorType ActorType { get; }
 
     /// <summary>
     /// Gets the optional display name or label associated with the actor.
@@ -129,7 +129,7 @@ public sealed class LiabilityHandshakeAcknowledgment
     /// <returns>A liability handshake acknowledgment response.</returns>
     public static LiabilityHandshakeAcknowledgment Create(
         LiabilityHandshakeRequest request,
-        IAsiBackboneActorContext actor,
+        IGovernanceActorContext actor,
         bool acknowledged,
         string? acknowledgmentId = null,
         DateTimeOffset? occurredUtc = null,
@@ -166,7 +166,7 @@ public sealed class LiabilityHandshakeAcknowledgment
     /// <returns>An accepted liability handshake acknowledgment response.</returns>
     public static LiabilityHandshakeAcknowledgment Accept(
         LiabilityHandshakeRequest request,
-        IAsiBackboneActorContext actor,
+        IGovernanceActorContext actor,
         string? acknowledgmentId = null,
         DateTimeOffset? occurredUtc = null,
         IReadOnlyDictionary<string, string>? metadata = null,
@@ -187,7 +187,7 @@ public sealed class LiabilityHandshakeAcknowledgment
     /// <returns>A rejected liability handshake acknowledgment response.</returns>
     public static LiabilityHandshakeAcknowledgment Reject(
         LiabilityHandshakeRequest request,
-        IAsiBackboneActorContext actor,
+        IGovernanceActorContext actor,
         string? acknowledgmentId = null,
         DateTimeOffset? occurredUtc = null,
         IReadOnlyDictionary<string, string>? metadata = null,

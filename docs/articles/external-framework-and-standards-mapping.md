@@ -5,7 +5,7 @@ Last reviewed: July 12, 2026
 > [!IMPORTANT]
 > This page is a scoping crosswalk, not a certification, legal opinion, compliance assessment, control implementation statement, or claim that AsiBackbone satisfies any framework, regulation, or standard. AsiBackbone provides software primitives that a host may use within a broader governance, security, privacy, risk-management, or assurance program.
 
-AsiBackbone is a governance spine for consequential .NET decision flow. It can help a host make policy decisions explicit, preserve evidence about those decisions, require acknowledgment, constrain follow-on authority, and keep execution under host control. It does not determine which laws apply, define an organization's risk appetite, establish a management system, configure security infrastructure, or make a consuming application compliant.
+AsiBackbone is a policy decision pipeline for consequential .NET decision flow. It can help a host make policy decisions explicit, preserve evidence about those decisions, require acknowledgment, constrain follow-on authority, and keep execution under host control. It does not determine which laws apply, define an organization's risk appetite, establish a management system, configure security infrastructure, or make a consuming application compliant.
 
 ## How to read this page
 
@@ -39,7 +39,7 @@ The mappings refer only to implemented surfaces:
 - host-owned constraints and decision policies;
 - acknowledgment and responsibility-handshake workflows;
 - capability grants and bounded continuation;
-- audit residue, durable ledger records, lifecycle records, and outbox records;
+- decision receipt, durable ledger records, lifecycle records, and outbox records;
 - correlation and trace identifiers;
 - metadata budgets, classification results, and sanitization helpers;
 - signing, verification, and audit-integrity seams;
@@ -52,9 +52,9 @@ NIST AI RMF 1.0 is voluntary guidance organized around **Govern**, **Map**, **Me
 
 | AI RMF function | Relevant AsiBackbone primitive | Potential support | Host-owned work still required | Explicit non-coverage |
 | --- | --- | --- | --- | --- |
-| Govern | Actor context, policy version/hash, decision policies, acknowledgment, capability grants, audit residue | **Direct library primitive** for accountable decision flow and evidence about which policy governed a proposed action | Governance structure, roles, policy approval, risk appetite, oversight, training, management review | AsiBackbone does not establish an AI governance program or assign organizational accountability |
+| Govern | Actor context, policy version/hash, decision policies, acknowledgment, capability grants, decision receipt | **Direct library primitive** for accountable decision flow and evidence about which policy governed a proposed action | Governance structure, roles, policy approval, risk appetite, oversight, training, management review | AsiBackbone does not establish an AI governance program or assign organizational accountability |
 | Map | Evaluation context, operation identity, metadata, threat-model contributors, regional and domain constraints | **Host-configured support** for representing known context and policy-relevant facts | Use-case inventory, affected-party analysis, system boundaries, impact analysis, lifecycle context | AsiBackbone does not discover risks, affected populations, dependencies, or deployment context automatically |
-| Measure | Structured outcomes, reason codes, tests, audit residue, telemetry projection | **Evidence contribution only** for observed governance decisions and policy-path behavior | Model evaluation, fairness assessment, robustness testing, security testing, quantitative risk measurement | AsiBackbone does not measure model quality, bias, safety, explainability, or trustworthiness |
+| Measure | Structured outcomes, reason codes, tests, decision receipt, telemetry projection | **Evidence contribution only** for observed governance decisions and policy-path behavior | Model evaluation, fairness assessment, robustness testing, security testing, quantitative risk measurement | AsiBackbone does not measure model quality, bias, safety, explainability, or trustworthiness |
 | Manage | Allow, warning, deny, defer, acknowledgment, escalation, bounded grants, outbox/lifecycle evidence | **Direct library primitive** for decision gating and controlled continuation | Organizational risk treatment, remediation ownership, exception approval, monitoring thresholds, incident response | AsiBackbone does not choose or execute enterprise risk treatments |
 
 Official source: [NIST AI Risk Management Framework](https://www.nist.gov/itl/ai-risk-management-framework)
@@ -67,7 +67,7 @@ ISO/IEC 42001 defines requirements for an artificial intelligence management sys
 | --- | --- | --- | --- | --- |
 | Policy and operational control | Policy version/hash, constraints, decision policies, host-owned execution boundary | **Host-configured support** for applying approved rules at a consequential-action boundary | AIMS scope, policy governance, documented procedures, control ownership | AsiBackbone does not create an AIMS |
 | Roles and accountability | Actor context, operation identity, acknowledgments | **Direct library primitive** for associating a decision and responsibility checkpoint with an actor | Organizational roles, authority, competence, training, segregation of duties | Actor records do not prove organizational accountability by themselves |
-| Monitoring and evidence | Audit residue, durable records, lifecycle events, OpenTelemetry projection | **Evidence contribution only** for review and monitoring | Monitoring objectives, metrics, management review, internal audit, corrective action | AsiBackbone does not conduct audits or management review |
+| Monitoring and evidence | Decision receipt, durable records, lifecycle events, OpenTelemetry projection | **Evidence contribution only** for review and monitoring | Monitoring objectives, metrics, management review, internal audit, corrective action | AsiBackbone does not conduct audits or management review |
 | Improvement inputs | Reason codes, escalation outcomes, verification failures, outbox/dead-letter state | **Evidence contribution only** for identifying recurring decision and delivery conditions | Nonconformity handling, root-cause analysis, corrective action, continual improvement | The library does not operate a continual-improvement program |
 
 Official source: [ISO/IEC 42001:2023](https://www.iso.org/standard/81230.html)
@@ -91,7 +91,7 @@ The EU AI Act is a legal framework with obligations that depend on the system, u
 | Concern | Relevant AsiBackbone primitive | Potential support | Host-owned work still required | Explicit non-coverage |
 | --- | --- | --- | --- | --- |
 | Risk-aware operational gating | Constraints, decision policies, structured outcomes, host-owned execution checks | **Host-configured support** for preventing or pausing selected operations | Legal applicability analysis, role determination, risk classification, approved control design | AsiBackbone does not determine whether a system is prohibited, high-risk, limited-risk, or general-purpose AI |
-| Recordkeeping and traceability | Audit residue, durable ledger/outbox records, policy identity, actor and operation identifiers | **Evidence contribution only** for selected application decisions | Required logging scope, technical-documentation set, retention, access, reporting | AsiBackbone records are not an EU AI Act technical file or conformity dossier |
+| Recordkeeping and traceability | Decision receipt, durable ledger/outbox records, policy identity, actor and operation identifiers | **Evidence contribution only** for selected application decisions | Required logging scope, technical-documentation set, retention, access, reporting | AsiBackbone records are not an EU AI Act technical file or conformity dossier |
 | Human oversight | Acknowledgment-required and escalation-recommended outcomes | **Host-configured support** for a human checkpoint before host execution | Competent oversight design, authority, training, UI, procedures, monitoring | Acknowledgment alone does not satisfy human-oversight obligations |
 | Post-deployment evidence | Lifecycle events, verification results, telemetry projection, dead-letter state | **Evidence contribution only** for operational review | Post-market monitoring, incident reporting, regulator interaction, quality management | AsiBackbone does not perform market surveillance, registration, or conformity assessment |
 
@@ -109,7 +109,7 @@ The Health Insurance Portability and Accountability Act is abbreviated **HIPAA**
 | Concern | Relevant AsiBackbone primitive | Potential support | Host-owned work still required | Explicit non-coverage |
 | --- | --- | --- | --- | --- |
 | Access-sensitive or disclosure-sensitive operations | Actor context, operation identity, constraints, decision outcomes | **Host-configured support** for governing a defined application operation | Authentication, authorization, identity proofing, workforce policy, minimum-necessary analysis | AsiBackbone does not determine whether an actor may access PHI or ePHI |
-| Audit controls | Audit residue, durable ledger records, correlation and trace identifiers | **Evidence contribution only** for selected governed decisions | Complete audit logging, monitoring, review procedures, retention, access controls | AsiBackbone is not a complete HIPAA audit-control implementation |
+| Audit controls | Decision receipt, durable ledger records, correlation and trace identifiers | **Evidence contribution only** for selected governed decisions | Complete audit logging, monitoring, review procedures, retention, access controls | AsiBackbone is not a complete HIPAA audit-control implementation |
 | Integrity | Canonical hashing, signing/verification seams, audit-integrity chain model | **Host-configured support** for protected evidence paths | Key custody, encryption, verification operations, immutable storage, backup, recovery | Signing seams do not create HIPAA compliance or tamper-evidence by themselves |
 | Data minimization | Metadata budgets, reserved-key guidance, sanitization and classification seams | **Host-configured support** for reducing metadata exposure | PHI/ePHI identification, privacy policy, DLP, redaction, encryption, data lifecycle | AsiBackbone does not classify data as PHI or ePHI |
 | High-risk review | Acknowledgment and escalation outcomes | **Evidence contribution only** for a responsibility checkpoint | Administrative safeguards, incident response, contingency planning, breach analysis | Acknowledgment does not replace required safeguards or authorization |
@@ -124,7 +124,7 @@ GDPR obligations depend on the processing activity, legal role, lawful basis, ju
 
 | Concern | Relevant AsiBackbone primitive | Potential support | Host-owned work still required | Explicit non-coverage |
 | --- | --- | --- | --- | --- |
-| Accountability evidence | Actor, operation, policy identity, reason codes, audit residue | **Evidence contribution only** for selected consequential decisions | Controller/processor analysis, records of processing, privacy governance, review | AsiBackbone does not demonstrate GDPR compliance |
+| Accountability evidence | Actor, operation, policy identity, reason codes, decision receipt | **Evidence contribution only** for selected consequential decisions | Controller/processor analysis, records of processing, privacy governance, review | AsiBackbone does not demonstrate GDPR compliance |
 | Data minimization | Metadata budgets, allow-list signing metadata, sanitization guidance | **Host-configured support** for limiting governance metadata | Data inventory, lawful basis, purpose limitation, retention, deletion | The library does not determine which personal data is necessary |
 | Human review of automated processing | Acknowledgment and escalation outcomes, host-owned execution boundary | **Host-configured support** for inserting a review checkpoint | Article 22 applicability, meaningful human review design, notices, appeal and remedy | AsiBackbone does not interpret Article 22 or provide data-subject rights |
 | Traceability | Correlation IDs, trace IDs, durable records | **Evidence contribution only** for connecting decisions to host processing | DPIAs, transfer assessments, breach notification, regulator and subject responses | Decision records are not a DPIA or record of processing |
@@ -150,7 +150,7 @@ NIST SP 800-53 is a control catalog. AsiBackbone may contribute implementation e
 
 | Control concern | Relevant AsiBackbone primitive | Potential support | Host-owned work still required | Explicit non-coverage |
 | --- | --- | --- | --- | --- |
-| Audit and accountability | Audit residue, durable records, actor, operation, policy identity | **Evidence contribution only** for governed operations | Control selection, complete audit architecture, retention, review, protection | AsiBackbone does not implement the AU family as a whole |
+| Audit and accountability | Decision receipt, durable records, actor, operation, policy identity | **Evidence contribution only** for governed operations | Control selection, complete audit architecture, retention, review, protection | AsiBackbone does not implement the AU family as a whole |
 | Access-control evidence | Constraints, outcomes, capability grants, execution checks | **Host-configured support** for application decisions | Authentication, authorization, entitlement management, enforcement coverage | Capability grants do not replace access control |
 | Assessment, authorization, monitoring | Tests, verification results, telemetry, lifecycle evidence | **Evidence contribution only** for selected components | Security assessment, authorization package, continuous monitoring program | AsiBackbone does not produce an authorization to operate |
 | System and information integrity | Signing, verification, integrity-chain seams, failure outcomes | **Host-configured support** for selected records | Secure architecture, malware protection, vulnerability management, key operations | The library does not implement a complete integrity program |
@@ -164,7 +164,7 @@ ISO/IEC 27001 defines requirements for an information security management system
 | Concern | Relevant AsiBackbone primitive | Potential support | Host-owned work still required | Explicit non-coverage |
 | --- | --- | --- | --- | --- |
 | Controlled operational decisions | Policy context, constraints, outcomes, host execution boundary | **Host-configured support** for selected application controls | ISMS scope, risk assessment, control selection, procedures | AsiBackbone does not create an ISMS |
-| Evidence and monitoring | Audit residue, durable records, telemetry, verification results | **Evidence contribution only** for selected operations | Monitoring program, internal audit, management review, corrective action | Records do not prove Annex A control effectiveness |
+| Evidence and monitoring | Decision receipt, durable records, telemetry, verification results | **Evidence contribution only** for selected operations | Monitoring program, internal audit, management review, corrective action | Records do not prove Annex A control effectiveness |
 | Change and responsibility traceability | Actor, operation, policy version/hash, acknowledgment | **Evidence contribution only** for accountable decisions | Change management, segregation of duties, approvals, competence | AsiBackbone does not define the Statement of Applicability or certify controls |
 
 Official source: [ISO/IEC 27001:2022](https://www.iso.org/standard/27001)
@@ -180,7 +180,7 @@ OpenUSD-aware host or external adapter
   -> identifies a consequential stage, layer, prim, variant, physics, or deployment operation
   -> translates safe operation facts into AsiBackbone policy context
   -> receives a GovernanceDecision
-  -> preserves audit residue and any acknowledgment or capability grant
+  -> preserves decision receipt and any acknowledgment or capability grant
   -> host performs or refuses the OpenUSD operation
 ```
 
@@ -190,7 +190,7 @@ Potentially governed operations could include publishing a layer, changing an ex
 | --- | --- | --- | --- | --- |
 | Consequential scene operation | Operation identity, constraints, decision outcomes | **Host-configured support** through an external adapter | USD parsing, stage access, composition, validation, asset resolution | AsiBackbone does not parse USD or implement stage composition |
 | Simulation-to-execution handoff | Acknowledgment, capability grants, host-owned execution boundary | **Host-configured support** for an accountable checkpoint | Simulation validation, robotics/industrial safety, controller integration | AsiBackbone does not control robots or physical systems |
-| Scene-change evidence | Audit residue, policy identity, actor, correlation, signing seams | **Evidence contribution only** for host-defined operations | Canonical stage manifest, dependency hashing, asset provenance, retention | Hashing one USD file does not identify a complete composed stage |
+| Scene-change evidence | Decision receipt, policy identity, actor, correlation, signing seams | **Evidence contribution only** for host-defined operations | Canonical stage manifest, dependency hashing, asset provenance, retention | Hashing one USD file does not identify a complete composed stage |
 
 Any future OpenUSD integration should remain an external add-on package. `AsiBackbone.Core` must not depend on OpenUSD. AsiBackbone does not implement USDA, USDC, USDZ, an asset resolver, the OpenUSD composition algorithm, or the OpenUSD compliance framework, and it does not claim OpenUSD conformance.
 

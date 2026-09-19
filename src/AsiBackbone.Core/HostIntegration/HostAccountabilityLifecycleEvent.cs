@@ -11,8 +11,8 @@ public static class HostAccountabilityLifecycleEvent
     /// <summary>
     /// Creates a gateway-execution-started lifecycle event for one logical operation and attempt.
     /// </summary>
-    public static AuditResidueLifecycleEvent ExecutionStarted(
-        IAsiBackboneAuditResidue residue,
+    public static DecisionReceiptLifecycleEvent ExecutionStarted(
+        IDecisionReceipt residue,
         string operationExecutionId,
         string? executionAttemptId = null,
         string? decisionAuditRecordId = null,
@@ -29,8 +29,8 @@ public static class HostAccountabilityLifecycleEvent
         AddOptional(lifecycleMetadata, HostAccountabilityMetadataKeys.ExecutionAttemptId, executionAttemptId);
         AddOptional(lifecycleMetadata, HostAccountabilityMetadataKeys.DecisionAuditRecordId, decisionAuditRecordId);
 
-        return AuditResidueLifecycleEvent.FromResidue(
-            AuditResidueLifecycleStage.GatewayExecutionStarted,
+        return DecisionReceiptLifecycleEvent.FromDecisionReceipt(
+            DecisionReceiptLifecycleStage.GatewayExecutionStarted,
             residue,
             eventId: eventId,
             occurredUtc: occurredUtc,
@@ -46,8 +46,8 @@ public static class HostAccountabilityLifecycleEvent
     /// distinctions are carried by the typed receipt outcome and stable metadata keys rather than by
     /// expanding the lifecycle-stage enum.
     /// </remarks>
-    public static AuditResidueLifecycleEvent FromExecutionReceipt(
-        IAsiBackboneAuditResidue residue,
+    public static DecisionReceiptLifecycleEvent FromExecutionReceipt(
+        IDecisionReceipt residue,
         GovernedOperationExecutionReceipt receipt,
         string? eventId = null,
         IReadOnlyDictionary<string, string>? metadata = null)
@@ -55,8 +55,8 @@ public static class HostAccountabilityLifecycleEvent
         ArgumentNullException.ThrowIfNull(residue);
         ArgumentNullException.ThrowIfNull(receipt);
 
-        return AuditResidueLifecycleEvent.FromResidue(
-            AuditResidueLifecycleStage.GatewayExecutionCompleted,
+        return DecisionReceiptLifecycleEvent.FromDecisionReceipt(
+            DecisionReceiptLifecycleStage.GatewayExecutionCompleted,
             residue,
             eventId: eventId,
             occurredUtc: receipt.CompletedUtc,

@@ -1,6 +1,6 @@
 # Signing Provider Package Boundary
 
-This article documents the stable signing-provider package boundary carried forward into the current AsiBackbone `5.x` package family.
+This article documents the stable signing-provider package boundary carried forward into the current AsiBackbone `6.x` package family.
 
 Issue: #253, updated for #512.
 
@@ -31,13 +31,13 @@ The approved production runtime signing-provider story is **provider-neutral onl
 
 AsiBackbone documents how hosts can connect Azure Key Vault, AWS KMS, GCP Cloud KMS, HSM, certificate-store, or enterprise key-management clients through `AsiBackbone.Signing.ManagedKey`. AsiBackbone does not ship or maintain first-party production signing provider packages for those systems, and it does not ship a production-style signing sample host that could be mistaken for a supported provider implementation.
 
-This boundary keeps AsiBackbone focused on governance flow, audit residue, canonical signing seams, safe metadata, and verification contracts while leaving key custody and provider operations with the consuming host.
+This boundary keeps AsiBackbone focused on governance flow, decision receipt, canonical signing seams, safe metadata, and verification contracts while leaving key custody and provider operations with the consuming host.
 
 ## Ownership boundaries
 
 | Layer | Owns | Must not own |
 | --- | --- | --- |
-| Core | `IAsiBackboneSigningService`, `IAsiBackboneSignatureVerificationService`, signing requests/results, signing metadata, provider-neutral canonical payload/hash contracts, verification-policy primitives, and safe metadata fields. | Azure SDKs, HSM SDKs, cloud KMS clients, local key-file production handling, certificate stores, credentials, raw keys, managed identity tokens, immutable storage, blockchain anchoring, legal interpretation, or compliance certification. |
+| Core | `IGovernanceSigningService`, `IGovernanceSignatureVerificationService`, signing requests/results, signing metadata, provider-neutral canonical payload/hash contracts, verification-policy primitives, and safe metadata fields. | Azure SDKs, HSM SDKs, cloud KMS clients, local key-file production handling, certificate stores, credentials, raw keys, managed identity tokens, immutable storage, blockchain anchoring, legal interpretation, or compliance certification. |
 | Local-development signing provider | Deterministic local signing/verification proof path, test/sample wiring, and local metadata assertions. | Production key custody, managed-key behavior, legal non-repudiation, immutability, or tamper-evidence. |
 | Managed-key adapter package | Adapter service, provider options, DI registration helpers, algorithm mapping, key reference validation, provider diagnostics, and provider-specific failure handling around a host-owned client. | Concrete Azure Key Vault/HSM/KMS client implementation by default, first-party production provider packages, production-style signing sample hosts, host policy decisions, host authentication, host authorization, durable audit ownership, database migrations, retention policy, or claims that records are tamper-evident by default. |
 | Host application | Configuration source, key identity, managed-key client implementation, provider credentials or managed identity, production failure policy, logging policy, persistence lifecycle, deployment, monitoring, verification path, and incident response. | Requiring Core to know provider secrets or making Core responsible for operational key management. |
@@ -60,7 +60,8 @@ A host-owned concrete signing client should:
 
 A concrete verifier should:
 
-- verify a supplied signing hash against provider-neutral signing metadata;
+- verify `SignatureVerificationRequest.SignatureInput` against provider-neutral signing metadata, not the signing hash text;
+- reject a `Provider` label it does not own, because the provider label is not part of the signature input;
 - use key ID and key version whenever available;
 - distinguish invalid signatures, hash mismatches, missing signatures, unknown key versions, unsupported algorithms, provider unavailability, and revoked or disabled keys where the provider can detect them;
 - avoid silently treating unverifiable records as trusted.

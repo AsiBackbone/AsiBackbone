@@ -7,7 +7,7 @@ using BenchmarkDotNet.Attributes;
 namespace AsiBackbone.Benchmarks.BenchmarkDotNet;
 
 /// <summary>
-/// Allocation-focused benchmark scenarios for <see cref="DefaultAsiBackbonePolicyEvaluator{TContext}"/>.
+/// Allocation-focused benchmark scenarios for <see cref="DefaultGovernancePolicyEvaluator{TContext}"/>.
 /// </summary>
 /// <remarks>
 /// These scenarios isolate the decision-policy and denied-decision composition paths reviewed in issue #484.
@@ -23,29 +23,29 @@ public class PolicyEvaluatorAllocationBenchmarks
     private readonly BdnPolicyContext firstDenialWithDecisionPolicyContext = CreateContext("policy_evaluator.first_denial_with_decision_policy");
     private readonly BdnPolicyContext firstDenialReasonCompositionContext = CreateContext("policy_evaluator.first_denial_reason_composition");
 
-    private readonly IAsiBackbonePolicyEvaluator<BdnPolicyContext> allAllowWithDecisionPolicyEvaluator =
-        DefaultAsiBackbonePolicyEvaluator.CreateBuilder<BdnPolicyContext>()
+    private readonly IGovernancePolicyEvaluator<BdnPolicyContext> allAllowWithDecisionPolicyEvaluator =
+        DefaultGovernancePolicyEvaluator.CreateBuilder<BdnPolicyContext>()
             .AddConstraints(CreateStaticConstraints(8, ConstraintEvaluationResult.Allow()))
             .WithDecisionPolicy(new BdnPassThroughDecisionPolicy())
             .Build();
 
-    private readonly IAsiBackbonePolicyEvaluator<BdnPolicyContext> mixedWithDecisionPolicyEvaluator =
-        DefaultAsiBackbonePolicyEvaluator.CreateBuilder<BdnPolicyContext>()
+    private readonly IGovernancePolicyEvaluator<BdnPolicyContext> mixedWithDecisionPolicyEvaluator =
+        DefaultGovernancePolicyEvaluator.CreateBuilder<BdnPolicyContext>()
             .AddConstraints(CreateMixedConstraints())
             .WithDecisionPolicy(new BdnPassThroughDecisionPolicy())
             .Build();
 
-    private readonly IAsiBackbonePolicyEvaluator<BdnPolicyContext> firstDenialWithDecisionPolicyEvaluator =
-        DefaultAsiBackbonePolicyEvaluator.CreateBuilder<BdnPolicyContext>()
+    private readonly IGovernancePolicyEvaluator<BdnPolicyContext> firstDenialWithDecisionPolicyEvaluator =
+        DefaultGovernancePolicyEvaluator.CreateBuilder<BdnPolicyContext>()
             .AddConstraints(CreateMixedConstraints())
             .WithDecisionPolicy(new BdnPassThroughDecisionPolicy())
-            .WithOptions(new AsiBackbonePolicyEvaluatorOptions { ShortCircuitOnFirstDenial = true })
+            .WithOptions(new GovernancePolicyOptions { ShortCircuitOnFirstDenial = true })
             .Build();
 
-    private readonly IAsiBackbonePolicyEvaluator<BdnPolicyContext> firstDenialReasonCompositionEvaluator =
-        DefaultAsiBackbonePolicyEvaluator.CreateBuilder<BdnPolicyContext>()
+    private readonly IGovernancePolicyEvaluator<BdnPolicyContext> firstDenialReasonCompositionEvaluator =
+        DefaultGovernancePolicyEvaluator.CreateBuilder<BdnPolicyContext>()
             .AddConstraints(CreateWarningThenDenialConstraints())
-            .WithOptions(new AsiBackbonePolicyEvaluatorOptions { ShortCircuitOnFirstDenial = true })
+            .WithOptions(new GovernancePolicyOptions { ShortCircuitOnFirstDenial = true })
             .Build();
 
     /// <summary>
@@ -128,9 +128,9 @@ public class PolicyEvaluatorAllocationBenchmarks
         };
     }
 
-    private static IAsiBackboneConstraint<BdnPolicyContext>[] CreateStaticConstraints(int count, ConstraintEvaluationResult result)
+    private static IGovernanceConstraint<BdnPolicyContext>[] CreateStaticConstraints(int count, ConstraintEvaluationResult result)
     {
-        var constraints = new IAsiBackboneConstraint<BdnPolicyContext>[count];
+        var constraints = new IGovernanceConstraint<BdnPolicyContext>[count];
 
         for (int index = 0; index < constraints.Length; index++)
         {
@@ -140,7 +140,7 @@ public class PolicyEvaluatorAllocationBenchmarks
         return constraints;
     }
 
-    private static IAsiBackboneConstraint<BdnPolicyContext>[] CreateMixedConstraints()
+    private static IGovernanceConstraint<BdnPolicyContext>[] CreateMixedConstraints()
     {
         return
         [
@@ -153,7 +153,7 @@ public class PolicyEvaluatorAllocationBenchmarks
         ];
     }
 
-    private static IAsiBackboneConstraint<BdnPolicyContext>[] CreateWarningThenDenialConstraints()
+    private static IGovernanceConstraint<BdnPolicyContext>[] CreateWarningThenDenialConstraints()
     {
         return
         [
@@ -163,7 +163,7 @@ public class PolicyEvaluatorAllocationBenchmarks
         ];
     }
 
-    private sealed class BdnStaticConstraint(string name, ConstraintEvaluationResult result) : IAsiBackboneConstraint<BdnPolicyContext>
+    private sealed class BdnStaticConstraint(string name, ConstraintEvaluationResult result) : IGovernanceConstraint<BdnPolicyContext>
     {
         public string Name { get; } = name;
 
@@ -174,7 +174,7 @@ public class PolicyEvaluatorAllocationBenchmarks
         }
     }
 
-    private sealed class BdnPassThroughDecisionPolicy : IAsiBackboneDecisionPolicy<BdnPolicyContext>
+    private sealed class BdnPassThroughDecisionPolicy : IGovernanceDecisionPolicy<BdnPolicyContext>
     {
         public ValueTask<GovernanceDecision> ApplyAsync(
             BdnPolicyContext context,
@@ -187,7 +187,7 @@ public class PolicyEvaluatorAllocationBenchmarks
         }
     }
 
-    private sealed class BdnPolicyContext : IAsiBackboneConstraintEvaluationContext
+    private sealed class BdnPolicyContext : IGovernanceEvaluationContext
     {
         public string? CorrelationId { get; init; }
         public string? PolicyVersion { get; init; }

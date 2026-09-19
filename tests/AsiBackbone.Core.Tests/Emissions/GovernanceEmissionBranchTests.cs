@@ -19,7 +19,7 @@ public sealed class GovernanceEmissionBranchTests
         _ = Assert.Throws<ArgumentOutOfRangeException>(() =>
             GovernanceEmissionEnvelope.Create(
                 GovernanceEmissionEventType.AuditLifecycle,
-                lifecycleStage: (AuditResidueLifecycleStage)999));
+                lifecycleStage: (DecisionReceiptLifecycleStage)999));
     }
 
     /// <summary>
@@ -61,10 +61,10 @@ public sealed class GovernanceEmissionBranchTests
     /// Tests that when creating a governance emission envelope from an audit residue, if the caller-supplied metadata contains keys that overlap with the residue's metadata, the caller's values take precedence in the resulting envelope's metadata.
     /// </summary>
     [Fact]
-    public void FromResidueUsesCallerMetadataWhenKeysOverlapResidueMetadata()
+    public void FromDecisionReceiptUsesCallerMetadataWhenKeysOverlapResidueMetadata()
     {
-        var residue = AuditResidue.Create(
-            AsiBackboneActorContext.Service("service-123"),
+        var residue = DecisionReceipt.Create(
+            GovernanceActorContext.Service("service-123"),
             "document.approve",
             "Allowed",
             eventId: "event-123",
@@ -76,7 +76,7 @@ public sealed class GovernanceEmissionBranchTests
             },
             auditResidueId: "residue-123");
 
-        var envelope = GovernanceEmissionEnvelope.FromResidue(
+        var envelope = GovernanceEmissionEnvelope.FromDecisionReceipt(
             residue,
             metadata: new Dictionary<string, string>
             {
@@ -95,8 +95,8 @@ public sealed class GovernanceEmissionBranchTests
     [Fact]
     public void FromLifecycleEventUsesCallerMetadataWhenKeysOverlapLifecycleMetadata()
     {
-        var lifecycleEvent = AuditResidueLifecycleEvent.Create(
-            AuditResidueLifecycleStage.ExternalEmissionQueued,
+        var lifecycleEvent = DecisionReceiptLifecycleEvent.Create(
+            DecisionReceiptLifecycleStage.ExternalEmissionQueued,
             "correlation-123",
             auditResidueId: "residue-123",
             eventId: "lifecycle-123",

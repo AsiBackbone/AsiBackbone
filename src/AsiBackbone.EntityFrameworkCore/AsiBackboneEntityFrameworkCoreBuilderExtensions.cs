@@ -29,7 +29,7 @@ public static class AsiBackboneEntityFrameworkCoreBuilderExtensions
     {
         ArgumentNullException.ThrowIfNull(builder);
 
-        _ = builder.Services.AddScoped<IAsiBackboneAuditLedgerStore>(serviceProvider =>
+        _ = builder.Services.AddScoped<IGovernanceAuditLedgerStore>(serviceProvider =>
             ActivatorUtilities.CreateInstance<EfCoreAuditLedgerStore>(
                 serviceProvider,
                 serviceProvider.GetRequiredService<TDbContext>()));
@@ -38,7 +38,7 @@ public static class AsiBackboneEntityFrameworkCoreBuilderExtensions
     }
 
     /// <summary>
-    /// Adds EF Core audit residue lifecycle storage through the AsiBackbone builder facade.
+    /// Adds EF Core decision receipt lifecycle storage through the AsiBackbone builder facade.
     /// </summary>
     /// <typeparam name="TDbContext">The host-owned context holding the lifecycle set.</typeparam>
     /// <param name="builder">The AsiBackbone builder.</param>
@@ -48,8 +48,8 @@ public static class AsiBackboneEntityFrameworkCoreBuilderExtensions
     {
         ArgumentNullException.ThrowIfNull(builder);
 
-        _ = builder.Services.AddScoped<IAsiBackboneAuditResidueLifecycleStore>(serviceProvider =>
-            ActivatorUtilities.CreateInstance<EfCoreAuditResidueLifecycleStore>(
+        _ = builder.Services.AddScoped<IDecisionReceiptLifecycleStore>(serviceProvider =>
+            ActivatorUtilities.CreateInstance<EfCoreDecisionReceiptLifecycleStore>(
                 serviceProvider,
                 serviceProvider.GetRequiredService<TDbContext>()));
 
@@ -57,7 +57,7 @@ public static class AsiBackboneEntityFrameworkCoreBuilderExtensions
     }
 
     /// <summary>
-    /// Adds outcome-aware EF Core durable governance outbox storage through the AsiBackbone builder facade.
+    /// Adds outcome-aware EF Core durable outbox storage through the AsiBackbone builder facade.
     /// </summary>
     /// <typeparam name="TDbContext">The host-owned context holding the outbox set.</typeparam>
     /// <param name="builder">The AsiBackbone builder.</param>
@@ -71,11 +71,11 @@ public static class AsiBackboneEntityFrameworkCoreBuilderExtensions
             ActivatorUtilities.CreateInstance<EfCoreGovernanceOutboxOutcomeStore>(
                 serviceProvider,
                 serviceProvider.GetRequiredService<TDbContext>()));
-        _ = builder.Services.AddScoped<IAsiBackboneGovernanceOutboxClaimOutcomeStore>(serviceProvider =>
+        _ = builder.Services.AddScoped<IGovernanceOutboxClaimOutcomeStore>(serviceProvider =>
             serviceProvider.GetRequiredService<EfCoreGovernanceOutboxOutcomeStore>());
-        _ = builder.Services.AddScoped<IAsiBackboneGovernanceOutboxClaimStore>(serviceProvider =>
+        _ = builder.Services.AddScoped<IGovernanceOutboxClaimStore>(serviceProvider =>
             serviceProvider.GetRequiredService<EfCoreGovernanceOutboxOutcomeStore>());
-        _ = builder.Services.AddScoped<IAsiBackboneGovernanceOutboxStore>(serviceProvider =>
+        _ = builder.Services.AddScoped<IGovernanceOutboxStore>(serviceProvider =>
             serviceProvider.GetRequiredService<EfCoreGovernanceOutboxOutcomeStore>());
 
         return builder;

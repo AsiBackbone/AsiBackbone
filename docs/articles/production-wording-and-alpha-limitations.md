@@ -1,11 +1,11 @@
 # Production Wording and Stable Signing Boundaries
 
-This article defines documentation wording boundaries for the current stable `5.x` AsiBackbone package family. It keeps current behavior, host responsibilities, released signing surfaces, provider boundaries, and future-provider strategy clearly separated.
+This article defines documentation wording boundaries for the current stable `6.x` AsiBackbone package family. It keeps current behavior, host responsibilities, released signing surfaces, provider boundaries, and future-provider strategy clearly separated.
 
 AsiBackbone is a governance spine for consequential software decision flow. It is not an AI model host, autonomous execution engine, key-management product, compliance certification product, immutable audit store, cloud governance platform, or operational guarantee by itself.
 
 > [!IMPORTANT]
-> Documentation should describe only implemented and released behavior as current behavior. The stable `5.x` family carries forward Core signing-ready and verification primitives, the local-development signing provider, and the managed-key adapter boundary. These surfaces still have important limits: local-development signing is for tests and samples, the managed-key package is an adapter boundary, and signing alone does not create production-grade audit guarantees without host-owned storage, key management, verification, monitoring, and retention controls.
+> Documentation should describe only implemented and released behavior as current behavior. The stable `6.x` family carries forward Core signing-ready and verification primitives, the local-development signing provider, and the managed-key adapter boundary. These surfaces still have important limits: local-development signing is for tests and samples, the managed-key package is an adapter boundary, and signing alone does not create production-grade audit guarantees without host-owned storage, key management, verification, monitoring, and retention controls.
 
 For sensitive security concerns, use the repository [Security Policy and Vulnerability Disclosure](https://github.com/AsiBackbone/AsiBackbone/blob/main/SECURITY.md). This article is a public wording guide, not a private reporting channel or certification statement.
 
@@ -13,8 +13,8 @@ For sensitive security concerns, use the repository [Security Policy and Vulnera
 
 | Topic | Preferred wording | Avoid wording |
 | --- | --- | --- |
-| Project identity | `Accountable Systems Infrastructure`, governance spine, decision governance infrastructure | artificial superintelligence implementation, AI model, ASI engine |
-| Current audit records | audit residue, audit ledger record, durable local/outbox record when configured | immutable audit store or production-grade evidence by default |
+| Project identity | `governance infrastructure`, policy decision pipeline, decision governance infrastructure | artificial superintelligence implementation, AI model, ASI engine |
+| Current audit records | decision receipt, audit ledger record, durable local/outbox record when configured | immutable audit store or production-grade evidence by default |
 | Stable Core signing primitives | signing-ready metadata, canonical payload hashing, provider-neutral signing and verification seams, verification-policy primitives | cryptographically signed by default or automatically verified by default |
 | Local-development signing provider | released local-development signer for tests, samples, local validation, and wiring proof paths | production signer or production key custody |
 | Managed-key adapter boundary | released managed-key signing adapter boundary with host-owned managed-key client and operational policy | built-in cloud key service or automatic production trust |
@@ -64,7 +64,7 @@ Default wording should preserve this sequence:
 
 ```text
 Decision or acknowledgment
-  -> audit residue / governance record
+  -> decision receipt / governance record
   -> durable local store or outbox when configured
   -> optional signing or verification boundary when configured
   -> optional provider emission

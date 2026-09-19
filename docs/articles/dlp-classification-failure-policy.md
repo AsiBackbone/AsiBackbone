@@ -35,8 +35,8 @@ Core owns:
 | `DlpFailureBehavior` | Configured behavior: allow, warn and allow, deny, defer, require acknowledgment, or escalate. |
 | `DlpFailurePolicyContext` | Provider-neutral failure context carrying risk, category, environment, timeout, correlation, policy, and safe metadata. |
 | `DlpFailurePolicyOptions` | Default risk behavior and risk/failure-specific overrides. |
-| `IAsiBackboneDlpFailurePolicyResolver` | Resolver abstraction for converting failure context into a policy resolution. |
-| `DefaultAsiBackboneDlpFailurePolicyResolver` | Default resolver using `DlpFailurePolicyOptions`. |
+| `IDlpFailurePolicyResolver` | Resolver abstraction for converting failure context into a policy resolution. |
+| `DefaultDlpFailurePolicyResolver` | Default resolver using `DlpFailurePolicyOptions`. |
 | `DlpFailurePolicyResolution` | Resolved behavior, reason code, and `GovernanceDecision`. |
 | `DlpFailureReasonCodes` | Stable reason-code constants. |
 
@@ -90,7 +90,7 @@ options.BehaviorOverrides[new DlpFailurePolicyKey(
     DlpIntentRiskLevel.High,
     DlpClassificationFailureKind.BlockedResult)] = DlpFailureBehavior.Escalate;
 
-var resolver = new DefaultAsiBackboneDlpFailurePolicyResolver(options);
+var resolver = new DefaultDlpFailurePolicyResolver(options);
 ```
 
 ## Timeout handling
@@ -118,7 +118,7 @@ Host applications should invoke their chosen scanner before provider emission or
 Host scanner
   -> provider-specific result or exception
   -> DlpFailurePolicyContext
-  -> IAsiBackboneDlpFailurePolicyResolver
+  -> IDlpFailurePolicyResolver
   -> DlpFailurePolicyResolution
   -> GovernanceDecision
 ```
@@ -133,7 +133,7 @@ Provider packages or host adapters should normalize provider-specific failures b
 Purview / custom classifier / internal DLP / future provider
   -> provider-specific result or exception
   -> DlpFailurePolicyContext
-  -> IAsiBackboneDlpFailurePolicyResolver
+  -> IDlpFailurePolicyResolver
   -> DlpFailurePolicyResolution
   -> GovernanceDecision
 ```
@@ -145,7 +145,7 @@ Provider-specific HTTP status codes, SDK exception types, classifier labels, or 
 The DLP failure policy model supports the durable audit and outbox direction:
 
 ```text
-Audit residue or emission envelope
+Decision receipt or emission envelope
   -> host DLP/classification check
   -> failure or indeterminate result
   -> DlpFailurePolicyResolution

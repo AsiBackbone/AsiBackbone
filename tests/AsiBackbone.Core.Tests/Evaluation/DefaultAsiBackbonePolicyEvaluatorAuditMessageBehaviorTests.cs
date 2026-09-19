@@ -21,7 +21,7 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorAuditMessageBehaviorTests
         TestPolicyContext context = CreateContext();
         var observedOrder = new List<string>();
 
-        var evaluator = new DefaultAsiBackbonePolicyEvaluator<TestPolicyContext>(
+        var evaluator = new DefaultGovernancePolicyEvaluator<TestPolicyContext>(
             [
                 new DelegateConstraint(
                     "pre-warning-constraint",
@@ -51,7 +51,7 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorAuditMessageBehaviorTests
                             "The second denial also blocked the operation.");
                     })
             ],
-            [CreateWarningContributor()]);
+            [CreateWarningContributor()], decisionPolicy: null, options: null, logger: null);
 
         GovernanceDecision decision = await evaluator.EvaluateAsync(context, TestContext.Current.CancellationToken);
 
@@ -73,7 +73,7 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorAuditMessageBehaviorTests
         TestPolicyContext context = CreateContext();
         var observedOrder = new List<string>();
 
-        var evaluator = new DefaultAsiBackbonePolicyEvaluator<TestPolicyContext>(
+        var evaluator = new DefaultGovernancePolicyEvaluator<TestPolicyContext>(
             [
                 new DelegateConstraint(
                     "pre-warning-constraint",
@@ -105,10 +105,10 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorAuditMessageBehaviorTests
             ],
             [CreateWarningContributor()],
             decisionPolicy: null,
-            options: new AsiBackbonePolicyEvaluatorOptions
+            options: new GovernancePolicyOptions
             {
                 ShortCircuitOnFirstDenial = true
-            });
+            }, logger: null);
 
         GovernanceDecision decision = await evaluator.EvaluateAsync(context, TestContext.Current.CancellationToken);
 
@@ -142,7 +142,7 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorAuditMessageBehaviorTests
                 GovernanceDecisionOutcome.Warning));
     }
 
-    private sealed class TestPolicyContext : IAsiBackboneConstraintEvaluationContext
+    private sealed class TestPolicyContext : IGovernanceEvaluationContext
     {
         public string? CorrelationId { get; init; }
 
@@ -156,7 +156,7 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorAuditMessageBehaviorTests
 
     private sealed class DelegateConstraint(
         string name,
-        Func<TestPolicyContext, CancellationToken, ConstraintEvaluationResult> evaluate) : IAsiBackboneConstraint<TestPolicyContext>
+        Func<TestPolicyContext, CancellationToken, ConstraintEvaluationResult> evaluate) : IGovernanceConstraint<TestPolicyContext>
     {
         private readonly Func<TestPolicyContext, CancellationToken, ConstraintEvaluationResult> evaluate = evaluate;
 

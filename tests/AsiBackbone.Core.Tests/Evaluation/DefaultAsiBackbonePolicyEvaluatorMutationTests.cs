@@ -19,7 +19,7 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorMutationTests
     {
         TestPolicyContext context = CreateContext();
 
-        var evaluator = new DefaultAsiBackbonePolicyEvaluator<TestPolicyContext>(
+        var evaluator = new DefaultGovernancePolicyEvaluator<TestPolicyContext>(
             [
                 new StaticConstraint(
                     ConstraintEvaluationResult.Warning(
@@ -34,7 +34,7 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorMutationTests
                     ConstraintEvaluationResult.Deny(
                         "constraint.denied.second",
                         "The second constraint denied the operation."))
-            ]);
+            ], threatModelContributors: null, decisionPolicy: null, options: null, logger: null);
 
         GovernanceDecision decision = await evaluator.EvaluateAsync(context, TestContext.Current.CancellationToken);
 
@@ -58,7 +58,7 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorMutationTests
     {
         TestPolicyContext context = CreateContext();
 
-        var evaluator = new DefaultAsiBackbonePolicyEvaluator<TestPolicyContext>(
+        var evaluator = new DefaultGovernancePolicyEvaluator<TestPolicyContext>(
             [
                 new StaticConstraint(ConstraintEvaluationResult.Allow()),
                 new StaticConstraint(ConstraintEvaluationResult.NotApplicable()),
@@ -70,7 +70,7 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorMutationTests
                     ConstraintEvaluationResult.Warning(
                         "constraint.warning.second",
                         "The second warning was produced."))
-            ]);
+            ], threatModelContributors: null, decisionPolicy: null, options: null, logger: null);
 
         GovernanceDecision decision = await evaluator.EvaluateAsync(context, TestContext.Current.CancellationToken);
 
@@ -95,7 +95,7 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorMutationTests
         int constraintsRun = 0;
         var policy = new PassthroughCapturingDecisionPolicy();
 
-        var evaluator = new DefaultAsiBackbonePolicyEvaluator<TestPolicyContext>(
+        var evaluator = new DefaultGovernancePolicyEvaluator<TestPolicyContext>(
             [
                 new DelegateConstraint(
                     (_, _) =>
@@ -122,7 +122,7 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorMutationTests
                                 "The constraint produced a warning."));
                     })
             ],
-            policy);
+            decisionPolicy: policy, threatModelContributors: null, options: null, logger: null);
 
         GovernanceDecision decision = await evaluator.EvaluateAsync(context, TestContext.Current.CancellationToken);
 
@@ -153,7 +153,7 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorMutationTests
         int secondConstraintRuns = 0;
         using var cancellationTokenSource = new CancellationTokenSource();
 
-        var evaluator = new DefaultAsiBackbonePolicyEvaluator<TestPolicyContext>(
+        var evaluator = new DefaultGovernancePolicyEvaluator<TestPolicyContext>(
             [
                 new DelegateConstraint(
                     (_, _) =>
@@ -169,7 +169,7 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorMutationTests
                         secondConstraintRuns++;
                         return new ValueTask<ConstraintEvaluationResult>(ConstraintEvaluationResult.Allow());
                     })
-            ]);
+            ], threatModelContributors: null, decisionPolicy: null, options: null, logger: null);
 
         _ = await Assert.ThrowsAsync<OperationCanceledException>(async () =>
             await evaluator.EvaluateAsync(context, cancellationTokenSource.Token));
@@ -188,7 +188,7 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorMutationTests
         };
     }
 
-    private sealed class TestPolicyContext : IAsiBackboneConstraintEvaluationContext
+    private sealed class TestPolicyContext : IGovernanceEvaluationContext
     {
         public string? CorrelationId { get; init; }
 
@@ -200,7 +200,7 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorMutationTests
             new Dictionary<string, string>(StringComparer.Ordinal);
     }
 
-    private sealed class StaticConstraint(ConstraintEvaluationResult result) : IAsiBackboneConstraint<TestPolicyContext>
+    private sealed class StaticConstraint(ConstraintEvaluationResult result) : IGovernanceConstraint<TestPolicyContext>
     {
         private readonly ConstraintEvaluationResult result = result;
 
@@ -215,7 +215,7 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorMutationTests
     }
 
     private sealed class DelegateConstraint(
-        Func<TestPolicyContext, CancellationToken, ValueTask<ConstraintEvaluationResult>> evaluate) : IAsiBackboneConstraint<TestPolicyContext>
+        Func<TestPolicyContext, CancellationToken, ValueTask<ConstraintEvaluationResult>> evaluate) : IGovernanceConstraint<TestPolicyContext>
     {
         private readonly Func<TestPolicyContext, CancellationToken, ValueTask<ConstraintEvaluationResult>> evaluate = evaluate;
 
@@ -229,7 +229,7 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorMutationTests
         }
     }
 
-    private sealed class PassthroughCapturingDecisionPolicy : IAsiBackboneDecisionPolicy<TestPolicyContext>
+    private sealed class PassthroughCapturingDecisionPolicy : IGovernanceDecisionPolicy<TestPolicyContext>
     {
         public GovernanceDecision? ComposedDecision { get; private set; }
 

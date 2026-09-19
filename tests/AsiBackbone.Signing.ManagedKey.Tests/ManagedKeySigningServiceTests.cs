@@ -290,7 +290,7 @@ public sealed class ManagedKeySigningServiceTests
         using ServiceProvider serviceProvider = services.BuildServiceProvider();
 
         Assert.NotNull(serviceProvider.GetRequiredService<ManagedKeySigningService>());
-        Assert.NotNull(serviceProvider.GetRequiredService<IAsiBackboneSigningService>());
+        Assert.NotNull(serviceProvider.GetRequiredService<IGovernanceSigningService>());
         Assert.False(serviceProvider.GetRequiredService<ManagedKeySigningOptions>().ReturnUnsignedOnFailure);
     }
 
@@ -314,7 +314,7 @@ public sealed class ManagedKeySigningServiceTests
         using ServiceProvider serviceProvider = services.BuildServiceProvider();
 
         Assert.NotNull(serviceProvider.GetRequiredService<ManagedKeySigningService>());
-        Assert.NotNull(serviceProvider.GetRequiredService<IAsiBackboneSigningService>());
+        Assert.NotNull(serviceProvider.GetRequiredService<IGovernanceSigningService>());
         Assert.True(serviceProvider.GetRequiredService<ManagedKeySigningOptions>().ReturnUnsignedOnFailure);
     }
 
@@ -333,6 +333,38 @@ public sealed class ManagedKeySigningServiceTests
             returnUnsignedOnFailure: returnUnsignedOnFailure,
             maxRetryAttempts: maxRetryAttempts,
             retryDelay: retryDelay ?? TimeSpan.Zero);
+    }
+
+    /// <summary>
+    /// Verifies that the managed-key client receives the exact signature input Core supplied, so a host client that signs
+    /// it binds the signing policy context rather than the hash text alone.
+    /// </summary>
+    /// <returns>A task representing the asynchronous operation.</returns>
+    [Fact]
+    public async Task SignAsyncPassesSignatureInputToClient()
+    {
+        var client = new FakeManagedKeySigningClient();
+        var service = new ManagedKeySigningService(CreateOptions(), client);
+        var hash = CanonicalPayloadHash.Create(
+            CanonicalArtifactTypes.AuditLedgerRecord,
+            "record-1",
+            "schema-v1",
+            CanonicalPayloadOptions.DefaultCanonicalizationVersion,
+            CanonicalPayloadOptions.DefaultHashAlgorithm,
+            "abc123");
+        SigningRequest request = GovernanceArtifactSigner.CreateSigningRequest(
+            hash,
+            keyId: "managed-key-1",
+            keyVersion: "v1",
+            metadata: new Dictionary<string, string>(StringComparer.Ordinal)
+            {
+                [GovernanceSignatureInput.PolicyVersionMetadataKey] = "policy-v1"
+            });
+
+        _ = await service.SignAsync(request, TestContext.Current.CancellationToken);
+
+        Assert.False(request.UsesLegacySignatureInput);
+        Assert.True(client.LastSignatureInput.Span.SequenceEqual(request.SignatureInput.Span));
     }
 
     private static ManagedKeySigningOptions CreateLocalValidationOptions(
@@ -354,6 +386,8 @@ public sealed class ManagedKeySigningServiceTests
     {
         public int CallCount { get; private set; }
 
+        public ReadOnlyMemory<byte> LastSignatureInput { get; private set; }
+
         public ValueTask<ManagedKeySignResult> SignAsync(
             ManagedKeySignRequest request,
             CancellationToken cancellationToken = default)
@@ -361,6 +395,7 @@ public sealed class ManagedKeySigningServiceTests
             ArgumentNullException.ThrowIfNull(request);
             cancellationToken.ThrowIfCancellationRequested();
             CallCount++;
+            LastSignatureInput = request.SignatureInput;
 
             if (CallCount <= retryableFailuresBeforeSuccess)
             {

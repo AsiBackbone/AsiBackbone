@@ -5,8 +5,10 @@ using AsiBackbone.Core.Audit;
 using AsiBackbone.Core.Constraints;
 using AsiBackbone.Core.Decisions;
 using AsiBackbone.Core.Evaluation;
+using AsiBackbone.Core.ThreatModeling;
 using AsiBackbone.Storage.InMemory.Audit;
 using Company.AsibackboneTemplate.Governance;
+using Microsoft.Extensions.Options;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
@@ -14,13 +16,20 @@ builder.Services.AddControllers();
 builder.Services.AddAsiBackboneAspNetCore();
 
 builder.Services.AddSingleton<InMemoryAuditLedger>();
-builder.Services.AddSingleton<IAsiBackboneAuditSink>(serviceProvider =>
+builder.Services.AddSingleton<IDecisionReceiptSink>(serviceProvider =>
     serviceProvider.GetRequiredService<InMemoryAuditLedger>());
 
-builder.Services.AddSingleton<IAsiBackboneEndpointCapabilityGrantValidator, SampleCapabilityGrantValidator>();
-builder.Services.AddSingleton<IAsiBackboneConstraint<AsiBackboneConstraintEvaluationContext>, SampleRegionConstraint>();
-builder.Services.AddSingleton<IAsiBackboneDecisionPolicy<AsiBackboneConstraintEvaluationContext>, SampleDecisionPolicy>();
-builder.Services.AddSingleton<IAsiBackbonePolicyEvaluator<AsiBackboneConstraintEvaluationContext>, DefaultAsiBackbonePolicyEvaluator<AsiBackboneConstraintEvaluationContext>>();
+builder.Services.AddSingleton<IEndpointCapabilityGrantValidator, SampleCapabilityGrantValidator>();
+builder.Services.AddSingleton<IGovernanceConstraint<GovernanceEvaluationContext>, SampleRegionConstraint>();
+builder.Services.AddSingleton<IGovernanceDecisionPolicy<GovernanceEvaluationContext>, SampleDecisionPolicy>();
+builder.Services.AddSingleton<IGovernancePolicyEvaluator<GovernanceEvaluationContext>>(serviceProvider =>
+    DefaultGovernancePolicyEvaluator.CreateBuilder<GovernanceEvaluationContext>()
+        .AddConstraints(serviceProvider.GetServices<IGovernanceConstraint<GovernanceEvaluationContext>>())
+        .AddThreatModelContributors(serviceProvider.GetServices<IThreatModelContributor<GovernanceEvaluationContext>>())
+        .WithDecisionPolicy(serviceProvider.GetService<IGovernanceDecisionPolicy<GovernanceEvaluationContext>>())
+        .WithOptions(serviceProvider.GetRequiredService<IOptions<GovernancePolicyOptions>>().Value)
+        .WithLogger(serviceProvider.GetService<ILogger<DefaultGovernancePolicyEvaluator<GovernanceEvaluationContext>>>())
+        .Build());
 
 WebApplication app = builder.Build();
 
@@ -39,13 +48,13 @@ app.MapGet("/", () => Results.Redirect("/sample/decision"));
 
 app.MapGet("/sample/decision", async (
     HttpContext httpContext,
-    IAsiBackbonePolicyEvaluator<AsiBackboneConstraintEvaluationContext> evaluator,
-    IAsiBackboneAuditSink auditSink,
+    IGovernancePolicyEvaluator<GovernanceEvaluationContext> evaluator,
+    IDecisionReceiptSink auditSink,
     CancellationToken cancellationToken) =>
 {
     string correlationId = httpContext.TraceIdentifier;
 
-    var context = new AsiBackboneConstraintEvaluationContext(
+    var context = new GovernanceEvaluationContext(
         correlationId: correlationId,
         policyVersion: "template-policy-v1",
         policyHash: "template-policy-hash",
@@ -61,8 +70,8 @@ app.MapGet("/sample/decision", async (
         .EvaluateAsync(context, cancellationToken)
         .ConfigureAwait(false);
 
-    var residue = AuditResidue.FromDecision(
-        AsiBackboneActorContext.Human("template-user", "Template User"),
+    var residue = DecisionReceipt.FromDecision(
+        GovernanceActorContext.Human("template-user", "Template User"),
         operationName: "template.sample.decision",
         decision,
         metadata: context.Metadata);
@@ -102,7 +111,7 @@ app.MapPost("/sample/minimal/execute", () => Results.Ok(new
 .RequireCapabilityGrant("sample.execute")
 .EmitGovernanceAudit();
 
-// Audit residue records who attempted what and why it was allowed or denied, so reading it is a governed operation
+// Decision receipt records who attempted what and why it was allowed or denied, so reading it is a governed operation
 // rather than an open lookup. It carries its own capability requirement, separate from executing the sample endpoints.
 app.MapGet("/sample/audit/{correlationId}", (
     string correlationId,

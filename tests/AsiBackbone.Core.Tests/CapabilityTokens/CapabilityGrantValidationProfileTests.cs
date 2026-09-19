@@ -189,7 +189,7 @@ public sealed class CapabilityGrantValidationProfileTests
         return SignedGovernanceArtifacts.FromSigningMetadata(grant, payload, hash, signingMetadata);
     }
 
-    private sealed class StubVerificationService : IAsiBackboneSignatureVerificationService
+    private sealed class StubVerificationService : IGovernanceSignatureVerificationService
     {
         public bool WasCalled { get; private set; }
 

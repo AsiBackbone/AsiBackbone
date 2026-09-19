@@ -7,10 +7,10 @@ An `Allowed` decision is therefore not proof that execution started, completed, 
 ## Accountability chain
 
 ```text
-AuditResidue / AuditLedgerRecord
+DecisionReceipt / AuditLedgerRecord
         -> operation execution identity
         -> host-owned mutation audit batch
-        -> AuditResidueLifecycleEvent completion record
+        -> DecisionReceiptLifecycleEvent completion record
 ```
 
 Each record remains authoritative for a separate question:
@@ -45,9 +45,9 @@ GovernedOperationExecutionReceipt receipt =
         persistenceProvider: "relational",
         decisionAuditRecordId: decisionRecord.RecordId);
 
-AuditResidueLifecycleEvent completed =
+DecisionReceiptLifecycleEvent completed =
     HostAccountabilityLifecycleEvent.FromExecutionReceipt(
-        residue,
+        receipt,
         receipt);
 
 await lifecycleStore.AppendAsync(completed, cancellationToken);
@@ -57,7 +57,7 @@ The helper uses the existing `GatewayExecutionCompleted` lifecycle stage. Outcom
 
 ## Recommended host sequence
 
-1. Evaluate policy and persist the decision `AuditResidue` or `AuditLedgerRecord`.
+1. Evaluate policy and persist the decision `DecisionReceipt` or `AuditLedgerRecord`.
 2. Create a stable operation execution ID and an attempt ID.
 3. Append `HostAccountabilityLifecycleEvent.ExecutionStarted(...)`.
 4. Begin the host-owned transaction and mutation-audit scope.
@@ -65,7 +65,7 @@ The helper uses the existing `GatewayExecutionCompleted` lifecycle stage. Outcom
 6. Commit or roll back the host transaction.
 7. Create a `GovernedOperationExecutionReceipt` from the host result.
 8. Append the completion lifecycle event locally.
-9. Optionally place the lifecycle artifact into the configured governance outbox or signing/integrity process.
+9. Optionally place the lifecycle artifact into the configured outbox or signing/integrity process.
 
 ## Mutation-manifest binding
 

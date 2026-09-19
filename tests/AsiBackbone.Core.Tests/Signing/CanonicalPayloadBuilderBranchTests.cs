@@ -17,14 +17,14 @@ public sealed class CanonicalPayloadBuilderBranchTests
     private static readonly DateTimeOffset RetryUtc = new(2026, 6, 18, 12, 10, 0, TimeSpan.Zero);
 
     /// <summary>
-    /// Tests that the ForAuditResidue method uses the event identifier as the artifact ID when the audit residue ID is missing, and filters metadata based on the provided options.
+    /// Tests that the ForDecisionReceipt method uses the event identifier as the artifact ID when the audit residue ID is missing, and filters metadata based on the provided options.
     /// </summary>
     [Fact]
-    public void ForAuditResidueUsesEventIdentifierWhenResidueIdIsMissingAndFiltersMetadata()
+    public void ForDecisionReceiptUsesEventIdentifierWhenResidueIdIsMissingAndFiltersMetadata()
     {
         var options = CanonicalPayloadOptions.Create(["safe"]);
-        var residue = AuditResidue.Create(
-            AsiBackboneActorContext.Service(" system-1 ", " System "),
+        var residue = DecisionReceipt.Create(
+            GovernanceActorContext.Service(" system-1 ", " System "),
             " gateway.execute ",
             " Allowed ",
             reasonCodes: [" reason.beta ", "", "reason.alpha", "reason.beta"],
@@ -39,7 +39,7 @@ public sealed class CanonicalPayloadBuilderBranchTests
             },
             auditResidueId: " ");
 
-        CanonicalPayload payload = CanonicalPayloadBuilder.ForAuditResidue(residue, options);
+        CanonicalPayload payload = CanonicalPayloadBuilder.ForDecisionReceipt(residue, options);
 
         Assert.Equal(CanonicalArtifactTypes.AuditResidue, payload.ArtifactType);
         Assert.Equal("event-1", payload.ArtifactId);
@@ -50,14 +50,14 @@ public sealed class CanonicalPayloadBuilderBranchTests
     }
 
     /// <summary>
-    /// Tests that the ForAuditResidueLifecycleEvent method includes filtered metadata and the correct stage sequence in the canonical payload.
+    /// Tests that the ForDecisionReceiptLifecycleEvent method includes filtered metadata and the correct stage sequence in the canonical payload.
     /// </summary>
     [Fact]
-    public void ForAuditResidueLifecycleEventIncludesFilteredMetadataAndStageSequence()
+    public void ForDecisionReceiptLifecycleEventIncludesFilteredMetadataAndStageSequence()
     {
         var options = CanonicalPayloadOptions.Create(["safe"]);
-        var lifecycleEvent = AuditResidueLifecycleEvent.Create(
-            AuditResidueLifecycleStage.ExternalEmissionQueued,
+        var lifecycleEvent = DecisionReceiptLifecycleEvent.Create(
+            DecisionReceiptLifecycleStage.ExternalEmissionQueued,
             " correlation-1 ",
             auditResidueId: " residue-1 ",
             eventId: " lifecycle-1 ",
@@ -71,12 +71,12 @@ public sealed class CanonicalPayloadBuilderBranchTests
                 ["ignored"] = " excluded "
             });
 
-        CanonicalPayload payload = CanonicalPayloadBuilder.ForAuditResidueLifecycleEvent(lifecycleEvent, options);
+        CanonicalPayload payload = CanonicalPayloadBuilder.ForDecisionReceiptLifecycleEvent(lifecycleEvent, options);
 
         Assert.Equal(CanonicalArtifactTypes.AuditResidueLifecycleEvent, payload.ArtifactType);
         Assert.Equal("lifecycle-1", payload.ArtifactId);
         Assert.Contains("\"metadata\":{\"safe\":\"included\"}", payload.CanonicalJson, StringComparison.Ordinal);
-        Assert.Contains($"\"stageSequence\":{(int)AuditResidueLifecycleStage.ExternalEmissionQueued}", payload.CanonicalJson, StringComparison.Ordinal);
+        Assert.Contains($"\"stageSequence\":{(int)DecisionReceiptLifecycleStage.ExternalEmissionQueued}", payload.CanonicalJson, StringComparison.Ordinal);
         Assert.DoesNotContain("ignored", payload.CanonicalJson, StringComparison.Ordinal);
     }
 
@@ -191,7 +191,7 @@ public sealed class CanonicalPayloadBuilderBranchTests
             createdUtc: CreatedUtc,
             correlationId: " correlation-1 ",
             auditResidueId: " residue-1 ",
-            lifecycleStage: AuditResidueLifecycleStage.ExternalEmissionQueued,
+            lifecycleStage: DecisionReceiptLifecycleStage.ExternalEmissionQueued,
             policyVersion: " policy-v1 ",
             policyHash: " policy-hash ",
             traceId: " trace-1 ",

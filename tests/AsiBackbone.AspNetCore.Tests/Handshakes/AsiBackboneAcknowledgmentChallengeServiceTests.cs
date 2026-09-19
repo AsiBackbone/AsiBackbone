@@ -8,17 +8,17 @@ using Xunit;
 namespace AsiBackbone.AspNetCore.Tests.Handshakes;
 
 /// <summary>
-/// Unit tests for the <see cref="DefaultAsiBackboneAcknowledgmentChallengeService"/> class, which handles the creation and processing of acknowledgment challenges in the AsiBackbone framework.
+/// Unit tests for the <see cref="DefaultAcknowledgmentChallengeService"/> class, which handles the creation and processing of acknowledgment challenges in the AsiBackbone framework.
 /// </summary>
 public sealed class AsiBackboneAcknowledgmentChallengeServiceTests
 {
     /// <summary>
-    /// Tests that the <see cref="DefaultAsiBackboneAcknowledgmentChallengeService.CreateChallenge"/> method correctly builds a host-friendly acknowledgment challenge from a given acknowledgment decision, including all relevant metadata and options.
+    /// Tests that the <see cref="DefaultAcknowledgmentChallengeService.CreateChallenge"/> method correctly builds a host-friendly acknowledgment challenge from a given acknowledgment decision, including all relevant metadata and options.
     /// </summary>
     [Fact]
     public void CreateChallengeBuildsHostFriendlyChallengeFromAcknowledgmentDecision()
     {
-        var actor = AsiBackboneActorContext.Human(" user-123 ", " Test User ");
+        var actor = GovernanceActorContext.Human(" user-123 ", " Test User ");
         var decision = GovernanceDecision.RequireAcknowledgment(
             "risk.high",
             "Manual acknowledgment is required.",
@@ -26,7 +26,7 @@ public sealed class AsiBackboneAcknowledgmentChallengeServiceTests
             traceId: " trace-123 ",
             policyVersion: " v1 ",
             policyHash: " hash-123 ");
-        var options = new AsiBackboneAcknowledgmentChallengeOptions
+        var options = new AcknowledgmentChallengeOptions
         {
             RequiredAcknowledgmentCode = "CONFIRM",
             RequiredAcknowledgmentText = "Confirm responsibility before continuing.",
@@ -35,9 +35,9 @@ public sealed class AsiBackboneAcknowledgmentChallengeServiceTests
             IncludeTraceId = true,
             IncludePolicyMetadata = true,
         };
-        DefaultAsiBackboneAcknowledgmentChallengeService service = CreateService(options);
+        DefaultAcknowledgmentChallengeService service = CreateService(options);
 
-        AsiBackboneAcknowledgmentChallenge challenge = service.CreateChallenge(
+        AcknowledgmentChallenge challenge = service.CreateChallenge(
             actor,
             " PublishEpisode ",
             decision,
@@ -62,12 +62,12 @@ public sealed class AsiBackboneAcknowledgmentChallengeServiceTests
     }
 
     /// <summary>
-    /// Tests that the <see cref="DefaultAsiBackboneAcknowledgmentChallengeService.CreateChallenge"/> method hides optional diagnostic fields (TraceId, PolicyVersion, PolicyHash) by default when creating an acknowledgment challenge.
+    /// Tests that the <see cref="DefaultAcknowledgmentChallengeService.CreateChallenge"/> method hides optional diagnostic fields (TraceId, PolicyVersion, PolicyHash) by default when creating an acknowledgment challenge.
     /// </summary>
     [Fact]
     public void CreateChallengeHidesOptionalDiagnosticFieldsByDefault()
     {
-        var actor = AsiBackboneActorContext.Human("user-123");
+        var actor = GovernanceActorContext.Human("user-123");
         var decision = GovernanceDecision.RequireAcknowledgment(
             "ack.required",
             "Acknowledgment required.",
@@ -75,9 +75,9 @@ public sealed class AsiBackboneAcknowledgmentChallengeServiceTests
             traceId: "trace-123",
             policyVersion: "v1",
             policyHash: "hash-123");
-        DefaultAsiBackboneAcknowledgmentChallengeService service = CreateService();
+        DefaultAcknowledgmentChallengeService service = CreateService();
 
-        AsiBackboneAcknowledgmentChallenge challenge = service.CreateChallenge(actor, "RunOperation", decision);
+        AcknowledgmentChallenge challenge = service.CreateChallenge(actor, "RunOperation", decision);
 
         Assert.Equal("Acknowledgment required.", challenge.ReasonMessage);
         Assert.Equal("correlation-123", challenge.CorrelationId);
@@ -87,32 +87,32 @@ public sealed class AsiBackboneAcknowledgmentChallengeServiceTests
     }
 
     /// <summary>
-    /// Tests that the <see cref="DefaultAsiBackboneAcknowledgmentChallengeService.CreateChallenge"/> method can be configured to hide the reason message in the acknowledgment challenge when the <see cref="AsiBackboneAcknowledgmentChallengeOptions.IncludeReasonMessage"/> option is set to false.
+    /// Tests that the <see cref="DefaultAcknowledgmentChallengeService.CreateChallenge"/> method can be configured to hide the reason message in the acknowledgment challenge when the <see cref="AcknowledgmentChallengeOptions.IncludeReasonMessage"/> option is set to false.
     /// </summary>
     [Fact]
     public void CreateChallengeCanHideReasonMessage()
     {
-        var actor = AsiBackboneActorContext.Human("user-123");
+        var actor = GovernanceActorContext.Human("user-123");
         var decision = GovernanceDecision.RequireAcknowledgment("ack.required", "Do not expose this.");
-        DefaultAsiBackboneAcknowledgmentChallengeService service = CreateService(new AsiBackboneAcknowledgmentChallengeOptions
+        DefaultAcknowledgmentChallengeService service = CreateService(new AcknowledgmentChallengeOptions
         {
             IncludeReasonMessage = false,
         });
 
-        AsiBackboneAcknowledgmentChallenge challenge = service.CreateChallenge(actor, "RunOperation", decision);
+        AcknowledgmentChallenge challenge = service.CreateChallenge(actor, "RunOperation", decision);
 
         Assert.Null(challenge.ReasonMessage);
     }
 
     /// <summary>
-    /// Tests that the <see cref="DefaultAsiBackboneAcknowledgmentChallengeService.CreateChallenge"/> method throws an <see cref="InvalidOperationException"/> when attempting to create a challenge for a decision that does not require acknowledgment, ensuring that only valid acknowledgment decisions are processed.
+    /// Tests that the <see cref="DefaultAcknowledgmentChallengeService.CreateChallenge"/> method throws an <see cref="InvalidOperationException"/> when attempting to create a challenge for a decision that does not require acknowledgment, ensuring that only valid acknowledgment decisions are processed.
     /// </summary>
     [Fact]
     public void CreateChallengeRejectsDecisionThatDoesNotRequireAcknowledgment()
     {
-        var actor = AsiBackboneActorContext.Human("user-123");
+        var actor = GovernanceActorContext.Human("user-123");
         var decision = GovernanceDecision.Allow();
-        DefaultAsiBackboneAcknowledgmentChallengeService service = CreateService();
+        DefaultAcknowledgmentChallengeService service = CreateService();
 
         InvalidOperationException exception = Assert.Throws<InvalidOperationException>(() =>
             service.CreateChallenge(actor, "RunOperation", decision));
@@ -121,23 +121,23 @@ public sealed class AsiBackboneAcknowledgmentChallengeServiceTests
     }
 
     /// <summary>
-    /// Tests that the <see cref="DefaultAsiBackboneAcknowledgmentChallengeService.HandleResponse"/> method correctly processes a valid acknowledgment response that matches the challenge, resulting in an accepted acknowledgment with the expected properties.
+    /// Tests that the <see cref="DefaultAcknowledgmentChallengeService.HandleResponse"/> method correctly processes a valid acknowledgment response that matches the challenge, resulting in an accepted acknowledgment with the expected properties.
     /// </summary>
     [Fact]
     public void HandleResponseCreatesAcceptedAcknowledgmentWhenResponseMatchesChallenge()
     {
-        var actor = AsiBackboneActorContext.Human("user-123", "Test User");
+        var actor = GovernanceActorContext.Human("user-123", "Test User");
         var decision = GovernanceDecision.RequireAcknowledgment(
             "ack.required",
             "Acknowledgment required.",
             correlationId: "correlation-123",
             traceId: "trace-123");
-        DefaultAsiBackboneAcknowledgmentChallengeService service = CreateService(new AsiBackboneAcknowledgmentChallengeOptions
+        DefaultAcknowledgmentChallengeService service = CreateService(new AcknowledgmentChallengeOptions
         {
             RequiredAcknowledgmentCode = "CONFIRM",
         });
-        AsiBackboneAcknowledgmentChallenge challenge = service.CreateChallenge(actor, "RunOperation", decision);
-        var response = new AsiBackboneAcknowledgmentChallengeRequest
+        AcknowledgmentChallenge challenge = service.CreateChallenge(actor, "RunOperation", decision);
+        var response = new AcknowledgmentChallengeRequest
         {
             HandshakeId = $" {challenge.HandshakeId} ",
             AcknowledgmentCode = " CONFIRM ",
@@ -149,7 +149,7 @@ public sealed class AsiBackboneAcknowledgmentChallengeServiceTests
         };
         DateTimeOffset occurredUtc = new(2026, 6, 11, 12, 0, 0, TimeSpan.Zero);
 
-        AsiBackboneAcknowledgmentChallengeResult result = service.HandleResponse(challenge, actor, response, occurredUtc);
+        AcknowledgmentChallengeResult result = service.HandleResponse(challenge, actor, response, occurredUtc);
 
         Assert.True(result.Succeeded);
         Assert.True(result.Acknowledged);
@@ -164,23 +164,23 @@ public sealed class AsiBackboneAcknowledgmentChallengeServiceTests
     }
 
     /// <summary>
-    /// Tests that the <see cref="DefaultAsiBackboneAcknowledgmentChallengeService.HandleResponse"/> method correctly processes a response where the actor declines to acknowledge, resulting in a rejected acknowledgment with the expected properties.
+    /// Tests that the <see cref="DefaultAcknowledgmentChallengeService.HandleResponse"/> method correctly processes a response where the actor declines to acknowledge, resulting in a rejected acknowledgment with the expected properties.
     /// </summary>
     [Fact]
     public void HandleResponseCreatesRejectedAcknowledgmentWhenActorDeclines()
     {
-        var actor = AsiBackboneActorContext.Human("user-123");
+        var actor = GovernanceActorContext.Human("user-123");
         var decision = GovernanceDecision.RequireAcknowledgment("ack.required", "Acknowledgment required.");
-        DefaultAsiBackboneAcknowledgmentChallengeService service = CreateService();
-        AsiBackboneAcknowledgmentChallenge challenge = service.CreateChallenge(actor, "RunOperation", decision);
-        var response = new AsiBackboneAcknowledgmentChallengeRequest
+        DefaultAcknowledgmentChallengeService service = CreateService();
+        AcknowledgmentChallenge challenge = service.CreateChallenge(actor, "RunOperation", decision);
+        var response = new AcknowledgmentChallengeRequest
         {
             HandshakeId = challenge.HandshakeId,
             AcknowledgmentCode = challenge.RequiredAcknowledgmentCode,
             Acknowledged = false,
         };
 
-        AsiBackboneAcknowledgmentChallengeResult result = service.HandleResponse(challenge, actor, response);
+        AcknowledgmentChallengeResult result = service.HandleResponse(challenge, actor, response);
 
         Assert.True(result.Succeeded);
         Assert.False(result.Acknowledged);
@@ -190,23 +190,23 @@ public sealed class AsiBackboneAcknowledgmentChallengeServiceTests
     }
 
     /// <summary>
-    /// Tests that the <see cref="DefaultAsiBackboneAcknowledgmentChallengeService.HandleResponse"/> method fails when the handshake ID in the response does not match the expected handshake ID from the challenge, resulting in a failure with the appropriate reason code.
+    /// Tests that the <see cref="DefaultAcknowledgmentChallengeService.HandleResponse"/> method fails when the handshake ID in the response does not match the expected handshake ID from the challenge, resulting in a failure with the appropriate reason code.
     /// </summary>
     [Fact]
     public void HandleResponseFailsWhenHandshakeIdDoesNotMatch()
     {
-        var actor = AsiBackboneActorContext.Human("user-123");
+        var actor = GovernanceActorContext.Human("user-123");
         var decision = GovernanceDecision.RequireAcknowledgment("ack.required", "Acknowledgment required.");
-        DefaultAsiBackboneAcknowledgmentChallengeService service = CreateService();
-        AsiBackboneAcknowledgmentChallenge challenge = service.CreateChallenge(actor, "RunOperation", decision);
-        var response = new AsiBackboneAcknowledgmentChallengeRequest
+        DefaultAcknowledgmentChallengeService service = CreateService();
+        AcknowledgmentChallenge challenge = service.CreateChallenge(actor, "RunOperation", decision);
+        var response = new AcknowledgmentChallengeRequest
         {
             HandshakeId = "different-handshake",
             AcknowledgmentCode = challenge.RequiredAcknowledgmentCode,
             Acknowledged = true,
         };
 
-        AsiBackboneAcknowledgmentChallengeResult result = service.HandleResponse(challenge, actor, response);
+        AcknowledgmentChallengeResult result = service.HandleResponse(challenge, actor, response);
 
         Assert.False(result.Succeeded);
         Assert.Null(result.Acknowledgment);
@@ -214,23 +214,23 @@ public sealed class AsiBackboneAcknowledgmentChallengeServiceTests
     }
 
     /// <summary>
-    /// Tests that the <see cref="DefaultAsiBackboneAcknowledgmentChallengeService.HandleResponse"/> method fails when the acknowledgment code in the response does not match the required acknowledgment code from the challenge, resulting in a failure with the appropriate reason code.
+    /// Tests that the <see cref="DefaultAcknowledgmentChallengeService.HandleResponse"/> method fails when the acknowledgment code in the response does not match the required acknowledgment code from the challenge, resulting in a failure with the appropriate reason code.
     /// </summary>
     [Fact]
     public void HandleResponseFailsWhenAcknowledgmentCodeDoesNotMatch()
     {
-        var actor = AsiBackboneActorContext.Human("user-123");
+        var actor = GovernanceActorContext.Human("user-123");
         var decision = GovernanceDecision.RequireAcknowledgment("ack.required", "Acknowledgment required.");
-        DefaultAsiBackboneAcknowledgmentChallengeService service = CreateService();
-        AsiBackboneAcknowledgmentChallenge challenge = service.CreateChallenge(actor, "RunOperation", decision);
-        var response = new AsiBackboneAcknowledgmentChallengeRequest
+        DefaultAcknowledgmentChallengeService service = CreateService();
+        AcknowledgmentChallenge challenge = service.CreateChallenge(actor, "RunOperation", decision);
+        var response = new AcknowledgmentChallengeRequest
         {
             HandshakeId = challenge.HandshakeId,
             AcknowledgmentCode = "wrong-code",
             Acknowledged = true,
         };
 
-        AsiBackboneAcknowledgmentChallengeResult result = service.HandleResponse(challenge, actor, response);
+        AcknowledgmentChallengeResult result = service.HandleResponse(challenge, actor, response);
 
         Assert.False(result.Succeeded);
         Assert.Null(result.Acknowledgment);
@@ -238,7 +238,7 @@ public sealed class AsiBackboneAcknowledgmentChallengeServiceTests
     }
 
     /// <summary>
-    /// Tests that the <see cref="AsiBackboneAcknowledgmentChallengeOptions.Validate"/> method throws an <see cref="InvalidOperationException"/> when the required acknowledgment code is null, empty, or whitespace.
+    /// Tests that the <see cref="AcknowledgmentChallengeOptions.Validate"/> method throws an <see cref="InvalidOperationException"/> when the required acknowledgment code is null, empty, or whitespace.
     /// </summary>
     [Theory]
     [InlineData(null)]
@@ -246,7 +246,7 @@ public sealed class AsiBackboneAcknowledgmentChallengeServiceTests
     [InlineData("   ")]
     public void ChallengeOptionsRejectMissingAcknowledgmentCode(string? code)
     {
-        var options = new AsiBackboneAcknowledgmentChallengeOptions
+        var options = new AcknowledgmentChallengeOptions
         {
             RequiredAcknowledgmentCode = code!,
         };
@@ -256,10 +256,10 @@ public sealed class AsiBackboneAcknowledgmentChallengeServiceTests
         Assert.Contains("acknowledgment code", exception.Message, StringComparison.OrdinalIgnoreCase);
     }
 
-    private static DefaultAsiBackboneAcknowledgmentChallengeService CreateService(
-        AsiBackboneAcknowledgmentChallengeOptions? options = null)
+    private static DefaultAcknowledgmentChallengeService CreateService(
+        AcknowledgmentChallengeOptions? options = null)
     {
-        return new DefaultAsiBackboneAcknowledgmentChallengeService(
-            Options.Create(options ?? new AsiBackboneAcknowledgmentChallengeOptions()));
+        return new DefaultAcknowledgmentChallengeService(
+            Options.Create(options ?? new AcknowledgmentChallengeOptions()));
     }
 }

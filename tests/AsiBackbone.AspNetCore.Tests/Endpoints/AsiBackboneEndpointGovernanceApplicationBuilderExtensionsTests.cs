@@ -8,7 +8,7 @@ using Xunit;
 namespace AsiBackbone.AspNetCore.Tests.Endpoints;
 
 /// <summary>
-/// Unit tests for the <see cref="AsiBackboneEndpointGovernanceApplicationBuilderExtensions" /> class.
+/// Unit tests for the <see cref="EndpointGovernanceApplicationBuilderExtensions" /> class.
 /// </summary>
 public sealed class AsiBackboneEndpointGovernanceApplicationBuilderExtensionsTests
 {

@@ -35,7 +35,7 @@ public sealed record NcatAuditCompletionDeliveryResult(
     string ReasonCode,
     string? LifecycleEventId = null,
     GovernedOperationExecutionReceipt? Receipt = null,
-    AuditResidueLifecycleEvent? LifecycleEvent = null,
+    DecisionReceiptLifecycleEvent? LifecycleEvent = null,
     string? FailureType = null)
 {
     /// <summary>

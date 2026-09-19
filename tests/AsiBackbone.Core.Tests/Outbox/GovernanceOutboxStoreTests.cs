@@ -42,18 +42,18 @@ public sealed class GovernanceOutboxStoreTests
     [Fact]
     public async Task FailedEmissionDoesNotLoseLocalLifecycleAuditRecord()
     {
-        var lifecycleStore = new InMemoryAuditResidueLifecycleStore();
+        var lifecycleStore = new InMemoryDecisionReceiptLifecycleStore();
         var outboxStore = new InMemoryGovernanceOutboxStore();
 
-        var lifecycleEvent = AuditResidueLifecycleEvent.Create(
-            AuditResidueLifecycleStage.ExternalEmissionQueued,
+        var lifecycleEvent = DecisionReceiptLifecycleEvent.Create(
+            DecisionReceiptLifecycleStage.ExternalEmissionQueued,
             "correlation-1",
             auditResidueId: "residue-1",
             eventId: "lifecycle-1",
             traceId: "trace-1",
             operationName: "governance.emit");
 
-        AuditResidueLifecycleEvent savedLifecycleEvent = await lifecycleStore.AppendAsync(
+        DecisionReceiptLifecycleEvent savedLifecycleEvent = await lifecycleStore.AppendAsync(
             lifecycleEvent,
             TestContext.Current.CancellationToken);
         GovernanceOutboxEntry entry = await outboxStore.EnqueueAsync(
@@ -72,7 +72,7 @@ public sealed class GovernanceOutboxStoreTests
             nextRetryUtc: DateTimeOffset.UtcNow.AddMinutes(5),
             cancellationToken: TestContext.Current.CancellationToken);
 
-        AuditResidueLifecycleEvent? storedLifecycleEvent = await lifecycleStore.FindByEventIdAsync(
+        DecisionReceiptLifecycleEvent? storedLifecycleEvent = await lifecycleStore.FindByEventIdAsync(
             "lifecycle-1",
             TestContext.Current.CancellationToken);
 
@@ -471,28 +471,28 @@ public sealed class GovernanceOutboxStoreTests
     [Fact]
     public void OutboxOptionValidationBranchesAreCoveredInCompiledOutboxTests()
     {
-        new AsiBackboneGovernanceOutboxOptions().Validate();
+        new GovernanceOutboxOptions().Validate();
 
-        new AsiBackboneGovernanceOutboxOptions
+        new GovernanceOutboxOptions
         {
             UseClaimLeases = true,
             ClaimWorkerId = "worker-1",
             ClaimLeaseDuration = TimeSpan.FromMinutes(2)
         }.Validate();
 
-        _ = Assert.Throws<InvalidOperationException>(() => new AsiBackboneGovernanceOutboxOptions
+        _ = Assert.Throws<InvalidOperationException>(() => new GovernanceOutboxOptions
         {
             RetryDelay = TimeSpan.FromTicks(-1)
         }.Validate());
-        _ = Assert.Throws<InvalidOperationException>(() => new AsiBackboneGovernanceOutboxOptions
+        _ = Assert.Throws<InvalidOperationException>(() => new GovernanceOutboxOptions
         {
             DeferredDelay = TimeSpan.FromTicks(-1)
         }.Validate());
-        _ = Assert.Throws<InvalidOperationException>(() => new AsiBackboneGovernanceOutboxOptions
+        _ = Assert.Throws<InvalidOperationException>(() => new GovernanceOutboxOptions
         {
             ClaimLeaseDuration = TimeSpan.Zero
         }.Validate());
-        _ = Assert.Throws<InvalidOperationException>(() => new AsiBackboneGovernanceOutboxOptions
+        _ = Assert.Throws<InvalidOperationException>(() => new GovernanceOutboxOptions
         {
             UseClaimLeases = true,
             ClaimWorkerId = " "
@@ -509,10 +509,10 @@ public sealed class GovernanceOutboxStoreTests
     public async Task ClaimedDrainBranchesAreCoveredInCompiledOutboxTests()
     {
         DateTimeOffset drainUtc = new(2026, 7, 8, 12, 0, 0, TimeSpan.Zero);
-        var selectionOnlyDrain = new AsiBackboneGovernanceOutboxDrain(
+        var selectionOnlyDrain = new GovernanceOutboxDrain(
             new SelectionOnlyOutboxStore(),
             new ResultEmitter(GovernanceEmissionResult.Delivered("provider", "record")),
-            outboxOptions: Options.Create(new AsiBackboneGovernanceOutboxOptions
+            outboxOptions: Options.Create(new GovernanceOutboxOptions
             {
                 UseClaimLeases = true,
                 ClaimWorkerId = "worker-1"
@@ -617,14 +617,14 @@ public sealed class GovernanceOutboxStoreTests
         Assert.Equal(drainUtc.AddMinutes(1), thrownEntry.NextRetryUtc);
     }
 
-    private static AsiBackboneGovernanceOutboxDrain CreateClaimDrain(
+    private static GovernanceOutboxDrain CreateClaimDrain(
         InMemoryGovernanceOutboxStore outboxStore,
-        IAsiBackboneGovernanceEmitter emitter)
+        IGovernanceEmitter emitter)
     {
-        return new AsiBackboneGovernanceOutboxDrain(
+        return new GovernanceOutboxDrain(
             outboxStore,
             emitter,
-            outboxOptions: Options.Create(new AsiBackboneGovernanceOutboxOptions
+            outboxOptions: Options.Create(new GovernanceOutboxOptions
             {
                 UseClaimLeases = true,
                 ClaimWorkerId = "worker-1",
@@ -647,7 +647,7 @@ public sealed class GovernanceOutboxStoreTests
             emitterProvider: "outbox");
     }
 
-    private sealed class ResultEmitter(GovernanceEmissionResult result) : IAsiBackboneGovernanceEmitter
+    private sealed class ResultEmitter(GovernanceEmissionResult result) : IGovernanceEmitter
     {
         public ValueTask<GovernanceEmissionResult> EmitAsync(
             GovernanceEmissionEnvelope envelope,
@@ -657,7 +657,7 @@ public sealed class GovernanceOutboxStoreTests
         }
     }
 
-    private sealed class ThrowingEmitter : IAsiBackboneGovernanceEmitter
+    private sealed class ThrowingEmitter : IGovernanceEmitter
     {
         public ValueTask<GovernanceEmissionResult> EmitAsync(
             GovernanceEmissionEnvelope envelope,
@@ -667,7 +667,7 @@ public sealed class GovernanceOutboxStoreTests
         }
     }
 
-    private sealed class SelectionOnlyOutboxStore : IAsiBackboneGovernanceOutboxStore
+    private sealed class SelectionOnlyOutboxStore : IGovernanceOutboxStore
     {
         public ValueTask<GovernanceOutboxEntry> EnqueueAsync(GovernanceEmissionEnvelope envelope, CancellationToken cancellationToken = default)
         {

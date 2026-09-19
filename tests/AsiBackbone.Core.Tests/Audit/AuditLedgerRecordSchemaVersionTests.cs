@@ -17,21 +17,21 @@ public sealed class AuditLedgerRecordSchemaVersionTests
     /// Verifies that audit ledger records default to the initial stable schema version and serialize it explicitly.
     /// </summary>
     [Fact]
-    public void FromResidueDefaultsAndSerializesStableSchemaVersion()
+    public void FromDecisionReceiptDefaultsAndSerializesStableSchemaVersion()
     {
-        var record = AuditLedgerRecord.FromResidue(CreateValidResidue());
+        var record = AuditLedgerRecord.FromDecisionReceipt(CreateValidResidue());
 
-        Assert.Equal(AsiBackboneSchemaVersions.StableArtifactsV1, record.SchemaVersion);
-        Assert.Equal(AsiBackboneSchemaVersions.StableArtifactsV1, ReadSerializedSchemaVersion(record));
+        Assert.Equal(GovernanceSchemaVersions.StableArtifactsV1, record.SchemaVersion);
+        Assert.Equal(GovernanceSchemaVersions.StableArtifactsV1, ReadSerializedSchemaVersion(record));
     }
 
     /// <summary>
     /// Verifies that audit ledger records preserve an explicit schema version and serialize it explicitly.
     /// </summary>
     [Fact]
-    public void FromResiduePreservesAndSerializesExplicitSchemaVersion()
+    public void FromDecisionReceiptPreservesAndSerializesExplicitSchemaVersion()
     {
-        var record = AuditLedgerRecord.FromResidue(
+        var record = AuditLedgerRecord.FromDecisionReceipt(
             CreateValidResidue(),
             schemaVersion: " 1.1-test ");
 
@@ -55,7 +55,7 @@ public sealed class AuditLedgerRecordSchemaVersionTests
             EventId = "event-123",
             OccurredUtc = new DateTimeOffset(2026, 6, 4, 12, 0, 0, TimeSpan.Zero),
             ActorId = "actor-123",
-            ActorType = AsiBackboneActorType.System,
+            ActorType = GovernanceActorType.System,
             ActorDisplayName = "System",
             OperationName = "system.sync",
             Outcome = "Allowed",
@@ -71,7 +71,7 @@ public sealed class AuditLedgerRecordSchemaVersionTests
         };
     }
 
-    private sealed class TestAuditResidue : IAsiBackboneAuditResidue
+    private sealed class TestAuditResidue : IDecisionReceipt
     {
         public string EventId { get; set; } = "event-123";
 
@@ -80,7 +80,7 @@ public sealed class AuditLedgerRecordSchemaVersionTests
 
         public string ActorId { get; set; } = "actor-123";
 
-        public AsiBackboneActorType ActorType { get; set; } = AsiBackboneActorType.System;
+        public GovernanceActorType ActorType { get; set; } = GovernanceActorType.System;
 
         public string? ActorDisplayName { get; set; } = "System";
 

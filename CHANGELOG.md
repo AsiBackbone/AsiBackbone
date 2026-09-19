@@ -6,6 +6,92 @@ This project follows the spirit of [Keep a Changelog](https://keepachangelog.com
 
 ## [Unreleased]
 
+## [6.0.0] - 2026-09-19
+
+### Release summary
+
+`6.0.0` is a major release for the AsiBackbone package family. It adopts
+plain-language semantic names across the public API, removes members whose
+`5.x` deprecation windows completed, and corrects security-sensitive signature
+verification and capability-grant behavior.
+
+Package IDs, public namespaces, and the `net10.0` target remain unchanged.
+`AssemblyVersion` advances to `6.0.0.0`; package and file versions advance to
+`6.0.0` and `6.0.0.0` respectively.
+
+Consumers moving from `5.x` must follow the
+[5.x to 6.0 migration guide](docs/articles/upgrade-500-to-600.md).
+
+### Changed
+
+* **Breaking (source and binary):** Renamed public types and helper members to
+  plain-language semantic names, including decision receipts, governance
+  constraints, policy evaluators, result types, endpoint governance, outbox,
+  persistence, and testing APIs. The complete inventory is recorded in the
+  [6.0 public API naming convention](docs/articles/public-api-naming-600.md).
+  Decision-receipt helper parameters now use `receipt`; the request-correlation
+  extension container and decision-receipt sink contract members use the same
+  vocabulary.
+* **Breaking (source and binary):** Renamed
+  `RequireGovernancePolicyAttribute` to `GovernancePolicyAttribute` to reflect
+  that the attribute marks policy metadata but does not itself enforce policy.
+* Updated the Entity Framework Core and Microsoft Extensions packages to
+  `10.0.12`, Microsoft.NET.Test.Sdk to `18.10.0`, dotnet-stryker to `5.0.0`,
+  and pinned GitHub Actions to their current reviewed revisions.
+
+### Removed
+
+* **Breaking (source and binary):** Removed the five partial-argument policy
+  evaluator constructors deprecated under `ASIB900` in `5.2.0`. Use
+  `DefaultGovernancePolicyEvaluator.CreateBuilder<TContext>()` or the
+  all-dependencies constructor.
+* **Breaking (source and binary):** Removed the obsolete
+  `RequireGovernancePolicy` route-builder extensions. Use
+  `MarkGovernancePolicy`.
+
+### Security
+
+* **Breaking (behavior):** Signature-verification pin mismatches now deny by default instead of deferring or
+  escalating, extending the 5.0 key-pin correction to the remaining pins. A `RequiredProvider` mismatch previously
+  reported `ProviderUnavailable` (`signature.provider-unavailable`, default `Defer`), so an artifact signed by the wrong
+  provider was treated as a transient outage. An `ExpectedPolicyVersion` or `ExpectedPolicyHash` mismatch previously
+  reported `CanonicalizationMismatch` (default `Escalate`). Both now report the new
+  `SignatureVerificationCategory.UntrustedSigningContext` with `signature.provider-not-trusted` or
+  `signature.policy-context-not-trusted`, defaulting to `Deny`.
+* **Breaking (behavior):** `CanonicalizationMismatch` and `MissingSignature` now default to `Deny`. Signing metadata
+  describing a different artifact, or an artifact carrying no signature, is not evidence for the artifact presented.
+  Hosts can opt a lower-assurance path back into `RequireAcknowledgment` for `MissingSignature` through
+  `VerificationPolicyOptions.Create`.
+* Capability-grant proof validation reports provider and policy-context pin mismatches, and provider-reported
+  canonicalization mismatches, as `InvalidProof` with `Deny`.
+* Added a test that pins the complete default verification action map, so a future category cannot silently inherit a
+  soft default. See [Verification policy defaults](docs/articles/upgrade-500-to-600.md#verification-policy-defaults).
+* **Breaking (wire format):** Signing providers now sign, and verification providers verify, a versioned signature
+  input instead of the canonical hash text. `GovernanceSignatureInput.CreateV1` binds the format identifier, canonical
+  descriptors, hash algorithm, hash value, and the `policy_version` and `policy_hash` signing metadata. Previously
+  every `SigningMetadata` value was an unauthenticated label, so a validly signed artifact could be relabeled with a
+  different policy context and still verify, and policy pins checked values the signature did not cover. Added
+  `SigningRequest.SignatureInput`, `SignatureVerificationRequest.SignatureInput`, and
+  `ManagedKeySignRequest.SignatureInput`; `SigningRequest.UsesLegacySignatureInput` and
+  `SignatureVerificationRequest.UsesLegacySignatureInput` identify requests using the hash-only fallback. Host
+  managed-key clients and verification services must sign and verify the supplied signature-input bytes.
+* Artifacts signed before 6.0 fail version 1 verification. `VerificationPolicyContext.WithLegacySignatureInputAllowed()`
+  opts a review path into a single hash-only retry; a signature accepted that way cannot satisfy a policy pin and
+  denies with `signature.policy-context-not-authenticated`.
+* The local-development verifier rejects provider labels other than its own with
+  `localdev.signature.provider-not-trusted`, because the provider label is not part of the signature input.
+  See [Signature input](docs/articles/upgrade-500-to-600.md#signature-input).
+* `InMemoryCapabilityGrantUseStore` no longer permits replay of expired grants when a validator's `AllowedClockSkew`
+  exceeds the store's `EvictionGracePeriod`. Previously the store evicted a grant's use record while the grant still
+  validated within the skew, so the next use started a fresh count. A grant past the retention horizon, measured from
+  the latest observed use time, is now refused with `capability.use-retention-elapsed`
+  (new `CapabilityGrantUseResult.RetentionElapsed`). `EvictionGracePeriod` rejects negative values.
+* Added issuer-scoped `StopGrant(issuer, grantId)` and `CancelGrant(issuer, grantId)` to `InMemoryCapabilityGrantUseStore`.
+  Stop and cancel state was keyed by token ID alone while use counts were keyed by issuer and token ID, so stopping one
+  issuer's grant stopped every issuer's grant sharing the identifier. The identifier-only overloads keep that
+  all-issuer behavior and now document it.
+  See [In-memory capability grant use store](docs/articles/upgrade-500-to-600.md#in-memory-capability-grant-use-store).
+
 ## [5.2.0] - 2026-09-14
 
 ### Release summary

@@ -19,7 +19,7 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorHotPathTests
     {
         TestPolicyContext context = CreateContext();
         var observedOrder = new List<string>();
-        var evaluator = new DefaultAsiBackbonePolicyEvaluator<TestPolicyContext>(
+        var evaluator = new DefaultGovernancePolicyEvaluator<TestPolicyContext>(
             [
                 new DelegateConstraint(
                     (_, _) =>
@@ -33,7 +33,7 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorHotPathTests
                         observedOrder.Add("second");
                         return ConstraintEvaluationResult.Allow();
                     })
-            ]);
+            ], threatModelContributors: null, decisionPolicy: null, options: null, logger: null);
 
         GovernanceDecision decision = await evaluator.EvaluateAsync(context, TestContext.Current.CancellationToken);
 
@@ -55,14 +55,14 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorHotPathTests
     public async Task EvaluateWarningConstraintReturnsWarningReasons()
     {
         TestPolicyContext context = CreateContext();
-        var evaluator = new DefaultAsiBackbonePolicyEvaluator<TestPolicyContext>(
+        var evaluator = new DefaultGovernancePolicyEvaluator<TestPolicyContext>(
             [
                 new StaticConstraint(ConstraintEvaluationResult.Allow()),
                 new StaticConstraint(
                     ConstraintEvaluationResult.Warning(
                         "constraint.warning",
                         "The constraint produced a warning."))
-            ]);
+            ], threatModelContributors: null, decisionPolicy: null, options: null, logger: null);
 
         GovernanceDecision decision = await evaluator.EvaluateAsync(context, TestContext.Current.CancellationToken);
 
@@ -80,13 +80,13 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorHotPathTests
     public async Task EvaluateDenialConstraintReturnsDenialReasons()
     {
         TestPolicyContext context = CreateContext();
-        var evaluator = new DefaultAsiBackbonePolicyEvaluator<TestPolicyContext>(
+        var evaluator = new DefaultGovernancePolicyEvaluator<TestPolicyContext>(
             [
                 new StaticConstraint(
                     ConstraintEvaluationResult.Deny(
                         "constraint.denied",
                         "The constraint denied the operation."))
-            ]);
+            ], threatModelContributors: null, decisionPolicy: null, options: null, logger: null);
 
         GovernanceDecision decision = await evaluator.EvaluateAsync(context, TestContext.Current.CancellationToken);
 
@@ -105,7 +105,7 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorHotPathTests
     {
         TestPolicyContext context = CreateContext();
         var observedOrder = new List<string>();
-        var evaluator = new DefaultAsiBackbonePolicyEvaluator<TestPolicyContext>(
+        var evaluator = new DefaultGovernancePolicyEvaluator<TestPolicyContext>(
             [
                 new DelegateConstraint(
                     (_, _) =>
@@ -129,7 +129,7 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorHotPathTests
                             "constraint.denied",
                             "The constraint denied the operation.");
                     })
-            ]);
+            ], threatModelContributors: null, decisionPolicy: null, options: null, logger: null);
 
         GovernanceDecision decision = await evaluator.EvaluateAsync(context, TestContext.Current.CancellationToken);
 
@@ -150,7 +150,7 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorHotPathTests
         };
     }
 
-    private sealed class TestPolicyContext : IAsiBackboneConstraintEvaluationContext
+    private sealed class TestPolicyContext : IGovernanceEvaluationContext
     {
         public string? CorrelationId { get; init; }
 
@@ -162,7 +162,7 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorHotPathTests
             new Dictionary<string, string>(StringComparer.Ordinal);
     }
 
-    private sealed class StaticConstraint(ConstraintEvaluationResult result) : IAsiBackboneConstraint<TestPolicyContext>
+    private sealed class StaticConstraint(ConstraintEvaluationResult result) : IGovernanceConstraint<TestPolicyContext>
     {
         private readonly ConstraintEvaluationResult result = result;
 
@@ -177,7 +177,7 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorHotPathTests
     }
 
     private sealed class DelegateConstraint(
-        Func<TestPolicyContext, CancellationToken, ConstraintEvaluationResult> evaluate) : IAsiBackboneConstraint<TestPolicyContext>
+        Func<TestPolicyContext, CancellationToken, ConstraintEvaluationResult> evaluate) : IGovernanceConstraint<TestPolicyContext>
     {
         private readonly Func<TestPolicyContext, CancellationToken, ConstraintEvaluationResult> evaluate = evaluate;
 

@@ -11,8 +11,8 @@
 
 This package implements:
 
-- `IAsiBackboneSigningService`
-- `IAsiBackboneSignatureVerificationService`
+- `IGovernanceSigningService`
+- `IGovernanceSignatureVerificationService`
 
 It signs the `SigningRequest.SigningHash` value using an in-process RSA key generated for the service instance and returns provider-neutral `SigningMetadata`.
 
@@ -55,8 +55,8 @@ var localSigningOptions = LocalDevelopmentSigningOptions.Create(
 var localSigningService = new LocalDevelopmentSigningService(localSigningOptions);
 
 builder.Services.AddSingleton(localSigningService);
-builder.Services.AddSingleton<IAsiBackboneSigningService>(localSigningService);
-builder.Services.AddSingleton<IAsiBackboneSignatureVerificationService>(localSigningService);
+builder.Services.AddSingleton<IGovernanceSigningService>(localSigningService);
+builder.Services.AddSingleton<IGovernanceSignatureVerificationService>(localSigningService);
 ```
 
 The builder facade validates configuration during registration:

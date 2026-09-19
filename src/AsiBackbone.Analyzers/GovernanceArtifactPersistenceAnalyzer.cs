@@ -17,12 +17,12 @@ public sealed class GovernanceArtifactPersistenceAnalyzer : DiagnosticAnalyzer
         "AsiBackbone.GovernanceSafety",
         DiagnosticSeverity.Warning,
         isEnabledByDefault: true,
-        description: "Governance decisions, audit residue, capability grants, handshake outcomes, and outbox artifacts should not be created and discarded without persistence, outbox emission, audit recording, or a deliberate host-owned continuation path.");
+        description: "Governance decisions, decision receipt, capability grants, handshake outcomes, and outbox artifacts should not be created and discarded without persistence, outbox emission, audit recording, or a deliberate host-owned continuation path.");
 
     private static readonly ImmutableHashSet<string> GovernanceArtifactTypeNames = ImmutableHashSet.Create(
         StringComparer.Ordinal,
         "AsiBackbone.Core.Audit.AuditLedgerRecord",
-        "AsiBackbone.Core.Audit.AuditResidue",
+        "AsiBackbone.Core.Audit.DecisionReceipt",
         "AsiBackbone.Core.CapabilityTokens.CapabilityGrantUseResult",
         "AsiBackbone.Core.CapabilityTokens.CapabilityGrantValidationResult",
         "AsiBackbone.Core.CapabilityTokens.CapabilityTokenGrant",
@@ -34,11 +34,11 @@ public sealed class GovernanceArtifactPersistenceAnalyzer : DiagnosticAnalyzer
 
     private static readonly ImmutableHashSet<string> PersistenceBoundaryTypeNames = ImmutableHashSet.Create(
         StringComparer.Ordinal,
-        "AsiBackbone.Core.Audit.IAsiBackboneAuditLedgerStore",
-        "AsiBackbone.Core.Audit.IAsiBackboneAuditResidueLifecycleStore",
-        "AsiBackbone.Core.Audit.IAsiBackboneAuditSink",
+        "AsiBackbone.Core.Audit.IGovernanceAuditLedgerStore",
+        "AsiBackbone.Core.Audit.IDecisionReceiptLifecycleStore",
+        "AsiBackbone.Core.Audit.IDecisionReceiptSink",
         "AsiBackbone.Core.CapabilityTokens.ICapabilityGrantUseStore",
-        "AsiBackbone.Core.Outbox.IAsiBackboneGovernanceOutboxStore");
+        "AsiBackbone.Core.Outbox.IGovernanceOutboxStore");
 
     public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => [Rule];
 

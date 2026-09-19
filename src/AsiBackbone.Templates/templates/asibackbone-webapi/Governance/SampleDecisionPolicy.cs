@@ -7,10 +7,10 @@ namespace Company.AsibackboneTemplate.Governance;
 /// <summary>
 /// Sample host-owned decision policy that can raise otherwise-allowed consequential actions into an acknowledgment-required decision.
 /// </summary>
-public sealed class SampleDecisionPolicy : IAsiBackboneDecisionPolicy<AsiBackboneConstraintEvaluationContext>
+public sealed class SampleDecisionPolicy : IGovernanceDecisionPolicy<GovernanceEvaluationContext>
 {
     public ValueTask<GovernanceDecision> ApplyAsync(
-        AsiBackboneConstraintEvaluationContext context,
+        GovernanceEvaluationContext context,
         GovernanceDecision composedDecision,
         IReadOnlyList<ConstraintEvaluationResult> constraintResults,
         CancellationToken cancellationToken = default)

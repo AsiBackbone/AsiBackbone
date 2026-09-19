@@ -14,7 +14,7 @@ AsiBackbone is a governance spine for consequential software decision flow. It i
 > See [1.1.0 Release Notes - Accepted deferrals](release-notes-110.md#accepted-deferrals) for the current release boundary.
 
 > [!NOTE]
-> Event Hubs is a downstream streaming boundary. It must not replace durable local audit residue, durable outbox persistence, policy evaluation, acknowledgment, capability-token, or gateway records.
+> Event Hubs is a downstream streaming boundary. It must not replace durable local decision receipt, durable outbox persistence, policy evaluation, acknowledgment, capability-token, or gateway records.
 
 ## Purpose
 
@@ -23,9 +23,9 @@ The Event Hubs provider design gives hosts a possible future Azure streaming pat
 A future provider should adapt provider-neutral governance emission envelopes into Event Hubs messages without making `AsiBackbone.Core` depend on Azure SDKs, Azure resource concepts, Event Hubs namespaces, Purview, SIEM products, or provider-specific retry clients.
 
 ```text
-Audit residue / lifecycle event / gateway result
+Decision receipt / lifecycle event / gateway result
   -> GovernanceEmissionEnvelope
-  -> durable governance outbox
+  -> durable outbox
   -> future Event Hubs governance emitter
   -> Azure Event Hubs namespace / event hub
   -> downstream monitoring, compliance, lineage, SIEM, enrichment, or analytics consumers
@@ -73,20 +73,20 @@ Downstream consumers such as Purview enrichment jobs, SIEM processors, or analyt
 
 Core already owns the provider-neutral contracts:
 
-* `IAsiBackboneGovernanceEmitter`
+* `IGovernanceEmitter`
 * `GovernanceEmissionEnvelope`
 * `GovernanceEmissionPayload`
 * `GovernanceEmissionResult`
 * `GovernanceEmissionStatus`
 * `GovernanceEmissionError`
 * `GovernanceEmissionEventType`
-* `IAsiBackboneGovernanceOutboxStore`
-* `AsiBackboneGovernanceOutboxDrain`
+* `IGovernanceOutboxStore`
+* `GovernanceOutboxDrain`
 
 A future Event Hubs provider should implement the neutral emitter seam:
 
 ```text
-IAsiBackboneGovernanceEmitter
+IGovernanceEmitter
   -> EventHubsGovernanceEmitter
 ```
 
@@ -108,7 +108,7 @@ Recommended envelope-level fields:
 | `EventId` | Stable governance event identifier. |
 | `OccurredUtc` / `CreatedUtc` | Event occurrence and envelope creation timestamps. |
 | `CorrelationId` | Host workflow or request join key. |
-| `AuditResidueId` | Opaque identifier for the durable audit residue record. |
+| `AuditResidueId` | Opaque identifier for the durable decision receipt record. |
 | `LifecycleStage` / `LifecycleStageSequence` | Lifecycle stage and stable sequence when available. |
 | `PolicyVersion` / `PolicyHash` | Policy version and hash that shaped the decision. |
 | `TraceId`, `SpanId`, `ParentSpanId` | Distributed tracing join fields when supplied by the host. |
@@ -140,7 +140,7 @@ A future provider should map stable envelope fields to Event Hubs message proper
 | `ContentType` | envelope content type | Use the versioned content type. |
 | `Properties["asibackbone.event_type"]` | `EventType` | Controlled event type only. |
 | `Properties["asibackbone.schema_version"]` | `SchemaVersion` | Safe schema identity. |
-| `Properties["asibackbone.audit_residue_id"]` | `AuditResidueId` | Opaque audit residue identifier. |
+| `Properties["asibackbone.audit_residue_id"]` | `AuditResidueId` | Opaque decision receipt identifier. |
 | `Properties["asibackbone.envelope_id"]` | `EnvelopeId` | Opaque envelope identifier. |
 | `Properties["asibackbone.policy.version"]` | `PolicyVersion` | Stable policy version. |
 | `Properties["asibackbone.policy.hash"]` | `PolicyHash` | Hash only; never raw policy content. |
@@ -164,7 +164,7 @@ Candidate partition keys:
 | Event type | Consumers process categories independently. | May create uneven partitions if one event type dominates. |
 | Correlation group | Hosts need workflow-local ordering. | Use a coarse derived key rather than raw identifiers when possible. |
 
-Avoid actor IDs, raw user IDs, audit residue IDs, event IDs, envelope IDs, trace IDs, capability-token IDs, and raw resource IDs as default partition keys unless host policy explicitly permits the cardinality and privacy tradeoff.
+Avoid actor IDs, raw user IDs, decision receipt IDs, event IDs, envelope IDs, trace IDs, capability-token IDs, and raw resource IDs as default partition keys unless host policy explicitly permits the cardinality and privacy tradeoff.
 
 ## Managed Identity and configuration
 
@@ -199,11 +199,11 @@ The provider should be downstream of durable outbox persistence.
 
 Recommended host sequence:
 
-1. Evaluate policy and produce the neutral decision/audit residue.
-2. Persist audit residue or lifecycle event locally.
+1. Evaluate policy and produce the neutral decision/decision receipt.
+2. Persist decision receipt or lifecycle event locally.
 3. Build a `GovernanceEmissionEnvelope`.
-4. Enqueue the envelope in `IAsiBackboneGovernanceOutboxStore`.
-5. Drain the outbox through `AsiBackboneGovernanceOutboxDrain` using the future `EventHubsGovernanceEmitter`.
+4. Enqueue the envelope in `IGovernanceOutboxStore`.
+5. Drain the outbox through `GovernanceOutboxDrain` using the future `EventHubsGovernanceEmitter`.
 6. The emitter serializes the envelope, maps safe message properties, and sends to Event Hubs.
 7. The emitter returns `GovernanceEmissionResult.Delivered` when Event Hubs accepts the event or batch.
 8. The outbox marks the entry delivered, deferred, failed, retryable, or dead-lettered according to the result.
@@ -238,7 +238,7 @@ Recommended split:
 | Outbox drain | Interpret result, increment attempt counters, schedule retry, defer, or dead-letter. |
 | Host policy | Decide max attempts, backoff, quarantine, alerting, and manual review. |
 
-Failed Event Hubs emission must not lose local audit records. The local audit residue and outbox entry should remain available for replay, investigation, or manual remediation.
+Failed Event Hubs emission must not lose local audit records. The local decision receipt and outbox entry should remain available for replay, investigation, or manual remediation.
 
 ## Privacy and minimization
 
@@ -299,7 +299,7 @@ Recommended tests:
 * provider respects cancellation;
 * Core has no Azure SDK dependency;
 * provider package has no Purview, Azure Monitor, OpenTelemetry exporter, SIEM, robotics, or AI model dependencies;
-* outbox drain can use the Event Hubs emitter through `IAsiBackboneGovernanceEmitter` without knowing about Event Hubs types.
+* outbox drain can use the Event Hubs emitter through `IGovernanceEmitter` without knowing about Event Hubs types.
 
 Live Event Hubs integration tests should be optional, explicitly configured, and excluded from default CI.
 
@@ -326,10 +326,10 @@ Before implementation begins, confirm:
 | --- | --- |
 | #140 Durable outbox | Event Hubs emission should happen after local durable outbox persistence. |
 | #141 Lifecycle stages | Lifecycle stage and sequence should be present in the envelope and safe message properties. |
-| #142 Audit residue telemetry | Trace, latency, gateway, outbox, and PII-safe identifiers provide provider mapping fields. |
+| #142 Decision receipt telemetry | Trace, latency, gateway, outbox, and PII-safe identifiers provide provider mapping fields. |
 | #144 OpenTelemetry provider | OpenTelemetry is the released `1.1.0` governance emission provider; Event Hubs remains a future Azure streaming provider design. |
 | #149 Observability architecture | This provider design follows the Core-neutral provider package architecture. |
-| #187 Governance emission contract | The provider implements the neutral `IAsiBackboneGovernanceEmitter` seam. |
+| #187 Governance emission contract | The provider implements the neutral `IGovernanceEmitter` seam. |
 | #193 No-op outbox drain | The no-op proof path validates the drain sequence before this real provider is added. |
 
 ## Related documentation
@@ -340,7 +340,7 @@ Before implementation begins, confirm:
 - [Governance Emission Contract](governance-emission-contract.md)
 - [Durable Audit and Outbox Persistence](durable-audit-outbox-persistence.md)
 - [Hosted Governance Outbox Drain](hosted-governance-outbox-drain.md)
-- [Audit Residue Observability Schema](audit-residue-observability-schema.md)
+- [Decision Receipt Observability Schema](decision-receipt-observability-schema.md)
 - [DLP and Classification Failure Policy](dlp-classification-failure-policy.md)
 - [Privacy and Signing Boundaries](privacy-and-signing-boundaries.md)
 

@@ -80,7 +80,7 @@ public sealed class CapabilityTokenGrant
         ResourceBinding = NormalizeOptional(resourceBinding);
         Metadata = metadata;
         MaxUseCount = maxUseCount;
-        SchemaVersion = AsiBackboneSchemaVersions.Normalize(schemaVersion);
+        SchemaVersion = GovernanceSchemaVersions.Normalize(schemaVersion);
     }
 
     /// <summary>

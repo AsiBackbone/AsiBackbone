@@ -22,7 +22,7 @@ public sealed class AsiBackboneGovernanceOutboxDrainHostedServiceLifecycleTests
     [Fact]
     public async Task DisabledAtStartupValidatesDependenciesWithoutDraining()
     {
-        AsiBackboneGovernanceOutboxDrainWorkerOptions options = CreateOptions(enabled: false);
+        GovernanceOutboxDrainWorkerOptions options = CreateOptions(enabled: false);
         using WorkerHarness harness = CreateHarness(options);
 
         await harness.Service.StartAsync(TestContext.Current.CancellationToken);
@@ -41,21 +41,21 @@ public sealed class AsiBackboneGovernanceOutboxDrainHostedServiceLifecycleTests
     [Fact]
     public async Task RuntimeDisableDelaysAndReenableResumesDraining()
     {
-        AsiBackboneGovernanceOutboxDrainWorkerOptions initialOptions = CreateOptions();
+        GovernanceOutboxDrainWorkerOptions initialOptions = CreateOptions();
         initialOptions.PollingInterval = TimeSpan.FromMilliseconds(50);
         using WorkerHarness harness = CreateHarness(initialOptions);
 
         await harness.Service.StartAsync(TestContext.Current.CancellationToken);
         await WaitAsync(harness.Store.WaitForFindPendingCallCountAsync(1));
 
-        AsiBackboneGovernanceOutboxDrainWorkerOptions disabledOptions = CreateOptions(enabled: false);
+        GovernanceOutboxDrainWorkerOptions disabledOptions = CreateOptions(enabled: false);
         disabledOptions.PollingInterval = TimeSpan.FromMilliseconds(100);
         int disabledVersion = harness.Options.Set(disabledOptions);
 
         await WaitAsync(harness.Options.WaitForObservedVersionAsync(disabledVersion));
         Assert.Equal(1, harness.Store.FindPendingCallCount);
 
-        AsiBackboneGovernanceOutboxDrainWorkerOptions enabledOptions = CreateOptions();
+        GovernanceOutboxDrainWorkerOptions enabledOptions = CreateOptions();
         enabledOptions.PollingInterval = TimeSpan.FromDays(1);
         _ = harness.Options.Set(enabledOptions);
 
@@ -72,7 +72,7 @@ public sealed class AsiBackboneGovernanceOutboxDrainHostedServiceLifecycleTests
     [Fact]
     public async Task MissingScopedDrainFailsStartupAndLogsCritical()
     {
-        AsiBackboneGovernanceOutboxDrainWorkerOptions options = CreateOptions();
+        GovernanceOutboxDrainWorkerOptions options = CreateOptions();
         using WorkerHarness harness = CreateHarness(options, registerDrain: false);
 
         _ = await Assert.ThrowsAsync<InvalidOperationException>(() =>
@@ -91,7 +91,7 @@ public sealed class AsiBackboneGovernanceOutboxDrainHostedServiceLifecycleTests
     [Fact]
     public async Task CancellationDuringPollingDelayStopsCleanly()
     {
-        AsiBackboneGovernanceOutboxDrainWorkerOptions options = CreateOptions();
+        GovernanceOutboxDrainWorkerOptions options = CreateOptions();
         options.PollingInterval = TimeSpan.FromDays(1);
         using WorkerHarness harness = CreateHarness(options);
 
@@ -110,7 +110,7 @@ public sealed class AsiBackboneGovernanceOutboxDrainHostedServiceLifecycleTests
     [Fact]
     public async Task CancellationDuringFailureDelayStopsCleanly()
     {
-        AsiBackboneGovernanceOutboxDrainWorkerOptions options = CreateOptions();
+        GovernanceOutboxDrainWorkerOptions options = CreateOptions();
         options.FailureDelay = TimeSpan.FromDays(1);
         var store = new RecordingOutboxStore((_, _) => throw new InvalidOperationException("Simulated store failure."));
         using WorkerHarness harness = CreateHarness(options, store);
@@ -131,7 +131,7 @@ public sealed class AsiBackboneGovernanceOutboxDrainHostedServiceLifecycleTests
     public async Task RetryClockIsNormalizedToUtcBeforeDrainInvocation()
     {
         DateTimeOffset retryClock = new(2026, 7, 11, 18, 30, 0, TimeSpan.FromHours(5.5));
-        AsiBackboneGovernanceOutboxDrainWorkerOptions options = CreateOptions();
+        GovernanceOutboxDrainWorkerOptions options = CreateOptions();
         options.RetryClock = () => retryClock;
         options.PollingInterval = TimeSpan.FromDays(1);
         using WorkerHarness harness = CreateHarness(options);
@@ -160,7 +160,7 @@ public sealed class AsiBackboneGovernanceOutboxDrainHostedServiceLifecycleTests
         bool drainOnShutdown,
         bool cancelStopToken)
     {
-        AsiBackboneGovernanceOutboxDrainWorkerOptions options = CreateOptions(enabled);
+        GovernanceOutboxDrainWorkerOptions options = CreateOptions(enabled);
         options.DrainOnShutdown = drainOnShutdown;
         using WorkerHarness harness = CreateHarness(options);
         using var stopCancellation = new CancellationTokenSource();
@@ -190,7 +190,7 @@ public sealed class AsiBackboneGovernanceOutboxDrainHostedServiceLifecycleTests
             await Task.Delay(Timeout.InfiniteTimeSpan, cancellationToken);
             return Array.Empty<GovernanceOutboxEntry>();
         });
-        AsiBackboneGovernanceOutboxDrainWorkerOptions options = CreateOptions();
+        GovernanceOutboxDrainWorkerOptions options = CreateOptions();
         options.DrainOnShutdown = true;
         options.ShutdownDrainTimeout = TimeSpan.FromMilliseconds(200);
         using WorkerHarness harness = CreateHarness(options, store);
@@ -217,7 +217,7 @@ public sealed class AsiBackboneGovernanceOutboxDrainHostedServiceLifecycleTests
             await Task.Delay(Timeout.InfiniteTimeSpan, cancellationToken);
             return Array.Empty<GovernanceOutboxEntry>();
         });
-        AsiBackboneGovernanceOutboxDrainWorkerOptions options = CreateOptions();
+        GovernanceOutboxDrainWorkerOptions options = CreateOptions();
         options.DrainOnShutdown = true;
         options.ShutdownDrainTimeout = TimeSpan.FromDays(1);
         using WorkerHarness harness = CreateHarness(options, store);
@@ -241,7 +241,7 @@ public sealed class AsiBackboneGovernanceOutboxDrainHostedServiceLifecycleTests
     {
         var failure = new InvalidOperationException("shutdown drain failed");
         var store = new RecordingOutboxStore((attempt, cancellationToken) => throw failure);
-        AsiBackboneGovernanceOutboxDrainWorkerOptions options = CreateOptions();
+        GovernanceOutboxDrainWorkerOptions options = CreateOptions();
         options.DrainOnShutdown = true;
         using WorkerHarness harness = CreateHarness(options, store);
 
@@ -259,7 +259,7 @@ public sealed class AsiBackboneGovernanceOutboxDrainHostedServiceLifecycleTests
     [Fact]
     public async Task SuccessfulShutdownDrainRunsOncePerStopCall()
     {
-        AsiBackboneGovernanceOutboxDrainWorkerOptions options = CreateOptions();
+        GovernanceOutboxDrainWorkerOptions options = CreateOptions();
         options.DrainOnShutdown = true;
         using WorkerHarness harness = CreateHarness(options);
 
@@ -270,9 +270,9 @@ public sealed class AsiBackboneGovernanceOutboxDrainHostedServiceLifecycleTests
         Assert.DoesNotContain(harness.Logger.Entries, entry => entry.EventId.Id is 19801 or 19802);
     }
 
-    private static AsiBackboneGovernanceOutboxDrainWorkerOptions CreateOptions(bool enabled = true)
+    private static GovernanceOutboxDrainWorkerOptions CreateOptions(bool enabled = true)
     {
-        return new AsiBackboneGovernanceOutboxDrainWorkerOptions
+        return new GovernanceOutboxDrainWorkerOptions
         {
             Enabled = enabled,
             BatchSize = 1,
@@ -284,7 +284,7 @@ public sealed class AsiBackboneGovernanceOutboxDrainHostedServiceLifecycleTests
     }
 
     private static WorkerHarness CreateHarness(
-        AsiBackboneGovernanceOutboxDrainWorkerOptions options,
+        GovernanceOutboxDrainWorkerOptions options,
         RecordingOutboxStore? store = null,
         bool registerDrain = true)
     {
@@ -294,22 +294,22 @@ public sealed class AsiBackboneGovernanceOutboxDrainHostedServiceLifecycleTests
 
         if (registerDrain)
         {
-            _ = services.AddSingleton<IAsiBackboneGovernanceOutboxStore>(store);
-            _ = services.AddSingleton<IAsiBackboneGovernanceEmitter>(NoOpGovernanceEmitter.Instance);
-            _ = services.AddSingleton(Options.Create(new AsiBackboneGovernanceOutboxOptions { UseClaimLeases = false }));
-            _ = services.AddScoped<AsiBackboneGovernanceOutboxDrain>();
+            _ = services.AddSingleton<IGovernanceOutboxStore>(store);
+            _ = services.AddSingleton<IGovernanceEmitter>(NoOpGovernanceEmitter.Instance);
+            _ = services.AddSingleton(Options.Create(new GovernanceOutboxOptions { UseClaimLeases = false }));
+            _ = services.AddScoped<GovernanceOutboxDrain>();
         }
 
         ServiceProvider provider = services.BuildServiceProvider();
         var scopeFactory = new RecordingScopeFactory(provider.GetRequiredService<IServiceScopeFactory>());
-        var optionsMonitor = new ControllableOptionsMonitor<AsiBackboneGovernanceOutboxDrainWorkerOptions>(options);
-        var logger = new RecordingLogger<AsiBackboneGovernanceOutboxDrainHostedService>();
-        var service = new AsiBackboneGovernanceOutboxDrainHostedService(scopeFactory, optionsMonitor, logger);
+        var optionsMonitor = new ControllableOptionsMonitor<GovernanceOutboxDrainWorkerOptions>(options);
+        var logger = new RecordingLogger<GovernanceOutboxDrainHostedService>();
+        var service = new GovernanceOutboxDrainHostedService(scopeFactory, optionsMonitor, logger);
 
         return new WorkerHarness(provider, service, scopeFactory, optionsMonitor, logger, store);
     }
 
-    private static async Task StopAsync(AsiBackboneGovernanceOutboxDrainHostedService service)
+    private static async Task StopAsync(GovernanceOutboxDrainHostedService service)
     {
         await WaitAsync(service.StopAsync(CancellationToken.None));
     }
@@ -326,19 +326,19 @@ public sealed class AsiBackboneGovernanceOutboxDrainHostedServiceLifecycleTests
 
     private sealed class WorkerHarness(
         ServiceProvider provider,
-        AsiBackboneGovernanceOutboxDrainHostedService service,
+        GovernanceOutboxDrainHostedService service,
         RecordingScopeFactory scopeFactory,
-        ControllableOptionsMonitor<AsiBackboneGovernanceOutboxDrainWorkerOptions> options,
-        RecordingLogger<AsiBackboneGovernanceOutboxDrainHostedService> logger,
+        ControllableOptionsMonitor<GovernanceOutboxDrainWorkerOptions> options,
+        RecordingLogger<GovernanceOutboxDrainHostedService> logger,
         RecordingOutboxStore store) : IDisposable
     {
-        public AsiBackboneGovernanceOutboxDrainHostedService Service { get; } = service;
+        public GovernanceOutboxDrainHostedService Service { get; } = service;
 
         public RecordingScopeFactory ScopeFactory { get; } = scopeFactory;
 
-        public ControllableOptionsMonitor<AsiBackboneGovernanceOutboxDrainWorkerOptions> Options { get; } = options;
+        public ControllableOptionsMonitor<GovernanceOutboxDrainWorkerOptions> Options { get; } = options;
 
-        public RecordingLogger<AsiBackboneGovernanceOutboxDrainHostedService> Logger { get; } = logger;
+        public RecordingLogger<GovernanceOutboxDrainHostedService> Logger { get; } = logger;
 
         public RecordingOutboxStore Store { get; } = store;
 
@@ -477,7 +477,7 @@ public sealed class AsiBackboneGovernanceOutboxDrainHostedServiceLifecycleTests
     }
 
     private sealed class RecordingOutboxStore(
-        Func<int, CancellationToken, ValueTask<IReadOnlyList<GovernanceOutboxEntry>>>? findPending = null) : IAsiBackboneGovernanceOutboxStore
+        Func<int, CancellationToken, ValueTask<IReadOnlyList<GovernanceOutboxEntry>>>? findPending = null) : IGovernanceOutboxStore
     {
         private readonly Lock sync = new();
         private readonly Func<int, CancellationToken, ValueTask<IReadOnlyList<GovernanceOutboxEntry>>> findPending = findPending ?? EmptyPendingAsync;
@@ -614,7 +614,7 @@ public sealed class AsiBackboneGovernanceOutboxDrainHostedServiceLifecycleTests
         private sealed record PendingCountWaiter(int ExpectedCount, TaskCompletionSource Completion);
     }
 
-    private sealed class NoOpGovernanceEmitter : IAsiBackboneGovernanceEmitter
+    private sealed class NoOpGovernanceEmitter : IGovernanceEmitter
     {
         public static NoOpGovernanceEmitter Instance { get; } = new();
 

@@ -1,6 +1,6 @@
 # Outbox Drain Reliability and Alerting
 
-This article documents provider-neutral operational guidance for monitoring, alerting, and recovering AsiBackbone governance outbox drain failures.
+This article documents provider-neutral operational guidance for monitoring, alerting, and recovering AsiBackbone outbox drain failures.
 
 AsiBackbone can preserve local governance records and provide outbox/drain primitives, but it does not guarantee centralized compliance visibility, immutable evidence, legal non-repudiation, or successful external ledger delivery without host-owned configuration and operations.
 
@@ -15,7 +15,7 @@ The operational expectation is:
 ```text
 Governed decision
   -> local audit / lifecycle record
-  -> durable governance outbox record
+  -> durable outbox record
   -> hosted or scheduled drain
   -> optional provider emission
   -> provider-side search, alerting, lineage, or review
@@ -152,7 +152,7 @@ A practical operations dashboard should answer:
 - Which reason code is most common?
 - Are any records close to max retry?
 - How many records are dead-lettered?
-- Can an operator pivot from outbox record to correlation ID, audit residue, provider event, and incident ticket?
+- Can an operator pivot from outbox record to correlation ID, decision receipt, provider event, and incident ticket?
 
 The dashboard can be built in any monitoring system. AsiBackbone should remain provider-neutral.
 
@@ -179,5 +179,5 @@ It does not implement a complete outbox worker, mandate a single retry policy, g
 - [Hosted Governance Outbox Drain](hosted-governance-outbox-drain.md)
 - [High-Throughput Host Service Guidance](high-throughput-host-services.md)
 - [Governance Emission Contract](governance-emission-contract.md)
-- [Audit Residue Observability Schema](audit-residue-observability-schema.md)
+- [Decision Receipt Observability Schema](decision-receipt-observability-schema.md)
 - [Production Wording and Alpha Limitations](production-wording-and-alpha-limitations.md)

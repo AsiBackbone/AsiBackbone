@@ -6,7 +6,7 @@ using Xunit;
 namespace AsiBackbone.Core.Tests.Evaluation;
 
 /// <summary>
-/// Executable examples for host-owned <see cref="IAsiBackboneDecisionPolicy{TContext}" /> patterns.
+/// Executable examples for host-owned <see cref="IGovernanceDecisionPolicy{TContext}" /> patterns.
 /// </summary>
 public sealed class CustomDecisionPolicyExampleTests
 {
@@ -17,7 +17,7 @@ public sealed class CustomDecisionPolicyExampleTests
     [Fact]
     public async Task StrictDenyWinsPolicyPreservesWarningAndDenyReasons()
     {
-        var evaluator = new DefaultAsiBackbonePolicyEvaluator<ExamplePolicyContext>(
+        var evaluator = new DefaultGovernancePolicyEvaluator<ExamplePolicyContext>(
             [
                 new StaticConstraint(ConstraintEvaluationResult.Warning(
                     "policy.warning",
@@ -26,7 +26,7 @@ public sealed class CustomDecisionPolicyExampleTests
                     "policy.denied",
                     "The request failed a blocking policy rule."))
             ],
-            new StrictDenyWinsDecisionPolicy());
+            decisionPolicy: new StrictDenyWinsDecisionPolicy(), threatModelContributors: null, options: null, logger: null);
 
         GovernanceDecision decision = await evaluator.EvaluateAsync(
             ExamplePolicyContext.Create("US-LA", "routine"),
@@ -45,9 +45,9 @@ public sealed class CustomDecisionPolicyExampleTests
     [Fact]
     public async Task RegionalOverlayPolicyCanRequireAcknowledgmentForLocalHighRiskAction()
     {
-        var evaluator = new DefaultAsiBackbonePolicyEvaluator<ExamplePolicyContext>(
+        var evaluator = new DefaultGovernancePolicyEvaluator<ExamplePolicyContext>(
             [new StaticConstraint(ConstraintEvaluationResult.Allow())],
-            new RegionalOverlayDecisionPolicy(CreateSupportedRegionSet()));
+            decisionPolicy: new RegionalOverlayDecisionPolicy(CreateSupportedRegionSet()), threatModelContributors: null, options: null, logger: null);
 
         GovernanceDecision decision = await evaluator.EvaluateAsync(
             ExamplePolicyContext.Create("US-LA", "high"),
@@ -67,9 +67,9 @@ public sealed class CustomDecisionPolicyExampleTests
     [Fact]
     public async Task RegionalOverlayPolicyNarrowsGlobalAllowForUnsupportedRegion()
     {
-        var evaluator = new DefaultAsiBackbonePolicyEvaluator<ExamplePolicyContext>(
+        var evaluator = new DefaultGovernancePolicyEvaluator<ExamplePolicyContext>(
             [new StaticConstraint(ConstraintEvaluationResult.Allow())],
-            new RegionalOverlayDecisionPolicy(CreateSupportedRegionSet()));
+            decisionPolicy: new RegionalOverlayDecisionPolicy(CreateSupportedRegionSet()), threatModelContributors: null, options: null, logger: null);
 
         GovernanceDecision decision = await evaluator.EvaluateAsync(
             ExamplePolicyContext.Create("EU-DE", "routine"),
@@ -86,11 +86,11 @@ public sealed class CustomDecisionPolicyExampleTests
     [Fact]
     public async Task RegionalOverlayPolicyDoesNotOverrideExistingDenyDecision()
     {
-        var evaluator = new DefaultAsiBackbonePolicyEvaluator<ExamplePolicyContext>(
+        var evaluator = new DefaultGovernancePolicyEvaluator<ExamplePolicyContext>(
             [new StaticConstraint(ConstraintEvaluationResult.Deny(
                 "constraint.blocked",
                 "The constraint blocked the request before regional overlay."))],
-            new RegionalOverlayDecisionPolicy(CreateSupportedRegionSet()));
+            decisionPolicy: new RegionalOverlayDecisionPolicy(CreateSupportedRegionSet()), threatModelContributors: null, options: null, logger: null);
 
         GovernanceDecision decision = await evaluator.EvaluateAsync(
             ExamplePolicyContext.Create("US-LA", "high"),
@@ -109,7 +109,7 @@ public sealed class CustomDecisionPolicyExampleTests
         };
     }
 
-    private sealed class StrictDenyWinsDecisionPolicy : IAsiBackboneDecisionPolicy<ExamplePolicyContext>
+    private sealed class StrictDenyWinsDecisionPolicy : IGovernanceDecisionPolicy<ExamplePolicyContext>
     {
         public ValueTask<GovernanceDecision> ApplyAsync(
             ExamplePolicyContext context,
@@ -143,7 +143,7 @@ public sealed class CustomDecisionPolicyExampleTests
     }
 
     private sealed class RegionalOverlayDecisionPolicy(IReadOnlySet<string> supportedRegions) :
-        IAsiBackboneDecisionPolicy<ExamplePolicyContext>
+        IGovernanceDecisionPolicy<ExamplePolicyContext>
     {
         public ValueTask<GovernanceDecision> ApplyAsync(
             ExamplePolicyContext context,
@@ -180,7 +180,7 @@ public sealed class CustomDecisionPolicyExampleTests
     }
 
     private sealed class StaticConstraint(ConstraintEvaluationResult result) :
-        IAsiBackboneConstraint<ExamplePolicyContext>
+        IGovernanceConstraint<ExamplePolicyContext>
     {
         public string Name => "example.static";
 
@@ -193,7 +193,7 @@ public sealed class CustomDecisionPolicyExampleTests
         }
     }
 
-    private sealed class ExamplePolicyContext : IAsiBackboneConstraintEvaluationContext
+    private sealed class ExamplePolicyContext : IGovernanceEvaluationContext
     {
         public required string CorrelationId { get; init; }
 

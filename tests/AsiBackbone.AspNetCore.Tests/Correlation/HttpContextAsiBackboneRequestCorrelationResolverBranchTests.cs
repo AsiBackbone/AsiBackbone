@@ -9,7 +9,7 @@ using Xunit;
 namespace AsiBackbone.AspNetCore.Tests.Correlation;
 
 /// <summary>
-/// Unit tests for the <see cref="HttpContextAsiBackboneRequestCorrelationResolver"/> class, focusing on branch coverage and edge cases.
+/// Unit tests for the <see cref="HttpContextGovernanceRequestCorrelationResolver"/> class, focusing on branch coverage and edge cases.
 /// </summary>
 public sealed class HttpContextAsiBackboneRequestCorrelationResolverBranchTests
 {
@@ -26,7 +26,7 @@ public sealed class HttpContextAsiBackboneRequestCorrelationResolverBranchTests
         httpContext.Request.Headers["X-Blank"] = "   ";
         httpContext.Request.Headers["X-Valid"] = " correlation-valid ";
 
-        HttpContextAsiBackboneRequestCorrelationResolver resolver = CreateResolver(
+        HttpContextGovernanceRequestCorrelationResolver resolver = CreateResolver(
             httpContext,
             options =>
             {
@@ -34,7 +34,7 @@ public sealed class HttpContextAsiBackboneRequestCorrelationResolverBranchTests
                 options.CorrelationIdHeaderNames = [" ", "X-Blank", "X-Valid"];
             });
 
-        AsiBackboneHttpRequestCorrelation correlation = resolver.ResolveRequestCorrelation();
+        GovernanceHttpRequestCorrelation correlation = resolver.ResolveRequestCorrelation();
 
         Assert.Equal("correlation-valid", correlation.CorrelationId);
     }
@@ -50,11 +50,11 @@ public sealed class HttpContextAsiBackboneRequestCorrelationResolverBranchTests
             TraceIdentifier = "trace-no-fallback",
         };
 
-        HttpContextAsiBackboneRequestCorrelationResolver resolver = CreateResolver(
+        HttpContextGovernanceRequestCorrelationResolver resolver = CreateResolver(
             httpContext,
             options => options.UseHttpContextTraceIdentifierAsCorrelationId = false);
 
-        AsiBackboneHttpRequestCorrelation correlation = resolver.ResolveRequestCorrelation();
+        GovernanceHttpRequestCorrelation correlation = resolver.ResolveRequestCorrelation();
 
         Assert.Null(correlation.CorrelationId);
         Assert.Equal("trace-no-fallback", correlation.TraceId);
@@ -72,11 +72,11 @@ public sealed class HttpContextAsiBackboneRequestCorrelationResolverBranchTests
         };
         httpContext.Request.Method = " ";
 
-        HttpContextAsiBackboneRequestCorrelationResolver resolver = CreateResolver(httpContext);
+        HttpContextGovernanceRequestCorrelationResolver resolver = CreateResolver(httpContext);
 
-        AsiBackboneHttpRequestCorrelation correlation = resolver.ResolveRequestCorrelation();
+        GovernanceHttpRequestCorrelation correlation = resolver.ResolveRequestCorrelation();
 
-        Assert.False(correlation.Metadata.ContainsKey(AsiBackboneHttpRequestMetadataKeys.Method));
+        Assert.False(correlation.Metadata.ContainsKey(GovernanceHttpRequestMetadataKeys.Method));
     }
 
     /// <summary>
@@ -91,12 +91,12 @@ public sealed class HttpContextAsiBackboneRequestCorrelationResolverBranchTests
         };
         httpContext.SetEndpoint(new Endpoint(_ => Task.CompletedTask, EndpointMetadataCollection.Empty, "Plain endpoint"));
 
-        HttpContextAsiBackboneRequestCorrelationResolver resolver = CreateResolver(httpContext);
+        HttpContextGovernanceRequestCorrelationResolver resolver = CreateResolver(httpContext);
 
-        AsiBackboneHttpRequestCorrelation correlation = resolver.ResolveRequestCorrelation();
+        GovernanceHttpRequestCorrelation correlation = resolver.ResolveRequestCorrelation();
 
-        Assert.Equal("Plain endpoint", correlation.Metadata[AsiBackboneHttpRequestMetadataKeys.EndpointDisplayName]);
-        Assert.False(correlation.Metadata.ContainsKey(AsiBackboneHttpRequestMetadataKeys.RoutePattern));
+        Assert.Equal("Plain endpoint", correlation.Metadata[GovernanceHttpRequestMetadataKeys.EndpointDisplayName]);
+        Assert.False(correlation.Metadata.ContainsKey(GovernanceHttpRequestMetadataKeys.RoutePattern));
     }
 
     /// <summary>
@@ -111,12 +111,12 @@ public sealed class HttpContextAsiBackboneRequestCorrelationResolverBranchTests
         };
         httpContext.SetEndpoint(CreateRouteEndpoint("/items/{id}", " "));
 
-        HttpContextAsiBackboneRequestCorrelationResolver resolver = CreateResolver(httpContext);
+        HttpContextGovernanceRequestCorrelationResolver resolver = CreateResolver(httpContext);
 
-        AsiBackboneHttpRequestCorrelation correlation = resolver.ResolveRequestCorrelation();
+        GovernanceHttpRequestCorrelation correlation = resolver.ResolveRequestCorrelation();
 
-        Assert.False(correlation.Metadata.ContainsKey(AsiBackboneHttpRequestMetadataKeys.EndpointDisplayName));
-        Assert.Equal("/items/{id}", correlation.Metadata[AsiBackboneHttpRequestMetadataKeys.RoutePattern]);
+        Assert.False(correlation.Metadata.ContainsKey(GovernanceHttpRequestMetadataKeys.EndpointDisplayName));
+        Assert.Equal("/items/{id}", correlation.Metadata[GovernanceHttpRequestMetadataKeys.RoutePattern]);
     }
 
     /// <summary>
@@ -133,11 +133,11 @@ public sealed class HttpContextAsiBackboneRequestCorrelationResolverBranchTests
         httpContext.Request.RouteValues["optional"] = null;
         httpContext.Request.RouteValues[" "] = "blank-key";
 
-        HttpContextAsiBackboneRequestCorrelationResolver resolver = CreateResolver(httpContext);
+        HttpContextGovernanceRequestCorrelationResolver resolver = CreateResolver(httpContext);
 
-        AsiBackboneHttpRequestCorrelation correlation = resolver.ResolveRequestCorrelation();
+        GovernanceHttpRequestCorrelation correlation = resolver.ResolveRequestCorrelation();
 
-        Assert.Equal("42", correlation.Metadata[$"{AsiBackboneHttpRequestMetadataKeys.RouteValuePrefix}id"]);
+        Assert.Equal("42", correlation.Metadata[$"{GovernanceHttpRequestMetadataKeys.RouteValuePrefix}id"]);
         Assert.DoesNotContain(correlation.Metadata.Keys, key => key.Contains("optional", StringComparison.Ordinal));
         Assert.DoesNotContain(correlation.Metadata.Values, value => value == "blank-key");
     }
@@ -157,7 +157,7 @@ public sealed class HttpContextAsiBackboneRequestCorrelationResolverBranchTests
         httpContext.Request.RouteValues["id"] = "42";
         httpContext.SetEndpoint(CreateRouteEndpoint("/items/{id}", "Items endpoint"));
 
-        HttpContextAsiBackboneRequestCorrelationResolver resolver = CreateResolver(
+        HttpContextGovernanceRequestCorrelationResolver resolver = CreateResolver(
             httpContext,
             options =>
             {
@@ -166,20 +166,20 @@ public sealed class HttpContextAsiBackboneRequestCorrelationResolverBranchTests
                 options.IncludeRouteValues = false;
             });
 
-        AsiBackboneHttpRequestCorrelation correlation = resolver.ResolveRequestCorrelation();
+        GovernanceHttpRequestCorrelation correlation = resolver.ResolveRequestCorrelation();
 
         _ = Assert.Single(correlation.Metadata);
-        Assert.Equal("trace-exclusions", correlation.Metadata[AsiBackboneHttpRequestMetadataKeys.TraceIdentifier]);
+        Assert.Equal("trace-exclusions", correlation.Metadata[GovernanceHttpRequestMetadataKeys.TraceIdentifier]);
     }
 
-    private static HttpContextAsiBackboneRequestCorrelationResolver CreateResolver(
+    private static HttpContextGovernanceRequestCorrelationResolver CreateResolver(
         HttpContext httpContext,
-        Action<AsiBackboneAspNetCoreOptions>? configure = null)
+        Action<AspNetCoreGovernanceOptions>? configure = null)
     {
-        AsiBackboneAspNetCoreOptions options = new();
+        AspNetCoreGovernanceOptions options = new();
         configure?.Invoke(options);
 
-        return new HttpContextAsiBackboneRequestCorrelationResolver(
+        return new HttpContextGovernanceRequestCorrelationResolver(
             new HttpContextAccessor { HttpContext = httpContext },
             Options.Create(options));
     }

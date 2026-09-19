@@ -21,7 +21,7 @@ public static class AsiBackboneAspNetCoreBuilderExtensions
     /// </summary>
     public static IAsiBackboneBuilder UseAspNetCoreEndpointGovernance(
         this IAsiBackboneBuilder builder,
-        Action<AsiBackboneAspNetCoreOptions> configure)
+        Action<AspNetCoreGovernanceOptions> configure)
     {
         ArgumentNullException.ThrowIfNull(builder);
         ArgumentNullException.ThrowIfNull(configure);
@@ -31,7 +31,7 @@ public static class AsiBackboneAspNetCoreBuilderExtensions
     }
 
     /// <summary>
-    /// Adds the host-owned governance outbox drain worker through the AsiBackbone builder facade using default options.
+    /// Adds the host-owned outbox drain worker through the AsiBackbone builder facade using default options.
     /// </summary>
     public static IAsiBackboneBuilder UseGovernanceOutboxDrain(this IAsiBackboneBuilder builder)
     {
@@ -39,11 +39,11 @@ public static class AsiBackboneAspNetCoreBuilderExtensions
     }
 
     /// <summary>
-    /// Adds the host-owned governance outbox drain worker through the AsiBackbone builder facade using configured options.
+    /// Adds the host-owned outbox drain worker through the AsiBackbone builder facade using configured options.
     /// </summary>
     public static IAsiBackboneBuilder UseGovernanceOutboxDrain(
         this IAsiBackboneBuilder builder,
-        Action<AsiBackboneGovernanceOutboxDrainWorkerOptions> configure)
+        Action<GovernanceOutboxDrainWorkerOptions> configure)
     {
         ArgumentNullException.ThrowIfNull(builder);
         ArgumentNullException.ThrowIfNull(configure);

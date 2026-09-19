@@ -1,5 +1,7 @@
 # ASIB900: Obsolete Policy Evaluator Constructors
 
+> Historical 5.x diagnostic guide. The five partial constructors and ASIB900 diagnostic metadata were removed in 6.0. Warning suppression cannot restore them; use the [5.x to 6.0 migration guide](upgrade-500-to-600.md).
+
 `ASIB900` is reported when code calls one of the five partial-argument
 `DefaultAsiBackbonePolicyEvaluator<TContext>` constructor overloads. These
 overloads are obsolete in the `5.x` line and will be removed in `6.0`.

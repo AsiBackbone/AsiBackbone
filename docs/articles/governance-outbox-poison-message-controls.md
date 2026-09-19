@@ -1,30 +1,30 @@
 # Governance Outbox Poison-Message Controls
 
-This article documents the provider-neutral maximum retry and dead-letter controls used by the AsiBackbone governance outbox drain.
+This article documents the provider-neutral maximum retry and dead-letter controls used by the AsiBackbone outbox drain.
 
 These controls provide deterministic quarantine behavior for repeatedly failing governance emissions. They do not replace host-owned monitoring, incident response, legal review, provider configuration, or replay authorization.
 
 ## Configuration
 
-`AsiBackboneGovernanceOutboxOptions` exposes the following controls:
+`GovernanceOutboxOptions` exposes the following controls:
 
 | Option | Default | Purpose |
 | --- | --- | --- |
 | `MaxRetryAttempts` | `5` | Maximum failed emission attempts permitted before the drain applies its poison-message policy. The failure currently being processed counts toward the threshold. |
 | `DeadLetterOnMaxRetryAttempts` | `true` | Dead-letters the entry when the configured threshold is reached. When disabled, retry failures remain eligible for later drain attempts until the host applies another terminal policy. |
 | `DeadLetterReasonCode` | `outbox.max_retry_attempts_exceeded` | Stable provider-neutral error code recorded on threshold dead-lettering. |
-| `DeadLetterReasonMessage` | `Governance outbox entry exceeded the configured maximum retry attempts.` | Stable provider-neutral diagnostic and dead-letter reason. |
+| `DeadLetterReasonMessage` | `Outbox entry exceeded the configured maximum retry attempts.` | Stable provider-neutral diagnostic and dead-letter reason. |
 
 Example:
 
 ```csharp
-services.Configure<AsiBackboneGovernanceOutboxOptions>(options =>
+services.Configure<GovernanceOutboxOptions>(options =>
 {
     options.MaxRetryAttempts = 8;
     options.DeadLetterOnMaxRetryAttempts = true;
     options.DeadLetterReasonCode = "outbox.max_retry_attempts_exceeded";
     options.DeadLetterReasonMessage =
-        "Governance outbox entry exceeded the configured maximum retry attempts.";
+        "Outbox entry exceeded the configured maximum retry attempts.";
 });
 ```
 
@@ -34,8 +34,8 @@ services.Configure<AsiBackboneGovernanceOutboxOptions>(options =>
 
 The same threshold policy applies to both drain modes:
 
-- normal provider-neutral draining through `IAsiBackboneGovernanceOutboxStore`; and
-- claim/lease draining through `IAsiBackboneGovernanceOutboxClaimStore`.
+- normal provider-neutral draining through `IGovernanceOutboxStore`; and
+- claim/lease draining through `IGovernanceOutboxClaimStore`.
 
 A successful emission is marked delivered as usual. Provider-returned terminal dead-letter results remain terminal. Pending and deferred results remain deferred and do not consume the failed-attempt threshold because they do not increment `RetryCount`.
 
@@ -57,7 +57,7 @@ The threshold is deliberately enforced in the drain rather than delegated to a p
 
 ## Authoritative retry policy
 
-`AsiBackboneGovernanceOutboxOptions` is the authoritative retry and poison-message policy for the built-in drain:
+`GovernanceOutboxOptions` is the authoritative retry and poison-message policy for the built-in drain:
 
 - `MaxRetryAttempts` applies consistently to every attempted emission handled by the drain.
 - `DeadLetterOnMaxRetryAttempts` determines whether reaching that threshold creates a terminal dead-letter transition.
@@ -74,7 +74,7 @@ AsiBackbone records a stable terminal state; the host must make that state opera
 - emit a counter or event whenever an entry transitions to dead-lettered;
 - alert on increases in dead-letter count, especially repeated reason codes or provider paths;
 - alert before the threshold when retry counts approach `MaxRetryAttempts`;
-- correlate the incident with outbox entry ID, correlation ID, audit residue ID, provider, region, tenant, and workload using minimized metadata;
+- correlate the incident with outbox entry ID, correlation ID, decision receipt ID, provider, region, tenant, and workload using minimized metadata;
 - avoid placing raw prompts, protected content, credentials, access tokens, or secrets in alerts.
 
 A dead-letter transition should normally open an incident or review item for regulated or consequential workloads. It should never be treated as successful delivery.

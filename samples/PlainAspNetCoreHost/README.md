@@ -9,7 +9,7 @@ It proves that AsiBackbone can be wired into a plain ASP.NET Core application wi
 - Host-owned policy evaluation using Core constraints and a host-defined decision policy.
 - Host-owned EF Core infrastructure using a plain `DbContext` and SQLite provider.
 - EF Core model contribution through `ApplyAsiBackboneConfigurations()`.
-- In-memory audit residue for local validation.
+- In-memory decision receipt for local validation.
 - EF Core audit ledger persistence through the host-owned `DbContext`.
 
 ## What this sample intentionally avoids
@@ -36,7 +36,7 @@ Then open:
 GET /sample/decision
 ```
 
-The endpoint builds a sample policy context, evaluates constraints, applies a decision policy, writes audit residue to the in-memory ledger, and persists an audit ledger record through the host-owned EF Core context.
+The endpoint builds a sample policy context, evaluates constraints, applies a decision policy, writes decision receipt to the in-memory ledger, and persists an audit ledger record through the host-owned EF Core context.
 
 You can query the in-memory and EF Core audit paths by correlation identifier returned from `/sample/decision`:
 

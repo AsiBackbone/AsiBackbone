@@ -27,12 +27,12 @@ public static class AsiBackboneStrictGovernanceServiceCollectionExtensions
     {
         ArgumentNullException.ThrowIfNull(services);
 
-        _ = services.AddOptions<AsiBackbonePolicyEvaluatorOptions>()
+        _ = services.AddOptions<GovernancePolicyOptions>()
             .Configure(ApplyStrictPolicyEvaluatorProfile)
             .Validate(static options => ValidateOptions(options), "Policy evaluator options must be valid.")
             .ValidateOnStart();
 
-        _ = services.AddOptions<AsiBackboneEndpointGovernanceOptions>()
+        _ = services.AddOptions<EndpointGovernanceOptions>()
             .Configure(ApplyStrictEndpointGovernanceProfile)
             .Validate(static options => ValidateOptions(options), "Endpoint governance options must be valid.")
             .ValidateOnStart();
@@ -56,7 +56,7 @@ public static class AsiBackboneStrictGovernanceServiceCollectionExtensions
         return builder;
     }
 
-    private static void ApplyStrictPolicyEvaluatorProfile(AsiBackbonePolicyEvaluatorOptions options)
+    private static void ApplyStrictPolicyEvaluatorProfile(GovernancePolicyOptions options)
     {
         options.DenyWhenNoConstraints = true;
         options.TreatConstraintExceptionAsDenial = true;
@@ -64,7 +64,7 @@ public static class AsiBackboneStrictGovernanceServiceCollectionExtensions
         options.PreventThreatAssessmentAllowDowngrade = true;
     }
 
-    private static void ApplyStrictEndpointGovernanceProfile(AsiBackboneEndpointGovernanceOptions options)
+    private static void ApplyStrictEndpointGovernanceProfile(EndpointGovernanceOptions options)
     {
         options.FailClosedWhenPolicyEvaluatorMissing = true;
         options.FailClosedWhenCapabilityValidatorMissing = true;
@@ -73,7 +73,7 @@ public static class AsiBackboneStrictGovernanceServiceCollectionExtensions
         options.IncludeDevelopmentDiagnosticsMetadataValues = false;
     }
 
-    private static bool ValidateOptions(AsiBackbonePolicyEvaluatorOptions options)
+    private static bool ValidateOptions(GovernancePolicyOptions options)
     {
         try
         {
@@ -86,7 +86,7 @@ public static class AsiBackboneStrictGovernanceServiceCollectionExtensions
         }
     }
 
-    private static bool ValidateOptions(AsiBackboneEndpointGovernanceOptions options)
+    private static bool ValidateOptions(EndpointGovernanceOptions options)
     {
         try
         {

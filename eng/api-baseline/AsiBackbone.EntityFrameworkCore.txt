@@ -1,5 +1,5 @@
 # AsiBackbone stable public API baseline
-# Baseline release: 5.0.0
+# Baseline release: 6.0.0
 # Assembly: AsiBackbone.EntityFrameworkCore.dll
 # Format: KIND | UID | C# declaration (or enum field display)
 # Update only after explicit API/SemVer review.
@@ -15,20 +15,20 @@ MEMBER | AsiBackbone.EntityFrameworkCore.Audit.EfCoreAuditLedgerStore.FindByCorr
 MEMBER | AsiBackbone.EntityFrameworkCore.Audit.EfCoreAuditLedgerStore.FindByRecordIdAsync(System.String,System.Threading.CancellationToken) | public ValueTask<AuditLedgerRecord?> FindByRecordIdAsync(string recordId, CancellationToken cancellationToken = default)
 MEMBER | AsiBackbone.EntityFrameworkCore.Audit.EfCoreAuditLedgerStore.FindByRecordedUtcRangeAsync(System.DateTimeOffset,System.DateTimeOffset,System.Threading.CancellationToken) | public ValueTask<IReadOnlyList<AuditLedgerRecord>> FindByRecordedUtcRangeAsync(DateTimeOffset recordedFromUtc, DateTimeOffset recordedToUtc, CancellationToken cancellationToken = default)
 MEMBER | AsiBackbone.EntityFrameworkCore.Audit.EfCoreAuditLedgerStore.FindByTraceIdAsync(System.String,System.Threading.CancellationToken) | public ValueTask<IReadOnlyList<AuditLedgerRecord>> FindByTraceIdAsync(string traceId, CancellationToken cancellationToken = default)
-MEMBER | AsiBackbone.EntityFrameworkCore.Audit.EfCoreAuditResidueLifecycleStore.#ctor(Microsoft.EntityFrameworkCore.DbContext) | public EfCoreAuditResidueLifecycleStore(DbContext dbContext)
-MEMBER | AsiBackbone.EntityFrameworkCore.Audit.EfCoreAuditResidueLifecycleStore.AppendAsync(AsiBackbone.Core.Audit.AuditResidueLifecycleEvent,System.Threading.CancellationToken) | public ValueTask<AuditResidueLifecycleEvent> AppendAsync(AuditResidueLifecycleEvent lifecycleEvent, CancellationToken cancellationToken = default)
-MEMBER | AsiBackbone.EntityFrameworkCore.Audit.EfCoreAuditResidueLifecycleStore.FindByAuditResidueIdAsync(System.String,System.Threading.CancellationToken) | public ValueTask<IReadOnlyList<AuditResidueLifecycleEvent>> FindByAuditResidueIdAsync(string auditResidueId, CancellationToken cancellationToken = default)
-MEMBER | AsiBackbone.EntityFrameworkCore.Audit.EfCoreAuditResidueLifecycleStore.FindByCorrelationIdAsync(System.String,System.Threading.CancellationToken) | public ValueTask<IReadOnlyList<AuditResidueLifecycleEvent>> FindByCorrelationIdAsync(string correlationId, CancellationToken cancellationToken = default)
-MEMBER | AsiBackbone.EntityFrameworkCore.Audit.EfCoreAuditResidueLifecycleStore.FindByEventIdAsync(System.String,System.Threading.CancellationToken) | public ValueTask<AuditResidueLifecycleEvent?> FindByEventIdAsync(string eventId, CancellationToken cancellationToken = default)
-MEMBER | AsiBackbone.EntityFrameworkCore.Configurations.AsiBackboneAuditLedgerMetadataEntityConfiguration.Configure(Microsoft.EntityFrameworkCore.Metadata.Builders.EntityTypeBuilder{AsiBackbone.EntityFrameworkCore.Persistence.AsiBackboneAuditLedgerMetadataEntity}) | public void Configure(EntityTypeBuilder<AsiBackboneAuditLedgerMetadataEntity> builder)
-MEMBER | AsiBackbone.EntityFrameworkCore.Configurations.AsiBackboneAuditLedgerReasonCodeEntityConfiguration.Configure(Microsoft.EntityFrameworkCore.Metadata.Builders.EntityTypeBuilder{AsiBackbone.EntityFrameworkCore.Persistence.AsiBackboneAuditLedgerReasonCodeEntity}) | public void Configure(EntityTypeBuilder<AsiBackboneAuditLedgerReasonCodeEntity> builder)
-MEMBER | AsiBackbone.EntityFrameworkCore.Configurations.AsiBackboneAuditLedgerRecordEntityConfiguration.Configure(Microsoft.EntityFrameworkCore.Metadata.Builders.EntityTypeBuilder{AsiBackbone.EntityFrameworkCore.Persistence.AsiBackboneAuditLedgerRecordEntity}) | public void Configure(EntityTypeBuilder<AsiBackboneAuditLedgerRecordEntity> builder)
-MEMBER | AsiBackbone.EntityFrameworkCore.Configurations.AsiBackboneAuditResidueLifecycleEventEntityConfiguration.Configure(Microsoft.EntityFrameworkCore.Metadata.Builders.EntityTypeBuilder{AsiBackbone.EntityFrameworkCore.Persistence.AsiBackboneAuditResidueLifecycleEventEntity}) | public void Configure(EntityTypeBuilder<AsiBackboneAuditResidueLifecycleEventEntity> builder)
-MEMBER | AsiBackbone.EntityFrameworkCore.Configurations.AsiBackboneGovernanceOutboxEntryEntityConfiguration.Configure(Microsoft.EntityFrameworkCore.Metadata.Builders.EntityTypeBuilder{AsiBackbone.EntityFrameworkCore.Persistence.AsiBackboneGovernanceOutboxEntryEntity}) | public void Configure(EntityTypeBuilder<AsiBackboneGovernanceOutboxEntryEntity> builder)
-MEMBER | AsiBackbone.EntityFrameworkCore.Configurations.AsiBackboneHandshakeAcknowledgmentEntityConfiguration.Configure(Microsoft.EntityFrameworkCore.Metadata.Builders.EntityTypeBuilder{AsiBackbone.EntityFrameworkCore.Persistence.AsiBackboneHandshakeAcknowledgmentEntity}) | public void Configure(EntityTypeBuilder<AsiBackboneHandshakeAcknowledgmentEntity> builder)
-MEMBER | AsiBackbone.EntityFrameworkCore.Configurations.AsiBackboneHandshakeAcknowledgmentMetadataEntityConfiguration.Configure(Microsoft.EntityFrameworkCore.Metadata.Builders.EntityTypeBuilder{AsiBackbone.EntityFrameworkCore.Persistence.AsiBackboneHandshakeAcknowledgmentMetadataEntity}) | public void Configure(EntityTypeBuilder<AsiBackboneHandshakeAcknowledgmentMetadataEntity> builder)
-MEMBER | AsiBackbone.EntityFrameworkCore.Configurations.AsiBackboneHandshakeRequestEntityConfiguration.Configure(Microsoft.EntityFrameworkCore.Metadata.Builders.EntityTypeBuilder{AsiBackbone.EntityFrameworkCore.Persistence.AsiBackboneHandshakeRequestEntity}) | public void Configure(EntityTypeBuilder<AsiBackboneHandshakeRequestEntity> builder)
-MEMBER | AsiBackbone.EntityFrameworkCore.Configurations.AsiBackboneHandshakeRequestMetadataEntityConfiguration.Configure(Microsoft.EntityFrameworkCore.Metadata.Builders.EntityTypeBuilder{AsiBackbone.EntityFrameworkCore.Persistence.AsiBackboneHandshakeRequestMetadataEntity}) | public void Configure(EntityTypeBuilder<AsiBackboneHandshakeRequestMetadataEntity> builder)
+MEMBER | AsiBackbone.EntityFrameworkCore.Audit.EfCoreDecisionReceiptLifecycleStore.#ctor(Microsoft.EntityFrameworkCore.DbContext) | public EfCoreDecisionReceiptLifecycleStore(DbContext dbContext)
+MEMBER | AsiBackbone.EntityFrameworkCore.Audit.EfCoreDecisionReceiptLifecycleStore.AppendAsync(AsiBackbone.Core.Audit.DecisionReceiptLifecycleEvent,System.Threading.CancellationToken) | public ValueTask<DecisionReceiptLifecycleEvent> AppendAsync(DecisionReceiptLifecycleEvent lifecycleEvent, CancellationToken cancellationToken = default)
+MEMBER | AsiBackbone.EntityFrameworkCore.Audit.EfCoreDecisionReceiptLifecycleStore.FindByAuditResidueIdAsync(System.String,System.Threading.CancellationToken) | public ValueTask<IReadOnlyList<DecisionReceiptLifecycleEvent>> FindByAuditResidueIdAsync(string auditResidueId, CancellationToken cancellationToken = default)
+MEMBER | AsiBackbone.EntityFrameworkCore.Audit.EfCoreDecisionReceiptLifecycleStore.FindByCorrelationIdAsync(System.String,System.Threading.CancellationToken) | public ValueTask<IReadOnlyList<DecisionReceiptLifecycleEvent>> FindByCorrelationIdAsync(string correlationId, CancellationToken cancellationToken = default)
+MEMBER | AsiBackbone.EntityFrameworkCore.Audit.EfCoreDecisionReceiptLifecycleStore.FindByEventIdAsync(System.String,System.Threading.CancellationToken) | public ValueTask<DecisionReceiptLifecycleEvent?> FindByEventIdAsync(string eventId, CancellationToken cancellationToken = default)
+MEMBER | AsiBackbone.EntityFrameworkCore.Configurations.AuditLedgerMetadataEntityConfiguration.Configure(Microsoft.EntityFrameworkCore.Metadata.Builders.EntityTypeBuilder{AsiBackbone.EntityFrameworkCore.Persistence.AuditLedgerMetadataEntity}) | public void Configure(EntityTypeBuilder<AuditLedgerMetadataEntity> builder)
+MEMBER | AsiBackbone.EntityFrameworkCore.Configurations.AuditLedgerReasonCodeEntityConfiguration.Configure(Microsoft.EntityFrameworkCore.Metadata.Builders.EntityTypeBuilder{AsiBackbone.EntityFrameworkCore.Persistence.AuditLedgerReasonCodeEntity}) | public void Configure(EntityTypeBuilder<AuditLedgerReasonCodeEntity> builder)
+MEMBER | AsiBackbone.EntityFrameworkCore.Configurations.AuditLedgerRecordEntityConfiguration.Configure(Microsoft.EntityFrameworkCore.Metadata.Builders.EntityTypeBuilder{AsiBackbone.EntityFrameworkCore.Persistence.AuditLedgerRecordEntity}) | public void Configure(EntityTypeBuilder<AuditLedgerRecordEntity> builder)
+MEMBER | AsiBackbone.EntityFrameworkCore.Configurations.DecisionReceiptLifecycleEventEntityConfiguration.Configure(Microsoft.EntityFrameworkCore.Metadata.Builders.EntityTypeBuilder{AsiBackbone.EntityFrameworkCore.Persistence.DecisionReceiptLifecycleEventEntity}) | public void Configure(EntityTypeBuilder<DecisionReceiptLifecycleEventEntity> builder)
+MEMBER | AsiBackbone.EntityFrameworkCore.Configurations.GovernanceOutboxEntryEntityConfiguration.Configure(Microsoft.EntityFrameworkCore.Metadata.Builders.EntityTypeBuilder{AsiBackbone.EntityFrameworkCore.Persistence.GovernanceOutboxEntryEntity}) | public void Configure(EntityTypeBuilder<GovernanceOutboxEntryEntity> builder)
+MEMBER | AsiBackbone.EntityFrameworkCore.Configurations.HandshakeAcknowledgmentEntityConfiguration.Configure(Microsoft.EntityFrameworkCore.Metadata.Builders.EntityTypeBuilder{AsiBackbone.EntityFrameworkCore.Persistence.HandshakeAcknowledgmentEntity}) | public void Configure(EntityTypeBuilder<HandshakeAcknowledgmentEntity> builder)
+MEMBER | AsiBackbone.EntityFrameworkCore.Configurations.HandshakeAcknowledgmentMetadataEntityConfiguration.Configure(Microsoft.EntityFrameworkCore.Metadata.Builders.EntityTypeBuilder{AsiBackbone.EntityFrameworkCore.Persistence.HandshakeAcknowledgmentMetadataEntity}) | public void Configure(EntityTypeBuilder<HandshakeAcknowledgmentMetadataEntity> builder)
+MEMBER | AsiBackbone.EntityFrameworkCore.Configurations.HandshakeRequestEntityConfiguration.Configure(Microsoft.EntityFrameworkCore.Metadata.Builders.EntityTypeBuilder{AsiBackbone.EntityFrameworkCore.Persistence.HandshakeRequestEntity}) | public void Configure(EntityTypeBuilder<HandshakeRequestEntity> builder)
+MEMBER | AsiBackbone.EntityFrameworkCore.Configurations.HandshakeRequestMetadataEntityConfiguration.Configure(Microsoft.EntityFrameworkCore.Metadata.Builders.EntityTypeBuilder{AsiBackbone.EntityFrameworkCore.Persistence.HandshakeRequestMetadataEntity}) | public void Configure(EntityTypeBuilder<HandshakeRequestMetadataEntity> builder)
 MEMBER | AsiBackbone.EntityFrameworkCore.Outbox.EfCoreGovernanceOutboxOutcomeStore.#ctor(Microsoft.EntityFrameworkCore.DbContext,Microsoft.Extensions.Logging.ILogger{AsiBackbone.EntityFrameworkCore.Outbox.EfCoreGovernanceOutboxOutcomeStore}) | public EfCoreGovernanceOutboxOutcomeStore(DbContext dbContext, ILogger<EfCoreGovernanceOutboxOutcomeStore>? logger = null)
 MEMBER | AsiBackbone.EntityFrameworkCore.Outbox.EfCoreGovernanceOutboxOutcomeStore.ClaimPendingAsync(AsiBackbone.Core.Outbox.GovernanceOutboxClaimRequest,System.Threading.CancellationToken) | public ValueTask<IReadOnlyList<GovernanceOutboxClaim>> ClaimPendingAsync(GovernanceOutboxClaimRequest request, CancellationToken cancellationToken = default)
 MEMBER | AsiBackbone.EntityFrameworkCore.Outbox.EfCoreGovernanceOutboxOutcomeStore.ClaimRetryReadyAsync(AsiBackbone.Core.Outbox.GovernanceOutboxClaimRequest,System.Threading.CancellationToken) | public ValueTask<IReadOnlyList<GovernanceOutboxClaim>> ClaimRetryReadyAsync(GovernanceOutboxClaimRequest request, CancellationToken cancellationToken = default)
@@ -65,176 +65,176 @@ MEMBER | AsiBackbone.EntityFrameworkCore.Outbox.EfCoreGovernanceOutboxStore.Mark
 MEMBER | AsiBackbone.EntityFrameworkCore.Outbox.EfCoreGovernanceOutboxStore.ReleaseClaimAsync(AsiBackbone.Core.Outbox.GovernanceOutboxClaim,System.String,System.Threading.CancellationToken) | public ValueTask<GovernanceOutboxEntry?> ReleaseClaimAsync(GovernanceOutboxClaim claim, string? reason = null, CancellationToken cancellationToken = default)
 MEMBER | AsiBackbone.EntityFrameworkCore.Outbox.EfCoreGovernanceOutboxStore.SaveAsync(AsiBackbone.Core.Outbox.GovernanceOutboxEntry,System.Threading.CancellationToken) | public ValueTask<GovernanceOutboxEntry> SaveAsync(GovernanceOutboxEntry entry, CancellationToken cancellationToken = default)
 MEMBER | AsiBackbone.EntityFrameworkCore.Outbox.EfCoreGovernanceOutboxStore.SaveClaimAsync(AsiBackbone.Core.Outbox.GovernanceOutboxClaim,AsiBackbone.Core.Outbox.GovernanceOutboxEntry,System.Threading.CancellationToken) | public ValueTask<GovernanceOutboxEntry> SaveClaimAsync(GovernanceOutboxClaim claim, GovernanceOutboxEntry entry, CancellationToken cancellationToken = default)
-MEMBER | AsiBackbone.EntityFrameworkCore.Persistence.AsiBackboneAuditLedgerMetadataEntity.AuditLedgerRecord | public AsiBackboneAuditLedgerRecordEntity AuditLedgerRecord { get; set; }
-MEMBER | AsiBackbone.EntityFrameworkCore.Persistence.AsiBackboneAuditLedgerMetadataEntity.AuditLedgerRecordId | public Guid AuditLedgerRecordId { get; set; }
-MEMBER | AsiBackbone.EntityFrameworkCore.Persistence.AsiBackboneAuditLedgerMetadataEntity.MetadataKey | public string MetadataKey { get; set; }
-MEMBER | AsiBackbone.EntityFrameworkCore.Persistence.AsiBackboneAuditLedgerMetadataEntity.MetadataValue | public string MetadataValue { get; set; }
-MEMBER | AsiBackbone.EntityFrameworkCore.Persistence.AsiBackboneAuditLedgerReasonCodeEntity.AuditLedgerRecord | public AsiBackboneAuditLedgerRecordEntity AuditLedgerRecord { get; set; }
-MEMBER | AsiBackbone.EntityFrameworkCore.Persistence.AsiBackboneAuditLedgerReasonCodeEntity.AuditLedgerRecordId | public Guid AuditLedgerRecordId { get; set; }
-MEMBER | AsiBackbone.EntityFrameworkCore.Persistence.AsiBackboneAuditLedgerReasonCodeEntity.ReasonCode | public string ReasonCode { get; set; }
-MEMBER | AsiBackbone.EntityFrameworkCore.Persistence.AsiBackboneAuditLedgerReasonCodeEntity.Sequence | public int Sequence { get; set; }
-MEMBER | AsiBackbone.EntityFrameworkCore.Persistence.AsiBackboneAuditLedgerRecordEntity.AcknowledgmentId | public string? AcknowledgmentId { get; set; }
-MEMBER | AsiBackbone.EntityFrameworkCore.Persistence.AsiBackboneAuditLedgerRecordEntity.ActorDisplayName | public string? ActorDisplayName { get; set; }
-MEMBER | AsiBackbone.EntityFrameworkCore.Persistence.AsiBackboneAuditLedgerRecordEntity.ActorId | public string ActorId { get; set; }
-MEMBER | AsiBackbone.EntityFrameworkCore.Persistence.AsiBackboneAuditLedgerRecordEntity.ActorType | public AsiBackboneActorType ActorType { get; set; }
-MEMBER | AsiBackbone.EntityFrameworkCore.Persistence.AsiBackboneAuditLedgerRecordEntity.AuditResidueId | public string? AuditResidueId { get; set; }
-MEMBER | AsiBackbone.EntityFrameworkCore.Persistence.AsiBackboneAuditLedgerRecordEntity.CapabilityTokenId | public string? CapabilityTokenId { get; set; }
-MEMBER | AsiBackbone.EntityFrameworkCore.Persistence.AsiBackboneAuditLedgerRecordEntity.ConstraintCount | public int? ConstraintCount { get; set; }
-MEMBER | AsiBackbone.EntityFrameworkCore.Persistence.AsiBackboneAuditLedgerRecordEntity.ConstraintSetHash | public string? ConstraintSetHash { get; set; }
-MEMBER | AsiBackbone.EntityFrameworkCore.Persistence.AsiBackboneAuditLedgerRecordEntity.CorrelationId | public string? CorrelationId { get; set; }
-MEMBER | AsiBackbone.EntityFrameworkCore.Persistence.AsiBackboneAuditLedgerRecordEntity.DecisionLatencyMs | public long? DecisionLatencyMs { get; set; }
-MEMBER | AsiBackbone.EntityFrameworkCore.Persistence.AsiBackboneAuditLedgerRecordEntity.DecisionStage | public string? DecisionStage { get; set; }
-MEMBER | AsiBackbone.EntityFrameworkCore.Persistence.AsiBackboneAuditLedgerRecordEntity.EmitterProvider | public string? EmitterProvider { get; set; }
-MEMBER | AsiBackbone.EntityFrameworkCore.Persistence.AsiBackboneAuditLedgerRecordEntity.EmitterStatus | public string? EmitterStatus { get; set; }
-MEMBER | AsiBackbone.EntityFrameworkCore.Persistence.AsiBackboneAuditLedgerRecordEntity.EventId | public string EventId { get; set; }
-MEMBER | AsiBackbone.EntityFrameworkCore.Persistence.AsiBackboneAuditLedgerRecordEntity.GatewayExecutionId | public string? GatewayExecutionId { get; set; }
-MEMBER | AsiBackbone.EntityFrameworkCore.Persistence.AsiBackboneAuditLedgerRecordEntity.HandshakeId | public string? HandshakeId { get; set; }
-MEMBER | AsiBackbone.EntityFrameworkCore.Persistence.AsiBackboneAuditLedgerRecordEntity.MetadataJson | public string MetadataJson { get; set; }
-MEMBER | AsiBackbone.EntityFrameworkCore.Persistence.AsiBackboneAuditLedgerRecordEntity.OccurredUtc | public DateTimeOffset OccurredUtc { get; set; }
-MEMBER | AsiBackbone.EntityFrameworkCore.Persistence.AsiBackboneAuditLedgerRecordEntity.OperationName | public string OperationName { get; set; }
-MEMBER | AsiBackbone.EntityFrameworkCore.Persistence.AsiBackboneAuditLedgerRecordEntity.OrganizationHash | public string? OrganizationHash { get; set; }
-MEMBER | AsiBackbone.EntityFrameworkCore.Persistence.AsiBackboneAuditLedgerRecordEntity.OutboxSequence | public long? OutboxSequence { get; set; }
-MEMBER | AsiBackbone.EntityFrameworkCore.Persistence.AsiBackboneAuditLedgerRecordEntity.Outcome | public string Outcome { get; set; }
-MEMBER | AsiBackbone.EntityFrameworkCore.Persistence.AsiBackboneAuditLedgerRecordEntity.ParentSpanId | public string? ParentSpanId { get; set; }
-MEMBER | AsiBackbone.EntityFrameworkCore.Persistence.AsiBackboneAuditLedgerRecordEntity.PolicyHash | public string? PolicyHash { get; set; }
-MEMBER | AsiBackbone.EntityFrameworkCore.Persistence.AsiBackboneAuditLedgerRecordEntity.PolicyScope | public string? PolicyScope { get; set; }
-MEMBER | AsiBackbone.EntityFrameworkCore.Persistence.AsiBackboneAuditLedgerRecordEntity.PolicyVersion | public string? PolicyVersion { get; set; }
-MEMBER | AsiBackbone.EntityFrameworkCore.Persistence.AsiBackboneAuditLedgerRecordEntity.PreviousRecordHash | public string? PreviousRecordHash { get; set; }
-MEMBER | AsiBackbone.EntityFrameworkCore.Persistence.AsiBackboneAuditLedgerRecordEntity.ReasonCodesJson | public string ReasonCodesJson { get; set; }
-MEMBER | AsiBackbone.EntityFrameworkCore.Persistence.AsiBackboneAuditLedgerRecordEntity.RecordHash | public string? RecordHash { get; set; }
-MEMBER | AsiBackbone.EntityFrameworkCore.Persistence.AsiBackboneAuditLedgerRecordEntity.RecordId | public string RecordId { get; set; }
-MEMBER | AsiBackbone.EntityFrameworkCore.Persistence.AsiBackboneAuditLedgerRecordEntity.RecordedUtc | public DateTimeOffset RecordedUtc { get; set; }
-MEMBER | AsiBackbone.EntityFrameworkCore.Persistence.AsiBackboneAuditLedgerRecordEntity.RiskScore | public double? RiskScore { get; set; }
-MEMBER | AsiBackbone.EntityFrameworkCore.Persistence.AsiBackboneAuditLedgerRecordEntity.SchemaVersion | public string SchemaVersion { get; set; }
-MEMBER | AsiBackbone.EntityFrameworkCore.Persistence.AsiBackboneAuditLedgerRecordEntity.SignatureAlgorithm | public string? SignatureAlgorithm { get; set; }
-MEMBER | AsiBackbone.EntityFrameworkCore.Persistence.AsiBackboneAuditLedgerRecordEntity.SignatureKeyId | public string? SignatureKeyId { get; set; }
-MEMBER | AsiBackbone.EntityFrameworkCore.Persistence.AsiBackboneAuditLedgerRecordEntity.SignatureKeyVersion | public string? SignatureKeyVersion { get; set; }
-MEMBER | AsiBackbone.EntityFrameworkCore.Persistence.AsiBackboneAuditLedgerRecordEntity.SignatureProvider | public string? SignatureProvider { get; set; }
-MEMBER | AsiBackbone.EntityFrameworkCore.Persistence.AsiBackboneAuditLedgerRecordEntity.SignatureValue | public string? SignatureValue { get; set; }
-MEMBER | AsiBackbone.EntityFrameworkCore.Persistence.AsiBackboneAuditLedgerRecordEntity.SignedUtc | public DateTimeOffset? SignedUtc { get; set; }
-MEMBER | AsiBackbone.EntityFrameworkCore.Persistence.AsiBackboneAuditLedgerRecordEntity.SigningHash | public string? SigningHash { get; set; }
-MEMBER | AsiBackbone.EntityFrameworkCore.Persistence.AsiBackboneAuditLedgerRecordEntity.SpanId | public string? SpanId { get; set; }
-MEMBER | AsiBackbone.EntityFrameworkCore.Persistence.AsiBackboneAuditLedgerRecordEntity.TenantHash | public string? TenantHash { get; set; }
-MEMBER | AsiBackbone.EntityFrameworkCore.Persistence.AsiBackboneAuditLedgerRecordEntity.TraceId | public string? TraceId { get; set; }
-MEMBER | AsiBackbone.EntityFrameworkCore.Persistence.AsiBackboneAuditResidueLifecycleEventEntity.AuditResidueId | public string? AuditResidueId { get; set; }
-MEMBER | AsiBackbone.EntityFrameworkCore.Persistence.AsiBackboneAuditResidueLifecycleEventEntity.CorrelationId | public string CorrelationId { get; set; }
-MEMBER | AsiBackbone.EntityFrameworkCore.Persistence.AsiBackboneAuditResidueLifecycleEventEntity.EventId | public string EventId { get; set; }
-MEMBER | AsiBackbone.EntityFrameworkCore.Persistence.AsiBackboneAuditResidueLifecycleEventEntity.MetadataJson | public string MetadataJson { get; set; }
-MEMBER | AsiBackbone.EntityFrameworkCore.Persistence.AsiBackboneAuditResidueLifecycleEventEntity.OccurredUtc | public DateTimeOffset OccurredUtc { get; set; }
-MEMBER | AsiBackbone.EntityFrameworkCore.Persistence.AsiBackboneAuditResidueLifecycleEventEntity.OperationName | public string? OperationName { get; set; }
-MEMBER | AsiBackbone.EntityFrameworkCore.Persistence.AsiBackboneAuditResidueLifecycleEventEntity.Outcome | public string? Outcome { get; set; }
-MEMBER | AsiBackbone.EntityFrameworkCore.Persistence.AsiBackboneAuditResidueLifecycleEventEntity.Stage | public AuditResidueLifecycleStage Stage { get; set; }
-MEMBER | AsiBackbone.EntityFrameworkCore.Persistence.AsiBackboneAuditResidueLifecycleEventEntity.StageSequence | public int StageSequence { get; set; }
-MEMBER | AsiBackbone.EntityFrameworkCore.Persistence.AsiBackboneAuditResidueLifecycleEventEntity.TraceId | public string? TraceId { get; set; }
-MEMBER | AsiBackbone.EntityFrameworkCore.Persistence.AsiBackboneGovernanceOutboxEntryEntity.ClaimAttemptCount | public int ClaimAttemptCount { get; set; }
-MEMBER | AsiBackbone.EntityFrameworkCore.Persistence.AsiBackboneGovernanceOutboxEntryEntity.ClaimExpiresUtc | public DateTimeOffset? ClaimExpiresUtc { get; set; }
-MEMBER | AsiBackbone.EntityFrameworkCore.Persistence.AsiBackboneGovernanceOutboxEntryEntity.ClaimOwner | public string? ClaimOwner { get; set; }
-MEMBER | AsiBackbone.EntityFrameworkCore.Persistence.AsiBackboneGovernanceOutboxEntryEntity.ClaimToken | public string? ClaimToken { get; set; }
-MEMBER | AsiBackbone.EntityFrameworkCore.Persistence.AsiBackboneGovernanceOutboxEntryEntity.ClaimedUtc | public DateTimeOffset? ClaimedUtc { get; set; }
-MEMBER | AsiBackbone.EntityFrameworkCore.Persistence.AsiBackboneGovernanceOutboxEntryEntity.CreatedUtc | public DateTimeOffset CreatedUtc { get; set; }
-MEMBER | AsiBackbone.EntityFrameworkCore.Persistence.AsiBackboneGovernanceOutboxEntryEntity.DeadLetterReason | public string? DeadLetterReason { get; set; }
-MEMBER | AsiBackbone.EntityFrameworkCore.Persistence.AsiBackboneGovernanceOutboxEntryEntity.DeliveredUtc | public DateTimeOffset? DeliveredUtc { get; set; }
-MEMBER | AsiBackbone.EntityFrameworkCore.Persistence.AsiBackboneGovernanceOutboxEntryEntity.EnvelopeActorId | public string? EnvelopeActorId { get; set; }
-MEMBER | AsiBackbone.EntityFrameworkCore.Persistence.AsiBackboneGovernanceOutboxEntryEntity.EnvelopeAuditResidueId | public string? EnvelopeAuditResidueId { get; set; }
-MEMBER | AsiBackbone.EntityFrameworkCore.Persistence.AsiBackboneGovernanceOutboxEntryEntity.EnvelopeCorrelationId | public string? EnvelopeCorrelationId { get; set; }
-MEMBER | AsiBackbone.EntityFrameworkCore.Persistence.AsiBackboneGovernanceOutboxEntryEntity.EnvelopeCreatedUtc | public DateTimeOffset EnvelopeCreatedUtc { get; set; }
-MEMBER | AsiBackbone.EntityFrameworkCore.Persistence.AsiBackboneGovernanceOutboxEntryEntity.EnvelopeDecisionStage | public string? EnvelopeDecisionStage { get; set; }
-MEMBER | AsiBackbone.EntityFrameworkCore.Persistence.AsiBackboneGovernanceOutboxEntryEntity.EnvelopeEmitterProvider | public string? EnvelopeEmitterProvider { get; set; }
-MEMBER | AsiBackbone.EntityFrameworkCore.Persistence.AsiBackboneGovernanceOutboxEntryEntity.EnvelopeEmitterStatus | public string? EnvelopeEmitterStatus { get; set; }
-MEMBER | AsiBackbone.EntityFrameworkCore.Persistence.AsiBackboneGovernanceOutboxEntryEntity.EnvelopeEventId | public string? EnvelopeEventId { get; set; }
-MEMBER | AsiBackbone.EntityFrameworkCore.Persistence.AsiBackboneGovernanceOutboxEntryEntity.EnvelopeEventType | public GovernanceEmissionEventType EnvelopeEventType { get; set; }
-MEMBER | AsiBackbone.EntityFrameworkCore.Persistence.AsiBackboneGovernanceOutboxEntryEntity.EnvelopeGatewayExecutionId | public string? EnvelopeGatewayExecutionId { get; set; }
-MEMBER | AsiBackbone.EntityFrameworkCore.Persistence.AsiBackboneGovernanceOutboxEntryEntity.EnvelopeId | public string EnvelopeId { get; set; }
-MEMBER | AsiBackbone.EntityFrameworkCore.Persistence.AsiBackboneGovernanceOutboxEntryEntity.EnvelopeLifecycleStage | public AuditResidueLifecycleStage? EnvelopeLifecycleStage { get; set; }
-MEMBER | AsiBackbone.EntityFrameworkCore.Persistence.AsiBackboneGovernanceOutboxEntryEntity.EnvelopeLifecycleStageSequence | public int? EnvelopeLifecycleStageSequence { get; set; }
-MEMBER | AsiBackbone.EntityFrameworkCore.Persistence.AsiBackboneGovernanceOutboxEntryEntity.EnvelopeMetadataJson | public string EnvelopeMetadataJson { get; set; }
-MEMBER | AsiBackbone.EntityFrameworkCore.Persistence.AsiBackboneGovernanceOutboxEntryEntity.EnvelopeOccurredUtc | public DateTimeOffset EnvelopeOccurredUtc { get; set; }
-MEMBER | AsiBackbone.EntityFrameworkCore.Persistence.AsiBackboneGovernanceOutboxEntryEntity.EnvelopeOperationName | public string? EnvelopeOperationName { get; set; }
-MEMBER | AsiBackbone.EntityFrameworkCore.Persistence.AsiBackboneGovernanceOutboxEntryEntity.EnvelopeOutboxSequence | public long? EnvelopeOutboxSequence { get; set; }
-MEMBER | AsiBackbone.EntityFrameworkCore.Persistence.AsiBackboneGovernanceOutboxEntryEntity.EnvelopeOutcome | public string? EnvelopeOutcome { get; set; }
-MEMBER | AsiBackbone.EntityFrameworkCore.Persistence.AsiBackboneGovernanceOutboxEntryEntity.EnvelopeParentSpanId | public string? EnvelopeParentSpanId { get; set; }
-MEMBER | AsiBackbone.EntityFrameworkCore.Persistence.AsiBackboneGovernanceOutboxEntryEntity.EnvelopePayloadContentHash | public string? EnvelopePayloadContentHash { get; set; }
-MEMBER | AsiBackbone.EntityFrameworkCore.Persistence.AsiBackboneGovernanceOutboxEntryEntity.EnvelopePayloadContentType | public string? EnvelopePayloadContentType { get; set; }
-MEMBER | AsiBackbone.EntityFrameworkCore.Persistence.AsiBackboneGovernanceOutboxEntryEntity.EnvelopePayloadMetadataJson | public string EnvelopePayloadMetadataJson { get; set; }
-MEMBER | AsiBackbone.EntityFrameworkCore.Persistence.AsiBackboneGovernanceOutboxEntryEntity.EnvelopePayloadSchemaVersion | public string? EnvelopePayloadSchemaVersion { get; set; }
-MEMBER | AsiBackbone.EntityFrameworkCore.Persistence.AsiBackboneGovernanceOutboxEntryEntity.EnvelopePayloadSizeBytes | public long? EnvelopePayloadSizeBytes { get; set; }
-MEMBER | AsiBackbone.EntityFrameworkCore.Persistence.AsiBackboneGovernanceOutboxEntryEntity.EnvelopePayloadType | public string? EnvelopePayloadType { get; set; }
-MEMBER | AsiBackbone.EntityFrameworkCore.Persistence.AsiBackboneGovernanceOutboxEntryEntity.EnvelopePolicyHash | public string? EnvelopePolicyHash { get; set; }
-MEMBER | AsiBackbone.EntityFrameworkCore.Persistence.AsiBackboneGovernanceOutboxEntryEntity.EnvelopePolicyVersion | public string? EnvelopePolicyVersion { get; set; }
-MEMBER | AsiBackbone.EntityFrameworkCore.Persistence.AsiBackboneGovernanceOutboxEntryEntity.EnvelopeSchemaVersion | public string EnvelopeSchemaVersion { get; set; }
-MEMBER | AsiBackbone.EntityFrameworkCore.Persistence.AsiBackboneGovernanceOutboxEntryEntity.EnvelopeSpanId | public string? EnvelopeSpanId { get; set; }
-MEMBER | AsiBackbone.EntityFrameworkCore.Persistence.AsiBackboneGovernanceOutboxEntryEntity.EnvelopeTraceId | public string? EnvelopeTraceId { get; set; }
-MEMBER | AsiBackbone.EntityFrameworkCore.Persistence.AsiBackboneGovernanceOutboxEntryEntity.LastErrorCode | public string? LastErrorCode { get; set; }
-MEMBER | AsiBackbone.EntityFrameworkCore.Persistence.AsiBackboneGovernanceOutboxEntryEntity.LastErrorIsRetryable | public bool? LastErrorIsRetryable { get; set; }
-MEMBER | AsiBackbone.EntityFrameworkCore.Persistence.AsiBackboneGovernanceOutboxEntryEntity.LastErrorMessage | public string? LastErrorMessage { get; set; }
-MEMBER | AsiBackbone.EntityFrameworkCore.Persistence.AsiBackboneGovernanceOutboxEntryEntity.LastErrorProviderErrorCode | public string? LastErrorProviderErrorCode { get; set; }
-MEMBER | AsiBackbone.EntityFrameworkCore.Persistence.AsiBackboneGovernanceOutboxEntryEntity.LastErrorProviderName | public string? LastErrorProviderName { get; set; }
-MEMBER | AsiBackbone.EntityFrameworkCore.Persistence.AsiBackboneGovernanceOutboxEntryEntity.MaxRetryCount | public int MaxRetryCount { get; set; }
-MEMBER | AsiBackbone.EntityFrameworkCore.Persistence.AsiBackboneGovernanceOutboxEntryEntity.MetadataJson | public string MetadataJson { get; set; }
-MEMBER | AsiBackbone.EntityFrameworkCore.Persistence.AsiBackboneGovernanceOutboxEntryEntity.NextRetryUtc | public DateTimeOffset? NextRetryUtc { get; set; }
-MEMBER | AsiBackbone.EntityFrameworkCore.Persistence.AsiBackboneGovernanceOutboxEntryEntity.OutboxEntryId | public string OutboxEntryId { get; set; }
-MEMBER | AsiBackbone.EntityFrameworkCore.Persistence.AsiBackboneGovernanceOutboxEntryEntity.ProviderName | public string? ProviderName { get; set; }
-MEMBER | AsiBackbone.EntityFrameworkCore.Persistence.AsiBackboneGovernanceOutboxEntryEntity.ProviderRecordId | public string? ProviderRecordId { get; set; }
-MEMBER | AsiBackbone.EntityFrameworkCore.Persistence.AsiBackboneGovernanceOutboxEntryEntity.RetryCount | public int RetryCount { get; set; }
-MEMBER | AsiBackbone.EntityFrameworkCore.Persistence.AsiBackboneGovernanceOutboxEntryEntity.Status | public GovernanceEmissionStatus Status { get; set; }
-MEMBER | AsiBackbone.EntityFrameworkCore.Persistence.AsiBackboneGovernanceOutboxEntryEntity.UpdatedUtc | public DateTimeOffset UpdatedUtc { get; set; }
-MEMBER | AsiBackbone.EntityFrameworkCore.Persistence.AsiBackboneHandshakeAcknowledgmentEntity.Acknowledged | public bool Acknowledged { get; set; }
-MEMBER | AsiBackbone.EntityFrameworkCore.Persistence.AsiBackboneHandshakeAcknowledgmentEntity.AcknowledgmentCode | public string AcknowledgmentCode { get; set; }
-MEMBER | AsiBackbone.EntityFrameworkCore.Persistence.AsiBackboneHandshakeAcknowledgmentEntity.AcknowledgmentId | public string AcknowledgmentId { get; set; }
-MEMBER | AsiBackbone.EntityFrameworkCore.Persistence.AsiBackboneHandshakeAcknowledgmentEntity.ActorDisplayName | public string? ActorDisplayName { get; set; }
-MEMBER | AsiBackbone.EntityFrameworkCore.Persistence.AsiBackboneHandshakeAcknowledgmentEntity.ActorId | public string ActorId { get; set; }
-MEMBER | AsiBackbone.EntityFrameworkCore.Persistence.AsiBackboneHandshakeAcknowledgmentEntity.ActorType | public AsiBackboneActorType ActorType { get; set; }
-MEMBER | AsiBackbone.EntityFrameworkCore.Persistence.AsiBackboneHandshakeAcknowledgmentEntity.CorrelationId | public string? CorrelationId { get; set; }
-MEMBER | AsiBackbone.EntityFrameworkCore.Persistence.AsiBackboneHandshakeAcknowledgmentEntity.HandshakeId | public string HandshakeId { get; set; }
-MEMBER | AsiBackbone.EntityFrameworkCore.Persistence.AsiBackboneHandshakeAcknowledgmentEntity.OccurredUtc | public DateTimeOffset OccurredUtc { get; set; }
-MEMBER | AsiBackbone.EntityFrameworkCore.Persistence.AsiBackboneHandshakeAcknowledgmentEntity.SchemaVersion | public string SchemaVersion { get; set; }
-MEMBER | AsiBackbone.EntityFrameworkCore.Persistence.AsiBackboneHandshakeAcknowledgmentEntity.TraceId | public string? TraceId { get; set; }
-MEMBER | AsiBackbone.EntityFrameworkCore.Persistence.AsiBackboneHandshakeAcknowledgmentMetadataEntity.HandshakeAcknowledgment | public AsiBackboneHandshakeAcknowledgmentEntity HandshakeAcknowledgment { get; set; }
-MEMBER | AsiBackbone.EntityFrameworkCore.Persistence.AsiBackboneHandshakeAcknowledgmentMetadataEntity.HandshakeAcknowledgmentId | public Guid HandshakeAcknowledgmentId { get; set; }
-MEMBER | AsiBackbone.EntityFrameworkCore.Persistence.AsiBackboneHandshakeAcknowledgmentMetadataEntity.MetadataKey | public string MetadataKey { get; set; }
-MEMBER | AsiBackbone.EntityFrameworkCore.Persistence.AsiBackboneHandshakeAcknowledgmentMetadataEntity.MetadataValue | public string MetadataValue { get; set; }
-MEMBER | AsiBackbone.EntityFrameworkCore.Persistence.AsiBackboneHandshakeRequestEntity.ActorDisplayName | public string? ActorDisplayName { get; set; }
-MEMBER | AsiBackbone.EntityFrameworkCore.Persistence.AsiBackboneHandshakeRequestEntity.ActorId | public string ActorId { get; set; }
-MEMBER | AsiBackbone.EntityFrameworkCore.Persistence.AsiBackboneHandshakeRequestEntity.ActorType | public AsiBackboneActorType ActorType { get; set; }
-MEMBER | AsiBackbone.EntityFrameworkCore.Persistence.AsiBackboneHandshakeRequestEntity.CorrelationId | public string? CorrelationId { get; set; }
-MEMBER | AsiBackbone.EntityFrameworkCore.Persistence.AsiBackboneHandshakeRequestEntity.HandshakeId | public string HandshakeId { get; set; }
-MEMBER | AsiBackbone.EntityFrameworkCore.Persistence.AsiBackboneHandshakeRequestEntity.Message | public string Message { get; set; }
-MEMBER | AsiBackbone.EntityFrameworkCore.Persistence.AsiBackboneHandshakeRequestEntity.OperationName | public string OperationName { get; set; }
-MEMBER | AsiBackbone.EntityFrameworkCore.Persistence.AsiBackboneHandshakeRequestEntity.PolicyHash | public string? PolicyHash { get; set; }
-MEMBER | AsiBackbone.EntityFrameworkCore.Persistence.AsiBackboneHandshakeRequestEntity.PolicyVersion | public string? PolicyVersion { get; set; }
-MEMBER | AsiBackbone.EntityFrameworkCore.Persistence.AsiBackboneHandshakeRequestEntity.ReasonCode | public string ReasonCode { get; set; }
-MEMBER | AsiBackbone.EntityFrameworkCore.Persistence.AsiBackboneHandshakeRequestEntity.RequiredAcknowledgmentCode | public string RequiredAcknowledgmentCode { get; set; }
-MEMBER | AsiBackbone.EntityFrameworkCore.Persistence.AsiBackboneHandshakeRequestEntity.RequiredAcknowledgmentText | public string RequiredAcknowledgmentText { get; set; }
-MEMBER | AsiBackbone.EntityFrameworkCore.Persistence.AsiBackboneHandshakeRequestEntity.RiskCategory | public string? RiskCategory { get; set; }
-MEMBER | AsiBackbone.EntityFrameworkCore.Persistence.AsiBackboneHandshakeRequestEntity.RiskLevel | public LiabilityHandshakeRiskLevel RiskLevel { get; set; }
-MEMBER | AsiBackbone.EntityFrameworkCore.Persistence.AsiBackboneHandshakeRequestEntity.SchemaVersion | public string SchemaVersion { get; set; }
-MEMBER | AsiBackbone.EntityFrameworkCore.Persistence.AsiBackboneHandshakeRequestEntity.TraceId | public string? TraceId { get; set; }
-MEMBER | AsiBackbone.EntityFrameworkCore.Persistence.AsiBackboneHandshakeRequestMetadataEntity.HandshakeRequest | public AsiBackboneHandshakeRequestEntity HandshakeRequest { get; set; }
-MEMBER | AsiBackbone.EntityFrameworkCore.Persistence.AsiBackboneHandshakeRequestMetadataEntity.HandshakeRequestId | public Guid HandshakeRequestId { get; set; }
-MEMBER | AsiBackbone.EntityFrameworkCore.Persistence.AsiBackboneHandshakeRequestMetadataEntity.MetadataKey | public string MetadataKey { get; set; }
-MEMBER | AsiBackbone.EntityFrameworkCore.Persistence.AsiBackboneHandshakeRequestMetadataEntity.MetadataValue | public string MetadataValue { get; set; }
+MEMBER | AsiBackbone.EntityFrameworkCore.Persistence.AuditLedgerMetadataEntity.AuditLedgerRecord | public AuditLedgerRecordEntity AuditLedgerRecord { get; set; }
+MEMBER | AsiBackbone.EntityFrameworkCore.Persistence.AuditLedgerMetadataEntity.AuditLedgerRecordId | public Guid AuditLedgerRecordId { get; set; }
+MEMBER | AsiBackbone.EntityFrameworkCore.Persistence.AuditLedgerMetadataEntity.MetadataKey | public string MetadataKey { get; set; }
+MEMBER | AsiBackbone.EntityFrameworkCore.Persistence.AuditLedgerMetadataEntity.MetadataValue | public string MetadataValue { get; set; }
+MEMBER | AsiBackbone.EntityFrameworkCore.Persistence.AuditLedgerReasonCodeEntity.AuditLedgerRecord | public AuditLedgerRecordEntity AuditLedgerRecord { get; set; }
+MEMBER | AsiBackbone.EntityFrameworkCore.Persistence.AuditLedgerReasonCodeEntity.AuditLedgerRecordId | public Guid AuditLedgerRecordId { get; set; }
+MEMBER | AsiBackbone.EntityFrameworkCore.Persistence.AuditLedgerReasonCodeEntity.ReasonCode | public string ReasonCode { get; set; }
+MEMBER | AsiBackbone.EntityFrameworkCore.Persistence.AuditLedgerReasonCodeEntity.Sequence | public int Sequence { get; set; }
+MEMBER | AsiBackbone.EntityFrameworkCore.Persistence.AuditLedgerRecordEntity.AcknowledgmentId | public string? AcknowledgmentId { get; set; }
+MEMBER | AsiBackbone.EntityFrameworkCore.Persistence.AuditLedgerRecordEntity.ActorDisplayName | public string? ActorDisplayName { get; set; }
+MEMBER | AsiBackbone.EntityFrameworkCore.Persistence.AuditLedgerRecordEntity.ActorId | public string ActorId { get; set; }
+MEMBER | AsiBackbone.EntityFrameworkCore.Persistence.AuditLedgerRecordEntity.ActorType | public GovernanceActorType ActorType { get; set; }
+MEMBER | AsiBackbone.EntityFrameworkCore.Persistence.AuditLedgerRecordEntity.AuditResidueId | public string? AuditResidueId { get; set; }
+MEMBER | AsiBackbone.EntityFrameworkCore.Persistence.AuditLedgerRecordEntity.CapabilityTokenId | public string? CapabilityTokenId { get; set; }
+MEMBER | AsiBackbone.EntityFrameworkCore.Persistence.AuditLedgerRecordEntity.ConstraintCount | public int? ConstraintCount { get; set; }
+MEMBER | AsiBackbone.EntityFrameworkCore.Persistence.AuditLedgerRecordEntity.ConstraintSetHash | public string? ConstraintSetHash { get; set; }
+MEMBER | AsiBackbone.EntityFrameworkCore.Persistence.AuditLedgerRecordEntity.CorrelationId | public string? CorrelationId { get; set; }
+MEMBER | AsiBackbone.EntityFrameworkCore.Persistence.AuditLedgerRecordEntity.DecisionLatencyMs | public long? DecisionLatencyMs { get; set; }
+MEMBER | AsiBackbone.EntityFrameworkCore.Persistence.AuditLedgerRecordEntity.DecisionStage | public string? DecisionStage { get; set; }
+MEMBER | AsiBackbone.EntityFrameworkCore.Persistence.AuditLedgerRecordEntity.EmitterProvider | public string? EmitterProvider { get; set; }
+MEMBER | AsiBackbone.EntityFrameworkCore.Persistence.AuditLedgerRecordEntity.EmitterStatus | public string? EmitterStatus { get; set; }
+MEMBER | AsiBackbone.EntityFrameworkCore.Persistence.AuditLedgerRecordEntity.EventId | public string EventId { get; set; }
+MEMBER | AsiBackbone.EntityFrameworkCore.Persistence.AuditLedgerRecordEntity.GatewayExecutionId | public string? GatewayExecutionId { get; set; }
+MEMBER | AsiBackbone.EntityFrameworkCore.Persistence.AuditLedgerRecordEntity.HandshakeId | public string? HandshakeId { get; set; }
+MEMBER | AsiBackbone.EntityFrameworkCore.Persistence.AuditLedgerRecordEntity.MetadataJson | public string MetadataJson { get; set; }
+MEMBER | AsiBackbone.EntityFrameworkCore.Persistence.AuditLedgerRecordEntity.OccurredUtc | public DateTimeOffset OccurredUtc { get; set; }
+MEMBER | AsiBackbone.EntityFrameworkCore.Persistence.AuditLedgerRecordEntity.OperationName | public string OperationName { get; set; }
+MEMBER | AsiBackbone.EntityFrameworkCore.Persistence.AuditLedgerRecordEntity.OrganizationHash | public string? OrganizationHash { get; set; }
+MEMBER | AsiBackbone.EntityFrameworkCore.Persistence.AuditLedgerRecordEntity.OutboxSequence | public long? OutboxSequence { get; set; }
+MEMBER | AsiBackbone.EntityFrameworkCore.Persistence.AuditLedgerRecordEntity.Outcome | public string Outcome { get; set; }
+MEMBER | AsiBackbone.EntityFrameworkCore.Persistence.AuditLedgerRecordEntity.ParentSpanId | public string? ParentSpanId { get; set; }
+MEMBER | AsiBackbone.EntityFrameworkCore.Persistence.AuditLedgerRecordEntity.PolicyHash | public string? PolicyHash { get; set; }
+MEMBER | AsiBackbone.EntityFrameworkCore.Persistence.AuditLedgerRecordEntity.PolicyScope | public string? PolicyScope { get; set; }
+MEMBER | AsiBackbone.EntityFrameworkCore.Persistence.AuditLedgerRecordEntity.PolicyVersion | public string? PolicyVersion { get; set; }
+MEMBER | AsiBackbone.EntityFrameworkCore.Persistence.AuditLedgerRecordEntity.PreviousRecordHash | public string? PreviousRecordHash { get; set; }
+MEMBER | AsiBackbone.EntityFrameworkCore.Persistence.AuditLedgerRecordEntity.ReasonCodesJson | public string ReasonCodesJson { get; set; }
+MEMBER | AsiBackbone.EntityFrameworkCore.Persistence.AuditLedgerRecordEntity.RecordHash | public string? RecordHash { get; set; }
+MEMBER | AsiBackbone.EntityFrameworkCore.Persistence.AuditLedgerRecordEntity.RecordId | public string RecordId { get; set; }
+MEMBER | AsiBackbone.EntityFrameworkCore.Persistence.AuditLedgerRecordEntity.RecordedUtc | public DateTimeOffset RecordedUtc { get; set; }
+MEMBER | AsiBackbone.EntityFrameworkCore.Persistence.AuditLedgerRecordEntity.RiskScore | public double? RiskScore { get; set; }
+MEMBER | AsiBackbone.EntityFrameworkCore.Persistence.AuditLedgerRecordEntity.SchemaVersion | public string SchemaVersion { get; set; }
+MEMBER | AsiBackbone.EntityFrameworkCore.Persistence.AuditLedgerRecordEntity.SignatureAlgorithm | public string? SignatureAlgorithm { get; set; }
+MEMBER | AsiBackbone.EntityFrameworkCore.Persistence.AuditLedgerRecordEntity.SignatureKeyId | public string? SignatureKeyId { get; set; }
+MEMBER | AsiBackbone.EntityFrameworkCore.Persistence.AuditLedgerRecordEntity.SignatureKeyVersion | public string? SignatureKeyVersion { get; set; }
+MEMBER | AsiBackbone.EntityFrameworkCore.Persistence.AuditLedgerRecordEntity.SignatureProvider | public string? SignatureProvider { get; set; }
+MEMBER | AsiBackbone.EntityFrameworkCore.Persistence.AuditLedgerRecordEntity.SignatureValue | public string? SignatureValue { get; set; }
+MEMBER | AsiBackbone.EntityFrameworkCore.Persistence.AuditLedgerRecordEntity.SignedUtc | public DateTimeOffset? SignedUtc { get; set; }
+MEMBER | AsiBackbone.EntityFrameworkCore.Persistence.AuditLedgerRecordEntity.SigningHash | public string? SigningHash { get; set; }
+MEMBER | AsiBackbone.EntityFrameworkCore.Persistence.AuditLedgerRecordEntity.SpanId | public string? SpanId { get; set; }
+MEMBER | AsiBackbone.EntityFrameworkCore.Persistence.AuditLedgerRecordEntity.TenantHash | public string? TenantHash { get; set; }
+MEMBER | AsiBackbone.EntityFrameworkCore.Persistence.AuditLedgerRecordEntity.TraceId | public string? TraceId { get; set; }
+MEMBER | AsiBackbone.EntityFrameworkCore.Persistence.DecisionReceiptLifecycleEventEntity.AuditResidueId | public string? AuditResidueId { get; set; }
+MEMBER | AsiBackbone.EntityFrameworkCore.Persistence.DecisionReceiptLifecycleEventEntity.CorrelationId | public string CorrelationId { get; set; }
+MEMBER | AsiBackbone.EntityFrameworkCore.Persistence.DecisionReceiptLifecycleEventEntity.EventId | public string EventId { get; set; }
+MEMBER | AsiBackbone.EntityFrameworkCore.Persistence.DecisionReceiptLifecycleEventEntity.MetadataJson | public string MetadataJson { get; set; }
+MEMBER | AsiBackbone.EntityFrameworkCore.Persistence.DecisionReceiptLifecycleEventEntity.OccurredUtc | public DateTimeOffset OccurredUtc { get; set; }
+MEMBER | AsiBackbone.EntityFrameworkCore.Persistence.DecisionReceiptLifecycleEventEntity.OperationName | public string? OperationName { get; set; }
+MEMBER | AsiBackbone.EntityFrameworkCore.Persistence.DecisionReceiptLifecycleEventEntity.Outcome | public string? Outcome { get; set; }
+MEMBER | AsiBackbone.EntityFrameworkCore.Persistence.DecisionReceiptLifecycleEventEntity.Stage | public DecisionReceiptLifecycleStage Stage { get; set; }
+MEMBER | AsiBackbone.EntityFrameworkCore.Persistence.DecisionReceiptLifecycleEventEntity.StageSequence | public int StageSequence { get; set; }
+MEMBER | AsiBackbone.EntityFrameworkCore.Persistence.DecisionReceiptLifecycleEventEntity.TraceId | public string? TraceId { get; set; }
+MEMBER | AsiBackbone.EntityFrameworkCore.Persistence.GovernanceOutboxEntryEntity.ClaimAttemptCount | public int ClaimAttemptCount { get; set; }
+MEMBER | AsiBackbone.EntityFrameworkCore.Persistence.GovernanceOutboxEntryEntity.ClaimExpiresUtc | public DateTimeOffset? ClaimExpiresUtc { get; set; }
+MEMBER | AsiBackbone.EntityFrameworkCore.Persistence.GovernanceOutboxEntryEntity.ClaimOwner | public string? ClaimOwner { get; set; }
+MEMBER | AsiBackbone.EntityFrameworkCore.Persistence.GovernanceOutboxEntryEntity.ClaimToken | public string? ClaimToken { get; set; }
+MEMBER | AsiBackbone.EntityFrameworkCore.Persistence.GovernanceOutboxEntryEntity.ClaimedUtc | public DateTimeOffset? ClaimedUtc { get; set; }
+MEMBER | AsiBackbone.EntityFrameworkCore.Persistence.GovernanceOutboxEntryEntity.CreatedUtc | public DateTimeOffset CreatedUtc { get; set; }
+MEMBER | AsiBackbone.EntityFrameworkCore.Persistence.GovernanceOutboxEntryEntity.DeadLetterReason | public string? DeadLetterReason { get; set; }
+MEMBER | AsiBackbone.EntityFrameworkCore.Persistence.GovernanceOutboxEntryEntity.DeliveredUtc | public DateTimeOffset? DeliveredUtc { get; set; }
+MEMBER | AsiBackbone.EntityFrameworkCore.Persistence.GovernanceOutboxEntryEntity.EnvelopeActorId | public string? EnvelopeActorId { get; set; }
+MEMBER | AsiBackbone.EntityFrameworkCore.Persistence.GovernanceOutboxEntryEntity.EnvelopeAuditResidueId | public string? EnvelopeAuditResidueId { get; set; }
+MEMBER | AsiBackbone.EntityFrameworkCore.Persistence.GovernanceOutboxEntryEntity.EnvelopeCorrelationId | public string? EnvelopeCorrelationId { get; set; }
+MEMBER | AsiBackbone.EntityFrameworkCore.Persistence.GovernanceOutboxEntryEntity.EnvelopeCreatedUtc | public DateTimeOffset EnvelopeCreatedUtc { get; set; }
+MEMBER | AsiBackbone.EntityFrameworkCore.Persistence.GovernanceOutboxEntryEntity.EnvelopeDecisionStage | public string? EnvelopeDecisionStage { get; set; }
+MEMBER | AsiBackbone.EntityFrameworkCore.Persistence.GovernanceOutboxEntryEntity.EnvelopeEmitterProvider | public string? EnvelopeEmitterProvider { get; set; }
+MEMBER | AsiBackbone.EntityFrameworkCore.Persistence.GovernanceOutboxEntryEntity.EnvelopeEmitterStatus | public string? EnvelopeEmitterStatus { get; set; }
+MEMBER | AsiBackbone.EntityFrameworkCore.Persistence.GovernanceOutboxEntryEntity.EnvelopeEventId | public string? EnvelopeEventId { get; set; }
+MEMBER | AsiBackbone.EntityFrameworkCore.Persistence.GovernanceOutboxEntryEntity.EnvelopeEventType | public GovernanceEmissionEventType EnvelopeEventType { get; set; }
+MEMBER | AsiBackbone.EntityFrameworkCore.Persistence.GovernanceOutboxEntryEntity.EnvelopeGatewayExecutionId | public string? EnvelopeGatewayExecutionId { get; set; }
+MEMBER | AsiBackbone.EntityFrameworkCore.Persistence.GovernanceOutboxEntryEntity.EnvelopeId | public string EnvelopeId { get; set; }
+MEMBER | AsiBackbone.EntityFrameworkCore.Persistence.GovernanceOutboxEntryEntity.EnvelopeLifecycleStage | public DecisionReceiptLifecycleStage? EnvelopeLifecycleStage { get; set; }
+MEMBER | AsiBackbone.EntityFrameworkCore.Persistence.GovernanceOutboxEntryEntity.EnvelopeLifecycleStageSequence | public int? EnvelopeLifecycleStageSequence { get; set; }
+MEMBER | AsiBackbone.EntityFrameworkCore.Persistence.GovernanceOutboxEntryEntity.EnvelopeMetadataJson | public string EnvelopeMetadataJson { get; set; }
+MEMBER | AsiBackbone.EntityFrameworkCore.Persistence.GovernanceOutboxEntryEntity.EnvelopeOccurredUtc | public DateTimeOffset EnvelopeOccurredUtc { get; set; }
+MEMBER | AsiBackbone.EntityFrameworkCore.Persistence.GovernanceOutboxEntryEntity.EnvelopeOperationName | public string? EnvelopeOperationName { get; set; }
+MEMBER | AsiBackbone.EntityFrameworkCore.Persistence.GovernanceOutboxEntryEntity.EnvelopeOutboxSequence | public long? EnvelopeOutboxSequence { get; set; }
+MEMBER | AsiBackbone.EntityFrameworkCore.Persistence.GovernanceOutboxEntryEntity.EnvelopeOutcome | public string? EnvelopeOutcome { get; set; }
+MEMBER | AsiBackbone.EntityFrameworkCore.Persistence.GovernanceOutboxEntryEntity.EnvelopeParentSpanId | public string? EnvelopeParentSpanId { get; set; }
+MEMBER | AsiBackbone.EntityFrameworkCore.Persistence.GovernanceOutboxEntryEntity.EnvelopePayloadContentHash | public string? EnvelopePayloadContentHash { get; set; }
+MEMBER | AsiBackbone.EntityFrameworkCore.Persistence.GovernanceOutboxEntryEntity.EnvelopePayloadContentType | public string? EnvelopePayloadContentType { get; set; }
+MEMBER | AsiBackbone.EntityFrameworkCore.Persistence.GovernanceOutboxEntryEntity.EnvelopePayloadMetadataJson | public string EnvelopePayloadMetadataJson { get; set; }
+MEMBER | AsiBackbone.EntityFrameworkCore.Persistence.GovernanceOutboxEntryEntity.EnvelopePayloadSchemaVersion | public string? EnvelopePayloadSchemaVersion { get; set; }
+MEMBER | AsiBackbone.EntityFrameworkCore.Persistence.GovernanceOutboxEntryEntity.EnvelopePayloadSizeBytes | public long? EnvelopePayloadSizeBytes { get; set; }
+MEMBER | AsiBackbone.EntityFrameworkCore.Persistence.GovernanceOutboxEntryEntity.EnvelopePayloadType | public string? EnvelopePayloadType { get; set; }
+MEMBER | AsiBackbone.EntityFrameworkCore.Persistence.GovernanceOutboxEntryEntity.EnvelopePolicyHash | public string? EnvelopePolicyHash { get; set; }
+MEMBER | AsiBackbone.EntityFrameworkCore.Persistence.GovernanceOutboxEntryEntity.EnvelopePolicyVersion | public string? EnvelopePolicyVersion { get; set; }
+MEMBER | AsiBackbone.EntityFrameworkCore.Persistence.GovernanceOutboxEntryEntity.EnvelopeSchemaVersion | public string EnvelopeSchemaVersion { get; set; }
+MEMBER | AsiBackbone.EntityFrameworkCore.Persistence.GovernanceOutboxEntryEntity.EnvelopeSpanId | public string? EnvelopeSpanId { get; set; }
+MEMBER | AsiBackbone.EntityFrameworkCore.Persistence.GovernanceOutboxEntryEntity.EnvelopeTraceId | public string? EnvelopeTraceId { get; set; }
+MEMBER | AsiBackbone.EntityFrameworkCore.Persistence.GovernanceOutboxEntryEntity.LastErrorCode | public string? LastErrorCode { get; set; }
+MEMBER | AsiBackbone.EntityFrameworkCore.Persistence.GovernanceOutboxEntryEntity.LastErrorIsRetryable | public bool? LastErrorIsRetryable { get; set; }
+MEMBER | AsiBackbone.EntityFrameworkCore.Persistence.GovernanceOutboxEntryEntity.LastErrorMessage | public string? LastErrorMessage { get; set; }
+MEMBER | AsiBackbone.EntityFrameworkCore.Persistence.GovernanceOutboxEntryEntity.LastErrorProviderErrorCode | public string? LastErrorProviderErrorCode { get; set; }
+MEMBER | AsiBackbone.EntityFrameworkCore.Persistence.GovernanceOutboxEntryEntity.LastErrorProviderName | public string? LastErrorProviderName { get; set; }
+MEMBER | AsiBackbone.EntityFrameworkCore.Persistence.GovernanceOutboxEntryEntity.MaxRetryCount | public int MaxRetryCount { get; set; }
+MEMBER | AsiBackbone.EntityFrameworkCore.Persistence.GovernanceOutboxEntryEntity.MetadataJson | public string MetadataJson { get; set; }
+MEMBER | AsiBackbone.EntityFrameworkCore.Persistence.GovernanceOutboxEntryEntity.NextRetryUtc | public DateTimeOffset? NextRetryUtc { get; set; }
+MEMBER | AsiBackbone.EntityFrameworkCore.Persistence.GovernanceOutboxEntryEntity.OutboxEntryId | public string OutboxEntryId { get; set; }
+MEMBER | AsiBackbone.EntityFrameworkCore.Persistence.GovernanceOutboxEntryEntity.ProviderName | public string? ProviderName { get; set; }
+MEMBER | AsiBackbone.EntityFrameworkCore.Persistence.GovernanceOutboxEntryEntity.ProviderRecordId | public string? ProviderRecordId { get; set; }
+MEMBER | AsiBackbone.EntityFrameworkCore.Persistence.GovernanceOutboxEntryEntity.RetryCount | public int RetryCount { get; set; }
+MEMBER | AsiBackbone.EntityFrameworkCore.Persistence.GovernanceOutboxEntryEntity.Status | public GovernanceEmissionStatus Status { get; set; }
+MEMBER | AsiBackbone.EntityFrameworkCore.Persistence.GovernanceOutboxEntryEntity.UpdatedUtc | public DateTimeOffset UpdatedUtc { get; set; }
+MEMBER | AsiBackbone.EntityFrameworkCore.Persistence.HandshakeAcknowledgmentEntity.Acknowledged | public bool Acknowledged { get; set; }
+MEMBER | AsiBackbone.EntityFrameworkCore.Persistence.HandshakeAcknowledgmentEntity.AcknowledgmentCode | public string AcknowledgmentCode { get; set; }
+MEMBER | AsiBackbone.EntityFrameworkCore.Persistence.HandshakeAcknowledgmentEntity.AcknowledgmentId | public string AcknowledgmentId { get; set; }
+MEMBER | AsiBackbone.EntityFrameworkCore.Persistence.HandshakeAcknowledgmentEntity.ActorDisplayName | public string? ActorDisplayName { get; set; }
+MEMBER | AsiBackbone.EntityFrameworkCore.Persistence.HandshakeAcknowledgmentEntity.ActorId | public string ActorId { get; set; }
+MEMBER | AsiBackbone.EntityFrameworkCore.Persistence.HandshakeAcknowledgmentEntity.ActorType | public GovernanceActorType ActorType { get; set; }
+MEMBER | AsiBackbone.EntityFrameworkCore.Persistence.HandshakeAcknowledgmentEntity.CorrelationId | public string? CorrelationId { get; set; }
+MEMBER | AsiBackbone.EntityFrameworkCore.Persistence.HandshakeAcknowledgmentEntity.HandshakeId | public string HandshakeId { get; set; }
+MEMBER | AsiBackbone.EntityFrameworkCore.Persistence.HandshakeAcknowledgmentEntity.OccurredUtc | public DateTimeOffset OccurredUtc { get; set; }
+MEMBER | AsiBackbone.EntityFrameworkCore.Persistence.HandshakeAcknowledgmentEntity.SchemaVersion | public string SchemaVersion { get; set; }
+MEMBER | AsiBackbone.EntityFrameworkCore.Persistence.HandshakeAcknowledgmentEntity.TraceId | public string? TraceId { get; set; }
+MEMBER | AsiBackbone.EntityFrameworkCore.Persistence.HandshakeAcknowledgmentMetadataEntity.HandshakeAcknowledgment | public HandshakeAcknowledgmentEntity HandshakeAcknowledgment { get; set; }
+MEMBER | AsiBackbone.EntityFrameworkCore.Persistence.HandshakeAcknowledgmentMetadataEntity.HandshakeAcknowledgmentId | public Guid HandshakeAcknowledgmentId { get; set; }
+MEMBER | AsiBackbone.EntityFrameworkCore.Persistence.HandshakeAcknowledgmentMetadataEntity.MetadataKey | public string MetadataKey { get; set; }
+MEMBER | AsiBackbone.EntityFrameworkCore.Persistence.HandshakeAcknowledgmentMetadataEntity.MetadataValue | public string MetadataValue { get; set; }
+MEMBER | AsiBackbone.EntityFrameworkCore.Persistence.HandshakeRequestEntity.ActorDisplayName | public string? ActorDisplayName { get; set; }
+MEMBER | AsiBackbone.EntityFrameworkCore.Persistence.HandshakeRequestEntity.ActorId | public string ActorId { get; set; }
+MEMBER | AsiBackbone.EntityFrameworkCore.Persistence.HandshakeRequestEntity.ActorType | public GovernanceActorType ActorType { get; set; }
+MEMBER | AsiBackbone.EntityFrameworkCore.Persistence.HandshakeRequestEntity.CorrelationId | public string? CorrelationId { get; set; }
+MEMBER | AsiBackbone.EntityFrameworkCore.Persistence.HandshakeRequestEntity.HandshakeId | public string HandshakeId { get; set; }
+MEMBER | AsiBackbone.EntityFrameworkCore.Persistence.HandshakeRequestEntity.Message | public string Message { get; set; }
+MEMBER | AsiBackbone.EntityFrameworkCore.Persistence.HandshakeRequestEntity.OperationName | public string OperationName { get; set; }
+MEMBER | AsiBackbone.EntityFrameworkCore.Persistence.HandshakeRequestEntity.PolicyHash | public string? PolicyHash { get; set; }
+MEMBER | AsiBackbone.EntityFrameworkCore.Persistence.HandshakeRequestEntity.PolicyVersion | public string? PolicyVersion { get; set; }
+MEMBER | AsiBackbone.EntityFrameworkCore.Persistence.HandshakeRequestEntity.ReasonCode | public string ReasonCode { get; set; }
+MEMBER | AsiBackbone.EntityFrameworkCore.Persistence.HandshakeRequestEntity.RequiredAcknowledgmentCode | public string RequiredAcknowledgmentCode { get; set; }
+MEMBER | AsiBackbone.EntityFrameworkCore.Persistence.HandshakeRequestEntity.RequiredAcknowledgmentText | public string RequiredAcknowledgmentText { get; set; }
+MEMBER | AsiBackbone.EntityFrameworkCore.Persistence.HandshakeRequestEntity.RiskCategory | public string? RiskCategory { get; set; }
+MEMBER | AsiBackbone.EntityFrameworkCore.Persistence.HandshakeRequestEntity.RiskLevel | public LiabilityHandshakeRiskLevel RiskLevel { get; set; }
+MEMBER | AsiBackbone.EntityFrameworkCore.Persistence.HandshakeRequestEntity.SchemaVersion | public string SchemaVersion { get; set; }
+MEMBER | AsiBackbone.EntityFrameworkCore.Persistence.HandshakeRequestEntity.TraceId | public string? TraceId { get; set; }
+MEMBER | AsiBackbone.EntityFrameworkCore.Persistence.HandshakeRequestMetadataEntity.HandshakeRequest | public HandshakeRequestEntity HandshakeRequest { get; set; }
+MEMBER | AsiBackbone.EntityFrameworkCore.Persistence.HandshakeRequestMetadataEntity.HandshakeRequestId | public Guid HandshakeRequestId { get; set; }
+MEMBER | AsiBackbone.EntityFrameworkCore.Persistence.HandshakeRequestMetadataEntity.MetadataKey | public string MetadataKey { get; set; }
+MEMBER | AsiBackbone.EntityFrameworkCore.Persistence.HandshakeRequestMetadataEntity.MetadataValue | public string MetadataValue { get; set; }
 TYPE | AsiBackbone.EntityFrameworkCore.AsiBackboneEntityFrameworkCoreBuilderExtensions | public static class AsiBackboneEntityFrameworkCoreBuilderExtensions
 TYPE | AsiBackbone.EntityFrameworkCore.AsiBackboneModelBuilderExtensions | public static class AsiBackboneModelBuilderExtensions
 TYPE | AsiBackbone.EntityFrameworkCore.AssemblyReference | public sealed class AssemblyReference
-TYPE | AsiBackbone.EntityFrameworkCore.Audit.EfCoreAuditLedgerStore | public sealed class EfCoreAuditLedgerStore : IAsiBackboneAuditLedgerStore
-TYPE | AsiBackbone.EntityFrameworkCore.Audit.EfCoreAuditResidueLifecycleStore | public sealed class EfCoreAuditResidueLifecycleStore : IAsiBackboneAuditResidueLifecycleStore
-TYPE | AsiBackbone.EntityFrameworkCore.Configurations.AsiBackboneAuditLedgerMetadataEntityConfiguration | public sealed class AsiBackboneAuditLedgerMetadataEntityConfiguration : IEntityTypeConfiguration<AsiBackboneAuditLedgerMetadataEntity>
-TYPE | AsiBackbone.EntityFrameworkCore.Configurations.AsiBackboneAuditLedgerReasonCodeEntityConfiguration | public sealed class AsiBackboneAuditLedgerReasonCodeEntityConfiguration : IEntityTypeConfiguration<AsiBackboneAuditLedgerReasonCodeEntity>
-TYPE | AsiBackbone.EntityFrameworkCore.Configurations.AsiBackboneAuditLedgerRecordEntityConfiguration | public sealed class AsiBackboneAuditLedgerRecordEntityConfiguration : IEntityTypeConfiguration<AsiBackboneAuditLedgerRecordEntity>
-TYPE | AsiBackbone.EntityFrameworkCore.Configurations.AsiBackboneAuditResidueLifecycleEventEntityConfiguration | public sealed class AsiBackboneAuditResidueLifecycleEventEntityConfiguration : IEntityTypeConfiguration<AsiBackboneAuditResidueLifecycleEventEntity>
-TYPE | AsiBackbone.EntityFrameworkCore.Configurations.AsiBackboneGovernanceOutboxEntryEntityConfiguration | public sealed class AsiBackboneGovernanceOutboxEntryEntityConfiguration : IEntityTypeConfiguration<AsiBackboneGovernanceOutboxEntryEntity>
-TYPE | AsiBackbone.EntityFrameworkCore.Configurations.AsiBackboneHandshakeAcknowledgmentEntityConfiguration | public sealed class AsiBackboneHandshakeAcknowledgmentEntityConfiguration : IEntityTypeConfiguration<AsiBackboneHandshakeAcknowledgmentEntity>
-TYPE | AsiBackbone.EntityFrameworkCore.Configurations.AsiBackboneHandshakeAcknowledgmentMetadataEntityConfiguration | public sealed class AsiBackboneHandshakeAcknowledgmentMetadataEntityConfiguration : IEntityTypeConfiguration<AsiBackboneHandshakeAcknowledgmentMetadataEntity>
-TYPE | AsiBackbone.EntityFrameworkCore.Configurations.AsiBackboneHandshakeRequestEntityConfiguration | public sealed class AsiBackboneHandshakeRequestEntityConfiguration : IEntityTypeConfiguration<AsiBackboneHandshakeRequestEntity>
-TYPE | AsiBackbone.EntityFrameworkCore.Configurations.AsiBackboneHandshakeRequestMetadataEntityConfiguration | public sealed class AsiBackboneHandshakeRequestMetadataEntityConfiguration : IEntityTypeConfiguration<AsiBackboneHandshakeRequestMetadataEntity>
-TYPE | AsiBackbone.EntityFrameworkCore.Outbox.EfCoreGovernanceOutboxOutcomeStore | public sealed class EfCoreGovernanceOutboxOutcomeStore : IAsiBackboneGovernanceOutboxClaimOutcomeStore, IAsiBackboneGovernanceOutboxClaimStore, IAsiBackboneGovernanceOutboxStore
-TYPE | AsiBackbone.EntityFrameworkCore.Outbox.EfCoreGovernanceOutboxStore | public sealed class EfCoreGovernanceOutboxStore : IAsiBackboneGovernanceOutboxClaimStore, IAsiBackboneGovernanceOutboxStore
-TYPE | AsiBackbone.EntityFrameworkCore.Persistence.AsiBackboneAuditLedgerMetadataEntity | public sealed class AsiBackboneAuditLedgerMetadataEntity : AsiBackboneEntity, IAsiBackboneEntity, IConcurrencyTrackedEntity
-TYPE | AsiBackbone.EntityFrameworkCore.Persistence.AsiBackboneAuditLedgerReasonCodeEntity | public sealed class AsiBackboneAuditLedgerReasonCodeEntity : AsiBackboneEntity, IAsiBackboneEntity, IConcurrencyTrackedEntity
-TYPE | AsiBackbone.EntityFrameworkCore.Persistence.AsiBackboneAuditLedgerRecordEntity | public sealed class AsiBackboneAuditLedgerRecordEntity : AsiBackboneEntity, IAsiBackboneEntity, IConcurrencyTrackedEntity
-TYPE | AsiBackbone.EntityFrameworkCore.Persistence.AsiBackboneAuditResidueLifecycleEventEntity | public sealed class AsiBackboneAuditResidueLifecycleEventEntity : AsiBackboneEntity, IAsiBackboneEntity, IConcurrencyTrackedEntity
-TYPE | AsiBackbone.EntityFrameworkCore.Persistence.AsiBackboneGovernanceOutboxEntryEntity | public sealed class AsiBackboneGovernanceOutboxEntryEntity : AsiBackboneEntity, IAsiBackboneEntity, IConcurrencyTrackedEntity
-TYPE | AsiBackbone.EntityFrameworkCore.Persistence.AsiBackboneHandshakeAcknowledgmentEntity | public sealed class AsiBackboneHandshakeAcknowledgmentEntity : AsiBackboneEntity, IAsiBackboneEntity, IConcurrencyTrackedEntity
-TYPE | AsiBackbone.EntityFrameworkCore.Persistence.AsiBackboneHandshakeAcknowledgmentMetadataEntity | public sealed class AsiBackboneHandshakeAcknowledgmentMetadataEntity : AsiBackboneEntity, IAsiBackboneEntity, IConcurrencyTrackedEntity
-TYPE | AsiBackbone.EntityFrameworkCore.Persistence.AsiBackboneHandshakeRequestEntity | public sealed class AsiBackboneHandshakeRequestEntity : AsiBackboneEntity, IAsiBackboneEntity, IConcurrencyTrackedEntity
-TYPE | AsiBackbone.EntityFrameworkCore.Persistence.AsiBackboneHandshakeRequestMetadataEntity | public sealed class AsiBackboneHandshakeRequestMetadataEntity : AsiBackboneEntity, IAsiBackboneEntity, IConcurrencyTrackedEntity
+TYPE | AsiBackbone.EntityFrameworkCore.Audit.EfCoreAuditLedgerStore | public sealed class EfCoreAuditLedgerStore : IGovernanceAuditLedgerStore
+TYPE | AsiBackbone.EntityFrameworkCore.Audit.EfCoreDecisionReceiptLifecycleStore | public sealed class EfCoreDecisionReceiptLifecycleStore : IDecisionReceiptLifecycleStore
+TYPE | AsiBackbone.EntityFrameworkCore.Configurations.AuditLedgerMetadataEntityConfiguration | public sealed class AuditLedgerMetadataEntityConfiguration : IEntityTypeConfiguration<AuditLedgerMetadataEntity>
+TYPE | AsiBackbone.EntityFrameworkCore.Configurations.AuditLedgerReasonCodeEntityConfiguration | public sealed class AuditLedgerReasonCodeEntityConfiguration : IEntityTypeConfiguration<AuditLedgerReasonCodeEntity>
+TYPE | AsiBackbone.EntityFrameworkCore.Configurations.AuditLedgerRecordEntityConfiguration | public sealed class AuditLedgerRecordEntityConfiguration : IEntityTypeConfiguration<AuditLedgerRecordEntity>
+TYPE | AsiBackbone.EntityFrameworkCore.Configurations.DecisionReceiptLifecycleEventEntityConfiguration | public sealed class DecisionReceiptLifecycleEventEntityConfiguration : IEntityTypeConfiguration<DecisionReceiptLifecycleEventEntity>
+TYPE | AsiBackbone.EntityFrameworkCore.Configurations.GovernanceOutboxEntryEntityConfiguration | public sealed class GovernanceOutboxEntryEntityConfiguration : IEntityTypeConfiguration<GovernanceOutboxEntryEntity>
+TYPE | AsiBackbone.EntityFrameworkCore.Configurations.HandshakeAcknowledgmentEntityConfiguration | public sealed class HandshakeAcknowledgmentEntityConfiguration : IEntityTypeConfiguration<HandshakeAcknowledgmentEntity>
+TYPE | AsiBackbone.EntityFrameworkCore.Configurations.HandshakeAcknowledgmentMetadataEntityConfiguration | public sealed class HandshakeAcknowledgmentMetadataEntityConfiguration : IEntityTypeConfiguration<HandshakeAcknowledgmentMetadataEntity>
+TYPE | AsiBackbone.EntityFrameworkCore.Configurations.HandshakeRequestEntityConfiguration | public sealed class HandshakeRequestEntityConfiguration : IEntityTypeConfiguration<HandshakeRequestEntity>
+TYPE | AsiBackbone.EntityFrameworkCore.Configurations.HandshakeRequestMetadataEntityConfiguration | public sealed class HandshakeRequestMetadataEntityConfiguration : IEntityTypeConfiguration<HandshakeRequestMetadataEntity>
+TYPE | AsiBackbone.EntityFrameworkCore.Outbox.EfCoreGovernanceOutboxOutcomeStore | public sealed class EfCoreGovernanceOutboxOutcomeStore : IGovernanceOutboxClaimOutcomeStore, IGovernanceOutboxClaimStore, IGovernanceOutboxStore
+TYPE | AsiBackbone.EntityFrameworkCore.Outbox.EfCoreGovernanceOutboxStore | public sealed class EfCoreGovernanceOutboxStore : IGovernanceOutboxClaimStore, IGovernanceOutboxStore
+TYPE | AsiBackbone.EntityFrameworkCore.Persistence.AuditLedgerMetadataEntity | public sealed class AuditLedgerMetadataEntity : GovernanceEntity, IGovernanceEntity, IConcurrencyTrackedEntity
+TYPE | AsiBackbone.EntityFrameworkCore.Persistence.AuditLedgerReasonCodeEntity | public sealed class AuditLedgerReasonCodeEntity : GovernanceEntity, IGovernanceEntity, IConcurrencyTrackedEntity
+TYPE | AsiBackbone.EntityFrameworkCore.Persistence.AuditLedgerRecordEntity | public sealed class AuditLedgerRecordEntity : GovernanceEntity, IGovernanceEntity, IConcurrencyTrackedEntity
+TYPE | AsiBackbone.EntityFrameworkCore.Persistence.DecisionReceiptLifecycleEventEntity | public sealed class DecisionReceiptLifecycleEventEntity : GovernanceEntity, IGovernanceEntity, IConcurrencyTrackedEntity
+TYPE | AsiBackbone.EntityFrameworkCore.Persistence.GovernanceOutboxEntryEntity | public sealed class GovernanceOutboxEntryEntity : GovernanceEntity, IGovernanceEntity, IConcurrencyTrackedEntity
+TYPE | AsiBackbone.EntityFrameworkCore.Persistence.HandshakeAcknowledgmentEntity | public sealed class HandshakeAcknowledgmentEntity : GovernanceEntity, IGovernanceEntity, IConcurrencyTrackedEntity
+TYPE | AsiBackbone.EntityFrameworkCore.Persistence.HandshakeAcknowledgmentMetadataEntity | public sealed class HandshakeAcknowledgmentMetadataEntity : GovernanceEntity, IGovernanceEntity, IConcurrencyTrackedEntity
+TYPE | AsiBackbone.EntityFrameworkCore.Persistence.HandshakeRequestEntity | public sealed class HandshakeRequestEntity : GovernanceEntity, IGovernanceEntity, IConcurrencyTrackedEntity
+TYPE | AsiBackbone.EntityFrameworkCore.Persistence.HandshakeRequestMetadataEntity | public sealed class HandshakeRequestMetadataEntity : GovernanceEntity, IGovernanceEntity, IConcurrencyTrackedEntity

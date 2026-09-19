@@ -2,7 +2,7 @@
 
 AsiBackbone can be used as a governance checkpoint between an AI agent's proposed action and the host application's execution boundary.
 
-In this scenario, the model or agent proposes intent. The host application converts that proposal into a framework-neutral evaluation context. AsiBackbone evaluates policy constraints and decision policy. The host then decides whether to deny, defer, escalate, require acknowledgment, persist audit residue, or execute the host-owned tool.
+In this scenario, the model or agent proposes intent. The host application converts that proposal into a framework-neutral evaluation context. AsiBackbone evaluates policy constraints and decision policy. The host then decides whether to deny, defer, escalate, require acknowledgment, persist decision receipt, or execute the host-owned tool.
 
 > [!IMPORTANT]
 > AsiBackbone is not an AI agent framework. It does not host, train, run, prompt, or orchestrate the model. It does not execute tools, APIs, infrastructure changes, file operations, external commands, robotics flows, or physical-control operations. The host application owns the agent runtime, tool registry, authorization, acknowledgment UX, execution behavior, and operational safeguards.
@@ -15,7 +15,7 @@ In this scenario, the model or agent proposes intent. The host application conve
 | Host application | Owns the model runtime, tool registry, actor context, authorization, policy-context construction, final execution, and error handling. |
 | AsiBackbone | Evaluates the host-provided context through constraints and decision policy, then returns a governance decision. |
 | Acknowledgment layer | Handles host-presented acknowledgment for consequential actions when the decision requires it. |
-| Audit sink or ledger | Stores the decision residue, reason codes, policy metadata, correlation identifiers, and host-provided metadata. |
+| Audit sink or ledger | Stores the decision receipt, reason codes, policy metadata, correlation identifiers, and host-provided metadata. |
 | External tool or API | Executes only if the host decides the governed action may proceed. |
 
 ## Sequence
@@ -34,17 +34,17 @@ sequenceDiagram
     Host->>Backbone: EvaluateAsync(context)
     Backbone-->>Host: GovernanceDecision
     alt Denied Deferred or EscalationRecommended
-        Host->>Audit: Persist decision residue
+        Host->>Audit: Persist decision receipt
         Host-->>Agent: Do not execute and return governed outcome
     else AcknowledgmentRequired
         Host->>Ack: Create and present challenge
         Ack-->>Host: Accepted or rejected response
-        Host->>Audit: Persist decision and acknowledgment residue
+        Host->>Audit: Persist decision receipt and acknowledgment record
         opt Accepted and host policy permits execution
             Host->>Tool: Execute host-owned operation
         end
     else Allowed or Warning
-        Host->>Audit: Persist decision residue
+        Host->>Audit: Persist decision receipt
         Host->>Tool: Execute host-owned operation
     end
 ```
@@ -58,7 +58,7 @@ A typical AI-agent gateway flow is:
 3. Host includes correlation, policy version, policy hash, actor, operation, risk, target, and tool metadata where appropriate.
 4. AsiBackbone constraints and decision policy evaluate the request.
 5. AsiBackbone returns a `GovernanceDecision`.
-6. Host persists audit residue from the decision.
+6. Host persists decision receipt from the decision.
 7. Host handles `AcknowledgmentRequired` decisions before execution.
 8. Host executes, denies, defers, or escalates through host-owned code.
 
@@ -88,7 +88,7 @@ IReadOnlyDictionary<string, string> metadata = new Dictionary<string, string>(St
     ["risk"] = "medium"
 };
 
-var context = new AsiBackboneConstraintEvaluationContext(
+var context = new GovernanceEvaluationContext(
     correlationId: correlationId,
     policyVersion: "agent-gateway-v1",
     policyHash: policyHash,
@@ -106,7 +106,7 @@ switch (decision.Outcome)
 {
     case GovernanceDecisionOutcome.Allowed:
     case GovernanceDecisionOutcome.Warning:
-        // Persist audit residue first, then execute through host-owned tool code.
+        // Persist decision receipt first, then execute through host-owned tool code.
         break;
 
     case GovernanceDecisionOutcome.AcknowledgmentRequired:
@@ -116,30 +116,30 @@ switch (decision.Outcome)
     case GovernanceDecisionOutcome.Denied:
     case GovernanceDecisionOutcome.Deferred:
     case GovernanceDecisionOutcome.EscalationRecommended:
-        // Persist audit residue and do not execute the tool call here.
+        // Persist decision receipt and do not execute the tool call here.
         break;
 }
 ```
 
-After evaluation, the host can create audit residue from the decision.
+After evaluation, the host can create decision receipt from the decision.
 
 ```csharp
-AuditResidue residue = AuditResidue.FromDecision(
+DecisionReceipt receipt = DecisionReceipt.FromDecision(
     actor,
     operationName: "agent.notification.send",
     decision,
     metadata: metadata);
 
-await auditSink.WriteAsync(residue, cancellationToken);
+await auditSink.WriteAsync(receipt, cancellationToken);
 ```
 
-For durable persistence, the host can map audit residue into its host-owned persistence plan, such as an EF Core ledger store. The host remains responsible for database provider, connection strings, migrations, retention, and deployment.
+For durable persistence, the host can map decision receipt into its host-owned persistence plan, such as an EF Core ledger store. The host remains responsible for database provider, connection strings, migrations, retention, and deployment.
 
 ## Acknowledgment-required actions
 
 When a decision returns `AcknowledgmentRequired`, the host should pause before execution.
 
-An ASP.NET Core host can use `IAsiBackboneAcknowledgmentChallengeService` to create and handle a challenge without forcing a specific UI framework. The host still owns how the challenge is displayed, who is authorized to respond, how the response is persisted, and whether a successful acknowledgment is sufficient to proceed.
+An ASP.NET Core host can use `IAcknowledgmentChallengeService` to create and handle a challenge without forcing a specific UI framework. The host still owns how the challenge is displayed, who is authorized to respond, how the response is persisted, and whether a successful acknowledgment is sufficient to proceed.
 
 A useful rule is:
 
@@ -158,18 +158,18 @@ This gateway pattern helps avoid common agent-integration mistakes:
 - Scattering policy checks across individual tool handlers.
 - Logging only after the tool has already executed.
 - Treating user approval as the same thing as structured acknowledgment.
-- Allowing high-risk operations without correlation, reason codes, policy version, or audit residue.
+- Allowing high-risk operations without correlation, reason codes, policy version, or decision receipt.
 
 ## Relevant APIs and samples
 
 Core classes and interfaces:
 
-- [`IAsiBackbonePolicyEvaluator<TContext>`](https://github.com/AsiBackbone/AsiBackbone/blob/main/src/AsiBackbone.Core/Evaluation/IAsiBackbonePolicyEvaluator.cs)
-- [`AsiBackboneConstraintEvaluationContext`](https://github.com/AsiBackbone/AsiBackbone/blob/main/src/AsiBackbone.Core/Constraints/AsiBackboneConstraintEvaluationContext.cs)
+- [`IGovernancePolicyEvaluator<TContext>`](https://github.com/AsiBackbone/AsiBackbone/blob/main/src/AsiBackbone.Core/Evaluation/IGovernancePolicyEvaluator.cs)
+- [`GovernanceEvaluationContext`](https://github.com/AsiBackbone/AsiBackbone/blob/main/src/AsiBackbone.Core/Constraints/GovernanceEvaluationContext.cs)
 - [`GovernanceDecision`](https://github.com/AsiBackbone/AsiBackbone/blob/main/src/AsiBackbone.Core/Decisions/GovernanceDecision.cs)
 - [`GovernanceDecisionOutcome`](https://github.com/AsiBackbone/AsiBackbone/blob/main/src/AsiBackbone.Core/Decisions/GovernanceDecisionOutcome.cs)
-- [`AuditResidue`](https://github.com/AsiBackbone/AsiBackbone/blob/main/src/AsiBackbone.Core/Audit/AuditResidue.cs)
-- [`IAsiBackboneAcknowledgmentChallengeService`](https://github.com/AsiBackbone/AsiBackbone/blob/main/src/AsiBackbone.AspNetCore/Handshakes/IAsiBackboneAcknowledgmentChallengeService.cs)
+- [`DecisionReceipt`](https://github.com/AsiBackbone/AsiBackbone/blob/main/src/AsiBackbone.Core/Audit/DecisionReceipt.cs)
+- [`IAcknowledgmentChallengeService`](https://github.com/AsiBackbone/AsiBackbone/blob/main/src/AsiBackbone.AspNetCore/Handshakes/IAcknowledgmentChallengeService.cs)
 
 Related documentation:
 

@@ -21,7 +21,7 @@ Proposed operation
   -> constraints evaluate
   -> policy evaluator composes GovernanceDecision
   -> optional acknowledgment workflow
-  -> audit residue / lifecycle evidence
+  -> decision receipt / lifecycle evidence
   -> optional capability grant
   -> host or gateway decides whether to execute
 ```
@@ -32,21 +32,21 @@ Core defines the governance primitives for this lane. It does not own the extern
 
 | Learning concept | Core API mapping | Core contract |
 | --- | --- | --- |
-| Actor context | [`IAsiBackboneActorContext`](xref:AsiBackbone.Core.Actors.IAsiBackboneActorContext) | Framework-neutral actor data supplied by the host. Core does not authenticate the actor. |
-| Policy context | [`IAsiBackboneConstraintEvaluationContext`](xref:AsiBackbone.Core.Constraints.IAsiBackboneConstraintEvaluationContext), [`AsiBackboneConstraintEvaluationContext`](xref:AsiBackbone.Core.Constraints.AsiBackboneConstraintEvaluationContext) | Carries the decision-relevant input used by constraints and evaluation. |
-| Constraint | [`IAsiBackkboneConstraint<TContext>`](xref:AsiBackbone.Core.Constraints.IAsiBackboneConstraint`1) | Evaluates one policy condition without performing the governed side effect. |
+| Actor context | [`IGovernanceActorContext`](xref:AsiBackbone.Core.Actors.IGovernanceActorContext) | Framework-neutral actor data supplied by the host. Core does not authenticate the actor. |
+| Policy context | [`IGovernanceEvaluationContext`](xref:AsiBackbone.Core.Constraints.IGovernanceEvaluationContext), [`GovernanceEvaluationContext`](xref:AsiBackbone.Core.Constraints.GovernanceEvaluationContext) | Carries the decision-relevant input used by constraints and evaluation. |
+| Constraint | [`IAsiBackkboneConstraint<TContext>`](xref:AsiBackbone.Core.Constraints.IGovernanceConstraint`1) | Evaluates one policy condition without performing the governed side effect. |
 | Constraint result | [`ConstraintEvaluationResult`](xref:AsiBackbone.Core.Constraints.ConstraintEvaluationResult) | Carries the constraint's product result/reasons into decision composition. |
-| Policy evaluation | [`IAsiBackbonePolicyEvaluator<TContext>`](xref:AsiBackbone.Core.Evaluation.IAsiBackbonePolicyEvaluator`1) | Composes constraint results into a governance decision. |
-| Decision policy | [`IAsiBackboneDecisionPolicy<TContext>`](xref:AsiBackbone.Core.Evaluation.IAsiBackboneDecisionPolicy`1) | Optional post-composition policy hook that can reshape or raise the final decision. |
+| Policy evaluation | [`IGovernancePolicyEvaluator<TContext>`](xref:AsiBackbone.Core.Evaluation.IGovernancePolicyEvaluator`1) | Composes constraint results into a governance decision. |
+| Decision policy | [`IGovernanceDecisionPolicy<TContext>`](xref:AsiBackbone.Core.Evaluation.IGovernanceDecisionPolicy`1) | Optional post-composition policy hook that can reshape or raise the final decision. |
 | Decision outcome | [`GovernanceDecision`](xref:AsiBackbone.Core.Decisions.GovernanceDecision), [`GovernanceDecisionOutcome`](xref:AsiBackbone.Core.Decisions.GovernanceDecisionOutcome) | Structured product outcome, policy identity metadata, reason data, and correlation information. |
 | Acknowledgment | [`LiabilityHandshakeRequest`](xref:AsiBackbone.Core.Handshakes.LiabilityHandshakeRequest), [`LiabilityHandshakeAcknowledgment`](xref:AsiBackbone.Core.Handshakes.LiabilityHandshakeAcknowledgment) | Product acknowledgment request/response primitives. Naming is preserved for API compatibility and does not create legal protection. |
-| Audit residue | [`AuditResidue`](xref:AsiBackbone.Core.Audit.AuditResidue) | Structured evidence of the governance decision. |
-| Audit ledger | [`AuditLedgerRecord`](xref:AsiBackbone.Core.Audit.AuditLedgerRecord), [`IAsiBackboneAuditLedgerStore`](xref:AsiBackbone.Core.Audit.IAsiBackboneAuditLedgerStore) | Storage-ready record and provider-neutral persistence contract. |
-| Audit sink | [`IAsiBackboneAuditSink`](xref:AsiBackbone.Core.Audit.IAsiBackboneAuditSink) | Provider-neutral boundary for receiving audit residue. |
+| Decision receipt | [`DecisionReceipt`](xref:AsiBackbone.Core.Audit.DecisionReceipt) | Structured evidence of the governance decision. |
+| Audit ledger | [`AuditLedgerRecord`](xref:AsiBackbone.Core.Audit.AuditLedgerRecord), [`IGovernanceAuditLedgerStore`](xref:AsiBackbone.Core.Audit.IGovernanceAuditLedgerStore) | Storage-ready record and provider-neutral persistence contract. |
+| Audit sink | [`IDecisionReceiptSink`](xref:AsiBackbone.Core.Audit.IDecisionReceiptSink) | Provider-neutral boundary for receiving decision receipt. |
 | Scoped capability | [`CapabilityTokenGrant`](xref:AsiBackbone.Core.CapabilityTokens.CapabilityTokenGrant), [`CapabilityGrantValidator`](xref:AsiBackbone.Core.CapabilityTokens.CapabilityGrantValidator) | Bounded grant data plus product validation logic. |
 | Operation result | [`OperationResult`](xref:AsiBackbone.Core.Results.OperationResult) | Package-operation success/failure, deliberately separate from governance outcome. |
 
-Not every architecture term maps to one class. **Governance spine**, **host-owned execution**, **operational gateway**, **decision provenance**, **active policy structure**, and similar terms describe relationships among APIs and host responsibilities rather than a required universal type.
+Not every architecture term maps to one class. **Policy decision pipeline**, **host-owned execution**, **operational gateway**, **decision provenance**, **active policy structure**, and similar terms describe relationships among APIs and host responsibilities rather than a required universal type.
 
 ## Decision outcome contract
 
@@ -79,7 +79,7 @@ Policy evaluation produces `GovernanceDecision`; Core does not perform the prote
 
 ### Audit evidence does not imply storage guarantees
 
-`AuditResidue`, `AuditLedgerRecord`, and sink/store contracts define evidence shapes and persistence seams. Durability, retention, cryptographic signing, immutability, and tamper evidence depend on the selected implementation and host operations.
+`DecisionReceipt`, `AuditLedgerRecord`, and sink/store contracts define evidence shapes and persistence seams. Durability, retention, cryptographic signing, immutability, and tamper evidence depend on the selected implementation and host operations.
 
 ### Governance outcome is not operation result
 
@@ -112,7 +112,7 @@ A policy version is a readable generation label. A policy hash/fingerprint ident
 - `GovernanceDecision` and `GovernanceDecisionOutcome`;
 - operation-result primitives;
 - acknowledgment/handshake primitives;
-- audit residue, audit ledger record, sink/store, and lifecycle primitives;
+- decision receipt, audit ledger record, sink/store, and lifecycle primitives;
 - capability-grant primitives and validation;
 - policy identity/version/hash and reason metadata;
 - correlation support and shared value objects.

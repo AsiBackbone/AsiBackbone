@@ -11,12 +11,12 @@ namespace AsiBackbone.Core.Tests.Audit;
 public sealed class AuditResidueBranchCoverageTests
 {
     /// <summary>
-    /// Validates that the <see cref="AuditResidue.Create"/> method normalizes reason codes correctly across various input scenarios, including null, empty collections, collections with blank entries, and valid reason codes. This ensures that the resulting <see cref="AuditResidue"/> instance has the expected properties for reason codes.
+    /// Validates that the <see cref="DecisionReceipt.Create"/> method normalizes reason codes correctly across various input scenarios, including null, empty collections, collections with blank entries, and valid reason codes. This ensures that the resulting <see cref="DecisionReceipt"/> instance has the expected properties for reason codes.
     /// </summary>
     /// <param name="scenario">
     /// The specific input scenario for reason codes, which can be one of the following:
     /// </param>
-    /// <param name="expectedHasReasonCodes">The expected value for the <see cref="AuditResidue.HasReasonCodes"/> property.</param>
+    /// <param name="expectedHasReasonCodes">The expected value for the <see cref="DecisionReceipt.HasReasonCodes"/> property.</param>
     /// <param name="expectedReasonCodes">The expected array of reason codes.</param>
     [Theory]
     [InlineData("null", false, new string[0])]
@@ -31,8 +31,8 @@ public sealed class AuditResidueBranchCoverageTests
         bool expectedHasReasonCodes,
         string[] expectedReasonCodes)
     {
-        var residue = AuditResidue.Create(
-            AsiBackboneActorContext.Service("audit-service"),
+        var residue = DecisionReceipt.Create(
+            GovernanceActorContext.Service("audit-service"),
             "audit.reason.normalization",
             "Completed",
             CreateReasonCodeScenario(scenario),
@@ -43,7 +43,7 @@ public sealed class AuditResidueBranchCoverageTests
     }
 
     /// <summary>
-    /// Validates that the <see cref="AuditResidue.FromConstraint"/> method correctly maps constraint evaluation outcomes and reason codes to the resulting <see cref="AuditResidue"/> instance. This test covers various constraint scenarios, including not applicable, allowed, warning, and denied outcomes, ensuring that the resulting audit residue reflects the expected outcome and reason codes.
+    /// Validates that the <see cref="DecisionReceipt.FromConstraint"/> method correctly maps constraint evaluation outcomes and reason codes to the resulting <see cref="DecisionReceipt"/> instance. This test covers various constraint scenarios, including not applicable, allowed, warning, and denied outcomes, ensuring that the resulting audit residue reflects the expected outcome and reason codes.
     /// </summary>
     /// <param name="scenario">The specific input scenario for constraint evaluation.</param>
     /// <param name="expectedOutcome">The expected outcome for the audit residue.</param>
@@ -60,8 +60,8 @@ public sealed class AuditResidueBranchCoverageTests
     {
         ConstraintEvaluationResult constraintResult = CreateConstraintResult(scenario);
 
-        var residue = AuditResidue.FromConstraint(
-            AsiBackboneActorContext.Service("audit-service"),
+        var residue = DecisionReceipt.FromConstraint(
+            GovernanceActorContext.Service("audit-service"),
             "audit.constraint.outcome",
             constraintResult,
             eventId: "event-constraint-outcome",
@@ -88,13 +88,13 @@ public sealed class AuditResidueBranchCoverageTests
     }
 
     /// <summary>
-    /// Validates that the <see cref="AuditResidue.Create"/> method correctly normalizes optional fields and uses an explicitly provided audit residue ID. This test ensures that the resulting <see cref="AuditResidue"/> instance has the expected properties, including normalized actor ID, display name, operation name, outcome, reason codes, correlation ID, trace ID, span ID, parent span ID, decision latency, constraint set hash, constraint count, risk score, policy scope, tenant hash, organization hash, emitter status, emitter provider, outbox sequence, gateway execution ID, decision stage, policy version, policy hash, and occurred UTC offset.
+    /// Validates that the <see cref="DecisionReceipt.Create"/> method correctly normalizes optional fields and uses an explicitly provided audit residue ID. This test ensures that the resulting <see cref="DecisionReceipt"/> instance has the expected properties, including normalized actor ID, display name, operation name, outcome, reason codes, correlation ID, trace ID, span ID, parent span ID, decision latency, constraint set hash, constraint count, risk score, policy scope, tenant hash, organization hash, emitter status, emitter provider, outbox sequence, gateway execution ID, decision stage, policy version, policy hash, and occurred UTC offset.
     /// </summary>
     [Fact]
     public void CreateNormalizesOptionalFieldsAndUsesExplicitAuditResidueId()
     {
-        var residue = AuditResidue.Create(
-            AsiBackboneActorContext.Service(" audit-service ", " Audit Service "),
+        var residue = DecisionReceipt.Create(
+            GovernanceActorContext.Service(" audit-service ", " Audit Service "),
             " audit.operation ",
             " Completed ",
             [" reason.one "],
@@ -150,7 +150,7 @@ public sealed class AuditResidueBranchCoverageTests
     }
 
     /// <summary>
-    /// Validates that the <see cref="AuditResidue.Create"/> method rejects negative values for fields that are expected to be non-negative, such as decision latency, constraint count, and outbox sequence. This test ensures that an <see cref="ArgumentOutOfRangeException"/> is thrown with an appropriate message when negative values are provided for these fields.
+    /// Validates that the <see cref="DecisionReceipt.Create"/> method rejects negative values for fields that are expected to be non-negative, such as decision latency, constraint count, and outbox sequence. This test ensures that an <see cref="ArgumentOutOfRangeException"/> is thrown with an appropriate message when negative values are provided for these fields.
     /// </summary>
     /// <param name="scenario">
     /// The specific field scenario to test for negative value rejection, which can be one of the following: "decision_latency", "constraint_count", or "outbox_sequence".
@@ -167,7 +167,7 @@ public sealed class AuditResidueBranchCoverageTests
     }
 
     /// <summary>
-    /// Validates that the <see cref="AuditResidue.Create"/> method rejects invalid risk score values, such as NaN, positive infinity, and negative values. This test ensures that an <see cref="ArgumentOutOfRangeException"/> is thrown with an appropriate message when invalid risk scores are provided.
+    /// Validates that the <see cref="DecisionReceipt.Create"/> method rejects invalid risk score values, such as NaN, positive infinity, and negative values. This test ensures that an <see cref="ArgumentOutOfRangeException"/> is thrown with an appropriate message when invalid risk scores are provided.
     /// </summary>
     /// <param name="scenario">
     /// The specific risk score scenario to test for invalid value rejection, which can be one of the following: "nan", "infinity", or "negative".
@@ -179,8 +179,8 @@ public sealed class AuditResidueBranchCoverageTests
     public void CreateRejectsInvalidRiskScore(string scenario)
     {
         ArgumentOutOfRangeException exception = Assert.Throws<ArgumentOutOfRangeException>(() =>
-            AuditResidue.Create(
-                AsiBackboneActorContext.Service("audit-service"),
+            DecisionReceipt.Create(
+                GovernanceActorContext.Service("audit-service"),
                 "audit.invalid_risk",
                 "Completed",
                 eventId: "event-invalid-risk",
@@ -190,7 +190,7 @@ public sealed class AuditResidueBranchCoverageTests
     }
 
     /// <summary>
-    /// Validates that the <see cref="AuditResidue.Create"/> method correctly handles metadata dictionaries that contain only blank keys. This test ensures that the resulting <see cref="AuditResidue"/> instance has no metadata entries and that the shared empty metadata shape is returned, confirming that blank keys are ignored during normalization.
+    /// Validates that the <see cref="DecisionReceipt.Create"/> method correctly handles metadata dictionaries that contain only blank keys. This test ensures that the resulting <see cref="DecisionReceipt"/> instance has no metadata entries and that the shared empty metadata shape is returned, confirming that blank keys are ignored during normalization.
     /// </summary>
     [Fact]
     public void CreateWithOnlyBlankMetadataKeysReturnsSharedEmptyMetadataShape()
@@ -201,8 +201,8 @@ public sealed class AuditResidueBranchCoverageTests
             ["\t"] = "also ignored"
         };
 
-        var residue = AuditResidue.Create(
-            AsiBackboneActorContext.Service("audit-service"),
+        var residue = DecisionReceipt.Create(
+            GovernanceActorContext.Service("audit-service"),
             "audit.blank_metadata",
             "Completed",
             metadata: metadata,
@@ -255,20 +255,20 @@ public sealed class AuditResidueBranchCoverageTests
     {
         _ = scenario switch
         {
-            "decision_latency" => AuditResidue.Create(
-                AsiBackboneActorContext.Service("audit-service"),
+            "decision_latency" => DecisionReceipt.Create(
+                GovernanceActorContext.Service("audit-service"),
                 "audit.negative_latency",
                 "Completed",
                 eventId: "event-negative-latency",
                 decisionLatencyMs: -1),
-            "constraint_count" => AuditResidue.Create(
-                AsiBackboneActorContext.Service("audit-service"),
+            "constraint_count" => DecisionReceipt.Create(
+                GovernanceActorContext.Service("audit-service"),
                 "audit.negative_constraint_count",
                 "Completed",
                 eventId: "event-negative-constraint-count",
                 constraintCount: -1),
-            "outbox_sequence" => AuditResidue.Create(
-                AsiBackboneActorContext.Service("audit-service"),
+            "outbox_sequence" => DecisionReceipt.Create(
+                GovernanceActorContext.Service("audit-service"),
                 "audit.negative_outbox_sequence",
                 "Completed",
                 eventId: "event-negative-outbox-sequence",

@@ -6,7 +6,7 @@
     "configuration": "Release",
     "test-runner": "mtp",
     "coverage-analysis": "off",
-    "test-case-filter": "FullyQualifiedName~AsiBackbone.AspNetCore.Tests.Handshakes.AsiBackboneAcknowledgmentChallenge",
+    "test-case-filter": "FullyQualifiedName~AsiBackbone.AspNetCore.Tests.Handshakes.AcknowledgmentChallenge",
     "reporters": [
       "html",
       "cleartext"
@@ -18,8 +18,8 @@
       "break": 0
     },
     "mutate": [
-      "Handshakes/AsiBackboneAcknowledgmentChallenge.cs",
-      "Handshakes/DefaultAsiBackboneAcknowledgmentChallengeService.cs"
+      "Handshakes/AcknowledgmentChallenge.cs",
+      "Handshakes/DefaultAcknowledgmentChallengeService.cs"
     ]
   }
 }

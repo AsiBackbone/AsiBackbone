@@ -42,8 +42,8 @@ public sealed class EfCoreAuditLedgerSchemaVersionTests
 
     private static AuditLedgerRecord CreateRecord(string recordId, string schemaVersion)
     {
-        var actor = AsiBackboneActorContext.Human("actor-123", "Test Actor");
-        var residue = AuditResidue.Create(
+        var actor = GovernanceActorContext.Human("actor-123", "Test Actor");
+        var residue = DecisionReceipt.Create(
             actor,
             "system.sync",
             "Allowed",
@@ -55,7 +55,7 @@ public sealed class EfCoreAuditLedgerSchemaVersionTests
             policyVersion: "2026.06",
             policyHash: "policy-hash");
 
-        return AuditLedgerRecord.FromResidue(
+        return AuditLedgerRecord.FromDecisionReceipt(
             residue,
             recordId: recordId,
             recordedUtc: new DateTimeOffset(2026, 6, 1, 10, 0, 0, TimeSpan.Zero),
@@ -65,14 +65,14 @@ public sealed class EfCoreAuditLedgerSchemaVersionTests
     private sealed class HostOwnedAuditDbContext(DbContextOptions<HostOwnedAuditDbContext> options)
         : DbContext(options)
     {
-        public DbSet<AsiBackboneAuditLedgerRecordEntity> AuditLedgerRecords =>
-            Set<AsiBackboneAuditLedgerRecordEntity>();
+        public DbSet<AuditLedgerRecordEntity> AuditLedgerRecords =>
+            Set<AuditLedgerRecordEntity>();
 
-        public DbSet<AsiBackboneAuditLedgerReasonCodeEntity> AuditLedgerReasonCodes =>
-            Set<AsiBackboneAuditLedgerReasonCodeEntity>();
+        public DbSet<AuditLedgerReasonCodeEntity> AuditLedgerReasonCodes =>
+            Set<AuditLedgerReasonCodeEntity>();
 
-        public DbSet<AsiBackboneAuditLedgerMetadataEntity> AuditLedgerMetadata =>
-            Set<AsiBackboneAuditLedgerMetadataEntity>();
+        public DbSet<AuditLedgerMetadataEntity> AuditLedgerMetadata =>
+            Set<AuditLedgerMetadataEntity>();
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

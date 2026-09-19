@@ -18,15 +18,15 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorConcurrencyTests
     [Fact]
     public async Task ConstructorFreezesOptionsAndPreservesConfiguredBehavior()
     {
-        var options = new AsiBackbonePolicyEvaluatorOptions
+        var options = new GovernancePolicyOptions
         {
             DenyWhenNoConstraints = false
         };
 
-        var evaluator = new DefaultAsiBackbonePolicyEvaluator<TestContext>(
+        var evaluator = new DefaultGovernancePolicyEvaluator<TestContext>(
             constraints: [],
             decisionPolicy: null,
-            options: options);
+            options: options, threatModelContributors: null, logger: null);
 
         _ = Assert.Throws<InvalidOperationException>(() => options.DenyWhenNoConstraints = true);
 
@@ -43,19 +43,19 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorConcurrencyTests
     [Fact]
     public async Task ConstructorSnapshotsConstraintCollectionAndOrdering()
     {
-        var constraints = new List<IAsiBackboneConstraint<TestContext>>
+        var constraints = new List<IGovernanceConstraint<TestContext>>
         {
             new FixedConstraint("first", ConstraintEvaluationResult.Warning("warning.first", "First warning.")),
             new FixedConstraint("second", ConstraintEvaluationResult.Deny("denial.second", "Second denial."))
         };
 
-        var evaluator = new DefaultAsiBackbonePolicyEvaluator<TestContext>(
+        var evaluator = new DefaultGovernancePolicyEvaluator<TestContext>(
             constraints,
             decisionPolicy: null,
-            options: new AsiBackbonePolicyEvaluatorOptions
+            options: new GovernancePolicyOptions
             {
                 ShortCircuitOnFirstDenial = true
-            });
+            }, threatModelContributors: null, logger: null);
 
         constraints.Clear();
         constraints.Add(new FixedConstraint("replacement", ConstraintEvaluationResult.Allow()));
@@ -80,11 +80,11 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorConcurrencyTests
             new FixedThreatContributor("second", CreateWarningAssessment("threat.second"))
         };
 
-        var evaluator = new DefaultAsiBackbonePolicyEvaluator<TestContext>(
+        var evaluator = new DefaultGovernancePolicyEvaluator<TestContext>(
             constraints: [new FixedConstraint("allow", ConstraintEvaluationResult.Allow())],
             threatModelContributors: contributors,
             decisionPolicy: null,
-            options: null);
+            options: null, logger: null);
 
         contributors.Clear();
         contributors.Add(new FixedThreatContributor("replacement", ThreatAssessment.NoThreat()));
@@ -103,12 +103,12 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorConcurrencyTests
     [Fact]
     public async Task ConcurrentEvaluationWithStatelessExtensionsProducesDeterministicResults()
     {
-        var evaluator = new DefaultAsiBackbonePolicyEvaluator<TestContext>(
+        var evaluator = new DefaultGovernancePolicyEvaluator<TestContext>(
             constraints:
             [
                 new FixedConstraint("warning", ConstraintEvaluationResult.Warning("policy.warning", "Warning.")),
                 new FixedConstraint("allow", ConstraintEvaluationResult.Allow())
-            ]);
+            ], threatModelContributors: null, decisionPolicy: null, options: null, logger: null);
 
         Task<GovernanceDecision>[] evaluations = [.. Enumerable.Range(0, 64)
             .Select(index => evaluator
@@ -145,7 +145,7 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorConcurrencyTests
             GovernanceDecisionOutcome.Warning);
     }
 
-    private sealed class TestContext(string correlationId) : IAsiBackboneConstraintEvaluationContext
+    private sealed class TestContext(string correlationId) : IGovernanceEvaluationContext
     {
         /// <summary>
         /// Gets the correlation ID for the test context.
@@ -171,7 +171,7 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorConcurrencyTests
 
     private sealed class FixedConstraint(
         string name,
-        ConstraintEvaluationResult result) : IAsiBackboneConstraint<TestContext>
+        ConstraintEvaluationResult result) : IGovernanceConstraint<TestContext>
     {
         /// <summary>
         /// Gets the name of the constraint.

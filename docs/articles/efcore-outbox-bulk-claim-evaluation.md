@@ -156,7 +156,7 @@ AsiBackbone.EntityFrameworkCore.SqlServer
 AsiBackbone.EntityFrameworkCore.PostgreSql
 ```
 
-The optimized store should implement `IAsiBackboneGovernanceOutboxClaimStore` and remain explicitly registered by the host. This keeps raw SQL out of the portable package, provider dependencies optional, transaction behavior explicit, and correctness tests scoped to the engine supplying the guarantee.
+The optimized store should implement `IGovernanceOutboxClaimStore` and remain explicitly registered by the host. This keeps raw SQL out of the portable package, provider dependencies optional, transaction behavior explicit, and correctness tests scoped to the engine supplying the guarantee.
 
 ## Optimization threshold
 

@@ -31,13 +31,19 @@ Do not treat `IsSigned` as permission to execute, emit, or trust a high-assuranc
 | `Valid` | The verifier confirmed the signature. | `Allow` |
 | `InvalidSignature` | Signature value was present but did not verify. | `Deny` |
 | `HashMismatch` | Expected hash does not match signing metadata or verifier expectation. | `Deny` |
-| `MissingSignature` | Required signature metadata is missing. | `RequireAcknowledgment` |
+| `MissingSignature` | Required signature metadata is missing. | `Deny` |
 | `UnknownKeyVersion` | Key ID or key version cannot be resolved or does not match policy expectation. | `Escalate` |
 | `RevokedKey` | Key is revoked, disabled, or no longer trusted. | `Deny` |
-| `ProviderUnavailable` | Verification provider could not complete verification. | `Defer` |
-| `CanonicalizationMismatch` | Artifact descriptors or policy context do not match the artifact being verified. | `Escalate` |
+| `ProviderUnavailable` | Verification provider could not complete verification. This is an operational condition only. | `Defer` |
+| `CanonicalizationMismatch` | Signing metadata describes a different artifact identifier, type, canonicalization version, or payload schema version. | `Deny` |
 | `UnsupportedAlgorithm` | Hash or signature algorithm is unsupported by verifier or policy. | `Deny` |
+| `UntrustedKey` | Signing key identifier or key version does not match the verification policy pin. | `Deny` |
+| `UntrustedSigningContext` | Signing provider, policy version, or policy hash does not match the verification policy pin. | `Deny` |
 | `Failed` | Verification failed without a more specific category. | `Escalate` |
+
+Only `Valid` allows by default. Every integrity or trust failure denies. Softer defaults are reserved for conditions that a retry or an operator can legitimately resolve: `ProviderUnavailable` defers, and `UnknownKeyVersion` and `Failed` escalate. A pin mismatch is never reported as an operational condition, because retrying or approving cannot make an artifact signed under the wrong key, provider, or policy context trustworthy.
+
+Hosts that deliberately accept unsigned artifacts on a lower-assurance path can restore the pre-6.0 behavior for that category through `VerificationPolicyOptions.Create`, for example by mapping `MissingSignature` to `RequireAcknowledgment`. Make that choice per workflow rather than globally.
 
 These categories do not require Core to know how a provider resolves keys. Provider-specific lookup remains outside Core.
 
@@ -124,7 +130,7 @@ The wrapper performs provider-neutral preflight checks before calling the verifi
 - required provider mismatch;
 - expected policy version or policy hash mismatch.
 
-Provider-specific cryptographic verification still happens through `IAsiBackboneSignatureVerificationService`.
+Provider-specific cryptographic verification still happens through `IGovernanceSignatureVerificationService`.
 
 ## Recommended verification points
 
@@ -137,10 +143,10 @@ Recommended default behavior:
 | Result category | Execution response |
 | --- | --- |
 | `Valid` | Allow if the rest of policy also allows. |
-| `MissingSignature` | Require acknowledgment or deny for high-risk workflows. |
-| `InvalidSignature`, `HashMismatch`, `RevokedKey`, `UnsupportedAlgorithm` | Deny and alert. |
+| `MissingSignature` | Deny. Opt into acknowledgment only for explicitly lower-assurance workflows. |
+| `InvalidSignature`, `HashMismatch`, `RevokedKey`, `UnsupportedAlgorithm`, `CanonicalizationMismatch`, `UntrustedKey`, `UntrustedSigningContext` | Deny and alert. |
 | `ProviderUnavailable` | Defer or fail closed depending on risk. |
-| `UnknownKeyVersion`, `CanonicalizationMismatch`, `Failed` | Escalate. |
+| `UnknownKeyVersion`, `Failed` | Escalate. |
 
 ### Before high-assurance emission
 
@@ -153,8 +159,8 @@ Recommended default behavior:
 | `Valid` | Emit and preserve verification outcome metadata. |
 | `ProviderUnavailable` | Retry or defer emission. |
 | `MissingSignature` | Dead-letter or route to lower-assurance channel, depending on policy. |
-| `InvalidSignature`, `HashMismatch`, `RevokedKey`, `UnsupportedAlgorithm` | Dead-letter and alert. |
-| `UnknownKeyVersion`, `CanonicalizationMismatch`, `Failed` | Escalate before emission. |
+| `InvalidSignature`, `HashMismatch`, `RevokedKey`, `UnsupportedAlgorithm`, `CanonicalizationMismatch`, `UntrustedKey`, `UntrustedSigningContext` | Dead-letter and alert. |
+| `UnknownKeyVersion`, `Failed` | Escalate before emission. |
 
 ### During audit review
 
@@ -168,7 +174,7 @@ Recommended default behavior:
 | `MissingSignature` | Mark as unsigned or signing-ready only. |
 | `ProviderUnavailable` | Mark verification pending and retry later. |
 | `UnknownKeyVersion` | Resolve historical key material or escalate. |
-| `InvalidSignature`, `HashMismatch`, `RevokedKey`, `CanonicalizationMismatch`, `UnsupportedAlgorithm`, `Failed` | Treat as integrity concern and preserve forensic context. |
+| `InvalidSignature`, `HashMismatch`, `RevokedKey`, `CanonicalizationMismatch`, `UnsupportedAlgorithm`, `UntrustedKey`, `UntrustedSigningContext`, `Failed` | Treat as integrity concern and preserve forensic context. |
 
 ## Safe-to-log outcomes
 

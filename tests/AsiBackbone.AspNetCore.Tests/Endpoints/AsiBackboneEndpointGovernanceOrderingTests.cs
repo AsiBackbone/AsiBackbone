@@ -28,7 +28,7 @@ public sealed class AsiBackboneEndpointGovernanceOrderingTests
     public async Task NullEndpointIsForwardedUnderDefaultOptions()
     {
         bool nextCalled = false;
-        AsiBackboneEndpointGovernanceMiddleware middleware = CreateMiddleware(
+        EndpointGovernanceMiddleware middleware = CreateMiddleware(
             _ =>
             {
                 nextCalled = true;
@@ -50,13 +50,13 @@ public sealed class AsiBackboneEndpointGovernanceOrderingTests
     public async Task NullEndpointFailsClosedWhenGovernanceMetadataIsRequired()
     {
         bool nextCalled = false;
-        AsiBackboneEndpointGovernanceMiddleware middleware = CreateMiddleware(
+        EndpointGovernanceMiddleware middleware = CreateMiddleware(
             _ =>
             {
                 nextCalled = true;
                 return Task.CompletedTask;
             },
-            new AsiBackboneEndpointGovernanceOptions { RequireGovernanceMetadata = true });
+            new EndpointGovernanceOptions { RequireGovernanceMetadata = true });
         HttpContext httpContext = CreateHttpContext();
 
         await middleware.InvokeAsync(httpContext, new AllowingGovernanceService());
@@ -76,9 +76,9 @@ public sealed class AsiBackboneEndpointGovernanceOrderingTests
     [Fact]
     public async Task NullEndpointReportsItsOwnDecisionStage()
     {
-        AsiBackboneEndpointGovernanceMiddleware middleware = CreateMiddleware(
+        EndpointGovernanceMiddleware middleware = CreateMiddleware(
             static _ => Task.CompletedTask,
-            new AsiBackboneEndpointGovernanceOptions
+            new EndpointGovernanceOptions
             {
                 RequireGovernanceMetadata = true,
                 EnableDevelopmentDiagnostics = true
@@ -98,9 +98,9 @@ public sealed class AsiBackboneEndpointGovernanceOrderingTests
     [Fact]
     public async Task EndpointWithoutGovernanceMetadataStillReportsTheMetadataStage()
     {
-        AsiBackboneEndpointGovernanceMiddleware middleware = CreateMiddleware(
+        EndpointGovernanceMiddleware middleware = CreateMiddleware(
             static _ => Task.CompletedTask,
-            new AsiBackboneEndpointGovernanceOptions
+            new EndpointGovernanceOptions
             {
                 RequireGovernanceMetadata = true,
                 EnableDevelopmentDiagnostics = true
@@ -168,13 +168,13 @@ public sealed class AsiBackboneEndpointGovernanceOrderingTests
         return new ApplicationBuilder(services.BuildServiceProvider());
     }
 
-    private static AsiBackboneEndpointGovernanceMiddleware CreateMiddleware(
+    private static EndpointGovernanceMiddleware CreateMiddleware(
         RequestDelegate next,
-        AsiBackboneEndpointGovernanceOptions? options = null)
+        EndpointGovernanceOptions? options = null)
     {
-        return new AsiBackboneEndpointGovernanceMiddleware(
+        return new EndpointGovernanceMiddleware(
             next,
-            Options.Create(options ?? new AsiBackboneEndpointGovernanceOptions()));
+            Options.Create(options ?? new EndpointGovernanceOptions()));
     }
 
     private static DefaultHttpContext CreateHttpContext()
@@ -213,11 +213,11 @@ public sealed class AsiBackboneEndpointGovernanceOrderingTests
         return await reader.ReadToEndAsync();
     }
 
-    private sealed class AllowingGovernanceService : IAsiBackboneEndpointGovernanceService
+    private sealed class AllowingGovernanceService : IEndpointGovernanceService
     {
-        public ValueTask<AsiBackboneEndpointGovernanceResult> EvaluateAsync(
+        public ValueTask<EndpointGovernanceResult> EvaluateAsync(
             HttpContext httpContext,
-            AsiBackboneEndpointGovernanceDescriptor descriptor,
+            EndpointGovernanceDescriptor descriptor,
             CancellationToken cancellationToken = default)
         {
             throw new InvalidOperationException(

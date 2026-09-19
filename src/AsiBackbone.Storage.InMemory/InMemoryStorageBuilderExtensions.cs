@@ -22,31 +22,31 @@ public static class InMemoryStorageBuilderExtensions
         ArgumentNullException.ThrowIfNull(builder);
 
         _ = builder.Services.AddSingleton<InMemoryAuditLedger>();
-        _ = builder.Services.AddSingleton<IAsiBackboneAuditSink>(serviceProvider =>
+        _ = builder.Services.AddSingleton<IDecisionReceiptSink>(serviceProvider =>
             serviceProvider.GetRequiredService<InMemoryAuditLedger>());
 
         return builder;
     }
 
     /// <summary>
-    /// Adds the non-durable in-memory audit residue lifecycle store through the AsiBackbone builder facade.
+    /// Adds the non-durable in-memory decision receipt lifecycle store through the AsiBackbone builder facade.
     /// </summary>
     public static IAsiBackboneBuilder UseInMemoryAuditLifecycle(this IAsiBackboneBuilder builder)
     {
         ArgumentNullException.ThrowIfNull(builder);
 
-        _ = builder.Services.AddSingleton<IAsiBackboneAuditResidueLifecycleStore, InMemoryAuditResidueLifecycleStore>();
+        _ = builder.Services.AddSingleton<IDecisionReceiptLifecycleStore, InMemoryDecisionReceiptLifecycleStore>();
         return builder;
     }
 
     /// <summary>
-    /// Adds the non-durable in-memory governance outbox store through the AsiBackbone builder facade.
+    /// Adds the non-durable in-memory outbox store through the AsiBackbone builder facade.
     /// </summary>
     public static IAsiBackboneBuilder UseInMemoryGovernanceOutbox(this IAsiBackboneBuilder builder)
     {
         ArgumentNullException.ThrowIfNull(builder);
 
-        _ = builder.Services.AddSingleton<IAsiBackboneGovernanceOutboxStore, InMemoryGovernanceOutboxStore>();
+        _ = builder.Services.AddSingleton<IGovernanceOutboxStore, InMemoryGovernanceOutboxStore>();
         return builder;
     }
 

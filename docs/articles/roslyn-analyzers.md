@@ -6,7 +6,7 @@ The analyzer package is intentionally separate from `AsiBackbone.Core`. Core rem
 
 ## Intent
 
-AsiBackbone keeps persistence, transaction boundaries, outbox behavior, signing key custody, verification paths, and execution ownership in the host application. That boundary is important, but it also means a host can accidentally create a governance artifact and then continue without preserving audit residue, durable outbox state, acknowledgment evidence, capability-grant checks, production signing review, or a safe continuation path.
+AsiBackbone keeps persistence, transaction boundaries, outbox behavior, signing key custody, verification paths, and execution ownership in the host application. That boundary is important, but it also means a host can accidentally create a governance artifact and then continue without preserving decision receipt, durable outbox state, acknowledgment evidence, capability-grant checks, production signing review, or a safe continuation path.
 
 The analyzer package helps catch simple, recognizable mistakes at build time. It is developer ergonomics, not proof of correctness.
 
@@ -32,7 +32,7 @@ Keep exploratory or workflow guidance as warnings unless the host has decided a 
 Examples of recognized artifacts include:
 
 - `GovernanceDecision`
-- `AuditResidue`
+- `DecisionReceipt`
 - `AuditLedgerRecord`
 - `GovernanceOutboxEntry`
 - `GovernanceEmissionEnvelope`
@@ -109,7 +109,7 @@ if (builder.Environment.IsDevelopment())
 ```csharp
 if (builder.Environment.IsProduction())
 {
-    builder.Services.AddSingleton<IAsiBackboneSigningService, HostOwnedManagedKeySigningService>();
+    builder.Services.AddSingleton<IGovernanceSigningService, HostOwnedManagedKeySigningService>();
 }
 ```
 

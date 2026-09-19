@@ -8,7 +8,7 @@ using Xunit;
 namespace AsiBackbone.AspNetCore.Tests.Handshakes;
 
 /// <summary>
-/// Unit tests for the <see cref="AsiBackboneAcknowledgmentChallenge"/> class and related functionality.
+/// Unit tests for the <see cref="AcknowledgmentChallenge"/> class and related functionality.
 /// </summary>
 public sealed class AsiBackboneAcknowledgmentChallengeMutationTests
 {
@@ -18,7 +18,7 @@ public sealed class AsiBackboneAcknowledgmentChallengeMutationTests
     [Fact]
     public void DefaultChallengeKeepsTraceAndPolicyMetadataOutOfHostFacingShape()
     {
-        var actor = AsiBackboneActorContext.Human("user-123");
+        var actor = GovernanceActorContext.Human("user-123");
         var decision = GovernanceDecision.RequireAcknowledgment(
             "ack.required",
             "Acknowledgment required.",
@@ -26,9 +26,9 @@ public sealed class AsiBackboneAcknowledgmentChallengeMutationTests
             traceId: "trace-123",
             policyVersion: "v1",
             policyHash: "hash-123");
-        DefaultAsiBackboneAcknowledgmentChallengeService service = CreateService();
+        DefaultAcknowledgmentChallengeService service = CreateService();
 
-        AsiBackboneAcknowledgmentChallenge challenge = service.CreateChallenge(actor, "RunOperation", decision);
+        AcknowledgmentChallenge challenge = service.CreateChallenge(actor, "RunOperation", decision);
 
         Assert.Equal("ack.required", challenge.ReasonCode);
         Assert.Equal("correlation-123", challenge.CorrelationId);
@@ -46,14 +46,14 @@ public sealed class AsiBackboneAcknowledgmentChallengeMutationTests
     [Fact]
     public void HiddenReasonMessageStillStaysInsideCoreHandshakeRequest()
     {
-        var actor = AsiBackboneActorContext.Human("user-123");
+        var actor = GovernanceActorContext.Human("user-123");
         var decision = GovernanceDecision.RequireAcknowledgment("ack.required", "Do not expose this.");
-        DefaultAsiBackboneAcknowledgmentChallengeService service = CreateService(new AsiBackboneAcknowledgmentChallengeOptions
+        DefaultAcknowledgmentChallengeService service = CreateService(new AcknowledgmentChallengeOptions
         {
             IncludeReasonMessage = false,
         });
 
-        AsiBackboneAcknowledgmentChallenge challenge = service.CreateChallenge(actor, "RunOperation", decision);
+        AcknowledgmentChallenge challenge = service.CreateChallenge(actor, "RunOperation", decision);
 
         Assert.Null(challenge.ReasonMessage);
         Assert.Equal("Do not expose this.", challenge.HandshakeRequest.Message);
@@ -65,18 +65,18 @@ public sealed class AsiBackboneAcknowledgmentChallengeMutationTests
     [Fact]
     public void AcceptedResponseCopiesActorAndResponseMetadataIntoCoreAcknowledgment()
     {
-        var actor = AsiBackboneActorContext.Human("user-123", "Test User");
+        var actor = GovernanceActorContext.Human("user-123", "Test User");
         var decision = GovernanceDecision.RequireAcknowledgment(
             "ack.required",
             "Acknowledgment required.",
             correlationId: "correlation-123",
             traceId: "trace-123");
-        DefaultAsiBackboneAcknowledgmentChallengeService service = CreateService(new AsiBackboneAcknowledgmentChallengeOptions
+        DefaultAcknowledgmentChallengeService service = CreateService(new AcknowledgmentChallengeOptions
         {
             RequiredAcknowledgmentCode = "CONFIRM",
         });
-        AsiBackboneAcknowledgmentChallenge challenge = service.CreateChallenge(actor, "RunOperation", decision);
-        var response = new AsiBackboneAcknowledgmentChallengeRequest
+        AcknowledgmentChallenge challenge = service.CreateChallenge(actor, "RunOperation", decision);
+        var response = new AcknowledgmentChallengeRequest
         {
             HandshakeId = challenge.HandshakeId,
             AcknowledgmentCode = "CONFIRM",
@@ -88,7 +88,7 @@ public sealed class AsiBackboneAcknowledgmentChallengeMutationTests
         };
         DateTimeOffset occurredUtc = new(2026, 6, 11, 12, 0, 0, TimeSpan.Zero);
 
-        AsiBackboneAcknowledgmentChallengeResult result = service.HandleResponse(challenge, actor, response, occurredUtc);
+        AcknowledgmentChallengeResult result = service.HandleResponse(challenge, actor, response, occurredUtc);
 
         Assert.True(result.Succeeded);
         Assert.True(result.Acknowledged);
@@ -96,7 +96,7 @@ public sealed class AsiBackboneAcknowledgmentChallengeMutationTests
         Assert.NotNull(result.Acknowledgment);
         Assert.Equal(challenge.HandshakeId, result.Acknowledgment.HandshakeId);
         Assert.Equal("user-123", result.Acknowledgment.ActorId);
-        Assert.Equal(AsiBackboneActorType.Human, result.Acknowledgment.ActorType);
+        Assert.Equal(GovernanceActorType.Human, result.Acknowledgment.ActorType);
         Assert.Equal("Test User", result.Acknowledgment.ActorDisplayName);
         Assert.Equal("CONFIRM", result.Acknowledgment.AcknowledgmentCode);
         Assert.Equal("correlation-123", result.Acknowledgment.CorrelationId);
@@ -111,18 +111,18 @@ public sealed class AsiBackboneAcknowledgmentChallengeMutationTests
     [Fact]
     public void DeclinedResponseStillRequiresMatchingAcknowledgmentCode()
     {
-        var actor = AsiBackboneActorContext.Human("user-123");
+        var actor = GovernanceActorContext.Human("user-123");
         var decision = GovernanceDecision.RequireAcknowledgment("ack.required", "Acknowledgment required.");
-        DefaultAsiBackboneAcknowledgmentChallengeService service = CreateService();
-        AsiBackboneAcknowledgmentChallenge challenge = service.CreateChallenge(actor, "RunOperation", decision);
-        var response = new AsiBackboneAcknowledgmentChallengeRequest
+        DefaultAcknowledgmentChallengeService service = CreateService();
+        AcknowledgmentChallenge challenge = service.CreateChallenge(actor, "RunOperation", decision);
+        var response = new AcknowledgmentChallengeRequest
         {
             HandshakeId = challenge.HandshakeId,
             AcknowledgmentCode = "wrong-code",
             Acknowledged = false,
         };
 
-        AsiBackboneAcknowledgmentChallengeResult result = service.HandleResponse(challenge, actor, response);
+        AcknowledgmentChallengeResult result = service.HandleResponse(challenge, actor, response);
 
         Assert.False(result.Succeeded);
         Assert.False(result.Acknowledged);
@@ -137,7 +137,7 @@ public sealed class AsiBackboneAcknowledgmentChallengeMutationTests
     [Fact]
     public void FromHandshakeRequestNormalizesMetadataKeysAndValues()
     {
-        var actor = AsiBackboneActorContext.Human("user-123");
+        var actor = GovernanceActorContext.Human("user-123");
         var decision = GovernanceDecision.RequireAcknowledgment("ack.required", "Acknowledgment required.");
         var request = LiabilityHandshakeRequest.FromDecision(
             actor,
@@ -154,7 +154,7 @@ public sealed class AsiBackboneAcknowledgmentChallengeMutationTests
             });
 
         var challenge =
-            AsiBackboneAcknowledgmentChallenge.FromHandshakeRequest(request);
+            AcknowledgmentChallenge.FromHandshakeRequest(request);
 
         Assert.Equal(2, challenge.Metadata.Count);
         Assert.Equal("web", challenge.Metadata["source"]);
@@ -168,7 +168,7 @@ public sealed class AsiBackboneAcknowledgmentChallengeMutationTests
     [Fact]
     public void FromHandshakeRequestUsesEmptyMetadataWhenMetadataIsNullOrEmpty()
     {
-        var actor = AsiBackboneActorContext.Human("user-123");
+        var actor = GovernanceActorContext.Human("user-123");
         var decision = GovernanceDecision.RequireAcknowledgment("ack.required", "Acknowledgment required.");
         var request = LiabilityHandshakeRequest.FromDecision(
             actor,
@@ -179,7 +179,7 @@ public sealed class AsiBackboneAcknowledgmentChallengeMutationTests
             LiabilityHandshakeRiskLevel.Medium);
 
         var challenge =
-            AsiBackboneAcknowledgmentChallenge.FromHandshakeRequest(request);
+            AcknowledgmentChallenge.FromHandshakeRequest(request);
 
         Assert.Empty(challenge.Metadata);
     }
@@ -190,7 +190,7 @@ public sealed class AsiBackboneAcknowledgmentChallengeMutationTests
     [Fact]
     public void FromHandshakeRequestIncludesOptionalTraceAndPolicyMetadataWhenEnabled()
     {
-        var actor = AsiBackboneActorContext.Human("user-123");
+        var actor = GovernanceActorContext.Human("user-123");
         var decision = GovernanceDecision.RequireAcknowledgment(
             "ack.required",
             "Acknowledgment required.",
@@ -207,14 +207,14 @@ public sealed class AsiBackboneAcknowledgmentChallengeMutationTests
             "Confirm responsibility.",
             LiabilityHandshakeRiskLevel.Medium);
 
-        var options = new AsiBackboneAcknowledgmentChallengeOptions
+        var options = new AcknowledgmentChallengeOptions
         {
             IncludeTraceId = true,
             IncludePolicyMetadata = true
         };
 
         var challenge =
-            AsiBackboneAcknowledgmentChallenge.FromHandshakeRequest(request, options);
+            AcknowledgmentChallenge.FromHandshakeRequest(request, options);
 
         Assert.Equal("trace-123", challenge.TraceId);
         Assert.Equal("v1", challenge.PolicyVersion);
@@ -228,7 +228,7 @@ public sealed class AsiBackboneAcknowledgmentChallengeMutationTests
     public void FromHandshakeRequestRejectsNullRequest()
     {
         _ = Assert.Throws<ArgumentNullException>(() =>
-            AsiBackboneAcknowledgmentChallenge.FromHandshakeRequest(null!));
+            AcknowledgmentChallenge.FromHandshakeRequest(null!));
     }
 
     /// <summary>
@@ -237,7 +237,7 @@ public sealed class AsiBackboneAcknowledgmentChallengeMutationTests
     [Fact]
     public void FromHandshakeRequestRejectsInvalidOptions()
     {
-        var actor = AsiBackboneActorContext.Human("user-123");
+        var actor = GovernanceActorContext.Human("user-123");
         var decision = GovernanceDecision.RequireAcknowledgment("ack.required", "Acknowledgment required.");
         var request = LiabilityHandshakeRequest.FromDecision(
             actor,
@@ -247,13 +247,13 @@ public sealed class AsiBackboneAcknowledgmentChallengeMutationTests
             "Confirm responsibility.",
             LiabilityHandshakeRiskLevel.Medium);
 
-        var options = new AsiBackboneAcknowledgmentChallengeOptions
+        var options = new AcknowledgmentChallengeOptions
         {
             RequiredAcknowledgmentCode = " "
         };
 
         _ = Assert.Throws<InvalidOperationException>(() =>
-            AsiBackboneAcknowledgmentChallenge.FromHandshakeRequest(request, options));
+            AcknowledgmentChallenge.FromHandshakeRequest(request, options));
     }
 
     /// <summary>
@@ -265,7 +265,7 @@ public sealed class AsiBackboneAcknowledgmentChallengeMutationTests
         LiabilityHandshakeRequest request = CreateHandshakeRequest();
 
         ArgumentNullException exception = Assert.Throws<ArgumentNullException>(() =>
-            new AsiBackboneAcknowledgmentChallenge(
+            new AcknowledgmentChallenge(
                 null!,
                 request.HandshakeId,
                 request.OperationName,
@@ -350,7 +350,7 @@ public sealed class AsiBackboneAcknowledgmentChallengeMutationTests
     [Fact]
     public void CreateChallengeRejectsNullActorBeforeDecision()
     {
-        DefaultAsiBackboneAcknowledgmentChallengeService service = CreateService();
+        DefaultAcknowledgmentChallengeService service = CreateService();
 
         ArgumentNullException exception = Assert.Throws<ArgumentNullException>(() =>
             service.CreateChallenge(null!, "RunOperation", null!));
@@ -358,7 +358,7 @@ public sealed class AsiBackboneAcknowledgmentChallengeMutationTests
         Assert.Equal("actor", exception.ParamName);
     }
 
-    private static AsiBackboneAcknowledgmentChallenge CreateChallengeUsingInternalConstructor(
+    private static AcknowledgmentChallenge CreateChallengeUsingInternalConstructor(
         string? handshakeId = null,
         string? operationName = null,
         string? reasonCode = null,
@@ -367,7 +367,7 @@ public sealed class AsiBackboneAcknowledgmentChallengeMutationTests
     {
         LiabilityHandshakeRequest request = CreateHandshakeRequest();
 
-        return new AsiBackboneAcknowledgmentChallenge(
+        return new AcknowledgmentChallenge(
             request,
             handshakeId ?? request.HandshakeId,
             operationName ?? request.OperationName,
@@ -386,7 +386,7 @@ public sealed class AsiBackboneAcknowledgmentChallengeMutationTests
 
     private static LiabilityHandshakeRequest CreateHandshakeRequest()
     {
-        IAsiBackboneActorContext actor = AsiBackboneActorContext.Human("user-123");
+        IGovernanceActorContext actor = GovernanceActorContext.Human("user-123");
 
         return LiabilityHandshakeRequest.Create(
             actor,
@@ -398,10 +398,10 @@ public sealed class AsiBackboneAcknowledgmentChallengeMutationTests
             LiabilityHandshakeRiskLevel.Medium);
     }
 
-    private static DefaultAsiBackboneAcknowledgmentChallengeService CreateService(
-        AsiBackboneAcknowledgmentChallengeOptions? options = null)
+    private static DefaultAcknowledgmentChallengeService CreateService(
+        AcknowledgmentChallengeOptions? options = null)
     {
-        return new DefaultAsiBackboneAcknowledgmentChallengeService(
-            Options.Create(options ?? new AsiBackboneAcknowledgmentChallengeOptions()));
+        return new DefaultAcknowledgmentChallengeService(
+            Options.Create(options ?? new AcknowledgmentChallengeOptions()));
     }
 }

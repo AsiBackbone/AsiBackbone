@@ -40,7 +40,7 @@ public sealed class CapabilityGrantValidatorTests
         { "unsupported-algorithm", CapabilityTokenValidationCategory.InvalidProof, VerificationPolicyAction.Deny, "signature.algorithm-unsupported" },
         { "provider-unavailable", CapabilityTokenValidationCategory.Failed, VerificationPolicyAction.Defer, "signature.provider-unavailable" },
         { "unknown-key-version", CapabilityTokenValidationCategory.Failed, VerificationPolicyAction.Escalate, "signature.key-version-unknown" },
-        { "canonicalization-mismatch", CapabilityTokenValidationCategory.Failed, VerificationPolicyAction.Escalate, "signature.canonicalization-mismatch" },
+        { "canonicalization-mismatch", CapabilityTokenValidationCategory.InvalidProof, VerificationPolicyAction.Deny, "signature.canonicalization-mismatch" },
         { "failed", CapabilityTokenValidationCategory.Failed, VerificationPolicyAction.Escalate, "verification.failure" }
     };
 
@@ -611,7 +611,7 @@ public sealed class CapabilityGrantValidatorTests
         field.SetValue(result, value);
     }
 
-    private sealed class StubVerificationService(SignatureVerificationResult result) : IAsiBackboneSignatureVerificationService
+    private sealed class StubVerificationService(SignatureVerificationResult result) : IGovernanceSignatureVerificationService
     {
         public bool WasCalled { get; private set; }
 

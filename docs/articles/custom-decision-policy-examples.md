@@ -3,12 +3,12 @@
 > [!NOTE]
 > This page is a package/API example. For policy-design education, alternative patterns, and tradeoffs, see [Constraint-Conditioned Decision Model](https://asibackbone.github.io/Learning/architecture/constraint-conditioned-decision-model.html) and the [Learning executable sample catalog](https://asibackbone.github.io/Learning/samples/).
 
-This article shows host-owned `IAsiBackboneDecisionPolicy<TContext>` patterns for composing constraint results into a final governance decision.
+This article shows host-owned `IGovernanceDecisionPolicy<TContext>` patterns for composing constraint results into a final governance decision.
 
 Use custom decision policies when individual constraints are not enough to describe the final host posture. Constraints should answer narrow rule questions. A decision policy can then apply broader orchestration rules such as local overlays, risk thresholds, acknowledgment requirements, or escalation routing.
 
 > [!IMPORTANT]
-> A decision policy still does not execute the protected action. It only returns a `GovernanceDecision`. The host application remains responsible for enforcing `decision.CanProceed`, writing audit residue, validating capability grants, and performing or refusing the actual operation.
+> A decision policy still does not execute the protected action. It only returns a `GovernanceDecision`. The host application remains responsible for enforcing `decision.CanProceed`, writing decision receipt, validating capability grants, and performing or refusing the actual operation.
 
 ## Decision policy boundary
 
@@ -18,8 +18,8 @@ The default evaluator first composes constraint results. Then it calls the optio
 context
   -> constraints produce allow / warning / deny / not-applicable results
   -> default evaluator composes a GovernanceDecision
-  -> optional IAsiBackboneDecisionPolicy can preserve, narrow, defer, require acknowledgment, or recommend escalation
-  -> host writes audit residue and owns execution
+  -> optional IGovernanceDecisionPolicy can preserve, narrow, defer, require acknowledgment, or recommend escalation
+  -> host writes decision receipt and owns execution
 ```
 
 A good custom policy should:
@@ -39,8 +39,8 @@ using AsiBackbone.Core.Decisions;
 using AsiBackbone.Core.Evaluation;
 using AsiBackbone.Core.Results;
 
-public sealed class StrictDenyWinsDecisionPolicy<TContext> : IAsiBackboneDecisionPolicy<TContext>
-    where TContext : IAsiBackboneConstraintEvaluationContext
+public sealed class StrictDenyWinsDecisionPolicy<TContext> : IGovernanceDecisionPolicy<TContext>
+    where TContext : IGovernanceEvaluationContext
 {
     public ValueTask<GovernanceDecision> ApplyAsync(
         TContext context,
@@ -93,8 +93,8 @@ using AsiBackbone.Core.Decisions;
 using AsiBackbone.Core.Evaluation;
 
 public sealed class RegionalOverlayDecisionPolicy<TContext>(IReadOnlySet<string> supportedRegions) :
-    IAsiBackboneDecisionPolicy<TContext>
-    where TContext : IAsiBackboneConstraintEvaluationContext
+    IGovernanceDecisionPolicy<TContext>
+    where TContext : IGovernanceEvaluationContext
 {
     public ValueTask<GovernanceDecision> ApplyAsync(
         TContext context,
@@ -141,7 +141,7 @@ public sealed class RegionalOverlayDecisionPolicy<TContext>(IReadOnlySet<string>
 Registration example:
 
 ```csharp
-builder.Services.AddSingleton<IAsiBackboneDecisionPolicy<MyPolicyContext>>(
+builder.Services.AddSingleton<IGovernanceDecisionPolicy<MyPolicyContext>>(
     new RegionalOverlayDecisionPolicy<MyPolicyContext>(
         new HashSet<string>(StringComparer.OrdinalIgnoreCase)
         {
@@ -157,8 +157,8 @@ Use this pattern when global policy defines the broad rule but local jurisdictio
 Gateway-style operations often need more than a simple allow result. For example, the host may require proof that a capability grant was validated and that a decision receipt is ready before external execution proceeds.
 
 ```csharp
-public sealed class GatewayReadinessDecisionPolicy<TContext> : IAsiBackboneDecisionPolicy<TContext>
-    where TContext : IAsiBackboneConstraintEvaluationContext
+public sealed class GatewayReadinessDecisionPolicy<TContext> : IGovernanceDecisionPolicy<TContext>
+    where TContext : IGovernanceEvaluationContext
 {
     public ValueTask<GovernanceDecision> ApplyAsync(
         TContext context,
@@ -200,10 +200,10 @@ This policy still does not validate the capability token, sign the receipt, or c
 For high-throughput paths, a host may intentionally prefer first-denial fast-abort behavior over full reason aggregation. That choice belongs in evaluator options, not inside hidden constraint side effects.
 
 ```csharp
-var evaluator = DefaultAsiBackbonePolicyEvaluator.CreateBuilder<MyPolicyContext>()
+var evaluator = DefaultGovernancePolicyEvaluator.CreateBuilder<MyPolicyContext>()
     .AddConstraints(constraintsFromConfiguration)
     .WithDecisionPolicy(new RegionalOverlayDecisionPolicy<MyPolicyContext>(supportedRegions))
-    .WithOptions(new AsiBackbonePolicyEvaluatorOptions
+    .WithOptions(new GovernancePolicyOptions
     {
         ShortCircuitOnFirstDenial = true
     })
@@ -219,13 +219,13 @@ After a decision policy returns, keep enforcement explicit:
 ```csharp
 GovernanceDecision decision = await evaluator.EvaluateAsync(context, cancellationToken);
 
-AuditResidue residue = AuditResidue.FromDecision(
+DecisionReceipt receipt = DecisionReceipt.FromDecision(
     actor,
     operationName,
     decision,
     metadata: context.Metadata);
 
-await auditSink.WriteAsync(residue, cancellationToken);
+await auditSink.WriteAsync(receipt, cancellationToken);
 
 if (!decision.CanProceed)
 {
@@ -259,4 +259,4 @@ This keeps the policy layer observable and testable without turning it into an i
 
 ## Product API reference
 
-Use the [Generated API Reference](../api-reference.md) for exact members and signatures. Key surfaces used by this page include [`IAsiBackboneDecisionPolicy<TContext>`](xref:AsiBackbone.Core.Evaluation.IAsiBackboneDecisionPolicy`1), [`IAsiBackbonePolicyEvaluator<TContext>`](xref:AsiBackbone.Core.Evaluation.IAsiBackbonePolicyEvaluator`1), and [`GovernanceDecision`](xref:AsiBackbone.Core.Decisions.GovernanceDecision).
+Use the [Generated API Reference](../api-reference.md) for exact members and signatures. Key surfaces used by this page include [`IGovernanceDecisionPolicy<TContext>`](xref:AsiBackbone.Core.Evaluation.IGovernanceDecisionPolicy`1), [`IGovernancePolicyEvaluator<TContext>`](xref:AsiBackbone.Core.Evaluation.IGovernancePolicyEvaluator`1), and [`GovernanceDecision`](xref:AsiBackbone.Core.Decisions.GovernanceDecision).

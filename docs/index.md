@@ -2,7 +2,7 @@
 
 Welcome to the AsiBackbone product documentation.
 
-In this software project, **ASI** means **Accountable Systems Infrastructure**. AsiBackbone is a .NET governance and policy-control package family implemented as practical software infrastructure. The project is a governance spine, not an intelligence engine.
+AsiBackbone is a .NET governance and policy-control package family for accountable software execution. It is not an intelligence engine.
 
 > [!IMPORTANT]
 > AsiBackbone provides framework-neutral building blocks and host integration seams for governing consequential actions in software systems. Host applications remain responsible for authentication, authorization, execution, persistence, deployment, monitoring, compliance review, and operational controls. See [Project Boundaries and Non-Claims](articles/project-boundaries.md) for the canonical boundary reference.
@@ -33,12 +33,14 @@ The DocFX header search is available for package names, API concepts, and articl
 
 ## Current stable package family
 
-Stable `5.x` package family. `5.2.0` is the current release. It is a
-backward-compatible minor release that adds a fluent policy-evaluator builder,
-begins the `ASIB900` constructor-deprecation window, and strengthens package
-compatibility, durable release evidence, quality gates, and project stewardship.
-Package IDs, public namespaces, the `net10.0` target, and the binary assembly
-identity `5.0.0.0` remain unchanged.
+Stable `6.x` package family. `6.0.0` is the current release. It is a
+major release that renames the public API to plain-language semantic names,
+removes the members whose `5.x` deprecation windows completed, makes
+signature-verification trust failures deny by default, binds the signing policy
+context into a versioned signature input, and closes a replay window in the
+reference in-memory capability-grant use store. Package IDs, public namespaces,
+and the `net10.0` target remain unchanged; the binary assembly identity advances
+to `6.0.0.0`.
 
 ```text
 AsiBackbone.Core
@@ -65,6 +67,7 @@ Package-specific READMEs and release notes define which surfaces are stable, opt
 * [Target Framework Support](articles/target-framework-support.md)
 * [Documentation Ownership](articles/documentation-ownership.md)
 * [AsiBackbone API Terminology Map](articles/terminology-map.md)
+* [6.0 Product Terminology](articles/terminology-600.md)
 * [AsiBackbone API Glossary](articles/glossary.md)
 
 ### Get started
@@ -108,9 +111,9 @@ Package-specific READMEs and release notes define which surfaces are stable, opt
 
 ### Releases and compatibility
 
-* [5.2.0 Release Notes](articles/release-notes-520.md)
-* [5.2.0 Consumer Verification Guide](articles/consumer-verification-520.md)
-* [5.0.0 Migration Guide](articles/upgrade-400-to-500.md)
+* [6.0.0 Release Notes](articles/release-notes-600.md)
+* [6.0.0 Consumer Verification Guide](articles/consumer-verification-600.md)
+* [Upgrade from 5.x to 6.0](articles/upgrade-500-to-600.md)
 * [API Compatibility and SemVer](articles/api-compatibility-and-semver.md)
 * [Schema Versioning](articles/schema-versioning.md)
 * [Release Validation](articles/release-validation.md)
@@ -124,7 +127,7 @@ Historical release notes and verification records remain available under [Releas
 * [Performance Benchmark Baseline](articles/performance-benchmark-baseline.md)
 * [API Baseline and Boundary Checks](articles/api-baseline-and-boundary-checks.md)
 * [Release Cadence and Readiness](articles/release-cadence-and-readiness.md)
-* [5.2.0 Release Readiness Record](articles/release-readiness-520.md)
+* [6.0.0 Release Readiness Record](articles/release-readiness-600.md)
 
 
 ### Historical records

@@ -62,6 +62,9 @@ for project in "${package_projects[@]}"; do
   echo
 done
 
+# Use a fresh consumer cache: release-branch builds can share a version with published 5.x packages.
+export NUGET_PACKAGES="$(to_dotnet_path "$work_root/.nuget/packages")"
+
 cat > "$work_root/NuGet.config" <<NUGETCONFIG
 <?xml version="1.0" encoding="utf-8"?>
 <configuration>
@@ -70,6 +73,14 @@ cat > "$work_root/NuGet.config" <<NUGETCONFIG
     <add key="local-asi-backbone" value="$package_output" />
     <add key="nuget.org" value="https://api.nuget.org/v3/index.json" />
   </packageSources>
+  <packageSourceMapping>
+    <packageSource key="local-asi-backbone">
+      <package pattern="AsiBackbone.*" />
+    </packageSource>
+    <packageSource key="nuget.org">
+      <package pattern="*" />
+    </packageSource>
+  </packageSourceMapping>
 </configuration>
 NUGETCONFIG
 
@@ -140,6 +151,7 @@ using AsiBackbone.Core.Constraints;
 using AsiBackbone.Core.Decisions;
 using AsiBackbone.Core.Evaluation;
 using AsiBackbone.Core.Results;
+using AsiBackbone.Core.ThreatModeling;
 using AsiBackbone.EntityFrameworkCore;
 using AsiBackbone.EntityFrameworkCore.Audit;
 using AsiBackbone.Storage.InMemory.Audit;
@@ -149,6 +161,8 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Xunit;
 
 namespace ExternalConsumerSmoke.Tests;
@@ -231,15 +245,22 @@ internal static class SmokeHost
             options.UseSqlite($"Data Source={databasePath}"));
         builder.Services.AddScoped<DbContext>(serviceProvider =>
             serviceProvider.GetRequiredService<SmokeHostDbContext>());
-        builder.Services.AddScoped<IAsiBackboneAuditLedgerStore, EfCoreAuditLedgerStore>();
+        builder.Services.AddScoped<IGovernanceAuditLedgerStore, EfCoreAuditLedgerStore>();
 
         builder.Services.AddSingleton<InMemoryAuditLedger>();
-        builder.Services.AddSingleton<IAsiBackboneAuditSink>(serviceProvider =>
+        builder.Services.AddSingleton<IDecisionReceiptSink>(serviceProvider =>
             serviceProvider.GetRequiredService<InMemoryAuditLedger>());
 
-        builder.Services.AddSingleton<IAsiBackboneConstraint<AsiBackboneConstraintEvaluationContext>, SmokeRegionConstraint>();
-        builder.Services.AddSingleton<IAsiBackboneDecisionPolicy<AsiBackboneConstraintEvaluationContext>, SmokeDecisionPolicy>();
-        builder.Services.AddSingleton<IAsiBackbonePolicyEvaluator<AsiBackboneConstraintEvaluationContext>, DefaultAsiBackbonePolicyEvaluator<AsiBackboneConstraintEvaluationContext>>();
+        builder.Services.AddSingleton<IGovernanceConstraint<GovernanceEvaluationContext>, SmokeRegionConstraint>();
+        builder.Services.AddSingleton<IGovernanceDecisionPolicy<GovernanceEvaluationContext>, SmokeDecisionPolicy>();
+        builder.Services.AddSingleton<IGovernancePolicyEvaluator<GovernanceEvaluationContext>>(serviceProvider =>
+            DefaultGovernancePolicyEvaluator.CreateBuilder<GovernanceEvaluationContext>()
+                .AddConstraints(serviceProvider.GetServices<IGovernanceConstraint<GovernanceEvaluationContext>>())
+                .AddThreatModelContributors(serviceProvider.GetServices<IThreatModelContributor<GovernanceEvaluationContext>>())
+                .WithDecisionPolicy(serviceProvider.GetService<IGovernanceDecisionPolicy<GovernanceEvaluationContext>>())
+                .WithOptions(serviceProvider.GetRequiredService<IOptions<GovernancePolicyOptions>>().Value)
+                .WithLogger(serviceProvider.GetService<ILogger<DefaultGovernancePolicyEvaluator<GovernanceEvaluationContext>>>())
+                .Build());
 
         WebApplication app = builder.Build();
 
@@ -250,11 +271,11 @@ internal static class SmokeHost
         }
 
         app.MapGet("/diagnostics/registrations", (
-            IAsiBackboneHttpActorContextResolver actorResolver,
-            IAsiBackboneHttpRequestCorrelationResolver correlationResolver,
-            IAsiBackboneAcknowledgmentChallengeService challengeService,
+            IHttpGovernanceActorContextResolver actorResolver,
+            IHttpGovernanceRequestCorrelationResolver correlationResolver,
+            IAcknowledgmentChallengeService challengeService,
             SmokeHostDbContext dbContext,
-            IAsiBackboneAuditLedgerStore ledgerStore,
+            IGovernanceAuditLedgerStore ledgerStore,
             InMemoryAuditLedger inMemoryLedger) => Results.Ok(new SmokeRegistrationResponse(
                 AspNetCoreAdapterResolved: actorResolver is not null && correlationResolver is not null && challengeService is not null,
                 HostOwnedDbContextResolved: dbContext is not null,
@@ -264,15 +285,15 @@ internal static class SmokeHost
         app.MapGet("/decisions/{mode}", async (
             string mode,
             HttpContext httpContext,
-            IAsiBackbonePolicyEvaluator<AsiBackboneConstraintEvaluationContext> evaluator,
-            IAsiBackboneAuditSink auditSink,
-            IAsiBackboneAuditLedgerStore ledgerStore,
+            IGovernancePolicyEvaluator<GovernanceEvaluationContext> evaluator,
+            IDecisionReceiptSink auditSink,
+            IGovernanceAuditLedgerStore ledgerStore,
             CancellationToken cancellationToken) =>
         {
             IReadOnlyDictionary<string, string> metadata = BuildMetadata(mode);
             string correlationId = $"smoke-{mode}-{Guid.NewGuid():N}";
 
-            var context = new AsiBackboneConstraintEvaluationContext(
+            var context = new GovernanceEvaluationContext(
                 correlationId: correlationId,
                 policyVersion: "external-smoke-policy-v1",
                 policyHash: "external-smoke-policy-hash",
@@ -282,11 +303,11 @@ internal static class SmokeHost
                 .EvaluateAsync(context, cancellationToken)
                 .ConfigureAwait(false);
 
-            IAsiBackboneActorContext actor = AsiBackboneActorContext.Human(
+            IGovernanceActorContext actor = GovernanceActorContext.Human(
                 "external-consumer-user",
                 "External Consumer User");
 
-            AuditResidue residue = AuditResidue.FromDecision(
+            DecisionReceipt residue = DecisionReceipt.FromDecision(
                 actor,
                 $"external-consumer.{mode}",
                 decision,
@@ -294,7 +315,7 @@ internal static class SmokeHost
 
             await auditSink.WriteAsync(residue, cancellationToken).ConfigureAwait(false);
 
-            AuditLedgerRecord record = AuditLedgerRecord.FromResidue(residue);
+            AuditLedgerRecord record = AuditLedgerRecord.FromDecisionReceipt(residue);
             OperationResult<AuditLedgerRecord> appendResult = await ledgerStore
                 .AppendAsync(record, cancellationToken)
                 .ConfigureAwait(false);
@@ -357,12 +378,12 @@ internal sealed class SmokeHostDbContext(DbContextOptions<SmokeHostDbContext> op
     }
 }
 
-internal sealed class SmokeRegionConstraint : IAsiBackboneConstraint<AsiBackboneConstraintEvaluationContext>
+internal sealed class SmokeRegionConstraint : IGovernanceConstraint<GovernanceEvaluationContext>
 {
     public string Name => "smoke.region";
 
     public ValueTask<ConstraintEvaluationResult> EvaluateAsync(
-        AsiBackboneConstraintEvaluationContext context,
+        GovernanceEvaluationContext context,
         CancellationToken cancellationToken = default)
     {
         cancellationToken.ThrowIfCancellationRequested();
@@ -378,10 +399,10 @@ internal sealed class SmokeRegionConstraint : IAsiBackboneConstraint<AsiBackbone
     }
 }
 
-internal sealed class SmokeDecisionPolicy : IAsiBackboneDecisionPolicy<AsiBackboneConstraintEvaluationContext>
+internal sealed class SmokeDecisionPolicy : IGovernanceDecisionPolicy<GovernanceEvaluationContext>
 {
     public ValueTask<GovernanceDecision> ApplyAsync(
-        AsiBackboneConstraintEvaluationContext context,
+        GovernanceEvaluationContext context,
         GovernanceDecision composedDecision,
         IReadOnlyList<ConstraintEvaluationResult> constraintResults,
         CancellationToken cancellationToken = default)

@@ -8,40 +8,40 @@ namespace AsiBackbone.Core.Signing;
 /// Provides provider-neutral helper methods for preparing and signing AsiBackbone governance artifacts.
 /// </summary>
 /// <remarks>
-/// The helpers canonicalize and hash artifacts before optionally invoking <see cref="IAsiBackboneSigningService" />.
+/// The helpers canonicalize and hash artifacts before optionally invoking <see cref="IGovernanceSigningService" />.
 /// They do not verify signatures, persist records, provide immutable storage, or make tamper-evidence claims.
 /// </remarks>
 public static class GovernanceArtifactSigner
 {
     /// <summary>
-    /// Creates an unsigned wrapper for audit residue.
+    /// Creates an unsigned wrapper for decision receipt.
     /// </summary>
-    public static SignedGovernanceArtifact<IAsiBackboneAuditResidue> CreateUnsignedAuditResidue(
-        IAsiBackboneAuditResidue residue,
+    public static SignedGovernanceArtifact<IDecisionReceipt> CreateUnsignedDecisionReceipt(
+        IDecisionReceipt receipt,
         CanonicalPayloadOptions? options = null,
         string? hashAlgorithm = null)
     {
-        return CreateUnsigned(residue, CanonicalPayloadBuilder.ForAuditResidue(residue, options), hashAlgorithm);
+        return CreateUnsigned(receipt, CanonicalPayloadBuilder.ForDecisionReceipt(receipt, options), hashAlgorithm);
     }
 
     /// <summary>
-    /// Creates signing-ready metadata for audit residue without invoking a signing provider.
+    /// Creates signing-ready metadata for decision receipt without invoking a signing provider.
     /// </summary>
-    public static SignedGovernanceArtifact<IAsiBackboneAuditResidue> CreateSigningReadyAuditResidue(
-        IAsiBackboneAuditResidue residue,
+    public static SignedGovernanceArtifact<IDecisionReceipt> CreateSigningReadyDecisionReceipt(
+        IDecisionReceipt receipt,
         CanonicalPayloadOptions? options = null,
         string? hashAlgorithm = null,
         IReadOnlyDictionary<string, string>? metadata = null)
     {
-        return CreateSigningReady(residue, CanonicalPayloadBuilder.ForAuditResidue(residue, options), hashAlgorithm, metadata);
+        return CreateSigningReady(receipt, CanonicalPayloadBuilder.ForDecisionReceipt(receipt, options), hashAlgorithm, metadata);
     }
 
     /// <summary>
-    /// Signs audit residue after canonical payload hashing.
+    /// Signs decision receipt after canonical payload hashing.
     /// </summary>
-    public static ValueTask<SignedGovernanceArtifact<IAsiBackboneAuditResidue>> SignAuditResidueAsync(
-        IAsiBackboneAuditResidue residue,
-        IAsiBackboneSigningService signingService,
+    public static ValueTask<SignedGovernanceArtifact<IDecisionReceipt>> SignDecisionReceiptAsync(
+        IDecisionReceipt receipt,
+        IGovernanceSigningService signingService,
         CanonicalPayloadOptions? options = null,
         string? hashAlgorithm = null,
         string? keyId = null,
@@ -51,8 +51,8 @@ public static class GovernanceArtifactSigner
         CancellationToken cancellationToken = default)
     {
         return SignAsync(
-            residue,
-            CanonicalPayloadBuilder.ForAuditResidue(residue, options),
+            receipt,
+            CanonicalPayloadBuilder.ForDecisionReceipt(receipt, options),
             signingService,
             hashAlgorithm,
             keyId,
@@ -90,7 +90,7 @@ public static class GovernanceArtifactSigner
     /// </summary>
     public static ValueTask<SignedGovernanceArtifact<AuditLedgerRecord>> SignAuditLedgerRecordAsync(
         AuditLedgerRecord record,
-        IAsiBackboneSigningService signingService,
+        IGovernanceSigningService signingService,
         CanonicalPayloadOptions? options = null,
         string? hashAlgorithm = null,
         string? keyId = null,
@@ -112,34 +112,34 @@ public static class GovernanceArtifactSigner
     }
 
     /// <summary>
-    /// Creates an unsigned wrapper for an audit residue lifecycle event.
+    /// Creates an unsigned wrapper for an decision receipt lifecycle event.
     /// </summary>
-    public static SignedGovernanceArtifact<AuditResidueLifecycleEvent> CreateUnsignedAuditResidueLifecycleEvent(
-        AuditResidueLifecycleEvent lifecycleEvent,
+    public static SignedGovernanceArtifact<DecisionReceiptLifecycleEvent> CreateUnsignedDecisionReceiptLifecycleEvent(
+        DecisionReceiptLifecycleEvent lifecycleEvent,
         CanonicalPayloadOptions? options = null,
         string? hashAlgorithm = null)
     {
-        return CreateUnsigned(lifecycleEvent, CanonicalPayloadBuilder.ForAuditResidueLifecycleEvent(lifecycleEvent, options), hashAlgorithm);
+        return CreateUnsigned(lifecycleEvent, CanonicalPayloadBuilder.ForDecisionReceiptLifecycleEvent(lifecycleEvent, options), hashAlgorithm);
     }
 
     /// <summary>
-    /// Creates signing-ready metadata for an audit residue lifecycle event without invoking a signing provider.
+    /// Creates signing-ready metadata for an decision receipt lifecycle event without invoking a signing provider.
     /// </summary>
-    public static SignedGovernanceArtifact<AuditResidueLifecycleEvent> CreateSigningReadyAuditResidueLifecycleEvent(
-        AuditResidueLifecycleEvent lifecycleEvent,
+    public static SignedGovernanceArtifact<DecisionReceiptLifecycleEvent> CreateSigningReadyDecisionReceiptLifecycleEvent(
+        DecisionReceiptLifecycleEvent lifecycleEvent,
         CanonicalPayloadOptions? options = null,
         string? hashAlgorithm = null,
         IReadOnlyDictionary<string, string>? metadata = null)
     {
-        return CreateSigningReady(lifecycleEvent, CanonicalPayloadBuilder.ForAuditResidueLifecycleEvent(lifecycleEvent, options), hashAlgorithm, metadata);
+        return CreateSigningReady(lifecycleEvent, CanonicalPayloadBuilder.ForDecisionReceiptLifecycleEvent(lifecycleEvent, options), hashAlgorithm, metadata);
     }
 
     /// <summary>
-    /// Signs an audit residue lifecycle event after canonical payload hashing.
+    /// Signs an decision receipt lifecycle event after canonical payload hashing.
     /// </summary>
-    public static ValueTask<SignedGovernanceArtifact<AuditResidueLifecycleEvent>> SignAuditResidueLifecycleEventAsync(
-        AuditResidueLifecycleEvent lifecycleEvent,
-        IAsiBackboneSigningService signingService,
+    public static ValueTask<SignedGovernanceArtifact<DecisionReceiptLifecycleEvent>> SignDecisionReceiptLifecycleEventAsync(
+        DecisionReceiptLifecycleEvent lifecycleEvent,
+        IGovernanceSigningService signingService,
         CanonicalPayloadOptions? options = null,
         string? hashAlgorithm = null,
         string? keyId = null,
@@ -150,7 +150,7 @@ public static class GovernanceArtifactSigner
     {
         return SignAsync(
             lifecycleEvent,
-            CanonicalPayloadBuilder.ForAuditResidueLifecycleEvent(lifecycleEvent, options),
+            CanonicalPayloadBuilder.ForDecisionReceiptLifecycleEvent(lifecycleEvent, options),
             signingService,
             hashAlgorithm,
             keyId,
@@ -188,7 +188,7 @@ public static class GovernanceArtifactSigner
     /// </summary>
     public static ValueTask<SignedGovernanceArtifact<GovernanceEmissionEnvelope>> SignGovernanceEmissionEnvelopeAsync(
         GovernanceEmissionEnvelope envelope,
-        IAsiBackboneSigningService signingService,
+        IGovernanceSigningService signingService,
         CanonicalPayloadOptions? options = null,
         string? hashAlgorithm = null,
         string? keyId = null,
@@ -210,7 +210,7 @@ public static class GovernanceArtifactSigner
     }
 
     /// <summary>
-    /// Creates an unsigned wrapper for a governance outbox entry.
+    /// Creates an unsigned wrapper for an outbox entry.
     /// </summary>
     public static SignedGovernanceArtifact<GovernanceOutboxEntry> CreateUnsignedGovernanceOutboxEntry(
         GovernanceOutboxEntry entry,
@@ -221,7 +221,7 @@ public static class GovernanceArtifactSigner
     }
 
     /// <summary>
-    /// Creates signing-ready metadata for a governance outbox entry without invoking a signing provider.
+    /// Creates signing-ready metadata for an outbox entry without invoking a signing provider.
     /// </summary>
     public static SignedGovernanceArtifact<GovernanceOutboxEntry> CreateSigningReadyGovernanceOutboxEntry(
         GovernanceOutboxEntry entry,
@@ -233,11 +233,11 @@ public static class GovernanceArtifactSigner
     }
 
     /// <summary>
-    /// Signs a governance outbox entry after canonical payload hashing.
+    /// Signs an outbox entry after canonical payload hashing.
     /// </summary>
     public static ValueTask<SignedGovernanceArtifact<GovernanceOutboxEntry>> SignGovernanceOutboxEntryAsync(
         GovernanceOutboxEntry entry,
-        IAsiBackboneSigningService signingService,
+        IGovernanceSigningService signingService,
         CanonicalPayloadOptions? options = null,
         string? hashAlgorithm = null,
         string? keyId = null,
@@ -277,7 +277,10 @@ public static class GovernanceArtifactSigner
             purpose: canonicalHash.ArtifactType,
             keyId: keyId,
             keyVersion: keyVersion,
-            metadata: signingReadyMetadata.Metadata);
+            metadata: signingReadyMetadata.Metadata)
+        {
+            SignatureInput = GovernanceSignatureInput.CreateV1(canonicalHash, signingReadyMetadata.Metadata)
+        };
     }
 
     private static SignedGovernanceArtifact<TArtifact> CreateUnsigned<TArtifact>(
@@ -307,7 +310,7 @@ public static class GovernanceArtifactSigner
     private static async ValueTask<SignedGovernanceArtifact<TArtifact>> SignAsync<TArtifact>(
         TArtifact artifact,
         CanonicalPayload payload,
-        IAsiBackboneSigningService signingService,
+        IGovernanceSigningService signingService,
         string? hashAlgorithm,
         string? keyId,
         string? keyVersion,
@@ -319,8 +322,9 @@ public static class GovernanceArtifactSigner
         cancellationToken.ThrowIfCancellationRequested();
 
         CanonicalPayloadHash hash = CanonicalPayloadHasher.ComputeHash(payload, hashAlgorithm);
+        SigningRequest signingRequest = CreateSigningRequest(hash, keyId, keyVersion, metadata);
         SigningResult signingResult = await signingService
-            .SignAsync(CreateSigningRequest(hash, keyId, keyVersion, metadata), cancellationToken)
+            .SignAsync(signingRequest, cancellationToken)
             .ConfigureAwait(false);
 
         // A provider returning a failure or no-signature result previously produced an artifact with IsSigned false and
@@ -333,6 +337,50 @@ public static class GovernanceArtifactSigner
                 artifact,
                 payload,
                 hash,
-                signingResult.Metadata);
+                BindSignedPolicyContext(signingResult.Metadata, signingRequest.Metadata));
+    }
+
+    /// <summary>
+    /// Restores the signing policy context that was bound into the signature input.
+    /// </summary>
+    /// <remarks>
+    /// The version 1 signature input binds the policy version and policy hash the signer was asked to sign. A provider that
+    /// dropped, altered, or added either key in its returned metadata would otherwise produce an artifact whose recorded
+    /// policy context no longer rebuilds the signed input: it would fail verification, or carry a label that differs from
+    /// what was signed.
+    /// </remarks>
+    private static SigningMetadata BindSignedPolicyContext(
+        SigningMetadata providerMetadata,
+        IReadOnlyDictionary<string, string> requestMetadata)
+    {
+        Dictionary<string, string> metadata = new(providerMetadata.Metadata, StringComparer.Ordinal);
+        CopyBoundValue(requestMetadata, metadata, GovernanceSignatureInput.PolicyVersionMetadataKey);
+        CopyBoundValue(requestMetadata, metadata, GovernanceSignatureInput.PolicyHashMetadataKey);
+
+        return SigningMetadata.Create(
+            signingHash: providerMetadata.SigningHash,
+            hashAlgorithm: providerMetadata.HashAlgorithm,
+            signature: providerMetadata.Signature,
+            signatureAlgorithm: providerMetadata.SignatureAlgorithm,
+            keyId: providerMetadata.KeyId,
+            keyVersion: providerMetadata.KeyVersion,
+            provider: providerMetadata.Provider,
+            signedUtc: providerMetadata.SignedUtc,
+            metadata: metadata);
+    }
+
+    private static void CopyBoundValue(
+        IReadOnlyDictionary<string, string> source,
+        Dictionary<string, string> target,
+        string key)
+    {
+        if (source.TryGetValue(key, out string? value))
+        {
+            target[key] = value;
+        }
+        else
+        {
+            _ = target.Remove(key);
+        }
     }
 }

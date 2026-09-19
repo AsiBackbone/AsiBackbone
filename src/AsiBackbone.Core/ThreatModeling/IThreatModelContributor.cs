@@ -12,7 +12,7 @@ namespace AsiBackbone.Core.ThreatModeling;
 /// Return <see cref="ThreatAssessment.NoThreat" /> when no finding is present. Actionable assessments must not recommend <see cref="GovernanceDecisionOutcome.Allowed" />; use <see cref="GovernanceDecisionOutcome.Warning" />, <see cref="GovernanceDecisionOutcome.Denied" />, <see cref="GovernanceDecisionOutcome.Deferred" />, <see cref="GovernanceDecisionOutcome.AcknowledgmentRequired" />, or <see cref="GovernanceDecisionOutcome.EscalationRecommended" /> instead.
 /// </remarks>
 public interface IThreatModelContributor<in TContext>
-    where TContext : IAsiBackboneConstraintEvaluationContext
+    where TContext : IGovernanceEvaluationContext
 {
     /// <summary>
     /// Gets the stable name of the contributor for audit metadata.

@@ -13,6 +13,8 @@
       href: documentation-ownership.md
     - name: AsiBackbone API Terminology Map
       href: terminology-map.md
+    - name: 6.0 Product Terminology
+      href: terminology-600.md
     - name: AsiBackbone API Glossary
       href: glossary.md
     - name: Core Governance Flow Diagrams
@@ -65,6 +67,10 @@
       href: managed-key-signing-provider.md
     - name: Schema Versioning
       href: schema-versioning.md
+    - name: 6.0 Public API Naming Convention
+      href: public-api-naming-600.md
+    - name: Upgrade from 5.x to 6.0
+      href: upgrade-500-to-600.md
     - name: API Compatibility and SemVer
       href: api-compatibility-and-semver.md
     - name: "ASIB900: Obsolete Policy Evaluator Constructors"
@@ -153,8 +159,8 @@
       href: governance-emission-contract.md
     - name: Safe Audit and Telemetry Data
       href: safe-audit-telemetry-data.md
-    - name: Audit Residue Observability Schema
-      href: audit-residue-observability-schema.md
+    - name: Decision Receipt Observability Schema
+      href: decision-receipt-observability-schema.md
     - name: DLP and Classification Failure Policy
       href: dlp-classification-failure-policy.md
     - name: DLP and Classification Scanner Integration
@@ -211,14 +217,14 @@
 
 - name: Releases & Compatibility
   items:
-    - name: 5.2.0 Release Notes
-      href: release-notes-520.md
-    - name: 5.2.0 Release Readiness Record
-      href: release-readiness-520.md
-    - name: 5.2.0 Consumer Verification Guide
-      href: consumer-verification-520.md
-    - name: 5.0.0 Migration Guide
-      href: upgrade-400-to-500.md
+    - name: 6.0.0 Release Notes
+      href: release-notes-600.md
+    - name: 6.0.0 Release Readiness Record
+      href: release-readiness-600.md
+    - name: 6.0.0 Consumer Verification Guide
+      href: consumer-verification-600.md
+    - name: Upgrade from 5.x to 6.0
+      href: upgrade-500-to-600.md
     - name: API Compatibility and SemVer
       href: api-compatibility-and-semver.md
     - name: Schema Versioning

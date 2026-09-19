@@ -114,8 +114,8 @@ public sealed class GovernanceOutboxEntry
     /// Gets the persisted maximum retry count retained for storage compatibility.
     /// </summary>
     /// <remarks>
-    /// Retry eligibility and threshold dead-lettering are controlled by <see cref="AsiBackboneGovernanceOutboxOptions" />
-    /// when the entry is processed by <see cref="AsiBackboneGovernanceOutboxDrain" />.
+    /// Retry eligibility and threshold dead-lettering are controlled by <see cref="GovernanceOutboxOptions" />
+    /// when the entry is processed by <see cref="GovernanceOutboxDrain" />.
     /// </remarks>
     public int MaxRetryCount { get; }
 
@@ -195,7 +195,7 @@ public sealed class GovernanceOutboxEntry
     public bool HasClaim => ClaimOwner is not null && ClaimToken is not null && ClaimedUtc.HasValue && ClaimExpiresUtc.HasValue;
 
     /// <summary>
-    /// Creates a pending durable governance outbox entry.
+    /// Creates a pending durable outbox entry.
     /// </summary>
     public static GovernanceOutboxEntry Create(
         GovernanceEmissionEnvelope envelope,

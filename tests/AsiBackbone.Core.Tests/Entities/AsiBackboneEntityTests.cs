@@ -4,12 +4,12 @@ using Xunit;
 namespace AsiBackbone.Core.Tests.Entities;
 
 /// <summary>
-/// Contains unit tests for the AsiBackboneEntity class, ensuring that its properties and methods behave as expected, including initialization of Id and ConcurrencyStamp, implementation of core interfaces, and generation of unique concurrency stamps.
+/// Contains unit tests for the GovernanceEntity class, ensuring that its properties and methods behave as expected, including initialization of Id and ConcurrencyStamp, implementation of core interfaces, and generation of unique concurrency stamps.
 /// </summary>
 public sealed class AsiBackboneEntityTests
 {
     /// <summary>
-    /// Verifies that the constructor of AsiBackboneEntity initializes the Id property with a non-empty GUID.
+    /// Verifies that the constructor of GovernanceEntity initializes the Id property with a non-empty GUID.
     /// </summary>
     [Fact]
     public void ConstructorInitializesId()
@@ -20,7 +20,7 @@ public sealed class AsiBackboneEntityTests
     }
 
     /// <summary>
-    /// Verifies that the constructor of AsiBackboneEntity initializes the ConcurrencyStamp property with a non-empty string of length 32.
+    /// Verifies that the constructor of GovernanceEntity initializes the ConcurrencyStamp property with a non-empty string of length 32.
     /// </summary>
     [Fact]
     public void ConstructorInitializesConcurrencyStamp()
@@ -32,14 +32,14 @@ public sealed class AsiBackboneEntityTests
     }
 
     /// <summary>
-    /// Verifies that the TestAsiBackboneEntity class implements the IAsiBackboneEntity and IConcurrencyTrackedEntity interfaces, ensuring it adheres to the expected contracts for entities in the ASI Backbone system.
+    /// Verifies that the TestAsiBackboneEntity class implements the IGovernanceEntity and IConcurrencyTrackedEntity interfaces, ensuring it adheres to the expected contracts for entities in the ASI Backbone system.
     /// </summary>
     [Fact]
     public void EntityImplementsCoreContracts()
     {
         TestAsiBackboneEntity entity = new();
 
-        _ = Assert.IsType<IAsiBackboneEntity>(entity, exactMatch: false);
+        _ = Assert.IsType<IGovernanceEntity>(entity, exactMatch: false);
         _ = Assert.IsType<IConcurrencyTrackedEntity>(entity, exactMatch: false);
     }
 
@@ -49,8 +49,8 @@ public sealed class AsiBackboneEntityTests
     [Fact]
     public void NewConcurrencyStampReturnsUniqueNormalizedValues()
     {
-        string first = AsiBackboneEntity.NewConcurrencyStamp();
-        string second = AsiBackboneEntity.NewConcurrencyStamp();
+        string first = GovernanceEntity.NewConcurrencyStamp();
+        string second = GovernanceEntity.NewConcurrencyStamp();
 
         Assert.NotEqual(first, second);
         Assert.Equal(32, first.Length);
@@ -59,7 +59,7 @@ public sealed class AsiBackboneEntityTests
         Assert.DoesNotContain("-", second, StringComparison.Ordinal);
     }
 
-    private sealed class TestAsiBackboneEntity : AsiBackboneEntity
+    private sealed class TestAsiBackboneEntity : GovernanceEntity
     {
     }
 }

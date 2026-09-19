@@ -7,7 +7,7 @@ Issue: #286.
 AsiBackbone supplies provider-neutral governance policy primitives after a host reports a DLP/classification outcome. It is not a DLP scanner, content-safety service, Microsoft Purview adapter, regex engine, classifier, compliance product, or external screening provider by itself.
 
 > [!IMPORTANT]
-> Scanner execution is host-owned and provider-specific. The host chooses and invokes its scanner before provider emission or before a governed execution path continues. AsiBackbone receives the normalized failure or policy-handling context through `DlpFailurePolicyContext`, resolves it with `IAsiBackboneDlpFailurePolicyResolver`, and returns a `DlpFailurePolicyResolution` containing a `GovernanceDecision`.
+> Scanner execution is host-owned and provider-specific. The host chooses and invokes its scanner before provider emission or before a governed execution path continues. AsiBackbone receives the normalized failure or policy-handling context through `DlpFailurePolicyContext`, resolves it with `IDlpFailurePolicyResolver`, and returns a `DlpFailurePolicyResolution` containing a `GovernanceDecision`.
 
 ## Where the scanner fits
 
@@ -23,7 +23,7 @@ Host request / payload / governance emission envelope
        internal compliance API
   -> scanner result or scanner failure
   -> normalize to DlpFailurePolicyContext when policy handling is needed
-  -> IAsiBackboneDlpFailurePolicyResolver
+  -> IDlpFailurePolicyResolver
   -> DlpFailurePolicyResolution
   -> GovernanceDecision
   -> host applies allow / warn / deny / defer / acknowledgment / escalation
@@ -105,7 +105,7 @@ The host then maps scanner outcomes into `DlpFailurePolicyContext` only when pol
 ```csharp
 public static async ValueTask<GovernanceDecision> EvaluateScannerOutcomeAsync(
     string payload,
-    IAsiBackboneDlpFailurePolicyResolver resolver,
+    IDlpFailurePolicyResolver resolver,
     CancellationToken cancellationToken)
 {
     FakeScannerResult result = FakeRegexScanner.Scan(payload);
@@ -190,8 +190,8 @@ options.BehaviorOverrides[new DlpFailurePolicyKey(
     DlpIntentRiskLevel.High,
     DlpClassificationFailureKind.BlockedResult)] = DlpFailureBehavior.Escalate;
 
-IAsiBackboneDlpFailurePolicyResolver resolver =
-    new DefaultAsiBackboneDlpFailurePolicyResolver(options);
+IDlpFailurePolicyResolver resolver =
+    new DefaultDlpFailurePolicyResolver(options);
 ```
 
 The host applies the returned decision using the same execution rules it uses for any other `GovernanceDecision`:
@@ -205,7 +205,7 @@ GovernanceDecision decision = await EvaluateScannerOutcomeAsync(
 if (!decision.CanProceed)
 {
     // Host-owned behavior: return a response, defer work, require acknowledgment,
-    // escalate to review, write audit residue, or stop provider emission.
+    // escalate to review, write decision receipt, or stop provider emission.
     return decision;
 }
 
@@ -338,7 +338,7 @@ Common placements include:
 | Before governed execution | Stop, defer, acknowledge, or escalate an execution request before side effects occur. |
 | Before Purview/Event Hubs enrichment | Keep strategy/design provider paths downstream of classification and minimization. |
 
-The host should persist the governance decision, scanner failure category, resolved behavior, and safe metadata in audit residue or lifecycle records according to its retention policy.
+The host should persist the governance decision, scanner failure category, resolved behavior, and safe metadata in decision receipt or lifecycle records according to its retention policy.
 
 ## Related documentation
 

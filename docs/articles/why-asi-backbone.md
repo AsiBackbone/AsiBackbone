@@ -11,7 +11,7 @@ The host needs one or more of the following:
 - policy evaluation that produces explicit decision outcomes;
 - structured reason codes and policy identity;
 - acknowledgment before selected consequential actions;
-- durable decision/audit residue;
+- durable decision/decision receipt;
 - short-lived scoped capability grants;
 - a host-owned execution boundary that can still refuse execution.
 

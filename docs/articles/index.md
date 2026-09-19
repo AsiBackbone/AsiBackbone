@@ -1,6 +1,6 @@
 # AsiBackbone Product Documentation
 
-This section organizes the Accountable Systems Infrastructure documentation for the stable `5.x` release line around product implementation, API use, operations, compatibility, and release evidence.
+This section organizes the Accountable Systems Infrastructure documentation for the stable `6.x` release line around product implementation, API use, operations, compatibility, and release evidence.
 AsiBackbone is a .NET governance package family for accountable software decision flow. See [Project Boundaries and Non-Claims](project-boundaries.md) for the canonical boundary reference.
 
 ## Documentation ownership
@@ -11,12 +11,14 @@ General architectural education belongs in [ASI Backbone Learning](https://asiba
 
 ## Current stable package posture
 
-Stable `5.x` package family. `5.2.0` is the current release. It is a
-backward-compatible minor release that adds a fluent policy-evaluator builder,
-begins the `ASIB900` constructor-deprecation window, and strengthens package
-compatibility, durable release evidence, quality gates, and project stewardship.
-Package IDs, public namespaces, the `net10.0` target, and the binary assembly
-identity `5.0.0.0` remain unchanged.
+Stable `6.x` package family. `6.0.0` is the current release. It is a
+major release that renames the public API to plain-language semantic names,
+removes the members whose `5.x` deprecation windows completed, makes
+signature-verification trust failures deny by default, binds the signing policy
+context into a versioned signature input, and closes a replay window in the
+reference in-memory capability-grant use store. Package IDs, public namespaces,
+and the `net10.0` target remain unchanged; the binary assembly identity advances
+to `6.0.0.0`.
 
 Released stable package surfaces include Core, DependencyInjection,
 Storage.InMemory, EntityFrameworkCore, AspNetCore, Testing, Templates,
@@ -33,7 +35,7 @@ packages, robotics, immutable storage, and additional non-signing provider
 packages remain design-only, strategy-only, sample-only, host-owned, or
 future-provider work unless a later stable release explicitly ships them.
 
-The release process includes explicit [Release Cadence and Readiness](release-cadence-and-readiness.md) guidance for patch, minor, and major release selection, package metadata, Source Link, SBOM/provenance, documentation links, and future package identity or namespace changes. The [5.2.0 Consumer Verification Guide](consumer-verification-520.md) gives consumers a conservative package-source, API-compatibility, Source Link, SBOM/provenance, deprecation, and deferred-signing verification path. Consumers moving from `4.x` should also follow the [5.0.0 Migration Guide](upgrade-400-to-500.md).
+The release process includes explicit [Release Cadence and Readiness](release-cadence-and-readiness.md) guidance for patch, minor, and major release selection, package metadata, Source Link, SBOM/provenance, documentation links, and future package identity or namespace changes. The [6.0.0 Consumer Verification Guide](consumer-verification-600.md) gives consumers a conservative package-source, API-compatibility, Source Link, SBOM/provenance, deprecation, and deferred-signing verification path. Consumers moving from `4.x` should also follow the [5.0.0 Migration Guide](upgrade-400-to-500.md).
 
 ## Search and navigation
 
@@ -47,6 +49,7 @@ Use these pages to establish the product boundary before integrating the package
 * [Package and Integration Boundaries](integration-boundaries.md)
 * [Target Framework Support](target-framework-support.md)
 * [Documentation Ownership](documentation-ownership.md)
+* [6.0 Product Terminology](terminology-600.md)
 * [AsiBackbone API Terminology Map](terminology-map.md)
 * [AsiBackbone API Glossary](glossary.md)
 * [Core Governance Flow Diagrams](core-governance-flow-diagrams.md)
@@ -143,10 +146,10 @@ These pages cover production hardening, durable audit/outbox behavior, observabi
 
 Start with the current release and compatibility rules. Older release notes, consumer-verification guides, and upgrade records are preserved under [Releases & Compatibility](../releases/index.md) so they remain easy to find without dominating the implementation navigation.
 
-* [5.2.0 Release Notes](release-notes-520.md)
-* [5.2.0 Release Readiness Record](release-readiness-520.md)
-* [5.2.0 Consumer Verification Guide](consumer-verification-520.md)
-* [5.0.0 Migration Guide](upgrade-400-to-500.md)
+* [6.0.0 Release Notes](release-notes-600.md)
+* [6.0.0 Release Readiness Record](release-readiness-600.md)
+* [6.0.0 Consumer Verification Guide](consumer-verification-600.md)
+* [Upgrade from 5.x to 6.0](upgrade-500-to-600.md)
 * [API Compatibility and SemVer](api-compatibility-and-semver.md)
 * [Schema Versioning](schema-versioning.md)
 * [Target Framework Support](target-framework-support.md)

@@ -10,11 +10,11 @@ AsiBackbone Core and ASP.NET Core adapters are intentionally small and provider-
 
 Common high-impact host services include:
 
-- `IAsiBackbonePolicyEvaluator<TContext>` registrations and host-owned constraints;
-- `IAsiBackboneEndpointCapabilityGrantValidator` implementations;
-- `IAsiBackboneAuditSink.WriteAsync` implementations;
-- `IAsiBackboneAuditLedgerStore`, lifecycle store, and governance outbox store implementations;
-- `IAsiBackboneGovernanceEmitter.EmitAsync` implementations used by the hosted outbox drain;
+- `IGovernancePolicyEvaluator<TContext>` registrations and host-owned constraints;
+- `IEndpointCapabilityGrantValidator` implementations;
+- `IDecisionReceiptSink.WriteAsync` implementations;
+- `IGovernanceAuditLedgerStore`, lifecycle store, and outbox store implementations;
+- `IGovernanceEmitter.EmitAsync` implementations used by the hosted outbox drain;
 - DLP, classification, signing, verification, enrichment, SIEM, or exporter services invoked by the host.
 
 A lightweight framework path can still become slow if a host implementation blocks threads, performs expensive network I/O per request, writes synchronously to a remote database, or starts unbounded background work.
@@ -38,7 +38,7 @@ The policy evaluator, capability validator, and audit sink may run while an ASP.
 
 ### Outbox drain path
 
-The hosted governance outbox drain can invoke host-provided storage and emitter services outside the request path:
+The hosted outbox drain can invoke host-provided storage and emitter services outside the request path:
 
 ```text
 Hosted drain pass
@@ -56,8 +56,8 @@ Moving expensive provider delivery behind a durable outbox removes that provider
 | --- | --- | --- |
 | Core contracts | Define provider-neutral interfaces and models. | Implement storage, providers, credentials, and operational behavior. |
 | ASP.NET Core endpoint governance | Read endpoint metadata, build context, invoke host services, and map safe outcomes. | Keep policy evaluators, validators, and audit sinks efficient and cancellable. |
-| Audit residue | Provide audit residue models and sink abstractions. | Choose durable storage, indexing, retention, batching, signing, and write behavior. |
-| Governance outbox | Provide provider-neutral outbox models and drain primitives. | Provide durable store semantics, leasing/claiming if needed, idempotency, retry, and monitoring. |
+| Decision receipt | Provide decision receipt models and sink abstractions. | Choose durable storage, indexing, retention, batching, signing, and write behavior. |
+| Outbox | Provide provider-neutral outbox models and drain primitives. | Provide durable store semantics, leasing/claiming if needed, idempotency, retry, and monitoring. |
 | Provider emission | Define provider-neutral emission result vocabulary. | Configure exporters, SIEM, cloud, network clients, throttling, credentials, and failure handling. |
 | Backpressure | Expose places where host policy can fail, defer, retry, or dead-letter. | Decide whether to reject, defer, shed load, queue, throttle, page operators, or pause a provider path. |
 
@@ -79,11 +79,11 @@ Do not wrap asynchronous provider calls in blocking waits or add artificial slee
 
 ```csharp
 public ValueTask WriteAsync(
-    IAsiBackboneAuditResidue residue,
+    IDecisionReceipt receipt,
     CancellationToken cancellationToken = default)
 {
     // Anti-pattern: blocks a request thread and ignores cancellation.
-    _httpClient.PostAsJsonAsync("/audit", residue).Result;
+    _httpClient.PostAsJsonAsync("/audit", receipt).Result;
 
     // Anti-pattern: ties up the request path during bursts.
     Thread.Sleep(TimeSpan.FromMilliseconds(250));
@@ -106,10 +106,10 @@ Prefer asynchronous implementation, cancellation propagation, timeout-aware clie
 
 ```csharp
 public async ValueTask WriteAsync(
-    IAsiBackboneAuditResidue residue,
+    IDecisionReceipt receipt,
     CancellationToken cancellationToken = default)
 {
-    AuditRecord record = AuditRecord.FromResidue(residue);
+    AuditRecord record = AuditRecord.FromDecisionReceipt(receipt);
 
     await _db.AuditRecords
         .AddAsync(record, cancellationToken)
@@ -172,7 +172,7 @@ When audit delivery to external systems is expensive or unreliable, use a durabl
 
 ## Outbox emitter guidance
 
-`IAsiBackboneGovernanceEmitter.EmitAsync` implementations run during drain passes and may dominate background-worker throughput.
+`IGovernanceEmitter.EmitAsync` implementations run during drain passes and may dominate background-worker throughput.
 
 Recommended characteristics:
 
@@ -210,7 +210,7 @@ Avoid unbounded per-request work:
 
 ```csharp
 // Anti-pattern: unbounded fire-and-forget work can hide failure and exhaust resources.
-_ = Task.Run(() => _externalTelemetryClient.Send(residue));
+_ = Task.Run(() => _externalTelemetryClient.Send(receipt));
 ```
 
 A better shape is a bounded, observable handoff:

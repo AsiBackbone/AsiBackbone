@@ -19,7 +19,7 @@ The minimum supported setup is `AsiBackbone.Core`. Add integration packages only
 
 | Need | Package |
 | --- | --- |
-| Framework-neutral decisions, constraints, audit residue, handshakes, and capability-token primitives | `AsiBackbone.Core` |
+| Framework-neutral decisions, constraints, decision receipt, handshakes, and capability-token primitives | `AsiBackbone.Core` |
 | Non-durable local validation or sample audit storage | `AsiBackbone.Storage.InMemory` |
 | Host-owned EF Core audit ledger persistence | `AsiBackbone.EntityFrameworkCore` |
 | ASP.NET Core request correlation, actor context, result mapping, and acknowledgment challenge helpers | `AsiBackbone.AspNetCore` |
@@ -52,7 +52,7 @@ dotnet add package AsiBackbone.EntityFrameworkCore
 
 ## Basic public API example
 
-The following example uses only public Core APIs. It creates a host-defined constraint, evaluates a request, and produces audit residue from the decision.
+The following example uses only public Core APIs. It creates a host-defined constraint, evaluates a request, and produces decision receipt from the decision.
 
 ```csharp
 using AsiBackbone.Core.Actors;
@@ -61,11 +61,11 @@ using AsiBackbone.Core.Constraints;
 using AsiBackbone.Core.Decisions;
 using AsiBackbone.Core.Evaluation;
 
-var evaluator = DefaultAsiBackbonePolicyEvaluator.CreateBuilder<AsiBackboneConstraintEvaluationContext>()
+var evaluator = DefaultGovernancePolicyEvaluator.CreateBuilder<GovernanceEvaluationContext>()
     .AddConstraint(new RegionRequiredConstraint())
     .Build();
 
-var context = new AsiBackboneConstraintEvaluationContext(
+var context = new GovernanceEvaluationContext(
     correlationId: Guid.NewGuid().ToString("N"),
     policyVersion: "policy-v1",
     policyHash: "policy-hash-v1",
@@ -77,8 +77,8 @@ var context = new AsiBackboneConstraintEvaluationContext(
 
 GovernanceDecision decision = await evaluator.EvaluateAsync(context);
 
-AuditResidue residue = AuditResidue.FromDecision(
-    AsiBackboneActorContext.Human("user-123", "Example User"),
+DecisionReceipt residue = DecisionReceipt.FromDecision(
+    GovernanceActorContext.Human("user-123", "Example User"),
     "example.document.approve",
     decision,
     metadata: context.Metadata);
@@ -87,12 +87,12 @@ Console.WriteLine($"Decision: {decision.Outcome}");
 Console.WriteLine($"Can proceed: {decision.CanProceed}");
 Console.WriteLine($"Audit event: {residue.EventId}");
 
-internal sealed class RegionRequiredConstraint : IAsiBackboneConstraint<AsiBackboneConstraintEvaluationContext>
+internal sealed class RegionRequiredConstraint : IGovernanceConstraint<GovernanceEvaluationContext>
 {
     public string Name => "region.required";
 
     public ValueTask<ConstraintEvaluationResult> EvaluateAsync(
-        AsiBackboneConstraintEvaluationContext context,
+        GovernanceEvaluationContext context,
         CancellationToken cancellationToken = default)
     {
         cancellationToken.ThrowIfCancellationRequested();
@@ -109,22 +109,22 @@ internal sealed class RegionRequiredConstraint : IAsiBackboneConstraint<AsiBackb
 }
 ```
 
-This example does not execute the requested operation. It only evaluates the request and creates audit residue. The consuming application remains responsible for deciding whether and how to execute the underlying operation.
+This example does not execute the requested operation. It only evaluates the request and creates decision receipt. The consuming application remains responsible for deciding whether and how to execute the underlying operation.
 
 ## Optional in-memory audit storage
 
-For local validation, tests, or sample hosts, write audit residue to `InMemoryAuditLedger`:
+For local validation, tests, or sample hosts, write decision receipt to `InMemoryAuditLedger`:
 
 ```csharp
 using AsiBackbone.Core.Audit;
 using AsiBackbone.Storage.InMemory.Audit;
 
 var ledger = new InMemoryAuditLedger();
-IAsiBackboneAuditSink sink = ledger;
+IDecisionReceiptSink sink = ledger;
 
 await sink.WriteAsync(residue);
 
-IAsiBackboneAuditResidue stored = ledger.Records.Single();
+IDecisionReceipt stored = ledger.Records.Single();
 Console.WriteLine(stored.CorrelationId);
 ```
 

@@ -14,18 +14,18 @@ public sealed class VerificationPolicyHandlingTests
     /// </summary>
     public static TheoryData<string, SignatureVerificationCategory, VerificationPolicyAction, string> PreflightFailureCases => new()
     {
-        { "missing-signing-hash", SignatureVerificationCategory.MissingSignature, VerificationPolicyAction.RequireAcknowledgment, "signature.missing" },
+        { "missing-signing-hash", SignatureVerificationCategory.MissingSignature, VerificationPolicyAction.Deny, "signature.missing" },
         { "signing-hash-mismatch", SignatureVerificationCategory.HashMismatch, VerificationPolicyAction.Deny, "signature.hash-mismatch" },
         { "metadata-hash-algorithm-mismatch", SignatureVerificationCategory.HashMismatch, VerificationPolicyAction.Deny, "signature.hash-algorithm-unsupported" },
         { "required-hash-algorithm-mismatch", SignatureVerificationCategory.HashMismatch, VerificationPolicyAction.Deny, "signature.hash-algorithm-unsupported" },
-        { "canonical-artifact-id-mismatch", SignatureVerificationCategory.CanonicalizationMismatch, VerificationPolicyAction.Escalate, "signature.canonicalization-mismatch" },
-        { "canonical-artifact-type-mismatch", SignatureVerificationCategory.CanonicalizationMismatch, VerificationPolicyAction.Escalate, "signature.canonicalization-mismatch" },
-        { "canonicalization-version-mismatch", SignatureVerificationCategory.CanonicalizationMismatch, VerificationPolicyAction.Escalate, "signature.canonicalization-mismatch" },
-        { "payload-schema-version-mismatch", SignatureVerificationCategory.CanonicalizationMismatch, VerificationPolicyAction.Escalate, "signature.canonicalization-mismatch" },
+        { "canonical-artifact-id-mismatch", SignatureVerificationCategory.CanonicalizationMismatch, VerificationPolicyAction.Deny, "signature.canonicalization-mismatch" },
+        { "canonical-artifact-type-mismatch", SignatureVerificationCategory.CanonicalizationMismatch, VerificationPolicyAction.Deny, "signature.canonicalization-mismatch" },
+        { "canonicalization-version-mismatch", SignatureVerificationCategory.CanonicalizationMismatch, VerificationPolicyAction.Deny, "signature.canonicalization-mismatch" },
+        { "payload-schema-version-mismatch", SignatureVerificationCategory.CanonicalizationMismatch, VerificationPolicyAction.Deny, "signature.canonicalization-mismatch" },
         { "expected-key-id-mismatch", SignatureVerificationCategory.UntrustedKey, VerificationPolicyAction.Deny, "signature.key-not-trusted" },
-        { "required-provider-mismatch", SignatureVerificationCategory.ProviderUnavailable, VerificationPolicyAction.Defer, "signature.provider-unavailable" },
-        { "expected-policy-version-mismatch", SignatureVerificationCategory.CanonicalizationMismatch, VerificationPolicyAction.Escalate, "signature.canonicalization-mismatch" },
-        { "expected-policy-hash-mismatch", SignatureVerificationCategory.CanonicalizationMismatch, VerificationPolicyAction.Escalate, "signature.canonicalization-mismatch" }
+        { "required-provider-mismatch", SignatureVerificationCategory.UntrustedSigningContext, VerificationPolicyAction.Deny, "signature.provider-not-trusted" },
+        { "expected-policy-version-mismatch", SignatureVerificationCategory.UntrustedSigningContext, VerificationPolicyAction.Deny, "signature.policy-context-not-trusted" },
+        { "expected-policy-hash-mismatch", SignatureVerificationCategory.UntrustedSigningContext, VerificationPolicyAction.Deny, "signature.policy-context-not-trusted" }
     };
 
     /// <summary>
@@ -47,6 +47,9 @@ public sealed class VerificationPolicyHandlingTests
         { "key-version-unknown", SignatureVerificationCategory.UnknownKeyVersion },
         { "key-dot-mismatch", SignatureVerificationCategory.UntrustedKey },
         { "key-dash-mismatch", SignatureVerificationCategory.UntrustedKey },
+        { "provider-not-trusted", SignatureVerificationCategory.UntrustedSigningContext },
+        { "policy-context-not-trusted", SignatureVerificationCategory.UntrustedSigningContext },
+        { "signing-context-not-trusted", SignatureVerificationCategory.UntrustedSigningContext },
         { "provider-unavailable", SignatureVerificationCategory.ProviderUnavailable },
         { "unavailable", SignatureVerificationCategory.ProviderUnavailable },
         { "timeout", SignatureVerificationCategory.ProviderUnavailable },
@@ -115,13 +118,13 @@ public sealed class VerificationPolicyHandlingTests
     }
 
     /// <summary>
-    /// Verifies that the VerifyAsync method correctly maps a missing signature to the expected SignatureVerificationCategory and VerificationPolicyAction, resulting in a require acknowledgment outcome.
+    /// Verifies that the VerifyAsync method maps a missing signature to a deny outcome by default, because an artifact carrying no proof must not be treated as awaiting acknowledgment.
     /// </summary>
     /// <returns>
     /// A task that represents the asynchronous operation of verifying the artifact and asserting the expected outcome for a missing signature scenario.
     /// </returns>
     [Fact]
-    public async Task VerifyAsyncMapsMissingSignatureToRequireAcknowledgment()
+    public async Task VerifyAsyncMapsMissingSignatureToDeny()
     {
         SignedGovernanceArtifact<string> artifact = CreateArtifactWithoutSignature();
         var verifier = new StubVerificationService(SignatureVerificationResult.Verified());
@@ -133,7 +136,8 @@ public sealed class VerificationPolicyHandlingTests
 
         Assert.False(outcome.IsVerified);
         Assert.Equal(SignatureVerificationCategory.MissingSignature, outcome.Category);
-        Assert.Equal(VerificationPolicyAction.RequireAcknowledgment, outcome.Action);
+        Assert.Equal(VerificationPolicyAction.Deny, outcome.Action);
+        Assert.False(outcome.ShouldAllow);
         Assert.Equal("signature.missing", outcome.FailureCode);
         Assert.False(verifier.WasCalled);
     }
@@ -503,6 +507,9 @@ public sealed class VerificationPolicyHandlingTests
             "key-version-unknown" => SignatureVerificationResult.Failed("signature.key-version-unknown", "Unknown key version."),
             "key-dot-mismatch" => SignatureVerificationResult.Failed("signature.key.mismatch", "Key mismatch."),
             "key-dash-mismatch" => SignatureVerificationResult.Failed("signature.key-mismatch", "Key mismatch."),
+            "provider-not-trusted" => SignatureVerificationResult.Failed("signature.provider-not-trusted", "Provider not trusted."),
+            "policy-context-not-trusted" => SignatureVerificationResult.Failed("signature.policy-context-not-trusted", "Policy context not trusted."),
+            "signing-context-not-trusted" => SignatureVerificationResult.Failed("provider.signing-context-not-trusted", "Signing context not trusted."),
             "provider-unavailable" => SignatureVerificationResult.Failed("signature.provider-unavailable", "Provider unavailable."),
             "unavailable" => SignatureVerificationResult.Failed("provider.unavailable", "Provider unavailable."),
             "timeout" => SignatureVerificationResult.Failed("provider.timeout", "Provider timeout."),
@@ -542,7 +549,7 @@ public sealed class VerificationPolicyHandlingTests
 
     private sealed class StubVerificationService(
         SignatureVerificationResult result,
-        Exception? exception = null) : IAsiBackboneSignatureVerificationService
+        Exception? exception = null) : IGovernanceSignatureVerificationService
     {
         public bool WasCalled { get; private set; }
 

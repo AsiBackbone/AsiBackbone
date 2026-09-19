@@ -10,7 +10,7 @@ Selected host style: `__HOST_STYLE__`
 - `UseAsiBackboneEndpointGovernance()` middleware.
 - A sample host-owned constraint and decision policy.
 - A Minimal API endpoint with fluent endpoint-governance metadata.
-- A controller action with `[RequireGovernancePolicy]`, `[RequireCapabilityGrant]`, and `[EmitGovernanceAudit]`.
+- A controller action with `[GovernancePolicy]`, `[RequireCapabilityGrant]`, and `[EmitGovernanceAudit]`.
 - Non-durable in-memory audit storage for local development and test-friendly inspection.
 - The AsiBackbone analyzer package reference.
 
@@ -31,7 +31,7 @@ POST /sample/minimal/execute
 POST /sample/controller/execute
 ```
 
-The `/sample/decision` endpoint returns the decision outcome, reason codes, correlation ID, policy version/hash, and audit event ID. Use that correlation ID with `/sample/audit/{correlationId}` to inspect the in-memory audit residue produced by the generated host.
+The `/sample/decision` endpoint returns the decision outcome, reason codes, correlation ID, policy version/hash, and audit event ID. Use that correlation ID with `/sample/audit/{correlationId}` to inspect the in-memory decision receipt produced by the generated host.
 
 ## Host-style notes
 

@@ -7,7 +7,7 @@ Use this checklist before opening a pull request against the stable AsiBackbone 
 Use the release-hardening path when you need evidence that the repository source and test surface has been built and tested:
 
 ```bash
-dotnet restore AsiBackbone.slnx
+dotnet restore AsiBackbone.slnx --locked-mode -p:Configuration=Release
 dotnet build AsiBackbone.slnx --configuration Release --no-restore
 dotnet test AsiBackbone.slnx --configuration Release --no-build --no-restore
 ```
@@ -15,7 +15,8 @@ dotnet test AsiBackbone.slnx --configuration Release --no-build --no-restore
 A default local Debug solution build is also expected to build all first-party package and test projects:
 
 ```bash
-dotnet build AsiBackbone.slnx
+dotnet restore AsiBackbone.slnx --locked-mode -p:Configuration=Debug
+dotnet build AsiBackbone.slnx -p:Configuration=Debug --no-restore
 ```
 
 ## Solution build configurations

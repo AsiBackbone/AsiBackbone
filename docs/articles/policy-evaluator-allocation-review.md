@@ -1,12 +1,12 @@
 # Policy Evaluator Allocation Review
 
-This note documents the allocation-review outcome for `DefaultAsiBackbonePolicyEvaluator<TContext>` hot paths.
+This note documents the allocation-review outcome for `DefaultGovernancePolicyEvaluator<TContext>` hot paths.
 
 ## Review scope
 
 The review focused on three allocation-sensitive areas:
 
-- constraint-result collection when an `IAsiBackboneDecisionPolicy<TContext>` is present;
+- constraint-result collection when an `IGovernanceDecisionPolicy<TContext>` is present;
 - read-only constraint-result views passed to decision policies;
 - warning-plus-denial reason composition when fast-abort mode preserves warnings already evaluated before the first denial.
 

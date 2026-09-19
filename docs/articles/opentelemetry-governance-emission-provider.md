@@ -6,12 +6,12 @@ The provider keeps the Core package provider-neutral. `AsiBackbone.Core` continu
 
 ## Package role
 
-`AsiBackbone.OpenTelemetry` implements `IAsiBackboneGovernanceEmitter` through `OpenTelemetryGovernanceEmitter`.
+`AsiBackbone.OpenTelemetry` implements `IGovernanceEmitter` through `OpenTelemetryGovernanceEmitter`.
 
 The provider emits:
 
 - an `ActivitySource` activity with a governance activity event;
-- stable `asibackbone.*` activity tags for correlation, audit residue, lifecycle, policy, trace, latency, gateway, outbox, schema, and emitter fields;
+- stable `asibackbone.*` activity tags for correlation, decision receipt, lifecycle, policy, trace, latency, gateway, outbox, schema, and emitter fields;
 - low-cardinality `Meter` counters and histograms for emission count, failure count, and emission latency;
 - provider-neutral `GovernanceEmissionResult` and `GovernanceEmissionError` values.
 
@@ -42,10 +42,10 @@ open-telemetry
 ## Recommended decision -> outbox -> drain -> OpenTelemetry flow
 
 ```text
-Policy decision / audit residue
+Policy decision / decision receipt
   -> GovernanceEmissionEnvelope
-  -> IAsiBackboneGovernanceOutboxStore
-  -> AsiBackboneGovernanceOutboxDrain
+  -> IGovernanceOutboxStore
+  -> GovernanceOutboxDrain
   -> OpenTelemetryGovernanceEmitter
   -> ActivitySource / Meter
   -> host-configured OpenTelemetry exporters
@@ -58,7 +58,7 @@ This preserves the local durable audit/outbox record before any external observa
 Direct emitter usage is useful for tests, smoke checks, or advanced host-owned flows:
 
 ```csharp
-IAsiBackboneGovernanceEmitter emitter = new OpenTelemetryGovernanceEmitter();
+IGovernanceEmitter emitter = new OpenTelemetryGovernanceEmitter();
 
 GovernanceEmissionEnvelope envelope = GovernanceEmissionEnvelope.Create(
     GovernanceEmissionEventType.Decision,
@@ -82,7 +82,7 @@ For production accountability, prefer the durable outbox flow rather than direct
 When paired with a configured outbox store, the hosted drain can deliver queued envelopes through the OpenTelemetry provider:
 
 ```csharp
-builder.Services.AddScoped<IAsiBackboneGovernanceEmitter, OpenTelemetryGovernanceEmitter>();
+builder.Services.AddScoped<IGovernanceEmitter, OpenTelemetryGovernanceEmitter>();
 
 builder.Services.AddAsiBackboneGovernanceOutboxDrainWorker(options =>
 {

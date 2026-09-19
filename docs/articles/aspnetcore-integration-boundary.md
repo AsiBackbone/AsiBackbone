@@ -12,7 +12,7 @@ It helps an ASP.NET Core application:
 
 - register AsiBackbone ASP.NET Core adapter services through standard dependency injection;
 - resolve request correlation and safe request metadata;
-- enrich audit residue from HTTP request context;
+- enrich decision receipt from HTTP request context;
 - map Core governance decisions and operation results into HTTP-friendly results when explicitly used by the host;
 - create and handle acknowledgment challenge models for host-owned UI flows;
 - remain usable in plain ASP.NET Core hosts and NetCoreApplicationTemplate-based hosts.
@@ -50,7 +50,7 @@ EF Core-backed storage remains in `AsiBackbone.EntityFrameworkCore`. In-memory h
 - options objects for HTTP integration behavior;
 - request-correlation resolution;
 - safe request metadata capture;
-- audit enrichment helpers for creating Core audit residue from HTTP request context;
+- audit enrichment helpers for creating Core decision receipt from HTTP request context;
 - HTTP result mapping helpers for Core `GovernanceDecision` and `OperationResult` values;
 - acknowledgment challenge models and response handling helpers.
 
@@ -111,7 +111,7 @@ The ASP.NET Core package does not implicitly register EF Core, in-memory persist
 
 ## Request Correlation and Audit Enrichment
 
-`IAsiBackboneHttpRequestCorrelationResolver` resolves request correlation data from the current `HttpContext` without making Core depend on ASP.NET Core types.
+`IHttpGovernanceRequestCorrelationResolver` resolves request correlation data from the current `HttpContext` without making Core depend on ASP.NET Core types.
 
 The default resolver:
 
@@ -130,19 +130,19 @@ Example usage:
 using AsiBackbone.AspNetCore.Correlation;
 using AsiBackbone.Core.Audit;
 
-AsiBackboneHttpRequestCorrelation correlation = correlationResolver.ResolveRequestCorrelation();
+GovernanceHttpRequestCorrelation correlation = correlationResolver.ResolveRequestCorrelation();
 
-AuditResidue residue = correlation.CreateAuditResidue(
+DecisionReceipt receipt = correlation.CreateDecisionReceipt(
     actor,
     "ApproveWidget",
     decision);
 ```
 
-Use `AsiBackboneHttpRequestCorrelation.ToEvaluationContext(...)` when a web host needs to carry the resolved correlation identifier and safe request metadata into a framework-neutral Core policy evaluation context.
+Use `GovernanceHttpRequestCorrelation.ToEvaluationContext(...)` when a web host needs to carry the resolved correlation identifier and safe request metadata into a framework-neutral Core policy evaluation context.
 
 ## HTTP Result Mapping
 
-`AsiBackboneHttpResultMappingExtensions` maps Core `GovernanceDecision` and `OperationResult` instances into ASP.NET Core `IResult` responses through explicit helpers.
+`GovernanceHttpResultMappingExtensions` maps Core `GovernanceDecision` and `OperationResult` instances into ASP.NET Core `IResult` responses through explicit helpers.
 
 ```csharp
 using AsiBackbone.AspNetCore.Results;
@@ -181,7 +181,7 @@ Hosts can opt into broader detail only when appropriate:
 ```csharp
 using AsiBackbone.AspNetCore.Results;
 
-AsiBackboneHttpResultMappingOptions mappingOptions = new()
+GovernanceHttpResultMappingOptions mappingOptions = new()
 {
     IncludeReasonMessages = true,
     IncludeTraceId = true,
@@ -191,11 +191,11 @@ AsiBackboneHttpResultMappingOptions mappingOptions = new()
 return decision.ToHttpResult(mappingOptions);
 ```
 
-Status-code policy remains host-overridable through `AsiBackboneHttpResultMappingOptions`. Hosts that intentionally mask denial or scanner traffic with alternate status codes should configure their own mapping rather than relying on the defaults.
+Status-code policy remains host-overridable through `GovernanceHttpResultMappingOptions`. Hosts that intentionally mask denial or scanner traffic with alternate status codes should configure their own mapping rather than relying on the defaults.
 
 ## Acknowledgment Challenge Flow
 
-`IAsiBackboneAcknowledgmentChallengeService` provides a host-friendly bridge for Core `AcknowledgmentRequired` decisions. It builds an `AsiBackboneAcknowledgmentChallenge` that MVC, Razor Pages, Minimal APIs, a SPA, or another UI layer can render without the package taking a dependency on that stack.
+`IAcknowledgmentChallengeService` provides a host-friendly bridge for Core `AcknowledgmentRequired` decisions. It builds an `AcknowledgmentChallenge` that MVC, Razor Pages, Minimal APIs, a SPA, or another UI layer can render without the package taking a dependency on that stack.
 
 ```csharp
 using AsiBackbone.AspNetCore.Handshakes;
@@ -206,21 +206,21 @@ GovernanceDecision decision = GovernanceDecision.RequireAcknowledgment(
     "Manual acknowledgment is required before execution.",
     correlationId: "request-123");
 
-AsiBackboneAcknowledgmentChallenge challenge = acknowledgmentChallengeService.CreateChallenge(
+AcknowledgmentChallenge challenge = acknowledgmentChallengeService.CreateChallenge(
     actor,
     "PublishEpisode",
     decision);
 ```
 
-The challenge preserves safe round-trip fields such as handshake identifier, operation name, reason code, required acknowledgment code/text, risk level, risk category, and correlation identifier. Trace identifiers and policy metadata are hidden by default and can be enabled through `AsiBackboneAcknowledgmentChallengeOptions` only when the host intentionally wants to expose those diagnostics.
+The challenge preserves safe round-trip fields such as handshake identifier, operation name, reason code, required acknowledgment code/text, risk level, risk category, and correlation identifier. Trace identifiers and policy metadata are hidden by default and can be enabled through `AcknowledgmentChallengeOptions` only when the host intentionally wants to expose those diagnostics.
 
 Hosts can round-trip a submitted acknowledgment response back into Core handshake models:
 
 ```csharp
-AsiBackboneAcknowledgmentChallengeResult result = acknowledgmentChallengeService.HandleResponse(
+AcknowledgmentChallengeResult result = acknowledgmentChallengeService.HandleResponse(
     challenge,
     actor,
-    new AsiBackboneAcknowledgmentChallengeRequest
+    new AcknowledgmentChallengeRequest
     {
         HandshakeId = challenge.HandshakeId,
         AcknowledgmentCode = challenge.RequiredAcknowledgmentCode,
@@ -293,8 +293,8 @@ This package currently provides thin HTTP adapters. Later issues may add additio
 
 `AsiBackbone.AspNetCore` is the web host adapter for AsiBackbone.
 
-It belongs at the edge between ASP.NET Core requests and Core governance primitives. It can prepare request context, resolve safe correlation metadata, enrich audit residue, map decision outcomes into HTTP-friendly responses, and support acknowledgment challenges.
+It belongs at the edge between ASP.NET Core requests and Core governance primitives. It can prepare request context, resolve safe correlation metadata, enrich decision receipt, map decision outcomes into HTTP-friendly responses, and support acknowledgment challenges.
 
 It does not own persistence, policy definitions, authentication schemes, authorization rules, database migrations, signing providers, NetCoreApplicationTemplate conventions, endpoint exposure, middleware enforcement, or external execution.
 
-That boundary keeps the package useful for both plain ASP.NET Core applications and NetCoreApplicationTemplate hosts while preserving the broader AsiBackbone principle: governance spine first, host assumptions last.
+That boundary keeps the package useful for both plain ASP.NET Core applications and NetCoreApplicationTemplate hosts while preserving the broader AsiBackbone principle: policy decision pipeline first, host assumptions last.

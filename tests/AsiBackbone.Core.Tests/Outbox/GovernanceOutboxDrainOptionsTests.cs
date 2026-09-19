@@ -8,14 +8,14 @@ using Xunit;
 namespace AsiBackbone.Core.Tests.Outbox;
 
 /// <summary>
-/// Tests for <see cref="AsiBackboneGovernanceOutboxDrain"/> that verify the behavior of the drain operation with respect to configured retry and deferred delays.
+/// Tests for <see cref="GovernanceOutboxDrain"/> that verify the behavior of the drain operation with respect to configured retry and deferred delays.
 /// </summary>
 public sealed class GovernanceOutboxDrainOptionsTests
 {
     private static readonly DateTimeOffset DrainUtc = new(2026, 6, 29, 14, 0, 0, TimeSpan.Zero);
 
     /// <summary>
-    /// Verifies that when the emitter throws an exception during the drain operation, the next retry time for the outbox entry is set according to the configured retry delay in <see cref="AsiBackboneGovernanceOutboxOptions"/>.
+    /// Verifies that when the emitter throws an exception during the drain operation, the next retry time for the outbox entry is set according to the configured retry delay in <see cref="GovernanceOutboxOptions"/>.
     /// </summary>
     /// <returns>
     /// A task that represents the asynchronous test operation.
@@ -27,12 +27,12 @@ public sealed class GovernanceOutboxDrainOptionsTests
         GovernanceOutboxEntry queuedEntry = await outboxStore.EnqueueAsync(
             CreateEnvelope("exception"),
             TestContext.Current.CancellationToken);
-        IOptions<AsiBackboneGovernanceOutboxOptions> options = Options.Create(new AsiBackboneGovernanceOutboxOptions
+        IOptions<GovernanceOutboxOptions> options = Options.Create(new GovernanceOutboxOptions
         {
             RetryDelay = TimeSpan.FromMinutes(7),
             DeferredDelay = TimeSpan.FromMinutes(13)
         });
-        var drain = new AsiBackboneGovernanceOutboxDrain(
+        var drain = new GovernanceOutboxDrain(
             outboxStore,
             new ThrowingEmitter(new InvalidOperationException("provider unavailable")),
             outboxOptions: options);
@@ -51,7 +51,7 @@ public sealed class GovernanceOutboxDrainOptionsTests
     }
 
     /// <summary>
-    /// Verifies that when the emitter returns a deferred result without a specified retry-after time, the next retry time for the outbox entry is set according to the configured deferred delay in <see cref="AsiBackboneGovernanceOutboxOptions"/>.
+    /// Verifies that when the emitter returns a deferred result without a specified retry-after time, the next retry time for the outbox entry is set according to the configured deferred delay in <see cref="GovernanceOutboxOptions"/>.
     /// </summary>
     /// <returns>
     /// A task that represents the asynchronous test operation.
@@ -63,12 +63,12 @@ public sealed class GovernanceOutboxDrainOptionsTests
         _ = await outboxStore.EnqueueAsync(
             CreateEnvelope("deferred"),
             TestContext.Current.CancellationToken);
-        IOptions<AsiBackboneGovernanceOutboxOptions> options = Options.Create(new AsiBackboneGovernanceOutboxOptions
+        IOptions<GovernanceOutboxOptions> options = Options.Create(new GovernanceOutboxOptions
         {
             RetryDelay = TimeSpan.FromMinutes(7),
             DeferredDelay = TimeSpan.FromMinutes(13)
         });
-        var drain = new AsiBackboneGovernanceOutboxDrain(
+        var drain = new GovernanceOutboxDrain(
             outboxStore,
             new ResultEmitter(GovernanceEmissionResult.Deferred()),
             outboxOptions: options);
@@ -82,7 +82,7 @@ public sealed class GovernanceOutboxDrainOptionsTests
     }
 
     /// <summary>
-    /// Verifies that when the emitter returns a deferred result with a specified retry-after time, the next retry time for the outbox entry is set to that retry-after time, even if it exceeds the configured deferred delay in <see cref="AsiBackboneGovernanceOutboxOptions"/>.
+    /// Verifies that when the emitter returns a deferred result with a specified retry-after time, the next retry time for the outbox entry is set to that retry-after time, even if it exceeds the configured deferred delay in <see cref="GovernanceOutboxOptions"/>.
     /// </summary>
     /// <returns>
     /// A task that represents the asynchronous test operation.
@@ -95,12 +95,12 @@ public sealed class GovernanceOutboxDrainOptionsTests
             CreateEnvelope("retry-after"),
             TestContext.Current.CancellationToken);
         DateTimeOffset retryAfterUtc = DrainUtc.AddMinutes(3);
-        IOptions<AsiBackboneGovernanceOutboxOptions> options = Options.Create(new AsiBackboneGovernanceOutboxOptions
+        IOptions<GovernanceOutboxOptions> options = Options.Create(new GovernanceOutboxOptions
         {
             RetryDelay = TimeSpan.FromMinutes(7),
             DeferredDelay = TimeSpan.FromMinutes(13)
         });
-        var drain = new AsiBackboneGovernanceOutboxDrain(
+        var drain = new GovernanceOutboxDrain(
             outboxStore,
             new ResultEmitter(GovernanceEmissionResult.Deferred(retryAfterUtc: retryAfterUtc)),
             outboxOptions: options);
@@ -114,34 +114,34 @@ public sealed class GovernanceOutboxDrainOptionsTests
     }
 
     /// <summary>
-    /// Verifies that the constructor of <see cref="AsiBackboneGovernanceOutboxDrain"/> throws an <see cref="InvalidOperationException"/> when provided with options that have a negative retry delay.
+    /// Verifies that the constructor of <see cref="GovernanceOutboxDrain"/> throws an <see cref="InvalidOperationException"/> when provided with options that have a negative retry delay.
     /// </summary>
     [Fact]
     public void ConstructorRejectsNegativeRetryDelayOptions()
     {
-        IOptions<AsiBackboneGovernanceOutboxOptions> options = Options.Create(new AsiBackboneGovernanceOutboxOptions
+        IOptions<GovernanceOutboxOptions> options = Options.Create(new GovernanceOutboxOptions
         {
             RetryDelay = TimeSpan.FromTicks(-1)
         });
 
-        _ = Assert.Throws<InvalidOperationException>(() => new AsiBackboneGovernanceOutboxDrain(
+        _ = Assert.Throws<InvalidOperationException>(() => new GovernanceOutboxDrain(
             new InMemoryGovernanceOutboxStore(),
             NoOpGovernanceEmitter.Instance,
             outboxOptions: options));
     }
 
     /// <summary>
-    /// Verifies that the constructor of <see cref="AsiBackboneGovernanceOutboxDrain"/> throws an <see cref="InvalidOperationException"/> when provided with options that have a negative deferred delay.
+    /// Verifies that the constructor of <see cref="GovernanceOutboxDrain"/> throws an <see cref="InvalidOperationException"/> when provided with options that have a negative deferred delay.
     /// </summary>  
     [Fact]
     public void ConstructorRejectsNegativeDeferredDelayOptions()
     {
-        IOptions<AsiBackboneGovernanceOutboxOptions> options = Options.Create(new AsiBackboneGovernanceOutboxOptions
+        IOptions<GovernanceOutboxOptions> options = Options.Create(new GovernanceOutboxOptions
         {
             DeferredDelay = TimeSpan.FromTicks(-1)
         });
 
-        _ = Assert.Throws<InvalidOperationException>(() => new AsiBackboneGovernanceOutboxDrain(
+        _ = Assert.Throws<InvalidOperationException>(() => new GovernanceOutboxDrain(
             new InMemoryGovernanceOutboxStore(),
             NoOpGovernanceEmitter.Instance,
             outboxOptions: options));
@@ -156,7 +156,7 @@ public sealed class GovernanceOutboxDrainOptionsTests
             envelopeId: $"envelope-{suffix}",
             correlationId: $"correlation-{suffix}",
             auditResidueId: $"residue-{suffix}",
-            lifecycleStage: AuditResidueLifecycleStage.ExternalEmissionQueued,
+            lifecycleStage: DecisionReceiptLifecycleStage.ExternalEmissionQueued,
             policyVersion: "v1",
             policyHash: "hash",
             traceId: $"trace-{suffix}",
@@ -165,7 +165,7 @@ public sealed class GovernanceOutboxDrainOptionsTests
             emitterProvider: "test-sink");
     }
 
-    private sealed class ResultEmitter(GovernanceEmissionResult result) : IAsiBackboneGovernanceEmitter
+    private sealed class ResultEmitter(GovernanceEmissionResult result) : IGovernanceEmitter
     {
         private readonly GovernanceEmissionResult result = result;
 
@@ -180,7 +180,7 @@ public sealed class GovernanceOutboxDrainOptionsTests
         }
     }
 
-    private sealed class ThrowingEmitter(Exception exception) : IAsiBackboneGovernanceEmitter
+    private sealed class ThrowingEmitter(Exception exception) : IGovernanceEmitter
     {
         public ValueTask<GovernanceEmissionResult> EmitAsync(
             GovernanceEmissionEnvelope envelope,

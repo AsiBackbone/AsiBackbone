@@ -1,6 +1,8 @@
-![AsiBackbone governance spine icon](https://raw.githubusercontent.com/AsiBackbone/ASIBackbone/main/docs/images/social-preview.png)
+![AsiBackbone icon](https://raw.githubusercontent.com/AsiBackbone/ASIBackbone/main/docs/images/social-preview.png)
 
 # AsiBackbone
+
+> Version 6.0 introduces plain-language semantic type names and product vocabulary. Examples use the 6.0 names; see the [5.x to 6.0 migration guide](docs/articles/upgrade-500-to-600.md), [naming convention](docs/articles/public-api-naming-600.md), and [6.0 terminology guide](docs/articles/terminology-600.md). Earlier release records remain historical context.
 
 [![CI](https://github.com/AsiBackbone/AsiBackbone/actions/workflows/ci.yml/badge.svg)](https://github.com/AsiBackbone/AsiBackbone/actions/workflows/ci.yml)
 [![Line Coverage Gate](https://img.shields.io/badge/line%20coverage%20gate-75%25-brightgreen)](https://asibackbone.github.io/AsiBackbone/coverage/index.html)
@@ -14,9 +16,11 @@
 [![GitHub Release](https://img.shields.io/github/v/release/AsiBackbone/AsiBackbone?sort=semver&display_name=tag&label=release)](https://github.com/AsiBackbone/AsiBackbone/releases)
 [![Zenodo DOI](https://img.shields.io/badge/DOI-10.5281%2Fzenodo.20546032-blue)](https://doi.org/10.5281/zenodo.20546032)
 
-**Accountable Systems Infrastructure for governed .NET decision flow.**
+**A governance framework for accountable .NET decision flow.**
 
 > AI may provide the intellect. AsiBackbone provides the accountable spine.
+
+AsiBackbone is the implementation package family for Accountable Systems Infrastructure (stable `6.0.x`).
 
 ## Documentation ownership
 
@@ -34,8 +38,6 @@ Most software can tell you *what* happened. Far less can show that an action was
 
 AsiBackbone is a .NET package family for that decision boundary. It helps a host application build safe policy context, evaluate constraints, return a structured decision, preserve a decision receipt, optionally scope continuation, and then let the host decide whether and how to execute.
 
-In this software project, **ASI** means **Accountable Systems Infrastructure**.
-
 ## Implementation-first mental model
 
 A normal API adoption path looks like this:
@@ -45,46 +47,46 @@ HTTP request
   -> host builds safe evaluation context
   -> host-owned rules evaluate the request
   -> AsiBackbone returns a GovernanceDecision
-  -> host writes audit residue / decision receipt
+  -> host writes a decision receipt
   -> host continues only when decision.CanProceed is true
 ```
 
 Use plain engineering translations first:
 
-| Project term | Practical meaning |
+| Term | Practical meaning |
 | --- | --- |
-| Governance spine | Policy decision pipeline around consequential operations. |
-| Audit residue | Decision receipt or audit-log payload. |
-| Acknowledgment handshake | Confirmation workflow before a risky operation. |
+| Policy decision pipeline | Rules evaluate request facts and return a structured decision. |
+| Decision receipt | Record of a decision, its outcome, and its reasons. |
+| Acknowledgment | Confirmation before a risky operation. |
 | Capability grant | Short-lived scoped permission. |
-| Governance outbox | Durable outbox pattern for governance events. |
+| Outbox | Durable records awaiting reliable delivery. |
 | OpenTelemetry projection | Optional traces/metrics projection after local records exist. |
-| Host-owned execution boundary | The application code that performs or refuses the protected operation. |
+| Host-owned execution | The application code that performs or refuses the protected operation. |
 
 ## First code path
 
-The snippet below is an intentionally small README slice, not a complete `Program.cs`. It shows the primary governance path: build safe context, evaluate policy, write audit residue, and let the host execute only after the decision allows it. The full compile-ready walkthrough lives in [First 15 Minutes: Standard API Gating](https://asibackbone.github.io/AsiBackbone/articles/quickstart-api-gating.html).
+The snippet below is an intentionally small README slice, not a complete `Program.cs`. It shows the primary governance path: build safe context, evaluate policy, write decision receipt, and let the host execute only after the decision allows it. The full compile-ready walkthrough lives in [First 15 Minutes: Standard API Gating](https://asibackbone.github.io/AsiBackbone/articles/quickstart-api-gating.html).
 
-> Note: it is recommended in production environments that reason codes stay in audit residue rather than client responses
+> Note: it is recommended in production environments that reason codes stay in decision receipt rather than client responses
 
 ```csharp
 // Registration: Core evaluator + one host-owned rule + local in-memory audit sink.
 builder.Services.AddAsiBackboneAspNetCore();
 builder.Services.AddSingleton<InMemoryAuditLedger>();
-builder.Services.AddSingleton<IAsiBackboneAuditSink>(sp =>
+builder.Services.AddSingleton<IDecisionReceiptSink>(sp =>
     sp.GetRequiredService<InMemoryAuditLedger>());
-builder.Services.AddSingleton<IAsiBackboneConstraint<AsiBackboneConstraintEvaluationContext>, AllowedRegionConstraint>();
-builder.Services.AddSingleton<IAsiBackbonePolicyEvaluator<AsiBackboneConstraintEvaluationContext>>(sp =>
-    DefaultAsiBackbonePolicyEvaluator.CreateBuilder<AsiBackboneConstraintEvaluationContext>()
-        .AddConstraints(sp.GetServices<IAsiBackboneConstraint<AsiBackboneConstraintEvaluationContext>>())
-        .WithOptions(new AsiBackbonePolicyEvaluatorOptions())
+builder.Services.AddSingleton<IGovernanceConstraint<GovernanceEvaluationContext>, AllowedRegionConstraint>();
+builder.Services.AddSingleton<IGovernancePolicyEvaluator<GovernanceEvaluationContext>>(sp =>
+    DefaultGovernancePolicyEvaluator.CreateBuilder<GovernanceEvaluationContext>()
+        .AddConstraints(sp.GetServices<IGovernanceConstraint<GovernanceEvaluationContext>>())
+        .WithOptions(new GovernancePolicyOptions())
         .Build());
 
 app.MapPost("/api/orders/{region}/approve", async (
     string region,
     HttpContext httpContext,
-    IAsiBackbonePolicyEvaluator<AsiBackboneConstraintEvaluationContext> evaluator,
-    IAsiBackboneAuditSink auditSink,
+    IGovernancePolicyEvaluator<GovernanceEvaluationContext> evaluator,
+    IDecisionReceiptSink auditSink,
     CancellationToken cancellationToken) =>
 {
     var metadata = new Dictionary<string, string>(StringComparer.Ordinal)
@@ -94,7 +96,7 @@ app.MapPost("/api/orders/{region}/approve", async (
         ["risk"] = "routine-api-write"
     };
 
-    var context = new AsiBackboneConstraintEvaluationContext(
+    var context = new GovernanceEvaluationContext(
         correlationId: httpContext.TraceIdentifier,
         policyVersion: "policy-v1",
         policyHash: "policy-hash-v1",
@@ -102,13 +104,13 @@ app.MapPost("/api/orders/{region}/approve", async (
 
     GovernanceDecision decision = await evaluator.EvaluateAsync(context, cancellationToken);
 
-    AuditResidue residue = AuditResidue.FromDecision(
-        AsiBackboneActorContext.Human("example-user", "Example User"),
+    DecisionReceipt receipt = DecisionReceipt.FromDecision(
+        GovernanceActorContext.Human("example-user", "Example User"),
         operationName: "orders.approve",
         decision,
         metadata: context.Metadata);
 
-    await auditSink.WriteAsync(residue, cancellationToken);
+    await auditSink.WriteAsync(receipt, cancellationToken);
     if (!decision.CanProceed)
     {
         return Results.Json(new
@@ -116,7 +118,7 @@ app.MapPost("/api/orders/{region}/approve", async (
             allowed = false,
             decision = decision.Outcome.ToString(),
             decision.ReasonCodes,
-            auditEventId = residue.EventId
+            auditEventId = receipt.EventId
         }, statusCode: StatusCodes.Status403Forbidden);
     }
 
@@ -125,7 +127,7 @@ app.MapPost("/api/orders/{region}/approve", async (
     {
         allowed = true,
         message = "Host order approval would run after this governance decision.",
-        auditEventId = residue.EventId
+        auditEventId = receipt.EventId
     });
 });
 ```
@@ -136,21 +138,23 @@ For production-style hosts, add durable audit/outbox persistence, signing or ver
 
 ## Package family
 
-Stable `5.2.x` package family. `5.2.0` is the current release. It is a
-backward-compatible minor release that adds the fluent policy-evaluator builder,
-starts the `ASIB900` deprecation window for partial evaluator constructors, and
-strengthens package compatibility, durable release evidence, quality gates, and
-project stewardship. Package IDs, public namespaces, the `net10.0` target, and
-the binary assembly identity `5.0.0.0` remain unchanged.
+Stable `6.x` package family. `6.0.0` is the current release. It is a
+major release that renames the public API to plain-language semantic names,
+removes the members whose `5.x` deprecation windows completed, makes
+signature-verification trust failures deny by default, binds the signing policy
+context into a versioned signature input, and closes a replay window in the
+reference in-memory capability-grant use store. Package IDs, public namespaces,
+and the `net10.0` target remain unchanged; the binary assembly identity advances
+to `6.0.0.0`.
 
-Consumers upgrading from `4.0.0` should review the [5.0.0 migration guide](https://github.com/AsiBackbone/AsiBackbone/blob/main/docs/articles/upgrade-400-to-500.md); hosts that persist the affected enums as integers need a data migration.
+Consumers upgrading from `5.x` must follow the [5.x to 6.0 migration guide](https://github.com/AsiBackbone/AsiBackbone/blob/main/docs/articles/upgrade-500-to-600.md). Host managed-key signing clients and verification services must adopt the new signature input, and hosts that persist `SignatureVerificationCategory` as an integer must accept the new value.
 
 | Package | Role |
 | --- | --- |
-| `AsiBackbone.Core` | Framework-neutral governance primitives: decisions, constraints, threat-model contributor hooks, acknowledgments, audit residue, lifecycle events, governed execution receipts, capability-token abstractions, explicit capability-grant validation profiles and proof trust pinning, durable outbox contracts, provider-neutral emission contracts, DLP/classification policy primitives, signing-ready metadata, canonical hashing/signing seams, verification-policy primitives, policy evaluator options, metadata budget helpers, and builder-style audit residue construction. |
+| `AsiBackbone.Core` | Framework-neutral governance primitives: decisions, constraints, threat-model contributor hooks, acknowledgments, decision receipt, lifecycle events, governed execution receipts, capability-token abstractions, explicit capability-grant validation profiles and proof trust pinning, durable outbox contracts, provider-neutral emission contracts, DLP/classification policy primitives, signing-ready metadata, canonical hashing/signing seams, verification-policy primitives, policy evaluator options, metadata budget helpers, and builder-style decision receipt construction. |
 | `AsiBackbone.DependencyInjection` | Explicit `AddAsiBackbone(...)` builder facade for coordinating host-selected provider registrations without making Core own infrastructure. |
 | `AsiBackbone.Storage.InMemory` | Non-durable in-memory storage helpers for tests, samples, local validation, lifecycle events, and outbox proof paths. |
-| `AsiBackbone.EntityFrameworkCore` | EF Core model configuration and host-owned persistence for audit ledger, acknowledgments, lifecycle events, JSON metadata storage, and governance outbox records. |
+| `AsiBackbone.EntityFrameworkCore` | EF Core model configuration and host-owned persistence for audit ledger, acknowledgments, lifecycle events, JSON metadata storage, and outbox records. |
 | `AsiBackbone.AspNetCore` | ASP.NET Core host adapters for actor context, conservative actor-type claim mapping, request correlation, audit enrichment, HTTP result mapping, acknowledgment challenge flows, endpoint governance, endpoint metadata mode, strict-governance profile helpers, endpoint fast-abort metadata, and hosted outbox drain integration. |
 | `AsiBackbone.Testing` | Test-only harness helpers for deterministic endpoint governance, policy results, capability validation, in-memory audit inspection, non-durable outbox storage, and no-signature signing seams. |
 | `AsiBackbone.Templates` | `dotnet new` templates for generating governed ASP.NET Core host scaffolds with endpoint governance, sample policies, local in-memory audit inspection, analyzers, and README guidance. |
@@ -159,13 +163,13 @@ Consumers upgrading from `4.0.0` should review the [5.0.0 migration guide](https
 | `AsiBackbone.Signing.LocalDevelopment` | Local-development signing and verification for tests, samples, and wiring proof paths only. Not for production key custody. |
 | `AsiBackbone.Signing.ManagedKey` | Provider-neutral managed-key signing adapter boundary. The host supplies the actual managed-key client, credentials, key operations, verification path, monitoring, and operational policy. Production-oriented registration fails closed by default when signing cannot complete. |
 
-Runtime governance-residue signing remains provider-neutral through `AsiBackbone.Signing.ManagedKey`. AsiBackbone does not ship first-party Azure Key Vault, AWS KMS, GCP Cloud KMS, HSM, certificate-store, enterprise KMS, or production-style signing sample-host implementations. Future Event Hubs, Purview, gateway, robotics, immutable-storage, or other non-signing provider packages are not part of the stable contract unless separately reviewed and released.
+Runtime decision-receipt signing remains provider-neutral through `AsiBackbone.Signing.ManagedKey`. AsiBackbone does not ship first-party Azure Key Vault, AWS KMS, GCP Cloud KMS, HSM, certificate-store, enterprise KMS, or production-style signing sample-host implementations. Future Event Hubs, Purview, gateway, robotics, immutable-storage, or other non-signing provider packages are not part of the stable contract unless separately reviewed and released.
 
 ## Supported target framework
 
-Stable `5.x` packages intentionally target `net10.0`. Consumers should plan on a .NET 10 SDK/runtime or later for the current package line.
+Stable `6.x` packages intentionally target `net10.0`. Consumers should plan on a .NET 10 SDK/runtime or later for the current package line.
 
-The project is not multi-targeting .NET 8 for `5.x`. That is an explicit adoption decision, not a defect workaround. The current package family uses a single repository-wide `TargetFramework` of `net10.0`, the EF Core integration is aligned with centrally managed EF Core `10.0.x` dependencies, and backporting the full package, analyzer, template, CI, packaging, and smoke-test surface would add compatibility overhead for a short-lived adoption window.
+The project is not multi-targeting .NET 8 for `6.x`. That is an explicit adoption decision, not a defect workaround. The current package family uses a single repository-wide `TargetFramework` of `net10.0`, the EF Core integration is aligned with centrally managed EF Core `10.0.x` dependencies, and backporting the full package, analyzer, template, CI, packaging, and smoke-test surface would add compatibility overhead for a short-lived adoption window.
 
 If meaningful external consumer demand appears, additional TFM support can be reconsidered in a later release with CI, packaging validation, analyzer compatibility, template smoke tests, and documentation updated together. See the [Target Framework Support Decision Record](https://github.com/AsiBackbone/AsiBackbone/blob/main/docs/articles/target-framework-support.md).
 
@@ -217,9 +221,9 @@ The full, categorized documentation set lives at the [documentation site](https:
 
 ## Current status
 
-Stable `5.x` is the current released line, with `5.2.0` as the current release. Package IDs and public namespaces remain unchanged, and the binary assembly identity is `5.0.0.0`.
+Stable `6.x` is the current released line, with `6.0.0` as the current release. Package IDs and public namespaces remain unchanged, and the binary assembly identity is `6.0.0.0`.
 
-The stable API contract is documented in [API Compatibility and SemVer](https://github.com/AsiBackbone/AsiBackbone/blob/main/docs/articles/api-compatibility-and-semver.md). The current release is recorded in [5.2.0 Release Notes](https://github.com/AsiBackbone/AsiBackbone/blob/main/docs/articles/release-notes-520.md). Consumers can use the [5.2.0 Consumer Verification Guide](https://github.com/AsiBackbone/AsiBackbone/blob/main/docs/articles/consumer-verification-520.md) for package-source, API-compatibility, Source Link, SBOM, provenance, deprecation, and deferred-signing checks. Consumers moving from `4.x` should also follow the [5.0.0 Migration Guide](https://github.com/AsiBackbone/AsiBackbone/blob/main/docs/articles/upgrade-400-to-500.md). Earlier release records remain available for historical traceability.
+The stable API contract is documented in [API Compatibility and SemVer](https://github.com/AsiBackbone/AsiBackbone/blob/main/docs/articles/api-compatibility-and-semver.md). The current release is recorded in [6.0.0 Release Notes](https://github.com/AsiBackbone/AsiBackbone/blob/main/docs/articles/release-notes-600.md). Consumers can use the [6.0.0 Consumer Verification Guide](https://github.com/AsiBackbone/AsiBackbone/blob/main/docs/articles/consumer-verification-600.md) for package-source, API-compatibility, Source Link, SBOM, provenance, behavior-change, and deferred-signing checks. Consumers moving from `5.x` must follow the [5.x to 6.0 migration guide](https://github.com/AsiBackbone/AsiBackbone/blob/main/docs/articles/upgrade-500-to-600.md). Earlier release records remain available for historical traceability.
 
 ## Support and project stewardship
 
@@ -243,9 +247,9 @@ A consumer should be able to use AsiBackbone in an application generated from Ne
 
 ## Alignment boundary
 
-AsiBackbone is a governance spine, not an intelligence engine. It implements governance-oriented software primitives for accountable decision flow and keeps execution authority with the host application. See [Project Boundaries and Non-Claims](https://asibackbone.github.io/AsiBackbone/articles/project-boundaries.html) for the full scope statement and safe wording guidance.
+AsiBackbone is a governance framework, not an intelligence engine. It implements software primitives for accountable decision flow and keeps execution authority with the host application. See [Project Boundaries and Non-Claims](https://asibackbone.github.io/AsiBackbone/articles/project-boundaries.html) for the full scope statement and safe wording guidance.
 
-> **Current NuGet packages are intentionally published without package signing.** The dated [NuGet Package Signing Decision Record](https://asibackbone.github.io/AsiBackbone/articles/nuget-package-signing-decision.html) records the accepted risk, compensating controls, mandatory review date, and early re-evaluation criteria. The project publishes durable release-attached SBOMs, package/SBOM provenance, Source Link metadata, and package hashes as distinct trust signals; none is presented as a signed-package guarantee. For current verification guidance, see the [**5.2.0 Release Notes**](https://asibackbone.github.io/AsiBackbone/articles/release-notes-520.html) and the [5.2.0 Consumer Verification Guide](https://asibackbone.github.io/AsiBackbone/articles/consumer-verification-520.html).
+> **Current NuGet packages are intentionally published without package signing.** The dated [NuGet Package Signing Decision Record](https://asibackbone.github.io/AsiBackbone/articles/nuget-package-signing-decision.html) records the accepted risk, compensating controls, mandatory review date, and early re-evaluation criteria. The project publishes durable release-attached SBOMs, package/SBOM provenance, Source Link metadata, and package hashes as distinct trust signals; none is presented as a signed-package guarantee. For current verification guidance, see the [**6.0.0 Release Notes**](https://asibackbone.github.io/AsiBackbone/articles/release-notes-600.html) and the [6.0.0 Consumer Verification Guide](https://asibackbone.github.io/AsiBackbone/articles/consumer-verification-600.html).
 
 ## Design principles
 

@@ -124,7 +124,7 @@ The explicit profiles are additive and do not silently change existing 3.x behav
 - Existing calls to `ValidateAsync(signedGrant)` continue to use the legacy default options where proof, acknowledgment-reference, and bounded-use checks are disabled.
 - New operational-gateway and consequential-execution code should prefer `CreateExecutionBoundary(...)`.
 - Code that intentionally performs only structural or temporal validation should prefer `CreateMetadataValidation(...)` so the reduced validation contract is visible in code review.
-- Hosts migrating an existing execution boundary should supply both an `IAsiBackboneSignatureVerificationService` and, when the profile keeps its default bounded-use requirement, an `ICapabilityGrantUseStore`.
+- Hosts migrating an existing execution boundary should supply both an `IGovernanceSignatureVerificationService` and, when the profile keeps its default bounded-use requirement, an `ICapabilityGrantUseStore`.
 
 The ambiguous no-options path remains available for 3.x compatibility. A future major version may tighten or remove that path; such a change would require explicit migration guidance rather than a silent behavioral change.
 
@@ -221,6 +221,23 @@ services.AddAsiBackbone(builder =>
 ```
 
 The in-memory store is thread-safe inside one process and can represent stopped and cancelled local-validation states through its public helpers. It is **not** durable, distributed, replicated, or production replay protection. It does not coordinate across replicas, survive process restarts, or replace a host-owned database/cache/lock strategy.
+
+### Retention horizon and clock skew
+
+The store evicts a grant's use record once the grant has been expired for longer than `EvictionGracePeriod` (default five minutes), measured from the latest use time the store has observed. A grant past that horizon is refused with `ReuseLimitExceeded` and `capability.use-retention-elapsed` instead of being given a fresh count, because its earlier uses may already have been evicted.
+
+Set `EvictionGracePeriod` to at least the largest `AllowedClockSkew` any validator uses with the store:
+
+```csharp
+TimeSpan skew = TimeSpan.FromMinutes(2);
+var useStore = new InMemoryCapabilityGrantUseStore { EvictionGracePeriod = skew };
+```
+
+If the grace period is shorter than the skew, grants that are expired but still inside the skew are denied rather than accepted. That is fail-closed, but it rejects uses the validator would otherwise allow. Durable implementations of `ICapabilityGrantUseStore` should apply the same rule: never discard a use record while the grant it describes can still pass validation, and refuse a grant whose record may have been discarded.
+
+### Stopping and cancelling grants
+
+Use records are keyed by issuer and token ID. `StopGrant(issuer, grantId)` and `CancelGrant(issuer, grantId)` affect only that issuer's grant. The identifier-only overloads `StopGrant(grantId)` and `CancelGrant(grantId)` affect every issuer's grant that uses the identifier.
 
 ## Core boundary
 

@@ -29,7 +29,7 @@ Core was responsible for framework-neutral domain primitives such as:
 - reason codes;
 - constraint evaluation;
 - governance decisions;
-- audit residue;
+- decision receipt;
 - liability / responsibility handshakes;
 - shared correlation, trace, policy version, and policy hash fields where appropriate.
 
@@ -111,7 +111,7 @@ Historical review status: Complete for alpha.
 
 ### Audit
 
-Audit residue primitives captured the framework-neutral trace of an operation, including actor, operation, outcome, reason codes, correlation data, policy version/hash, timestamp, and metadata.
+Decision receipt primitives captured the framework-neutral trace of an operation, including actor, operation, outcome, reason codes, correlation data, policy version/hash, timestamp, and metadata.
 
 Historical review status: Complete for alpha.
 
@@ -150,7 +150,7 @@ Unit tests were expected to cover:
 - reason code behavior;
 - constraint evaluation outcomes;
 - governance decision outcomes;
-- audit residue construction and mapping;
+- decision receipt construction and mapping;
 - handshake request and acknowledgment behavior.
 
 Historical review status: Complete, pending final `dotnet test` at the time of the alpha record.

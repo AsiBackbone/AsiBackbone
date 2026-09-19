@@ -21,8 +21,8 @@ public sealed class StrictGovernanceDiagnosticsTests
         _ = services.AddAsiBackboneStrictGovernance();
 
         using ServiceProvider provider = services.BuildServiceProvider(validateScopes: true);
-        AsiBackboneEndpointGovernanceOptions options = provider
-            .GetRequiredService<IOptions<AsiBackboneEndpointGovernanceOptions>>()
+        EndpointGovernanceOptions options = provider
+            .GetRequiredService<IOptions<EndpointGovernanceOptions>>()
             .Value;
 
         Assert.False(options.IncludeDevelopmentDiagnosticsMetadataValues);

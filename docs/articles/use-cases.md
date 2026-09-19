@@ -61,7 +61,7 @@ The host remains responsible for:
 2. Build a current policy context.
 3. Add one or two meaningful constraints.
 4. Evaluate an explicit decision.
-5. Persist decision residue.
+5. Persist decision receipt.
 6. Add acknowledgment only where the policy requires it.
 7. Add scoped capability only when delayed/delegated execution justifies it.
 8. Keep the final side effect in the host.

@@ -16,7 +16,7 @@ namespace AsiBackbone.EntityFrameworkCore.Audit;
 /// This store is append-oriented and intentionally relies on the host application to expose the ASI Backbone entities from
 /// its own <see cref="DbContext" /> and migrations. It does not create a package-owned context or select a database provider.
 /// </remarks>
-public sealed class EfCoreAuditLedgerStore : IAsiBackboneAuditLedgerStore
+public sealed class EfCoreAuditLedgerStore : IGovernanceAuditLedgerStore
 {
     private const string AppendFailedReasonCode = "asi_backbone.audit_ledger.append_failed";
     private const string AppendFailedReasonMessage =
@@ -56,25 +56,25 @@ public sealed class EfCoreAuditLedgerStore : IAsiBackboneAuditLedgerStore
         ArgumentNullException.ThrowIfNull(record);
         cancellationToken.ThrowIfCancellationRequested();
 
-        AsiBackboneAuditLedgerRecordEntity entity = ToEntity(record);
+        AuditLedgerRecordEntity entity = ToEntity(record);
 
         _ = await dbContext
-            .Set<AsiBackboneAuditLedgerRecordEntity>()
+            .Set<AuditLedgerRecordEntity>()
             .AddAsync(entity, cancellationToken)
             .ConfigureAwait(false);
 
-        foreach (AsiBackboneAuditLedgerReasonCodeEntity reasonCode in ToReasonCodeEntities(entity.Id, record.ReasonCodes))
+        foreach (AuditLedgerReasonCodeEntity reasonCode in ToReasonCodeEntities(entity.Id, record.ReasonCodes))
         {
             _ = await dbContext
-                .Set<AsiBackboneAuditLedgerReasonCodeEntity>()
+                .Set<AuditLedgerReasonCodeEntity>()
                 .AddAsync(reasonCode, cancellationToken)
                 .ConfigureAwait(false);
         }
 
-        foreach (AsiBackboneAuditLedgerMetadataEntity metadata in ToMetadataEntities(entity.Id, record.Metadata))
+        foreach (AuditLedgerMetadataEntity metadata in ToMetadataEntities(entity.Id, record.Metadata))
         {
             _ = await dbContext
-                .Set<AsiBackboneAuditLedgerMetadataEntity>()
+                .Set<AuditLedgerMetadataEntity>()
                 .AddAsync(metadata, cancellationToken)
                 .ConfigureAwait(false);
         }
@@ -109,7 +109,7 @@ public sealed class EfCoreAuditLedgerStore : IAsiBackboneAuditLedgerStore
 
         string normalizedRecordId = recordId.Trim();
 
-        AsiBackboneAuditLedgerRecordEntity? entity = await LedgerRecords()
+        AuditLedgerRecordEntity? entity = await LedgerRecords()
             .Where(record => record.RecordId == normalizedRecordId)
             .SingleOrDefaultAsync(cancellationToken)
             .ConfigureAwait(false);
@@ -126,7 +126,7 @@ public sealed class EfCoreAuditLedgerStore : IAsiBackboneAuditLedgerStore
 
         string normalizedCorrelationId = correlationId.Trim();
 
-        List<AsiBackboneAuditLedgerRecordEntity> entities = await LedgerRecords()
+        List<AuditLedgerRecordEntity> entities = await LedgerRecords()
             .Where(record => record.CorrelationId == normalizedCorrelationId)
             .OrderBy(record => record.RecordedUtc)
             .ThenBy(record => record.RecordId)
@@ -145,7 +145,7 @@ public sealed class EfCoreAuditLedgerStore : IAsiBackboneAuditLedgerStore
 
         string normalizedTraceId = traceId.Trim();
 
-        List<AsiBackboneAuditLedgerRecordEntity> entities = await LedgerRecords()
+        List<AuditLedgerRecordEntity> entities = await LedgerRecords()
             .Where(record => record.TraceId == normalizedTraceId)
             .OrderBy(record => record.RecordedUtc)
             .ThenBy(record => record.RecordId)
@@ -164,7 +164,7 @@ public sealed class EfCoreAuditLedgerStore : IAsiBackboneAuditLedgerStore
 
         string normalizedActorId = actorId.Trim();
 
-        List<AsiBackboneAuditLedgerRecordEntity> entities = await LedgerRecords()
+        List<AuditLedgerRecordEntity> entities = await LedgerRecords()
             .Where(record => record.ActorId == normalizedActorId)
             .OrderBy(record => record.RecordedUtc)
             .ThenBy(record => record.RecordId)
@@ -190,7 +190,7 @@ public sealed class EfCoreAuditLedgerStore : IAsiBackboneAuditLedgerStore
                 nameof(recordedFromUtc));
         }
 
-        List<AsiBackboneAuditLedgerRecordEntity> entities = await LedgerRecords()
+        List<AuditLedgerRecordEntity> entities = await LedgerRecords()
             .Where(record => record.RecordedUtc >= normalizedFromUtc && record.RecordedUtc <= normalizedToUtc)
             .OrderBy(record => record.RecordedUtc)
             .ThenBy(record => record.RecordId)
@@ -200,14 +200,14 @@ public sealed class EfCoreAuditLedgerStore : IAsiBackboneAuditLedgerStore
         return ToRecords(entities);
     }
 
-    private IQueryable<AsiBackboneAuditLedgerRecordEntity> LedgerRecords()
+    private IQueryable<AuditLedgerRecordEntity> LedgerRecords()
     {
-        return dbContext.Set<AsiBackboneAuditLedgerRecordEntity>().AsNoTracking();
+        return dbContext.Set<AuditLedgerRecordEntity>().AsNoTracking();
     }
 
-    private static AsiBackboneAuditLedgerRecordEntity ToEntity(AuditLedgerRecord record)
+    private static AuditLedgerRecordEntity ToEntity(AuditLedgerRecord record)
     {
-        return new AsiBackboneAuditLedgerRecordEntity
+        return new AuditLedgerRecordEntity
         {
             RecordId = record.RecordId,
             SchemaVersion = record.SchemaVersion,
@@ -255,12 +255,12 @@ public sealed class EfCoreAuditLedgerStore : IAsiBackboneAuditLedgerStore
         };
     }
 
-    private static AsiBackboneAuditLedgerReasonCodeEntity[] ToReasonCodeEntities(
+    private static AuditLedgerReasonCodeEntity[] ToReasonCodeEntities(
         Guid auditLedgerRecordId,
         IReadOnlyList<string> reasonCodes)
     {
         return [.. reasonCodes
-            .Select((reasonCode, index) => new AsiBackboneAuditLedgerReasonCodeEntity
+            .Select((reasonCode, index) => new AuditLedgerReasonCodeEntity
             {
                 AuditLedgerRecordId = auditLedgerRecordId,
                 Sequence = index,
@@ -268,12 +268,12 @@ public sealed class EfCoreAuditLedgerStore : IAsiBackboneAuditLedgerStore
             })];
     }
 
-    private static AsiBackboneAuditLedgerMetadataEntity[] ToMetadataEntities(
+    private static AuditLedgerMetadataEntity[] ToMetadataEntities(
         Guid auditLedgerRecordId,
         IReadOnlyDictionary<string, string> metadata)
     {
         return [.. metadata
-            .Select(item => new AsiBackboneAuditLedgerMetadataEntity
+            .Select(item => new AuditLedgerMetadataEntity
             {
                 AuditLedgerRecordId = auditLedgerRecordId,
                 MetadataKey = item.Key,
@@ -281,12 +281,12 @@ public sealed class EfCoreAuditLedgerStore : IAsiBackboneAuditLedgerStore
             })];
     }
 
-    private static AuditLedgerRecord[] ToRecords(IEnumerable<AsiBackboneAuditLedgerRecordEntity> entities)
+    private static AuditLedgerRecord[] ToRecords(IEnumerable<AuditLedgerRecordEntity> entities)
     {
         return [.. entities.Select(ToRecord)];
     }
 
-    private static AuditLedgerRecord ToRecord(AsiBackboneAuditLedgerRecordEntity entity)
+    private static AuditLedgerRecord ToRecord(AuditLedgerRecordEntity entity)
     {
         string[] reasonCodes = DeserializeReasonCodes(entity.ReasonCodesJson);
         ReadOnlyDictionary<string, string> metadata = DeserializeMetadata(entity.MetadataJson);
@@ -322,7 +322,7 @@ public sealed class EfCoreAuditLedgerStore : IAsiBackboneAuditLedgerStore
             entity.PolicyHash,
             metadata);
 
-        return AuditLedgerRecord.FromResidue(
+        return AuditLedgerRecord.FromDecisionReceipt(
             residue,
             entity.RecordId,
             entity.RecordedUtc,
@@ -368,7 +368,7 @@ public sealed class EfCoreAuditLedgerStore : IAsiBackboneAuditLedgerStore
         string schemaVersion,
         DateTimeOffset occurredUtc,
         string actorId,
-        AsiBackboneActorType actorType,
+        GovernanceActorType actorType,
         string? actorDisplayName,
         string operationName,
         string outcome,
@@ -391,7 +391,7 @@ public sealed class EfCoreAuditLedgerStore : IAsiBackboneAuditLedgerStore
         string? decisionStage,
         string? policyVersion,
         string? policyHash,
-        IReadOnlyDictionary<string, string> metadata) : IAsiBackboneAuditResidue
+        IReadOnlyDictionary<string, string> metadata) : IDecisionReceipt
     {
         public string EventId { get; } = eventId;
 
@@ -403,7 +403,7 @@ public sealed class EfCoreAuditLedgerStore : IAsiBackboneAuditLedgerStore
 
         public string ActorId { get; } = actorId;
 
-        public AsiBackboneActorType ActorType { get; } = actorType;
+        public GovernanceActorType ActorType { get; } = actorType;
 
         public string? ActorDisplayName { get; } = actorDisplayName;
 

@@ -20,7 +20,7 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorAllocationReviewTests
         TestPolicyContext context = CreateContext();
         int skippedEvaluationCount = 0;
         var policy = new CapturingDecisionPolicy();
-        var evaluator = new DefaultAsiBackbonePolicyEvaluator<TestPolicyContext>(
+        var evaluator = new DefaultGovernancePolicyEvaluator<TestPolicyContext>(
             [
                 new StaticConstraint(
                     ConstraintEvaluationResult.Warning(
@@ -39,11 +39,11 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorAllocationReviewTests
                             "This warning should not be evaluated.");
                     })
             ],
-            policy,
-            new AsiBackbonePolicyEvaluatorOptions
+            decisionPolicy: policy,
+            options: new GovernancePolicyOptions
             {
                 ShortCircuitOnFirstDenial = true
-            });
+            }, threatModelContributors: null, logger: null);
 
         GovernanceDecision decision = await evaluator.EvaluateAsync(context, TestContext.Current.CancellationToken);
 
@@ -71,12 +71,12 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorAllocationReviewTests
     {
         TestPolicyContext context = CreateContext();
         var policy = new CapturingDecisionPolicy();
-        var evaluator = new DefaultAsiBackbonePolicyEvaluator<TestPolicyContext>(
+        var evaluator = new DefaultGovernancePolicyEvaluator<TestPolicyContext>(
             [
                 new StaticConstraint(ConstraintEvaluationResult.Allow()),
                 new StaticConstraint(ConstraintEvaluationResult.NotApplicable())
             ],
-            policy);
+            decisionPolicy: policy, threatModelContributors: null, options: null, logger: null);
 
         GovernanceDecision decision = await evaluator.EvaluateAsync(context, TestContext.Current.CancellationToken);
 
@@ -99,7 +99,7 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorAllocationReviewTests
         };
     }
 
-    private sealed class TestPolicyContext : IAsiBackboneConstraintEvaluationContext
+    private sealed class TestPolicyContext : IGovernanceEvaluationContext
     {
         public string? CorrelationId { get; init; }
 
@@ -111,7 +111,7 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorAllocationReviewTests
             new Dictionary<string, string>(StringComparer.Ordinal);
     }
 
-    private sealed class StaticConstraint(ConstraintEvaluationResult result) : IAsiBackboneConstraint<TestPolicyContext>
+    private sealed class StaticConstraint(ConstraintEvaluationResult result) : IGovernanceConstraint<TestPolicyContext>
     {
         private readonly ConstraintEvaluationResult result = result;
 
@@ -126,7 +126,7 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorAllocationReviewTests
     }
 
     private sealed class DelegateConstraint(
-        Func<TestPolicyContext, CancellationToken, ConstraintEvaluationResult> evaluate) : IAsiBackboneConstraint<TestPolicyContext>
+        Func<TestPolicyContext, CancellationToken, ConstraintEvaluationResult> evaluate) : IGovernanceConstraint<TestPolicyContext>
     {
         private readonly Func<TestPolicyContext, CancellationToken, ConstraintEvaluationResult> evaluate = evaluate;
 
@@ -140,7 +140,7 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorAllocationReviewTests
         }
     }
 
-    private sealed class CapturingDecisionPolicy : IAsiBackboneDecisionPolicy<TestPolicyContext>
+    private sealed class CapturingDecisionPolicy : IGovernanceDecisionPolicy<TestPolicyContext>
     {
         public int ApplyCount { get; private set; }
 

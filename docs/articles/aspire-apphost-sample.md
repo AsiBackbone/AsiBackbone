@@ -47,13 +47,13 @@ The AppHost uses the Aspire SDK and hosting package through NuGet references. It
 flowchart LR
     AppHost["Aspire AppHost"] --> Api["asi-backbone-api"]
     Api --> Decision["GovernanceDecision"]
-    Api --> Audit["In-memory audit residue"]
+    Api --> Audit["In-memory decision receipt"]
     Api --> Ledger["Host-owned SQLite ledger"]
     Api --> Signing["Local-development signing"]
     Api --> Dashboard["Aspire dashboard resource and console visibility"]
 ```
 
-The AppHost sets a local SQLite connection string for the sample API and starts the governed API as an Aspire project resource. The API itself owns policy evaluation, audit residue, local-development signing, EF Core ledger persistence, and endpoint-governance middleware.
+The AppHost sets a local SQLite connection string for the sample API and starts the governed API as an Aspire project resource. The API itself owns policy evaluation, decision receipt, local-development signing, EF Core ledger persistence, and endpoint-governance middleware.
 
 ## Run locally
 

@@ -10,7 +10,7 @@ Endpoint governance development diagnostics make local failures easier to unders
 Configure endpoint governance options from the ASP.NET Core host:
 
 ```csharp
-builder.Services.Configure<AsiBackboneEndpointGovernanceOptions>(options =>
+builder.Services.Configure<EndpointGovernanceOptions>(options =>
 {
     options.EnableDevelopmentDiagnostics = builder.Environment.IsDevelopment();
     options.DevelopmentDiagnosticsDocumentationBaseUrl = "https://asibackbone.github.io/AsiBackbone/articles/";
@@ -79,12 +79,12 @@ Exact fields depend on the failing stage, configured metadata mode, and the deci
 
 ### `endpoint.policy_evaluator.missing`
 
-The endpoint has `[RequireGovernancePolicy]` or `.MarkGovernancePolicy<TPolicy>()`, but no `IAsiBackbonePolicyEvaluator<AsiBackboneConstraintEvaluationContext>` is registered.
+The endpoint has `[GovernancePolicy]` or `.MarkGovernancePolicy<TPolicy>()`, but no `IGovernancePolicyEvaluator<GovernanceEvaluationContext>` is registered.
 
 Register a host-owned evaluator:
 
 ```csharp
-builder.Services.AddSingleton<IAsiBackbonePolicyEvaluator<AsiBackboneConstraintEvaluationContext>, MyPolicyEvaluator>();
+builder.Services.AddSingleton<IGovernancePolicyEvaluator<GovernanceEvaluationContext>, MyPolicyEvaluator>();
 ```
 
 ### `endpoint.capability_validator.missing`
@@ -94,12 +94,12 @@ The endpoint has `[RequireCapabilityGrant]` or `.RequireCapabilityGrant(...)`, b
 Register a validator that checks scope, expiry, replay, actor binding, and downstream authorization for your host:
 
 ```csharp
-builder.Services.AddSingleton<IAsiBackboneEndpointCapabilityGrantValidator, MyCapabilityGrantValidator>();
+builder.Services.AddSingleton<IEndpointCapabilityGrantValidator, MyCapabilityGrantValidator>();
 ```
 
 ### `endpoint.audit_sink.missing`
 
-The endpoint requested `.EmitGovernanceAudit()` or `[EmitGovernanceAudit]`, but no `IAsiBackboneAuditSink` is registered.
+The endpoint requested `.EmitGovernanceAudit()` or `[EmitGovernanceAudit]`, but no `IDecisionReceiptSink` is registered.
 
 Register a host-owned audit sink. For local-only validation, `AsiBackbone.Storage.InMemory` can provide non-durable inspection. Production hosts should use durable host-owned persistence when records must survive restart.
 

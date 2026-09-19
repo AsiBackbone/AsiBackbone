@@ -159,12 +159,12 @@ public sealed class GovernanceArtifactPersistenceAnalyzerTests
             {
                 public sealed class AuditLedgerRecord;
 
-                public interface IAsiBackboneAuditLedgerStore
+                public interface IGovernanceAuditLedgerStore
                 {
                     ValueTask<OperationResult<AuditLedgerRecord>> AppendAsync(AuditLedgerRecord record);
                 }
 
-                public sealed class AuditLedgerStore : IAsiBackboneAuditLedgerStore
+                public sealed class AuditLedgerStore : IGovernanceAuditLedgerStore
                 {
                     public ValueTask<OperationResult<AuditLedgerRecord>> AppendAsync(AuditLedgerRecord record) => default;
                 }
@@ -199,7 +199,7 @@ public sealed class GovernanceArtifactPersistenceAnalyzerTests
             {
                 private ValueTask<GovernanceDecision> pendingDecision;
 
-                public void Execute(IAsiBackbonePolicyEvaluator evaluator)
+                public void Execute(IGovernancePolicyEvaluator evaluator)
                 {
                     pendingDecision = evaluator.EvaluateAsync();
                 }
@@ -212,7 +212,7 @@ public sealed class GovernanceArtifactPersistenceAnalyzerTests
 
             namespace AsiBackbone.Core.Evaluation
             {
-                public interface IAsiBackbonePolicyEvaluator
+                public interface IGovernancePolicyEvaluator
                 {
                     ValueTask<GovernanceDecision> EvaluateAsync();
                 }

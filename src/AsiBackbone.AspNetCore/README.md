@@ -1,8 +1,8 @@
 # AsiBackbone.AspNetCore
 
-ASP.NET Core host adapters for Accountable Systems Infrastructure governance primitives.
+ASP.NET Core host adapters for AsiBackbone governance primitives.
 
-Stable `5.x` package family. `5.2.0` is the current release for this package.
+Stable `6.x` package family. `6.0.0` is the current release for this package.
 
 This package acts as a thin web-host adapter around `AsiBackbone.Core`.
 
@@ -56,7 +56,7 @@ app.MapPost("/high-risk-action", handler)
 Controller/action attributes are also available:
 
 ```csharp
-[RequireGovernancePolicy(typeof(MyStrictPolicy))]
+[GovernancePolicy(typeof(MyStrictPolicy))]
 [RequireLiabilityHandshake]
 [RequireCapabilityGrant("robotics.execute")]
 [EmitGovernanceAudit]
@@ -66,11 +66,11 @@ public IActionResult ExecuteHighRiskAction()
 }
 ```
 
-The metadata layer is optional and ergonomic. It does not replace full manual wire-up. Hosts that attach policy metadata should register an `IAsiBackbonePolicyEvaluator<AsiBackboneConstraintEvaluationContext>`. Hosts that attach capability metadata should register an `IAsiBackboneEndpointCapabilityGrantValidator`. Hosts that request audit emission should register a host-owned `IAsiBackboneAuditSink`.
+The metadata layer is optional and ergonomic. It does not replace full manual wire-up. Hosts that attach policy metadata should register an `IGovernancePolicyEvaluator<GovernanceEvaluationContext>`. Hosts that attach capability metadata should register an `IEndpointCapabilityGrantValidator`. Hosts that request audit emission should register a host-owned `IDecisionReceiptSink`.
 
-## Hosted governance outbox drain
+## Hosted outbox drain
 
-`AddAsiBackboneGovernanceOutboxDrainWorker` registers a host-owned background worker that runs the provider-neutral Core `AsiBackboneGovernanceOutboxDrain` through dependency injection.
+`AddAsiBackboneGovernanceOutboxDrainWorker` registers a host-owned background worker that runs the provider-neutral Core `GovernanceOutboxDrain` through dependency injection.
 
 ```csharp
 using AsiBackbone.AspNetCore.DependencyInjection;
@@ -78,10 +78,10 @@ using AsiBackbone.Core.Emissions;
 using AsiBackbone.Core.Outbox;
 using AsiBackbone.Storage.InMemory.Outbox;
 
-builder.Services.AddSingleton<IAsiBackboneGovernanceOutboxStore, InMemoryGovernanceOutboxStore>();
-builder.Services.AddSingleton<IAsiBackboneGovernanceEmitter>(NoOpGovernanceEmitter.Instance);
+builder.Services.AddSingleton<IGovernanceOutboxStore, InMemoryGovernanceOutboxStore>();
+builder.Services.AddSingleton<IGovernanceEmitter>(NoOpGovernanceEmitter.Instance);
 
-builder.Services.Configure<AsiBackboneGovernanceOutboxOptions>(options =>
+builder.Services.Configure<GovernanceOutboxOptions>(options =>
 {
     options.RetryDelay = TimeSpan.FromMinutes(2);
     options.DeferredDelay = TimeSpan.FromMinutes(5);
@@ -94,13 +94,13 @@ builder.Services.AddAsiBackboneGovernanceOutboxDrainWorker(options =>
 });
 ```
 
-`AsiBackboneGovernanceOutboxOptions` controls persisted retry timing when an emitter does not supply its own `RetryAfterUtc`. `RetryDelay` applies to unexpected emitter exceptions converted to retryable failures. `DeferredDelay` applies to pending/deferred emission results without a retry-after timestamp. Both default to one minute to preserve the original drain behavior.
+`GovernanceOutboxOptions` controls persisted retry timing when an emitter does not supply its own `RetryAfterUtc`. `RetryDelay` applies to unexpected emitter exceptions converted to retryable failures. `DeferredDelay` applies to pending/deferred emission results without a retry-after timestamp. Both default to one minute to preserve the original drain behavior.
 
 The worker resolves the drain from a scoped service provider so host-owned durable stores can depend on scoped infrastructure such as EF Core `DbContext` instances. Production hosts should avoid duplicate active drain workers against the same durable outbox unless their store implements leasing, row claiming, partitioning, or provider-side idempotency.
 
 ## Request correlation and audit enrichment
 
-`IAsiBackboneHttpRequestCorrelationResolver` resolves request correlation data from the current `HttpContext` without making Core depend on ASP.NET Core types.
+`IHttpGovernanceRequestCorrelationResolver` resolves request correlation data from the current `HttpContext` without making Core depend on ASP.NET Core types.
 
 The default resolver:
 
@@ -111,7 +111,7 @@ The default resolver:
 - emits safe request metadata such as method, route pattern, endpoint display name, and route values;
 - excludes sensitive request data such as headers, query strings, request bodies, cookies, and tokens by default.
 
-Set `TrustInboundCorrelationIdHeaders` to `true` only behind a trusted ingress that removes caller-supplied values for the configured headers and writes its own correlation identifier. Opted-in values are trimmed and accepted only when printable and no longer than `AsiBackboneIdentifierLimits.MaximumLength`. Invalid values are discarded in full rather than truncated or partially sanitized. Do not enable header trust for requests received directly from untrusted callers, because doing so lets a caller choose the audit correlation key.
+Set `TrustInboundCorrelationIdHeaders` to `true` only behind a trusted ingress that removes caller-supplied values for the configured headers and writes its own correlation identifier. Opted-in values are trimmed and accepted only when printable and no longer than `GovernanceIdentifierLimits.MaximumLength`. Invalid values are discarded in full rather than truncated or partially sanitized. Do not enable header trust for requests received directly from untrusted callers, because doing so lets a caller choose the audit correlation key.
 
 Example usage:
 
@@ -119,19 +119,19 @@ Example usage:
 using AsiBackbone.AspNetCore.Correlation;
 using AsiBackbone.Core.Audit;
 
-AsiBackboneHttpRequestCorrelation correlation = correlationResolver.ResolveRequestCorrelation();
+GovernanceHttpRequestCorrelation correlation = correlationResolver.ResolveRequestCorrelation();
 
-AuditResidue residue = correlation.CreateAuditResidue(
+DecisionReceipt receipt = correlation.CreateDecisionReceipt(
     actor,
     "ApproveWidget",
     decision);
 ```
 
-Use `AsiBackboneHttpRequestCorrelation.ToEvaluationContext(...)` when a web host needs to carry the resolved correlation identifier and safe request metadata into a framework-neutral Core policy evaluation context.
+Use `GovernanceHttpRequestCorrelation.ToEvaluationContext(...)` when a web host needs to carry the resolved correlation identifier and safe request metadata into a framework-neutral Core policy evaluation context.
 
 ## HTTP result mapping
 
-`AsiBackboneHttpResultMappingExtensions` maps Core `GovernanceDecision` and `OperationResult` instances into ASP.NET Core `IResult` responses through explicit helpers.
+`GovernanceHttpResultMappingExtensions` maps Core `GovernanceDecision` and `OperationResult` instances into ASP.NET Core `IResult` responses through explicit helpers.
 
 ```csharp
 using AsiBackbone.AspNetCore.Results;

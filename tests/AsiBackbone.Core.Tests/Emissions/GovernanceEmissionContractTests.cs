@@ -33,7 +33,7 @@ public sealed class GovernanceEmissionContractTests
             });
 
         Assert.Equal("envelope-123", envelope.EnvelopeId);
-        Assert.Equal(AsiBackboneSchemaVersions.StableArtifactsV1, envelope.SchemaVersion);
+        Assert.Equal(GovernanceSchemaVersions.StableArtifactsV1, envelope.SchemaVersion);
         Assert.Equal(GovernanceEmissionEventType.Decision, envelope.EventType);
         Assert.Equal("event-123", envelope.EventId);
         Assert.Equal(new DateTimeOffset(2026, 6, 15, 14, 0, 0, TimeSpan.Zero), envelope.OccurredUtc);
@@ -50,14 +50,14 @@ public sealed class GovernanceEmissionContractTests
         Assert.Equal("envelope-123", root.GetProperty("envelopeId").GetString());
         Assert.Equal("event-123", root.GetProperty("eventId").GetString());
         Assert.Equal((int)GovernanceEmissionEventType.Decision, root.GetProperty("eventType").GetInt32());
-        Assert.Equal(AsiBackboneSchemaVersions.StableArtifactsV1, root.GetProperty("schemaVersion").GetString());
+        Assert.Equal(GovernanceSchemaVersions.StableArtifactsV1, root.GetProperty("schemaVersion").GetString());
     }
 
     /// <summary>
     /// Verifies that an audit residue envelope preserves correlation, trace, policy, and safe diagnostic telemetry.
     /// </summary>
     [Fact]
-    public void FromResiduePreservesCorrelationTracePolicyAndTelemetryFields()
+    public void FromDecisionReceiptPreservesCorrelationTracePolicyAndTelemetryFields()
     {
         var payload = GovernanceEmissionPayload.Create(
             "audit-residue",
@@ -70,8 +70,8 @@ public sealed class GovernanceEmissionContractTests
                 ["classification"] = "minimized"
             });
 
-        var residue = AuditResidue.Create(
-            AsiBackboneActorContext.Service(" service-123 "),
+        var residue = DecisionReceipt.Create(
+            GovernanceActorContext.Service(" service-123 "),
             " document.approve ",
             " Allowed ",
             eventId: " event-123 ",
@@ -92,7 +92,7 @@ public sealed class GovernanceEmissionContractTests
             gatewayExecutionId: " gateway-123 ",
             decisionStage: " DecisionEvaluated ");
 
-        var envelope = GovernanceEmissionEnvelope.FromResidue(
+        var envelope = GovernanceEmissionEnvelope.FromDecisionReceipt(
             residue,
             envelopeId: " envelope-123 ",
             payload: payload,
@@ -130,8 +130,8 @@ public sealed class GovernanceEmissionContractTests
     [Fact]
     public void FromLifecycleEventPreservesLifecycleStageAndCorrelation()
     {
-        var lifecycleEvent = AuditResidueLifecycleEvent.Create(
-            AuditResidueLifecycleStage.ExternalEmissionFailed,
+        var lifecycleEvent = DecisionReceiptLifecycleEvent.Create(
+            DecisionReceiptLifecycleStage.ExternalEmissionFailed,
             " correlation-123 ",
             auditResidueId: " residue-123 ",
             eventId: " lifecycle-123 ",
@@ -155,8 +155,8 @@ public sealed class GovernanceEmissionContractTests
         Assert.Equal("lifecycle-123", envelope.EventId);
         Assert.Equal("correlation-123", envelope.CorrelationId);
         Assert.Equal("residue-123", envelope.AuditResidueId);
-        Assert.Equal(AuditResidueLifecycleStage.ExternalEmissionFailed, envelope.LifecycleStage);
-        Assert.Equal((int)AuditResidueLifecycleStage.ExternalEmissionFailed, envelope.LifecycleStageSequence);
+        Assert.Equal(DecisionReceiptLifecycleStage.ExternalEmissionFailed, envelope.LifecycleStage);
+        Assert.Equal((int)DecisionReceiptLifecycleStage.ExternalEmissionFailed, envelope.LifecycleStageSequence);
         Assert.Equal("ExternalEmissionFailed", envelope.DecisionStage);
         Assert.Equal("trace-456", envelope.TraceId);
         Assert.Equal("governance.emit", envelope.OperationName);
@@ -247,7 +247,7 @@ public sealed class GovernanceEmissionContractTests
                 sizeBytes: -1));
     }
 
-    private sealed class CapturingGovernanceEmitter : IAsiBackboneGovernanceEmitter
+    private sealed class CapturingGovernanceEmitter : IGovernanceEmitter
     {
         public GovernanceEmissionEnvelope? LastEnvelope { get; private set; }
 

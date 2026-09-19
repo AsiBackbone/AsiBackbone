@@ -15,7 +15,7 @@ Examples include account-status changes, approval of sensitive workflow steps, p
 | Host application | Owns identity, authorization, operation validation, UI, persistence, and final execution. |
 | AsiBackbone | Evaluates the host-provided policy context and returns a governance decision. |
 | Acknowledgment layer | Presents a responsibility or risk acknowledgment when the decision requires it. |
-| Audit sink or ledger | Preserves decision residue, reason codes, policy metadata, actor context, and correlation data. |
+| Audit sink or ledger | Preserves decision receipt, reason codes, policy metadata, actor context, and correlation data. |
 
 ## Sequence
 
@@ -27,17 +27,17 @@ Requesting actor
   -> Host application: receives governance decision
 
 If denied, deferred, or escalation-recommended:
-  -> Host application persists decision residue
+  -> Host application persists decision receipt
   -> Host application returns governed outcome without execution
 
 If acknowledgment-required:
   -> Host application presents acknowledgment challenge
   -> Acknowledgment layer returns accepted or rejected response
-  -> Host application persists decision and acknowledgment residue
+  -> Host application persists decision receipt and acknowledgment record
   -> Host application executes only if accepted and host policy permits execution
 
 If allowed or warning:
-  -> Host application persists decision residue
+  -> Host application persists decision receipt
   -> Host application decides whether and how to execute the host-owned operation
 ```
 
@@ -66,4 +66,4 @@ The host can then map the `GovernanceDecision` into its own UI, API response, qu
 
 ## Adoption note
 
-Start with one administrative workflow that already needs review. Keep execution owned by the host, but route the proposed action through policy evaluation, audit residue, and acknowledgment handling first.
+Start with one administrative workflow that already needs review. Keep execution owned by the host, but route the proposed action through policy evaluation, decision receipt, and acknowledgment handling first.

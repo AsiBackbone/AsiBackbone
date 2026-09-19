@@ -17,7 +17,7 @@ public sealed class NcatAuditCompletionAdapterTests
     [Fact]
     public async Task CommittedHandoffAppendsBoundLifecycleEvent()
     {
-        InMemoryAuditResidueLifecycleStore store = new();
+        InMemoryDecisionReceiptLifecycleStore store = new();
         NcatAuditCompletionAdapter adapter = CreateAdapter(store);
 
         NcatAuditCompletionDeliveryResult result = await adapter.DeliverAsync(
@@ -54,7 +54,7 @@ public sealed class NcatAuditCompletionAdapterTests
         string sourceOutcome,
         GovernedOperationPersistenceOutcome expectedOutcome)
     {
-        NcatAuditCompletionAdapter adapter = CreateAdapter(new InMemoryAuditResidueLifecycleStore());
+        NcatAuditCompletionAdapter adapter = CreateAdapter(new InMemoryDecisionReceiptLifecycleStore());
         NcatAuditCompletionHandoff handoff = CreateCommittedHandoff() with
         {
             PersistenceOutcome = sourceOutcome,
@@ -79,7 +79,7 @@ public sealed class NcatAuditCompletionAdapterTests
     [Fact]
     public async Task CommittedHandoffWithoutManifestIsTerminal()
     {
-        NcatAuditCompletionAdapter adapter = CreateAdapter(new InMemoryAuditResidueLifecycleStore());
+        NcatAuditCompletionAdapter adapter = CreateAdapter(new InMemoryDecisionReceiptLifecycleStore());
         NcatAuditCompletionHandoff handoff = CreateCommittedHandoff() with
         {
             MutationManifestHash = null,
@@ -102,7 +102,7 @@ public sealed class NcatAuditCompletionAdapterTests
     public async Task MissingDecisionResidueDefersDelivery()
     {
         NcatAuditCompletionAdapter adapter = new(
-            new InMemoryAuditResidueLifecycleStore(),
+            new InMemoryDecisionReceiptLifecycleStore(),
             new StubResolver(null));
 
         NcatAuditCompletionDeliveryResult result = await adapter.DeliverAsync(
@@ -119,7 +119,7 @@ public sealed class NcatAuditCompletionAdapterTests
     [Fact]
     public async Task CorrelationMismatchIsTerminal()
     {
-        NcatAuditCompletionAdapter adapter = CreateAdapter(new InMemoryAuditResidueLifecycleStore());
+        NcatAuditCompletionAdapter adapter = CreateAdapter(new InMemoryDecisionReceiptLifecycleStore());
         NcatAuditCompletionHandoff handoff = CreateCommittedHandoff() with { CorrelationId = "other" };
 
         NcatAuditCompletionDeliveryResult result = await adapter.DeliverAsync(
@@ -136,7 +136,7 @@ public sealed class NcatAuditCompletionAdapterTests
     [Fact]
     public async Task DuplicateHandoffIsAcknowledgedWithoutSecondAppend()
     {
-        InMemoryAuditResidueLifecycleStore store = new();
+        InMemoryDecisionReceiptLifecycleStore store = new();
         NcatAuditCompletionAdapter adapter = CreateAdapter(store);
         NcatAuditCompletionHandoff handoff = CreateCommittedHandoff();
 
@@ -203,7 +203,7 @@ public sealed class NcatAuditCompletionAdapterTests
         string decisionAuditRecordId,
         string expectedReason)
     {
-        NcatAuditCompletionAdapter adapter = CreateAdapter(new InMemoryAuditResidueLifecycleStore());
+        NcatAuditCompletionAdapter adapter = CreateAdapter(new InMemoryDecisionReceiptLifecycleStore());
         NcatAuditCompletionHandoff handoff = CreateCommittedHandoff() with
         {
             CompletionEntryId = completionEntryId,
@@ -220,7 +220,7 @@ public sealed class NcatAuditCompletionAdapterTests
     }
 
     private static NcatAuditCompletionAdapter CreateAdapter(
-        IAsiBackboneAuditResidueLifecycleStore store,
+        IDecisionReceiptLifecycleStore store,
         NcatAuditCompletionAdapterOptions? options = null)
     {
         return new NcatAuditCompletionAdapter(store, new StubResolver(new TestAuditResidue()), options);
@@ -244,56 +244,56 @@ public sealed class NcatAuditCompletionAdapterTests
             DeliveryAttempt: 1);
     }
 
-    private sealed class StubResolver(IAsiBackboneAuditResidue? residue) : INcatDecisionResidueResolver
+    private sealed class StubResolver(IDecisionReceipt? receipt) : INcatDecisionReceiptResolver
     {
-        public ValueTask<IAsiBackboneAuditResidue?> ResolveAsync(
+        public ValueTask<IDecisionReceipt?> ResolveAsync(
             string decisionAuditRecordId,
             string? correlationId,
             CancellationToken cancellationToken = default)
         {
             cancellationToken.ThrowIfCancellationRequested();
-            return ValueTask.FromResult(residue);
+            return ValueTask.FromResult(receipt);
         }
     }
 
-    private sealed class ThrowingLifecycleStore : IAsiBackboneAuditResidueLifecycleStore
+    private sealed class ThrowingLifecycleStore : IDecisionReceiptLifecycleStore
     {
-        public ValueTask<AuditResidueLifecycleEvent> AppendAsync(
-            AuditResidueLifecycleEvent lifecycleEvent,
+        public ValueTask<DecisionReceiptLifecycleEvent> AppendAsync(
+            DecisionReceiptLifecycleEvent lifecycleEvent,
             CancellationToken cancellationToken = default)
         {
             throw new InvalidOperationException("Simulated durable-store failure.");
         }
 
-        public ValueTask<AuditResidueLifecycleEvent?> FindByEventIdAsync(
+        public ValueTask<DecisionReceiptLifecycleEvent?> FindByEventIdAsync(
             string eventId,
             CancellationToken cancellationToken = default)
         {
-            return ValueTask.FromResult<AuditResidueLifecycleEvent?>(null);
+            return ValueTask.FromResult<DecisionReceiptLifecycleEvent?>(null);
         }
 
-        public ValueTask<IReadOnlyList<AuditResidueLifecycleEvent>> FindByCorrelationIdAsync(
+        public ValueTask<IReadOnlyList<DecisionReceiptLifecycleEvent>> FindByCorrelationIdAsync(
             string correlationId,
             CancellationToken cancellationToken = default)
         {
-            return ValueTask.FromResult<IReadOnlyList<AuditResidueLifecycleEvent>>([]);
+            return ValueTask.FromResult<IReadOnlyList<DecisionReceiptLifecycleEvent>>([]);
         }
 
-        public ValueTask<IReadOnlyList<AuditResidueLifecycleEvent>> FindByAuditResidueIdAsync(
+        public ValueTask<IReadOnlyList<DecisionReceiptLifecycleEvent>> FindByAuditResidueIdAsync(
             string auditResidueId,
             CancellationToken cancellationToken = default)
         {
-            return ValueTask.FromResult<IReadOnlyList<AuditResidueLifecycleEvent>>([]);
+            return ValueTask.FromResult<IReadOnlyList<DecisionReceiptLifecycleEvent>>([]);
         }
     }
 
-    private sealed class TestAuditResidue : IAsiBackboneAuditResidue
+    private sealed class TestAuditResidue : IDecisionReceipt
     {
         public string EventId => "decision-1";
         public string? AuditResidueId => "decision-1";
         public DateTimeOffset OccurredUtc => DateTimeOffset.UtcNow;
         public string ActorId => "actor-1";
-        public AsiBackboneActorType ActorType => AsiBackboneActorType.Human;
+        public GovernanceActorType ActorType => GovernanceActorType.Human;
         public string? ActorDisplayName => "Actor";
         public string OperationName => "orders.update";
         public string Outcome => "Allowed";
