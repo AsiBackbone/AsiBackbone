@@ -148,7 +148,7 @@ var signingResult = await signingService.SignAsync(
         metadata: payload.SafeMetadata),
     cancellationToken);
 
-var signedRecord = AuditLedgerRecord.FromResidue(
+var signedRecord = AuditLedgerRecord.FromDecisionReceipt(
     receipt,
     signingHash: signingResult.Metadata.SigningHash,
     signatureKeyId: signingResult.Metadata.KeyId,

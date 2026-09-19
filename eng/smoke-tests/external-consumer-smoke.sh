@@ -315,7 +315,7 @@ internal static class SmokeHost
 
             await auditSink.WriteAsync(residue, cancellationToken).ConfigureAwait(false);
 
-            AuditLedgerRecord record = AuditLedgerRecord.FromResidue(residue);
+            AuditLedgerRecord record = AuditLedgerRecord.FromDecisionReceipt(residue);
             OperationResult<AuditLedgerRecord> appendResult = await ledgerStore
                 .AppendAsync(record, cancellationToken)
                 .ConfigureAwait(false);

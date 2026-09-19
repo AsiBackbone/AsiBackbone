@@ -539,7 +539,7 @@ public sealed class CanonicalPayloadHashingTests
             gatewayExecutionId: "gateway-1",
             decisionStage: "policy-evaluated");
 
-        return AuditLedgerRecord.FromResidue(
+        return AuditLedgerRecord.FromDecisionReceipt(
             residue,
             recordId: "record-1",
             recordedUtc: new DateTimeOffset(2026, 6, 16, 13, 0, 1, TimeSpan.Zero),

@@ -322,7 +322,7 @@ public sealed class EfCoreAuditLedgerStore : IGovernanceAuditLedgerStore
             entity.PolicyHash,
             metadata);
 
-        return AuditLedgerRecord.FromResidue(
+        return AuditLedgerRecord.FromDecisionReceipt(
             residue,
             entity.RecordId,
             entity.RecordedUtc,

@@ -406,7 +406,7 @@ internal static class StableSmokeHost
                     ["storage"] = "sqlite"
                 });
 
-            AuditLedgerRecord record = AuditLedgerRecord.FromResidue(residue);
+            AuditLedgerRecord record = AuditLedgerRecord.FromDecisionReceipt(residue);
             OperationResult<AuditLedgerRecord> appendResult = await ledgerStore
                 .AppendAsync(record, cancellationToken)
                 .ConfigureAwait(false);

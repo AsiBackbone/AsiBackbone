@@ -153,7 +153,7 @@ public sealed class AuditResidueTelemetryFieldsTests
             gatewayExecutionId: "gateway-123",
             decisionStage: "DecisionEvaluated");
 
-        var record = AuditLedgerRecord.FromResidue(
+        var record = AuditLedgerRecord.FromDecisionReceipt(
             residue,
             recordId: "record-123");
 

@@ -152,7 +152,7 @@ app.MapGet("/asi-backbone/validation", async (
 
     await auditSink.WriteAsync(receipt, cancellationToken);
 
-    AuditLedgerRecord record = AuditLedgerRecord.FromResidue(receipt);
+    AuditLedgerRecord record = AuditLedgerRecord.FromDecisionReceipt(receipt);
     await ledgerStore.AppendAsync(record, cancellationToken);
 
     return Results.Ok(new

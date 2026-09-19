@@ -57,7 +57,7 @@ public sealed class GovernanceEmissionContractTests
     /// Verifies that an audit residue envelope preserves correlation, trace, policy, and safe diagnostic telemetry.
     /// </summary>
     [Fact]
-    public void FromResiduePreservesCorrelationTracePolicyAndTelemetryFields()
+    public void FromDecisionReceiptPreservesCorrelationTracePolicyAndTelemetryFields()
     {
         var payload = GovernanceEmissionPayload.Create(
             "audit-residue",
@@ -92,7 +92,7 @@ public sealed class GovernanceEmissionContractTests
             gatewayExecutionId: " gateway-123 ",
             decisionStage: " DecisionEvaluated ");
 
-        var envelope = GovernanceEmissionEnvelope.FromResidue(
+        var envelope = GovernanceEmissionEnvelope.FromDecisionReceipt(
             residue,
             envelopeId: " envelope-123 ",
             payload: payload,

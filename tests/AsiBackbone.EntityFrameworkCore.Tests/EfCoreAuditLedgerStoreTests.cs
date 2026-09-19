@@ -207,7 +207,7 @@ public sealed class EfCoreAuditLedgerStoreTests
             policyHash: "policy-hash",
             metadata: metadata);
 
-        return AuditLedgerRecord.FromResidue(
+        return AuditLedgerRecord.FromDecisionReceipt(
             residue,
             recordId: recordId,
             recordedUtc: recordedUtc,

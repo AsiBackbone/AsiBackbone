@@ -157,7 +157,7 @@ public sealed class GovernanceArtifactSignerTests
             policyHash: "policy-hash",
             auditResidueId: "residue-1");
 
-        return AuditLedgerRecord.FromResidue(
+        return AuditLedgerRecord.FromDecisionReceipt(
             residue,
             recordId: "record-1",
             recordedUtc: new DateTimeOffset(2026, 6, 16, 12, 0, 1, TimeSpan.Zero),

@@ -29,7 +29,7 @@ public static class HostAccountabilityLifecycleEvent
         AddOptional(lifecycleMetadata, HostAccountabilityMetadataKeys.ExecutionAttemptId, executionAttemptId);
         AddOptional(lifecycleMetadata, HostAccountabilityMetadataKeys.DecisionAuditRecordId, decisionAuditRecordId);
 
-        return DecisionReceiptLifecycleEvent.FromResidue(
+        return DecisionReceiptLifecycleEvent.FromDecisionReceipt(
             DecisionReceiptLifecycleStage.GatewayExecutionStarted,
             residue,
             eventId: eventId,
@@ -55,7 +55,7 @@ public static class HostAccountabilityLifecycleEvent
         ArgumentNullException.ThrowIfNull(residue);
         ArgumentNullException.ThrowIfNull(receipt);
 
-        return DecisionReceiptLifecycleEvent.FromResidue(
+        return DecisionReceiptLifecycleEvent.FromDecisionReceipt(
             DecisionReceiptLifecycleStage.GatewayExecutionCompleted,
             residue,
             eventId: eventId,

@@ -27,7 +27,7 @@ public sealed class IAsiBackboneAuditLedgerStoreTests
             eventId: "event-123",
             correlationId: "correlation-123");
 
-        var record = AuditLedgerRecord.FromResidue(
+        var record = AuditLedgerRecord.FromDecisionReceipt(
             residue,
             recordId: "record-123");
 
@@ -171,7 +171,7 @@ public sealed class IAsiBackboneAuditLedgerStoreTests
             correlationId: correlationId,
             traceId: traceId);
 
-        return AuditLedgerRecord.FromResidue(
+        return AuditLedgerRecord.FromDecisionReceipt(
             residue,
             recordId: recordId,
             recordedUtc: recordedUtc);

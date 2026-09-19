@@ -144,17 +144,17 @@ public sealed class DecisionReceiptLifecycleEvent
     /// Creates an decision receipt lifecycle event by copying correlation context from existing decision receipt.
     /// </summary>
     /// <param name="stage">The lifecycle stage represented by this event.</param>
-    /// <param name="residue">The original decision receipt to correlate with the lifecycle event.</param>
-    /// <param name="correlationId">Optional correlation identifier override. When omitted, the residue correlation identifier is used.</param>
-    /// <param name="auditResidueId">Optional decision receipt identifier override. When omitted, the residue event identifier is used.</param>
+    /// <param name="receipt">The original decision receipt to correlate with the lifecycle event.</param>
+    /// <param name="correlationId">Optional correlation identifier override. When omitted, the receipt correlation identifier is used.</param>
+    /// <param name="auditResidueId">Optional decision receipt identifier override. When omitted, the receipt event identifier is used.</param>
     /// <param name="eventId">Optional lifecycle event identifier. When omitted, a new identifier is generated.</param>
     /// <param name="occurredUtc">Optional lifecycle timestamp. When omitted, the current UTC timestamp is used.</param>
-    /// <param name="outcome">Optional lifecycle or host-defined outcome. When omitted, the residue outcome is used.</param>
-    /// <param name="metadata">Optional host-provided lifecycle metadata merged after residue metadata.</param>
+    /// <param name="outcome">Optional lifecycle or host-defined outcome. When omitted, the receipt outcome is used.</param>
+    /// <param name="metadata">Optional host-provided lifecycle metadata merged after receipt metadata.</param>
     /// <returns>An decision receipt lifecycle event.</returns>
-    public static DecisionReceiptLifecycleEvent FromResidue(
+    public static DecisionReceiptLifecycleEvent FromDecisionReceipt(
         DecisionReceiptLifecycleStage stage,
-        IDecisionReceipt residue,
+        IDecisionReceipt receipt,
         string? correlationId = null,
         string? auditResidueId = null,
         string? eventId = null,
@@ -162,22 +162,22 @@ public sealed class DecisionReceiptLifecycleEvent
         string? outcome = null,
         IReadOnlyDictionary<string, string>? metadata = null)
     {
-        ArgumentNullException.ThrowIfNull(residue);
+        ArgumentNullException.ThrowIfNull(receipt);
 
         string? effectiveCorrelationId = string.IsNullOrWhiteSpace(correlationId)
-            ? residue.CorrelationId
+            ? receipt.CorrelationId
             : correlationId;
 
         return new DecisionReceiptLifecycleEvent(
             NormalizeIdentifier(eventId),
             stage,
             occurredUtc ?? DateTimeOffset.UtcNow,
-            effectiveCorrelationId ?? throw new ArgumentException("A lifecycle event requires a correlation identifier from the residue or an explicit override.", nameof(correlationId)),
-            string.IsNullOrWhiteSpace(auditResidueId) ? residue.EventId : auditResidueId,
-            residue.TraceId,
-            residue.OperationName,
-            string.IsNullOrWhiteSpace(outcome) ? residue.Outcome : outcome,
-            NormalizeMetadata(residue.Metadata, metadata));
+            effectiveCorrelationId ?? throw new ArgumentException("A lifecycle event requires a correlation identifier from the receipt or an explicit override.", nameof(correlationId)),
+            string.IsNullOrWhiteSpace(auditResidueId) ? receipt.EventId : auditResidueId,
+            receipt.TraceId,
+            receipt.OperationName,
+            string.IsNullOrWhiteSpace(outcome) ? receipt.Outcome : outcome,
+            NormalizeMetadata(receipt.Metadata, metadata));
     }
 
     private static string NormalizeIdentifier(string? identifier)

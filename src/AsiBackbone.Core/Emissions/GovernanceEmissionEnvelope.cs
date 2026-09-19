@@ -273,43 +273,43 @@ public sealed class GovernanceEmissionEnvelope
     }
 
     /// <summary>
-    /// Creates a provider-neutral governance emission envelope from decision receipt.
+    /// Creates a provider-neutral governance emission envelope from a decision receipt.
     /// </summary>
-    public static GovernanceEmissionEnvelope FromResidue(
-        IDecisionReceipt residue,
+    public static GovernanceEmissionEnvelope FromDecisionReceipt(
+        IDecisionReceipt receipt,
         GovernanceEmissionEventType eventType = GovernanceEmissionEventType.AuditResidue,
         string? envelopeId = null,
         DateTimeOffset? createdUtc = null,
         GovernanceEmissionPayload? payload = null,
         IReadOnlyDictionary<string, string>? metadata = null)
     {
-        ArgumentNullException.ThrowIfNull(residue);
+        ArgumentNullException.ThrowIfNull(receipt);
 
         return new GovernanceEmissionEnvelope(
             NormalizeIdentifier(envelopeId),
-            residue.SchemaVersion,
+            receipt.SchemaVersion,
             eventType,
-            residue.EventId,
-            residue.OccurredUtc,
+            receipt.EventId,
+            receipt.OccurredUtc,
             createdUtc ?? DateTimeOffset.UtcNow,
-            residue.CorrelationId,
-            residue.AuditResidueId,
+            receipt.CorrelationId,
+            receipt.AuditResidueId,
             null,
-            residue.PolicyVersion,
-            residue.PolicyHash,
-            residue.TraceId,
-            residue.SpanId,
-            residue.ParentSpanId,
-            residue.OperationName,
-            residue.Outcome,
-            residue.ActorId,
-            residue.EmitterStatus,
-            residue.EmitterProvider,
-            residue.OutboxSequence,
-            residue.GatewayExecutionId,
-            residue.DecisionStage,
+            receipt.PolicyVersion,
+            receipt.PolicyHash,
+            receipt.TraceId,
+            receipt.SpanId,
+            receipt.ParentSpanId,
+            receipt.OperationName,
+            receipt.Outcome,
+            receipt.ActorId,
+            receipt.EmitterStatus,
+            receipt.EmitterProvider,
+            receipt.OutboxSequence,
+            receipt.GatewayExecutionId,
+            receipt.DecisionStage,
             payload,
-            NormalizeMetadata(residue.Metadata, metadata));
+            NormalizeMetadata(receipt.Metadata, metadata));
     }
 
     /// <summary>

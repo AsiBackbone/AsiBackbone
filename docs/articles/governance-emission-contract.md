@@ -100,7 +100,7 @@ Provider-specific exception types, HTTP codes, SDK error objects, and backend pa
 | --- | --- |
 | #140 Durable outbox | The outbox can store `GovernanceEmissionEnvelope` values and hand them to `IGovernanceEmitter` when ready. |
 | #141 Lifecycle stages | `GovernanceEmissionEnvelope` can carry `DecisionReceiptLifecycleStage` and stable stage sequence values. |
-| #142 Decision receipt telemetry | `GovernanceEmissionEnvelope.FromResidue` copies neutral telemetry, trace, outbox, gateway, and policy fields from decision receipt. |
+| #142 Decision receipt telemetry | `GovernanceEmissionEnvelope.FromDecisionReceipt` copies neutral telemetry, trace, outbox, gateway, and policy fields from decision receipt. |
 | #144 OpenTelemetry provider | The OpenTelemetry provider should adapt this contract into spans, events, logs, metrics, and attributes without changing Core semantics. |
 | #145 Event Hubs provider | The Event Hubs provider should adapt this contract into versioned stream messages with stable message properties, outbox-safe retry behavior, and no Core Azure dependency. |
 | #146 Purview enrichment | Purview enrichment should consume minimized envelopes or summaries as optional catalog, classification, lineage, and compliance context without becoming the raw audit store. |

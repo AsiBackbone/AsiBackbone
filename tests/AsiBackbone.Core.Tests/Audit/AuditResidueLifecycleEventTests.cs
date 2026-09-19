@@ -69,7 +69,7 @@ public sealed class AuditResidueLifecycleEventTests
     /// Verifies that lifecycle events can be correlated to the original decision receipt without rewriting it.
     /// </summary>
     [Fact]
-    public void FromResidueCopiesDecisionContextWithoutRewritingOriginalResidue()
+    public void FromDecisionReceiptCopiesDecisionContextWithoutRewritingOriginalResidue()
     {
         var residue = DecisionReceipt.Create(
             GovernanceActorContext.Human("user-123", "Chris"),
@@ -84,7 +84,7 @@ public sealed class AuditResidueLifecycleEventTests
                 [" workflow "] = " document-approval "
             });
 
-        var lifecycleEvent = DecisionReceiptLifecycleEvent.FromResidue(
+        var lifecycleEvent = DecisionReceiptLifecycleEvent.FromDecisionReceipt(
             DecisionReceiptLifecycleStage.AcknowledgmentCompleted,
             residue,
             eventId: "lifecycle-event-123",
@@ -178,7 +178,7 @@ public sealed class AuditResidueLifecycleEventTests
     /// Verifies that creating a lifecycle event from residue requires either residue correlation or an explicit correlation override.
     /// </summary>
     [Fact]
-    public void FromResidueRequiresCorrelationWhenResidueDoesNotContainOne()
+    public void FromDecisionReceiptRequiresCorrelationWhenResidueDoesNotContainOne()
     {
         var residue = DecisionReceipt.Create(
             GovernanceActorContext.System,
@@ -187,11 +187,11 @@ public sealed class AuditResidueLifecycleEventTests
             eventId: "audit-residue-123");
 
         _ = Assert.Throws<ArgumentException>(() =>
-            DecisionReceiptLifecycleEvent.FromResidue(
+            DecisionReceiptLifecycleEvent.FromDecisionReceipt(
                 DecisionReceiptLifecycleStage.DecisionEvaluated,
                 residue));
 
-        var lifecycleEvent = DecisionReceiptLifecycleEvent.FromResidue(
+        var lifecycleEvent = DecisionReceiptLifecycleEvent.FromDecisionReceipt(
             DecisionReceiptLifecycleStage.DecisionEvaluated,
             residue,
             correlationId: "correlation-override");

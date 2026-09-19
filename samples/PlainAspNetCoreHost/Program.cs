@@ -116,7 +116,7 @@ app.MapGet("/sample/decision", async (
 
     await auditSink.WriteAsync(receipt, cancellationToken).ConfigureAwait(false);
 
-    var unsignedRecord = AuditLedgerRecord.FromResidue(receipt);
+    var unsignedRecord = AuditLedgerRecord.FromDecisionReceipt(receipt);
     CanonicalPayload canonicalPayload = CanonicalPayloadBuilder.ForAuditLedgerRecord(unsignedRecord);
     CanonicalPayloadHash canonicalHash = CanonicalPayloadHasher.ComputeHash(canonicalPayload);
     // CreateSigningRequest supplies the version 1 signature input, which binds the canonical descriptors, hash, and any
@@ -141,7 +141,7 @@ app.MapGet("/sample/decision", async (
             cancellationToken)
         .ConfigureAwait(false);
 
-    var record = AuditLedgerRecord.FromResidue(
+    var record = AuditLedgerRecord.FromDecisionReceipt(
         receipt,
         recordId: unsignedRecord.RecordId,
         recordedUtc: unsignedRecord.RecordedUtc,

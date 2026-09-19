@@ -61,7 +61,7 @@ public sealed class GovernanceEmissionBranchTests
     /// Tests that when creating a governance emission envelope from an audit residue, if the caller-supplied metadata contains keys that overlap with the residue's metadata, the caller's values take precedence in the resulting envelope's metadata.
     /// </summary>
     [Fact]
-    public void FromResidueUsesCallerMetadataWhenKeysOverlapResidueMetadata()
+    public void FromDecisionReceiptUsesCallerMetadataWhenKeysOverlapResidueMetadata()
     {
         var residue = DecisionReceipt.Create(
             GovernanceActorContext.Service("service-123"),
@@ -76,7 +76,7 @@ public sealed class GovernanceEmissionBranchTests
             },
             auditResidueId: "residue-123");
 
-        var envelope = GovernanceEmissionEnvelope.FromResidue(
+        var envelope = GovernanceEmissionEnvelope.FromDecisionReceipt(
             residue,
             metadata: new Dictionary<string, string>
             {

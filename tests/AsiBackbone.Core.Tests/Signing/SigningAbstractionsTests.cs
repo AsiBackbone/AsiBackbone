@@ -128,7 +128,7 @@ public sealed class SigningAbstractionsTests
             policyVersion: "policy-v1",
             policyHash: "policy-hash");
 
-        var record = AuditLedgerRecord.FromResidue(
+        var record = AuditLedgerRecord.FromDecisionReceipt(
             residue,
             capabilityTokenId: " capability-token-1 ",
             recordHash: " record-hash ",

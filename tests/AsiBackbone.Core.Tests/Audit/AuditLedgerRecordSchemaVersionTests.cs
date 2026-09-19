@@ -17,9 +17,9 @@ public sealed class AuditLedgerRecordSchemaVersionTests
     /// Verifies that audit ledger records default to the initial stable schema version and serialize it explicitly.
     /// </summary>
     [Fact]
-    public void FromResidueDefaultsAndSerializesStableSchemaVersion()
+    public void FromDecisionReceiptDefaultsAndSerializesStableSchemaVersion()
     {
-        var record = AuditLedgerRecord.FromResidue(CreateValidResidue());
+        var record = AuditLedgerRecord.FromDecisionReceipt(CreateValidResidue());
 
         Assert.Equal(GovernanceSchemaVersions.StableArtifactsV1, record.SchemaVersion);
         Assert.Equal(GovernanceSchemaVersions.StableArtifactsV1, ReadSerializedSchemaVersion(record));
@@ -29,9 +29,9 @@ public sealed class AuditLedgerRecordSchemaVersionTests
     /// Verifies that audit ledger records preserve an explicit schema version and serialize it explicitly.
     /// </summary>
     [Fact]
-    public void FromResiduePreservesAndSerializesExplicitSchemaVersion()
+    public void FromDecisionReceiptPreservesAndSerializesExplicitSchemaVersion()
     {
-        var record = AuditLedgerRecord.FromResidue(
+        var record = AuditLedgerRecord.FromDecisionReceipt(
             CreateValidResidue(),
             schemaVersion: " 1.1-test ");
 

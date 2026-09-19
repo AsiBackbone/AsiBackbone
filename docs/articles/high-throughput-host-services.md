@@ -109,7 +109,7 @@ public async ValueTask WriteAsync(
     IDecisionReceipt receipt,
     CancellationToken cancellationToken = default)
 {
-    AuditRecord record = AuditRecord.FromResidue(receipt);
+    AuditRecord record = AuditRecord.FromDecisionReceipt(receipt);
 
     await _db.AuditRecords
         .AddAsync(record, cancellationToken)

@@ -153,7 +153,7 @@ public sealed class EfCoreAuditLedgerStoreBranchTests
                 ["branch"] = "true",
             });
 
-        return AuditLedgerRecord.FromResidue(
+        return AuditLedgerRecord.FromDecisionReceipt(
             residue,
             recordId: recordId,
             recordedUtc: new DateTimeOffset(2026, 6, 1, 10, 0, 0, TimeSpan.Zero));

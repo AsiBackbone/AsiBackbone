@@ -263,3 +263,21 @@ The inventory reviews 232 public type entries across all ten managed package bas
 ## Compatibility boundary
 
 These managed API changes rename types and update receipt diagnostic wording. The default validation label on GovernanceDecisionContract.VerifyDecisionReceipt (formerly VerifyAuditResidue) is now "Decision receipt". Package IDs, namespaces, registration method names, protocol member names, JSON keys, schema versions, canonical artifact tags, signing payloads, diagnostic IDs/host opt-in markers, and EF table/column names retain their established contracts. In particular, AuditResidueId and its related members (DecisionReceiptBuilder.WithAuditResidueId, FindByAuditResidueIdAsync, and the OpenTelemetry AuditResidueId attribute constant) remain protocol member names because the identifier is persisted and serialized. `OpenTelemetryGovernanceInstrumentation.AuditResidueCreatedEventName` likewise retains the emitted value `asibackbone.audit_residue.created` so existing dashboards, alerts, and queries remain compatible. Helper methods that operate on decision receipts were renamed in 6.0 (see [Helper member renames](upgrade-500-to-600.md#helper-member-renames)); renaming a receipt type does not rewrite stored evidence or signed bytes. Historical release/migration records retain 5.x type names.
+
+### Planned 6.x deprecations
+
+The retained `AuditResidue` CLR names are planned for deprecation in a later 6.x
+release. That release would add decision-receipt aliases, mark the current names
+obsolete under an ASIB diagnostic ID, and remove them in 7.0:
+
+- `CanonicalArtifactTypes.AuditResidue` and `AuditResidueLifecycleEvent`
+- `GovernanceEmissionEventType.AuditResidue`
+- `AuditResidueId` and its related members
+- `OpenTelemetryGovernanceInstrumentation.AuditResidueCreatedEventName`
+
+Only the CLR names are affected. Serialized and emitted values stay permanent:
+the `asibackbone.audit-residue` and `asibackbone.audit-residue-lifecycle-event`
+artifact tags, the `auditResidueId` payload key, EF column names, enum value
+`500`, and the `asibackbone.audit_residue.created` event name. Signed bytes,
+stored evidence, and telemetry queries remain valid. The 6.0 names are
+supported until then.

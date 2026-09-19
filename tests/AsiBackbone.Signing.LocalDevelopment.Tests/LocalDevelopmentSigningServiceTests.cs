@@ -142,7 +142,7 @@ public sealed class LocalDevelopmentSigningServiceTests
             correlationId: "correlation-1",
             policyVersion: "policy-v1",
             policyHash: "policy-hash");
-        var record = AuditLedgerRecord.FromResidue(
+        var record = AuditLedgerRecord.FromDecisionReceipt(
             residue,
             recordId: "record-1",
             recordedUtc: new DateTimeOffset(2026, 6, 16, 10, 0, 1, TimeSpan.Zero));
@@ -279,7 +279,7 @@ public sealed class LocalDevelopmentSigningServiceTests
             policyVersion: "policy-v1",
             policyHash: "policy-hash");
 
-        return AuditLedgerRecord.FromResidue(
+        return AuditLedgerRecord.FromDecisionReceipt(
             residue,
             recordId: "record-1",
             recordedUtc: new DateTimeOffset(2026, 9, 18, 10, 0, 1, TimeSpan.Zero));

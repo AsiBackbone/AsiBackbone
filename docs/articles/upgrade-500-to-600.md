@@ -130,6 +130,9 @@ signed bytes, JSON keys, and EF table and column names are unchanged.
 | `AsiBackboneAuditSinkContract.CreateAuditResidue()` | `DecisionReceiptSinkContract.CreateDecisionReceipt()` |
 | `AsiBackboneAuditSinkContract.CreateAuditSink()` | `DecisionReceiptSinkContract.CreateDecisionReceiptSink()` |
 | `AsiBackboneAuditSinkContract.VerifyAuditSinkAcceptsValidResidueAsync()` | `DecisionReceiptSinkContract.VerifyDecisionReceiptSinkAcceptsValidReceiptAsync()` |
+| `AuditLedgerRecord.FromResidue` | `FromDecisionReceipt` |
+| `DecisionReceiptLifecycleEvent.FromResidue` | `FromDecisionReceipt` |
+| `GovernanceEmissionEnvelope.FromResidue` | `FromDecisionReceipt` |
 | `RequireGovernancePolicyAttribute` / `[RequireGovernancePolicy(...)]` | `GovernancePolicyAttribute` / `[GovernancePolicy(...)]` |
 
 Contract-test fixtures derived from `DecisionReceiptSinkContract` must rename
@@ -140,8 +143,8 @@ the contract verification method must use
 
 The public `IDecisionReceipt` parameter on `ForDecisionReceipt`,
 `CreateUnsignedDecisionReceipt`, `CreateSigningReadyDecisionReceipt`,
-`SignDecisionReceiptAsync`, and `VerifyDecisionReceipt` is named `receipt` in
-6.0. Named-argument callers must update `residue:` to `receipt:`.
+`SignDecisionReceiptAsync`, `VerifyDecisionReceipt`, and the three
+`FromDecisionReceipt` factories is named `receipt` in 6.0. Named-argument callers must update `residue:` to `receipt:`.
 
 Protocol and persisted names remain unchanged: the `AuditResidueId` member
 family, `CanonicalArtifactTypes.AuditResidue`, and
