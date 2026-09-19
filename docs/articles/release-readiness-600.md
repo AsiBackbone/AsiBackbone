@@ -40,7 +40,7 @@ commit.
 - [x] Template fallback package references use `6.0.0`.
 - [x] NuGet lock files reference `6.0.0` for in-repository projects and restore
   in locked mode.
-- [ ] Package validation compares `6.0.0` against the configured
+- [x] Package validation compares `6.0.0` against the configured
   `AsiBackbonePackageValidationBaselineVersion`, with every intentional break
   recorded as an exact suppression. The baseline remains `5.1.0`, the latest
   published package family; `5.2.0` was not published and therefore cannot be a
@@ -48,33 +48,33 @@ commit.
   development stage, such as the policy-evaluator builder, is covered by the
   reviewed public API baseline and documented in the migration guide rather
   than detected by NuGet package validation.
-- [ ] Public API baselines are regenerated and reviewed.
-- [ ] `CHANGELOG.md` and release notes describe the same change set and
+- [x] Public API baselines are regenerated and reviewed.
+- [x] `CHANGELOG.md` and release notes describe the same change set and
   compatibility boundary.
-- [ ] Evergreen documentation identifies `6.0.0` as the current release without
+- [x] Evergreen documentation identifies `6.0.0` as the current release without
   rewriting historical release records.
 
 ## Required validation before tag
 
-- [ ] Version consistency passes for `6.0.0` and `v6.0.0`.
-- [ ] Locked restore succeeds using the repository SDK and package configuration.
-- [ ] Debug and Release solution builds succeed with warnings treated as errors.
-- [ ] `dotnet format --verify-no-changes` succeeds.
-- [ ] All tests pass, including the signature-input binding and use-store replay
+- [x] Version consistency passes for `6.0.0` and `v6.0.0`.
+- [x] Locked restore succeeds using the repository SDK and package configuration.
+- [x] Debug and Release solution builds succeed with warnings treated as errors.
+- [x] `dotnet format --verify-no-changes` succeeds.
+- [x] All tests pass, including the signature-input binding and use-store replay
   tests.
-- [ ] Public API baseline and package-validation checks pass.
-- [ ] XML-documentation inventory and enforcement checks pass.
-- [ ] Documentation continuity, links, and release-claim validation pass.
-- [ ] DocFX site generation succeeds with no release-blocking warnings.
-- [ ] Package creation succeeds for the complete publishable package set.
-- [ ] Package IDs, versions, dependencies, repository metadata, symbols, and
+- [x] Public API baseline and package-validation checks pass.
+- [x] XML-documentation inventory and enforcement checks pass.
+- [x] Documentation continuity, links, and release-claim validation pass.
+- [x] DocFX site generation succeeds with no release-blocking warnings.
+- [x] Package creation succeeds for the complete publishable package set.
+- [x] Package IDs, versions, dependencies, repository metadata, symbols, and
   README content are correct.
-- [ ] Package SBOM generation succeeds.
-- [ ] Template, external-consumer, and stable-package smoke tests succeed.
+- [x] Package SBOM generation succeeds.
+- [x] Template, external-consumer, and stable-package smoke tests succeed.
 - [ ] CodeQL and dependency review report no blocking findings.
 - [ ] Required actionlint/Zizmor, workflow-security, OWASP Dependency-Check, and
   related repository checks have no unexplained blocking findings.
-- [ ] No package-author-signing claim is made for unsigned project packages.
+- [x] No package-author-signing claim is made for unsigned project packages.
 
 ## Major-release checks
 
