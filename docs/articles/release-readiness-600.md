@@ -71,8 +71,8 @@ commit.
   README content are correct.
 - [x] Package SBOM generation succeeds.
 - [x] Template, external-consumer, and stable-package smoke tests succeed.
-- [ ] CodeQL and dependency review report no blocking findings.
-- [ ] Required actionlint/Zizmor, workflow-security, OWASP Dependency-Check, and
+- [x] CodeQL and dependency review report no blocking findings.
+- [x] Required actionlint/Zizmor, workflow-security, OWASP Dependency-Check, and
   related repository checks have no unexplained blocking findings.
 - [x] No package-author-signing claim is made for unsigned project packages.
 
