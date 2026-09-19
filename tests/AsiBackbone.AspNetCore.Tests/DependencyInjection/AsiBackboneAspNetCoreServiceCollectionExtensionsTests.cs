@@ -288,10 +288,12 @@ public sealed class AsiBackboneAspNetCoreServiceCollectionExtensionsTests
     {
         ServiceCollection services = new();
 
-        InvalidOperationException exception = Assert.Throws<InvalidOperationException>(() =>
-            services.AddAsiBackboneAspNetCore(options => options.CorrelationIdHeaderName = headerName!));
+        _ = services.AddAsiBackboneAspNetCore(options => options.CorrelationIdHeaderName = headerName!);
 
-        Assert.Contains("correlation identifier header name", exception.Message, StringComparison.Ordinal);
+        OptionsValidationException exception = Assert.Throws<OptionsValidationException>(() =>
+            ResolveOptions<AspNetCoreGovernanceOptions>(services));
+
+        Assert.Contains("ASP.NET Core integration options", exception.Message, StringComparison.Ordinal);
     }
 
     /// <summary>

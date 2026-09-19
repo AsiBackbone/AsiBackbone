@@ -234,10 +234,15 @@ public sealed class AsiBackboneGovernanceOutboxDrainHostedServiceTests
     {
         ServiceCollection services = new();
 
-        InvalidOperationException exception = Assert.Throws<InvalidOperationException>(() =>
-            services.AddAsiBackboneGovernanceOutboxDrainWorker(options => options.BatchSize = batchSize));
+        _ = services.AddAsiBackboneGovernanceOutboxDrainWorker(options => options.BatchSize = batchSize);
 
-        Assert.Contains("batch size", exception.Message, StringComparison.Ordinal);
+        OptionsValidationException exception = Assert.Throws<OptionsValidationException>(() =>
+        {
+            using ServiceProvider provider = services.BuildServiceProvider();
+            _ = provider.GetRequiredService<IOptions<GovernanceOutboxDrainWorkerOptions>>().Value;
+        });
+
+        Assert.Contains("Governance outbox drain worker options", exception.Message, StringComparison.Ordinal);
     }
 
     private static ServiceProvider BuildProvider(

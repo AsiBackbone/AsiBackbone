@@ -41,10 +41,6 @@ public static class AsiBackboneAspNetCoreServiceCollectionExtensions
         ArgumentNullException.ThrowIfNull(services);
         ArgumentNullException.ThrowIfNull(configure);
 
-        AspNetCoreGovernanceOptions options = new();
-        configure(options);
-        options.Validate();
-
         _ = services.AddOptions<AspNetCoreGovernanceOptions>()
             .Configure(configure)
             .Validate(static options =>
@@ -174,10 +170,6 @@ public static class AsiBackboneAspNetCoreServiceCollectionExtensions
     {
         ArgumentNullException.ThrowIfNull(services);
         ArgumentNullException.ThrowIfNull(configure);
-
-        GovernanceOutboxDrainWorkerOptions options = new();
-        configure(options);
-        options.Validate();
 
         _ = services.AddOptions<GovernanceOutboxDrainWorkerOptions>()
             .Configure(configure)
