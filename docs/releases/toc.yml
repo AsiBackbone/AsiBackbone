@@ -3,14 +3,10 @@
 
 - name: Current Release
   items:
-    - name: 6.0.0 Release Notes
-      href: ../articles/release-notes-600.md
-    - name: 6.0.0 Consumer Verification Guide
-      href: ../articles/consumer-verification-600.md
-    - name: Upgrade from 5.x to 6.0
-      href: ../articles/upgrade-500-to-600.md
-    - name: 6.0 Public API Naming Convention
-      href: ../articles/public-api-naming-600.md
+    - name: 7.0.0 Release Notes
+      href: ../articles/release-notes-700.md
+    - name: Upgrade from 6.x to 7.0
+      href: ../articles/upgrade-600-to-700.md
     - name: API Compatibility and SemVer
       href: ../articles/api-compatibility-and-semver.md
     - name: Schema Versioning
@@ -24,6 +20,17 @@
       href: https://github.com/AsiBackbone/AsiBackbone/blob/main/CHANGELOG.md
     - name: "Upgrade Guide: 1.0.0 to 1.1.0"
       href: ../articles/upgrade-100-to-110.md
+
+- name: 6.0.0 Archive
+  items:
+    - name: 6.0.0 Release Notes
+      href: ../articles/release-notes-600.md
+    - name: 6.0.0 Consumer Verification Guide
+      href: ../articles/consumer-verification-600.md
+    - name: Upgrade from 5.x to 6.0
+      href: ../articles/upgrade-500-to-600.md
+    - name: 6.0 Public API Naming Convention
+      href: ../articles/public-api-naming-600.md
 
 - name: 5.2.0 Archive
   items:

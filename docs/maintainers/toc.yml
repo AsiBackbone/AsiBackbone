@@ -1,7 +1,7 @@
 - name: Maintainer & Quality Evidence
   href: index.md
 
-- name: Current Release Evidence
+- name: Latest Completed Release Evidence
   items:
     - name: 6.0.0 Release Readiness Record
       href: ../articles/release-readiness-600.md
