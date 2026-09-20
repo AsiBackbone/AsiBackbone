@@ -126,12 +126,11 @@ public sealed class GovernanceOutboxDrainClaimSafetyTests
     [Fact]
     public async Task DrainAsyncReleasesClaimWhenCancellationOccursDuringClaimDeadLettering()
     {
+        using var cancellationTokenSource = new CancellationTokenSource();
         var store = new RecordingClaimStore(availableEntryCount: 1, claimAttemptCount: 6)
         {
-            ThrowOnMarkClaimDeadLettered = true
+            CancelWhenMarkingDeadLettered = cancellationTokenSource
         };
-        using var cancellationTokenSource = new CancellationTokenSource();
-        cancellationTokenSource.Cancel();
 
         var drain = new GovernanceOutboxDrain(
             store,
@@ -315,7 +314,7 @@ public sealed class GovernanceOutboxDrainClaimSafetyTests
 
         public bool ThrowOnMarkClaimDelivered { get; set; }
 
-        public bool ThrowOnMarkClaimDeadLettered { get; set; }
+        public CancellationTokenSource? CancelWhenMarkingDeadLettered { get; set; }
 
         public List<int> PendingClaimMaxCounts { get; } = [];
 
@@ -383,9 +382,10 @@ public sealed class GovernanceOutboxDrainClaimSafetyTests
             string? deadLetterReason = null,
             CancellationToken cancellationToken = default)
         {
-            if (ThrowOnMarkClaimDeadLettered && cancellationToken.IsCancellationRequested)
+            if (CancelWhenMarkingDeadLettered is { } cancellationTokenSource)
             {
-                throw new OperationCanceledException(cancellationToken);
+                cancellationTokenSource.Cancel();
+                cancellationToken.ThrowIfCancellationRequested();
             }
 
             DeadLetteredCount++;

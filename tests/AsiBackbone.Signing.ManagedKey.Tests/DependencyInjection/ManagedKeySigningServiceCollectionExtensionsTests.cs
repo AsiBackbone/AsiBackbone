@@ -5,8 +5,21 @@ using Xunit;
 namespace AsiBackbone.Signing.ManagedKey.Tests.DependencyInjection;
 
 /// <summary>
+/// Prevents tests that mutate process-wide environment variables from overlapping other test collections.
+/// </summary>
+[CollectionDefinition(Name, DisableParallelization = true)]
+public sealed class EnvironmentVariableTestGroup
+{
+    /// <summary>
+    /// The xUnit collection name used by tests that mutate process-wide environment variables.
+    /// </summary>
+    public const string Name = "Environment variable tests";
+}
+
+/// <summary>
 /// Unit tests for <see cref="ManagedKeySigningServiceCollectionExtensions" /> registration overloads.
 /// </summary>
+[Collection(EnvironmentVariableTestGroup.Name)]
 public sealed class ManagedKeySigningServiceCollectionExtensionsTests
 {
     private static readonly object EnvironmentMutationLock = new();
@@ -102,12 +115,14 @@ public sealed class ManagedKeySigningServiceCollectionExtensionsTests
 
         ServiceCollection services = new();
         _ = services.AddSingleton<IGovernanceSignatureVerificationService>(new StubVerificationService());
+        _ = services.AddSingleton<IManagedKeySigningClient>(new StubManagedKeySigningClient());
 
         IServiceCollection result = services.AddAsiBackboneManagedKeySigning(ConfigureValidOptions);
 
         Assert.Same(services, result);
         using ServiceProvider provider = services.BuildServiceProvider();
         Assert.NotNull(provider.GetRequiredService<IGovernanceSignatureVerificationService>());
+        Assert.NotNull(provider.GetRequiredService<ManagedKeySigningService>());
     }
 
     /// <summary>
@@ -275,24 +290,46 @@ public sealed class ManagedKeySigningServiceCollectionExtensionsTests
 
     private sealed class EnvironmentVariableScope : IDisposable
     {
-        private readonly string? originalDotnetEnvironment = Environment.GetEnvironmentVariable("DOTNET_ENVIRONMENT");
-        private readonly string? originalAspNetEnvironment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
+        private readonly string? originalDotnetEnvironment;
+        private readonly string? originalAspNetEnvironment;
+        private bool lockHeld;
 
         public EnvironmentVariableScope(string environmentName)
         {
-            lock (EnvironmentMutationLock)
+            Monitor.Enter(EnvironmentMutationLock);
+            lockHeld = true;
+
+            try
             {
+                originalDotnetEnvironment = Environment.GetEnvironmentVariable("DOTNET_ENVIRONMENT");
+                originalAspNetEnvironment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
                 Environment.SetEnvironmentVariable("DOTNET_ENVIRONMENT", environmentName);
                 Environment.SetEnvironmentVariable("ASPNETCORE_ENVIRONMENT", null);
+            }
+            catch
+            {
+                lockHeld = false;
+                Monitor.Exit(EnvironmentMutationLock);
+                throw;
             }
         }
 
         public void Dispose()
         {
-            lock (EnvironmentMutationLock)
+            if (!lockHeld)
+            {
+                return;
+            }
+
+            try
             {
                 Environment.SetEnvironmentVariable("DOTNET_ENVIRONMENT", originalDotnetEnvironment);
                 Environment.SetEnvironmentVariable("ASPNETCORE_ENVIRONMENT", originalAspNetEnvironment);
+            }
+            finally
+            {
+                lockHeld = false;
+                Monitor.Exit(EnvironmentMutationLock);
             }
         }
     }
