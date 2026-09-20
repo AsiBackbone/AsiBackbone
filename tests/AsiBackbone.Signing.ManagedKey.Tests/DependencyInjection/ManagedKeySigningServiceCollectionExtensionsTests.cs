@@ -9,6 +9,8 @@ namespace AsiBackbone.Signing.ManagedKey.Tests.DependencyInjection;
 /// </summary>
 public sealed class ManagedKeySigningServiceCollectionExtensionsTests
 {
+    private static readonly object EnvironmentMutationLock = new();
+
     /// <summary>
     /// Verifies production registration with a client factory.
     /// </summary>
@@ -73,29 +75,17 @@ public sealed class ManagedKeySigningServiceCollectionExtensionsTests
     [Fact]
     public void ProductionRegistrationRequiresVerificationService()
     {
-        string? originalDotnetEnvironment = Environment.GetEnvironmentVariable("DOTNET_ENVIRONMENT");
-        string? originalAspNetEnvironment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
+        using var scope = new EnvironmentVariableScope("Production");
 
-        try
-        {
-            Environment.SetEnvironmentVariable("DOTNET_ENVIRONMENT", "Production");
-            Environment.SetEnvironmentVariable("ASPNETCORE_ENVIRONMENT", null);
+        ServiceCollection services = new();
+        _ = services.AddSingleton<IManagedKeySigningClient>(new StubManagedKeySigningClient());
+        _ = services.AddAsiBackboneManagedKeySigning(ConfigureValidOptions);
 
-            ServiceCollection services = new();
-            _ = services.AddSingleton<IManagedKeySigningClient>(new StubManagedKeySigningClient());
-            _ = services.AddAsiBackboneManagedKeySigning(ConfigureValidOptions);
+        using ServiceProvider provider = services.BuildServiceProvider();
+        InvalidOperationException exception = Assert.Throws<InvalidOperationException>(() =>
+            _ = provider.GetRequiredService<ManagedKeySigningService>());
 
-            using ServiceProvider provider = services.BuildServiceProvider();
-            InvalidOperationException exception = Assert.Throws<InvalidOperationException>(() =>
-                _ = provider.GetRequiredService<ManagedKeySigningService>());
-
-            Assert.Contains("IGovernanceSignatureVerificationService", exception.Message, StringComparison.Ordinal);
-        }
-        finally
-        {
-            Environment.SetEnvironmentVariable("DOTNET_ENVIRONMENT", originalDotnetEnvironment);
-            Environment.SetEnvironmentVariable("ASPNETCORE_ENVIRONMENT", originalAspNetEnvironment);
-        }
+        Assert.Contains("IGovernanceSignatureVerificationService", exception.Message, StringComparison.Ordinal);
     }
 
     /// <summary>
@@ -104,28 +94,16 @@ public sealed class ManagedKeySigningServiceCollectionExtensionsTests
     [Fact]
     public void ProductionRegistrationAllowsVerificationService()
     {
-        string? originalDotnetEnvironment = Environment.GetEnvironmentVariable("DOTNET_ENVIRONMENT");
-        string? originalAspNetEnvironment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
+        using var scope = new EnvironmentVariableScope("Production");
 
-        try
-        {
-            Environment.SetEnvironmentVariable("DOTNET_ENVIRONMENT", "Production");
-            Environment.SetEnvironmentVariable("ASPNETCORE_ENVIRONMENT", null);
+        ServiceCollection services = new();
+        _ = services.AddSingleton<IGovernanceSignatureVerificationService>(new StubVerificationService());
 
-            ServiceCollection services = new();
-            _ = services.AddSingleton<IGovernanceSignatureVerificationService>(new StubVerificationService());
+        IServiceCollection result = services.AddAsiBackboneManagedKeySigning(ConfigureValidOptions);
 
-            IServiceCollection result = services.AddAsiBackboneManagedKeySigning(ConfigureValidOptions);
-
-            Assert.Same(services, result);
-            using ServiceProvider provider = services.BuildServiceProvider();
-            Assert.NotNull(provider.GetRequiredService<IGovernanceSignatureVerificationService>());
-        }
-        finally
-        {
-            Environment.SetEnvironmentVariable("DOTNET_ENVIRONMENT", originalDotnetEnvironment);
-            Environment.SetEnvironmentVariable("ASPNETCORE_ENVIRONMENT", originalAspNetEnvironment);
-        }
+        Assert.Same(services, result);
+        using ServiceProvider provider = services.BuildServiceProvider();
+        Assert.NotNull(provider.GetRequiredService<IGovernanceSignatureVerificationService>());
     }
 
     /// <summary>
@@ -282,6 +260,30 @@ public sealed class ManagedKeySigningServiceCollectionExtensionsTests
             CancellationToken cancellationToken = default)
         {
             return ValueTask.FromResult(SignatureVerificationResult.Verified());
+        }
+    }
+
+    private sealed class EnvironmentVariableScope : IDisposable
+    {
+        private readonly string? originalDotnetEnvironment = Environment.GetEnvironmentVariable("DOTNET_ENVIRONMENT");
+        private readonly string? originalAspNetEnvironment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
+
+        public EnvironmentVariableScope(string environmentName)
+        {
+            lock (EnvironmentMutationLock)
+            {
+                Environment.SetEnvironmentVariable("DOTNET_ENVIRONMENT", environmentName);
+                Environment.SetEnvironmentVariable("ASPNETCORE_ENVIRONMENT", null);
+            }
+        }
+
+        public void Dispose()
+        {
+            lock (EnvironmentMutationLock)
+            {
+                Environment.SetEnvironmentVariable("DOTNET_ENVIRONMENT", originalDotnetEnvironment);
+                Environment.SetEnvironmentVariable("ASPNETCORE_ENVIRONMENT", originalAspNetEnvironment);
+            }
         }
     }
 }

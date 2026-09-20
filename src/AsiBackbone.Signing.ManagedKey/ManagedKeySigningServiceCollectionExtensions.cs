@@ -107,15 +107,15 @@ public static class ManagedKeySigningServiceCollectionExtensions
     {
         _ = services.AddSingleton(options);
         _ = services.AddSingleton(clientFactory);
-        _ = services.AddSingleton<ManagedKeySigningService>(serviceProvider =>
+        _ = services.AddSingleton(provider =>
         {
-            ThrowIfProductionWithoutVerification(serviceProvider);
+            ThrowIfProductionWithoutVerification(provider);
             return new ManagedKeySigningService(
-                serviceProvider.GetRequiredService<ManagedKeySigningOptions>(),
-                serviceProvider.GetRequiredService<IManagedKeySigningClient>());
+                provider.GetRequiredService<ManagedKeySigningOptions>(),
+                provider.GetRequiredService<IManagedKeySigningClient>());
         });
-        _ = services.AddSingleton<IGovernanceSigningService>(serviceProvider =>
-            serviceProvider.GetRequiredService<ManagedKeySigningService>());
+        _ = services.AddSingleton<IGovernanceSigningService>(provider =>
+            provider.GetRequiredService<ManagedKeySigningService>());
 
         return services;
     }
@@ -125,15 +125,15 @@ public static class ManagedKeySigningServiceCollectionExtensions
         ManagedKeySigningOptions options)
     {
         _ = services.AddSingleton(options);
-        _ = services.AddSingleton<ManagedKeySigningService>(serviceProvider =>
+        _ = services.AddSingleton(provider =>
         {
-            ThrowIfProductionWithoutVerification(serviceProvider);
+            ThrowIfProductionWithoutVerification(provider);
             return new ManagedKeySigningService(
-                serviceProvider.GetRequiredService<ManagedKeySigningOptions>(),
-                serviceProvider.GetRequiredService<IManagedKeySigningClient>());
+                provider.GetRequiredService<ManagedKeySigningOptions>(),
+                provider.GetRequiredService<IManagedKeySigningClient>());
         });
-        _ = services.AddSingleton<IGovernanceSigningService>(serviceProvider =>
-            serviceProvider.GetRequiredService<ManagedKeySigningService>());
+        _ = services.AddSingleton<IGovernanceSigningService>(provider =>
+            provider.GetRequiredService<ManagedKeySigningService>());
 
         return services;
     }
