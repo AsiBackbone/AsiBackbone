@@ -16,6 +16,7 @@ public sealed class ManagedKeySigningServiceCollectionExtensionsTests
     public void ProductionFactoryRegistrationUsesSingletonServicesAndFailsClosed()
     {
         ServiceCollection services = new();
+        _ = services.AddSingleton<IGovernanceSignatureVerificationService>(new StubVerificationService());
         var client = new StubManagedKeySigningClient();
         int factoryCalls = 0;
 
@@ -49,6 +50,7 @@ public sealed class ManagedKeySigningServiceCollectionExtensionsTests
     public void ProductionRegisteredClientRegistrationUsesHostSingletonAndFailsClosed()
     {
         ServiceCollection services = new();
+        _ = services.AddSingleton<IGovernanceSignatureVerificationService>(new StubVerificationService());
         var client = new StubManagedKeySigningClient();
         _ = services.AddSingleton<IManagedKeySigningClient>(client);
 
