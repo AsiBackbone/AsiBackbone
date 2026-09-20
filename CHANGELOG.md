@@ -6,6 +6,26 @@ This project follows the spirit of [Keep a Changelog](https://keepachangelog.com
 
 ## [Unreleased]
 
+### Security
+
+* **Breaking (behavior):** `IAcknowledgmentChallengeService.HandleResponse` now binds the acknowledgment response to the
+  challenged actor. The `actor` argument must match the `ActorId` and `ActorType` recorded by `CreateChallenge`, otherwise
+  the response fails with the new `acknowledgment.challenge.actor_mismatch` reason code and no
+  `LiabilityHandshakeAcknowledgment` is produced. Previously the response was validated only against the handshake
+  identifier and the required acknowledgment code, so any actor that could name an active challenge could satisfy it and
+  the resulting acknowledgment attributed the liability to whoever answered rather than to whoever was challenged. Hosts
+  that resolve the current actor per request must resolve the same principal on both legs of the round trip. This does not
+  add challenge expiry or single-use enforcement, which remain host responsibilities.
+* **Breaking (binary and persisted values):** `DlpFailureBehavior` and `DlpIntentRiskLevel` each gained an `Unspecified`
+  member at zero, shifting every other member up by one. Previously `DlpFailureBehavior.Allow` and
+  `DlpIntentRiskLevel.Low` were the default values, so an unset property, an absent configuration value, a deserialized
+  payload that omitted the field, or a database column default resolved a screening failure to the most permissive
+  outcome. Supplying `Unspecified` now raises `ArgumentOutOfRangeException` rather than being defaulted:
+  `DlpFailurePolicyContext.Create` rejects an unassigned risk level, `DlpFailurePolicyOptions.GetBehavior` rejects an
+  unconfigured tier behavior or override, and `DlpFailurePolicyResolution.Create` rejects an unresolved behavior. Source
+  that refers to these members by name is unaffected; consumers that persisted or transmitted the numeric values must
+  remap them, because enum constants compiled against `6.0.0` retain the previous numbers.
+
 ## [6.0.0] - 2026-09-19
 
 ### Release summary

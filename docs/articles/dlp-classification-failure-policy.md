@@ -31,8 +31,8 @@ Core owns:
 | Type | Role |
 | --- | --- |
 | `DlpClassificationFailureKind` | Stable failure kinds such as service unavailable, timeout, indeterminate result, blocked result, and classified result. |
-| `DlpIntentRiskLevel` | Host-assigned risk level: low, medium, or high. |
-| `DlpFailureBehavior` | Configured behavior: allow, warn and allow, deny, defer, require acknowledgment, or escalate. |
+| `DlpIntentRiskLevel` | Host-assigned risk level: low, medium, or high. `Unspecified` is the default value and is rejected rather than defaulted. |
+| `DlpFailureBehavior` | Configured behavior: allow, warn and allow, deny, defer, require acknowledgment, or escalate. `Unspecified` is the default value and is rejected rather than defaulted. |
 | `DlpFailurePolicyContext` | Provider-neutral failure context carrying risk, category, environment, timeout, correlation, policy, and safe metadata. |
 | `DlpFailurePolicyOptions` | Default risk behavior and risk/failure-specific overrides. |
 | `IDlpFailurePolicyResolver` | Resolver abstraction for converting failure context into a policy resolution. |
@@ -75,6 +75,8 @@ The default resolver uses a conservative baseline:
 | `High` | `Deny` | `GovernanceDecision.Deny(...)` |
 
 This is only a default. Hosts can override behavior globally by risk level or specifically by risk/failure pair.
+
+Neither enum uses a permissive value for its default. `DlpIntentRiskLevel.Unspecified` and `DlpFailureBehavior.Unspecified` occupy the zero slot, so an unset field, an absent configuration value, or a deserialized payload that omitted either value cannot resolve to `Low` or `Allow`. Supplying `Unspecified` raises `ArgumentOutOfRangeException`: `DlpFailurePolicyContext.Create` rejects an unassigned risk level, `DlpFailurePolicyOptions.GetBehavior` rejects an unconfigured tier behavior or override, and `DlpFailurePolicyResolution.Create` rejects an unresolved behavior. An incomplete policy therefore fails loudly instead of failing open.
 
 Example override:
 
