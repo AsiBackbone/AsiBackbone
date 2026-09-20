@@ -222,7 +222,8 @@ public sealed class AsiBackboneGovernanceOutboxDrainHostedServiceTests
     }
 
     /// <summary>
-    /// Tests that the <c>AddAsiBackboneGovernanceOutboxDrainWorker</c> extension method rejects invalid batch sizes (zero or negative) and throws an appropriate exception.
+    /// Tests that resolving <see cref="GovernanceOutboxDrainWorkerOptions"/> throws an <see cref="OptionsValidationException"/>
+    /// when <c>AddAsiBackboneGovernanceOutboxDrainWorker</c> is configured with an invalid batch size.
     /// </summary>
     /// <param name="batchSize">
     /// The batch size to test, which is expected to be invalid (zero or negative).

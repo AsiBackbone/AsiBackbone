@@ -276,7 +276,9 @@ public sealed class AsiBackboneAspNetCoreServiceCollectionExtensionsTests
     }
 
     /// <summary>
-    /// Tests that the <see cref="AsiBackboneAspNetCoreServiceCollectionExtensions.AddAsiBackboneAspNetCore(IServiceCollection, Action{AspNetCoreGovernanceOptions})"/> method throws an <see cref="OptionsValidationException"/> when the <see cref="AspNetCoreGovernanceOptions.CorrelationIdHeaderName"/> is null, empty, or whitespace.
+    /// Tests that resolving <see cref="AspNetCoreGovernanceOptions"/> throws an <see cref="OptionsValidationException"/> when
+    /// <see cref="AsiBackboneAspNetCoreServiceCollectionExtensions.AddAsiBackboneAspNetCore(IServiceCollection, Action{AspNetCoreGovernanceOptions})"/>
+    /// is configured with a null, empty, or whitespace <see cref="AspNetCoreGovernanceOptions.CorrelationIdHeaderName"/>.
     /// </summary>
     /// <param name="headerName">
     /// The name of the correlation identifier header.
@@ -298,7 +300,8 @@ public sealed class AsiBackboneAspNetCoreServiceCollectionExtensionsTests
     }
 
     /// <summary>
-    /// Tests that the <see cref="AsiBackboneAspNetCoreServiceCollectionExtensions.AddAsiBackboneAspNetCore(IServiceCollection, Action{AspNetCoreGovernanceOptions})"/> method throws an <see cref="OptionsValidationException"/> when the <see cref="HttpGovernanceActorContextOptions"/> are configured with invalid values.
+    /// Tests that resolving <see cref="HttpGovernanceActorContextOptions"/> throws an <see cref="OptionsValidationException"/>
+    /// when the registered actor-context options contain invalid values.
     /// </summary>
     [Fact]
     public void ActorContextOptionsRegistrationRejectsInvalidConfiguredOptions()
@@ -314,7 +317,8 @@ public sealed class AsiBackboneAspNetCoreServiceCollectionExtensionsTests
     }
 
     /// <summary>
-    /// Tests that the <see cref="AsiBackboneAspNetCoreServiceCollectionExtensions.AddAsiBackboneAspNetCore(IServiceCollection, Action{AspNetCoreGovernanceOptions})"/> method throws an <see cref="OptionsValidationException"/> when the <see cref="GovernanceHttpResultMappingOptions"/> are configured with invalid values.
+    /// Tests that resolving <see cref="GovernanceHttpResultMappingOptions"/> throws an <see cref="OptionsValidationException"/>
+    /// when the registered result-mapping options contain invalid values.
     /// </summary>
     [Fact]
     public void ResultMappingOptionsRegistrationRejectsInvalidConfiguredOptions()
@@ -330,7 +334,8 @@ public sealed class AsiBackboneAspNetCoreServiceCollectionExtensionsTests
     }
 
     /// <summary>
-    /// Tests that the <see cref="AsiBackboneAspNetCoreServiceCollectionExtensions.AddAsiBackboneAspNetCore(IServiceCollection, Action{AspNetCoreGovernanceOptions})"/> method throws an <see cref="OptionsValidationException"/> when the <see cref="AcknowledgmentChallengeOptions"/> are configured with invalid values.
+    /// Tests that resolving <see cref="AcknowledgmentChallengeOptions"/> throws an <see cref="OptionsValidationException"/>
+    /// when the registered acknowledgment-challenge options contain invalid values.
     /// </summary>
     [Fact]
     public void AcknowledgmentChallengeOptionsRegistrationRejectsInvalidConfiguredOptions()
