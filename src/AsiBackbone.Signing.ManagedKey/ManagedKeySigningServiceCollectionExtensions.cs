@@ -106,7 +106,9 @@ public static class ManagedKeySigningServiceCollectionExtensions
         Func<IServiceProvider, IManagedKeySigningClient> clientFactory)
     {
         _ = services.AddSingleton(options);
-        _ = services.AddSingleton(clientFactory);
+#pragma warning disable IDE0001 // Keep the registered service type explicit for DI clarity.
+        _ = services.AddSingleton<IManagedKeySigningClient>(clientFactory);
+#pragma warning restore IDE0001
         _ = services.AddSingleton(provider =>
         {
             ThrowIfProductionWithoutVerification(provider);
