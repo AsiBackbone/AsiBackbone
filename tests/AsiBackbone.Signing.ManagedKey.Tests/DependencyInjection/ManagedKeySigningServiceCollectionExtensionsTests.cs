@@ -305,18 +305,30 @@ public sealed class ManagedKeySigningServiceCollectionExtensionsTests
         {
             Monitor.Enter(EnvironmentMutationLock);
             lockHeld = true;
+            bool restoreRequired = false;
 
             try
             {
                 originalDotnetEnvironment = Environment.GetEnvironmentVariable("DOTNET_ENVIRONMENT");
                 originalAspNetEnvironment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
+                restoreRequired = true;
                 Environment.SetEnvironmentVariable("DOTNET_ENVIRONMENT", dotnetEnvironment);
                 Environment.SetEnvironmentVariable("ASPNETCORE_ENVIRONMENT", aspNetCoreEnvironment);
             }
             catch
             {
-                lockHeld = false;
-                Monitor.Exit(EnvironmentMutationLock);
+                try
+                {
+                    if (restoreRequired)
+                    {
+                        RestoreEnvironmentVariables();
+                    }
+                }
+                finally
+                {
+                    ReleaseLock();
+                }
+
                 throw;
             }
         }
@@ -330,14 +342,30 @@ public sealed class ManagedKeySigningServiceCollectionExtensionsTests
 
             try
             {
-                Environment.SetEnvironmentVariable("DOTNET_ENVIRONMENT", originalDotnetEnvironment);
-                Environment.SetEnvironmentVariable("ASPNETCORE_ENVIRONMENT", originalAspNetEnvironment);
+                RestoreEnvironmentVariables();
             }
             finally
             {
-                lockHeld = false;
-                Monitor.Exit(EnvironmentMutationLock);
+                ReleaseLock();
             }
+        }
+
+        private void RestoreEnvironmentVariables()
+        {
+            try
+            {
+                Environment.SetEnvironmentVariable("DOTNET_ENVIRONMENT", originalDotnetEnvironment);
+            }
+            finally
+            {
+                Environment.SetEnvironmentVariable("ASPNETCORE_ENVIRONMENT", originalAspNetEnvironment);
+            }
+        }
+
+        private void ReleaseLock()
+        {
+            lockHeld = false;
+            Monitor.Exit(EnvironmentMutationLock);
         }
     }
 }
