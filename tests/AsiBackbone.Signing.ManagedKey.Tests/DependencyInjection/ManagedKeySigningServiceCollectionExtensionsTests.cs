@@ -82,8 +82,12 @@ public sealed class ManagedKeySigningServiceCollectionExtensionsTests
             Environment.SetEnvironmentVariable("ASPNETCORE_ENVIRONMENT", null);
 
             ServiceCollection services = new();
+            _ = services.AddSingleton<IManagedKeySigningClient>(new StubManagedKeySigningClient());
+            _ = services.AddAsiBackboneManagedKeySigning(ConfigureValidOptions);
+
+            using ServiceProvider provider = services.BuildServiceProvider();
             InvalidOperationException exception = Assert.Throws<InvalidOperationException>(() =>
-                services.AddAsiBackboneManagedKeySigning(ConfigureValidOptions));
+                _ = provider.GetRequiredService<ManagedKeySigningService>());
 
             Assert.Contains("IGovernanceSignatureVerificationService", exception.Message, StringComparison.Ordinal);
         }

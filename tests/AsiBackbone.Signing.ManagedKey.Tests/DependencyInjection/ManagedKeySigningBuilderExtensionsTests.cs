@@ -178,7 +178,7 @@ public sealed class ManagedKeySigningBuilderExtensionsTests
         Assert.Contains(
             services,
             descriptor => descriptor.ServiceType == typeof(ManagedKeySigningService)
-                && descriptor.ImplementationType == typeof(ManagedKeySigningService)
+                && descriptor.ImplementationFactory is not null
                 && descriptor.Lifetime == ServiceLifetime.Singleton);
         Assert.Contains(
             services,

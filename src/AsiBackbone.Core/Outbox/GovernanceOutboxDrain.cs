@@ -426,10 +426,11 @@ public sealed class GovernanceOutboxDrain(
                 cancellationToken: CancellationToken.None)
                 .ConfigureAwait(false);
         }
-        catch (OperationCanceledException)
+        catch (Exception)
         {
-            // Best-effort release must not be blocked by the caller's cancellation token. The shutdown handoff
-            // is latency-sensitive but claim release is idempotent and the current drain invocation is already aborting.
+            // Best-effort release must not block shutdown or surface a secondary failure while the drain is already
+            // aborting. The caller is exiting and claim release is idempotent, so a transient storage failure should not
+            // mask the original cancellation or leave the remaining page of leases stuck until the normal lease expiry.
         }
     }
 
