@@ -106,7 +106,7 @@ An incomplete policy now fails loudly where it previously proceeded. Hosts that 
 
 ## Validation
 
-Package validation runs against the published `6.0.0` baseline. The intentional enum value changes are recorded as exact `CP0011` suppressions in `src/AsiBackbone.Core/CompatibilitySuppressions.xml`; all other package compatibility checks remain enabled.
+Package validation continues to run against the `5.1.0` baseline so the complete `5.1.0`-to-`7.0.0` compatibility surface remains checked. The intentional enum value changes are recorded as exact `CP0011` suppressions in `src/AsiBackbone.Core/CompatibilitySuppressions.xml`; the exact suppressions for the reviewed 6.0 major-boundary changes remain in place and all other package compatibility checks remain enabled.
 
 ## Related documentation
 

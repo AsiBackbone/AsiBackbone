@@ -92,7 +92,8 @@ its own assembly, with nothing in the assembly identity to signal the change.
 
 ## Validation
 
-Package validation runs against the published `6.0.0` baseline. The intentional
+Package validation continues to run against the `5.1.0` baseline so the complete
+`5.1.0`-to-`7.0.0` compatibility surface remains checked. The intentional
 enum value changes are recorded as exact `CP0011` suppressions in
 `src/AsiBackbone.Core/CompatibilitySuppressions.xml`; all other package
 compatibility checks remain enabled. The committed public API baselines under

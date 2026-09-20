@@ -33,8 +33,10 @@ commit.
   the 7.0 major-release scope.
 - [x] Template fallback package references use `7.0.0`.
 - [x] NuGet lock files reference `7.0.0` for in-repository projects.
-- [x] Package validation compares `7.0.0` with the published `6.0.0` baseline;
-  intentional enum-value changes have exact `CP0011` suppressions.
+- [x] Package validation compares `7.0.0` with the `5.1.0` baseline so the full
+  two-major compatibility surface remains checked. Reviewed 6.0 breaks retain
+  their exact suppressions, and intentional 7.0 enum-value changes have exact
+  `CP0011` suppressions.
 - [x] Public API baselines record the 7.0 enum values and new members.
 - [x] `CHANGELOG.md`, release notes, and the upgrade guide describe the same
   change set and compatibility boundary.
