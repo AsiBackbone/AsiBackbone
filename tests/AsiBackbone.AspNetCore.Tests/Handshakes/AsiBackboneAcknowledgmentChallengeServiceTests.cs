@@ -297,7 +297,7 @@ public sealed class AsiBackboneAcknowledgmentChallengeServiceTests
         var decision = GovernanceDecision.RequireAcknowledgment("ack.required", "Acknowledgment required.");
         DefaultAcknowledgmentChallengeService service = CreateService();
         AcknowledgmentChallenge challenge = service.CreateChallenge(challengedActor, "RunOperation", decision);
-        var reresolvedActor = GovernanceActorContext.Human(" user-123 ");
+        IGovernanceActorContext reresolvedActor = new TestActorContext(" user-123 ", GovernanceActorType.Human);
         var response = new AcknowledgmentChallengeRequest
         {
             HandshakeId = challenge.HandshakeId,
@@ -335,5 +335,14 @@ public sealed class AsiBackboneAcknowledgmentChallengeServiceTests
     {
         return new DefaultAcknowledgmentChallengeService(
             Options.Create(options ?? new AcknowledgmentChallengeOptions()));
+    }
+
+    private sealed record TestActorContext(string ActorId, GovernanceActorType ActorType) : IGovernanceActorContext
+    {
+        public string? DisplayName => null;
+
+        public bool IsKnown => true;
+
+        public bool IsAuthenticated => true;
     }
 }
