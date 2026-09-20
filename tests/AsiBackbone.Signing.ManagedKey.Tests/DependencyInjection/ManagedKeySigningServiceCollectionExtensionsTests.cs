@@ -89,10 +89,14 @@ public sealed class ManagedKeySigningServiceCollectionExtensionsTests
     /// <summary>
     /// Verifies production registration fails when no verification service is available.
     /// </summary>
-    [Fact]
-    public void ProductionRegistrationRequiresVerificationService()
+    [Theory]
+    [InlineData("Production", null)]
+    [InlineData(null, "Production")]
+    public void ProductionRegistrationRequiresVerificationService(
+        string? dotnetEnvironment,
+        string? aspNetCoreEnvironment)
     {
-        using var scope = new EnvironmentVariableScope("Production");
+        using var scope = new EnvironmentVariableScope(dotnetEnvironment, aspNetCoreEnvironment);
 
         ServiceCollection services = new();
         _ = services.AddSingleton<IManagedKeySigningClient>(new StubManagedKeySigningClient());
@@ -294,7 +298,9 @@ public sealed class ManagedKeySigningServiceCollectionExtensionsTests
         private readonly string? originalAspNetEnvironment;
         private bool lockHeld;
 
-        public EnvironmentVariableScope(string environmentName)
+        public EnvironmentVariableScope(
+            string? dotnetEnvironment,
+            string? aspNetCoreEnvironment = null)
         {
             Monitor.Enter(EnvironmentMutationLock);
             lockHeld = true;
@@ -303,8 +309,8 @@ public sealed class ManagedKeySigningServiceCollectionExtensionsTests
             {
                 originalDotnetEnvironment = Environment.GetEnvironmentVariable("DOTNET_ENVIRONMENT");
                 originalAspNetEnvironment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
-                Environment.SetEnvironmentVariable("DOTNET_ENVIRONMENT", environmentName);
-                Environment.SetEnvironmentVariable("ASPNETCORE_ENVIRONMENT", null);
+                Environment.SetEnvironmentVariable("DOTNET_ENVIRONMENT", dotnetEnvironment);
+                Environment.SetEnvironmentVariable("ASPNETCORE_ENVIRONMENT", aspNetCoreEnvironment);
             }
             catch
             {

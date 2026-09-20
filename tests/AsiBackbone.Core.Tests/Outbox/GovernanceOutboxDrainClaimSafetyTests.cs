@@ -1,6 +1,7 @@
 using AsiBackbone.Core.Audit;
 using AsiBackbone.Core.Emissions;
 using AsiBackbone.Core.Outbox;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Xunit;
 
@@ -118,6 +119,34 @@ public sealed class GovernanceOutboxDrainClaimSafetyTests
             await drain.DrainAsync(DrainUtc, maxCount: 1, cancellationTokenSource.Token));
 
         Assert.Equal(1, store.ReleaseCount);
+    }
+
+    /// <summary>
+    /// Verifies that a best-effort claim release failure is logged without replacing the original cancellation.
+    /// </summary>
+    [Fact]
+    public async Task DrainAsyncLogsClaimReleaseFailureWithoutMaskingCancellation()
+    {
+        var releaseException = new InvalidOperationException("claim release failed");
+        var store = new RecordingClaimStore(availableEntryCount: 1) { ReleaseException = releaseException };
+        var logger = new RecordingLogger<GovernanceOutboxDrain>();
+        using var cancellationTokenSource = new CancellationTokenSource();
+        var drain = new GovernanceOutboxDrain(
+            store,
+            new CancellingEmitter(cancellationTokenSource),
+            logger,
+            Options.Create(new GovernanceOutboxOptions { ClaimWorkerId = "worker-1" }));
+
+        _ = await Assert.ThrowsAsync<OperationCanceledException>(async () =>
+            await drain.DrainAsync(DrainUtc, maxCount: 1, cancellationTokenSource.Token));
+
+        Assert.Equal(1, store.ReleaseCount);
+        LogEntry logEntry = Assert.Single(logger.Entries);
+        Assert.Equal(LogLevel.Warning, logEntry.LogLevel);
+        Assert.Equal("LogGovernanceClaimReleaseFailure", logEntry.EventId.Name);
+        Assert.Same(releaseException, logEntry.Exception);
+        Assert.Equal("outbox-1", Assert.IsType<string>(logEntry["OutboxEntryId"]));
+        Assert.Equal("worker-1", Assert.IsType<string>(logEntry["ClaimWorkerId"]));
     }
 
     /// <summary>
@@ -322,6 +351,8 @@ public sealed class GovernanceOutboxDrainClaimSafetyTests
 
         public int ReleaseCount { get; private set; }
 
+        public Exception? ReleaseException { get; set; }
+
         public GovernanceEmissionError? LastDeadLetterError { get; private set; }
 
         public ValueTask<IReadOnlyList<GovernanceOutboxClaim>> ClaimPendingAsync(
@@ -407,7 +438,9 @@ public sealed class GovernanceOutboxDrainClaimSafetyTests
             CancellationToken cancellationToken = default)
         {
             ReleaseCount++;
-            return ValueTask.FromResult<GovernanceOutboxEntry?>(claim.Entry);
+            return ReleaseException is null
+                ? ValueTask.FromResult<GovernanceOutboxEntry?>(claim.Entry)
+                : throw ReleaseException;
         }
 
         public ValueTask<GovernanceOutboxEntry> EnqueueAsync(
@@ -486,6 +519,60 @@ public sealed class GovernanceOutboxDrainClaimSafetyTests
                 claimExpiresUtc: DrainUtc.AddMinutes(5),
                 claimAttemptCount: claimAttemptCount);
         }
+    }
+
+    private sealed class RecordingLogger<T> : ILogger<T>
+    {
+        private static readonly IDisposable NoopScope = new NullScope();
+
+        public List<LogEntry> Entries { get; } = [];
+
+        public IDisposable? BeginScope<TState>(TState state)
+            where TState : notnull
+        {
+            return NoopScope;
+        }
+
+        public bool IsEnabled(LogLevel logLevel)
+        {
+            return true;
+        }
+
+        public void Log<TState>(
+            LogLevel logLevel,
+            EventId eventId,
+            TState state,
+            Exception? exception,
+            Func<TState, Exception?, string> formatter)
+        {
+            ArgumentNullException.ThrowIfNull(formatter);
+
+            Entries.Add(new LogEntry(
+                logLevel,
+                eventId,
+                exception,
+                formatter(state, exception),
+                state is IEnumerable<KeyValuePair<string, object?>> structuredState
+                    ? [.. structuredState]
+                    : []));
+        }
+
+        private sealed class NullScope : IDisposable
+        {
+            public void Dispose()
+            {
+            }
+        }
+    }
+
+    private sealed record LogEntry(
+        LogLevel LogLevel,
+        EventId EventId,
+        Exception? Exception,
+        string Message,
+        KeyValuePair<string, object?>[] State)
+    {
+        public object? this[string key] => State.FirstOrDefault(item => item.Key == key).Value;
     }
 
     private sealed class NonClaimStore : IGovernanceOutboxStore

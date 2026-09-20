@@ -34,6 +34,11 @@ public sealed class GovernanceOutboxDrain(
         new EventId(19702, nameof(LogGovernanceClaimAttemptsExceeded)),
         "Governance outbox entry {OutboxEntryId} was claimed {ClaimAttemptCount} times without reaching a terminal state, exceeding the configured maximum of {MaxClaimAttempts}. The entry is being dead-lettered without a further emission attempt. Correlation ID: {CorrelationId}.");
 
+    private static readonly Action<ILogger, string, string, Exception?> LogGovernanceClaimReleaseFailure = LoggerMessage.Define<string, string>(
+        LogLevel.Warning,
+        new EventId(19703, nameof(LogGovernanceClaimReleaseFailure)),
+        "Governance outbox claim release failed during cancellation for outbox entry {OutboxEntryId} owned by worker {ClaimWorkerId}. The lease will remain active until it expires.");
+
     private readonly IGovernanceOutboxStore outboxStore = outboxStore ?? throw new ArgumentNullException(nameof(outboxStore));
     private readonly IGovernanceEmitter emitter = emitter ?? throw new ArgumentNullException(nameof(emitter));
     private readonly ILogger<GovernanceOutboxDrain> logger = logger ?? NullLogger<GovernanceOutboxDrain>.Instance;
@@ -403,7 +408,7 @@ public sealed class GovernanceOutboxDrain(
         }
     }
 
-    private static async ValueTask ReleaseClaimLeaseAsync(
+    private async ValueTask ReleaseClaimLeaseAsync(
         IGovernanceOutboxClaimStore claimStore,
         GovernanceOutboxClaim claim)
     {
@@ -415,8 +420,10 @@ public sealed class GovernanceOutboxDrain(
                 cancellationToken: CancellationToken.None)
                 .ConfigureAwait(false);
         }
-        catch (Exception)
+        catch (Exception ex)
         {
+            LogGovernanceClaimReleaseFailure(logger, claim.OutboxEntryId, claim.WorkerId, ex);
+
             // Best-effort release must not block shutdown or surface a secondary failure while the drain is already
             // aborting. The caller is exiting and claim release is idempotent, so a transient storage failure should not
             // mask the original cancellation or leave the remaining page of leases stuck until the normal lease expiry.
