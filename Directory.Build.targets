@@ -28,7 +28,7 @@
     for an intentional major-version break.
   -->
   <PropertyGroup Condition="$(MSBuildProjectDirectory.StartsWith('$(MSBuildThisFileDirectory)src'))">
-    <AsiBackbonePackageValidationBaselineVersion Condition="'$(AsiBackbonePackageValidationBaselineVersion)' == ''">5.1.0</AsiBackbonePackageValidationBaselineVersion>
+    <AsiBackbonePackageValidationBaselineVersion Condition="'$(AsiBackbonePackageValidationBaselineVersion)' == ''">6.0.0</AsiBackbonePackageValidationBaselineVersion>
     <EnablePackageValidation>true</EnablePackageValidation>
     <PackageValidationBaselineVersion>$(AsiBackbonePackageValidationBaselineVersion)</PackageValidationBaselineVersion>
   </PropertyGroup>
