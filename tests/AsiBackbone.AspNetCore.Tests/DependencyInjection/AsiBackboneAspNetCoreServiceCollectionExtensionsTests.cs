@@ -3,6 +3,7 @@ using AsiBackbone.AspNetCore.Correlation;
 using AsiBackbone.AspNetCore.DependencyInjection;
 using AsiBackbone.AspNetCore.Endpoints;
 using AsiBackbone.AspNetCore.Handshakes;
+using AsiBackbone.AspNetCore.Outbox;
 using AsiBackbone.AspNetCore.Results;
 using AsiBackbone.Core.Constraints;
 using AsiBackbone.Core.Decisions;
@@ -342,6 +343,62 @@ public sealed class AsiBackboneAspNetCoreServiceCollectionExtensionsTests
             ResolveOptions<AcknowledgmentChallengeOptions>(services));
 
         Assert.Contains("Acknowledgment challenge options", exception.Message, StringComparison.Ordinal);
+    }
+
+    /// <summary>
+    /// Tests that the <see cref="AsiBackboneAspNetCoreServiceCollectionExtensions.AddAsiBackboneAspNetCore(IServiceCollection, Action{AspNetCoreGovernanceOptions})"/> method invokes the configuration callback exactly once when the options are resolved.
+    /// </summary>
+    [Fact]
+    public void AddAsiBackboneAspNetCoreInvokesConfigureCallbackOnceWhenOptionsAreResolved()
+    {
+        ServiceCollection services = new();
+        int callbackCount = 0;
+
+        _ = services.AddAsiBackboneAspNetCore(options =>
+        {
+            callbackCount++;
+            options.IncludeRequestPath = true;
+        });
+
+        // Deferred configuration: registration should not execute callback.
+        Assert.Equal(0, callbackCount);
+
+        using ServiceProvider provider = services.BuildServiceProvider();
+        AspNetCoreGovernanceOptions first = provider.GetRequiredService<IOptions<AspNetCoreGovernanceOptions>>().Value;
+        AspNetCoreGovernanceOptions second = provider.GetRequiredService<IOptions<AspNetCoreGovernanceOptions>>().Value;
+
+        Assert.True(first.IncludeRequestPath);
+        Assert.Same(first, second);
+        Assert.Equal(1, callbackCount);
+    }
+
+    /// <summary>
+    /// Tests that the <see cref="AsiBackboneAspNetCoreServiceCollectionExtensions.AddAsiBackboneGovernanceOutboxDrainWorker(IServiceCollection, Action{GovernanceOutboxDrainWorkerOptions})"/> method invokes the configuration callback exactly once when the options are resolved.
+    /// </summary>
+    [Fact]
+    public void AddAsiBackboneGovernanceOutboxDrainWorkerInvokesConfigureCallbackOnceWhenOptionsAreResolved()
+    {
+        ServiceCollection services = new();
+        int callbackCount = 0;
+
+        _ = services.AddAsiBackboneGovernanceOutboxDrainWorker(options =>
+        {
+            callbackCount++;
+            options.BatchSize = 7;
+        });
+
+        // Deferred configuration: registration should not execute callback.
+        Assert.Equal(0, callbackCount);
+
+        using ServiceProvider provider = services.BuildServiceProvider();
+        GovernanceOutboxDrainWorkerOptions first =
+            provider.GetRequiredService<IOptions<GovernanceOutboxDrainWorkerOptions>>().Value;
+        GovernanceOutboxDrainWorkerOptions second =
+            provider.GetRequiredService<IOptions<GovernanceOutboxDrainWorkerOptions>>().Value;
+
+        Assert.Equal(7, first.BatchSize);
+        Assert.Same(first, second);
+        Assert.Equal(1, callbackCount);
     }
 
     private static GovernanceEvaluationContext CreateContext()
