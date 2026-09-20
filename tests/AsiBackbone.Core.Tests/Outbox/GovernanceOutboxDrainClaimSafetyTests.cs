@@ -121,6 +121,34 @@ public sealed class GovernanceOutboxDrainClaimSafetyTests
     }
 
     /// <summary>
+    /// Verifies that cancellation during dead-letter persistence releases the current active claim before the exception escapes.
+    /// </summary>
+    [Fact]
+    public async Task DrainAsyncReleasesClaimWhenCancellationOccursDuringClaimDeadLettering()
+    {
+        var store = new RecordingClaimStore(availableEntryCount: 1, claimAttemptCount: 6)
+        {
+            ThrowOnMarkClaimDeadLettered = true
+        };
+        using var cancellationTokenSource = new CancellationTokenSource();
+        cancellationTokenSource.Cancel();
+
+        var drain = new GovernanceOutboxDrain(
+            store,
+            new DeliveringEmitter(),
+            outboxOptions: Options.Create(new GovernanceOutboxOptions
+            {
+                ClaimWorkerId = "worker-1",
+                MaxClaimAttempts = 5
+            }));
+
+        _ = await Assert.ThrowsAsync<OperationCanceledException>(async () =>
+            await drain.DrainAsync(DrainUtc, maxCount: 1, cancellationTokenSource.Token));
+
+        Assert.Equal(1, store.ReleaseCount);
+    }
+
+    /// <summary>
     /// Verifies that cancellation while persisting the claim result still releases the current active claim before the exception escapes.
     /// </summary>
     [Fact]
@@ -287,6 +315,8 @@ public sealed class GovernanceOutboxDrainClaimSafetyTests
 
         public bool ThrowOnMarkClaimDelivered { get; set; }
 
+        public bool ThrowOnMarkClaimDeadLettered { get; set; }
+
         public List<int> PendingClaimMaxCounts { get; } = [];
 
         public int DeadLetteredCount { get; private set; }
@@ -353,6 +383,11 @@ public sealed class GovernanceOutboxDrainClaimSafetyTests
             string? deadLetterReason = null,
             CancellationToken cancellationToken = default)
         {
+            if (ThrowOnMarkClaimDeadLettered && cancellationToken.IsCancellationRequested)
+            {
+                throw new OperationCanceledException(cancellationToken);
+            }
+
             DeadLetteredCount++;
             LastDeadLetterError = governanceEmissionError;
             return ValueTask.FromResult(claim.Entry);

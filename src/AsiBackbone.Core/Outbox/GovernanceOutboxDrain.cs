@@ -357,28 +357,28 @@ public sealed class GovernanceOutboxDrain(
         DateTimeOffset drainUtc,
         CancellationToken cancellationToken)
     {
-        // An emitter that hangs or is killed mid-emission leaves the entry claimed but never failed, so its retry
-        // count does not advance and the retry-based poison-message policy never fires. The claim count does
-        // advance on every reclaim, so it is the only signal that bounds that loop. Checked before emission so a
-        // repeatedly reclaimed entry is not handed to the emitter again.
-        if (ShouldDeadLetterForClaimAttempts(claim.Entry))
-        {
-            var claimExhaustedError = GovernanceEmissionError.Create(
-                retryOptions.MaxClaimAttemptsReasonCode,
-                retryOptions.MaxClaimAttemptsReasonMessage);
-
-            LogClaimAttemptsExceeded(claim.Entry);
-
-            return await claimStore.MarkClaimDeadLetteredAsync(
-                claim,
-                claimExhaustedError,
-                retryOptions.MaxClaimAttemptsReasonMessage,
-                cancellationToken)
-                .ConfigureAwait(false);
-        }
-
         try
         {
+            // An emitter that hangs or is killed mid-emission leaves the entry claimed but never failed, so its retry
+            // count does not advance and the retry-based poison-message policy never fires. The claim count does
+            // advance on every reclaim, so it is the only signal that bounds that loop. Checked before emission so a
+            // repeatedly reclaimed entry is not handed to the emitter again.
+            if (ShouldDeadLetterForClaimAttempts(claim.Entry))
+            {
+                var claimExhaustedError = GovernanceEmissionError.Create(
+                    retryOptions.MaxClaimAttemptsReasonCode,
+                    retryOptions.MaxClaimAttemptsReasonMessage);
+
+                LogClaimAttemptsExceeded(claim.Entry);
+
+                return await claimStore.MarkClaimDeadLetteredAsync(
+                    claim,
+                    claimExhaustedError,
+                    retryOptions.MaxClaimAttemptsReasonMessage,
+                    cancellationToken)
+                    .ConfigureAwait(false);
+            }
+
             GovernanceEmissionResult result = await emitter.EmitAsync(claim.Entry.Envelope, cancellationToken).ConfigureAwait(false);
             return await ApplyEmissionResultAsync(claimStore, claim, result, drainUtc, cancellationToken).ConfigureAwait(false);
         }
