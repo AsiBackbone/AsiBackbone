@@ -140,10 +140,12 @@ public static class ManagedKeySigningServiceCollectionExtensions
 
     private static void ThrowIfProductionWithoutVerification(IServiceProvider serviceProvider)
     {
-        string? environmentName = Environment.GetEnvironmentVariable("DOTNET_ENVIRONMENT")
-            ?? Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
+        string? dotnetEnvironment = Environment.GetEnvironmentVariable("DOTNET_ENVIRONMENT");
+        string? aspNetCoreEnvironment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
+        bool isProduction = string.Equals(dotnetEnvironment, "Production", StringComparison.OrdinalIgnoreCase)
+            || string.Equals(aspNetCoreEnvironment, "Production", StringComparison.OrdinalIgnoreCase);
 
-        if (!string.Equals(environmentName, "Production", StringComparison.OrdinalIgnoreCase))
+        if (!isProduction)
         {
             return;
         }

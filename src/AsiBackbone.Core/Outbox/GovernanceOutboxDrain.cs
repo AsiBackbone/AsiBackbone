@@ -377,16 +377,14 @@ public sealed class GovernanceOutboxDrain(
                 .ConfigureAwait(false);
         }
 
-        GovernanceEmissionResult result;
-        bool cancellationDuringEmit = false;
-
         try
         {
-            result = await emitter.EmitAsync(claim.Entry.Envelope, cancellationToken).ConfigureAwait(false);
+            GovernanceEmissionResult result = await emitter.EmitAsync(claim.Entry.Envelope, cancellationToken).ConfigureAwait(false);
+            return await ApplyEmissionResultAsync(claimStore, claim, result, drainUtc, cancellationToken).ConfigureAwait(false);
         }
         catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
         {
-            cancellationDuringEmit = true;
+            await ReleaseClaimLeaseAsync(claimStore, claim).ConfigureAwait(false);
             throw;
         }
         catch (Exception ex)
@@ -403,15 +401,6 @@ public sealed class GovernanceOutboxDrain(
                 cancellationToken)
                 .ConfigureAwait(false);
         }
-        finally
-        {
-            if (cancellationDuringEmit)
-            {
-                await ReleaseClaimLeaseAsync(claimStore, claim).ConfigureAwait(false);
-            }
-        }
-
-        return await ApplyEmissionResultAsync(claimStore, claim, result, drainUtc, cancellationToken).ConfigureAwait(false);
     }
 
     private static async ValueTask ReleaseClaimLeaseAsync(

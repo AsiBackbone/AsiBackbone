@@ -121,6 +121,25 @@ public sealed class GovernanceOutboxDrainClaimSafetyTests
     }
 
     /// <summary>
+    /// Verifies that cancellation while persisting the claim result still releases the current active claim before the exception escapes.
+    /// </summary>
+    [Fact]
+    public async Task DrainAsyncReleasesClaimWhenCancellationOccursDuringClaimPersistence()
+    {
+        var store = new RecordingClaimStore(availableEntryCount: 1) { ThrowOnMarkClaimDelivered = true };
+        using var cancellationTokenSource = new CancellationTokenSource();
+        var drain = new GovernanceOutboxDrain(
+            store,
+            new AfterEmitCancellingEmitter(cancellationTokenSource),
+            outboxOptions: Options.Create(new GovernanceOutboxOptions { ClaimWorkerId = "worker-1" }));
+
+        _ = await Assert.ThrowsAsync<OperationCanceledException>(async () =>
+            await drain.DrainAsync(DrainUtc, maxCount: 1, cancellationTokenSource.Token));
+
+        Assert.Equal(1, store.ReleaseCount);
+    }
+
+    /// <summary>
     /// Verifies that an entry reclaimed past the configured threshold is dead-lettered instead of being emitted again.
     /// </summary>
     /// <returns>A task that represents the asynchronous test operation.</returns>
@@ -246,6 +265,18 @@ public sealed class GovernanceOutboxDrainClaimSafetyTests
         }
     }
 
+    private sealed class AfterEmitCancellingEmitter(CancellationTokenSource cancellationTokenSource) : IGovernanceEmitter
+    {
+        public ValueTask<GovernanceEmissionResult> EmitAsync(
+            GovernanceEmissionEnvelope envelope,
+            CancellationToken cancellationToken = default)
+        {
+            ArgumentNullException.ThrowIfNull(envelope);
+            cancellationTokenSource.Cancel();
+            return ValueTask.FromResult(GovernanceEmissionResult.Delivered("test-sink", envelope.EnvelopeId));
+        }
+    }
+
     /// <summary>
     /// A claim store that hands out a fixed number of entries and records how each page was requested.
     /// </summary>
@@ -253,6 +284,8 @@ public sealed class GovernanceOutboxDrainClaimSafetyTests
         : IGovernanceOutboxClaimStore
     {
         private int issuedEntryCount;
+
+        public bool ThrowOnMarkClaimDelivered { get; set; }
 
         public List<int> PendingClaimMaxCounts { get; } = [];
 
@@ -297,6 +330,11 @@ public sealed class GovernanceOutboxDrainClaimSafetyTests
             GovernanceEmissionResult result,
             CancellationToken cancellationToken = default)
         {
+            if (ThrowOnMarkClaimDelivered)
+            {
+                cancellationToken.ThrowIfCancellationRequested();
+            }
+
             return ValueTask.FromResult(claim.Entry);
         }
 
