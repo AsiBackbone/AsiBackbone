@@ -115,7 +115,7 @@ For a package release or validation run, consumers can review:
 4. GitHub artifact attestations when the workflow event produced them;
 5. NuGet package metadata and Source Link metadata after package publication.
 
-For the current package family, the [6.0.0 Consumer Verification Guide](consumer-verification-600.md) provides durable asset links and copy/paste validation commands for package source, package IDs, package version, repository metadata, Source Link metadata, package SBOMs, provenance attestations, deprecation status, and deferred package-signing wording.
+The most recently published guide, the [6.0.0 Consumer Verification Guide](consumer-verification-600.md), provides durable asset links and copy/paste validation commands for package source, package IDs, package version, repository metadata, Source Link metadata, package SBOMs, provenance attestations, deprecation status, and deferred package-signing wording. The same procedure applies to the current package family; the `7.0.0` guide is published when the `7.0.0` release checklist is completed.
 
 For released NuGet packages, Source Link metadata validation remains a separate post-publish check. SBOM/provenance metadata complements that check; it does not replace source review, package validation, vulnerability scanning, or organizational approval.
 

@@ -8,7 +8,7 @@ In this software project, **ASI** means **Accountable Systems Infrastructure**. 
 
 ## Supported versions
 
-Security review and vulnerability handling focus on the current stable `6.x` release line.
+Security review and vulnerability handling focus on the current stable `7.x` release line.
 
 | Version line | Support posture |
 | --- | --- |

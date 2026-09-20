@@ -1,12 +1,12 @@
 # Stable Release Validation
 
-This article documents the reusable release-blocking validation path for stable release lines. The current released stable package family is `6.x`, with `6.0.0` as the current release.
+This article documents the reusable release-blocking validation path for stable release lines. The current released stable package family is `7.x`, with `7.0.0` as the current release.
 
 The binary assembly identity for the `6.x` line is `6.0.0.0`.
 
 Release validation should confirm that the package family remains practical governance infrastructure and that implementation claims stay within the documented software boundary. See [Release Cadence and Readiness](release-cadence-and-readiness.md) for the release-stream and stabilization guidance that complements this checklist.
 
-The [6.0.0 Release Readiness Record](release-readiness-600.md) is the current release-candidate control sheet, and the [6.0.0 Consumer Verification Guide](consumer-verification-600.md) covers package-source, API-compatibility, Source Link, SBOM/provenance, behavior-change, and deferred package-signing verification. The [Upgrade from 5.x to 6.0](upgrade-500-to-600.md) guide is authoritative for consumers moving from `5.x`. Earlier readiness records are retained for traceability.
+The [6.0.0 Release Readiness Record](release-readiness-600.md) and the [6.0.0 Consumer Verification Guide](consumer-verification-600.md) are the most recently completed release control sheets, covering package-source, API-compatibility, Source Link, SBOM/provenance, behavior-change, and deferred package-signing verification. The equivalent `7.0.0` records are produced when the `7.0.0` release checklist is completed and are not published in advance of it. The [Upgrade from 6.x to 7.0](upgrade-600-to-700.md) guide is authoritative for consumers moving from `6.x`. Earlier readiness records are retained for traceability.
 
 ## Required checks before tagging a stable release
 

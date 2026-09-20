@@ -1,6 +1,6 @@
 # AsiBackbone Product Documentation
 
-This section organizes the Accountable Systems Infrastructure documentation for the stable `6.x` release line around product implementation, API use, operations, compatibility, and release evidence.
+This section organizes the Accountable Systems Infrastructure documentation for the stable `7.x` release line around product implementation, API use, operations, compatibility, and release evidence.
 AsiBackbone is a .NET governance package family for accountable software decision flow. See [Project Boundaries and Non-Claims](project-boundaries.md) for the canonical boundary reference.
 
 ## Documentation ownership
@@ -11,7 +11,7 @@ General architectural education belongs in [ASI Backbone Learning](https://asiba
 
 ## Current stable package posture
 
-Stable `6.x` package family. `6.0.0` is the current release. It is a
+Stable `7.x` package family. `7.0.0` is the current release. It is a
 major release that renames the public API to plain-language semantic names,
 removes the members whose `5.x` deprecation windows completed, makes
 signature-verification trust failures deny by default, binds the signing policy

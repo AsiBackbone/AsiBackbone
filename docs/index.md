@@ -33,7 +33,7 @@ The DocFX header search is available for package names, API concepts, and articl
 
 ## Current stable package family
 
-Stable `6.x` package family. `6.0.0` is the current release. It is a
+Stable `7.x` package family. `7.0.0` is the current release. It is a
 major release that renames the public API to plain-language semantic names,
 removes the members whose `5.x` deprecation windows completed, makes
 signature-verification trust failures deny by default, binds the signing policy

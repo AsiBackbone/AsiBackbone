@@ -29,7 +29,7 @@ may apply to its own governance records.
 
 ## Decision
 
-NuGet package signing remains deferred for the current `6.x` line. Unsigned
+NuGet package signing remains deferred for the current `7.x` line. Unsigned
 packages must not be described as maintainer-signed, repository-signed,
 Authenticode-signed, tamper-proof, or legally non-repudiable.
 

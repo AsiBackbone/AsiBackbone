@@ -69,6 +69,8 @@
       href: schema-versioning.md
     - name: 6.0 Public API Naming Convention
       href: public-api-naming-600.md
+    - name: Upgrade from 6.x to 7.0
+      href: upgrade-600-to-700.md
     - name: Upgrade from 5.x to 6.0
       href: upgrade-500-to-600.md
     - name: API Compatibility and SemVer
@@ -217,6 +219,10 @@
 
 - name: Releases & Compatibility
   items:
+    - name: 7.0.0 Release Notes
+      href: release-notes-700.md
+    - name: Upgrade from 6.x to 7.0
+      href: upgrade-600-to-700.md
     - name: 6.0.0 Release Notes
       href: release-notes-600.md
     - name: 6.0.0 Release Readiness Record

@@ -14,6 +14,21 @@
       "path": "docs/articles/api-compatibility-and-semver.md",
       "linePattern": "^(?:### Original|The initial stable|### Expanded|The `1\\.[12]\\.x` and `1\\.[12]\\.x` releases expanded the stable)",
       "reason": "Explicitly historical compatibility sections retain their original release identities inside an otherwise current article."
+    },
+    {
+      "path": "docs/articles/api-compatibility-and-semver.md",
+      "linePattern": "^(?:### `[0-9]+\\.x` stable family|`[0-9]+\\.0\\.0` established the previous stable line)",
+      "reason": "Superseded stable-family sections retain the release identities they describe inside an otherwise current article."
+    },
+    {
+      "path": "docs/articles/release-validation.md",
+      "linePattern": "^The \\[6\\.0\\.0 Release Readiness Record\\]",
+      "reason": "Release readiness and consumer verification records are produced when a release checklist completes, so the most recently completed release is named explicitly until the 7.0.0 records exist."
+    },
+    {
+      "path": "docs/articles/supply-chain-provenance.md",
+      "linePattern": "^The most recently published guide, the \\[6\\.0\\.0 Consumer Verification Guide\\]",
+      "reason": "Names the most recently published consumer verification guide explicitly; the 7.0.0 guide is published when the 7.0.0 release checklist completes."
     }
   ]
 }

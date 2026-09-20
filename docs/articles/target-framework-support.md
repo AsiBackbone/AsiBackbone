@@ -2,7 +2,7 @@
 
 ## Status
 
-Accepted for the stable `6.x` package family.
+Accepted for the stable `7.x` package family.
 
 ## Decision
 

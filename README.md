@@ -20,7 +20,7 @@
 
 > AI may provide the intellect. AsiBackbone provides the accountable spine.
 
-AsiBackbone is the implementation package family for Accountable Systems Infrastructure (stable `6.0.x`).
+AsiBackbone is the implementation package family for Accountable Systems Infrastructure (stable `7.0.x`).
 
 ## Documentation ownership
 
@@ -138,7 +138,7 @@ For production-style hosts, add durable audit/outbox persistence, signing or ver
 
 ## Package family
 
-Stable `6.x` package family. `6.0.0` is the current release. It is a
+Stable `7.x` package family. `7.0.0` is the current release. It is a
 major release that renames the public API to plain-language semantic names,
 removes the members whose `5.x` deprecation windows completed, makes
 signature-verification trust failures deny by default, binds the signing policy
@@ -221,7 +221,7 @@ The full, categorized documentation set lives at the [documentation site](https:
 
 ## Current status
 
-Stable `6.x` is the current released line, with `6.0.0` as the current release. Package IDs and public namespaces remain unchanged, and the binary assembly identity is `6.0.0.0`.
+Stable `7.x` is the current released line, with `7.0.0` as the current release. Package IDs and public namespaces remain unchanged, and the binary assembly identity is `7.0.0.0`.
 
 The stable API contract is documented in [API Compatibility and SemVer](https://github.com/AsiBackbone/AsiBackbone/blob/main/docs/articles/api-compatibility-and-semver.md). The current release is recorded in [6.0.0 Release Notes](https://github.com/AsiBackbone/AsiBackbone/blob/main/docs/articles/release-notes-600.md). Consumers can use the [6.0.0 Consumer Verification Guide](https://github.com/AsiBackbone/AsiBackbone/blob/main/docs/articles/consumer-verification-600.md) for package-source, API-compatibility, Source Link, SBOM, provenance, behavior-change, and deferred-signing checks. Consumers moving from `5.x` must follow the [5.x to 6.0 migration guide](https://github.com/AsiBackbone/AsiBackbone/blob/main/docs/articles/upgrade-500-to-600.md). Earlier release records remain available for historical traceability.
 
@@ -249,7 +249,7 @@ A consumer should be able to use AsiBackbone in an application generated from Ne
 
 AsiBackbone is a governance framework, not an intelligence engine. It implements software primitives for accountable decision flow and keeps execution authority with the host application. See [Project Boundaries and Non-Claims](https://asibackbone.github.io/AsiBackbone/articles/project-boundaries.html) for the full scope statement and safe wording guidance.
 
-> **Current NuGet packages are intentionally published without package signing.** The dated [NuGet Package Signing Decision Record](https://asibackbone.github.io/AsiBackbone/articles/nuget-package-signing-decision.html) records the accepted risk, compensating controls, mandatory review date, and early re-evaluation criteria. The project publishes durable release-attached SBOMs, package/SBOM provenance, Source Link metadata, and package hashes as distinct trust signals; none is presented as a signed-package guarantee. For current verification guidance, see the [**6.0.0 Release Notes**](https://asibackbone.github.io/AsiBackbone/articles/release-notes-600.html) and the [6.0.0 Consumer Verification Guide](https://asibackbone.github.io/AsiBackbone/articles/consumer-verification-600.html).
+> **Current NuGet packages are intentionally published without package signing.** The dated [NuGet Package Signing Decision Record](https://asibackbone.github.io/AsiBackbone/articles/nuget-package-signing-decision.html) records the accepted risk, compensating controls, mandatory review date, and early re-evaluation criteria. The project publishes durable release-attached SBOMs, package/SBOM provenance, Source Link metadata, and package hashes as distinct trust signals; none is presented as a signed-package guarantee. For current verification guidance, see the [**7.0.0 Release Notes**](https://asibackbone.github.io/AsiBackbone/articles/release-notes-600.html) and the [7.0.0 Consumer Verification Guide](https://asibackbone.github.io/AsiBackbone/articles/consumer-verification-600.html).
 
 ## Design principles
 

@@ -24,9 +24,9 @@ Minor releases should be paced enough to let additive surfaces be reviewed, docu
 
 Major releases should be rare. They should be reserved for identity, namespace, public API, durable artifact, binary identity, or package-boundary breaks that are strongly justified and documented in advance.
 
-## Current `6.x` stabilization posture
+## Current `7.x` stabilization posture
 
-`6.x` is the current stable package line, and `6.0.0` is the current release.
+`7.x` is the current stable package line, and `7.0.0` is the current release.
 
 The `6.0.0` release preserves the package IDs, namespaces, and `net10.0` target while advancing the binary identity to `6.0.0.0`. It completes the `5.x` deprecation windows, renames the public API to plain-language semantic names, and ships verification, signature-input, and use-store corrections that could only change at a major boundary.
 

@@ -2,7 +2,7 @@
 
 ASP.NET Core host adapters for AsiBackbone governance primitives.
 
-Stable `6.x` package family. `6.0.0` is the current release for this package.
+Stable `7.x` package family. `7.0.0` is the current release for this package.
 
 This package acts as a thin web-host adapter around `AsiBackbone.Core`.
 
