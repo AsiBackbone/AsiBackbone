@@ -105,6 +105,8 @@ public static class ManagedKeySigningServiceCollectionExtensions
         ManagedKeySigningOptions options,
         Func<IServiceProvider, IManagedKeySigningClient> clientFactory)
     {
+        ThrowIfProductionWithoutVerification(services);
+
         _ = services.AddSingleton(options);
         _ = services.AddSingleton(clientFactory);
         _ = services.AddSingleton<ManagedKeySigningService>();
@@ -118,11 +120,35 @@ public static class ManagedKeySigningServiceCollectionExtensions
         IServiceCollection services,
         ManagedKeySigningOptions options)
     {
+        ThrowIfProductionWithoutVerification(services);
+
         _ = services.AddSingleton(options);
         _ = services.AddSingleton<ManagedKeySigningService>();
         _ = services.AddSingleton<IGovernanceSigningService>(serviceProvider =>
             serviceProvider.GetRequiredService<ManagedKeySigningService>());
 
         return services;
+    }
+
+    private static void ThrowIfProductionWithoutVerification(IServiceCollection services)
+    {
+        string? environmentName = Environment.GetEnvironmentVariable("DOTNET_ENVIRONMENT")
+            ?? Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
+
+        if (!string.Equals(environmentName, "Production", StringComparison.OrdinalIgnoreCase))
+        {
+            return;
+        }
+
+        bool hasVerificationService = services.Any(descriptor =>
+            descriptor.ServiceType == typeof(IGovernanceSignatureVerificationService));
+
+        if (!hasVerificationService)
+        {
+            throw new InvalidOperationException(
+                "Managed-key signing is being registered in Production without an IGovernanceSignatureVerificationService. " +
+                "This host signs artifacts but never verifies them, which silently breaks trust validation. " +
+                "Register a verification implementation or move this signing registration behind a non-production guard.");
+        }
     }
 }

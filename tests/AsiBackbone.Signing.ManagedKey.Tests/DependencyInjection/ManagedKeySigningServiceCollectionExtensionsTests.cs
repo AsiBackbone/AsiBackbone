@@ -66,6 +66,63 @@ public sealed class ManagedKeySigningServiceCollectionExtensionsTests
     }
 
     /// <summary>
+    /// Verifies production registration fails when no verification service is available.
+    /// </summary>
+    [Fact]
+    public void ProductionRegistrationRequiresVerificationService()
+    {
+        string? originalDotnetEnvironment = Environment.GetEnvironmentVariable("DOTNET_ENVIRONMENT");
+        string? originalAspNetEnvironment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
+
+        try
+        {
+            Environment.SetEnvironmentVariable("DOTNET_ENVIRONMENT", "Production");
+            Environment.SetEnvironmentVariable("ASPNETCORE_ENVIRONMENT", null);
+
+            ServiceCollection services = new();
+            InvalidOperationException exception = Assert.Throws<InvalidOperationException>(() =>
+                services.AddAsiBackboneManagedKeySigning(ConfigureValidOptions));
+
+            Assert.Contains("IGovernanceSignatureVerificationService", exception.Message, StringComparison.Ordinal);
+        }
+        finally
+        {
+            Environment.SetEnvironmentVariable("DOTNET_ENVIRONMENT", originalDotnetEnvironment);
+            Environment.SetEnvironmentVariable("ASPNETCORE_ENVIRONMENT", originalAspNetEnvironment);
+        }
+    }
+
+    /// <summary>
+    /// Verifies production registration allows an explicit verification implementation.
+    /// </summary>
+    [Fact]
+    public void ProductionRegistrationAllowsVerificationService()
+    {
+        string? originalDotnetEnvironment = Environment.GetEnvironmentVariable("DOTNET_ENVIRONMENT");
+        string? originalAspNetEnvironment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
+
+        try
+        {
+            Environment.SetEnvironmentVariable("DOTNET_ENVIRONMENT", "Production");
+            Environment.SetEnvironmentVariable("ASPNETCORE_ENVIRONMENT", null);
+
+            ServiceCollection services = new();
+            _ = services.AddSingleton<IGovernanceSignatureVerificationService>(new StubVerificationService());
+
+            IServiceCollection result = services.AddAsiBackboneManagedKeySigning(ConfigureValidOptions);
+
+            Assert.Same(services, result);
+            using ServiceProvider provider = services.BuildServiceProvider();
+            Assert.NotNull(provider.GetRequiredService<IGovernanceSignatureVerificationService>());
+        }
+        finally
+        {
+            Environment.SetEnvironmentVariable("DOTNET_ENVIRONMENT", originalDotnetEnvironment);
+            Environment.SetEnvironmentVariable("ASPNETCORE_ENVIRONMENT", originalAspNetEnvironment);
+        }
+    }
+
+    /// <summary>
     /// Verifies local-validation registration with a client factory.
     /// </summary>
     [Fact]
@@ -209,6 +266,16 @@ public sealed class ManagedKeySigningServiceCollectionExtensionsTests
             CancellationToken cancellationToken = default)
         {
             throw new NotSupportedException("Registration tests do not invoke signing.");
+        }
+    }
+
+    private sealed class StubVerificationService : IGovernanceSignatureVerificationService
+    {
+        public ValueTask<SignatureVerificationResult> VerifyAsync(
+            SignatureVerificationRequest request,
+            CancellationToken cancellationToken = default)
+        {
+            return ValueTask.FromResult(SignatureVerificationResult.Verified());
         }
     }
 }
