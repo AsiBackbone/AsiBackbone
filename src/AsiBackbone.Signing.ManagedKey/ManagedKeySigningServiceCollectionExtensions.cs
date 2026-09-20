@@ -106,7 +106,7 @@ public static class ManagedKeySigningServiceCollectionExtensions
         Func<IServiceProvider, IManagedKeySigningClient> clientFactory)
     {
         _ = services.AddSingleton(options);
-_ = services.AddSingleton<IManagedKeySigningClient>(clientFactory);
+        _ = services.AddSingleton(clientFactory);
         _ = services.AddSingleton(provider =>
         {
             ThrowIfProductionWithoutVerification(provider);
