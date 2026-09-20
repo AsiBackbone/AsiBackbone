@@ -157,7 +157,7 @@ public static class ManagedKeySigningServiceCollectionExtensions
 
         IServiceProviderIsService? isService = serviceProvider.GetService<IServiceProviderIsService>();
         bool hasVerificationRegistration = isService?.IsService(typeof(IGovernanceSignatureVerificationService))
-            ?? serviceProvider.GetService<IGovernanceSignatureVerificationService>() is not null;
+            ?? (serviceProvider.GetService<IGovernanceSignatureVerificationService>() is not null);
 
         if (!hasVerificationRegistration)
         {
