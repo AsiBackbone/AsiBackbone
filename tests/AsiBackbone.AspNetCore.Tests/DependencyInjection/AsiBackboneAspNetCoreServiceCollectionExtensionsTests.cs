@@ -275,7 +275,7 @@ public sealed class AsiBackboneAspNetCoreServiceCollectionExtensionsTests
     }
 
     /// <summary>
-    /// Tests that the <see cref="AsiBackboneAspNetCoreServiceCollectionExtensions.AddAsiBackboneAspNetCore(IServiceCollection, Action{AspNetCoreGovernanceOptions})"/> method throws an <see cref="InvalidOperationException"/> when the <see cref="AspNetCoreGovernanceOptions.CorrelationIdHeaderName"/> is null, empty, or whitespace.
+    /// Tests that the <see cref="AsiBackboneAspNetCoreServiceCollectionExtensions.AddAsiBackboneAspNetCore(IServiceCollection, Action{AspNetCoreGovernanceOptions})"/> method throws an <see cref="OptionsValidationException"/> when the <see cref="AspNetCoreGovernanceOptions.CorrelationIdHeaderName"/> is null, empty, or whitespace.
     /// </summary>
     /// <param name="headerName">
     /// The name of the correlation identifier header.
