@@ -3,6 +3,12 @@
 <!-- Issues #782/#783: intentional 6.0 type renames and obsolete API removals.
      Exact baseline targets only; all other package compatibility checks remain enabled.
      See docs/articles/public-api-naming-600.md and upgrade-500-to-600.md. -->
+<!-- CP0011: intentional renumbering of DlpFailureBehavior and DlpIntentRiskLevel so that neither
+     enum keeps its most permissive member at zero. Both gained Unspecified = 0, shifting the
+     remaining members up by one, so an unset field or an omitted configuration value can no longer
+     resolve a screening failure to Allow or Low. Source that names these members is unaffected;
+     consumers that persisted or transmitted the numeric values must remap them.
+     See the Unreleased section of CHANGELOG.md and docs/articles/dlp-classification-failure-policy.md. -->
 <Suppressions xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
   <Suppression>
     <DiagnosticId>CP0001</DiagnosticId>
@@ -441,6 +447,69 @@
   <Suppression>
     <DiagnosticId>CP0008</DiagnosticId>
     <Target>T:AsiBackbone.Core.Emissions.NoOpGovernanceEmitter</Target>
+    <Left>lib/net10.0/AsiBackbone.Core.dll</Left>
+    <Right>lib/net10.0/AsiBackbone.Core.dll</Right>
+    <IsBaselineSuppression>true</IsBaselineSuppression>
+  </Suppression>
+  <Suppression>
+    <DiagnosticId>CP0011</DiagnosticId>
+    <Target>F:AsiBackbone.Core.Classification.DlpFailureBehavior.Allow</Target>
+    <Left>lib/net10.0/AsiBackbone.Core.dll</Left>
+    <Right>lib/net10.0/AsiBackbone.Core.dll</Right>
+    <IsBaselineSuppression>true</IsBaselineSuppression>
+  </Suppression>
+  <Suppression>
+    <DiagnosticId>CP0011</DiagnosticId>
+    <Target>F:AsiBackbone.Core.Classification.DlpFailureBehavior.Defer</Target>
+    <Left>lib/net10.0/AsiBackbone.Core.dll</Left>
+    <Right>lib/net10.0/AsiBackbone.Core.dll</Right>
+    <IsBaselineSuppression>true</IsBaselineSuppression>
+  </Suppression>
+  <Suppression>
+    <DiagnosticId>CP0011</DiagnosticId>
+    <Target>F:AsiBackbone.Core.Classification.DlpFailureBehavior.Deny</Target>
+    <Left>lib/net10.0/AsiBackbone.Core.dll</Left>
+    <Right>lib/net10.0/AsiBackbone.Core.dll</Right>
+    <IsBaselineSuppression>true</IsBaselineSuppression>
+  </Suppression>
+  <Suppression>
+    <DiagnosticId>CP0011</DiagnosticId>
+    <Target>F:AsiBackbone.Core.Classification.DlpFailureBehavior.Escalate</Target>
+    <Left>lib/net10.0/AsiBackbone.Core.dll</Left>
+    <Right>lib/net10.0/AsiBackbone.Core.dll</Right>
+    <IsBaselineSuppression>true</IsBaselineSuppression>
+  </Suppression>
+  <Suppression>
+    <DiagnosticId>CP0011</DiagnosticId>
+    <Target>F:AsiBackbone.Core.Classification.DlpFailureBehavior.RequireAcknowledgment</Target>
+    <Left>lib/net10.0/AsiBackbone.Core.dll</Left>
+    <Right>lib/net10.0/AsiBackbone.Core.dll</Right>
+    <IsBaselineSuppression>true</IsBaselineSuppression>
+  </Suppression>
+  <Suppression>
+    <DiagnosticId>CP0011</DiagnosticId>
+    <Target>F:AsiBackbone.Core.Classification.DlpFailureBehavior.WarnAndAllow</Target>
+    <Left>lib/net10.0/AsiBackbone.Core.dll</Left>
+    <Right>lib/net10.0/AsiBackbone.Core.dll</Right>
+    <IsBaselineSuppression>true</IsBaselineSuppression>
+  </Suppression>
+  <Suppression>
+    <DiagnosticId>CP0011</DiagnosticId>
+    <Target>F:AsiBackbone.Core.Classification.DlpIntentRiskLevel.High</Target>
+    <Left>lib/net10.0/AsiBackbone.Core.dll</Left>
+    <Right>lib/net10.0/AsiBackbone.Core.dll</Right>
+    <IsBaselineSuppression>true</IsBaselineSuppression>
+  </Suppression>
+  <Suppression>
+    <DiagnosticId>CP0011</DiagnosticId>
+    <Target>F:AsiBackbone.Core.Classification.DlpIntentRiskLevel.Low</Target>
+    <Left>lib/net10.0/AsiBackbone.Core.dll</Left>
+    <Right>lib/net10.0/AsiBackbone.Core.dll</Right>
+    <IsBaselineSuppression>true</IsBaselineSuppression>
+  </Suppression>
+  <Suppression>
+    <DiagnosticId>CP0011</DiagnosticId>
+    <Target>F:AsiBackbone.Core.Classification.DlpIntentRiskLevel.Medium</Target>
     <Left>lib/net10.0/AsiBackbone.Core.dll</Left>
     <Right>lib/net10.0/AsiBackbone.Core.dll</Right>
     <IsBaselineSuppression>true</IsBaselineSuppression>
