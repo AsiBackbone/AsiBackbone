@@ -83,6 +83,44 @@ public sealed class GovernanceOutboxDrainClaimSafetyTests
     }
 
     /// <summary>
+    /// Verifies that cancellation between claim entries releases the remaining active leases for the page.
+    /// </summary>
+    [Fact]
+    public async Task DrainAsyncReleasesOutstandingClaimsWhenCancellationOccursBetweenEntries()
+    {
+        var store = new RecordingClaimStore(availableEntryCount: 2);
+        using var cancellationTokenSource = new CancellationTokenSource();
+        var drain = new GovernanceOutboxDrain(
+            store,
+            new BetweenEntryCancellingEmitter(cancellationTokenSource),
+            outboxOptions: Options.Create(new GovernanceOutboxOptions { ClaimWorkerId = "worker-1" }));
+
+        _ = await Assert.ThrowsAsync<OperationCanceledException>(async () =>
+            await drain.DrainAsync(DrainUtc, maxCount: 2, cancellationTokenSource.Token));
+
+        Assert.Equal(1, store.ReleaseCount);
+    }
+
+    /// <summary>
+    /// Verifies that cancellation during an in-flight emit releases the current active claim before the exception escapes.
+    /// </summary>
+    [Fact]
+    public async Task DrainAsyncReleasesClaimWhenCancellationOccursDuringEmit()
+    {
+        var store = new RecordingClaimStore(availableEntryCount: 1);
+        using var cancellationTokenSource = new CancellationTokenSource();
+        var drain = new GovernanceOutboxDrain(
+            store,
+            new CancellingEmitter(cancellationTokenSource),
+            outboxOptions: Options.Create(new GovernanceOutboxOptions { ClaimWorkerId = "worker-1" }));
+
+        _ = await Assert.ThrowsAsync<OperationCanceledException>(async () =>
+            await drain.DrainAsync(DrainUtc, maxCount: 1, cancellationTokenSource.Token));
+
+        Assert.Equal(1, store.ReleaseCount);
+    }
+
+    /// <summary>
     /// Verifies that an entry reclaimed past the configured threshold is dead-lettered instead of being emitted again.
     /// </summary>
     /// <returns>A task that represents the asynchronous test operation.</returns>
@@ -176,6 +214,38 @@ public sealed class GovernanceOutboxDrainClaimSafetyTests
         }
     }
 
+    private sealed class BetweenEntryCancellingEmitter(CancellationTokenSource cancellationTokenSource) : IGovernanceEmitter
+    {
+        private int emitCount;
+
+        public ValueTask<GovernanceEmissionResult> EmitAsync(
+            GovernanceEmissionEnvelope envelope,
+            CancellationToken cancellationToken = default)
+        {
+            ArgumentNullException.ThrowIfNull(envelope);
+
+            if (++emitCount == 1)
+            {
+                cancellationTokenSource.Cancel();
+                return ValueTask.FromResult(GovernanceEmissionResult.Delivered("test-sink", envelope.EnvelopeId));
+            }
+
+            throw new OperationCanceledException(cancellationToken);
+        }
+    }
+
+    private sealed class CancellingEmitter(CancellationTokenSource cancellationTokenSource) : IGovernanceEmitter
+    {
+        public ValueTask<GovernanceEmissionResult> EmitAsync(
+            GovernanceEmissionEnvelope envelope,
+            CancellationToken cancellationToken = default)
+        {
+            ArgumentNullException.ThrowIfNull(envelope);
+            cancellationTokenSource.Cancel();
+            throw new OperationCanceledException(cancellationToken);
+        }
+    }
+
     /// <summary>
     /// A claim store that hands out a fixed number of entries and records how each page was requested.
     /// </summary>
@@ -187,6 +257,8 @@ public sealed class GovernanceOutboxDrainClaimSafetyTests
         public List<int> PendingClaimMaxCounts { get; } = [];
 
         public int DeadLetteredCount { get; private set; }
+
+        public int ReleaseCount { get; private set; }
 
         public GovernanceEmissionError? LastDeadLetterError { get; private set; }
 
@@ -261,6 +333,7 @@ public sealed class GovernanceOutboxDrainClaimSafetyTests
             string? reason = null,
             CancellationToken cancellationToken = default)
         {
+            ReleaseCount++;
             return ValueTask.FromResult<GovernanceOutboxEntry?>(claim.Entry);
         }
 

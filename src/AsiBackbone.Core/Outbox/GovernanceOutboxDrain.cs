@@ -212,11 +212,28 @@ public sealed class GovernanceOutboxDrain(
 
         List<GovernanceOutboxEntry> updatedEntries = new(claimsToDrain.Count);
 
-        foreach (GovernanceOutboxClaim claim in claimsToDrain)
+        for (int claimIndex = 0; claimIndex < claimsToDrain.Count; claimIndex++)
         {
-            cancellationToken.ThrowIfCancellationRequested();
-            GovernanceOutboxEntry updatedEntry = await DrainClaimAsync(claimStore, claim, drainUtc, cancellationToken).ConfigureAwait(false);
-            updatedEntries.Add(updatedEntry);
+            GovernanceOutboxClaim claim = claimsToDrain[claimIndex];
+            bool drainAttempted = false;
+
+            try
+            {
+                cancellationToken.ThrowIfCancellationRequested();
+                drainAttempted = true;
+                GovernanceOutboxEntry updatedEntry = await DrainClaimAsync(claimStore, claim, drainUtc, cancellationToken).ConfigureAwait(false);
+                updatedEntries.Add(updatedEntry);
+            }
+            catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
+            {
+                int releaseStartIndex = drainAttempted ? claimIndex + 1 : claimIndex;
+                for (int releaseIndex = releaseStartIndex; releaseIndex < claimsToDrain.Count; releaseIndex++)
+                {
+                    await ReleaseClaimLeaseAsync(claimStore, claimsToDrain[releaseIndex]).ConfigureAwait(false);
+                }
+
+                throw;
+            }
         }
 
         return updatedEntries;
@@ -361,6 +378,7 @@ public sealed class GovernanceOutboxDrain(
         }
 
         GovernanceEmissionResult result;
+        bool cancellationDuringEmit = false;
 
         try
         {
@@ -368,6 +386,7 @@ public sealed class GovernanceOutboxDrain(
         }
         catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
         {
+            cancellationDuringEmit = true;
             throw;
         }
         catch (Exception ex)
@@ -384,8 +403,34 @@ public sealed class GovernanceOutboxDrain(
                 cancellationToken)
                 .ConfigureAwait(false);
         }
+        finally
+        {
+            if (cancellationDuringEmit)
+            {
+                await ReleaseClaimLeaseAsync(claimStore, claim).ConfigureAwait(false);
+            }
+        }
 
         return await ApplyEmissionResultAsync(claimStore, claim, result, drainUtc, cancellationToken).ConfigureAwait(false);
+    }
+
+    private static async ValueTask ReleaseClaimLeaseAsync(
+        IGovernanceOutboxClaimStore claimStore,
+        GovernanceOutboxClaim claim)
+    {
+        try
+        {
+            _ = await claimStore.ReleaseClaimAsync(
+                claim,
+                reason: "drain canceled; releasing active claim",
+                cancellationToken: CancellationToken.None)
+                .ConfigureAwait(false);
+        }
+        catch (OperationCanceledException)
+        {
+            // Best-effort release must not be blocked by the caller's cancellation token. The shutdown handoff
+            // is latency-sensitive but claim release is idempotent and the current drain invocation is already aborting.
+        }
     }
 
     private async ValueTask<GovernanceOutboxEntry> ApplyEmissionResultAsync(
