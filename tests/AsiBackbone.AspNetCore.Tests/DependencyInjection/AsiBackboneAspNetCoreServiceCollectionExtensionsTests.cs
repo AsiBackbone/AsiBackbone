@@ -373,10 +373,10 @@ public sealed class AsiBackboneAspNetCoreServiceCollectionExtensionsTests
     }
 
     /// <summary>
-    /// Tests that the <see cref="AsiBackboneAspNetCoreServiceCollectionExtensions.AddAsiBackboneGovernanceOutboxDrainWorker(IServiceCollection, Action{GovernanceOutboxDrainWorkerOptions})"/> method invokes the configuration callback exactly once when the options are resolved.
+    /// Tests that the <see cref="AsiBackboneAspNetCoreServiceCollectionExtensions.AddAsiBackboneGovernanceOutboxDrainWorker(IServiceCollection, Action{GovernanceOutboxDrainWorkerOptions})"/> method invokes the configuration callback exactly once when monitor-backed options are resolved.
     /// </summary>
     [Fact]
-    public void AddAsiBackboneGovernanceOutboxDrainWorkerInvokesConfigureCallbackOnceWhenOptionsAreResolved()
+    public void AddAsiBackboneGovernanceOutboxDrainWorkerInvokesConfigureCallbackOnceWhenMonitorOptionsAreResolved()
     {
         ServiceCollection services = new();
         int callbackCount = 0;
@@ -391,10 +391,12 @@ public sealed class AsiBackboneAspNetCoreServiceCollectionExtensionsTests
         Assert.Equal(0, callbackCount);
 
         using ServiceProvider provider = services.BuildServiceProvider();
-        GovernanceOutboxDrainWorkerOptions first =
-            provider.GetRequiredService<IOptions<GovernanceOutboxDrainWorkerOptions>>().Value;
-        GovernanceOutboxDrainWorkerOptions second =
-            provider.GetRequiredService<IOptions<GovernanceOutboxDrainWorkerOptions>>().Value;
+        GovernanceOutboxDrainWorkerOptions first = provider
+            .GetRequiredService<IOptionsMonitor<GovernanceOutboxDrainWorkerOptions>>()
+            .CurrentValue;
+        GovernanceOutboxDrainWorkerOptions second = provider
+            .GetRequiredService<IOptionsMonitor<GovernanceOutboxDrainWorkerOptions>>()
+            .CurrentValue;
 
         Assert.Equal(7, first.BatchSize);
         Assert.Same(first, second);
