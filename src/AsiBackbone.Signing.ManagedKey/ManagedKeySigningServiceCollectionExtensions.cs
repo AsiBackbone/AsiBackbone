@@ -153,7 +153,11 @@ public static class ManagedKeySigningServiceCollectionExtensions
             return;
         }
 
-        if (serviceProvider.GetService<IGovernanceSignatureVerificationService>() is null)
+        IServiceProviderIsService? isService = serviceProvider.GetService<IServiceProviderIsService>();
+        bool hasVerificationRegistration = isService?.IsService(typeof(IGovernanceSignatureVerificationService))
+            ?? serviceProvider.GetService<IGovernanceSignatureVerificationService>() is not null;
+
+        if (!hasVerificationRegistration)
         {
             throw new InvalidOperationException(
                 "Managed-key signing is being resolved in Production without an IGovernanceSignatureVerificationService. " +
