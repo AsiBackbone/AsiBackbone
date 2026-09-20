@@ -166,7 +166,8 @@ public static class AsiBackboneAspNetCoreServiceCollectionExtensions
     /// 
     /// Validation of <paramref name="configure" /> values is deferred to the options pipeline.
     /// Invalid values are reported as <see cref="Microsoft.Extensions.Options.OptionsValidationException" />
-    /// when options are resolved or at startup when <c>ValidateOnStart</c> runs.
+    /// when options are resolved, including hosted-service startup validation through
+    /// <see cref="Microsoft.Extensions.Options.IOptionsMonitor{TOptions}.CurrentValue" />.
     /// </remarks>
     /// <param name="services">The service collection to add services to.</param>
     /// <param name="configure">The worker options configuration callback.</param>
@@ -194,8 +195,7 @@ public static class AsiBackboneAspNetCoreServiceCollectionExtensions
                 {
                     return false;
                 }
-            }, "Governance outbox drain worker options must be valid.")
-            .ValidateOnStart();
+            }, "Governance outbox drain worker options must be valid.");
 
         _ = services.AddOptions<GovernanceOutboxOptions>()
             .Validate(static options =>
