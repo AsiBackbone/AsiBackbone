@@ -34,6 +34,12 @@ public static class AsiBackboneAspNetCoreServiceCollectionExtensions
     /// <exception cref="ArgumentNullException">
     /// Thrown when <paramref name="services" /> or <paramref name="configure" /> is <see langword="null" />.
     /// </exception>
+    /// <remarks>
+    /// Option validation is deferred to the Microsoft.Extensions.Options pipeline.
+    /// Invalid option values are reported as <see cref="Microsoft.Extensions.Options.OptionsValidationException" />
+    /// when <see cref="Microsoft.Extensions.Options.IOptions{TOptions}.Value" /> is resolved or during host startup
+    /// when <c>ValidateOnStart</c> executes.
+    /// </remarks>
     public static IServiceCollection AddAsiBackboneAspNetCore(
         this IServiceCollection services,
         Action<AspNetCoreGovernanceOptions> configure)
@@ -157,6 +163,10 @@ public static class AsiBackboneAspNetCoreServiceCollectionExtensions
     /// store that cannot claim. Disabling it allows two replicas to select and emit the same envelope, so a host that opts
     /// out should partition work, run the worker on a single role, or rely on provider-side idempotency.
     /// Claiming coordinates workers; it does not by itself create an exactly-once delivery guarantee.
+    /// 
+    /// Validation of <paramref name="configure" /> values is deferred to the options pipeline.
+    /// Invalid values are reported as <see cref="Microsoft.Extensions.Options.OptionsValidationException" />
+    /// when options are resolved or at startup when <c>ValidateOnStart</c> runs.
     /// </remarks>
     /// <param name="services">The service collection to add services to.</param>
     /// <param name="configure">The worker options configuration callback.</param>
