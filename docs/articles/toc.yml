@@ -221,6 +221,10 @@
   items:
     - name: 7.0.0 Release Notes
       href: release-notes-700.md
+    - name: 7.0.0 Release Readiness Record
+      href: release-readiness-700.md
+    - name: 7.0.0 Consumer Verification Guide
+      href: consumer-verification-700.md
     - name: Upgrade from 6.x to 7.0
       href: upgrade-600-to-700.md
     - name: 6.0.0 Release Notes

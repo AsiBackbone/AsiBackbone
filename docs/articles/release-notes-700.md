@@ -92,7 +92,7 @@ its own assembly, with nothing in the assembly identity to signal the change.
 
 ## Validation
 
-Package validation continues to run against the `5.1.0` baseline. The intentional
+Package validation runs against the published `6.0.0` baseline. The intentional
 enum value changes are recorded as exact `CP0011` suppressions in
 `src/AsiBackbone.Core/CompatibilitySuppressions.xml`; all other package
 compatibility checks remain enabled. The committed public API baselines under
@@ -101,6 +101,8 @@ compatibility checks remain enabled. The committed public API baselines under
 ## Related documentation
 
 * [Upgrade from 6.x to 7.0](upgrade-600-to-700.md)
+* [7.0.0 Release Readiness Record](release-readiness-700.md)
+* [7.0.0 Consumer Verification Guide](consumer-verification-700.md)
 * [API Compatibility and SemVer](api-compatibility-and-semver.md)
 * [DLP and Classification Failure Policy](dlp-classification-failure-policy.md)
 * [ASP.NET Core Integration Boundary](aspnetcore-integration-boundary.md)

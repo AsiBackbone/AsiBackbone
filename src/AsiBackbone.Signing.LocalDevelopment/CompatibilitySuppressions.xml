@@ -1,14 +1,3 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <!-- https://learn.microsoft.com/dotnet/fundamentals/package-validation/diagnostic-ids -->
-<!-- Issues #782/#783: intentional 6.0 type renames and obsolete API removals.
-     Exact baseline targets only; all other package compatibility checks remain enabled.
-     See docs/articles/public-api-naming-600.md and upgrade-500-to-600.md. -->
-<Suppressions xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
-  <Suppression>
-    <DiagnosticId>CP0008</DiagnosticId>
-    <Target>T:AsiBackbone.Signing.LocalDevelopment.LocalDevelopmentSigningService</Target>
-    <Left>lib/net10.0/AsiBackbone.Signing.LocalDevelopment.dll</Left>
-    <Right>lib/net10.0/AsiBackbone.Signing.LocalDevelopment.dll</Right>
-    <IsBaselineSuppression>true</IsBaselineSuppression>
-  </Suppression>
-</Suppressions>
+<Suppressions xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" />

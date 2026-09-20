@@ -2,7 +2,7 @@
 
 # AsiBackbone
 
-> Version 6.0 introduces plain-language semantic type names and product vocabulary. Examples use the 6.0 names; see the [5.x to 6.0 migration guide](docs/articles/upgrade-500-to-600.md), [naming convention](docs/articles/public-api-naming-600.md), and [6.0 terminology guide](docs/articles/terminology-600.md). Earlier release records remain historical context.
+> Version 7.0 binds acknowledgment responses to the challenged actor and removes permissive zero defaults from the DLP policy enums. See the [6.x to 7.0 upgrade guide](docs/articles/upgrade-600-to-700.md) before upgrading. The [6.0 naming convention](docs/articles/public-api-naming-600.md) and [terminology guide](docs/articles/terminology-600.md) remain current; earlier release records remain historical context.
 
 [![CI](https://github.com/AsiBackbone/AsiBackbone/actions/workflows/ci.yml/badge.svg)](https://github.com/AsiBackbone/AsiBackbone/actions/workflows/ci.yml)
 [![Line Coverage Gate](https://img.shields.io/badge/line%20coverage%20gate-75%25-brightgreen)](https://asibackbone.github.io/AsiBackbone/coverage/index.html)
@@ -138,16 +138,13 @@ For production-style hosts, add durable audit/outbox persistence, signing or ver
 
 ## Package family
 
-Stable `7.x` package family. `7.0.0` is the current release. It is a
-major release that renames the public API to plain-language semantic names,
-removes the members whose `5.x` deprecation windows completed, makes
-signature-verification trust failures deny by default, binds the signing policy
-context into a versioned signature input, and closes a replay window in the
-reference in-memory capability-grant use store. Package IDs, public namespaces,
-and the `net10.0` target remain unchanged; the binary assembly identity advances
-to `6.0.0.0`.
+Stable `7.x` package family. `7.0.0` is the current release. It binds
+acknowledgment responses to the challenged actor and makes unconfigured DLP
+failure behavior and risk levels fail explicitly instead of inheriting a
+permissive zero value. Package IDs, public namespaces, and the `net10.0` target
+remain unchanged; the binary assembly identity advances to `7.0.0.0`.
 
-Consumers upgrading from `5.x` must follow the [5.x to 6.0 migration guide](https://github.com/AsiBackbone/AsiBackbone/blob/main/docs/articles/upgrade-500-to-600.md). Host managed-key signing clients and verification services must adopt the new signature input, and hosts that persist `SignatureVerificationCategory` as an integer must accept the new value.
+Consumers upgrading from `6.x` must follow the [6.x to 7.0 upgrade guide](https://github.com/AsiBackbone/AsiBackbone/blob/main/docs/articles/upgrade-600-to-700.md). Hosts must preserve actor identity across both acknowledgment-challenge legs and remap persisted numeric DLP enum values.
 
 | Package | Role |
 | --- | --- |
@@ -167,9 +164,9 @@ Runtime decision-receipt signing remains provider-neutral through `AsiBackbone.S
 
 ## Supported target framework
 
-Stable `6.x` packages intentionally target `net10.0`. Consumers should plan on a .NET 10 SDK/runtime or later for the current package line.
+Stable `7.x` packages intentionally target `net10.0`. Consumers should plan on a .NET 10 SDK/runtime or later for the current package line.
 
-The project is not multi-targeting .NET 8 for `6.x`. That is an explicit adoption decision, not a defect workaround. The current package family uses a single repository-wide `TargetFramework` of `net10.0`, the EF Core integration is aligned with centrally managed EF Core `10.0.x` dependencies, and backporting the full package, analyzer, template, CI, packaging, and smoke-test surface would add compatibility overhead for a short-lived adoption window.
+The project is not multi-targeting .NET 8 for `7.x`. That is an explicit adoption decision, not a defect workaround. The current package family uses a single repository-wide `TargetFramework` of `net10.0`, the EF Core integration is aligned with centrally managed EF Core `10.0.x` dependencies, and backporting the full package, analyzer, template, CI, packaging, and smoke-test surface would add compatibility overhead for a short-lived adoption window.
 
 If meaningful external consumer demand appears, additional TFM support can be reconsidered in a later release with CI, packaging validation, analyzer compatibility, template smoke tests, and documentation updated together. See the [Target Framework Support Decision Record](https://github.com/AsiBackbone/AsiBackbone/blob/main/docs/articles/target-framework-support.md).
 
@@ -223,7 +220,7 @@ The full, categorized documentation set lives at the [documentation site](https:
 
 Stable `7.x` is the current released line, with `7.0.0` as the current release. Package IDs and public namespaces remain unchanged, and the binary assembly identity is `7.0.0.0`.
 
-The stable API contract is documented in [API Compatibility and SemVer](https://github.com/AsiBackbone/AsiBackbone/blob/main/docs/articles/api-compatibility-and-semver.md). The current release is recorded in [6.0.0 Release Notes](https://github.com/AsiBackbone/AsiBackbone/blob/main/docs/articles/release-notes-600.md). Consumers can use the [6.0.0 Consumer Verification Guide](https://github.com/AsiBackbone/AsiBackbone/blob/main/docs/articles/consumer-verification-600.md) for package-source, API-compatibility, Source Link, SBOM, provenance, behavior-change, and deferred-signing checks. Consumers moving from `5.x` must follow the [5.x to 6.0 migration guide](https://github.com/AsiBackbone/AsiBackbone/blob/main/docs/articles/upgrade-500-to-600.md). Earlier release records remain available for historical traceability.
+The stable API contract is documented in [API Compatibility and SemVer](https://github.com/AsiBackbone/AsiBackbone/blob/main/docs/articles/api-compatibility-and-semver.md). The current release is recorded in [7.0.0 Release Notes](https://github.com/AsiBackbone/AsiBackbone/blob/main/docs/articles/release-notes-700.md). Consumers can use the [7.0.0 Consumer Verification Guide](https://github.com/AsiBackbone/AsiBackbone/blob/main/docs/articles/consumer-verification-700.md) for package-source, API-compatibility, Source Link, SBOM, provenance, behavior-change, and deferred-signing checks. Consumers moving from `6.x` must follow the [6.x to 7.0 upgrade guide](https://github.com/AsiBackbone/AsiBackbone/blob/main/docs/articles/upgrade-600-to-700.md). Earlier release records remain available for historical traceability.
 
 ## Support and project stewardship
 
@@ -249,7 +246,7 @@ A consumer should be able to use AsiBackbone in an application generated from Ne
 
 AsiBackbone is a governance framework, not an intelligence engine. It implements software primitives for accountable decision flow and keeps execution authority with the host application. See [Project Boundaries and Non-Claims](https://asibackbone.github.io/AsiBackbone/articles/project-boundaries.html) for the full scope statement and safe wording guidance.
 
-> **Current NuGet packages are intentionally published without package signing.** The dated [NuGet Package Signing Decision Record](https://asibackbone.github.io/AsiBackbone/articles/nuget-package-signing-decision.html) records the accepted risk, compensating controls, mandatory review date, and early re-evaluation criteria. The project publishes durable release-attached SBOMs, package/SBOM provenance, Source Link metadata, and package hashes as distinct trust signals; none is presented as a signed-package guarantee. For current verification guidance, see the [**7.0.0 Release Notes**](https://asibackbone.github.io/AsiBackbone/articles/release-notes-600.html) and the [7.0.0 Consumer Verification Guide](https://asibackbone.github.io/AsiBackbone/articles/consumer-verification-600.html).
+> **Current NuGet packages are intentionally published without package signing.** The dated [NuGet Package Signing Decision Record](https://asibackbone.github.io/AsiBackbone/articles/nuget-package-signing-decision.html) records the accepted risk, compensating controls, mandatory review date, and early re-evaluation criteria. The project publishes durable release-attached SBOMs, package/SBOM provenance, Source Link metadata, and package hashes as distinct trust signals; none is presented as a signed-package guarantee. For current verification guidance, see the [**7.0.0 Release Notes**](https://asibackbone.github.io/AsiBackbone/articles/release-notes-700.html) and the [7.0.0 Consumer Verification Guide](https://asibackbone.github.io/AsiBackbone/articles/consumer-verification-700.html).
 
 ## Design principles
 
