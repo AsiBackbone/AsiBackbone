@@ -92,6 +92,7 @@ public sealed class ManagedKeySigningServiceCollectionExtensionsTests
     [Theory]
     [InlineData("Production", null)]
     [InlineData(null, "Production")]
+    [InlineData(null, null)]
     public void ProductionRegistrationRequiresVerificationService(
         string? dotnetEnvironment,
         string? aspNetCoreEnvironment)

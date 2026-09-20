@@ -142,7 +142,10 @@ public static class ManagedKeySigningServiceCollectionExtensions
     {
         string? dotnetEnvironment = Environment.GetEnvironmentVariable("DOTNET_ENVIRONMENT");
         string? aspNetCoreEnvironment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
-        bool isProduction = string.Equals(dotnetEnvironment, "Production", StringComparison.OrdinalIgnoreCase)
+        bool hasExplicitEnvironment = !string.IsNullOrWhiteSpace(dotnetEnvironment)
+            || !string.IsNullOrWhiteSpace(aspNetCoreEnvironment);
+        bool isProduction = !hasExplicitEnvironment
+            || string.Equals(dotnetEnvironment, "Production", StringComparison.OrdinalIgnoreCase)
             || string.Equals(aspNetCoreEnvironment, "Production", StringComparison.OrdinalIgnoreCase);
 
         if (!isProduction)
