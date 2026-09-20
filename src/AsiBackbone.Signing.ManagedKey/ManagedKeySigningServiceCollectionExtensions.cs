@@ -107,9 +107,15 @@ public static class ManagedKeySigningServiceCollectionExtensions
     {
         _ = services.AddSingleton(options);
         _ = services.AddSingleton(clientFactory);
-        _ = services.AddSingleton<ManagedKeySigningService>();
-        _ = services.AddSingleton<IGovernanceSigningService>(serviceProvider =>
-            serviceProvider.GetRequiredService<ManagedKeySigningService>());
+        _ = services.AddSingleton(provider =>
+        {
+            ThrowIfProductionWithoutVerification(provider);
+            return new ManagedKeySigningService(
+                provider.GetRequiredService<ManagedKeySigningOptions>(),
+                provider.GetRequiredService<IManagedKeySigningClient>());
+        });
+        _ = services.AddSingleton<IGovernanceSigningService>(provider =>
+            provider.GetRequiredService<ManagedKeySigningService>());
 
         return services;
     }
@@ -119,10 +125,44 @@ public static class ManagedKeySigningServiceCollectionExtensions
         ManagedKeySigningOptions options)
     {
         _ = services.AddSingleton(options);
-        _ = services.AddSingleton<ManagedKeySigningService>();
-        _ = services.AddSingleton<IGovernanceSigningService>(serviceProvider =>
-            serviceProvider.GetRequiredService<ManagedKeySigningService>());
+        _ = services.AddSingleton(provider =>
+        {
+            ThrowIfProductionWithoutVerification(provider);
+            return new ManagedKeySigningService(
+                provider.GetRequiredService<ManagedKeySigningOptions>(),
+                provider.GetRequiredService<IManagedKeySigningClient>());
+        });
+        _ = services.AddSingleton<IGovernanceSigningService>(provider =>
+            provider.GetRequiredService<ManagedKeySigningService>());
 
         return services;
+    }
+
+    private static void ThrowIfProductionWithoutVerification(IServiceProvider serviceProvider)
+    {
+        string? dotnetEnvironment = Environment.GetEnvironmentVariable("DOTNET_ENVIRONMENT");
+        string? aspNetCoreEnvironment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
+        bool hasExplicitEnvironment = !string.IsNullOrWhiteSpace(dotnetEnvironment)
+            || !string.IsNullOrWhiteSpace(aspNetCoreEnvironment);
+        bool isProduction = !hasExplicitEnvironment
+            || string.Equals(dotnetEnvironment, "Production", StringComparison.OrdinalIgnoreCase)
+            || string.Equals(aspNetCoreEnvironment, "Production", StringComparison.OrdinalIgnoreCase);
+
+        if (!isProduction)
+        {
+            return;
+        }
+
+        IServiceProviderIsService? isService = serviceProvider.GetService<IServiceProviderIsService>();
+        bool hasVerificationRegistration = isService?.IsService(typeof(IGovernanceSignatureVerificationService))
+            ?? (serviceProvider.GetService<IGovernanceSignatureVerificationService>() is not null);
+
+        if (!hasVerificationRegistration)
+        {
+            throw new InvalidOperationException(
+                "Managed-key signing is being resolved in Production without an IGovernanceSignatureVerificationService. " +
+                "This host signs artifacts but never verifies them, which silently breaks trust validation. " +
+                "Register a verification implementation before resolving the signing service or move this registration behind a non-production guard.");
+        }
     }
 }

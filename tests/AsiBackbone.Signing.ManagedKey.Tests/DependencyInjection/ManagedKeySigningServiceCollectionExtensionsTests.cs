@@ -5,17 +5,35 @@ using Xunit;
 namespace AsiBackbone.Signing.ManagedKey.Tests.DependencyInjection;
 
 /// <summary>
+/// Prevents tests that mutate process-wide environment variables from overlapping other test collections.
+/// </summary>
+[CollectionDefinition(Name, DisableParallelization = true)]
+public sealed class EnvironmentVariableTestGroup
+{
+    /// <summary>
+    /// The xUnit collection name used by tests that mutate process-wide environment variables.
+    /// </summary>
+    public const string Name = "Environment variable tests";
+}
+
+/// <summary>
 /// Unit tests for <see cref="ManagedKeySigningServiceCollectionExtensions" /> registration overloads.
 /// </summary>
+[Collection(EnvironmentVariableTestGroup.Name)]
 public sealed class ManagedKeySigningServiceCollectionExtensionsTests
 {
+    private static readonly object EnvironmentMutationLock = new();
+
     /// <summary>
     /// Verifies production registration with a client factory.
     /// </summary>
     [Fact]
     public void ProductionFactoryRegistrationUsesSingletonServicesAndFailsClosed()
     {
+        using var scope = new EnvironmentVariableScope("Development");
+
         ServiceCollection services = new();
+        _ = services.AddSingleton<IGovernanceSignatureVerificationService>(new StubVerificationService());
         var client = new StubManagedKeySigningClient();
         int factoryCalls = 0;
 
@@ -48,7 +66,10 @@ public sealed class ManagedKeySigningServiceCollectionExtensionsTests
     [Fact]
     public void ProductionRegisteredClientRegistrationUsesHostSingletonAndFailsClosed()
     {
+        using var scope = new EnvironmentVariableScope("Development");
+
         ServiceCollection services = new();
+        _ = services.AddSingleton<IGovernanceSignatureVerificationService>(new StubVerificationService());
         var client = new StubManagedKeySigningClient();
         _ = services.AddSingleton<IManagedKeySigningClient>(client);
 
@@ -66,11 +87,57 @@ public sealed class ManagedKeySigningServiceCollectionExtensionsTests
     }
 
     /// <summary>
+    /// Verifies production registration fails when no verification service is available.
+    /// </summary>
+    [Theory]
+    [InlineData("Production", null)]
+    [InlineData(null, "Production")]
+    [InlineData(null, null)]
+    public void ProductionRegistrationRequiresVerificationService(
+        string? dotnetEnvironment,
+        string? aspNetCoreEnvironment)
+    {
+        using var scope = new EnvironmentVariableScope(dotnetEnvironment, aspNetCoreEnvironment);
+
+        ServiceCollection services = new();
+        _ = services.AddSingleton<IManagedKeySigningClient>(new StubManagedKeySigningClient());
+        _ = services.AddAsiBackboneManagedKeySigning(ConfigureValidOptions);
+
+        using ServiceProvider provider = services.BuildServiceProvider();
+        InvalidOperationException exception = Assert.Throws<InvalidOperationException>(() =>
+            _ = provider.GetRequiredService<ManagedKeySigningService>());
+
+        Assert.Contains("IGovernanceSignatureVerificationService", exception.Message, StringComparison.Ordinal);
+    }
+
+    /// <summary>
+    /// Verifies production registration allows an explicit verification implementation.
+    /// </summary>
+    [Fact]
+    public void ProductionRegistrationAllowsVerificationService()
+    {
+        using var scope = new EnvironmentVariableScope("Production");
+
+        ServiceCollection services = new();
+        _ = services.AddSingleton<IGovernanceSignatureVerificationService>(new StubVerificationService());
+        _ = services.AddSingleton<IManagedKeySigningClient>(new StubManagedKeySigningClient());
+
+        IServiceCollection result = services.AddAsiBackboneManagedKeySigning(ConfigureValidOptions);
+
+        Assert.Same(services, result);
+        using ServiceProvider provider = services.BuildServiceProvider();
+        Assert.NotNull(provider.GetRequiredService<IGovernanceSignatureVerificationService>());
+        Assert.NotNull(provider.GetRequiredService<ManagedKeySigningService>());
+    }
+
+    /// <summary>
     /// Verifies local-validation registration with a client factory.
     /// </summary>
     [Fact]
     public void LocalValidationFactoryRegistrationForcesUnsignedFailures()
     {
+        using var scope = new EnvironmentVariableScope("Development");
+
         ServiceCollection services = new();
         var client = new StubManagedKeySigningClient();
 
@@ -99,6 +166,8 @@ public sealed class ManagedKeySigningServiceCollectionExtensionsTests
     [Fact]
     public void LocalValidationRegisteredClientRegistrationForcesUnsignedFailures()
     {
+        using var scope = new EnvironmentVariableScope("Development");
+
         ServiceCollection services = new();
         var client = new StubManagedKeySigningClient();
         _ = services.AddSingleton<IManagedKeySigningClient>(client);
@@ -126,6 +195,8 @@ public sealed class ManagedKeySigningServiceCollectionExtensionsTests
     [Fact]
     public void RegistrationOverloadsRejectNullArguments()
     {
+        using var scope = new EnvironmentVariableScope("Development");
+
         ServiceCollection services = new();
         static IManagedKeySigningClient factory(IServiceProvider _)
         {
@@ -209,6 +280,92 @@ public sealed class ManagedKeySigningServiceCollectionExtensionsTests
             CancellationToken cancellationToken = default)
         {
             throw new NotSupportedException("Registration tests do not invoke signing.");
+        }
+    }
+
+    private sealed class StubVerificationService : IGovernanceSignatureVerificationService
+    {
+        public ValueTask<SignatureVerificationResult> VerifyAsync(
+            SignatureVerificationRequest request,
+            CancellationToken cancellationToken = default)
+        {
+            return ValueTask.FromResult(SignatureVerificationResult.Verified());
+        }
+    }
+
+    private sealed class EnvironmentVariableScope : IDisposable
+    {
+        private readonly string? originalDotnetEnvironment;
+        private readonly string? originalAspNetEnvironment;
+        private bool lockHeld;
+
+        public EnvironmentVariableScope(
+            string? dotnetEnvironment,
+            string? aspNetCoreEnvironment = null)
+        {
+            Monitor.Enter(EnvironmentMutationLock);
+            lockHeld = true;
+            bool restoreRequired = false;
+
+            try
+            {
+                originalDotnetEnvironment = Environment.GetEnvironmentVariable("DOTNET_ENVIRONMENT");
+                originalAspNetEnvironment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
+                restoreRequired = true;
+                Environment.SetEnvironmentVariable("DOTNET_ENVIRONMENT", dotnetEnvironment);
+                Environment.SetEnvironmentVariable("ASPNETCORE_ENVIRONMENT", aspNetCoreEnvironment);
+            }
+            catch
+            {
+                try
+                {
+                    if (restoreRequired)
+                    {
+                        RestoreEnvironmentVariables();
+                    }
+                }
+                finally
+                {
+                    ReleaseLock();
+                }
+
+                throw;
+            }
+        }
+
+        public void Dispose()
+        {
+            if (!lockHeld)
+            {
+                return;
+            }
+
+            try
+            {
+                RestoreEnvironmentVariables();
+            }
+            finally
+            {
+                ReleaseLock();
+            }
+        }
+
+        private void RestoreEnvironmentVariables()
+        {
+            try
+            {
+                Environment.SetEnvironmentVariable("DOTNET_ENVIRONMENT", originalDotnetEnvironment);
+            }
+            finally
+            {
+                Environment.SetEnvironmentVariable("ASPNETCORE_ENVIRONMENT", originalAspNetEnvironment);
+            }
+        }
+
+        private void ReleaseLock()
+        {
+            lockHeld = false;
+            Monitor.Exit(EnvironmentMutationLock);
         }
     }
 }

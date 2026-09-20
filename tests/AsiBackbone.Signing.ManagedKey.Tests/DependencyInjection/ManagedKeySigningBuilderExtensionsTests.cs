@@ -17,6 +17,7 @@ public sealed class ManagedKeySigningBuilderExtensionsTests
     public void UseManagedKeySigningWithFactoryRegistersServicesAndReturnsSameBuilder()
     {
         ServiceCollection services = new();
+        _ = services.AddSingleton<IGovernanceSignatureVerificationService>(new StubVerificationService());
         IAsiBackboneBuilder builder = new AsiBackboneBuilder(services);
         var client = new StubManagedKeySigningClient();
         bool configureInvoked = false;
@@ -60,6 +61,7 @@ public sealed class ManagedKeySigningBuilderExtensionsTests
     public void UseManagedKeySigningWithRegisteredClientUsesHostClientAndReturnsSameBuilder()
     {
         ServiceCollection services = new();
+        _ = services.AddSingleton<IGovernanceSignatureVerificationService>(new StubVerificationService());
         var client = new StubManagedKeySigningClient();
         _ = services.AddSingleton<IManagedKeySigningClient>(client);
         IAsiBackboneBuilder builder = new AsiBackboneBuilder(services);
@@ -176,7 +178,7 @@ public sealed class ManagedKeySigningBuilderExtensionsTests
         Assert.Contains(
             services,
             descriptor => descriptor.ServiceType == typeof(ManagedKeySigningService)
-                && descriptor.ImplementationType == typeof(ManagedKeySigningService)
+                && descriptor.ImplementationFactory is not null
                 && descriptor.Lifetime == ServiceLifetime.Singleton);
         Assert.Contains(
             services,
@@ -201,6 +203,16 @@ public sealed class ManagedKeySigningBuilderExtensionsTests
             CancellationToken cancellationToken = default)
         {
             throw new NotSupportedException("The builder tests do not invoke managed-key signing.");
+        }
+    }
+
+    private sealed class StubVerificationService : IGovernanceSignatureVerificationService
+    {
+        public ValueTask<SignatureVerificationResult> VerifyAsync(
+            SignatureVerificationRequest request,
+            CancellationToken cancellationToken = default)
+        {
+            return ValueTask.FromResult(SignatureVerificationResult.Verified());
         }
     }
 }

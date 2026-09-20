@@ -34,6 +34,11 @@ public sealed class GovernanceOutboxDrain(
         new EventId(19702, nameof(LogGovernanceClaimAttemptsExceeded)),
         "Governance outbox entry {OutboxEntryId} was claimed {ClaimAttemptCount} times without reaching a terminal state, exceeding the configured maximum of {MaxClaimAttempts}. The entry is being dead-lettered without a further emission attempt. Correlation ID: {CorrelationId}.");
 
+    private static readonly Action<ILogger, string, string, Exception?> LogGovernanceClaimReleaseFailure = LoggerMessage.Define<string, string>(
+        LogLevel.Warning,
+        new EventId(19703, nameof(LogGovernanceClaimReleaseFailure)),
+        "Governance outbox claim release failed during cancellation for outbox entry {OutboxEntryId} owned by worker {ClaimWorkerId}. The lease will remain active until it expires.");
+
     private readonly IGovernanceOutboxStore outboxStore = outboxStore ?? throw new ArgumentNullException(nameof(outboxStore));
     private readonly IGovernanceEmitter emitter = emitter ?? throw new ArgumentNullException(nameof(emitter));
     private readonly ILogger<GovernanceOutboxDrain> logger = logger ?? NullLogger<GovernanceOutboxDrain>.Instance;
@@ -212,11 +217,28 @@ public sealed class GovernanceOutboxDrain(
 
         List<GovernanceOutboxEntry> updatedEntries = new(claimsToDrain.Count);
 
-        foreach (GovernanceOutboxClaim claim in claimsToDrain)
+        for (int claimIndex = 0; claimIndex < claimsToDrain.Count; claimIndex++)
         {
-            cancellationToken.ThrowIfCancellationRequested();
-            GovernanceOutboxEntry updatedEntry = await DrainClaimAsync(claimStore, claim, drainUtc, cancellationToken).ConfigureAwait(false);
-            updatedEntries.Add(updatedEntry);
+            GovernanceOutboxClaim claim = claimsToDrain[claimIndex];
+            bool drainAttempted = false;
+
+            try
+            {
+                cancellationToken.ThrowIfCancellationRequested();
+                drainAttempted = true;
+                GovernanceOutboxEntry updatedEntry = await DrainClaimAsync(claimStore, claim, drainUtc, cancellationToken).ConfigureAwait(false);
+                updatedEntries.Add(updatedEntry);
+            }
+            catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
+            {
+                int releaseStartIndex = drainAttempted ? claimIndex + 1 : claimIndex;
+                for (int releaseIndex = releaseStartIndex; releaseIndex < claimsToDrain.Count; releaseIndex++)
+                {
+                    await ReleaseClaimLeaseAsync(claimStore, claimsToDrain[releaseIndex]).ConfigureAwait(false);
+                }
+
+                throw;
+            }
         }
 
         return updatedEntries;
@@ -340,34 +362,34 @@ public sealed class GovernanceOutboxDrain(
         DateTimeOffset drainUtc,
         CancellationToken cancellationToken)
     {
-        // An emitter that hangs or is killed mid-emission leaves the entry claimed but never failed, so its retry
-        // count does not advance and the retry-based poison-message policy never fires. The claim count does
-        // advance on every reclaim, so it is the only signal that bounds that loop. Checked before emission so a
-        // repeatedly reclaimed entry is not handed to the emitter again.
-        if (ShouldDeadLetterForClaimAttempts(claim.Entry))
-        {
-            var claimExhaustedError = GovernanceEmissionError.Create(
-                retryOptions.MaxClaimAttemptsReasonCode,
-                retryOptions.MaxClaimAttemptsReasonMessage);
-
-            LogClaimAttemptsExceeded(claim.Entry);
-
-            return await claimStore.MarkClaimDeadLetteredAsync(
-                claim,
-                claimExhaustedError,
-                retryOptions.MaxClaimAttemptsReasonMessage,
-                cancellationToken)
-                .ConfigureAwait(false);
-        }
-
-        GovernanceEmissionResult result;
-
         try
         {
-            result = await emitter.EmitAsync(claim.Entry.Envelope, cancellationToken).ConfigureAwait(false);
+            // An emitter that hangs or is killed mid-emission leaves the entry claimed but never failed, so its retry
+            // count does not advance and the retry-based poison-message policy never fires. The claim count does
+            // advance on every reclaim, so it is the only signal that bounds that loop. Checked before emission so a
+            // repeatedly reclaimed entry is not handed to the emitter again.
+            if (ShouldDeadLetterForClaimAttempts(claim.Entry))
+            {
+                var claimExhaustedError = GovernanceEmissionError.Create(
+                    retryOptions.MaxClaimAttemptsReasonCode,
+                    retryOptions.MaxClaimAttemptsReasonMessage);
+
+                LogClaimAttemptsExceeded(claim.Entry);
+
+                return await claimStore.MarkClaimDeadLetteredAsync(
+                    claim,
+                    claimExhaustedError,
+                    retryOptions.MaxClaimAttemptsReasonMessage,
+                    cancellationToken)
+                    .ConfigureAwait(false);
+            }
+
+            GovernanceEmissionResult result = await emitter.EmitAsync(claim.Entry.Envelope, cancellationToken).ConfigureAwait(false);
+            return await ApplyEmissionResultAsync(claimStore, claim, result, drainUtc, cancellationToken).ConfigureAwait(false);
         }
         catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
         {
+            await ReleaseClaimLeaseAsync(claimStore, claim).ConfigureAwait(false);
             throw;
         }
         catch (Exception ex)
@@ -384,8 +406,28 @@ public sealed class GovernanceOutboxDrain(
                 cancellationToken)
                 .ConfigureAwait(false);
         }
+    }
 
-        return await ApplyEmissionResultAsync(claimStore, claim, result, drainUtc, cancellationToken).ConfigureAwait(false);
+    private async ValueTask ReleaseClaimLeaseAsync(
+        IGovernanceOutboxClaimStore claimStore,
+        GovernanceOutboxClaim claim)
+    {
+        try
+        {
+            _ = await claimStore.ReleaseClaimAsync(
+                claim,
+                reason: "drain canceled; releasing active claim",
+                cancellationToken: CancellationToken.None)
+                .ConfigureAwait(false);
+        }
+        catch (Exception ex)
+        {
+            LogGovernanceClaimReleaseFailure(logger, claim.OutboxEntryId, claim.WorkerId, ex);
+
+            // Best-effort release must not block shutdown or surface a secondary failure while the drain is already
+            // aborting. The caller is exiting and claim release is idempotent, so a transient storage failure should not
+            // mask the original cancellation or leave the remaining page of leases stuck until the normal lease expiry.
+        }
     }
 
     private async ValueTask<GovernanceOutboxEntry> ApplyEmissionResultAsync(

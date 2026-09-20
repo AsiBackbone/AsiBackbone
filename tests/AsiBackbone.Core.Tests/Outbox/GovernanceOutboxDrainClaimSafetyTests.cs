@@ -1,6 +1,7 @@
 using AsiBackbone.Core.Audit;
 using AsiBackbone.Core.Emissions;
 using AsiBackbone.Core.Outbox;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Xunit;
 
@@ -80,6 +81,118 @@ public sealed class GovernanceOutboxDrainClaimSafetyTests
         Assert.All(
             store.PendingClaimMaxCounts,
             maxCount => Assert.Equal(GovernanceOutboxOptions.DefaultClaimPageSize, maxCount));
+    }
+
+    /// <summary>
+    /// Verifies that cancellation between claim entries releases the remaining active leases for the page.
+    /// </summary>
+    [Fact]
+    public async Task DrainAsyncReleasesOutstandingClaimsWhenCancellationOccursBetweenEntries()
+    {
+        var store = new RecordingClaimStore(availableEntryCount: 2);
+        using var cancellationTokenSource = new CancellationTokenSource();
+        var drain = new GovernanceOutboxDrain(
+            store,
+            new BetweenEntryCancellingEmitter(cancellationTokenSource),
+            outboxOptions: Options.Create(new GovernanceOutboxOptions { ClaimWorkerId = "worker-1" }));
+
+        _ = await Assert.ThrowsAsync<OperationCanceledException>(async () =>
+            await drain.DrainAsync(DrainUtc, maxCount: 2, cancellationTokenSource.Token));
+
+        Assert.Equal(1, store.ReleaseCount);
+    }
+
+    /// <summary>
+    /// Verifies that cancellation during an in-flight emit releases the current active claim before the exception escapes.
+    /// </summary>
+    [Fact]
+    public async Task DrainAsyncReleasesClaimWhenCancellationOccursDuringEmit()
+    {
+        var store = new RecordingClaimStore(availableEntryCount: 1);
+        using var cancellationTokenSource = new CancellationTokenSource();
+        var drain = new GovernanceOutboxDrain(
+            store,
+            new CancellingEmitter(cancellationTokenSource),
+            outboxOptions: Options.Create(new GovernanceOutboxOptions { ClaimWorkerId = "worker-1" }));
+
+        _ = await Assert.ThrowsAsync<OperationCanceledException>(async () =>
+            await drain.DrainAsync(DrainUtc, maxCount: 1, cancellationTokenSource.Token));
+
+        Assert.Equal(1, store.ReleaseCount);
+    }
+
+    /// <summary>
+    /// Verifies that a best-effort claim release failure is logged without replacing the original cancellation.
+    /// </summary>
+    [Fact]
+    public async Task DrainAsyncLogsClaimReleaseFailureWithoutMaskingCancellation()
+    {
+        var releaseException = new InvalidOperationException("claim release failed");
+        var store = new RecordingClaimStore(availableEntryCount: 1) { ReleaseException = releaseException };
+        var logger = new RecordingLogger<GovernanceOutboxDrain>();
+        using var cancellationTokenSource = new CancellationTokenSource();
+        var drain = new GovernanceOutboxDrain(
+            store,
+            new CancellingEmitter(cancellationTokenSource),
+            logger,
+            Options.Create(new GovernanceOutboxOptions { ClaimWorkerId = "worker-1" }));
+
+        _ = await Assert.ThrowsAsync<OperationCanceledException>(async () =>
+            await drain.DrainAsync(DrainUtc, maxCount: 1, cancellationTokenSource.Token));
+
+        Assert.Equal(1, store.ReleaseCount);
+        LogEntry logEntry = Assert.Single(logger.Entries);
+        Assert.Equal(LogLevel.Warning, logEntry.LogLevel);
+        Assert.Equal("LogGovernanceClaimReleaseFailure", logEntry.EventId.Name);
+        Assert.Same(releaseException, logEntry.Exception);
+        Assert.Equal("outbox-1", Assert.IsType<string>(logEntry["OutboxEntryId"]));
+        Assert.Equal("worker-1", Assert.IsType<string>(logEntry["ClaimWorkerId"]));
+    }
+
+    /// <summary>
+    /// Verifies that cancellation during dead-letter persistence releases the current active claim before the exception escapes.
+    /// </summary>
+    [Fact]
+    public async Task DrainAsyncReleasesClaimWhenCancellationOccursDuringClaimDeadLettering()
+    {
+        using var cancellationTokenSource = new CancellationTokenSource();
+        var store = new RecordingClaimStore(availableEntryCount: 1, claimAttemptCount: 6)
+        {
+            CancelWhenMarkingDeadLettered = cancellationTokenSource
+        };
+
+        var drain = new GovernanceOutboxDrain(
+            store,
+            new DeliveringEmitter(),
+            outboxOptions: Options.Create(new GovernanceOutboxOptions
+            {
+                ClaimWorkerId = "worker-1",
+                MaxClaimAttempts = 5
+            }));
+
+        _ = await Assert.ThrowsAsync<OperationCanceledException>(async () =>
+            await drain.DrainAsync(DrainUtc, maxCount: 1, cancellationTokenSource.Token));
+
+        Assert.Equal(1, store.ReleaseCount);
+    }
+
+    /// <summary>
+    /// Verifies that cancellation while persisting the claim result still releases the current active claim before the exception escapes.
+    /// </summary>
+    [Fact]
+    public async Task DrainAsyncReleasesClaimWhenCancellationOccursDuringClaimPersistence()
+    {
+        var store = new RecordingClaimStore(availableEntryCount: 1) { ThrowOnMarkClaimDelivered = true };
+        using var cancellationTokenSource = new CancellationTokenSource();
+        var drain = new GovernanceOutboxDrain(
+            store,
+            new AfterEmitCancellingEmitter(cancellationTokenSource),
+            outboxOptions: Options.Create(new GovernanceOutboxOptions { ClaimWorkerId = "worker-1" }));
+
+        _ = await Assert.ThrowsAsync<OperationCanceledException>(async () =>
+            await drain.DrainAsync(DrainUtc, maxCount: 1, cancellationTokenSource.Token));
+
+        Assert.Equal(1, store.ReleaseCount);
     }
 
     /// <summary>
@@ -176,6 +289,50 @@ public sealed class GovernanceOutboxDrainClaimSafetyTests
         }
     }
 
+    private sealed class BetweenEntryCancellingEmitter(CancellationTokenSource cancellationTokenSource) : IGovernanceEmitter
+    {
+        private int emitCount;
+
+        public ValueTask<GovernanceEmissionResult> EmitAsync(
+            GovernanceEmissionEnvelope envelope,
+            CancellationToken cancellationToken = default)
+        {
+            ArgumentNullException.ThrowIfNull(envelope);
+
+            if (++emitCount == 1)
+            {
+                cancellationTokenSource.Cancel();
+                return ValueTask.FromResult(GovernanceEmissionResult.Delivered("test-sink", envelope.EnvelopeId));
+            }
+
+            throw new OperationCanceledException(cancellationToken);
+        }
+    }
+
+    private sealed class CancellingEmitter(CancellationTokenSource cancellationTokenSource) : IGovernanceEmitter
+    {
+        public ValueTask<GovernanceEmissionResult> EmitAsync(
+            GovernanceEmissionEnvelope envelope,
+            CancellationToken cancellationToken = default)
+        {
+            ArgumentNullException.ThrowIfNull(envelope);
+            cancellationTokenSource.Cancel();
+            throw new OperationCanceledException(cancellationToken);
+        }
+    }
+
+    private sealed class AfterEmitCancellingEmitter(CancellationTokenSource cancellationTokenSource) : IGovernanceEmitter
+    {
+        public ValueTask<GovernanceEmissionResult> EmitAsync(
+            GovernanceEmissionEnvelope envelope,
+            CancellationToken cancellationToken = default)
+        {
+            ArgumentNullException.ThrowIfNull(envelope);
+            cancellationTokenSource.Cancel();
+            return ValueTask.FromResult(GovernanceEmissionResult.Delivered("test-sink", envelope.EnvelopeId));
+        }
+    }
+
     /// <summary>
     /// A claim store that hands out a fixed number of entries and records how each page was requested.
     /// </summary>
@@ -184,9 +341,17 @@ public sealed class GovernanceOutboxDrainClaimSafetyTests
     {
         private int issuedEntryCount;
 
+        public bool ThrowOnMarkClaimDelivered { get; set; }
+
+        public CancellationTokenSource? CancelWhenMarkingDeadLettered { get; set; }
+
         public List<int> PendingClaimMaxCounts { get; } = [];
 
         public int DeadLetteredCount { get; private set; }
+
+        public int ReleaseCount { get; private set; }
+
+        public Exception? ReleaseException { get; set; }
 
         public GovernanceEmissionError? LastDeadLetterError { get; private set; }
 
@@ -225,6 +390,11 @@ public sealed class GovernanceOutboxDrainClaimSafetyTests
             GovernanceEmissionResult result,
             CancellationToken cancellationToken = default)
         {
+            if (ThrowOnMarkClaimDelivered)
+            {
+                cancellationToken.ThrowIfCancellationRequested();
+            }
+
             return ValueTask.FromResult(claim.Entry);
         }
 
@@ -243,6 +413,12 @@ public sealed class GovernanceOutboxDrainClaimSafetyTests
             string? deadLetterReason = null,
             CancellationToken cancellationToken = default)
         {
+            if (CancelWhenMarkingDeadLettered is { } cancellationTokenSource)
+            {
+                cancellationTokenSource.Cancel();
+                cancellationToken.ThrowIfCancellationRequested();
+            }
+
             DeadLetteredCount++;
             LastDeadLetterError = governanceEmissionError;
             return ValueTask.FromResult(claim.Entry);
@@ -261,7 +437,10 @@ public sealed class GovernanceOutboxDrainClaimSafetyTests
             string? reason = null,
             CancellationToken cancellationToken = default)
         {
-            return ValueTask.FromResult<GovernanceOutboxEntry?>(claim.Entry);
+            ReleaseCount++;
+            return ReleaseException is null
+                ? ValueTask.FromResult<GovernanceOutboxEntry?>(claim.Entry)
+                : throw ReleaseException;
         }
 
         public ValueTask<GovernanceOutboxEntry> EnqueueAsync(
@@ -340,6 +519,60 @@ public sealed class GovernanceOutboxDrainClaimSafetyTests
                 claimExpiresUtc: DrainUtc.AddMinutes(5),
                 claimAttemptCount: claimAttemptCount);
         }
+    }
+
+    private sealed class RecordingLogger<T> : ILogger<T>
+    {
+        private static readonly IDisposable NoopScope = new NullScope();
+
+        public List<LogEntry> Entries { get; } = [];
+
+        public IDisposable? BeginScope<TState>(TState state)
+            where TState : notnull
+        {
+            return NoopScope;
+        }
+
+        public bool IsEnabled(LogLevel logLevel)
+        {
+            return true;
+        }
+
+        public void Log<TState>(
+            LogLevel logLevel,
+            EventId eventId,
+            TState state,
+            Exception? exception,
+            Func<TState, Exception?, string> formatter)
+        {
+            ArgumentNullException.ThrowIfNull(formatter);
+
+            Entries.Add(new LogEntry(
+                logLevel,
+                eventId,
+                exception,
+                formatter(state, exception),
+                state is IEnumerable<KeyValuePair<string, object?>> structuredState
+                    ? [.. structuredState]
+                    : []));
+        }
+
+        private sealed class NullScope : IDisposable
+        {
+            public void Dispose()
+            {
+            }
+        }
+    }
+
+    private sealed record LogEntry(
+        LogLevel LogLevel,
+        EventId EventId,
+        Exception? Exception,
+        string Message,
+        KeyValuePair<string, object?>[] State)
+    {
+        public object? this[string key] => State.FirstOrDefault(item => item.Key == key).Value;
     }
 
     private sealed class NonClaimStore : IGovernanceOutboxStore

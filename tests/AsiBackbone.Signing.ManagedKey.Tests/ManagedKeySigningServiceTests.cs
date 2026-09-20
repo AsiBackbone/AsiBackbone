@@ -277,6 +277,7 @@ public sealed class ManagedKeySigningServiceTests
     public void AddAsiBackboneManagedKeySigningRegistersFailClosedSigningServiceByDefault()
     {
         ServiceCollection services = new();
+        _ = services.AddSingleton<IGovernanceSignatureVerificationService>(new StubVerificationService());
         _ = services.AddAsiBackboneManagedKeySigning(
             options =>
             {
@@ -301,6 +302,7 @@ public sealed class ManagedKeySigningServiceTests
     public void AddAsiBackboneManagedKeySigningForLocalValidationRegistersFailOpenSigningService()
     {
         ServiceCollection services = new();
+        _ = services.AddSingleton<IGovernanceSignatureVerificationService>(new StubVerificationService());
         _ = services.AddAsiBackboneManagedKeySigningForLocalValidation(
             options =>
             {
@@ -422,6 +424,16 @@ public sealed class ManagedKeySigningServiceTests
                     ["provider_operation_id"] = "provider-spoof",
                     ["access_token"] = "should-not-be-preserved"
                 }));
+        }
+    }
+
+    private sealed class StubVerificationService : IGovernanceSignatureVerificationService
+    {
+        public ValueTask<SignatureVerificationResult> VerifyAsync(
+            SignatureVerificationRequest request,
+            CancellationToken cancellationToken = default)
+        {
+            return ValueTask.FromResult(SignatureVerificationResult.Verified());
         }
     }
 }
