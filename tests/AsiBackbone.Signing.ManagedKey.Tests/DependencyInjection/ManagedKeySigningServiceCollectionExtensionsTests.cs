@@ -17,6 +17,8 @@ public sealed class ManagedKeySigningServiceCollectionExtensionsTests
     [Fact]
     public void ProductionFactoryRegistrationUsesSingletonServicesAndFailsClosed()
     {
+        using var scope = new EnvironmentVariableScope("Development");
+
         ServiceCollection services = new();
         _ = services.AddSingleton<IGovernanceSignatureVerificationService>(new StubVerificationService());
         var client = new StubManagedKeySigningClient();
@@ -51,6 +53,8 @@ public sealed class ManagedKeySigningServiceCollectionExtensionsTests
     [Fact]
     public void ProductionRegisteredClientRegistrationUsesHostSingletonAndFailsClosed()
     {
+        using var scope = new EnvironmentVariableScope("Development");
+
         ServiceCollection services = new();
         _ = services.AddSingleton<IGovernanceSignatureVerificationService>(new StubVerificationService());
         var client = new StubManagedKeySigningClient();
@@ -112,6 +116,8 @@ public sealed class ManagedKeySigningServiceCollectionExtensionsTests
     [Fact]
     public void LocalValidationFactoryRegistrationForcesUnsignedFailures()
     {
+        using var scope = new EnvironmentVariableScope("Development");
+
         ServiceCollection services = new();
         var client = new StubManagedKeySigningClient();
 
@@ -140,6 +146,8 @@ public sealed class ManagedKeySigningServiceCollectionExtensionsTests
     [Fact]
     public void LocalValidationRegisteredClientRegistrationForcesUnsignedFailures()
     {
+        using var scope = new EnvironmentVariableScope("Development");
+
         ServiceCollection services = new();
         var client = new StubManagedKeySigningClient();
         _ = services.AddSingleton<IManagedKeySigningClient>(client);
@@ -167,6 +175,8 @@ public sealed class ManagedKeySigningServiceCollectionExtensionsTests
     [Fact]
     public void RegistrationOverloadsRejectNullArguments()
     {
+        using var scope = new EnvironmentVariableScope("Development");
+
         ServiceCollection services = new();
         static IManagedKeySigningClient factory(IServiceProvider _)
         {
