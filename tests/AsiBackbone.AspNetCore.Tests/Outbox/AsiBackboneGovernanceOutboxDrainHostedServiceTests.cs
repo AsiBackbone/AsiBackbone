@@ -222,7 +222,8 @@ public sealed class AsiBackboneGovernanceOutboxDrainHostedServiceTests
     }
 
     /// <summary>
-    /// Tests that the <c>AddAsiBackboneGovernanceOutboxDrainWorker</c> extension method rejects invalid batch sizes (zero or negative) and throws an appropriate exception.
+    /// Tests that resolving <see cref="GovernanceOutboxDrainWorkerOptions"/> throws an <see cref="OptionsValidationException"/>
+    /// when <c>AddAsiBackboneGovernanceOutboxDrainWorker</c> is configured with an invalid batch size.
     /// </summary>
     /// <param name="batchSize">
     /// The batch size to test, which is expected to be invalid (zero or negative).
@@ -234,10 +235,15 @@ public sealed class AsiBackboneGovernanceOutboxDrainHostedServiceTests
     {
         ServiceCollection services = new();
 
-        InvalidOperationException exception = Assert.Throws<InvalidOperationException>(() =>
-            services.AddAsiBackboneGovernanceOutboxDrainWorker(options => options.BatchSize = batchSize));
+        _ = services.AddAsiBackboneGovernanceOutboxDrainWorker(options => options.BatchSize = batchSize);
 
-        Assert.Contains("batch size", exception.Message, StringComparison.Ordinal);
+        OptionsValidationException exception = Assert.Throws<OptionsValidationException>(() =>
+        {
+            using ServiceProvider provider = services.BuildServiceProvider();
+            _ = provider.GetRequiredService<IOptions<GovernanceOutboxDrainWorkerOptions>>().Value;
+        });
+
+        Assert.Contains("Governance outbox drain worker options", exception.Message, StringComparison.Ordinal);
     }
 
     private static ServiceProvider BuildProvider(

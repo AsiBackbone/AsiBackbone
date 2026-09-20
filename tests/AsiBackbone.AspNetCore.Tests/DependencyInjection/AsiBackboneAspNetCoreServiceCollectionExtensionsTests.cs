@@ -3,6 +3,7 @@ using AsiBackbone.AspNetCore.Correlation;
 using AsiBackbone.AspNetCore.DependencyInjection;
 using AsiBackbone.AspNetCore.Endpoints;
 using AsiBackbone.AspNetCore.Handshakes;
+using AsiBackbone.AspNetCore.Outbox;
 using AsiBackbone.AspNetCore.Results;
 using AsiBackbone.Core.Constraints;
 using AsiBackbone.Core.Decisions;
@@ -275,7 +276,9 @@ public sealed class AsiBackboneAspNetCoreServiceCollectionExtensionsTests
     }
 
     /// <summary>
-    /// Tests that the <see cref="AsiBackboneAspNetCoreServiceCollectionExtensions.AddAsiBackboneAspNetCore(IServiceCollection, Action{AspNetCoreGovernanceOptions})"/> method throws an <see cref="InvalidOperationException"/> when the <see cref="AspNetCoreGovernanceOptions.CorrelationIdHeaderName"/> is null, empty, or whitespace.
+    /// Tests that resolving <see cref="AspNetCoreGovernanceOptions"/> throws an <see cref="OptionsValidationException"/> when
+    /// <see cref="AsiBackboneAspNetCoreServiceCollectionExtensions.AddAsiBackboneAspNetCore(IServiceCollection, Action{AspNetCoreGovernanceOptions})"/>
+    /// is configured with a null, empty, or whitespace <see cref="AspNetCoreGovernanceOptions.CorrelationIdHeaderName"/>.
     /// </summary>
     /// <param name="headerName">
     /// The name of the correlation identifier header.
@@ -288,14 +291,17 @@ public sealed class AsiBackboneAspNetCoreServiceCollectionExtensionsTests
     {
         ServiceCollection services = new();
 
-        InvalidOperationException exception = Assert.Throws<InvalidOperationException>(() =>
-            services.AddAsiBackboneAspNetCore(options => options.CorrelationIdHeaderName = headerName!));
+        _ = services.AddAsiBackboneAspNetCore(options => options.CorrelationIdHeaderName = headerName!);
 
-        Assert.Contains("correlation identifier header name", exception.Message, StringComparison.Ordinal);
+        OptionsValidationException exception = Assert.Throws<OptionsValidationException>(() =>
+            ResolveOptions<AspNetCoreGovernanceOptions>(services));
+
+        Assert.Contains("ASP.NET Core integration options", exception.Message, StringComparison.Ordinal);
     }
 
     /// <summary>
-    /// Tests that the <see cref="AsiBackboneAspNetCoreServiceCollectionExtensions.AddAsiBackboneAspNetCore(IServiceCollection, Action{AspNetCoreGovernanceOptions})"/> method throws an <see cref="OptionsValidationException"/> when the <see cref="HttpGovernanceActorContextOptions"/> are configured with invalid values.
+    /// Tests that resolving <see cref="HttpGovernanceActorContextOptions"/> throws an <see cref="OptionsValidationException"/>
+    /// when the registered actor-context options contain invalid values.
     /// </summary>
     [Fact]
     public void ActorContextOptionsRegistrationRejectsInvalidConfiguredOptions()
@@ -311,7 +317,8 @@ public sealed class AsiBackboneAspNetCoreServiceCollectionExtensionsTests
     }
 
     /// <summary>
-    /// Tests that the <see cref="AsiBackboneAspNetCoreServiceCollectionExtensions.AddAsiBackboneAspNetCore(IServiceCollection, Action{AspNetCoreGovernanceOptions})"/> method throws an <see cref="OptionsValidationException"/> when the <see cref="GovernanceHttpResultMappingOptions"/> are configured with invalid values.
+    /// Tests that resolving <see cref="GovernanceHttpResultMappingOptions"/> throws an <see cref="OptionsValidationException"/>
+    /// when the registered result-mapping options contain invalid values.
     /// </summary>
     [Fact]
     public void ResultMappingOptionsRegistrationRejectsInvalidConfiguredOptions()
@@ -327,7 +334,8 @@ public sealed class AsiBackboneAspNetCoreServiceCollectionExtensionsTests
     }
 
     /// <summary>
-    /// Tests that the <see cref="AsiBackboneAspNetCoreServiceCollectionExtensions.AddAsiBackboneAspNetCore(IServiceCollection, Action{AspNetCoreGovernanceOptions})"/> method throws an <see cref="OptionsValidationException"/> when the <see cref="AcknowledgmentChallengeOptions"/> are configured with invalid values.
+    /// Tests that resolving <see cref="AcknowledgmentChallengeOptions"/> throws an <see cref="OptionsValidationException"/>
+    /// when the registered acknowledgment-challenge options contain invalid values.
     /// </summary>
     [Fact]
     public void AcknowledgmentChallengeOptionsRegistrationRejectsInvalidConfiguredOptions()
@@ -340,6 +348,64 @@ public sealed class AsiBackboneAspNetCoreServiceCollectionExtensionsTests
             ResolveOptions<AcknowledgmentChallengeOptions>(services));
 
         Assert.Contains("Acknowledgment challenge options", exception.Message, StringComparison.Ordinal);
+    }
+
+    /// <summary>
+    /// Tests that the <see cref="AsiBackboneAspNetCoreServiceCollectionExtensions.AddAsiBackboneAspNetCore(IServiceCollection, Action{AspNetCoreGovernanceOptions})"/> method invokes the configuration callback exactly once when the options are resolved.
+    /// </summary>
+    [Fact]
+    public void AddAsiBackboneAspNetCoreInvokesConfigureCallbackOnceWhenOptionsAreResolved()
+    {
+        ServiceCollection services = new();
+        int callbackCount = 0;
+
+        _ = services.AddAsiBackboneAspNetCore(options =>
+        {
+            callbackCount++;
+            options.IncludeRequestPath = true;
+        });
+
+        // Deferred configuration: registration should not execute callback.
+        Assert.Equal(0, callbackCount);
+
+        using ServiceProvider provider = services.BuildServiceProvider();
+        AspNetCoreGovernanceOptions first = provider.GetRequiredService<IOptions<AspNetCoreGovernanceOptions>>().Value;
+        AspNetCoreGovernanceOptions second = provider.GetRequiredService<IOptions<AspNetCoreGovernanceOptions>>().Value;
+
+        Assert.True(first.IncludeRequestPath);
+        Assert.Same(first, second);
+        Assert.Equal(1, callbackCount);
+    }
+
+    /// <summary>
+    /// Tests that the <see cref="AsiBackboneAspNetCoreServiceCollectionExtensions.AddAsiBackboneGovernanceOutboxDrainWorker(IServiceCollection, Action{GovernanceOutboxDrainWorkerOptions})"/> method invokes the configuration callback exactly once when monitor-backed options are resolved.
+    /// </summary>
+    [Fact]
+    public void AddAsiBackboneGovernanceOutboxDrainWorkerInvokesConfigureCallbackOnceWhenMonitorOptionsAreResolved()
+    {
+        ServiceCollection services = new();
+        int callbackCount = 0;
+
+        _ = services.AddAsiBackboneGovernanceOutboxDrainWorker(options =>
+        {
+            callbackCount++;
+            options.BatchSize = 7;
+        });
+
+        // Deferred configuration: registration should not execute callback.
+        Assert.Equal(0, callbackCount);
+
+        using ServiceProvider provider = services.BuildServiceProvider();
+        GovernanceOutboxDrainWorkerOptions first = provider
+            .GetRequiredService<IOptionsMonitor<GovernanceOutboxDrainWorkerOptions>>()
+            .CurrentValue;
+        GovernanceOutboxDrainWorkerOptions second = provider
+            .GetRequiredService<IOptionsMonitor<GovernanceOutboxDrainWorkerOptions>>()
+            .CurrentValue;
+
+        Assert.Equal(7, first.BatchSize);
+        Assert.Same(first, second);
+        Assert.Equal(1, callbackCount);
     }
 
     private static GovernanceEvaluationContext CreateContext()

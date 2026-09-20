@@ -34,16 +34,18 @@ public static class AsiBackboneAspNetCoreServiceCollectionExtensions
     /// <exception cref="ArgumentNullException">
     /// Thrown when <paramref name="services" /> or <paramref name="configure" /> is <see langword="null" />.
     /// </exception>
+    /// <remarks>
+    /// Option validation is deferred to the Microsoft.Extensions.Options pipeline.
+    /// Invalid option values are reported as <see cref="Microsoft.Extensions.Options.OptionsValidationException" />
+    /// when <see cref="Microsoft.Extensions.Options.IOptions{TOptions}.Value" /> is resolved or during host startup
+    /// when <c>ValidateOnStart</c> executes.
+    /// </remarks>
     public static IServiceCollection AddAsiBackboneAspNetCore(
         this IServiceCollection services,
         Action<AspNetCoreGovernanceOptions> configure)
     {
         ArgumentNullException.ThrowIfNull(services);
         ArgumentNullException.ThrowIfNull(configure);
-
-        AspNetCoreGovernanceOptions options = new();
-        configure(options);
-        options.Validate();
 
         _ = services.AddOptions<AspNetCoreGovernanceOptions>()
             .Configure(configure)
@@ -161,6 +163,11 @@ public static class AsiBackboneAspNetCoreServiceCollectionExtensions
     /// store that cannot claim. Disabling it allows two replicas to select and emit the same envelope, so a host that opts
     /// out should partition work, run the worker on a single role, or rely on provider-side idempotency.
     /// Claiming coordinates workers; it does not by itself create an exactly-once delivery guarantee.
+    /// 
+    /// Validation of <paramref name="configure" /> values is deferred to the options pipeline.
+    /// Invalid values are reported as <see cref="Microsoft.Extensions.Options.OptionsValidationException" />
+    /// when options are resolved, including hosted-service startup validation through
+    /// <see cref="Microsoft.Extensions.Options.IOptionsMonitor{TOptions}.CurrentValue" />.
     /// </remarks>
     /// <param name="services">The service collection to add services to.</param>
     /// <param name="configure">The worker options configuration callback.</param>
@@ -175,10 +182,6 @@ public static class AsiBackboneAspNetCoreServiceCollectionExtensions
         ArgumentNullException.ThrowIfNull(services);
         ArgumentNullException.ThrowIfNull(configure);
 
-        GovernanceOutboxDrainWorkerOptions options = new();
-        configure(options);
-        options.Validate();
-
         _ = services.AddOptions<GovernanceOutboxDrainWorkerOptions>()
             .Configure(configure)
             .Validate(static options =>
@@ -192,8 +195,7 @@ public static class AsiBackboneAspNetCoreServiceCollectionExtensions
                 {
                     return false;
                 }
-            }, "Governance outbox drain worker options must be valid.")
-            .ValidateOnStart();
+            }, "Governance outbox drain worker options must be valid.");
 
         _ = services.AddOptions<GovernanceOutboxOptions>()
             .Validate(static options =>
