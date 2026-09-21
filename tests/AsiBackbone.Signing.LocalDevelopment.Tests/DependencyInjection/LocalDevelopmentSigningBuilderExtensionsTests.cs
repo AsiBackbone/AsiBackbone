@@ -164,6 +164,35 @@ public sealed class LocalDevelopmentSigningBuilderExtensionsTests
     }
 
     /// <summary>
+    /// Verifies that changing the options instance resolved from the container, before the signing service is first
+    /// resolved, does not change the provider that registration validated.
+    /// </summary>
+    [Fact]
+    public async Task MutatingResolvedOptionsBeforeFirstServiceResolutionDoesNotChangeProvider()
+    {
+        ServiceCollection services = new();
+        IAsiBackboneBuilder builder = new AsiBackboneBuilder(services);
+        _ = builder.UseLocalDevelopmentSigning(LocalDevelopmentSigningOptions.Create(
+            signatureAlgorithm: "LOCAL-REGISTERED-ALGORITHM",
+            environmentName: "Development"));
+
+        using ServiceProvider provider = services.BuildServiceProvider();
+        LocalDevelopmentSigningOptions resolved = provider.GetRequiredService<LocalDevelopmentSigningOptions>();
+        resolved.SignatureAlgorithm = "LOCAL-MUTATED-ALGORITHM";
+        resolved.KeyId = "mutated-key";
+
+        IGovernanceSigningService signing = provider.GetRequiredService<IGovernanceSigningService>();
+        SigningResult result = await signing.SignAsync(
+            new SigningRequest("resolved-mutation-hash", hashAlgorithm: "SHA-256"),
+            TestContext.Current.CancellationToken);
+
+        Assert.True(result.IsSigned);
+        Assert.Equal("LOCAL-REGISTERED-ALGORITHM", result.Metadata.SignatureAlgorithm);
+        Assert.Equal(LocalDevelopmentSigningOptions.DefaultKeyId, result.Metadata.KeyId);
+    }
+
+
+    /// <summary>
     /// Verifies that a <see cref="TimeProvider" /> registered by the host supplies the signing time.
     /// </summary>
     [Fact]

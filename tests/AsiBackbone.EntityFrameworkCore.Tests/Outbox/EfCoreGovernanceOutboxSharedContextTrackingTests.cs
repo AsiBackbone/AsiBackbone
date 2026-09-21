@@ -104,6 +104,70 @@ public sealed class EfCoreGovernanceOutboxSharedContextTrackingTests
         Assert.Equal("shared-context-worker", tracked.ClaimOwner);
     }
 
+    /// <summary>
+    /// Verifies that unsaved host changes on a tracked row survive a claim, that the tracked row reflects the claim,
+    /// and that a later host save persists both.
+    /// </summary>
+    [Fact]
+    public async Task ClaimPreservesUnsavedHostChangesOnTrackedRow()
+    {
+        CancellationToken cancellationToken = TestContext.Current.CancellationToken;
+        await using var connection = new SqliteConnection("Filename=:memory:");
+        await connection.OpenAsync(cancellationToken);
+        await using SharedContextDbContext context = await CreateContextAsync(connection, cancellationToken);
+        var store = new EfCoreGovernanceOutboxStore(context);
+
+        GovernanceOutboxEntry enqueued = await store.EnqueueAsync(CreateEnvelope("shared-context-dirty"), cancellationToken);
+        GovernanceOutboxEntryEntity tracked = context.GovernanceOutboxEntries.Local
+            .Single(entity => entity.OutboxEntryId == enqueued.OutboxEntryId);
+        tracked.EnvelopeOperationName = "host-unsaved-change";
+
+        GovernanceOutboxClaim claim = Assert.Single(await store.ClaimPendingAsync(
+            GovernanceOutboxClaimRequest.Create("shared-context-worker", CreatedUtc.AddMinutes(1), TimeSpan.FromMinutes(5)),
+            cancellationToken));
+
+        Assert.Equal(EntityState.Modified, context.Entry(tracked).State);
+        Assert.Equal("host-unsaved-change", tracked.EnvelopeOperationName);
+        Assert.Equal(claim.ClaimToken, tracked.ClaimToken);
+
+        _ = await context.SaveChangesAsync(cancellationToken);
+
+        GovernanceOutboxEntryEntity persisted = await context.GovernanceOutboxEntries.AsNoTracking()
+            .SingleAsync(entity => entity.OutboxEntryId == claim.OutboxEntryId, cancellationToken);
+        Assert.Equal("host-unsaved-change", persisted.EnvelopeOperationName);
+        Assert.Equal(claim.ClaimToken, persisted.ClaimToken);
+        Assert.Equal("shared-context-worker", persisted.ClaimOwner);
+    }
+
+    /// <summary>
+    /// Verifies that a tracked row the host has marked for deletion stays marked after a claim and can still be deleted.
+    /// </summary>
+    [Fact]
+    public async Task ClaimPreservesPendingHostDeletionOnTrackedRow()
+    {
+        CancellationToken cancellationToken = TestContext.Current.CancellationToken;
+        await using var connection = new SqliteConnection("Filename=:memory:");
+        await connection.OpenAsync(cancellationToken);
+        await using SharedContextDbContext context = await CreateContextAsync(connection, cancellationToken);
+        var store = new EfCoreGovernanceOutboxStore(context);
+
+        GovernanceOutboxEntry enqueued = await store.EnqueueAsync(CreateEnvelope("shared-context-deleted"), cancellationToken);
+        GovernanceOutboxEntryEntity tracked = context.GovernanceOutboxEntries.Local
+            .Single(entity => entity.OutboxEntryId == enqueued.OutboxEntryId);
+        _ = context.GovernanceOutboxEntries.Remove(tracked);
+
+        _ = Assert.Single(await store.ClaimPendingAsync(
+            GovernanceOutboxClaimRequest.Create("shared-context-worker", CreatedUtc.AddMinutes(1), TimeSpan.FromMinutes(5)),
+            cancellationToken));
+
+        Assert.Equal(EntityState.Deleted, context.Entry(tracked).State);
+
+        _ = await context.SaveChangesAsync(cancellationToken);
+
+        Assert.False(await context.GovernanceOutboxEntries.AsNoTracking()
+            .AnyAsync(entity => entity.OutboxEntryId == enqueued.OutboxEntryId, cancellationToken));
+    }
+
     private static async Task<SharedContextDbContext> CreateContextAsync(
         SqliteConnection connection,
         CancellationToken cancellationToken)

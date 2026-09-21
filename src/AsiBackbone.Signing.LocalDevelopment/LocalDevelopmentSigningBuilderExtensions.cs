@@ -37,9 +37,14 @@ public static class LocalDevelopmentSigningBuilderExtensions
         snapshot.Validate();
         ThrowIfProduction(snapshot);
 
+        // The registered options instance is resolvable and mutable, so the service gets its own snapshot. Closing over
+        // the registered instance let a change made to the resolved options before the service was first resolved
+        // reach the provider.
+        LocalDevelopmentSigningOptions serviceSnapshot = snapshot.Snapshot();
+
         _ = builder.Services.AddSingleton(snapshot);
         _ = builder.Services.AddSingleton(serviceProvider => new LocalDevelopmentSigningService(
-            snapshot,
+            serviceSnapshot,
             serviceProvider.GetService<TimeProvider>() ?? TimeProvider.System));
         _ = builder.Services.AddSingleton<IGovernanceSigningService>(serviceProvider =>
             serviceProvider.GetRequiredService<LocalDevelopmentSigningService>());

@@ -386,41 +386,87 @@ public sealed class EfCoreGovernanceOutboxStore : IGovernanceOutboxClaimStore
             .ToListAsync(cancellationToken)
             .ConfigureAwait(false);
 
-        DetachTrackedEntries(claimedEntities);
+        ReconcileTrackedEntries(claimedEntities);
 
         return [.. claimedEntities.Select(ToEntry).Select(CreateClaim)];
     }
 
     /// <summary>
-    /// Detaches tracked instances of rows that a set-based update has just rewritten.
+    /// Reconciles tracked instances of rows that a set-based update has just rewritten.
     /// </summary>
     /// <remarks>
     /// <c>ExecuteUpdateAsync</c> writes to the database without passing through the change tracker. An instance the
     /// host-owned context already tracks, such as one added by <see cref="EnqueueAsync" />, keeps its pre-claim values,
     /// and identity resolution returns that stale instance from later tracking queries. The claim then appears not to
-    /// be held, so claim-scoped transitions return without applying. Detaching makes the next query load the claimed row.
+    /// be held, so claim-scoped transitions return without applying.
+    /// <para>
+    /// An unchanged instance is detached, so the next query loads the claimed row. A modified or deleted instance holds
+    /// unsaved host work that detaching would discard, so only the columns the claim wrote are merged into it: each
+    /// becomes the new original value, and also the current value unless the host had changed that column itself. The
+    /// other pending changes, and a pending deletion, are kept and save against the claimed row.
+    /// </para>
     /// </remarks>
     /// <param name="claimedEntities">The claimed rows, read without tracking after the update.</param>
-    private void DetachTrackedEntries(List<GovernanceOutboxEntryEntity> claimedEntities)
+    private void ReconcileTrackedEntries(List<GovernanceOutboxEntryEntity> claimedEntities)
     {
         if (claimedEntities.Count == 0)
         {
             return;
         }
 
-        var claimedIds = claimedEntities
-            .Select(entity => entity.OutboxEntryId)
-            .ToHashSet(StringComparer.Ordinal);
+        var claimedById = claimedEntities.ToDictionary(entity => entity.OutboxEntryId, StringComparer.Ordinal);
 
         List<Microsoft.EntityFrameworkCore.ChangeTracking.EntityEntry<GovernanceOutboxEntryEntity>> staleEntries = [.. dbContext
             .ChangeTracker
             .Entries<GovernanceOutboxEntryEntity>()
-            .Where(entry => claimedIds.Contains(entry.Entity.OutboxEntryId))];
+            .Where(entry => claimedById.ContainsKey(entry.Entity.OutboxEntryId))];
 
         foreach (Microsoft.EntityFrameworkCore.ChangeTracking.EntityEntry<GovernanceOutboxEntryEntity> entry in staleEntries)
         {
-            entry.State = EntityState.Detached;
+            if (entry.State == EntityState.Unchanged)
+            {
+                entry.State = EntityState.Detached;
+                continue;
+            }
+
+            if (entry.State is EntityState.Modified or EntityState.Deleted)
+            {
+                MergeClaimColumns(entry, claimedById[entry.Entity.OutboxEntryId]);
+            }
         }
+    }
+
+    private static void MergeClaimColumns(
+        Microsoft.EntityFrameworkCore.ChangeTracking.EntityEntry<GovernanceOutboxEntryEntity> entry,
+        GovernanceOutboxEntryEntity claimed)
+    {
+        foreach ((string propertyName, object? claimedValue) in ClaimColumnValues(claimed))
+        {
+            Microsoft.EntityFrameworkCore.ChangeTracking.PropertyEntry property = entry.Property(propertyName);
+            bool hostModified = property.IsModified;
+
+            property.OriginalValue = claimedValue;
+
+            if (!hostModified)
+            {
+                property.CurrentValue = claimedValue;
+            }
+        }
+    }
+
+    // The columns written by the claim update in ClaimEntriesAsync. Keep the two lists aligned.
+    private static (string PropertyName, object? Value)[] ClaimColumnValues(GovernanceOutboxEntryEntity claimed)
+    {
+        return
+        [
+            (nameof(GovernanceOutboxEntryEntity.ConcurrencyStamp), claimed.ConcurrencyStamp),
+            (nameof(GovernanceOutboxEntryEntity.UpdatedUtc), claimed.UpdatedUtc),
+            (nameof(GovernanceOutboxEntryEntity.ClaimOwner), claimed.ClaimOwner),
+            (nameof(GovernanceOutboxEntryEntity.ClaimToken), claimed.ClaimToken),
+            (nameof(GovernanceOutboxEntryEntity.ClaimedUtc), claimed.ClaimedUtc),
+            (nameof(GovernanceOutboxEntryEntity.ClaimExpiresUtc), claimed.ClaimExpiresUtc),
+            (nameof(GovernanceOutboxEntryEntity.ClaimAttemptCount), claimed.ClaimAttemptCount),
+        ];
     }
 
     private async ValueTask<GovernanceOutboxEntry> UpdateClaimedEntryAsync(

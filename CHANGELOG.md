@@ -87,8 +87,9 @@ Consumers moving from `6.x` must follow the
   `DbContext`. The set-based claim update bypasses the change tracker, so the instance `EnqueueAsync` left tracked kept
   its pre-claim values and identity resolution returned it to later queries. `MarkClaimDeliveredAsync` therefore
   returned the entry still `Pending` without recording delivery, letting another worker re-claim and re-emit it after
-  the lease expired, and `ReleaseClaimAsync` left the claim held. The store now detaches tracked instances of rows it has
-  just claimed.
+  the lease expired, and `ReleaseClaimAsync` left the claim held. The store now reconciles tracked instances of rows it
+  has just claimed: an unchanged instance is detached so the next query reloads it, while a modified or deleted instance
+  keeps its unsaved host changes and has only the columns the claim wrote merged in.
 * `LocalDevelopmentSigningService` creates its key with `RSA.Create(int)` instead of assigning `KeySize` after
   creation, whose behavior varies by platform provider. A key size that passes option validation but that the provider
   cannot generate, such as `2049`, now raises `InvalidOperationException` with the other configuration failures instead
