@@ -10,7 +10,7 @@ The [6.0.0 Release Readiness Record](release-readiness-600.md) and the
 [6.0.0 Consumer Verification Guide](consumer-verification-600.md) remain
 the most recently completed release-control sheets while the `7.0.0`
 release evidence is still being finalized.
-The [7.0.0 Release Notes](release-notes-700.md) record the current stable
+The [7.0.0 Release Notes](release-notes-700.md) record the planned `7.x`
 release boundary.
 The [Upgrade from 6.x to 7.0](upgrade-600-to-700.md) guide is
 authoritative for consumers moving from the previous stable line.
