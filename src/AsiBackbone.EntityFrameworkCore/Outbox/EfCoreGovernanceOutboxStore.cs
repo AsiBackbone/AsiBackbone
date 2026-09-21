@@ -401,9 +401,12 @@ public sealed class EfCoreGovernanceOutboxStore : IGovernanceOutboxClaimStore
     /// be held, so claim-scoped transitions return without applying.
     /// <para>
     /// An unchanged instance is detached, so the next query loads the claimed row. A modified or deleted instance holds
-    /// unsaved host work that detaching would discard, so only the columns the claim wrote are merged into it: each
-    /// becomes the new original value, and also the current value unless the host had changed that column itself. The
-    /// other pending changes, and a pending deletion, are kept and save against the claimed row.
+    /// unsaved host work that detaching would discard, so the claim-governed columns are resolved from the persisted
+    /// claimed row instead: the columns the claim wrote, plus <see cref="GovernanceOutboxEntryEntity.Status" />, which
+    /// the claim was taken against. Each is set as both the original and the current value, overriding any pending host
+    /// change to that column. A pending host status or claim-field change would otherwise let the tracked instance look
+    /// terminal or unclaimed, so the claim-scoped transition would return without recording delivery or clearing the
+    /// lease. The host's other pending changes, and a pending deletion, are kept and save against the claimed row.
     /// </para>
     /// </remarks>
     /// <param name="claimedEntities">The claimed rows, read without tracking after the update.</param>
@@ -443,23 +446,19 @@ public sealed class EfCoreGovernanceOutboxStore : IGovernanceOutboxClaimStore
         foreach ((string propertyName, object? claimedValue) in ClaimColumnValues(claimed))
         {
             Microsoft.EntityFrameworkCore.ChangeTracking.PropertyEntry property = entry.Property(propertyName);
-            bool hostModified = property.IsModified;
-
             property.OriginalValue = claimedValue;
-
-            if (!hostModified)
-            {
-                property.CurrentValue = claimedValue;
-            }
+            property.CurrentValue = claimedValue;
         }
     }
 
-    // The columns written by the claim update in ClaimEntriesAsync. Keep the two lists aligned.
+    // The claim-governed columns: those written by the claim update in ClaimEntriesAsync, which must stay aligned with
+    // that update, plus Status, which the claim eligibility query was evaluated against.
     private static (string PropertyName, object? Value)[] ClaimColumnValues(GovernanceOutboxEntryEntity claimed)
     {
         return
         [
             (nameof(GovernanceOutboxEntryEntity.ConcurrencyStamp), claimed.ConcurrencyStamp),
+            (nameof(GovernanceOutboxEntryEntity.Status), claimed.Status),
             (nameof(GovernanceOutboxEntryEntity.UpdatedUtc), claimed.UpdatedUtc),
             (nameof(GovernanceOutboxEntryEntity.ClaimOwner), claimed.ClaimOwner),
             (nameof(GovernanceOutboxEntryEntity.ClaimToken), claimed.ClaimToken),

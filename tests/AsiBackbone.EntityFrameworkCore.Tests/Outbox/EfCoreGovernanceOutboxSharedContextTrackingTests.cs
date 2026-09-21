@@ -168,6 +168,45 @@ public sealed class EfCoreGovernanceOutboxSharedContextTrackingTests
             .AnyAsync(entity => entity.OutboxEntryId == enqueued.OutboxEntryId, cancellationToken));
     }
 
+    /// <summary>
+    /// Verifies that an unsaved terminal status on a tracked row does not short-circuit the claim transition. The claim
+    /// was taken against the persisted status, so the persisted status governs the claimed row.
+    /// </summary>
+    /// <param name="hostStatus">The terminal status the host set without saving.</param>
+    [Theory]
+    [InlineData(GovernanceEmissionStatus.Delivered)]
+    [InlineData(GovernanceEmissionStatus.DeadLettered)]
+    public async Task UnsavedTerminalStatusDoesNotBypassClaimTransition(GovernanceEmissionStatus hostStatus)
+    {
+        CancellationToken cancellationToken = TestContext.Current.CancellationToken;
+        await using var connection = new SqliteConnection("Filename=:memory:");
+        await connection.OpenAsync(cancellationToken);
+        await using SharedContextDbContext context = await CreateContextAsync(connection, cancellationToken);
+        var store = new EfCoreGovernanceOutboxStore(context);
+
+        GovernanceOutboxEntry enqueued = await store.EnqueueAsync(CreateEnvelope($"shared-context-{hostStatus}"), cancellationToken);
+        GovernanceOutboxEntryEntity tracked = context.GovernanceOutboxEntries.Local
+            .Single(entity => entity.OutboxEntryId == enqueued.OutboxEntryId);
+        tracked.Status = hostStatus;
+
+        GovernanceOutboxClaim claim = Assert.Single(await store.ClaimPendingAsync(
+            GovernanceOutboxClaimRequest.Create("shared-context-worker", CreatedUtc.AddMinutes(1), TimeSpan.FromMinutes(5)),
+            cancellationToken));
+
+        GovernanceOutboxEntry delivered = await store.MarkClaimDeliveredAsync(
+            claim,
+            GovernanceEmissionResult.Delivered("shared-context-provider"),
+            cancellationToken);
+
+        Assert.Equal(GovernanceEmissionStatus.Delivered, delivered.Status);
+
+        GovernanceOutboxEntryEntity persisted = await context.GovernanceOutboxEntries.AsNoTracking()
+            .SingleAsync(entity => entity.OutboxEntryId == claim.OutboxEntryId, cancellationToken);
+        Assert.Equal(GovernanceEmissionStatus.Delivered, persisted.Status);
+        Assert.Equal("shared-context-provider", persisted.ProviderName);
+    }
+
+
     private static async Task<SharedContextDbContext> CreateContextAsync(
         SqliteConnection connection,
         CancellationToken cancellationToken)

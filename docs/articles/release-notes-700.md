@@ -9,7 +9,10 @@ security corrections that change stable contracts, so both require a major
 boundary rather than a `6.x` release.
 
 Package IDs, public namespaces, and the `net10.0` target remain unchanged. No
-public type, member, namespace, or package is renamed or removed.
+public type, namespace, or package is renamed or removed. The
+`GovernanceOutboxDrain` and `GovernanceOutboxDrainHostedService` constructors are
+replaced by signatures with an optional trailing `TimeProvider` parameter; source
+compiles unchanged, but assemblies built against `6.x` must be rebuilt.
 `AssemblyVersion` advances to `7.0.0.0`; package and file versions advance to
 `7.0.0` and `7.0.0.0` respectively.
 

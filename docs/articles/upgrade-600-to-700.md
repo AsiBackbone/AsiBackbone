@@ -2,7 +2,7 @@
 
 Version 7.0 carries two security corrections that change stable contracts. It binds liability handshake acknowledgment responses to the actor the challenge was issued to, and it moves `DlpFailureBehavior` and `DlpIntentRiskLevel` off their permissive zero values, which changes the numeric value of every existing member of both enums. These are intentional major-version breaks. Rebuild consumers against the 7.0 packages after migrating.
 
-No public type, member, namespace, or package was renamed or removed in this release. Code that compiles against 6.x continues to compile against 7.0 unless it relies on one of the behaviors below. The acknowledgment and DLP changes are the two security corrections that required the major boundary; [Other changes that affect hosts](#other-changes-that-affect-hosts) covers the remaining adjustments.
+No public type, namespace, or package was renamed or removed in this release. Two public constructors were replaced: `GovernanceOutboxDrain` and `GovernanceOutboxDrainHostedService` each gained an optional trailing `TimeProvider` parameter, which removes their previous signatures from the compiled assemblies. Code that compiles against 6.x continues to compile against 7.0 unless it relies on one of the behaviors below, but assemblies compiled against 6.x must be rebuilt. The acknowledgment and DLP changes are the two security corrections that required the major boundary; [Other changes that affect hosts](#other-changes-that-affect-hosts) covers the remaining adjustments.
 
 ## Why these changes required a major release
 

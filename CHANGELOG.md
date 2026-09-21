@@ -89,7 +89,9 @@ Consumers moving from `6.x` must follow the
   returned the entry still `Pending` without recording delivery, letting another worker re-claim and re-emit it after
   the lease expired, and `ReleaseClaimAsync` left the claim held. The store now reconciles tracked instances of rows it
   has just claimed: an unchanged instance is detached so the next query reloads it, while a modified or deleted instance
-  keeps its unsaved host changes and has only the columns the claim wrote merged in.
+  keeps its unsaved host changes except for the claim-governed columns, the columns the claim wrote plus `Status`.
+  Those are resolved from the persisted claimed row, so a pending host status or claim-field change cannot make the
+  tracked instance look terminal or unclaimed and short-circuit the transition.
 * `LocalDevelopmentSigningService` creates its key with `RSA.Create(int)` instead of assigning `KeySize` after
   creation, whose behavior varies by platform provider. A key size that passes option validation but that the provider
   cannot generate, such as `2049`, now raises `InvalidOperationException` with the other configuration failures instead
