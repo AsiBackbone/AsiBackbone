@@ -220,7 +220,11 @@ The full, categorized documentation set lives at the [documentation site](https:
 
 Stable `7.x` is the current released line, with `7.0.0` as the current release. Package IDs and public namespaces remain unchanged, and the binary assembly identity is `7.0.0.0`.
 
-The stable API contract is documented in [API Compatibility and SemVer](https://github.com/AsiBackbone/AsiBackbone/blob/main/docs/articles/api-compatibility-and-semver.md). The current release is recorded in [7.0.0 Release Notes](https://github.com/AsiBackbone/AsiBackbone/blob/main/docs/articles/release-notes-700.md). Consumers can use the [7.0.0 Consumer Verification Guide](https://github.com/AsiBackbone/AsiBackbone/blob/main/docs/articles/consumer-verification-700.md) for package-source, API-compatibility, Source Link, SBOM, provenance, behavior-change, and deferred-signing checks. Consumers moving from `6.x` must follow the [6.x to 7.0 upgrade guide](https://github.com/AsiBackbone/AsiBackbone/blob/main/docs/articles/upgrade-600-to-700.md). Earlier release records remain available for historical traceability.
+The stable API contract is documented in [API Compatibility and SemVer](https://github.com/AsiBackbone/AsiBackbone/blob/main/docs/articles/api-compatibility-and-semver.md).
+The current release is recorded in [7.0.0 Release Notes](https://github.com/AsiBackbone/AsiBackbone/blob/main/docs/articles/release-notes-700.md).
+The most recently published consumer verification evidence remains the [6.0.0 Consumer Verification Guide](https://github.com/AsiBackbone/AsiBackbone/blob/main/docs/articles/consumer-verification-600.md) while the `7.0.0` release checklist is still being finalized.
+Consumers moving from the previous stable line must follow the [6.x to 7.0 upgrade guide](https://github.com/AsiBackbone/AsiBackbone/blob/main/docs/articles/upgrade-600-to-700.md).
+Earlier release records remain available for historical traceability.
 
 ## Support and project stewardship
 
@@ -246,7 +250,7 @@ A consumer should be able to use AsiBackbone in an application generated from Ne
 
 AsiBackbone is a governance framework, not an intelligence engine. It implements software primitives for accountable decision flow and keeps execution authority with the host application. See [Project Boundaries and Non-Claims](https://asibackbone.github.io/AsiBackbone/articles/project-boundaries.html) for the full scope statement and safe wording guidance.
 
-> **Current NuGet packages are intentionally published without package signing.** The dated [NuGet Package Signing Decision Record](https://asibackbone.github.io/AsiBackbone/articles/nuget-package-signing-decision.html) records the accepted risk, compensating controls, mandatory review date, and early re-evaluation criteria. The project publishes durable release-attached SBOMs, package/SBOM provenance, Source Link metadata, and package hashes as distinct trust signals; none is presented as a signed-package guarantee. For current verification guidance, see the [**7.0.0 Release Notes**](https://asibackbone.github.io/AsiBackbone/articles/release-notes-700.html) and the [7.0.0 Consumer Verification Guide](https://asibackbone.github.io/AsiBackbone/articles/consumer-verification-700.html).
+> **Current NuGet packages are intentionally published without package signing.** The dated [NuGet Package Signing Decision Record](https://asibackbone.github.io/AsiBackbone/articles/nuget-package-signing-decision.html) records the accepted risk, compensating controls, mandatory review date, and early re-evaluation criteria. The project publishes durable release-attached SBOMs, package/SBOM provenance, Source Link metadata, and package hashes as distinct trust signals; none is presented as a signed-package guarantee. For current verification guidance, see the [**7.0.0 Release Notes**](https://asibackbone.github.io/AsiBackbone/articles/release-notes-700.html) and the most recently published [6.0.0 Consumer Verification Guide](https://asibackbone.github.io/AsiBackbone/articles/consumer-verification-600.html).
 
 ## Design principles
 

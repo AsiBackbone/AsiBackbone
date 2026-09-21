@@ -32,7 +32,9 @@ packages, robotics, immutable storage, and additional non-signing provider
 packages remain design-only, strategy-only, sample-only, host-owned, or
 future-provider work unless a later stable release explicitly ships them.
 
-The release process includes explicit [Release Cadence and Readiness](release-cadence-and-readiness.md) guidance for patch, minor, and major release selection, package metadata, Source Link, SBOM/provenance, documentation links, and future package identity or namespace changes. The [7.0.0 Consumer Verification Guide](consumer-verification-700.md) gives consumers a conservative package-source, API-compatibility, Source Link, SBOM/provenance, behavior-change, and deferred-signing verification path. Consumers moving from `6.x` must also follow the [Upgrade from 6.x to 7.0](upgrade-600-to-700.md) guide.
+The release process includes explicit [Release Cadence and Readiness](release-cadence-and-readiness.md) guidance for patch, minor, and major release selection, package metadata, Source Link, SBOM/provenance, documentation links, and future package identity or namespace changes.
+The most recently published verification evidence remains the [6.0.0 Consumer Verification Guide](consumer-verification-600.md) while the `7.0.0` release checklist is still being finalized.
+Consumers moving from the previous stable line must also follow the [Upgrade from 6.x to 7.0](upgrade-600-to-700.md) guide.
 
 ## Search and navigation
 
@@ -144,8 +146,8 @@ These pages cover production hardening, durable audit/outbox behavior, observabi
 Start with the current release and compatibility rules. Older release notes, consumer-verification guides, and upgrade records are preserved under [Releases & Compatibility](../releases/index.md) so they remain easy to find without dominating the implementation navigation.
 
 * [7.0.0 Release Notes](release-notes-700.md)
-* [7.0.0 Release Readiness Record](release-readiness-700.md)
-* [7.0.0 Consumer Verification Guide](consumer-verification-700.md)
+* [6.0.0 Release Readiness Record](release-readiness-600.md)
+* [6.0.0 Consumer Verification Guide](consumer-verification-600.md)
 * [Upgrade from 6.x to 7.0](upgrade-600-to-700.md)
 * [API Compatibility and SemVer](api-compatibility-and-semver.md)
 * [Schema Versioning](schema-versioning.md)

@@ -6,7 +6,15 @@ The binary assembly identity for the `7.x` line is `7.0.0.0`.
 
 Release validation should confirm that the package family remains practical governance infrastructure and that implementation claims stay within the documented software boundary. See [Release Cadence and Readiness](release-cadence-and-readiness.md) for the release-stream and stabilization guidance that complements this checklist.
 
-The [7.0.0 Release Readiness Record](release-readiness-700.md) and the [7.0.0 Consumer Verification Guide](consumer-verification-700.md) are the active release control sheets, covering package-source, API-compatibility, Source Link, SBOM/provenance, behavior-change, and deferred package-signing verification. The [Upgrade from 6.x to 7.0](upgrade-600-to-700.md) guide is authoritative for consumers moving from `6.x`. Earlier readiness records are retained for traceability.
+The [6.0.0 Release Readiness Record](release-readiness-600.md) and the
+[6.0.0 Consumer Verification Guide](consumer-verification-600.md) remain
+the most recently completed release-control sheets while the `7.0.0`
+release evidence is still being finalized.
+The [7.0.0 Release Notes](release-notes-700.md) record the current stable
+release boundary.
+The [Upgrade from 6.x to 7.0](upgrade-600-to-700.md) guide is
+authoritative for consumers moving from the previous stable line.
+Earlier readiness records are retained for traceability.
 
 ## Required checks before tagging a stable release
 

@@ -74,7 +74,7 @@ In 6.x, `DlpFailureBehavior.Allow` and `DlpIntentRiskLevel.Low` occupied the zer
 
 **Source that names these members needs no change.** `DlpFailureBehavior.Deny` still means deny. Recompiling against 7.0 picks up the new numbers automatically.
 
-**Persisted, serialized, or transmitted numeric values must be remapped.** Enum constants are inlined at compile time, so any value written to a database column, cached payload, configuration file, message contract, or log by a 6.x build carries the old number. Add one to every stored `DlpFailureBehavior` and `DlpIntentRiskLevel` value, or re-derive the values from their names.
+**Persisted, serialized, or transmitted numeric values must be remapped carefully.** Enum constants are inlined at compile time, so any value written to a database column, cached payload, configuration file, message contract, or log by a 6.x build carries the old number. Non-zero values can be remapped with the table above, but legacy zeroes must be audited before migration because `0` could mean either a deliberate `Allow`/`Low` assignment or an unset/default value. Where that distinction cannot be recovered, reject the old zero or re-derive the value from the original member name or source input instead of blindly promoting it.
 
 Storage that persisted the member *name* rather than its number needs no remapping.
 
