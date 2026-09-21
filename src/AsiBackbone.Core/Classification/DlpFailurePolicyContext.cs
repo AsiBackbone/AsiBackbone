@@ -33,6 +33,17 @@ public sealed class DlpFailurePolicyContext
             throw new ArgumentOutOfRangeException(nameof(riskLevel), riskLevel, "DLP intent risk level must be defined.");
         }
 
+        // The host assigns the risk tier, and every tier maps to a different failure behavior. An unassigned tier is
+        // rejected here rather than treated as the lowest one, so a caller that never set it fails closed at the boundary
+        // instead of resolving to the most permissive policy.
+        if (riskLevel == DlpIntentRiskLevel.Unspecified)
+        {
+            throw new ArgumentOutOfRangeException(
+                nameof(riskLevel),
+                riskLevel,
+                "DLP intent risk level must be assigned. Supply Low, Medium, or High rather than leaving the risk level unspecified.");
+        }
+
         if (timeout < TimeSpan.Zero)
         {
             throw new ArgumentOutOfRangeException(nameof(timeout), timeout, "Timeout must be greater than or equal to zero.");

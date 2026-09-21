@@ -3,11 +3,11 @@
 | Field | Decision |
 | --- | --- |
 | Status | Accepted, with mandatory review |
-| Decision date | 2026-09-12 |
+| Decision date | 2026-09-20 |
 | Decision owner | [@cdcavell](https://github.com/cdcavell), Core Maintainer |
 | Scope | NuGet package signing for the public `AsiBackbone.*` package family |
 | Current decision | Defer NuGet package signing |
-| Next mandatory review | 2027-03-31 or before the first `6.0.0` release candidate, whichever occurs first |
+| Next mandatory review | 2027-03-31 or before the first `8.0.0` release candidate, whichever occurs first |
 
 ## Context
 
@@ -29,12 +29,12 @@ may apply to its own governance records.
 
 ## Decision
 
-NuGet package signing remains deferred for the current `6.x` line. Unsigned
+NuGet package signing remains deferred for the current `7.x` line. Unsigned
 packages must not be described as maintainer-signed, repository-signed,
 Authenticode-signed, tamper-proof, or legally non-repudiable.
 
 The deferral is time-bounded. The maintainer must review it by 2027-03-31 or
-before the first `6.0.0` release candidate, whichever comes first, even if none
+before the first `8.0.0` release candidate, whichever comes first, even if none
 of the event-driven criteria below has occurred.
 
 ## Accepted residual risk
@@ -100,6 +100,12 @@ A proposal to adopt signing must define and validate:
   release notes, and consumer verification guidance.
 
 ## Review record
+
+The decision was reviewed for the `7.0.0` release on 2026-09-20. No adopted
+certificate owner, recoverable key-custody process, or consumer requirement
+changed the original operational assessment. The project therefore retains the
+deferral and its compensating controls for the `7.x` line and advances the next
+major-boundary review trigger to the first `8.0.0` release candidate.
 
 At each review, update the decision date, status, rationale, next review date,
 and any triggered criteria. If deferral continues, record why the residual risk

@@ -21,6 +21,29 @@ $stableAssemblies = [ordered]@{
     "AsiBackbone.Testing.dll" = "AsiBackbone.Testing.txt"
 }
 
+# The baseline header records the release the committed rows describe. Derive it from the
+# shared version metadata so a major-version bump does not silently regress the header that
+# the next -Update run writes.
+function Get-BaselineReleaseVersion {
+    $directoryBuildPropsPath = Join-Path (Split-Path -Parent $PSScriptRoot) 'Directory.Build.props'
+    if (-not (Test-Path -LiteralPath $directoryBuildPropsPath -PathType Leaf)) {
+        throw "Directory.Build.props was not found at '$directoryBuildPropsPath'."
+    }
+
+    [xml]$project = Get-Content -LiteralPath $directoryBuildPropsPath -Raw
+    $versionPrefixNodes = @($project.Project.PropertyGroup.ChildNodes | Where-Object {
+        $_.NodeType -eq [System.Xml.XmlNodeType]::Element -and $_.Name -eq 'VersionPrefix'
+    })
+
+    if ($versionPrefixNodes.Count -eq 0) {
+        throw "VersionPrefix was not found in '$directoryBuildPropsPath'."
+    }
+
+    return $versionPrefixNodes[0].InnerText.Trim()
+}
+
+$baselineReleaseVersion = Get-BaselineReleaseVersion
+
 $regexOptions = [System.Text.RegularExpressions.RegexOptions]::IgnoreCase -bor
     [System.Text.RegularExpressions.RegexOptions]::Singleline
 
@@ -148,7 +171,7 @@ function New-BaselineContent {
 
     $header = @(
         '# AsiBackbone stable public API baseline',
-        '# Baseline release: 6.0.0',
+        "# Baseline release: $baselineReleaseVersion",
         "# Assembly: $Assembly",
         '# Format: KIND | UID | C# declaration (or enum field display)',
         '# Update only after explicit API/SemVer review.',

@@ -238,6 +238,106 @@ public sealed class AsiBackboneAcknowledgmentChallengeServiceTests
     }
 
     /// <summary>
+    /// Tests that the <see cref="DefaultAcknowledgmentChallengeService.HandleResponse"/> method fails when a different actor submits an otherwise valid response, so that one actor cannot accept the liability recorded against another.
+    /// </summary>
+    [Fact]
+    public void HandleResponseFailsWhenRespondingActorIsNotTheChallengedActor()
+    {
+        var challengedActor = GovernanceActorContext.Human("user-123");
+        var otherActor = GovernanceActorContext.Human("user-456");
+        var decision = GovernanceDecision.RequireAcknowledgment("ack.required", "Acknowledgment required.");
+        DefaultAcknowledgmentChallengeService service = CreateService();
+        AcknowledgmentChallenge challenge = service.CreateChallenge(challengedActor, "RunOperation", decision);
+        var response = new AcknowledgmentChallengeRequest
+        {
+            HandshakeId = challenge.HandshakeId,
+            AcknowledgmentCode = challenge.RequiredAcknowledgmentCode,
+            Acknowledged = true,
+        };
+
+        AcknowledgmentChallengeResult result = service.HandleResponse(challenge, otherActor, response);
+
+        Assert.False(result.Succeeded);
+        Assert.Null(result.Acknowledgment);
+        Assert.Contains("acknowledgment.challenge.actor_mismatch", result.Result.ReasonCodes);
+    }
+
+    /// <summary>
+    /// Tests that the <see cref="DefaultAcknowledgmentChallengeService.HandleResponse"/> method prioritizes actor binding failures over acknowledgment code failures.
+    /// </summary>
+    [Fact]
+    public void HandleResponseFailsWithActorMismatchWhenActorAndCodeDoNotMatch()
+    {
+        var challengedActor = GovernanceActorContext.Human("user-123");
+        var otherActor = GovernanceActorContext.Human("user-456");
+        var decision = GovernanceDecision.RequireAcknowledgment("ack.required", "Acknowledgment required.");
+        DefaultAcknowledgmentChallengeService service = CreateService();
+        AcknowledgmentChallenge challenge = service.CreateChallenge(challengedActor, "RunOperation", decision);
+        var response = new AcknowledgmentChallengeRequest
+        {
+            HandshakeId = challenge.HandshakeId,
+            AcknowledgmentCode = "wrong-code",
+            Acknowledged = true,
+        };
+
+        AcknowledgmentChallengeResult result = service.HandleResponse(challenge, otherActor, response);
+
+        Assert.False(result.Succeeded);
+        Assert.Null(result.Acknowledgment);
+        Assert.Contains("acknowledgment.challenge.actor_mismatch", result.Result.ReasonCodes);
+        Assert.DoesNotContain("acknowledgment.challenge.code_mismatch", result.Result.ReasonCodes);
+    }
+
+    /// <summary>
+    /// Tests that the <see cref="DefaultAcknowledgmentChallengeService.HandleResponse"/> method fails when the responding actor reuses the challenged actor identifier under a different actor type, because that is a different principal.
+    /// </summary>
+    [Fact]
+    public void HandleResponseFailsWhenRespondingActorTypeDiffers()
+    {
+        var challengedActor = GovernanceActorContext.Human("shared-id");
+        var impersonatingActor = GovernanceActorContext.Service("shared-id");
+        var decision = GovernanceDecision.RequireAcknowledgment("ack.required", "Acknowledgment required.");
+        DefaultAcknowledgmentChallengeService service = CreateService();
+        AcknowledgmentChallenge challenge = service.CreateChallenge(challengedActor, "RunOperation", decision);
+        var response = new AcknowledgmentChallengeRequest
+        {
+            HandshakeId = challenge.HandshakeId,
+            AcknowledgmentCode = challenge.RequiredAcknowledgmentCode,
+            Acknowledged = true,
+        };
+
+        AcknowledgmentChallengeResult result = service.HandleResponse(challenge, impersonatingActor, response);
+
+        Assert.False(result.Succeeded);
+        Assert.Null(result.Acknowledgment);
+        Assert.Contains("acknowledgment.challenge.actor_mismatch", result.Result.ReasonCodes);
+    }
+
+    /// <summary>
+    /// Tests that the <see cref="DefaultAcknowledgmentChallengeService.HandleResponse"/> method accepts a response from an equivalent actor context whose identifier carries surrounding whitespace, so the actor binding check does not reject a legitimately re-resolved actor.
+    /// </summary>
+    [Fact]
+    public void HandleResponseAcceptsEquivalentActorWithUntrimmedIdentifier()
+    {
+        var challengedActor = GovernanceActorContext.Human("user-123");
+        var decision = GovernanceDecision.RequireAcknowledgment("ack.required", "Acknowledgment required.");
+        DefaultAcknowledgmentChallengeService service = CreateService();
+        AcknowledgmentChallenge challenge = service.CreateChallenge(challengedActor, "RunOperation", decision);
+        IGovernanceActorContext reresolvedActor = new TestActorContext(" user-123 ", GovernanceActorType.Human);
+        var response = new AcknowledgmentChallengeRequest
+        {
+            HandshakeId = challenge.HandshakeId,
+            AcknowledgmentCode = challenge.RequiredAcknowledgmentCode,
+            Acknowledged = true,
+        };
+
+        AcknowledgmentChallengeResult result = service.HandleResponse(challenge, reresolvedActor, response);
+
+        Assert.True(result.Succeeded);
+        Assert.True(result.Acknowledged);
+    }
+
+    /// <summary>
     /// Tests that the <see cref="AcknowledgmentChallengeOptions.Validate"/> method throws an <see cref="InvalidOperationException"/> when the required acknowledgment code is null, empty, or whitespace.
     /// </summary>
     [Theory]
@@ -261,5 +361,14 @@ public sealed class AsiBackboneAcknowledgmentChallengeServiceTests
     {
         return new DefaultAcknowledgmentChallengeService(
             Options.Create(options ?? new AcknowledgmentChallengeOptions()));
+    }
+
+    private sealed record TestActorContext(string ActorId, GovernanceActorType ActorType) : IGovernanceActorContext
+    {
+        public string? DisplayName => null;
+
+        public bool IsKnown => true;
+
+        public bool IsAuthenticated => true;
     }
 }

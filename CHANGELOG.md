@@ -6,6 +6,58 @@ This project follows the spirit of [Keep a Changelog](https://keepachangelog.com
 
 ## [Unreleased]
 
+## [7.0.0] - 2026-09-20
+
+### Release summary
+
+`7.0.0` is a major release for the AsiBackbone package family. It carries two
+security corrections that change stable contracts, so both require a major
+boundary rather than a `6.x` release.
+
+The first binds liability handshake acknowledgments to the actor the challenge
+was issued to. The second moves the DLP classification enums off their
+permissive zero values, which changes the numeric value of every existing member
+of `DlpFailureBehavior` and `DlpIntentRiskLevel`. Under the repository's
+[API compatibility and SemVer contract](docs/articles/api-compatibility-and-semver.md),
+an enum value change affects a stable package contract and cannot ship on the
+`6.x` line, where `AssemblyVersion` stays pinned at `6.0.0.0` and a consumer
+would otherwise load a library that reinterprets its inlined constants without
+any change in assembly identity.
+
+Package IDs, public namespaces, and the `net10.0` target remain unchanged.
+`AssemblyVersion` advances to `7.0.0.0`; package and file versions advance to
+`7.0.0` and `7.0.0.0` respectively.
+
+Consumers moving from `6.x` must follow the
+[6.x to 7.0 migration guide](docs/articles/upgrade-600-to-700.md).
+
+### Security
+
+* **Breaking (behavior):** `IAcknowledgmentChallengeService.HandleResponse` now binds the acknowledgment response to the
+  challenged actor. The `actor` argument must match the `ActorId` and `ActorType` recorded by `CreateChallenge`, otherwise
+  the response fails with the new `acknowledgment.challenge.actor_mismatch` reason code and no
+  `LiabilityHandshakeAcknowledgment` is produced. Previously the response was validated only against the handshake
+  identifier and the required acknowledgment code, so any actor that could name an active challenge could satisfy it and
+  the resulting acknowledgment attributed the liability to whoever answered rather than to whoever was challenged. Hosts
+  that resolve the current actor per request must resolve the same principal on both legs of the round trip. This does not
+  add challenge expiry or single-use enforcement, which remain host responsibilities.
+* **Breaking (binary and persisted values):** `DlpFailureBehavior` and `DlpIntentRiskLevel` each gained an `Unspecified`
+  member at zero, shifting every other member up by one. Previously `DlpFailureBehavior.Allow` and
+  `DlpIntentRiskLevel.Low` were the default values, so an unset property, an absent configuration value, a deserialized
+  payload that omitted the field, or a database column default resolved a screening failure to the most permissive
+  outcome. Supplying `Unspecified` now raises `ArgumentOutOfRangeException` rather than being defaulted:
+  `DlpFailurePolicyContext.Create` rejects an unassigned risk level, `DlpFailurePolicyOptions.GetBehavior` rejects an
+  unconfigured tier behavior or override, and `DlpFailurePolicyResolution.Create` rejects an unresolved behavior. Source
+  that refers to these members by name is unaffected; consumers that persisted or transmitted the numeric values must
+  remap them, because enum constants compiled against `6.0.0` retain the previous numbers.
+
+### Changed
+
+* Advanced the package family to the `7.x` major line. `AssemblyVersion` and `FileVersion` move to `7.0.0.0`, and
+  `VersionPrefix` moves to `7.0.0`. The package validation baseline stays at `5.1.0`, so the intentional breaks in this
+  release are recorded as exact suppressions in the package compatibility suppression files rather than by disabling
+  validation.
+
 ## [6.0.0] - 2026-09-19
 
 ### Release summary

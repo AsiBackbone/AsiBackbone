@@ -76,9 +76,9 @@ The workflows do not attest broad repository outputs, coverage reports, document
 GitHub attestations are verified against a downloaded subject digest; the repository API is not a collection listing of every attestation. After downloading a build package and SBOM from the GitHub release, verify them with:
 
 ```powershell
-gh release download v6.0.0 --repo AsiBackbone/AsiBackbone --pattern 'AsiBackbone.Core.6.0.0.nupkg'
-gh attestation verify ./AsiBackbone.Core.6.0.0.nupkg --repo AsiBackbone/AsiBackbone
-gh attestation verify ./AsiBackbone.Core.6.0.0.spdx.json --repo AsiBackbone/AsiBackbone
+gh release download v7.0.0 --repo AsiBackbone/AsiBackbone --pattern 'AsiBackbone.Core.7.0.0.nupkg'
+gh attestation verify ./AsiBackbone.Core.7.0.0.nupkg --repo AsiBackbone/AsiBackbone
+gh attestation verify ./AsiBackbone.Core.7.0.0.spdx.json --repo AsiBackbone/AsiBackbone
 ```
 
 Repeat the command for each package or SBOM being admitted. A successful provenance verification identifies the workflow and source repository that produced the subject; it is not a NuGet author or repository signature.
@@ -103,7 +103,7 @@ Rationale:
 
 Current packages should therefore be described as having workflow-generated SBOMs and GitHub artifact provenance where supported, not as maintainer-signed NuGet packages.
 
-The decision record requires review by 2027-03-31 or before the first `6.0.0` release candidate, whichever occurs first, and defines mandatory early re-evaluation criteria. When signing is adopted, update `SECURITY.md`, stable release validation guidance, the active release-readiness record, release notes, and consumer verification guidance before publishing public claims that package artifacts are maintainer-signed, repository-signed, or Authenticode-signed.
+The decision record requires review by 2027-03-31 or before the first `8.0.0` release candidate, whichever occurs first, and defines mandatory early re-evaluation criteria. When signing is adopted, update `SECURITY.md`, stable release validation guidance, the active release-readiness record, release notes, and consumer verification guidance before publishing public claims that package artifacts are maintainer-signed, repository-signed, or Authenticode-signed.
 
 ## Consumer guidance
 
@@ -115,13 +115,13 @@ For a package release or validation run, consumers can review:
 4. GitHub artifact attestations when the workflow event produced them;
 5. NuGet package metadata and Source Link metadata after package publication.
 
-For the current package family, the [6.0.0 Consumer Verification Guide](consumer-verification-600.md) provides durable asset links and copy/paste validation commands for package source, package IDs, package version, repository metadata, Source Link metadata, package SBOMs, provenance attestations, deprecation status, and deferred package-signing wording.
+The [7.0.0 Consumer Verification Guide](consumer-verification-700.md) provides durable asset links and copy/paste validation commands for package source, package IDs, package version, repository metadata, Source Link metadata, package SBOMs, provenance attestations, behavior changes, and deferred package-signing wording.
 
 For released NuGet packages, Source Link metadata validation remains a separate post-publish check. SBOM/provenance metadata complements that check; it does not replace source review, package validation, vulnerability scanning, or organizational approval.
 
 ## Related documentation
 
-- [6.0.0 Consumer Verification Guide](consumer-verification-600.md)
+- [7.0.0 Consumer Verification Guide](consumer-verification-700.md)
 - [Stable Release Validation](release-validation.md)
 - [NuGet Package Signing Decision Record](nuget-package-signing-decision.md)
 - [API Compatibility and SemVer](api-compatibility-and-semver.md)

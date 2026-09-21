@@ -33,14 +33,15 @@ The DocFX header search is available for package names, API concepts, and articl
 
 ## Current stable package family
 
-Stable `6.x` package family. `6.0.0` is the current release. It is a
-major release that renames the public API to plain-language semantic names,
-removes the members whose `5.x` deprecation windows completed, makes
-signature-verification trust failures deny by default, binds the signing policy
-context into a versioned signature input, and closes a replay window in the
-reference in-memory capability-grant use store. Package IDs, public namespaces,
-and the `net10.0` target remain unchanged; the binary assembly identity advances
-to `6.0.0.0`.
+Stable `7.x` package family. `7.0.0` is the current release. It binds
+acknowledgment responses to the challenged actor and makes unconfigured DLP
+failure behavior and intent risk levels fail explicitly instead of inheriting a
+permissive zero value. Package IDs, public namespaces, and the `net10.0` target
+remain unchanged; the binary assembly identity advances to `7.0.0.0`.
+
+`7.0.0` is prepared for release and is not yet tagged or published. Published
+packages remain on the previous stable line until the release readiness
+checklist completes and `v7.0.0` is tagged.
 
 ```text
 AsiBackbone.Core
@@ -111,9 +112,10 @@ Package-specific READMEs and release notes define which surfaces are stable, opt
 
 ### Releases and compatibility
 
-* [6.0.0 Release Notes](articles/release-notes-600.md)
+* [7.0.0 Release Notes](articles/release-notes-700.md)
+* [6.0.0 Release Readiness Record](articles/release-readiness-600.md)
 * [6.0.0 Consumer Verification Guide](articles/consumer-verification-600.md)
-* [Upgrade from 5.x to 6.0](articles/upgrade-500-to-600.md)
+* [Upgrade from 6.x to 7.0](articles/upgrade-600-to-700.md)
 * [API Compatibility and SemVer](articles/api-compatibility-and-semver.md)
 * [Schema Versioning](articles/schema-versioning.md)
 * [Release Validation](articles/release-validation.md)

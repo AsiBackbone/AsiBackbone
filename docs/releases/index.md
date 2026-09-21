@@ -6,12 +6,12 @@ Current package/runtime behavior is documented in the product articles and gener
 
 ## Current release
 
-Stable package family: `6.x`. Current release: `6.0.0`.
+Stable package family: `7.x`. Current release: `7.0.0`.
 
-- [6.0.0 Release Notes](../articles/release-notes-600.md)
-- [6.0.0 Release Readiness Record](../articles/release-readiness-600.md)
-- [6.0.0 Consumer Verification Guide](../articles/consumer-verification-600.md)
-- [Upgrade from 5.x to 6.0](../articles/upgrade-500-to-600.md)
+- [7.0.0 Release Notes](../articles/release-notes-700.md)
+- [7.0.0 Release Readiness Record](../articles/release-readiness-700.md)
+- [7.0.0 Consumer Verification Guide](../articles/consumer-verification-700.md)
+- [Upgrade from 6.x to 7.0](../articles/upgrade-600-to-700.md)
 - [6.0 Public API Naming Convention](../articles/public-api-naming-600.md)
 - [API Compatibility and Semantic Versioning](../articles/api-compatibility-and-semver.md)
 - [Schema Versioning](../articles/schema-versioning.md)
@@ -25,6 +25,14 @@ Stable package family: `6.x`. Current release: `6.0.0`.
 The upgrade guide is a historical version-to-version record. Use current compatibility, target-framework, and release notes for present-day package decisions.
 
 ## Release archive
+
+### 6.0.0
+
+- [6.0.0 Release Notes](../articles/release-notes-600.md)
+- [6.0.0 Release Readiness Record](../articles/release-readiness-600.md)
+- [6.0.0 Consumer Verification Guide](../articles/consumer-verification-600.md)
+- [Upgrade from 5.x to 6.0](../articles/upgrade-500-to-600.md)
+- [6.0 Public API Naming Convention](../articles/public-api-naming-600.md)
 
 ### 5.2.0
 

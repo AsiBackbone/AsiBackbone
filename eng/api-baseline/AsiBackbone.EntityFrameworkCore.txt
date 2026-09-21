@@ -1,5 +1,5 @@
 # AsiBackbone stable public API baseline
-# Baseline release: 6.0.0
+# Baseline release: 7.0.0
 # Assembly: AsiBackbone.EntityFrameworkCore.dll
 # Format: KIND | UID | C# declaration (or enum field display)
 # Update only after explicit API/SemVer review.

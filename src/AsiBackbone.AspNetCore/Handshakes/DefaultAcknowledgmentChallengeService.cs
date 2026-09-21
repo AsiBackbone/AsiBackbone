@@ -11,6 +11,7 @@ namespace AsiBackbone.AspNetCore.Handshakes;
 public sealed class DefaultAcknowledgmentChallengeService : IAcknowledgmentChallengeService
 {
     private const string ChallengeMismatchCode = "acknowledgment.challenge.mismatch";
+    private const string ChallengeActorMismatchCode = "acknowledgment.challenge.actor_mismatch";
     private const string ChallengeCodeMismatchCode = "acknowledgment.challenge.code_mismatch";
 
     private readonly AcknowledgmentChallengeOptions options;
@@ -71,6 +72,16 @@ public sealed class DefaultAcknowledgmentChallengeService : IAcknowledgmentChall
                 "The acknowledgment response did not match the active challenge.");
         }
 
+        // The acknowledgment is the accountability record for the operation, so it must be produced by the actor the
+        // challenge was issued to. Previously any actor could satisfy any challenge it could name, and the persisted
+        // acknowledgment attributed the liability to whoever answered rather than to whoever was challenged.
+        if (!IsChallengedActor(challenge, actor))
+        {
+            return AcknowledgmentChallengeResult.Failure(
+                ChallengeActorMismatchCode,
+                "The acknowledgment response was not submitted by the actor the challenge was issued to.");
+        }
+
         if (!string.Equals(challenge.RequiredAcknowledgmentCode, response.AcknowledgmentCode?.Trim(), StringComparison.Ordinal))
         {
             return AcknowledgmentChallengeResult.Failure(
@@ -86,5 +97,26 @@ public sealed class DefaultAcknowledgmentChallengeService : IAcknowledgmentChall
             metadata: response.Metadata);
 
         return AcknowledgmentChallengeResult.Success(acknowledgment);
+    }
+
+    /// <summary>
+    /// Determines whether the responding actor is the actor the challenge was issued to.
+    /// </summary>
+    /// <remarks>
+    /// Both the identifier and the actor type participate, because the same identifier under a different actor type is a
+    /// different principal. A single reason code covers both comparisons so a caller cannot use the failure to probe
+    /// which component differed.
+    /// </remarks>
+    /// <param name="challenge">The active acknowledgment challenge.</param>
+    /// <param name="actor">The actor that submitted the acknowledgment response.</param>
+    /// <returns><see langword="true" /> when the responding actor matches the challenged actor.</returns>
+    private static bool IsChallengedActor(
+        AcknowledgmentChallenge challenge,
+        IGovernanceActorContext actor)
+    {
+        LiabilityHandshakeRequest request = challenge.HandshakeRequest;
+
+        return string.Equals(request.ActorId, actor.ActorId?.Trim(), StringComparison.Ordinal)
+            && request.ActorType == actor.ActorType;
     }
 }

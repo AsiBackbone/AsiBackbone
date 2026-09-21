@@ -10,7 +10,7 @@ the published `v5.0.0` source at commit
 type/member UID together with the rendered C# declaration. Enum values are also
 recorded with their displayed numeric value.
 
-The committed files now describe the reviewed `6.0.0` public API after the
+The committed files now describe the reviewed `7.0.0` public API after the
 intentional major-version changes documented below.
 
 ## Included stable managed assemblies
@@ -72,6 +72,13 @@ Issue #794 completes the decision-receipt terminology pass for the signing and
 contract-test helpers, including their named-argument parameter names and the
 ASP.NET Core correlation extension class. These intentional 6.0 breaks and
 their replacements are recorded in the upgrade guide.
+
+The 7.0 major boundary changes enum values for the first time. `DlpFailureBehavior`
+and `DlpIntentRiskLevel` each gained an `Unspecified` member at zero so that neither
+enum keeps its most permissive member in the default slot, which shifts every other
+member up by one. The baselines record the new values, and exact `CP0011` entries in
+the Core package compatibility suppression file cover the shift. No public type or
+member is renamed or removed in 7.0. See `docs/articles/upgrade-600-to-700.md`.
 
 A baseline update is an approval artifact, not an approval mechanism. First
 classify the API change under the project's Semantic Versioning policy. Additive

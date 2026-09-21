@@ -319,6 +319,7 @@ public sealed class DefaultAsiBackboneDlpFailurePolicyResolverTests
                 Assert.False(resolution.IsFailClosed);
                 AssertDecisionHasSingleReason(resolution);
                 break;
+            case DlpFailureBehavior.Unspecified:
             default:
                 throw new InvalidOperationException("Unexpected DLP failure behavior under test.");
         }
@@ -416,6 +417,121 @@ public sealed class DefaultAsiBackboneDlpFailurePolicyResolverTests
     }
 
     /// <summary>
+    /// Verifies that the default DlpIntentRiskLevel value is Unspecified rather than a usable risk tier, so that an unset
+    /// field cannot resolve to the most permissive policy.
+    /// </summary>
+    [Fact]
+    public void DefaultRiskLevelIsUnspecifiedRatherThanLow()
+    {
+        Assert.Equal(DlpIntentRiskLevel.Unspecified, default);
+        Assert.NotEqual(DlpIntentRiskLevel.Low, default);
+    }
+
+    /// <summary>
+    /// Verifies that an unspecified DlpIntentRiskLevel is rejected by DlpFailurePolicyContext.Create instead of being
+    /// treated as the lowest risk tier, so an omitted risk level fails closed at the boundary.
+    /// </summary>
+    [Fact]
+    public void UnspecifiedRiskLevelThrowsArgumentOutOfRangeException()
+    {
+        ArgumentOutOfRangeException exception = Assert.Throws<ArgumentOutOfRangeException>(() =>
+            DlpFailurePolicyContext.Create(
+                DlpClassificationFailureKind.ServiceUnavailable,
+                DlpIntentRiskLevel.Unspecified));
+
+        Assert.Equal("riskLevel", exception.ParamName);
+        Assert.Contains("must be assigned", exception.Message, StringComparison.Ordinal);
+    }
+
+    /// <summary>
+    /// Verifies that the default DlpFailureBehavior value is Unspecified rather than Allow, so that an unset behavior
+    /// cannot silently permit an operation after a screening failure.
+    /// </summary>
+    [Fact]
+    public void DefaultFailureBehaviorIsUnspecifiedRatherThanAllow()
+    {
+        Assert.Equal(DlpFailureBehavior.Unspecified, default);
+        Assert.NotEqual(DlpFailureBehavior.Allow, default);
+    }
+
+    /// <summary>
+    /// Verifies that an unspecified DlpFailureBehavior configured on a risk tier is rejected during resolution rather than
+    /// resolving the screening failure into an allow.
+    /// </summary>
+    [Theory]
+    [InlineData(DlpIntentRiskLevel.Low)]
+    [InlineData(DlpIntentRiskLevel.Medium)]
+    [InlineData(DlpIntentRiskLevel.High)]
+    public async Task UnspecifiedTierBehaviorThrowsArgumentOutOfRangeException(DlpIntentRiskLevel riskLevel)
+    {
+        var options = new DlpFailurePolicyOptions();
+
+        switch (riskLevel)
+        {
+            case DlpIntentRiskLevel.Low:
+                options.LowRiskBehavior = DlpFailureBehavior.Unspecified;
+                break;
+            case DlpIntentRiskLevel.Medium:
+                options.MediumRiskBehavior = DlpFailureBehavior.Unspecified;
+                break;
+            case DlpIntentRiskLevel.High:
+                options.HighRiskBehavior = DlpFailureBehavior.Unspecified;
+                break;
+            case DlpIntentRiskLevel.Unspecified:
+            default:
+                throw new InvalidOperationException("Unexpected DLP risk level under test.");
+        }
+
+        var resolver = new DefaultDlpFailurePolicyResolver(options);
+        var context = DlpFailurePolicyContext.Create(
+            DlpClassificationFailureKind.ServiceUnavailable,
+            riskLevel);
+
+        ArgumentOutOfRangeException exception = await Assert.ThrowsAsync<ArgumentOutOfRangeException>(async () =>
+            await resolver.ResolveAsync(context, TestContext.Current.CancellationToken));
+
+        Assert.Contains("must be configured", exception.Message, StringComparison.Ordinal);
+    }
+
+    /// <summary>
+    /// Verifies that an unspecified DlpFailureBehavior supplied through BehaviorOverrides is rejected during resolution.
+    /// </summary>
+    [Fact]
+    public async Task UnspecifiedOverrideBehaviorThrowsArgumentOutOfRangeException()
+    {
+        var options = new DlpFailurePolicyOptions();
+        options.BehaviorOverrides[new DlpFailurePolicyKey(
+            DlpIntentRiskLevel.High,
+            DlpClassificationFailureKind.ServiceUnavailable)] = DlpFailureBehavior.Unspecified;
+
+        var resolver = new DefaultDlpFailurePolicyResolver(options);
+        var context = DlpFailurePolicyContext.Create(
+            DlpClassificationFailureKind.ServiceUnavailable,
+            DlpIntentRiskLevel.High);
+
+        _ = await Assert.ThrowsAsync<ArgumentOutOfRangeException>(async () =>
+            await resolver.ResolveAsync(context, TestContext.Current.CancellationToken));
+    }
+
+    /// <summary>
+    /// Verifies that DlpFailurePolicyResolution.Create rejects an unspecified behavior rather than materializing a
+    /// governance decision a host would act on.
+    /// </summary>
+    [Fact]
+    public void UnspecifiedBehaviorIsRejectedByResolutionCreate()
+    {
+        var context = DlpFailurePolicyContext.Create(
+            DlpClassificationFailureKind.ServiceUnavailable,
+            DlpIntentRiskLevel.High);
+
+        ArgumentOutOfRangeException exception = Assert.Throws<ArgumentOutOfRangeException>(() =>
+            DlpFailurePolicyResolution.Create(context, DlpFailureBehavior.Unspecified));
+
+        Assert.Equal("behavior", exception.ParamName);
+        Assert.Contains("must be resolved", exception.Message, StringComparison.Ordinal);
+    }
+
+    /// <summary>
     /// Verifies that providing an invalid DlpClassificationFailureKind value to the DlpFailurePolicyContext.Create method or the DlpFailureReasonCodes.GetFor method throws an ArgumentOutOfRangeException, ensuring that only valid failure kinds are accepted.
     /// </summary>
     [Fact]
@@ -452,6 +568,7 @@ public sealed class DefaultAsiBackboneDlpFailurePolicyResolverTests
             case DlpIntentRiskLevel.High:
                 options.HighRiskBehavior = (DlpFailureBehavior)999;
                 break;
+            case DlpIntentRiskLevel.Unspecified:
             default:
                 throw new InvalidOperationException("Unexpected DLP risk level under test.");
         }

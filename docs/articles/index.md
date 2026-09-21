@@ -1,6 +1,6 @@
 # AsiBackbone Product Documentation
 
-This section organizes the Accountable Systems Infrastructure documentation for the stable `6.x` release line around product implementation, API use, operations, compatibility, and release evidence.
+This section organizes the Accountable Systems Infrastructure documentation for the stable `7.x` release line around product implementation, API use, operations, compatibility, and release evidence.
 AsiBackbone is a .NET governance package family for accountable software decision flow. See [Project Boundaries and Non-Claims](project-boundaries.md) for the canonical boundary reference.
 
 ## Documentation ownership
@@ -11,14 +11,15 @@ General architectural education belongs in [ASI Backbone Learning](https://asiba
 
 ## Current stable package posture
 
-Stable `6.x` package family. `6.0.0` is the current release. It is a
-major release that renames the public API to plain-language semantic names,
-removes the members whose `5.x` deprecation windows completed, makes
-signature-verification trust failures deny by default, binds the signing policy
-context into a versioned signature input, and closes a replay window in the
-reference in-memory capability-grant use store. Package IDs, public namespaces,
-and the `net10.0` target remain unchanged; the binary assembly identity advances
-to `6.0.0.0`.
+Stable `7.x` package family. `7.0.0` is the current release. It binds
+acknowledgment responses to the challenged actor and makes unconfigured DLP
+failure behavior and risk levels fail explicitly instead of inheriting a
+permissive zero value. Package IDs, public namespaces, and the `net10.0` target
+remain unchanged; the binary assembly identity advances to `7.0.0.0`.
+
+`7.0.0` is prepared for release and is not yet tagged or published. Published
+packages remain on the previous stable line until the release readiness
+checklist completes and `v7.0.0` is tagged.
 
 Released stable package surfaces include Core, DependencyInjection,
 Storage.InMemory, EntityFrameworkCore, AspNetCore, Testing, Templates,
@@ -35,7 +36,9 @@ packages, robotics, immutable storage, and additional non-signing provider
 packages remain design-only, strategy-only, sample-only, host-owned, or
 future-provider work unless a later stable release explicitly ships them.
 
-The release process includes explicit [Release Cadence and Readiness](release-cadence-and-readiness.md) guidance for patch, minor, and major release selection, package metadata, Source Link, SBOM/provenance, documentation links, and future package identity or namespace changes. The [6.0.0 Consumer Verification Guide](consumer-verification-600.md) gives consumers a conservative package-source, API-compatibility, Source Link, SBOM/provenance, deprecation, and deferred-signing verification path. Consumers moving from `4.x` should also follow the [5.0.0 Migration Guide](upgrade-400-to-500.md).
+The release process includes explicit [Release Cadence and Readiness](release-cadence-and-readiness.md) guidance for patch, minor, and major release selection, package metadata, Source Link, SBOM/provenance, documentation links, and future package identity or namespace changes.
+The most recently published verification evidence remains the [6.0.0 Consumer Verification Guide](consumer-verification-600.md) while the `7.0.0` release checklist is still being finalized.
+Consumers moving from the previous stable line must also follow the [Upgrade from 6.x to 7.0](upgrade-600-to-700.md) guide.
 
 ## Search and navigation
 
@@ -146,10 +149,10 @@ These pages cover production hardening, durable audit/outbox behavior, observabi
 
 Start with the current release and compatibility rules. Older release notes, consumer-verification guides, and upgrade records are preserved under [Releases & Compatibility](../releases/index.md) so they remain easy to find without dominating the implementation navigation.
 
-* [6.0.0 Release Notes](release-notes-600.md)
+* [7.0.0 Release Notes](release-notes-700.md)
 * [6.0.0 Release Readiness Record](release-readiness-600.md)
 * [6.0.0 Consumer Verification Guide](consumer-verification-600.md)
-* [Upgrade from 5.x to 6.0](upgrade-500-to-600.md)
+* [Upgrade from 6.x to 7.0](upgrade-600-to-700.md)
 * [API Compatibility and SemVer](api-compatibility-and-semver.md)
 * [Schema Versioning](schema-versioning.md)
 * [Target Framework Support](target-framework-support.md)

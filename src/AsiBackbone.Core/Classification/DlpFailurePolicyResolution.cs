@@ -78,6 +78,17 @@ public sealed class DlpFailurePolicyResolution
             throw new ArgumentOutOfRangeException(nameof(behavior), behavior, "DLP failure behavior must be defined.");
         }
 
+        // A resolution carries the governance decision a host acts on, so an unconfigured behavior cannot be materialized
+        // into one. Rejecting it here rather than in the switch below names the actual problem instead of reporting the
+        // value as merely undefined.
+        if (behavior == DlpFailureBehavior.Unspecified)
+        {
+            throw new ArgumentOutOfRangeException(
+                nameof(behavior),
+                behavior,
+                "DLP failure behavior must be resolved before a policy resolution is created. Unspecified is not an actionable outcome.");
+        }
+
         var reason = OperationReason.Create(
             DlpFailureReasonCodes.GetFor(context.FailureKind),
             BuildMessage(context),
@@ -123,6 +134,9 @@ public sealed class DlpFailurePolicyResolution
                 traceId: context.TraceId,
                 policyVersion: context.PolicyVersion,
                 policyHash: context.PolicyHash),
+            // Rejected above, so this arm is unreachable. It stays explicit so that an unconfigured behavior can never
+            // acquire a governance decision by falling through to a default.
+            DlpFailureBehavior.Unspecified => throw new ArgumentOutOfRangeException(nameof(behavior), behavior, "DLP failure behavior must be resolved before a policy resolution is created."),
             _ => throw new ArgumentOutOfRangeException(nameof(behavior), behavior, "DLP failure behavior must be defined.")
         };
 

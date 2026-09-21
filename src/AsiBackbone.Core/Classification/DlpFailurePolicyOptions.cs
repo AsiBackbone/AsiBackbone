@@ -47,18 +47,34 @@ public sealed class DlpFailurePolicyOptions
             DlpIntentRiskLevel.Low => LowRiskBehavior,
             DlpIntentRiskLevel.Medium => MediumRiskBehavior,
             DlpIntentRiskLevel.High => HighRiskBehavior,
+            // DlpFailurePolicyContext rejects an unspecified risk level at construction, so this arm is unreachable through
+            // a validly constructed context. It stays explicit so an unassigned tier can never fall through to a default.
+            DlpIntentRiskLevel.Unspecified => throw new ArgumentOutOfRangeException(nameof(context), context.RiskLevel, "DLP intent risk level must be assigned before a behavior can be resolved."),
             _ => throw new ArgumentOutOfRangeException(nameof(context), context.RiskLevel, "DLP intent risk level must be defined.")
         };
 
         return ValidateBehavior(behavior, nameof(context));
     }
 
+    /// <summary>
+    /// Validates a resolved or configured failure behavior.
+    /// </summary>
+    /// <remarks>
+    /// This is the single choke point for both the risk-tier properties and <see cref="BehaviorOverrides" />, so rejecting
+    /// <see cref="DlpFailureBehavior.Unspecified" /> here keeps a partially configured policy from resolving a screening
+    /// failure into an allow. An incomplete policy raises instead of quietly proceeding.
+    /// </remarks>
     private static DlpFailureBehavior ValidateBehavior(
         DlpFailureBehavior behavior,
         string parameterName)
     {
-        return Enum.IsDefined(behavior)
-            ? behavior
-            : throw new ArgumentOutOfRangeException(parameterName, behavior, "DLP failure behavior must be defined.");
+        return !Enum.IsDefined(behavior)
+            ? throw new ArgumentOutOfRangeException(parameterName, behavior, "DLP failure behavior must be defined.")
+            : behavior == DlpFailureBehavior.Unspecified
+                ? throw new ArgumentOutOfRangeException(
+                    parameterName,
+                    behavior,
+                    "DLP failure behavior must be configured. Set an explicit behavior rather than leaving it unspecified.")
+                : behavior;
     }
 }

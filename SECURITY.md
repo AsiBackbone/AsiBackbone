@@ -8,18 +8,18 @@ In this software project, **ASI** means **Accountable Systems Infrastructure**. 
 
 ## Supported versions
 
-Security review and vulnerability handling focus on the current stable `6.x` release line.
+Security review and vulnerability handling focus on the current stable `7.x` release line.
 
 | Version line | Support posture |
 | --- | --- |
-| `6.x` | Supported stable line. Please prefer the latest available `6.x` patch when validating or reporting a concern. |
-| `5.x` | Previous stable line. Supported only for migration-sensitive reports that also affect or inform the current `6.x` package family. |
-| `4.x`, `3.x` | Historical stable lines. Supported only for migration-sensitive reports that also affect or inform the current `6.x` package family. |
-| `2.x`, `1.x` | Historical stable lines. Supported only for migration-sensitive reports that also affect or inform the current `6.x` package family. |
+| `7.x` | Supported stable line. Please prefer the latest available `7.x` patch when validating or reporting a concern. |
+| `6.x` | Previous stable line. Supported only for migration-sensitive reports that also affect or inform the current `7.x` package family. |
+| `5.x`, `4.x`, `3.x` | Historical stable lines. Supported only for migration-sensitive reports that also affect or inform the current `7.x` package family. |
+| `2.x`, `1.x` | Historical stable lines. Supported only for migration-sensitive reports that also affect or inform the current `7.x` package family. |
 | `0.x`, alpha, beta, preview, or historical package lines | Not supported except when a maintainer explicitly asks for comparison or reproduction details. |
 | Unreleased `main` branch changes | Reviewed on a best-effort basis before release, but not treated as a supported production release line. |
 
-A report that affects supported `6.x` packages may still result in documentation, sample, analyzer, package, or release-process changes depending on where the actual risk lives.
+A report that affects supported `7.x` packages may still result in documentation, sample, analyzer, package, or release-process changes depending on where the actual risk lives.
 
 ## Reporting a Vulnerability or Sensitive Concern
 
@@ -140,7 +140,7 @@ This is a deliberate governance decision while the project is independently main
 
 Consumers should validate package identity through the official NuGet package source, package version, repository metadata, Source Link information, GitHub release tags, and available integrity metadata provided by NuGet tooling.
 
-Package signing remains deferred under the dated [NuGet Package Signing Decision Record](docs/articles/nuget-package-signing-decision.md). That record requires review by 2027-03-31 or before the first `6.0.0` release candidate, whichever occurs first, and defines earlier re-evaluation triggers for maintainer capacity, consumer or regulatory requirements, suitable signing infrastructure, and supply-chain incidents. Until package signing is formally adopted and documented, AsiBackbone should not be described as providing signed release artifacts, repository-signed packages, or Authenticode-signed packages.
+Package signing remains deferred under the dated [NuGet Package Signing Decision Record](docs/articles/nuget-package-signing-decision.md). That record requires review by 2027-03-31 or before the first `8.0.0` release candidate, whichever occurs first, and defines earlier re-evaluation triggers for maintainer capacity, consumer or regulatory requirements, suitable signing infrastructure, and supply-chain incidents. Until package signing is formally adopted and documented, AsiBackbone should not be described as providing signed release artifacts, repository-signed packages, or Authenticode-signed packages.
 
 ### Current trust model
 
@@ -160,8 +160,8 @@ Download the attested build package from the matching GitHub release and verify
 its workflow provenance by subject digest:
 
 ```powershell
-gh release download v5.1.0 --repo AsiBackbone/AsiBackbone --pattern 'AsiBackbone.Core.5.1.0.nupkg'
-gh attestation verify ./AsiBackbone.Core.5.1.0.nupkg --repo AsiBackbone/AsiBackbone
+gh release download v7.0.0 --repo AsiBackbone/AsiBackbone --pattern 'AsiBackbone.Core.7.0.0.nupkg'
+gh attestation verify ./AsiBackbone.Core.7.0.0.nupkg --repo AsiBackbone/AsiBackbone
 ```
 
 NuGet.org repository-signs packages during ingestion, so a package downloaded

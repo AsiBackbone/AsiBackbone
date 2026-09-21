@@ -61,13 +61,17 @@ The `2.0.0` release established the simplified `AsiBackbone.*` package and names
 
 `5.0.0` established the previous stable line, and `5.2.0` was its final minor release. It preserved the `AsiBackbone.*` package IDs, namespaces, the `net10.0` target, and binary assembly identity `5.0.0.0`, and began the `ASIB900` deprecation window completed in `6.0.0`.
 
-### Current `6.x` stable family
+### `6.x` stable family
 
-`6.0.0` is the current stable release. It preserves the `AsiBackbone.*` package IDs, namespaces, and the `net10.0` target, and advances the binary assembly identity to `6.0.0.0`. It renames public types and helper members to plain-language semantic names, removes the members whose `5.x` deprecation windows completed, and changes verification defaults, the signature-input wire format, and in-memory use-store retention. See [Upgrade from 5.x to 6.0](upgrade-500-to-600.md).
+`6.0.0` established the previous stable line. It preserved the `AsiBackbone.*` package IDs, namespaces, and the `net10.0` target while advancing the binary assembly identity to `6.0.0.0`. It renamed public types and helper members to plain-language semantic names, removed the members whose `5.x` deprecation windows completed, and changed verification defaults, the signature-input wire format, and in-memory use-store retention. See [Upgrade from 5.x to 6.0](upgrade-500-to-600.md).
 
-| Package | `6.x` stable role |
+### Current `7.x` stable family
+
+`7.0.0` is the current stable release. It preserves the `AsiBackbone.*` package IDs, namespaces, and the `net10.0` target, and advances the binary assembly identity to `7.0.0.0`. It renames and removes nothing. It carries two security corrections that change stable contracts: liability handshake acknowledgment responses are now bound to the challenged actor, and the DLP classification enums move off their permissive zero values, which changes the numeric value of every existing member of `DlpFailureBehavior` and `DlpIntentRiskLevel`. The enum change is what requires the major boundary, because an enum value change affects a stable package contract and the `6.x` line pins its assembly identity at `6.0.0.0`. See [Upgrade from 6.x to 7.0](upgrade-600-to-700.md).
+
+| Package | `7.x` stable role |
 | --- | --- |
-| `AsiBackbone.Core` | Framework-neutral governance primitives and durable artifact contracts for the current `6.x` line, including policy evaluation, governance decisions, threat-model contributor hooks, metadata budget validation helpers, constraint-exception denial behavior, governed execution-to-mutation accountability receipts, capability-proof trust pinning, explicit capability-grant validation profiles, and canonical capability-grant payload construction. |
+| `AsiBackbone.Core` | Framework-neutral governance primitives and durable artifact contracts for the current `7.x` line, including policy evaluation, governance decisions, threat-model contributor hooks, metadata budget validation helpers, constraint-exception denial behavior, governed execution-to-mutation accountability receipts, capability-proof trust pinning, explicit capability-grant validation profiles, and canonical capability-grant payload construction. |
 | `AsiBackbone.DependencyInjection` | Explicit builder facade and host-selected provider registration composition path. |
 | `AsiBackbone.Storage.InMemory` | Non-durable storage helpers for tests, samples, local validation, lifecycle events, and outbox proof paths. |
 | `AsiBackbone.EntityFrameworkCore` | EF Core host-owned persistence helpers for audit, acknowledgment, lifecycle, JSON metadata storage guidance, and outbox records. |
@@ -112,7 +116,7 @@ For future releases, additive public API or package changes should be grouped in
 
 ## Assembly version policy
 
-For the stable `6.x` package line, AsiBackbone keeps `AssemblyVersion` fixed at `6.0.0.0` for compatible minor and patch releases. NuGet package `Version`, `FileVersion`, and `InformationalVersion` continue to move with each package release.
+For the stable `7.x` package line, AsiBackbone keeps `AssemblyVersion` fixed at `7.0.0.0` for compatible minor and patch releases. NuGet package `Version`, `FileVersion`, and `InformationalVersion` continue to move with each package release.
 
 Expected stable-line behavior:
 
@@ -142,6 +146,7 @@ Expected stable-line behavior:
 | `5.1.0` | `5.1.0` | `5.0.0.0` | `5.1.0.0` | `5.1.0+...` |
 | `5.2.0` | `5.2.0` | `5.0.0.0` | `5.2.0.0` | `5.2.0+...` |
 | `6.0.0` | `6.0.0` | `6.0.0.0` | `6.0.0.0` | `6.0.0+...` |
+| `7.0.0` | `7.0.0` | `7.0.0.0` | `7.0.0.0` | `7.0.0+...` |
 
 Before cutting stable releases, release validation should verify that `AssemblyVersion`, `FileVersion`, `InformationalVersion`, package metadata, release notes, and repository tags match this policy.
 
@@ -175,6 +180,8 @@ Before cutting a stable release or stable package-family expansion, the release 
 
 - [API Baseline and Architecture Boundary Checks](api-baseline-and-boundary-checks.md)
 - [4.0.0 Release Notes](release-notes-400.md)
+- [7.0.0 Release Notes](release-notes-700.md)
+- [Upgrade from 6.x to 7.0](upgrade-600-to-700.md)
 - [6.0.0 Release Notes](release-notes-600.md)
 - [6.0.0 Release Readiness Record](release-readiness-600.md)
 - [6.0.0 Consumer Verification Guide](consumer-verification-600.md)

@@ -1,8 +1,8 @@
 {
   "title": "ASI Backbone",
-  "version": "6.0.0",
+  "version": "7.0.0",
   "upload_type": "software",
-  "description": "AsiBackbone 6.0.0 is a major release of the Accountable Systems Infrastructure package family for .NET. It renames the public API to plain-language semantic names, including decision receipts in place of audit residue, removes the obsolete members whose 5.x deprecation windows completed, makes signature-verification trust failures deny by default, binds the signing policy context into a versioned signature input, and closes a replay window in the reference in-memory capability-grant use store. Package IDs, public namespaces, and the net10.0 target remain unchanged; AssemblyVersion advances to 6.0.0.0.",
+  "description": "AsiBackbone 7.0.0 is a major release of the Accountable Systems Infrastructure package family for .NET. It binds liability handshake acknowledgment responses to the actor the challenge was issued to, so an acknowledgment can no longer attribute liability to whichever actor happened to answer, and it moves the DLP classification enums off their permissive zero values by adding DlpFailureBehavior.Unspecified and DlpIntentRiskLevel.Unspecified, so an unset field or an omitted configuration value can no longer resolve a screening failure to Allow or Low. Package IDs, public namespaces, and the net10.0 target remain unchanged; AssemblyVersion advances to 7.0.0.0.",
   "creators": [
     {
       "name": "Cavell, Christopher D.",
