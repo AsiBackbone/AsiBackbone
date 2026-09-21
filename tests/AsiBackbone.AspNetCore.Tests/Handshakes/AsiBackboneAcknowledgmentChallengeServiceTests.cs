@@ -356,6 +356,55 @@ public sealed class AsiBackboneAcknowledgmentChallengeServiceTests
         Assert.Contains("acknowledgment code", exception.Message, StringComparison.OrdinalIgnoreCase);
     }
 
+    /// <summary>
+    /// Tests that <see cref="AcknowledgmentChallengeResult.CanProceed"/> is true only for a handled acceptance, and false for a handled refusal even though <see cref="AcknowledgmentChallengeResult.Succeeded"/> is true.
+    /// </summary>
+    /// <param name="acknowledged">Whether the actor accepts the challenge.</param>
+    [Theory]
+    [InlineData(true)]
+    [InlineData(false)]
+    public void CanProceedReflectsAcceptanceRatherThanHandlingSuccess(bool acknowledged)
+    {
+        var actor = GovernanceActorContext.Human("user-123");
+        var decision = GovernanceDecision.RequireAcknowledgment("ack.required", "Acknowledgment required.");
+        DefaultAcknowledgmentChallengeService service = CreateService();
+        AcknowledgmentChallenge challenge = service.CreateChallenge(actor, "RunOperation", decision);
+        var response = new AcknowledgmentChallengeRequest
+        {
+            HandshakeId = challenge.HandshakeId,
+            AcknowledgmentCode = challenge.RequiredAcknowledgmentCode,
+            Acknowledged = acknowledged,
+        };
+
+        AcknowledgmentChallengeResult result = service.HandleResponse(challenge, actor, response);
+
+        Assert.True(result.Succeeded);
+        Assert.Equal(acknowledged, result.CanProceed);
+    }
+
+    /// <summary>
+    /// Tests that <see cref="AcknowledgmentChallengeResult.CanProceed"/> is false when response handling fails, even if the response claimed acceptance.
+    /// </summary>
+    [Fact]
+    public void CanProceedIsFalseWhenResponseHandlingFails()
+    {
+        var actor = GovernanceActorContext.Human("user-123");
+        var decision = GovernanceDecision.RequireAcknowledgment("ack.required", "Acknowledgment required.");
+        DefaultAcknowledgmentChallengeService service = CreateService();
+        AcknowledgmentChallenge challenge = service.CreateChallenge(actor, "RunOperation", decision);
+        var response = new AcknowledgmentChallengeRequest
+        {
+            HandshakeId = challenge.HandshakeId,
+            AcknowledgmentCode = "wrong-code",
+            Acknowledged = true,
+        };
+
+        AcknowledgmentChallengeResult result = service.HandleResponse(challenge, actor, response);
+
+        Assert.False(result.Succeeded);
+        Assert.False(result.CanProceed);
+    }
+
     private static DefaultAcknowledgmentChallengeService CreateService(
         AcknowledgmentChallengeOptions? options = null)
     {

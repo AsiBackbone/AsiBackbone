@@ -24,6 +24,7 @@ MEMBER | AsiBackbone.Signing.LocalDevelopment.LocalDevelopmentSigningOptions.Sig
 MEMBER | AsiBackbone.Signing.LocalDevelopment.LocalDevelopmentSigningOptions.Validate | public void Validate()
 MEMBER | AsiBackbone.Signing.LocalDevelopment.LocalDevelopmentSigningService.#ctor | public LocalDevelopmentSigningService()
 MEMBER | AsiBackbone.Signing.LocalDevelopment.LocalDevelopmentSigningService.#ctor(AsiBackbone.Signing.LocalDevelopment.LocalDevelopmentSigningOptions) | public LocalDevelopmentSigningService(LocalDevelopmentSigningOptions options)
+MEMBER | AsiBackbone.Signing.LocalDevelopment.LocalDevelopmentSigningService.#ctor(AsiBackbone.Signing.LocalDevelopment.LocalDevelopmentSigningOptions,System.TimeProvider) | public LocalDevelopmentSigningService(LocalDevelopmentSigningOptions options, TimeProvider timeProvider)
 MEMBER | AsiBackbone.Signing.LocalDevelopment.LocalDevelopmentSigningService.Dispose | public void Dispose()
 MEMBER | AsiBackbone.Signing.LocalDevelopment.LocalDevelopmentSigningService.SignAsync(AsiBackbone.Core.Signing.SigningRequest,System.Threading.CancellationToken) | public ValueTask<SigningResult> SignAsync(SigningRequest request, CancellationToken cancellationToken = default)
 MEMBER | AsiBackbone.Signing.LocalDevelopment.LocalDevelopmentSigningService.VerifyAsync(AsiBackbone.Core.Signing.SignatureVerificationRequest,System.Threading.CancellationToken) | public ValueTask<SignatureVerificationResult> VerifyAsync(SignatureVerificationRequest request, CancellationToken cancellationToken = default)

@@ -29,11 +29,18 @@ public static class LocalDevelopmentSigningBuilderExtensions
     {
         ArgumentNullException.ThrowIfNull(builder);
         ArgumentNullException.ThrowIfNull(options);
-        options.Validate();
-        ThrowIfProduction(options);
 
-        _ = builder.Services.AddSingleton(options);
-        _ = builder.Services.AddSingleton<LocalDevelopmentSigningService>();
+        // Register a snapshot, and run the validation and production guard against that snapshot. Registering the
+        // caller's instance let an assignment made after this call, such as setting AllowInProduction once the guard
+        // had passed, change what the registered provider did.
+        LocalDevelopmentSigningOptions snapshot = options.Snapshot();
+        snapshot.Validate();
+        ThrowIfProduction(snapshot);
+
+        _ = builder.Services.AddSingleton(snapshot);
+        _ = builder.Services.AddSingleton(serviceProvider => new LocalDevelopmentSigningService(
+            snapshot,
+            serviceProvider.GetService<TimeProvider>() ?? TimeProvider.System));
         _ = builder.Services.AddSingleton<IGovernanceSigningService>(serviceProvider =>
             serviceProvider.GetRequiredService<LocalDevelopmentSigningService>());
         _ = builder.Services.AddSingleton<IGovernanceSignatureVerificationService>(serviceProvider =>

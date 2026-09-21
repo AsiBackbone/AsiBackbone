@@ -386,7 +386,41 @@ public sealed class EfCoreGovernanceOutboxStore : IGovernanceOutboxClaimStore
             .ToListAsync(cancellationToken)
             .ConfigureAwait(false);
 
+        DetachTrackedEntries(claimedEntities);
+
         return [.. claimedEntities.Select(ToEntry).Select(CreateClaim)];
+    }
+
+    /// <summary>
+    /// Detaches tracked instances of rows that a set-based update has just rewritten.
+    /// </summary>
+    /// <remarks>
+    /// <c>ExecuteUpdateAsync</c> writes to the database without passing through the change tracker. An instance the
+    /// host-owned context already tracks, such as one added by <see cref="EnqueueAsync" />, keeps its pre-claim values,
+    /// and identity resolution returns that stale instance from later tracking queries. The claim then appears not to
+    /// be held, so claim-scoped transitions return without applying. Detaching makes the next query load the claimed row.
+    /// </remarks>
+    /// <param name="claimedEntities">The claimed rows, read without tracking after the update.</param>
+    private void DetachTrackedEntries(List<GovernanceOutboxEntryEntity> claimedEntities)
+    {
+        if (claimedEntities.Count == 0)
+        {
+            return;
+        }
+
+        var claimedIds = claimedEntities
+            .Select(entity => entity.OutboxEntryId)
+            .ToHashSet(StringComparer.Ordinal);
+
+        List<Microsoft.EntityFrameworkCore.ChangeTracking.EntityEntry<GovernanceOutboxEntryEntity>> staleEntries = [.. dbContext
+            .ChangeTracker
+            .Entries<GovernanceOutboxEntryEntity>()
+            .Where(entry => claimedIds.Contains(entry.Entity.OutboxEntryId))];
+
+        foreach (Microsoft.EntityFrameworkCore.ChangeTracking.EntityEntry<GovernanceOutboxEntryEntity> entry in staleEntries)
+        {
+            entry.State = EntityState.Detached;
+        }
     }
 
     private async ValueTask<GovernanceOutboxEntry> UpdateClaimedEntryAsync(

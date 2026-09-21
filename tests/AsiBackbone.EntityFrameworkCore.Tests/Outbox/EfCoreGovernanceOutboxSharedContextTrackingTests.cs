@@ -1,0 +1,145 @@
+using AsiBackbone.Core.Emissions;
+using AsiBackbone.Core.Outbox;
+using AsiBackbone.EntityFrameworkCore.Outbox;
+using AsiBackbone.EntityFrameworkCore.Persistence;
+using Microsoft.Data.Sqlite;
+using Microsoft.EntityFrameworkCore;
+using Xunit;
+
+namespace AsiBackbone.EntityFrameworkCore.Tests.Outbox;
+
+/// <summary>
+/// Relational coverage for claim transitions performed through the same host-owned <see cref="DbContext" /> that
+/// enqueued the entries.
+/// </summary>
+/// <remarks>
+/// The claim path updates rows with a set-based statement that bypasses the change tracker. An entity already
+/// tracked by the same context would otherwise keep its pre-claim values, and a later tracking query returns that
+/// tracked instance instead of the claimed row, so the claim appears not to be held.
+/// </remarks>
+public sealed class EfCoreGovernanceOutboxSharedContextTrackingTests
+{
+    private static readonly DateTimeOffset CreatedUtc = new(2026, 9, 21, 10, 0, 0, TimeSpan.Zero);
+
+    /// <summary>
+    /// Verifies that an entry enqueued and claimed through one context can be marked delivered through that context.
+    /// </summary>
+    [Fact]
+    public async Task ClaimedEntryEnqueuedThroughSameContextCanBeMarkedDelivered()
+    {
+        CancellationToken cancellationToken = TestContext.Current.CancellationToken;
+        await using var connection = new SqliteConnection("Filename=:memory:");
+        await connection.OpenAsync(cancellationToken);
+        await using SharedContextDbContext context = await CreateContextAsync(connection, cancellationToken);
+        var store = new EfCoreGovernanceOutboxStore(context);
+
+        _ = await store.EnqueueAsync(CreateEnvelope("shared-context-delivered"), cancellationToken);
+
+        GovernanceOutboxClaim claim = Assert.Single(await store.ClaimPendingAsync(
+            GovernanceOutboxClaimRequest.Create("shared-context-worker", CreatedUtc.AddMinutes(1), TimeSpan.FromMinutes(5)),
+            cancellationToken));
+
+        GovernanceOutboxEntry delivered = await store.MarkClaimDeliveredAsync(
+            claim,
+            GovernanceEmissionResult.Delivered("shared-context-provider"),
+            cancellationToken);
+
+        Assert.Equal(GovernanceEmissionStatus.Delivered, delivered.Status);
+
+        GovernanceOutboxEntry? persisted = await store.FindByOutboxEntryIdAsync(claim.OutboxEntryId, cancellationToken);
+        Assert.NotNull(persisted);
+        Assert.Equal(GovernanceEmissionStatus.Delivered, persisted.Status);
+    }
+
+    /// <summary>
+    /// Verifies that a claim taken through the same context that enqueued the entry can be released.
+    /// </summary>
+    [Fact]
+    public async Task ClaimedEntryEnqueuedThroughSameContextCanBeReleased()
+    {
+        CancellationToken cancellationToken = TestContext.Current.CancellationToken;
+        await using var connection = new SqliteConnection("Filename=:memory:");
+        await connection.OpenAsync(cancellationToken);
+        await using SharedContextDbContext context = await CreateContextAsync(connection, cancellationToken);
+        var store = new EfCoreGovernanceOutboxStore(context);
+
+        _ = await store.EnqueueAsync(CreateEnvelope("shared-context-released"), cancellationToken);
+
+        GovernanceOutboxClaim claim = Assert.Single(await store.ClaimPendingAsync(
+            GovernanceOutboxClaimRequest.Create("shared-context-worker", CreatedUtc.AddMinutes(1), TimeSpan.FromMinutes(5)),
+            cancellationToken));
+
+        GovernanceOutboxEntry? released = await store.ReleaseClaimAsync(claim, cancellationToken: cancellationToken);
+
+        Assert.NotNull(released);
+        Assert.False(released.IsClaimedBy(claim));
+
+        GovernanceOutboxEntry? persisted = await store.FindByOutboxEntryIdAsync(claim.OutboxEntryId, cancellationToken);
+        Assert.NotNull(persisted);
+        Assert.False(persisted.IsClaimedBy(claim));
+    }
+
+    /// <summary>
+    /// Verifies that entities tracked by the context reflect the claim written by the set-based update.
+    /// </summary>
+    [Fact]
+    public async Task TrackedEntityDoesNotRetainPreClaimValuesAfterClaim()
+    {
+        CancellationToken cancellationToken = TestContext.Current.CancellationToken;
+        await using var connection = new SqliteConnection("Filename=:memory:");
+        await connection.OpenAsync(cancellationToken);
+        await using SharedContextDbContext context = await CreateContextAsync(connection, cancellationToken);
+        var store = new EfCoreGovernanceOutboxStore(context);
+
+        _ = await store.EnqueueAsync(CreateEnvelope("shared-context-tracked"), cancellationToken);
+
+        GovernanceOutboxClaim claim = Assert.Single(await store.ClaimPendingAsync(
+            GovernanceOutboxClaimRequest.Create("shared-context-worker", CreatedUtc.AddMinutes(1), TimeSpan.FromMinutes(5)),
+            cancellationToken));
+
+        GovernanceOutboxEntryEntity tracked = await context.GovernanceOutboxEntries
+            .SingleAsync(entity => entity.OutboxEntryId == claim.OutboxEntryId, cancellationToken);
+
+        Assert.Equal(claim.ClaimToken, tracked.ClaimToken);
+        Assert.Equal("shared-context-worker", tracked.ClaimOwner);
+    }
+
+    private static async Task<SharedContextDbContext> CreateContextAsync(
+        SqliteConnection connection,
+        CancellationToken cancellationToken)
+    {
+        DbContextOptions<SharedContextDbContext> options = new DbContextOptionsBuilder<SharedContextDbContext>()
+            .UseSqlite(connection)
+            .Options;
+
+        var context = new SharedContextDbContext(options);
+        _ = await context.Database.EnsureCreatedAsync(cancellationToken);
+        return context;
+    }
+
+    private static GovernanceEmissionEnvelope CreateEnvelope(string suffix)
+    {
+        return GovernanceEmissionEnvelope.Create(
+            GovernanceEmissionEventType.Outbox,
+            $"event-{suffix}",
+            CreatedUtc,
+            envelopeId: $"envelope-{suffix}",
+            createdUtc: CreatedUtc,
+            correlationId: "efcore-outbox-shared-context",
+            emitterStatus: GovernanceEmissionStatus.Pending.ToString(),
+            emitterProvider: "efcore-outbox");
+    }
+
+    private sealed class SharedContextDbContext(DbContextOptions<SharedContextDbContext> options)
+        : DbContext(options)
+    {
+        public DbSet<GovernanceOutboxEntryEntity> GovernanceOutboxEntries =>
+            Set<GovernanceOutboxEntryEntity>();
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            base.OnModelCreating(modelBuilder);
+            _ = modelBuilder.ApplyAsiBackboneConfigurations();
+        }
+    }
+}

@@ -57,6 +57,42 @@ Consumers moving from `6.x` must follow the
   `VersionPrefix` moves to `7.0.0`. The package validation baseline stays at `5.1.0`, so the intentional breaks in this
   release are recorded as exact suppressions in the package compatibility suppression files rather than by disabling
   validation.
+* **Breaking (binary):** `GovernanceOutboxDrain` and `GovernanceOutboxDrainHostedService` each take an optional trailing
+  `TimeProvider? timeProvider = null` constructor parameter. Source that constructs them is unaffected; assemblies
+  compiled against `6.0.0` must be rebuilt, which `7.0.0` already requires. Each type keeps a single constructor so
+  dependency injection still names the exact missing service, such as `IGovernanceOutboxStore`, when a drain
+  dependency is unregistered.
+* **Breaking (behavior):** `UseLocalDevelopmentSigning` and `LocalDevelopmentSigningService` now hold a snapshot of the
+  supplied `LocalDevelopmentSigningOptions` instead of the caller's instance. Every option has a public setter, so an
+  assignment made after registration, including setting `AllowInProduction` after the production guard had run, could
+  previously change what the registered provider did. The options resolved from the container are now a copy.
+
+### Added
+
+* Services now read time from `TimeProvider`. `GovernanceOutboxDrain`, `GovernanceOutboxDrainHostedService`, and
+  `LocalDevelopmentSigningService` take a `TimeProvider`, and dependency injection supplies a registered one, falling
+  back to `TimeProvider.System`. The local-development signer previously stamped `SignedUtc` from an unoverridable
+  `DateTimeOffset.UtcNow`. `GovernanceOutboxDrainWorkerOptions.RetryClock` remains supported: while it keeps its default
+  the worker reads the registered `TimeProvider`, and an assigned delegate still takes precedence. Core static factories
+  such as `DecisionReceipt.FromDecision` already accept explicit timestamps and keep their `DateTimeOffset.UtcNow`
+  fallback when none is supplied.
+* `AcknowledgmentChallengeResult.CanProceed` is `true` only when the response was handled and the actor accepted.
+  `Succeeded` is also `true` for a handled refusal, because a refusal is recorded as an acknowledgment, so a host that
+  gated the operation on `Succeeded` proceeded after an explicit decline. `CanProceed` matches
+  `GovernanceDecision.CanProceed` and is the check to gate on.
+
+### Fixed
+
+* `EfCoreGovernanceOutboxStore` claim transitions silently did nothing when the entry had been enqueued through the same
+  `DbContext`. The set-based claim update bypasses the change tracker, so the instance `EnqueueAsync` left tracked kept
+  its pre-claim values and identity resolution returned it to later queries. `MarkClaimDeliveredAsync` therefore
+  returned the entry still `Pending` without recording delivery, letting another worker re-claim and re-emit it after
+  the lease expired, and `ReleaseClaimAsync` left the claim held. The store now detaches tracked instances of rows it has
+  just claimed.
+* `LocalDevelopmentSigningService` creates its key with `RSA.Create(int)` instead of assigning `KeySize` after
+  creation, whose behavior varies by platform provider. A key size that passes option validation but that the provider
+  cannot generate, such as `2049`, now raises `InvalidOperationException` with the other configuration failures instead
+  of an unexpected `CryptographicException`, and a generated key of a different size is refused rather than used.
 
 ## [6.0.0] - 2026-09-19
 

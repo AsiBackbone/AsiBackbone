@@ -69,7 +69,8 @@ public sealed class LocalDevelopmentSigningBuilderExtensionsTests
         IGovernanceSignatureVerificationService verification =
             provider.GetRequiredService<IGovernanceSignatureVerificationService>();
 
-        Assert.Same(configured, resolved);
+        // Registration holds a snapshot, not the caller's mutable instance.
+        Assert.NotSame(configured, resolved);
         Assert.Equal("local-test-provider", resolved.ProviderName);
         Assert.Equal("local-test-key", resolved.KeyId);
         Assert.Equal("v2", resolved.KeyVersion);
@@ -124,6 +125,68 @@ public sealed class LocalDevelopmentSigningBuilderExtensionsTests
         Assert.Equal("options", exception.ParamName);
     }
 
+    /// <summary>
+    /// Verifies that changing the caller's options instance after registration does not change the registered
+    /// options or the registered provider.
+    /// </summary>
+    [Fact]
+    public async Task MutatingOptionsAfterRegistrationDoesNotChangeRegisteredProvider()
+    {
+        ServiceCollection services = new();
+        IAsiBackboneBuilder builder = new AsiBackboneBuilder(services);
+        var configured = LocalDevelopmentSigningOptions.Create(
+            signatureAlgorithm: "LOCAL-REGISTERED-ALGORITHM",
+            environmentName: "Development");
+
+        _ = builder.UseLocalDevelopmentSigning(configured);
+
+        configured.SignatureAlgorithm = "LOCAL-MUTATED-ALGORITHM";
+        configured.KeyId = "mutated-key";
+        configured.AllowInProduction = true;
+        configured.EnvironmentName = "Production";
+
+        using ServiceProvider provider = services.BuildServiceProvider();
+        LocalDevelopmentSigningOptions resolved = provider.GetRequiredService<LocalDevelopmentSigningOptions>();
+        IGovernanceSigningService signing = provider.GetRequiredService<IGovernanceSigningService>();
+
+        Assert.Equal("LOCAL-REGISTERED-ALGORITHM", resolved.SignatureAlgorithm);
+        Assert.Equal(LocalDevelopmentSigningOptions.DefaultKeyId, resolved.KeyId);
+        Assert.False(resolved.AllowInProduction);
+        Assert.Equal("Development", resolved.EnvironmentName);
+
+        SigningResult result = await signing.SignAsync(
+            new SigningRequest("snapshot-hash", hashAlgorithm: "SHA-256"),
+            TestContext.Current.CancellationToken);
+
+        Assert.True(result.IsSigned);
+        Assert.Equal("LOCAL-REGISTERED-ALGORITHM", result.Metadata.SignatureAlgorithm);
+        Assert.Equal(LocalDevelopmentSigningOptions.DefaultKeyId, result.Metadata.KeyId);
+    }
+
+    /// <summary>
+    /// Verifies that a <see cref="TimeProvider" /> registered by the host supplies the signing time.
+    /// </summary>
+    [Fact]
+    public async Task RegisteredTimeProviderSuppliesSigningTime()
+    {
+        DateTimeOffset fixedUtc = new(2026, 9, 21, 8, 30, 0, TimeSpan.Zero);
+        ServiceCollection services = new();
+        _ = services.AddSingleton<TimeProvider>(new FixedTimeProvider(fixedUtc));
+        IAsiBackboneBuilder builder = new AsiBackboneBuilder(services);
+
+        _ = builder.UseLocalDevelopmentSigning(LocalDevelopmentSigningOptions.Create(environmentName: "Development"));
+
+        using ServiceProvider provider = services.BuildServiceProvider();
+        IGovernanceSigningService signing = provider.GetRequiredService<IGovernanceSigningService>();
+
+        SigningResult result = await signing.SignAsync(
+            new SigningRequest("clock-hash", hashAlgorithm: "SHA-256"),
+            TestContext.Current.CancellationToken);
+
+        Assert.True(result.IsSigned);
+        Assert.Equal(fixedUtc, result.Metadata.SignedUtc);
+    }
+
     private static void AssertSingletonRegistrations(IServiceCollection services)
     {
         Assert.Contains(
@@ -134,7 +197,7 @@ public sealed class LocalDevelopmentSigningBuilderExtensionsTests
         Assert.Contains(
             services,
             descriptor => descriptor.ServiceType == typeof(LocalDevelopmentSigningService)
-                && descriptor.ImplementationType == typeof(LocalDevelopmentSigningService)
+                && descriptor.ImplementationFactory is not null
                 && descriptor.Lifetime == ServiceLifetime.Singleton);
         Assert.Contains(
             services,
@@ -146,5 +209,13 @@ public sealed class LocalDevelopmentSigningBuilderExtensionsTests
             descriptor => descriptor.ServiceType == typeof(IGovernanceSignatureVerificationService)
                 && descriptor.ImplementationFactory is not null
                 && descriptor.Lifetime == ServiceLifetime.Singleton);
+    }
+
+    private sealed class FixedTimeProvider(DateTimeOffset utcNow) : TimeProvider
+    {
+        public override DateTimeOffset GetUtcNow()
+        {
+            return utcNow;
+        }
     }
 }

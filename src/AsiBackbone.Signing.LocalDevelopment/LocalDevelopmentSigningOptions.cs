@@ -107,6 +107,30 @@ public sealed class LocalDevelopmentSigningOptions
     }
 
     /// <summary>
+    /// Creates an independent copy of these options.
+    /// </summary>
+    /// <remarks>
+    /// Registration and the signing service each hold a snapshot rather than the caller's instance. Every property has a
+    /// public setter, so holding the caller's instance would let a later assignment, such as setting
+    /// <see cref="AllowInProduction" /> after the production guard ran, change a registered service's behavior.
+    /// </remarks>
+    /// <returns>A copy whose later changes do not affect this instance, and the reverse.</returns>
+    internal LocalDevelopmentSigningOptions Snapshot()
+    {
+        return new LocalDevelopmentSigningOptions
+        {
+            ProviderName = ProviderName,
+            KeyId = KeyId,
+            KeyVersion = KeyVersion,
+            SignatureAlgorithm = SignatureAlgorithm,
+            KeySizeBits = KeySizeBits,
+            ReturnUnsignedOnFailure = ReturnUnsignedOnFailure,
+            AllowInProduction = AllowInProduction,
+            EnvironmentName = EnvironmentName
+        };
+    }
+
+    /// <summary>
     /// Creates options for the local-development signing provider.
     /// </summary>
     public static LocalDevelopmentSigningOptions Create(

@@ -79,6 +79,27 @@ Source that refers to these members by name is unaffected. Consumers that
 persisted, serialized, or transmitted the numeric values must remap them,
 because enum constants compiled against `6.0.0` retain the previous numbers.
 
+## Additional changes
+
+- **Fixed:** `EfCoreGovernanceOutboxStore` claim transitions no longer silently
+  do nothing when the entry was enqueued through the same `DbContext`. Previously
+  `MarkClaimDeliveredAsync` left such an entry `Pending`, so it could be
+  re-claimed and emitted again after the lease expired.
+- **Fixed:** `LocalDevelopmentSigningService` creates its key with
+  `RSA.Create(int)` and reports a provider-unsupported key size as
+  `InvalidOperationException`.
+- **Added:** `AcknowledgmentChallengeResult.CanProceed`, which is `true` only
+  for a handled acceptance. `Succeeded` is also `true` for a handled refusal.
+- **Added:** `TimeProvider` support in `GovernanceOutboxDrain`,
+  `GovernanceOutboxDrainHostedService`, and `LocalDevelopmentSigningService`,
+  resolved from dependency injection when registered.
+- **Changed:** local-development signing registration captures a snapshot of
+  its options, and the outbox drain and worker constructors gained an optional
+  `TimeProvider` parameter.
+
+See [Other changes that affect hosts](upgrade-600-to-700.md#other-changes-that-affect-hosts)
+for the migration details.
+
 ## Why this required a major release
 
 The repository's

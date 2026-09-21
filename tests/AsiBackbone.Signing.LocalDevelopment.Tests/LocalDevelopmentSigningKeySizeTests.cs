@@ -51,6 +51,29 @@ public sealed class LocalDevelopmentSigningKeySizeTests
     }
 
     /// <summary>
+    /// Verifies a key size that passes option validation but that the platform RSA provider cannot generate fails with
+    /// the documented exception type instead of a provider exception or a silently different key.
+    /// </summary>
+    /// <param name="keySizeBits">A key size above the minimum that is not a legal RSA provider key size.</param>
+    [Theory]
+    [InlineData(2049)]
+    [InlineData(2050)]
+    public void UnsupportedProviderKeySizeFailsExplicitly(int keySizeBits)
+    {
+        var options = LocalDevelopmentSigningOptions.Create(keySizeBits: keySizeBits);
+        options.Validate();
+
+        InvalidOperationException exception = Assert.Throws<InvalidOperationException>(
+            () => new LocalDevelopmentSigningService(options));
+
+        Assert.Contains(
+            keySizeBits.ToString(System.Globalization.CultureInfo.InvariantCulture),
+            exception.Message,
+            StringComparison.Ordinal);
+        Assert.Contains("not supported", exception.Message, StringComparison.Ordinal);
+    }
+
+    /// <summary>
     /// Verifies below-minimum and nonsensical key sizes fail explicitly.
     /// </summary>
     /// <param name="keySizeBits">The invalid configured key size.</param>

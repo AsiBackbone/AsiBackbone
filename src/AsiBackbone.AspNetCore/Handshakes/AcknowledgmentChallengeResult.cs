@@ -31,6 +31,12 @@ public sealed class AcknowledgmentChallengeResult
     /// <summary>
     /// Gets a value indicating whether the response was handled successfully.
     /// </summary>
+    /// <remarks>
+    /// This reports only that the response was valid and produced an acknowledgment record. It is <see langword="true" />
+    /// when the actor explicitly declined, because a refusal is recorded as a <see cref="LiabilityHandshakeAcknowledgment" />
+    /// just like an acceptance. Do not use it to decide whether the operation may continue; use
+    /// <see cref="CanProceed" /> instead.
+    /// </remarks>
     public bool Succeeded => Result.Succeeded;
 
     /// <summary>
@@ -42,6 +48,16 @@ public sealed class AcknowledgmentChallengeResult
     /// Gets a value indicating whether the response was rejected by the actor.
     /// </summary>
     public bool Rejected => Acknowledgment?.Rejected == true;
+
+    /// <summary>
+    /// Gets a value indicating whether the operation that required acknowledgment may continue.
+    /// </summary>
+    /// <remarks>
+    /// This is <see langword="true" /> only when the response was handled successfully and the actor accepted. A handled
+    /// refusal and every handling failure yield <see langword="false" />. It is the single check a host should gate the
+    /// consequential operation on, matching <see cref="Core.Decisions.GovernanceDecision.CanProceed" />.
+    /// </remarks>
+    public bool CanProceed => Succeeded && Acknowledged;
 
     /// <summary>
     /// Creates a successful acknowledgment challenge result.

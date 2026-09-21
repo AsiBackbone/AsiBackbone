@@ -18,11 +18,13 @@ namespace AsiBackbone.Core.Outbox;
 /// <param name="emitter">The provider-neutral governance emitter.</param>
 /// <param name="logger">The logger used to record local operational diagnostics for drain failures.</param>
 /// <param name="outboxOptions">The provider-neutral retry, poison-message, and claim options used by the drain.</param>
+/// <param name="timeProvider">The clock used for the drain time and per-page claim-lease time when <see cref="DrainAsync" /> is called without an explicit timestamp. Defaults to <see cref="TimeProvider.System" />; dependency injection supplies a registered <see cref="TimeProvider" />.</param>
 public sealed class GovernanceOutboxDrain(
     IGovernanceOutboxStore outboxStore,
     IGovernanceEmitter emitter,
     ILogger<GovernanceOutboxDrain>? logger = null,
-    IOptions<GovernanceOutboxOptions>? outboxOptions = null)
+    IOptions<GovernanceOutboxOptions>? outboxOptions = null,
+    TimeProvider? timeProvider = null)
 {
     private static readonly Action<ILogger, string, int, string, DateTimeOffset, string?, string?, Exception?> LogGovernanceEmissionException = LoggerMessage.Define<string, int, string, DateTimeOffset, string?, string?>(
         LogLevel.Warning,
@@ -43,11 +45,12 @@ public sealed class GovernanceOutboxDrain(
     private readonly IGovernanceEmitter emitter = emitter ?? throw new ArgumentNullException(nameof(emitter));
     private readonly ILogger<GovernanceOutboxDrain> logger = logger ?? NullLogger<GovernanceOutboxDrain>.Instance;
     private readonly GovernanceOutboxOptions retryOptions = ResolveOptions(outboxOptions);
+    private readonly TimeProvider timeProvider = timeProvider ?? TimeProvider.System;
 
     /// <summary>
     /// Drains pending and retry-ready outbox entries through the configured emitter.
     /// </summary>
-    /// <param name="utcNow">The UTC timestamp used for retry-ready checks.</param>
+    /// <param name="utcNow">The UTC timestamp used for retry-ready checks. When omitted, the configured <see cref="TimeProvider" /> is read.</param>
     /// <param name="maxCount">The maximum number of entries to drain.</param>
     /// <param name="cancellationToken">A cancellation token.</param>
     /// <returns>The updated outbox entries that were attempted by the drain.</returns>
@@ -63,7 +66,7 @@ public sealed class GovernanceOutboxDrain(
 
         cancellationToken.ThrowIfCancellationRequested();
 
-        DateTimeOffset drainUtc = (utcNow ?? DateTimeOffset.UtcNow).ToUniversalTime();
+        DateTimeOffset drainUtc = (utcNow ?? timeProvider.GetUtcNow()).ToUniversalTime();
 
         if (retryOptions.UseClaimLeases)
         {
@@ -71,7 +74,7 @@ public sealed class GovernanceOutboxDrain(
             // otherwise each page is leased from a fresh reading taken when that page is claimed.
             Func<DateTimeOffset> claimClock = utcNow.HasValue
                 ? () => drainUtc
-                : static () => DateTimeOffset.UtcNow;
+                : timeProvider.GetUtcNow;
 
             return await DrainClaimedAsync(claimClock, maxCount, cancellationToken).ConfigureAwait(false);
         }

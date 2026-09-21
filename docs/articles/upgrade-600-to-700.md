@@ -2,7 +2,7 @@
 
 Version 7.0 carries two security corrections that change stable contracts. It binds liability handshake acknowledgment responses to the actor the challenge was issued to, and it moves `DlpFailureBehavior` and `DlpIntentRiskLevel` off their permissive zero values, which changes the numeric value of every existing member of both enums. These are intentional major-version breaks. Rebuild consumers against the 7.0 packages after migrating.
 
-No public type, member, namespace, or package was renamed or removed in this release. Code that compiles against 6.x continues to compile against 7.0 unless it relies on one of the two behaviors below.
+No public type, member, namespace, or package was renamed or removed in this release. Code that compiles against 6.x continues to compile against 7.0 unless it relies on one of the behaviors below. The acknowledgment and DLP changes are the two security corrections that required the major boundary; [Other changes that affect hosts](#other-changes-that-affect-hosts) covers the remaining adjustments.
 
 ## Why these changes required a major release
 
@@ -103,6 +103,39 @@ Supplying `Unspecified` raises `ArgumentOutOfRangeException` at each boundary ra
 | `DlpFailurePolicyResolution.Create` | An unresolved `DlpFailureBehavior`. |
 
 An incomplete policy now fails loudly where it previously proceeded. Hosts that relied on an unset risk level being treated as `Low`, or an unset behavior being treated as `Allow`, must now assign those values explicitly. That is the intended effect of the change: the previous behavior was indistinguishable from a deliberate decision to allow.
+
+## Other changes that affect hosts
+
+### Gate acknowledged operations on `CanProceed`
+
+`AcknowledgmentChallengeResult.Succeeded` is `true` whenever the response was handled, including when the actor explicitly declined, because a refusal is recorded as a `LiabilityHandshakeAcknowledgment` just like an acceptance. A host that gated the consequential operation on `Succeeded` therefore proceeded after a decline. Gate on the new `CanProceed` property instead, which is `true` only for a handled acceptance:
+
+```csharp
+AcknowledgmentChallengeResult result = challengeService.HandleResponse(challenge, currentActor, response);
+
+if (result.CanProceed)
+{
+    // Revalidate authorization and current policy, then run the operation.
+}
+```
+
+`Succeeded` keeps its meaning, so code that checked `Succeeded && Acknowledged` is already correct.
+
+### Outbox drain and worker constructors take an optional clock
+
+`GovernanceOutboxDrain` and `GovernanceOutboxDrainHostedService` each gained an optional trailing `TimeProvider? timeProvider = null` constructor parameter. Code that constructs them compiles unchanged, but the constructor signature changed, so rebuild any assembly compiled against 6.x. Hosts that register a `TimeProvider` now have it used for drain and claim-lease timestamps.
+
+`GovernanceOutboxDrainWorkerOptions.RetryClock` still works. While it keeps its default, the worker reads the registered `TimeProvider`; a delegate you assign still takes precedence. Prefer registering a `TimeProvider`, which also drives the local-development signer's `SignedUtc`:
+
+```csharp
+builder.Services.AddSingleton(TimeProvider.System); // Or a fake clock in tests.
+```
+
+### Local-development signing options are captured at registration
+
+`UseLocalDevelopmentSigning` and `LocalDevelopmentSigningService` now take a snapshot of the `LocalDevelopmentSigningOptions` you pass. Assigning to that instance afterward no longer changes the registered provider, and the options resolved from the container are a copy rather than your instance. Configure every option before registering. Code that asserted the resolved options were the same instance it registered must compare values instead.
+
+A key size that passes validation but that the platform RSA provider cannot generate, such as `2049`, now raises `InvalidOperationException` instead of `CryptographicException`.
 
 ## Validation
 
