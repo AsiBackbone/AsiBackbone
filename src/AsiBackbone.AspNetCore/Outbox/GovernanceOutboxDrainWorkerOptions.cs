@@ -43,9 +43,20 @@ public sealed class GovernanceOutboxDrainWorkerOptions
     public TimeSpan FailureDelay { get; set; } = TimeSpan.FromSeconds(30);
 
     /// <summary>
+    /// The default <see cref="RetryClock" /> value. The worker recognizes it by reference and reads the registered
+    /// <see cref="TimeProvider" /> instead.
+    /// </summary>
+    internal static readonly Func<DateTimeOffset> DefaultRetryClock = static () => DateTimeOffset.UtcNow;
+
+    /// <summary>
     /// Gets or sets the retry clock used when finding retry-ready entries.
     /// </summary>
-    public Func<DateTimeOffset> RetryClock { get; set; } = static () => DateTimeOffset.UtcNow;
+    /// <remarks>
+    /// Prefer registering a <see cref="TimeProvider" /> instead. While this property keeps its default value, the worker
+    /// reads the time from the registered <see cref="TimeProvider" />, which is the same clock the drain and the
+    /// signing providers use. Assigning a custom delegate overrides that clock for this worker only.
+    /// </remarks>
+    public Func<DateTimeOffset> RetryClock { get; set; } = DefaultRetryClock;
 
     /// <summary>
     /// Gets or sets a value indicating whether a final drain pass should be attempted during host shutdown.

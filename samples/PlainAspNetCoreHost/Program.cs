@@ -229,7 +229,7 @@ app.MapPost("/sample/acknowledgments/responses", (
     var actor = GovernanceActorContext.Human("sample-user", "Sample User");
     AcknowledgmentChallengeResult result = challengeService.HandleResponse(challenge!, actor, response);
 
-    return result.Acknowledged
+    return result.CanProceed
         ? Results.Ok(new
         {
             message = "The host validated the acknowledgment and may now run its separately authorized operation.",

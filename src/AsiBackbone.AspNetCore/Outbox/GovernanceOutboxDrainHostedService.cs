@@ -16,10 +16,15 @@ namespace AsiBackbone.AspNetCore.Outbox;
 /// to <see cref="GovernanceOutboxDrainWorkerOptions.Enabled" /> pause or resume new drain cycles without
 /// terminating the hosted service.
 /// </remarks>
+/// <param name="scopeFactory">The factory used to create a scope for each drain cycle.</param>
+/// <param name="optionsMonitor">The monitored worker options.</param>
+/// <param name="logger">The worker logger.</param>
+/// <param name="timeProvider">The clock used for drain timestamps unless <see cref="GovernanceOutboxDrainWorkerOptions.RetryClock" /> has been assigned a custom delegate. Defaults to <see cref="TimeProvider.System" />; dependency injection supplies a registered <see cref="TimeProvider" />.</param>
 public sealed class GovernanceOutboxDrainHostedService(
     IServiceScopeFactory scopeFactory,
     IOptionsMonitor<GovernanceOutboxDrainWorkerOptions> optionsMonitor,
-    ILogger<GovernanceOutboxDrainHostedService> logger) : BackgroundService
+    ILogger<GovernanceOutboxDrainHostedService> logger,
+    TimeProvider? timeProvider = null) : BackgroundService
 {
     private static readonly Action<ILogger, Exception?> LogShutdownDrainCanceled = LoggerMessage.Define(
         LogLevel.Debug,
@@ -54,6 +59,7 @@ public sealed class GovernanceOutboxDrainHostedService(
     private readonly IServiceScopeFactory scopeFactory = scopeFactory ?? throw new ArgumentNullException(nameof(scopeFactory));
     private readonly IOptionsMonitor<GovernanceOutboxDrainWorkerOptions> optionsMonitor = optionsMonitor ?? throw new ArgumentNullException(nameof(optionsMonitor));
     private readonly ILogger<GovernanceOutboxDrainHostedService> logger = logger ?? throw new ArgumentNullException(nameof(logger));
+    private readonly TimeProvider timeProvider = timeProvider ?? TimeProvider.System;
     private readonly Lock optionsChangedSync = new();
     private TaskCompletionSource optionsChanged = CreateOptionsChangedSource();
     private long optionsVersion;
@@ -173,7 +179,7 @@ public sealed class GovernanceOutboxDrainHostedService(
 
         using IServiceScope scope = scopeFactory.CreateScope();
         GovernanceOutboxDrain drain = scope.ServiceProvider.GetRequiredService<GovernanceOutboxDrain>();
-        DateTimeOffset retryUtc = options.RetryClock().ToUniversalTime();
+        DateTimeOffset retryUtc = ResolveDrainUtc(options);
         IReadOnlyList<GovernanceOutboxEntry> drainedEntries = await drain.DrainAsync(
             retryUtc,
             options.BatchSize,
@@ -229,6 +235,23 @@ public sealed class GovernanceOutboxDrainHostedService(
         }
 
         _ = completedSource.TrySetResult();
+    }
+
+    /// <summary>
+    /// Resolves the drain timestamp for one drain cycle.
+    /// </summary>
+    /// <remarks>
+    /// A custom <see cref="GovernanceOutboxDrainWorkerOptions.RetryClock" /> is honored for compatibility. While it keeps
+    /// its default value, the registered <see cref="TimeProvider" /> supplies the time, so the worker, the drain, and the
+    /// signing providers read one clock.
+    /// </remarks>
+    private DateTimeOffset ResolveDrainUtc(GovernanceOutboxDrainWorkerOptions options)
+    {
+        DateTimeOffset utcNow = ReferenceEquals(options.RetryClock, GovernanceOutboxDrainWorkerOptions.DefaultRetryClock)
+            ? timeProvider.GetUtcNow()
+            : options.RetryClock();
+
+        return utcNow.ToUniversalTime();
     }
 
     private static TaskCompletionSource CreateOptionsChangedSource()

@@ -145,6 +145,56 @@ public sealed class AsiBackboneGovernanceOutboxDrainHostedServiceLifecycleTests
     }
 
     /// <summary>
+    /// Verifies that the registered <see cref="TimeProvider" /> supplies the drain time while the retry clock keeps its default.
+    /// </summary>
+    /// <returns>A task that represents the asynchronous test operation.</returns>
+    [Fact]
+    public async Task TimeProviderSuppliesDrainTimeWhenRetryClockIsDefault()
+    {
+        DateTimeOffset providerUtc = new(2026, 9, 21, 14, 0, 0, TimeSpan.Zero);
+        GovernanceOutboxDrainWorkerOptions options = CreateOptions();
+        options.RetryClock = GovernanceOutboxDrainWorkerOptions.DefaultRetryClock;
+        using WorkerHarness harness = CreateHarness(options, timeProvider: new FixedTimeProvider(providerUtc));
+
+        await harness.Service.StartAsync(TestContext.Current.CancellationToken);
+        DateTimeOffset observedRetryUtc = await WaitAsync(harness.Store.WaitForRetryReadyAsync());
+        await StopAsync(harness.Service);
+
+        Assert.Equal(providerUtc, observedRetryUtc);
+    }
+
+    /// <summary>
+    /// Verifies that a custom retry clock still takes precedence over the registered <see cref="TimeProvider" />.
+    /// </summary>
+    /// <returns>A task that represents the asynchronous test operation.</returns>
+    [Fact]
+    public async Task CustomRetryClockTakesPrecedenceOverTimeProvider()
+    {
+        DateTimeOffset providerUtc = new(2026, 9, 21, 14, 0, 0, TimeSpan.Zero);
+        DateTimeOffset customUtc = new(2026, 1, 2, 3, 4, 5, TimeSpan.Zero);
+        GovernanceOutboxDrainWorkerOptions options = CreateOptions();
+        options.RetryClock = () => customUtc;
+        using WorkerHarness harness = CreateHarness(options, timeProvider: new FixedTimeProvider(providerUtc));
+
+        await harness.Service.StartAsync(TestContext.Current.CancellationToken);
+        DateTimeOffset observedRetryUtc = await WaitAsync(harness.Store.WaitForRetryReadyAsync());
+        await StopAsync(harness.Service);
+
+        Assert.Equal(customUtc, observedRetryUtc);
+    }
+
+    /// <summary>
+    /// Verifies that new worker options default to the retry clock the worker treats as deferring to <see cref="TimeProvider" />.
+    /// </summary>
+    [Fact]
+    public void RetryClockDefaultsToTimeProviderSentinel()
+    {
+        Assert.Same(
+            GovernanceOutboxDrainWorkerOptions.DefaultRetryClock,
+            new GovernanceOutboxDrainWorkerOptions().RetryClock);
+    }
+
+    /// <summary>
     /// Verifies that shutdown draining is skipped when disabled, not requested, or the supplied stop token is already canceled.
     /// </summary>
     /// <param name="enabled">Whether the worker is enabled.</param>
@@ -286,7 +336,8 @@ public sealed class AsiBackboneGovernanceOutboxDrainHostedServiceLifecycleTests
     private static WorkerHarness CreateHarness(
         GovernanceOutboxDrainWorkerOptions options,
         RecordingOutboxStore? store = null,
-        bool registerDrain = true)
+        bool registerDrain = true,
+        TimeProvider? timeProvider = null)
     {
         store ??= new RecordingOutboxStore();
         ServiceCollection services = new();
@@ -304,7 +355,7 @@ public sealed class AsiBackboneGovernanceOutboxDrainHostedServiceLifecycleTests
         var scopeFactory = new RecordingScopeFactory(provider.GetRequiredService<IServiceScopeFactory>());
         var optionsMonitor = new ControllableOptionsMonitor<GovernanceOutboxDrainWorkerOptions>(options);
         var logger = new RecordingLogger<GovernanceOutboxDrainHostedService>();
-        var service = new GovernanceOutboxDrainHostedService(scopeFactory, optionsMonitor, logger);
+        var service = new GovernanceOutboxDrainHostedService(scopeFactory, optionsMonitor, logger, timeProvider);
 
         return new WorkerHarness(provider, service, scopeFactory, optionsMonitor, logger, store);
     }
@@ -724,6 +775,14 @@ public sealed class AsiBackboneGovernanceOutboxDrainHostedServiceLifecycleTests
 
         public void Dispose()
         {
+        }
+    }
+
+    private sealed class FixedTimeProvider(DateTimeOffset utcNow) : TimeProvider
+    {
+        public override DateTimeOffset GetUtcNow()
+        {
+            return utcNow;
         }
     }
 }

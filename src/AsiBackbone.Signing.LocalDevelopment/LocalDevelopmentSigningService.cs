@@ -16,6 +16,7 @@ public sealed class LocalDevelopmentSigningService : IGovernanceSigningService, 
     private static readonly Encoding SigningEncoding = Encoding.UTF8;
 
     private readonly LocalDevelopmentSigningOptions options;
+    private readonly TimeProvider timeProvider;
     private readonly RSA rsa;
     private readonly Lock rsaSync = new();
     private readonly int keySizeBits;
@@ -33,16 +34,35 @@ public sealed class LocalDevelopmentSigningService : IGovernanceSigningService, 
     /// Initializes a new instance of the <see cref="LocalDevelopmentSigningService" /> class.
     /// </summary>
     /// <exception cref="InvalidOperationException">
-    /// Thrown when the configured RSA key size is below the supported minimum.
+    /// Thrown when the configured RSA key size is below the supported minimum or is not supported by the platform RSA
+    /// provider.
     /// </exception>
     public LocalDevelopmentSigningService(LocalDevelopmentSigningOptions options)
+        : this(options, TimeProvider.System)
+    {
+    }
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="LocalDevelopmentSigningService" /> class with an explicit clock.
+    /// </summary>
+    /// <param name="options">The local-development signing options. A snapshot is taken, so later changes to this instance have no effect.</param>
+    /// <param name="timeProvider">The clock used to record the signing time in signing metadata.</param>
+    /// <exception cref="InvalidOperationException">
+    /// Thrown when the configured RSA key size is below the supported minimum or is not supported by the platform RSA
+    /// provider.
+    /// </exception>
+    public LocalDevelopmentSigningService(LocalDevelopmentSigningOptions options, TimeProvider timeProvider)
     {
         ArgumentNullException.ThrowIfNull(options);
-        options.Validate();
+        ArgumentNullException.ThrowIfNull(timeProvider);
 
-        this.options = options;
-        rsa = RSA.Create();
-        rsa.KeySize = options.KeySizeBits;
+        // Validate the snapshot rather than the caller's instance, so the values that were checked are the values used.
+        LocalDevelopmentSigningOptions snapshot = options.Snapshot();
+        snapshot.Validate();
+
+        this.options = snapshot;
+        this.timeProvider = timeProvider;
+        rsa = CreateRsa(snapshot.KeySizeBits);
         keySizeBits = rsa.KeySize;
     }
 
@@ -87,7 +107,7 @@ public sealed class LocalDevelopmentSigningService : IGovernanceSigningService, 
                     keyId: NormalizeRequired(options.KeyId, LocalDevelopmentSigningOptions.DefaultKeyId),
                     keyVersion: NormalizeRequired(options.KeyVersion, LocalDevelopmentSigningOptions.DefaultKeyVersion),
                     provider: NormalizeRequired(options.ProviderName, LocalDevelopmentSigningOptions.DefaultProviderName),
-                    signedUtc: DateTimeOffset.UtcNow,
+                    signedUtc: timeProvider.GetUtcNow(),
                     metadata: metadata);
 
                 return ValueTask.FromResult(SigningResult.FromMetadata(signingMetadata));
@@ -208,6 +228,45 @@ public sealed class LocalDevelopmentSigningService : IGovernanceSigningService, 
             disposed = true;
             rsa.Dispose();
         }
+    }
+
+    /// <summary>
+    /// Creates an RSA key of exactly the requested size.
+    /// </summary>
+    /// <remarks>
+    /// The key size is supplied at creation through <see cref="RSA.Create(int)" /> rather than assigned to
+    /// <see cref="AsymmetricAlgorithm.KeySize" /> afterwards, whose behavior varies across platform providers. A size the
+    /// provider rejects is reported as <see cref="InvalidOperationException" /> alongside the other configuration failures,
+    /// and a key whose generated size differs from the request is refused rather than used under a different size.
+    /// </remarks>
+    /// <param name="requestedKeySizeBits">The configured RSA key size in bits.</param>
+    /// <returns>An RSA instance whose key size equals <paramref name="requestedKeySizeBits" />.</returns>
+    /// <exception cref="InvalidOperationException">Thrown when the platform RSA provider cannot generate the requested size.</exception>
+    private static RSA CreateRsa(int requestedKeySizeBits)
+    {
+        RSA created;
+
+        try
+        {
+            created = RSA.Create(requestedKeySizeBits);
+        }
+        catch (CryptographicException exception)
+        {
+            throw new InvalidOperationException(
+                $"Local-development RSA key size {requestedKeySizeBits} bits is not supported by the platform RSA provider.",
+                exception);
+        }
+
+        if (created.KeySize != requestedKeySizeBits)
+        {
+            int generatedKeySizeBits = created.KeySize;
+            created.Dispose();
+
+            throw new InvalidOperationException(
+                $"Local-development RSA key size {requestedKeySizeBits} bits is not supported by the platform RSA provider, which generated {generatedKeySizeBits} bits instead.");
+        }
+
+        return created;
     }
 
     private static string NormalizeRequired(string? value, string fallback)

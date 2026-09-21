@@ -16,7 +16,9 @@ commit.
 ## Compatibility boundary
 
 - Package IDs, public namespaces, and the `net10.0` target remain unchanged.
-- No public type, member, namespace, or package is renamed or removed.
+- No public type, namespace, or package is renamed or removed. The
+  `GovernanceOutboxDrain` and `GovernanceOutboxDrainHostedService` constructors are
+  replaced by source-compatible signatures with an optional `TimeProvider` parameter.
 - Package version advances to `7.0.0`; `AssemblyVersion` and `FileVersion`
   advance to `7.0.0.0`.
 - Acknowledgment responses must match the challenged actor's ID and type.
