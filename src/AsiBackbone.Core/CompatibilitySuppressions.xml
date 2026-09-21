@@ -9,7 +9,7 @@
      remaining members up by one, so an unset field or an omitted configuration value can no longer
      resolve a screening failure to Allow or Low. Source that names these members is unaffected;
      consumers that persisted or transmitted the numeric values must remap them.
-     See the Unreleased section of CHANGELOG.md and docs/articles/dlp-classification-failure-policy.md. -->
+     See the [7.0.0] section of CHANGELOG.md and docs/articles/dlp-classification-failure-policy.md. -->
 <Suppressions xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
   <Suppression>
     <DiagnosticId>CP0001</DiagnosticId>
