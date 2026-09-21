@@ -1,6 +1,6 @@
 # Stable Release Validation
 
-This article documents the reusable release-blocking validation path for stable release lines. The current released stable package family is `7.x`, with `7.0.0` as the current release.
+This article documents the reusable release-blocking validation path for stable release lines. The current released stable package family is `6.x`, with `6.0.0` as the current release.
 
 The binary assembly identity for the `7.x` line is `7.0.0.0`.
 

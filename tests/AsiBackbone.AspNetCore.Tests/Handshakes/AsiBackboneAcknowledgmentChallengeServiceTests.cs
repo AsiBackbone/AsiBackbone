@@ -263,6 +263,32 @@ public sealed class AsiBackboneAcknowledgmentChallengeServiceTests
     }
 
     /// <summary>
+    /// Tests that the <see cref="DefaultAcknowledgmentChallengeService.HandleResponse"/> method prioritizes actor binding failures over acknowledgment code failures.
+    /// </summary>
+    [Fact]
+    public void HandleResponseFailsWithActorMismatchWhenActorAndCodeDoNotMatch()
+    {
+        var challengedActor = GovernanceActorContext.Human("user-123");
+        var otherActor = GovernanceActorContext.Human("user-456");
+        var decision = GovernanceDecision.RequireAcknowledgment("ack.required", "Acknowledgment required.");
+        DefaultAcknowledgmentChallengeService service = CreateService();
+        AcknowledgmentChallenge challenge = service.CreateChallenge(challengedActor, "RunOperation", decision);
+        var response = new AcknowledgmentChallengeRequest
+        {
+            HandshakeId = challenge.HandshakeId,
+            AcknowledgmentCode = "wrong-code",
+            Acknowledged = true,
+        };
+
+        AcknowledgmentChallengeResult result = service.HandleResponse(challenge, otherActor, response);
+
+        Assert.False(result.Succeeded);
+        Assert.Null(result.Acknowledgment);
+        Assert.Contains("acknowledgment.challenge.actor_mismatch", result.Result.ReasonCodes);
+        Assert.DoesNotContain("acknowledgment.challenge.code_mismatch", result.Result.ReasonCodes);
+    }
+
+    /// <summary>
     /// Tests that the <see cref="DefaultAcknowledgmentChallengeService.HandleResponse"/> method fails when the responding actor reuses the challenged actor identifier under a different actor type, because that is a different principal.
     /// </summary>
     [Fact]
