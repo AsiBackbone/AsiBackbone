@@ -17,6 +17,10 @@ failure behavior and risk levels fail explicitly instead of inheriting a
 permissive zero value. Package IDs, public namespaces, and the `net10.0` target
 remain unchanged; the binary assembly identity advances to `7.0.0.0`.
 
+`7.0.0` is prepared for release and is not yet tagged or published. Published
+packages remain on the previous stable line until the release readiness
+checklist completes and `v7.0.0` is tagged.
+
 Released stable package surfaces include Core, DependencyInjection,
 Storage.InMemory, EntityFrameworkCore, AspNetCore, Testing, Templates,
 Analyzers, OpenTelemetry, Signing.LocalDevelopment, and Signing.ManagedKey.

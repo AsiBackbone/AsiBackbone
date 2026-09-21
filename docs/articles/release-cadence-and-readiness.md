@@ -26,7 +26,7 @@ Major releases should be rare. They should be reserved for identity, namespace, 
 
 ## Current `7.x` stabilization posture
 
-`7.x` is the current stable package line, and `7.0.0` is the current release.
+`7.x` is the current stable package line, and `7.0.0` is the current release. `7.0.0` is prepared for release and is not yet tagged or published.
 
 The `7.0.0` release preserves the package IDs, namespaces, and `net10.0` target while advancing the binary identity to `7.0.0.0`. It binds acknowledgment responses to the challenged actor and removes permissive zero defaults from the DLP failure-behavior and intent-risk enums.
 

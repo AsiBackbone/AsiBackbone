@@ -144,6 +144,10 @@ failure behavior and risk levels fail explicitly instead of inheriting a
 permissive zero value. Package IDs, public namespaces, and the `net10.0` target
 remain unchanged; the binary assembly identity advances to `7.0.0.0`.
 
+`7.0.0` is prepared for release and is not yet tagged or published. Published
+packages remain on the previous stable line until the release readiness
+checklist completes and `v7.0.0` is tagged.
+
 Consumers upgrading from `6.x` must follow the [6.x to 7.0 upgrade guide](https://github.com/AsiBackbone/AsiBackbone/blob/main/docs/articles/upgrade-600-to-700.md). Hosts must preserve actor identity across both acknowledgment-challenge legs and remap persisted numeric DLP enum values.
 
 | Package | Role |
@@ -218,7 +222,7 @@ The full, categorized documentation set lives at the [documentation site](https:
 
 ## Current status
 
-Stable `7.x` is the current released line, with `7.0.0` as the current release. Package IDs and public namespaces remain unchanged, and the binary assembly identity is `7.0.0.0`.
+Stable `7.x` is the current release line, with `7.0.0` as the current release. Package IDs and public namespaces remain unchanged, and the binary assembly identity is `7.0.0.0`. `7.0.0` is prepared for release and is not yet tagged or published.
 
 The stable API contract is documented in [API Compatibility and SemVer](https://github.com/AsiBackbone/AsiBackbone/blob/main/docs/articles/api-compatibility-and-semver.md).
 The current release is recorded in [7.0.0 Release Notes](https://github.com/AsiBackbone/AsiBackbone/blob/main/docs/articles/release-notes-700.md).
