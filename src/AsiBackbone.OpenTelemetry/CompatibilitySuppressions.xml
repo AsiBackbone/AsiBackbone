@@ -1,10 +1,20 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <!-- https://learn.microsoft.com/dotnet/fundamentals/package-validation/diagnostic-ids -->
-<!-- Issues #782/#783: retain the reviewed 6.0 type renames and obsolete API removals
-     as exact suppressions under the 5.1.0 package-validation baseline for 7.0.0;
-     all other package compatibility checks remain enabled. See
-     docs/articles/public-api-naming-600.md and upgrade-500-to-600.md. -->
 <Suppressions xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <Suppression>
+    <DiagnosticId>CP0002</DiagnosticId>
+    <Target>F:AsiBackbone.OpenTelemetry.OpenTelemetryGovernanceAttributes.AuditResidueId</Target>
+    <Left>lib/net10.0/AsiBackbone.OpenTelemetry.dll</Left>
+    <Right>lib/net10.0/AsiBackbone.OpenTelemetry.dll</Right>
+    <IsBaselineSuppression>true</IsBaselineSuppression>
+  </Suppression>
+  <Suppression>
+    <DiagnosticId>CP0002</DiagnosticId>
+    <Target>F:AsiBackbone.OpenTelemetry.OpenTelemetryGovernanceInstrumentation.AuditResidueCreatedEventName</Target>
+    <Left>lib/net10.0/AsiBackbone.OpenTelemetry.dll</Left>
+    <Right>lib/net10.0/AsiBackbone.OpenTelemetry.dll</Right>
+    <IsBaselineSuppression>true</IsBaselineSuppression>
+  </Suppression>
   <Suppression>
     <DiagnosticId>CP0008</DiagnosticId>
     <Target>T:AsiBackbone.OpenTelemetry.OpenTelemetryGovernanceEmitter</Target>

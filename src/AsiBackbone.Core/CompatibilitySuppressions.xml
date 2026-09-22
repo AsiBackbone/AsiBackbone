@@ -1,15 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <!-- https://learn.microsoft.com/dotnet/fundamentals/package-validation/diagnostic-ids -->
-<!-- Issues #782/#783: retain the reviewed 6.0 type renames and obsolete API removals
-     as exact suppressions under the 5.1.0 package-validation baseline for 7.0.0;
-     all other package compatibility checks remain enabled. See
-     docs/articles/public-api-naming-600.md and upgrade-500-to-600.md. -->
-<!-- CP0011: intentional renumbering of DlpFailureBehavior and DlpIntentRiskLevel so that neither
-     enum keeps its most permissive member at zero. Both gained Unspecified = 0, shifting the
-     remaining members up by one, so an unset field or an omitted configuration value can no longer
-     resolve a screening failure to Allow or Low. Source that names these members is unaffected;
-     consumers that persisted or transmitted the numeric values must remap them.
-     See the [7.0.0] section of CHANGELOG.md and docs/articles/dlp-classification-failure-policy.md. -->
 <Suppressions xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
   <Suppression>
     <DiagnosticId>CP0001</DiagnosticId>
@@ -91,6 +81,62 @@
   <Suppression>
     <DiagnosticId>CP0001</DiagnosticId>
     <Target>T:AsiBackbone.Core.Audit.IAsiBackboneAuditSink</Target>
+    <Left>lib/net10.0/AsiBackbone.Core.dll</Left>
+    <Right>lib/net10.0/AsiBackbone.Core.dll</Right>
+    <IsBaselineSuppression>true</IsBaselineSuppression>
+  </Suppression>
+  <Suppression>
+    <DiagnosticId>CP0001</DiagnosticId>
+    <Target>T:AsiBackbone.Core.CapabilityTokens.CapabilityGrantUseResult</Target>
+    <Left>lib/net10.0/AsiBackbone.Core.dll</Left>
+    <Right>lib/net10.0/AsiBackbone.Core.dll</Right>
+    <IsBaselineSuppression>true</IsBaselineSuppression>
+  </Suppression>
+  <Suppression>
+    <DiagnosticId>CP0001</DiagnosticId>
+    <Target>T:AsiBackbone.Core.CapabilityTokens.CapabilityGrantValidationOptions</Target>
+    <Left>lib/net10.0/AsiBackbone.Core.dll</Left>
+    <Right>lib/net10.0/AsiBackbone.Core.dll</Right>
+    <IsBaselineSuppression>true</IsBaselineSuppression>
+  </Suppression>
+  <Suppression>
+    <DiagnosticId>CP0001</DiagnosticId>
+    <Target>T:AsiBackbone.Core.CapabilityTokens.CapabilityGrantValidationResult</Target>
+    <Left>lib/net10.0/AsiBackbone.Core.dll</Left>
+    <Right>lib/net10.0/AsiBackbone.Core.dll</Right>
+    <IsBaselineSuppression>true</IsBaselineSuppression>
+  </Suppression>
+  <Suppression>
+    <DiagnosticId>CP0001</DiagnosticId>
+    <Target>T:AsiBackbone.Core.CapabilityTokens.CapabilityGrantValidator</Target>
+    <Left>lib/net10.0/AsiBackbone.Core.dll</Left>
+    <Right>lib/net10.0/AsiBackbone.Core.dll</Right>
+    <IsBaselineSuppression>true</IsBaselineSuppression>
+  </Suppression>
+  <Suppression>
+    <DiagnosticId>CP0001</DiagnosticId>
+    <Target>T:AsiBackbone.Core.CapabilityTokens.CapabilityTokenGrant</Target>
+    <Left>lib/net10.0/AsiBackbone.Core.dll</Left>
+    <Right>lib/net10.0/AsiBackbone.Core.dll</Right>
+    <IsBaselineSuppression>true</IsBaselineSuppression>
+  </Suppression>
+  <Suppression>
+    <DiagnosticId>CP0001</DiagnosticId>
+    <Target>T:AsiBackbone.Core.CapabilityTokens.CapabilityTokenValidationCategory</Target>
+    <Left>lib/net10.0/AsiBackbone.Core.dll</Left>
+    <Right>lib/net10.0/AsiBackbone.Core.dll</Right>
+    <IsBaselineSuppression>true</IsBaselineSuppression>
+  </Suppression>
+  <Suppression>
+    <DiagnosticId>CP0001</DiagnosticId>
+    <Target>T:AsiBackbone.Core.CapabilityTokens.GrantUseState</Target>
+    <Left>lib/net10.0/AsiBackbone.Core.dll</Left>
+    <Right>lib/net10.0/AsiBackbone.Core.dll</Right>
+    <IsBaselineSuppression>true</IsBaselineSuppression>
+  </Suppression>
+  <Suppression>
+    <DiagnosticId>CP0001</DiagnosticId>
+    <Target>T:AsiBackbone.Core.CapabilityTokens.ICapabilityGrantUseStore</Target>
     <Left>lib/net10.0/AsiBackbone.Core.dll</Left>
     <Right>lib/net10.0/AsiBackbone.Core.dll</Right>
     <IsBaselineSuppression>true</IsBaselineSuppression>
@@ -181,6 +227,27 @@
   </Suppression>
   <Suppression>
     <DiagnosticId>CP0001</DiagnosticId>
+    <Target>T:AsiBackbone.Core.Handshakes.LiabilityHandshakeAcknowledgment</Target>
+    <Left>lib/net10.0/AsiBackbone.Core.dll</Left>
+    <Right>lib/net10.0/AsiBackbone.Core.dll</Right>
+    <IsBaselineSuppression>true</IsBaselineSuppression>
+  </Suppression>
+  <Suppression>
+    <DiagnosticId>CP0001</DiagnosticId>
+    <Target>T:AsiBackbone.Core.Handshakes.LiabilityHandshakeRequest</Target>
+    <Left>lib/net10.0/AsiBackbone.Core.dll</Left>
+    <Right>lib/net10.0/AsiBackbone.Core.dll</Right>
+    <IsBaselineSuppression>true</IsBaselineSuppression>
+  </Suppression>
+  <Suppression>
+    <DiagnosticId>CP0001</DiagnosticId>
+    <Target>T:AsiBackbone.Core.Handshakes.LiabilityHandshakeRiskLevel</Target>
+    <Left>lib/net10.0/AsiBackbone.Core.dll</Left>
+    <Right>lib/net10.0/AsiBackbone.Core.dll</Right>
+    <IsBaselineSuppression>true</IsBaselineSuppression>
+  </Suppression>
+  <Suppression>
+    <DiagnosticId>CP0001</DiagnosticId>
     <Target>T:AsiBackbone.Core.Outbox.AsiBackboneGovernanceOutboxDrain</Target>
     <Left>lib/net10.0/AsiBackbone.Core.dll</Left>
     <Right>lib/net10.0/AsiBackbone.Core.dll</Right>
@@ -244,6 +311,34 @@
   </Suppression>
   <Suppression>
     <DiagnosticId>CP0002</DiagnosticId>
+    <Target>F:AsiBackbone.Core.Emissions.GovernanceEmissionEventType.AuditResidue</Target>
+    <Left>lib/net10.0/AsiBackbone.Core.dll</Left>
+    <Right>lib/net10.0/AsiBackbone.Core.dll</Right>
+    <IsBaselineSuppression>true</IsBaselineSuppression>
+  </Suppression>
+  <Suppression>
+    <DiagnosticId>CP0002</DiagnosticId>
+    <Target>F:AsiBackbone.Core.Signing.CanonicalArtifactTypes.AuditResidue</Target>
+    <Left>lib/net10.0/AsiBackbone.Core.dll</Left>
+    <Right>lib/net10.0/AsiBackbone.Core.dll</Right>
+    <IsBaselineSuppression>true</IsBaselineSuppression>
+  </Suppression>
+  <Suppression>
+    <DiagnosticId>CP0002</DiagnosticId>
+    <Target>F:AsiBackbone.Core.Signing.CanonicalArtifactTypes.AuditResidueLifecycleEvent</Target>
+    <Left>lib/net10.0/AsiBackbone.Core.dll</Left>
+    <Right>lib/net10.0/AsiBackbone.Core.dll</Right>
+    <IsBaselineSuppression>true</IsBaselineSuppression>
+  </Suppression>
+  <Suppression>
+    <DiagnosticId>CP0002</DiagnosticId>
+    <Target>F:AsiBackbone.Core.Signing.CanonicalArtifactTypes.CapabilityTokenGrant</Target>
+    <Left>lib/net10.0/AsiBackbone.Core.dll</Left>
+    <Right>lib/net10.0/AsiBackbone.Core.dll</Right>
+    <IsBaselineSuppression>true</IsBaselineSuppression>
+  </Suppression>
+  <Suppression>
+    <DiagnosticId>CP0002</DiagnosticId>
     <Target>M:AsiBackbone.Core.Audit.AuditLedgerRecord.FromResidue(AsiBackbone.Core.Audit.IAsiBackboneAuditResidue,System.String,System.Nullable{System.DateTimeOffset},System.String,System.String,System.String,System.String,System.String,System.String,System.String,System.String,System.String,System.String,System.String,System.Nullable{System.DateTimeOffset},System.Collections.Generic.IReadOnlyDictionary{System.String,System.String},System.String)</Target>
     <Left>lib/net10.0/AsiBackbone.Core.dll</Left>
     <Right>lib/net10.0/AsiBackbone.Core.dll</Right>
@@ -258,7 +353,7 @@
   </Suppression>
   <Suppression>
     <DiagnosticId>CP0002</DiagnosticId>
-    <Target>M:AsiBackbone.Core.CapabilityTokens.CapabilityGrantValidator.ValidateAsync(AsiBackbone.Core.Signing.SignedGovernanceArtifact{AsiBackbone.Core.CapabilityTokens.CapabilityTokenGrant},AsiBackbone.Core.CapabilityTokens.CapabilityGrantValidationOptions,AsiBackbone.Core.Signing.IAsiBackboneSignatureVerificationService,AsiBackbone.Core.CapabilityTokens.ICapabilityGrantUseStore,System.Threading.CancellationToken)</Target>
+    <Target>M:AsiBackbone.Core.Audit.AuditLedgerRecord.get_AuditResidueId</Target>
     <Left>lib/net10.0/AsiBackbone.Core.dll</Left>
     <Right>lib/net10.0/AsiBackbone.Core.dll</Right>
     <IsBaselineSuppression>true</IsBaselineSuppression>
@@ -286,56 +381,14 @@
   </Suppression>
   <Suppression>
     <DiagnosticId>CP0002</DiagnosticId>
+    <Target>M:AsiBackbone.Core.Emissions.GovernanceEmissionEnvelope.get_AuditResidueId</Target>
+    <Left>lib/net10.0/AsiBackbone.Core.dll</Left>
+    <Right>lib/net10.0/AsiBackbone.Core.dll</Right>
+    <IsBaselineSuppression>true</IsBaselineSuppression>
+  </Suppression>
+  <Suppression>
+    <DiagnosticId>CP0002</DiagnosticId>
     <Target>M:AsiBackbone.Core.Emissions.GovernanceEmissionEnvelope.get_LifecycleStage</Target>
-    <Left>lib/net10.0/AsiBackbone.Core.dll</Left>
-    <Right>lib/net10.0/AsiBackbone.Core.dll</Right>
-    <IsBaselineSuppression>true</IsBaselineSuppression>
-  </Suppression>
-  <Suppression>
-    <DiagnosticId>CP0002</DiagnosticId>
-    <Target>M:AsiBackbone.Core.Handshakes.LiabilityHandshakeAcknowledgment.Accept(AsiBackbone.Core.Handshakes.LiabilityHandshakeRequest,AsiBackbone.Core.Actors.IAsiBackboneActorContext,System.String,System.Nullable{System.DateTimeOffset},System.Collections.Generic.IReadOnlyDictionary{System.String,System.String},System.String)</Target>
-    <Left>lib/net10.0/AsiBackbone.Core.dll</Left>
-    <Right>lib/net10.0/AsiBackbone.Core.dll</Right>
-    <IsBaselineSuppression>true</IsBaselineSuppression>
-  </Suppression>
-  <Suppression>
-    <DiagnosticId>CP0002</DiagnosticId>
-    <Target>M:AsiBackbone.Core.Handshakes.LiabilityHandshakeAcknowledgment.Create(AsiBackbone.Core.Handshakes.LiabilityHandshakeRequest,AsiBackbone.Core.Actors.IAsiBackboneActorContext,System.Boolean,System.String,System.Nullable{System.DateTimeOffset},System.Collections.Generic.IReadOnlyDictionary{System.String,System.String},System.String)</Target>
-    <Left>lib/net10.0/AsiBackbone.Core.dll</Left>
-    <Right>lib/net10.0/AsiBackbone.Core.dll</Right>
-    <IsBaselineSuppression>true</IsBaselineSuppression>
-  </Suppression>
-  <Suppression>
-    <DiagnosticId>CP0002</DiagnosticId>
-    <Target>M:AsiBackbone.Core.Handshakes.LiabilityHandshakeAcknowledgment.get_ActorType</Target>
-    <Left>lib/net10.0/AsiBackbone.Core.dll</Left>
-    <Right>lib/net10.0/AsiBackbone.Core.dll</Right>
-    <IsBaselineSuppression>true</IsBaselineSuppression>
-  </Suppression>
-  <Suppression>
-    <DiagnosticId>CP0002</DiagnosticId>
-    <Target>M:AsiBackbone.Core.Handshakes.LiabilityHandshakeAcknowledgment.Reject(AsiBackbone.Core.Handshakes.LiabilityHandshakeRequest,AsiBackbone.Core.Actors.IAsiBackboneActorContext,System.String,System.Nullable{System.DateTimeOffset},System.Collections.Generic.IReadOnlyDictionary{System.String,System.String},System.String)</Target>
-    <Left>lib/net10.0/AsiBackbone.Core.dll</Left>
-    <Right>lib/net10.0/AsiBackbone.Core.dll</Right>
-    <IsBaselineSuppression>true</IsBaselineSuppression>
-  </Suppression>
-  <Suppression>
-    <DiagnosticId>CP0002</DiagnosticId>
-    <Target>M:AsiBackbone.Core.Handshakes.LiabilityHandshakeRequest.Create(AsiBackbone.Core.Actors.IAsiBackboneActorContext,System.String,System.String,System.String,System.String,System.String,AsiBackbone.Core.Handshakes.LiabilityHandshakeRiskLevel,System.String,System.String,System.String,System.String,System.String,System.String,System.Collections.Generic.IReadOnlyDictionary{System.String,System.String},System.String)</Target>
-    <Left>lib/net10.0/AsiBackbone.Core.dll</Left>
-    <Right>lib/net10.0/AsiBackbone.Core.dll</Right>
-    <IsBaselineSuppression>true</IsBaselineSuppression>
-  </Suppression>
-  <Suppression>
-    <DiagnosticId>CP0002</DiagnosticId>
-    <Target>M:AsiBackbone.Core.Handshakes.LiabilityHandshakeRequest.FromDecision(AsiBackbone.Core.Actors.IAsiBackboneActorContext,System.String,AsiBackbone.Core.Decisions.GovernanceDecision,System.String,System.String,AsiBackbone.Core.Handshakes.LiabilityHandshakeRiskLevel,System.String,System.String,System.Collections.Generic.IReadOnlyDictionary{System.String,System.String},System.String)</Target>
-    <Left>lib/net10.0/AsiBackbone.Core.dll</Left>
-    <Right>lib/net10.0/AsiBackbone.Core.dll</Right>
-    <IsBaselineSuppression>true</IsBaselineSuppression>
-  </Suppression>
-  <Suppression>
-    <DiagnosticId>CP0002</DiagnosticId>
-    <Target>M:AsiBackbone.Core.Handshakes.LiabilityHandshakeRequest.get_ActorType</Target>
     <Left>lib/net10.0/AsiBackbone.Core.dll</Left>
     <Right>lib/net10.0/AsiBackbone.Core.dll</Right>
     <IsBaselineSuppression>true</IsBaselineSuppression>
@@ -364,6 +417,13 @@
   <Suppression>
     <DiagnosticId>CP0002</DiagnosticId>
     <Target>M:AsiBackbone.Core.Signing.CanonicalPayloadBuilder.ForAuditResidueLifecycleEvent(AsiBackbone.Core.Audit.AuditResidueLifecycleEvent,AsiBackbone.Core.Signing.CanonicalPayloadOptions)</Target>
+    <Left>lib/net10.0/AsiBackbone.Core.dll</Left>
+    <Right>lib/net10.0/AsiBackbone.Core.dll</Right>
+    <IsBaselineSuppression>true</IsBaselineSuppression>
+  </Suppression>
+  <Suppression>
+    <DiagnosticId>CP0002</DiagnosticId>
+    <Target>M:AsiBackbone.Core.Signing.CanonicalPayloadBuilder.ForCapabilityTokenGrant(AsiBackbone.Core.CapabilityTokens.CapabilityTokenGrant,AsiBackbone.Core.Signing.CanonicalPayloadOptions)</Target>
     <Left>lib/net10.0/AsiBackbone.Core.dll</Left>
     <Right>lib/net10.0/AsiBackbone.Core.dll</Right>
     <IsBaselineSuppression>true</IsBaselineSuppression>
