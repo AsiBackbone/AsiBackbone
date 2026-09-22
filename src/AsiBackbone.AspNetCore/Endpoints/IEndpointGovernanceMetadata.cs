@@ -32,12 +32,12 @@ public interface IEndpointPolicyEvaluationOptionsMetadata : IEndpointGovernanceM
 /// <summary>
 /// Describes whether an ASP.NET Core endpoint expects an acknowledgment challenge path when policy requires it.
 /// </summary>
-public interface IEndpointLiabilityHandshakeMetadata : IEndpointGovernanceMetadata
+public interface IEndpointAcknowledgmentMetadata : IEndpointGovernanceMetadata
 {
     /// <summary>
     /// Gets a value indicating whether the endpoint requires liability-handshake support.
     /// </summary>
-    bool RequiresLiabilityHandshake { get; }
+    bool RequiresAcknowledgment { get; }
 }
 
 /// <summary>

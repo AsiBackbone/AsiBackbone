@@ -17,7 +17,7 @@ public sealed class OpenTelemetryGovernanceEventNameMapperTests
         { GovernanceEmissionEventType.Acknowledgment, OpenTelemetryGovernanceInstrumentation.AcknowledgmentRecordedEventName },
         { GovernanceEmissionEventType.CapabilityToken, OpenTelemetryGovernanceInstrumentation.CapabilityTokenIssuedEventName },
         { GovernanceEmissionEventType.Gateway, OpenTelemetryGovernanceInstrumentation.GatewayCompletedEventName },
-        { GovernanceEmissionEventType.AuditResidue, OpenTelemetryGovernanceInstrumentation.AuditResidueCreatedEventName },
+        { GovernanceEmissionEventType.DecisionReceipt, OpenTelemetryGovernanceInstrumentation.DecisionReceiptCreatedEventName },
         { GovernanceEmissionEventType.AuditLifecycle, OpenTelemetryGovernanceInstrumentation.LifecycleRecordedEventName },
         { GovernanceEmissionEventType.Outbox, OpenTelemetryGovernanceInstrumentation.OutboxUpdatedEventName }
     };

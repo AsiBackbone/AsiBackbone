@@ -1,4 +1,4 @@
-![AsiBackbone icon](https://raw.githubusercontent.com/AsiBackbone/ASIBackbone/main/docs/images/social-preview.png)
+![AsiBackbone icon](https://raw.githubusercontent.com/AsiBackbone/AsiBackbone/main/docs/images/social-preview.png)
 
 # AsiBackbone
 
@@ -70,7 +70,7 @@ The snippet below is an intentionally small README slice, not a complete `Progra
 > Note: it is recommended in production environments that reason codes stay in decision receipt rather than client responses
 
 ```csharp
-// Registration: Core evaluator + one host-owned rule + local in-memory audit sink.
+// Registration: Core evaluator + one host-owned rule + local in-memory decision receipt sink.
 builder.Services.AddAsiBackboneAspNetCore();
 builder.Services.AddSingleton<InMemoryAuditLedger>();
 builder.Services.AddSingleton<IDecisionReceiptSink>(sp =>
@@ -214,7 +214,7 @@ For **optional conceptual background**:
 - [Intent to Execution: An Accountability Pattern](https://asibackbone.github.io/AsiBackbone/articles/intent-to-execution-pattern.html)
 - [Core Governance Flow Diagrams](https://asibackbone.github.io/AsiBackbone/articles/core-governance-flow-diagrams.html)
 - [ASI Backbone Concept Synopsis](https://asibackbone.github.io/AsiBackbone/articles/asi-backbone-concept.html)
-- [Dynamic Liability Handshake](https://asibackbone.github.io/AsiBackbone/articles/dynamic-liability-handshake.html)
+- [Acknowledgment Workflow](https://asibackbone.github.io/AsiBackbone/articles/dynamic-liability-handshake.html)
 - [Core Domain Language](https://asibackbone.github.io/AsiBackbone/articles/core-domain-language.html)
 - [Host-Owned Execution Enforcement](https://asibackbone.github.io/AsiBackbone/articles/host-owned-execution-enforcement.html)
 

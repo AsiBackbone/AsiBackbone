@@ -1,5 +1,5 @@
+using AsiBackbone.Core.Acknowledgments;
 using AsiBackbone.Core.Actors;
-using AsiBackbone.Core.Handshakes;
 using AsiBackbone.EntityFrameworkCore.Persistence;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
@@ -26,10 +26,10 @@ public sealed class AsiBackboneSqlitePersistenceIntegrationTests
         Assert.NotNull(context.Model.FindEntityType(typeof(AuditLedgerRecordEntity)));
         Assert.NotNull(context.Model.FindEntityType(typeof(AuditLedgerReasonCodeEntity)));
         Assert.NotNull(context.Model.FindEntityType(typeof(AuditLedgerMetadataEntity)));
-        Assert.NotNull(context.Model.FindEntityType(typeof(HandshakeRequestEntity)));
-        Assert.NotNull(context.Model.FindEntityType(typeof(HandshakeRequestMetadataEntity)));
-        Assert.NotNull(context.Model.FindEntityType(typeof(HandshakeAcknowledgmentEntity)));
-        Assert.NotNull(context.Model.FindEntityType(typeof(HandshakeAcknowledgmentMetadataEntity)));
+        Assert.NotNull(context.Model.FindEntityType(typeof(AcknowledgmentRequestEntity)));
+        Assert.NotNull(context.Model.FindEntityType(typeof(AcknowledgmentRequestMetadataEntity)));
+        Assert.NotNull(context.Model.FindEntityType(typeof(AcknowledgmentResponseEntity)));
+        Assert.NotNull(context.Model.FindEntityType(typeof(AcknowledgmentResponseMetadataEntity)));
         Assert.Empty(context.Database.GetMigrations());
 
         string[] tableNames = await context.Database
@@ -192,11 +192,11 @@ public sealed class AsiBackboneSqlitePersistenceIntegrationTests
     /// </summary>
     /// <returns>A task that represents the asynchronous test operation.</returns>
     [Fact]
-    public async Task HandshakeRequestAndAcknowledgmentPersistWithMetadata()
+    public async Task AcknowledgmentRequestAndAcknowledgmentPersistWithMetadata()
     {
         await using SqliteHostFixture fixture = await SqliteHostFixture.CreateAsync(TestContext.Current.CancellationToken);
         await using HostOwnedSqliteDbContext context = fixture.CreateContext();
-        var request = new HandshakeRequestEntity
+        var request = new AcknowledgmentRequestEntity
         {
             HandshakeId = "handshake-123",
             ActorId = "actor-123",
@@ -207,14 +207,14 @@ public sealed class AsiBackboneSqlitePersistenceIntegrationTests
             Message = "This action requires acknowledgment before execution.",
             RequiredAcknowledgmentCode = "ACK-REQUIRED",
             RequiredAcknowledgmentText = "I understand the responsibility for this action.",
-            RiskLevel = LiabilityHandshakeRiskLevel.Medium,
+            RiskLevel = AcknowledgmentRiskLevel.Medium,
             RiskCategory = "external-api",
             CorrelationId = "correlation-123",
             TraceId = "trace-123",
             PolicyVersion = "2026.06",
             PolicyHash = "policy-hash-123"
         };
-        var acknowledgment = new HandshakeAcknowledgmentEntity
+        var acknowledgment = new AcknowledgmentResponseEntity
         {
             AcknowledgmentId = "ack-123",
             HandshakeId = "handshake-123",
@@ -228,31 +228,31 @@ public sealed class AsiBackboneSqlitePersistenceIntegrationTests
             TraceId = "trace-123"
         };
 
-        _ = context.HandshakeRequests.Add(request);
-        context.HandshakeRequestMetadata.AddRange(
-            new HandshakeRequestMetadataEntity
+        _ = context.AcknowledgmentRequests.Add(request);
+        context.AcknowledgmentRequestMetadata.AddRange(
+            new AcknowledgmentRequestMetadataEntity
             {
-                HandshakeRequestId = request.Id,
+                AcknowledgmentRequestId = request.Id,
                 MetadataKey = "tenant",
                 MetadataValue = "sample"
             },
-            new HandshakeRequestMetadataEntity
+            new AcknowledgmentRequestMetadataEntity
             {
-                HandshakeRequestId = request.Id,
+                AcknowledgmentRequestId = request.Id,
                 MetadataKey = "channel",
                 MetadataValue = "web"
             });
-        _ = context.HandshakeAcknowledgments.Add(acknowledgment);
-        context.HandshakeAcknowledgmentMetadata.AddRange(
-            new HandshakeAcknowledgmentMetadataEntity
+        _ = context.AcknowledgmentResponses.Add(acknowledgment);
+        context.AcknowledgmentResponseMetadata.AddRange(
+            new AcknowledgmentResponseMetadataEntity
             {
-                HandshakeAcknowledgmentId = acknowledgment.Id,
+                AcknowledgmentResponseId = acknowledgment.Id,
                 MetadataKey = "ip",
                 MetadataValue = "127.0.0.1"
             },
-            new HandshakeAcknowledgmentMetadataEntity
+            new AcknowledgmentResponseMetadataEntity
             {
-                HandshakeAcknowledgmentId = acknowledgment.Id,
+                AcknowledgmentResponseId = acknowledgment.Id,
                 MetadataKey = "agent",
                 MetadataValue = "integration-test"
             });
@@ -260,19 +260,19 @@ public sealed class AsiBackboneSqlitePersistenceIntegrationTests
         _ = await context.SaveChangesAsync(TestContext.Current.CancellationToken);
         context.ChangeTracker.Clear();
 
-        HandshakeRequestEntity persistedRequest = await context.HandshakeRequests
+        AcknowledgmentRequestEntity persistedRequest = await context.AcknowledgmentRequests
             .SingleAsync(entity => entity.HandshakeId == "handshake-123", TestContext.Current.CancellationToken);
-        HandshakeAcknowledgmentEntity persistedAcknowledgment = await context.HandshakeAcknowledgments
+        AcknowledgmentResponseEntity persistedAcknowledgment = await context.AcknowledgmentResponses
             .SingleAsync(entity => entity.AcknowledgmentId == "ack-123", TestContext.Current.CancellationToken);
-        Dictionary<string, string> requestMetadata = await context.HandshakeRequestMetadata
-            .Where(entity => entity.HandshakeRequestId == persistedRequest.Id)
+        Dictionary<string, string> requestMetadata = await context.AcknowledgmentRequestMetadata
+            .Where(entity => entity.AcknowledgmentRequestId == persistedRequest.Id)
             .ToDictionaryAsync(entity => entity.MetadataKey, entity => entity.MetadataValue, TestContext.Current.CancellationToken);
-        Dictionary<string, string> acknowledgmentMetadata = await context.HandshakeAcknowledgmentMetadata
-            .Where(entity => entity.HandshakeAcknowledgmentId == persistedAcknowledgment.Id)
+        Dictionary<string, string> acknowledgmentMetadata = await context.AcknowledgmentResponseMetadata
+            .Where(entity => entity.AcknowledgmentResponseId == persistedAcknowledgment.Id)
             .ToDictionaryAsync(entity => entity.MetadataKey, entity => entity.MetadataValue, TestContext.Current.CancellationToken);
 
         Assert.Equal(GovernanceActorType.Human, persistedRequest.ActorType);
-        Assert.Equal(LiabilityHandshakeRiskLevel.Medium, persistedRequest.RiskLevel);
+        Assert.Equal(AcknowledgmentRiskLevel.Medium, persistedRequest.RiskLevel);
         Assert.Equal("correlation-123", persistedRequest.CorrelationId);
         Assert.Equal("trace-123", persistedRequest.TraceId);
         Assert.Equal("2026.06", persistedRequest.PolicyVersion);
@@ -370,17 +370,17 @@ public sealed class AsiBackboneSqlitePersistenceIntegrationTests
         public DbSet<AuditLedgerMetadataEntity> AuditLedgerMetadata =>
             Set<AuditLedgerMetadataEntity>();
 
-        public DbSet<HandshakeRequestEntity> HandshakeRequests =>
-            Set<HandshakeRequestEntity>();
+        public DbSet<AcknowledgmentRequestEntity> AcknowledgmentRequests =>
+            Set<AcknowledgmentRequestEntity>();
 
-        public DbSet<HandshakeRequestMetadataEntity> HandshakeRequestMetadata =>
-            Set<HandshakeRequestMetadataEntity>();
+        public DbSet<AcknowledgmentRequestMetadataEntity> AcknowledgmentRequestMetadata =>
+            Set<AcknowledgmentRequestMetadataEntity>();
 
-        public DbSet<HandshakeAcknowledgmentEntity> HandshakeAcknowledgments =>
-            Set<HandshakeAcknowledgmentEntity>();
+        public DbSet<AcknowledgmentResponseEntity> AcknowledgmentResponses =>
+            Set<AcknowledgmentResponseEntity>();
 
-        public DbSet<HandshakeAcknowledgmentMetadataEntity> HandshakeAcknowledgmentMetadata =>
-            Set<HandshakeAcknowledgmentMetadataEntity>();
+        public DbSet<AcknowledgmentResponseMetadataEntity> AcknowledgmentResponseMetadata =>
+            Set<AcknowledgmentResponseMetadataEntity>();
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -400,7 +400,7 @@ public sealed class AsiBackboneSqlitePersistenceIntegrationTests
                 .Property(entity => entity.RecordedUtc)
                 .HasConversion(DateTimeOffsetToTicksConverter);
 
-            _ = modelBuilder.Entity<HandshakeAcknowledgmentEntity>()
+            _ = modelBuilder.Entity<AcknowledgmentResponseEntity>()
                 .Property(entity => entity.OccurredUtc)
                 .HasConversion(DateTimeOffsetToTicksConverter);
         }

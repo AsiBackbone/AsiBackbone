@@ -15,7 +15,7 @@ Examples include account-status changes, approval of sensitive workflow steps, p
 | Host application | Owns identity, authorization, operation validation, UI, persistence, and final execution. |
 | AsiBackbone | Evaluates the host-provided policy context and returns a governance decision. |
 | Acknowledgment layer | Presents a responsibility or risk acknowledgment when the decision requires it. |
-| Audit sink or ledger | Preserves decision receipt, reason codes, policy metadata, actor context, and correlation data. |
+| Decision receipt sink or ledger | Preserves decision receipt, reason codes, policy metadata, actor context, and correlation data. |
 
 ## Sequence
 

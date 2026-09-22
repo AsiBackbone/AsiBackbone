@@ -2,7 +2,7 @@
 
 This article documents implementation guidance for host-provided governance services that may run on ASP.NET Core request hot paths, hosted outbox drain paths, or other high-volume execution paths.
 
-AsiBackbone provides governance contracts, decision orchestration, host adapters, audit residue models, and outbox/drain primitives. It does not own the host application's database, network clients, external telemetry providers, retry policy, queue infrastructure, or production operations.
+AsiBackbone provides governance contracts, decision orchestration, host adapters, decision receipt models, and outbox/drain primitives. It does not own the host application's database, network clients, external telemetry providers, retry policy, queue infrastructure, or production operations.
 
 ## Why host service throughput matters
 
@@ -30,11 +30,11 @@ HTTP request
   -> endpoint governance metadata lookup
   -> host-owned policy evaluation
   -> host-owned capability validation
-  -> optional host-owned audit sink write
+  -> optional host-owned decision receipt sink write
   -> host-owned endpoint execution when allowed
 ```
 
-The policy evaluator, capability validator, and audit sink may run while an ASP.NET Core request is waiting. Their latency, allocation behavior, cancellation behavior, and failure behavior become part of the request experience.
+The policy evaluator, capability validator, and decision receipt sink may run while an ASP.NET Core request is waiting. Their latency, allocation behavior, cancellation behavior, and failure behavior become part of the request experience.
 
 ### Outbox drain path
 
@@ -55,7 +55,7 @@ Moving expensive provider delivery behind a durable outbox removes that provider
 | Concern | AsiBackbone responsibility | Host responsibility |
 | --- | --- | --- |
 | Core contracts | Define provider-neutral interfaces and models. | Implement storage, providers, credentials, and operational behavior. |
-| ASP.NET Core endpoint governance | Read endpoint metadata, build context, invoke host services, and map safe outcomes. | Keep policy evaluators, validators, and audit sinks efficient and cancellable. |
+| ASP.NET Core endpoint governance | Read endpoint metadata, build context, invoke host services, and map safe outcomes. | Keep policy evaluators, validators, and decision receipt sinks efficient and cancellable. |
 | Decision receipt | Provide decision receipt models and sink abstractions. | Choose durable storage, indexing, retention, batching, signing, and write behavior. |
 | Outbox | Provide provider-neutral outbox models and drain primitives. | Provide durable store semantics, leasing/claiming if needed, idempotency, retry, and monitoring. |
 | Provider emission | Define provider-neutral emission result vocabulary. | Configure exporters, SIEM, cloud, network clients, throttling, credentials, and failure handling. |
@@ -157,9 +157,9 @@ Avoid:
 - CPU-heavy rule compilation inside `EvaluateAsync`;
 - calling external AI/model services from a request-time validator without timeout, budget, and fallback policy.
 
-## Audit sink guidance
+## Decision receipt sink guidance
 
-An audit sink can sit directly on the request path. Keep its behavior clear:
+An decision receipt sink can sit directly on the request path. Keep its behavior clear:
 
 - For low-risk development flows, in-memory sinks are acceptable but non-durable.
 - For production-style flows, write a minimized local audit record before optional provider emission.
@@ -240,7 +240,7 @@ Cancellation should not corrupt local accountability state. If a host must guara
 | --- | --- | --- |
 | Request-time policy evaluator | Remote policy store unavailable. | Deny, defer, or use documented cached policy only when safe. |
 | Request-time capability validator | Token introspection times out. | Fail closed or require a fresh validated grant. |
-| Request-time audit sink | Local durable store unavailable. | Fail closed or return a host-defined unavailable/deferred response for governed endpoints. |
+| Request-time decision receipt sink | Local durable store unavailable. | Fail closed or return a host-defined unavailable/deferred response for governed endpoints. |
 | Request-time external telemetry call | Provider slow or unavailable. | Move external delivery behind local durable outbox. |
 | Outbox store lookup/update | Database unavailable or concurrency conflict. | Retry with backoff, alert on sustained store failures, avoid duplicate provider calls without claiming/idempotency. |
 | Governance emitter | Provider throttling or outage. | Return retryable/deferred result, honor retry-after, monitor backlog, dead-letter terminal failures. |

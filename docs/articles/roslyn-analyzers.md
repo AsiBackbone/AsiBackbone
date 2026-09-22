@@ -37,10 +37,10 @@ Examples of recognized artifacts include:
 - `GovernanceOutboxEntry`
 - `GovernanceEmissionEnvelope`
 - `GovernanceEmissionResult`
-- `CapabilityTokenGrant`
+- `CapabilityGrant`
 - `CapabilityGrantValidationResult`
 - `CapabilityGrantUseResult`
-- `LiabilityHandshakeAcknowledgment`
+- `AcknowledgmentResponse`
 
 ### Diagnostic examples
 

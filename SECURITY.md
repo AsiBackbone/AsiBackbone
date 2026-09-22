@@ -2,7 +2,7 @@
 
 Thank you for taking the time to report security concerns responsibly.
 
-AsiBackbone is a .NET governance and policy-control package family for accountable software decision flow. It is intended to help host applications structure policy evaluation, acknowledgment, audit residue, capability scoping, provider emission, and signing-ready metadata around consequential actions.
+AsiBackbone is a .NET governance and policy-control package family for accountable software decision flow. It is intended to help host applications structure policy evaluation, acknowledgment, decision receipt, capability scoping, provider emission, and signing-ready metadata around consequential actions.
 
 In this software project, **ASI** means **Accountable Systems Infrastructure**. AsiBackbone is a governance spine, not an intelligence engine.
 

@@ -3,7 +3,7 @@
 `AsiBackbone.Testing` is a test-only package for host applications that need to test AsiBackbone-governed endpoints without wiring production persistence, signing, audit, outbox, or capability-grant infrastructure in every test fixture.
 
 > [!IMPORTANT]
-> The testing package is not a production enforcement provider. It exists for automated tests, local developer validation, and sample hosts only. Production hosts should register real policy evaluators, capability validators, audit sinks, durable outbox stores, signing providers, and storage providers.
+> The testing package is not a production enforcement provider. It exists for automated tests, local developer validation, and sample hosts only. Production hosts should register real policy evaluators, capability validators, decision receipt sinks, durable outbox stores, signing providers, and storage providers.
 
 ## When to use it
 

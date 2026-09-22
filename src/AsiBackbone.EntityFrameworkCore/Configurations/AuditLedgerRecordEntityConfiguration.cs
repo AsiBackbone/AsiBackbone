@@ -60,7 +60,7 @@ public sealed class AuditLedgerRecordEntityConfiguration
             .IsRequired()
             .HasMaxLength(IdentifierMaxLength);
 
-        _ = builder.Property(record => record.AuditResidueId)
+        _ = builder.Property(record => record.DecisionReceiptId)
             .HasMaxLength(IdentifierMaxLength);
 
         _ = builder.Property(record => record.OccurredUtc)

@@ -89,7 +89,7 @@ The stable package integration smoke path adds explicit package-composition asse
 | Test | Purpose |
 | --- | --- |
 | Core + in-memory decision/audit composition | Confirms the Core evaluator and in-memory ledger can be consumed together from packages. |
-| Stubbed audit sink | Confirms a consuming application can implement `IDecisionReceiptSink` without internal dependencies. |
+| Stubbed decision receipt sink | Confirms a consuming application can implement `IDecisionReceiptSink` without internal dependencies. |
 | ASP.NET Core + EF Core + SQLite host wiring | Confirms host-owned web and persistence integration remains package-consumer friendly. |
 
 ## Pre-release use
@@ -101,6 +101,6 @@ Run these smoke tests before packaging or release-candidate validation. A failur
 - host-owned EF Core integration boundaries;
 - in-memory storage registration expectations;
 - minimal HTTP host behavior;
-- public audit sink or evaluator composition contracts.
+- public decision receipt sink or evaluator composition contracts.
 
 Treat failures as package-consumer issues first, not sample-host issues, because the generated smoke projects are deliberately outside the solution's normal project-reference graph.

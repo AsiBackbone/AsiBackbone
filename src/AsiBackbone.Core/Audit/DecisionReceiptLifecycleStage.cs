@@ -24,7 +24,7 @@ public enum DecisionReceiptLifecycleStage
     AcknowledgmentCompleted = 210,
 
     /// <summary>
-    /// A scoped capability token was issued for a permitted operation.
+    /// A scoped capability grant was issued for a permitted operation.
     /// </summary>
     CapabilityTokenIssued = 300,
 

@@ -38,7 +38,7 @@ public sealed class EndpointGovernanceOptions
     public bool FailClosedWhenCapabilityValidatorMissing { get; set; } = true;
 
     /// <summary>
-    /// Gets or sets a value indicating whether audit metadata should fail closed when no host-owned audit sink is configured.
+    /// Gets or sets a value indicating whether audit metadata should fail closed when no host-owned decision receipt sink is configured.
     /// </summary>
     public bool FailClosedWhenAuditSinkMissing { get; set; } = true;
 
@@ -53,7 +53,7 @@ public sealed class EndpointGovernanceOptions
     public int CapabilityFailureStatusCode { get; set; } = StatusCodes.Status403Forbidden;
 
     /// <summary>
-    /// Gets or sets the HTTP status code used when a governance decision requires acknowledgment and the endpoint requested a liability handshake.
+    /// Gets or sets the HTTP status code used when a governance decision requires acknowledgment and the endpoint requested a acknowledgment.
     /// </summary>
     public int AcknowledgmentChallengeStatusCode { get; set; } = StatusCodes.Status428PreconditionRequired;
 

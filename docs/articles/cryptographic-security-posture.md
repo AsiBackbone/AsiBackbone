@@ -1,6 +1,6 @@
 # Cryptographic Security Posture and Production Guidance
 
-This article documents the AsiBackbone cryptographic security posture for signing-ready records, signed artifacts, verification, audit-chain integrity, key management, capability tokens, and production wording.
+This article documents the AsiBackbone cryptographic security posture for signing-ready records, signed artifacts, verification, audit-chain integrity, key management, capability grants, and production wording.
 
 Issue: #216, updated for #253.
 
@@ -273,7 +273,7 @@ Security guidance:
 
 ## Capability-token validation
 
-Capability tokens should be short-lived, scoped, and validated at the execution boundary. Signing a token is useful only when the validator checks it every time it matters.
+Capability grants should be short-lived, scoped, and validated at the execution boundary. Signing a token is useful only when the validator checks it every time it matters.
 
 Recommended validation checks:
 
@@ -402,7 +402,7 @@ Cryptographic metadata can improve integrity checks, but it does not remove the 
 | Record deletion | Use retention policy, backups, append-only stores, object lock, or external anchoring where required. |
 | Key compromise | Use managed keys, least privilege, rotation, revocation, monitoring, and incident response. |
 | Signing bad data | Require policy evaluation, acknowledgment workflow, canonicalization review, DLP checks, and approval gates before signing. |
-| Replay of capability token | Use short expiration, nonce or token ID, audience/scope checks, single-use stores, and revocation. |
+| Replay of capability grant | Use short expiration, nonce or token ID, audience/scope checks, single-use stores, and revocation. |
 | Clock manipulation | Monitor clock skew and use trusted timestamping when required. |
 | Provider outage | Persist local audit/outbox records and apply fail-closed, defer, retry, or escalate policy based on risk. |
 | Privileged operator misuse | Separate duties, restrict sign permissions, review logs, use external anchors, and require break-glass auditing. |
@@ -431,9 +431,9 @@ Cryptographic posture should reinforce the existing AsiBackbone governance flow 
 | Governance area | Cryptographic relationship |
 | --- | --- |
 | Policy pipeline | Policy version and policy hash should be part of the canonical signed artifact when signatures are required. |
-| Dynamic Liability Handshake / acknowledgment workflow | Acknowledgment and handshake identifiers should be included in signed receipts for consequential actions. |
+| Acknowledgment Workflow / acknowledgment workflow | Acknowledgment and handshake identifiers should be included in signed receipts for consequential actions. |
 | Audit receipts | Audit records can carry signing metadata, hashes, key references, and chain references. |
-| Capability tokens | Tokens should be signed or otherwise protected and validated at the execution boundary. |
+| Capability grants | Tokens should be signed or otherwise protected and validated at the execution boundary. |
 | Durable outbox | Outbox records should be preserved locally before external emission, and high-assurance deployments may sign the local artifact or the emission envelope. |
 | Gateway execution | Gateways should validate token scope, expiration, policy binding, and acknowledgment binding before execution. |
 

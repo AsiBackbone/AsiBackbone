@@ -82,7 +82,7 @@ public sealed class AsiBackboneEndpointGovernanceMetadataModeTests
             static _ => Task.CompletedTask,
             new EndpointMetadataCollection(
                 new GovernancePolicyAttribute(typeof(SamplePolicy)),
-                new RequireLiabilityHandshakeAttribute()),
+                new RequireAcknowledgmentAttribute()),
             "sample.metadata.reduced");
         var descriptor = EndpointGovernanceDescriptor.FromEndpoint(endpoint);
         IEndpointGovernanceService service = scope.ServiceProvider.GetRequiredService<IEndpointGovernanceService>();
@@ -201,7 +201,7 @@ public sealed class AsiBackboneEndpointGovernanceMetadataModeTests
             static _ => Task.CompletedTask,
             new EndpointMetadataCollection(
                 new GovernancePolicyAttribute(typeof(SamplePolicy)),
-                new RequireLiabilityHandshakeAttribute(),
+                new RequireAcknowledgmentAttribute(),
                 new RequireCapabilityGrantAttribute("robotics.execute"),
                 new EmitGovernanceAuditAttribute()),
             "sample.metadata");

@@ -23,7 +23,7 @@ Microsoft Purview can help organizations understand where governed decisions tou
 The Purview strategy should avoid turning every raw AsiBackbone decision into a first-class catalog asset. High-volume raw decision events belong in local audit/outbox storage and operational observability or streaming systems. Purview should receive summarized, classified, and PII-safe governance context when catalog or lineage enrichment adds value.
 
 ```text
-Decision / acknowledgment / capability token / gateway result
+Decision / acknowledgment / capability grant / gateway result
   -> Decision receipt
   -> Durable local store / outbox
   -> Optional observability or streaming emission
@@ -67,7 +67,7 @@ Purview is not the preferred place for:
 * every policy evaluator result;
 * outbox retry state;
 * detailed provider exception payloads;
-* secrets, raw user content, prompts, protected records, or raw capability tokens;
+* secrets, raw user content, prompts, protected records, or raw capability grants;
 * low-latency alerting or SIEM-style event search.
 
 ## Durable audit storage versus governance enrichment
@@ -104,7 +104,7 @@ Use stable, minimized, and correlation-safe fields.
 | Field | Purview usage | Guidance |
 | --- | --- | --- |
 | `CorrelationId` | Join investigations across audit, telemetry, stream, and catalog views. | Opaque workflow ID. |
-| `AuditResidueId` | Link back to host-owned audit record. | Opaque ID only; no raw audit body. |
+| `DecisionReceiptId` | Link back to host-owned audit record. | Opaque ID only; no raw audit body. |
 | `EventId` / `EnvelopeId` | Deduplication and enrichment tracking. | Opaque event identifiers. |
 | `SchemaVersion` | Consumer compatibility and mapping version. | Required for enrichment records. |
 | `EventType` | Category mapping. | Controlled vocabulary only. |
@@ -137,7 +137,7 @@ Recommended rules:
 
 Do not send these values to Purview by default:
 
-* raw capability tokens;
+* raw capability grants;
 * secrets, connection strings, API keys, credentials, signing keys, or managed identity details;
 * raw prompts, documents, request bodies, protected records, payload bodies, or user-submitted content;
 * raw personal data unless a host explicitly opts into that behavior after classification and legal review;
@@ -156,7 +156,7 @@ Purview records should correlate with local audit, OpenTelemetry/Azure Monitor e
 ```text
 Host-owned decision receipt
   CorrelationId
-  AuditResidueId
+  DecisionReceiptId
   SchemaVersion
   PolicyVersion / PolicyHash
         |
@@ -172,7 +172,7 @@ Recommended correlation fields:
 | Correlation field | Local audit | OpenTelemetry / Azure Monitor | Event Hubs | Purview |
 | --- | --- | --- | --- | --- |
 | `CorrelationId` | Required when available | Attribute/log field | Message property | Enrichment property |
-| `AuditResidueId` | Primary local reference | Attribute/log field | Message property | External reference only |
+| `DecisionReceiptId` | Primary local reference | Attribute/log field | Message property | External reference only |
 | `SchemaVersion` | Required | Attribute/log field | Message property and body | Enrichment schema field |
 | `PolicyVersion` | Required when available | Attribute/log field | Message property | Governance property |
 | `PolicyHash` | Required when available | Attribute/log field | Message property | Governance property |
@@ -268,8 +268,8 @@ The strategy should be testable without live Purview resources.
 Recommended tests for a future provider or mapper:
 
 * mapping creates a summarized enrichment record rather than a raw audit clone;
-* mapping preserves `CorrelationId`, `AuditResidueId`, `SchemaVersion`, `PolicyVersion`, `PolicyHash`, event type, lifecycle stage, and gateway/capability/acknowledgment IDs when present;
-* raw capability tokens, secrets, payload bodies, prompts, protected records, and raw personal data are excluded by default;
+* mapping preserves `CorrelationId`, `DecisionReceiptId`, `SchemaVersion`, `PolicyVersion`, `PolicyHash`, event type, lifecycle stage, and gateway/capability/acknowledgment IDs when present;
+* raw capability grants, secrets, payload bodies, prompts, protected records, and raw personal data are excluded by default;
 * high-cardinality fields are omitted, hashed, tokenized, or generalized according to mapper options;
 * classification-blocked records do not produce Purview enrichment by default;
 * Purview API failures normalize into provider-neutral emission/enrichment results;

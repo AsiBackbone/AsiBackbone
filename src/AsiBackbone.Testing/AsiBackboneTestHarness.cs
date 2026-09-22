@@ -45,7 +45,7 @@ public sealed class GovernanceTestHarnessOptions
     public bool RequireExplicitPolicyResults { get; private set; }
 
     /// <summary>
-    /// Gets or sets a value indicating whether the harness registers <see cref="GovernanceTestDecisionReceiptSink" /> as the host audit sink.
+    /// Gets or sets a value indicating whether the harness registers <see cref="GovernanceTestDecisionReceiptSink" /> as the host decision receipt sink.
     /// </summary>
     public bool RegisterInMemoryAuditSink { get; set; } = true;
 
@@ -323,7 +323,7 @@ public sealed class GovernanceTestHarnessEndpointCapabilityGrantValidator(Govern
 }
 
 /// <summary>
-/// In-memory audit sink with inspection helpers for tests.
+/// In-memory decision receipt sink with inspection helpers for tests.
 /// </summary>
 public sealed class GovernanceTestDecisionReceiptSink : IDecisionReceiptSink
 {

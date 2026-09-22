@@ -57,7 +57,7 @@ AsiBackbone.Core.Audit
 AsiBackbone.Core.Constraints
 AsiBackbone.Core.Decisions
 AsiBackbone.Core.Entities
-AsiBackbone.Core.Handshakes
+AsiBackbone.Core.Acknowledgments
 AsiBackbone.Core.Results
 ```
 

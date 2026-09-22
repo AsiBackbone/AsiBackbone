@@ -1,10 +1,10 @@
 using AsiBackbone.Core.Audit;
-using AsiBackbone.Core.CapabilityTokens;
+using AsiBackbone.Core.CapabilityGrants;
 using AsiBackbone.Core.Outbox;
 using AsiBackbone.DependencyInjection;
 using AsiBackbone.Storage.InMemory;
 using AsiBackbone.Storage.InMemory.Audit;
-using AsiBackbone.Storage.InMemory.CapabilityTokens;
+using AsiBackbone.Storage.InMemory.CapabilityGrants;
 using AsiBackbone.Storage.InMemory.Outbox;
 using Microsoft.Extensions.DependencyInjection;
 using Xunit;
@@ -39,13 +39,13 @@ public sealed class InMemoryStorageCoverageTests
 
         IReadOnlyList<DecisionReceiptLifecycleEvent> byCorrelation = await store.FindByCorrelationIdAsync(
             " correlation-1 ", TestContext.Current.CancellationToken);
-        IReadOnlyList<DecisionReceiptLifecycleEvent> byResidue = await store.FindByAuditResidueIdAsync(
+        IReadOnlyList<DecisionReceiptLifecycleEvent> byResidue = await store.FindByDecisionReceiptIdAsync(
             " residue-1 ", TestContext.Current.CancellationToken);
 
         Assert.Equal(["event-a", "event-b"], byCorrelation.Select(item => item.EventId));
         Assert.Equal(["event-a", "event-b"], byResidue.Select(item => item.EventId));
         Assert.Empty(await store.FindByCorrelationIdAsync("missing", TestContext.Current.CancellationToken));
-        Assert.Empty(await store.FindByAuditResidueIdAsync("missing", TestContext.Current.CancellationToken));
+        Assert.Empty(await store.FindByDecisionReceiptIdAsync("missing", TestContext.Current.CancellationToken));
     }
 
     /// <summary>
@@ -90,7 +90,7 @@ public sealed class InMemoryStorageCoverageTests
         _ = await Assert.ThrowsAnyAsync<ArgumentException>(async () =>
             await store.FindByCorrelationIdAsync(" ", testCancellationToken));
         _ = await Assert.ThrowsAnyAsync<ArgumentException>(async () =>
-            await store.FindByAuditResidueIdAsync(" ", testCancellationToken));
+            await store.FindByDecisionReceiptIdAsync(" ", testCancellationToken));
         _ = await Assert.ThrowsAsync<OperationCanceledException>(async () =>
             await store.AppendAsync(lifecycleEvent, source.Token));
         _ = await Assert.ThrowsAsync<OperationCanceledException>(async () =>
@@ -98,7 +98,7 @@ public sealed class InMemoryStorageCoverageTests
         _ = await Assert.ThrowsAsync<OperationCanceledException>(async () =>
             await store.FindByCorrelationIdAsync("correlation-1", source.Token));
         _ = await Assert.ThrowsAsync<OperationCanceledException>(async () =>
-            await store.FindByAuditResidueIdAsync("residue-1", source.Token));
+            await store.FindByDecisionReceiptIdAsync("residue-1", source.Token));
     }
 
     /// <summary>
@@ -147,12 +147,12 @@ public sealed class InMemoryStorageCoverageTests
         string eventId,
         DateTimeOffset occurredUtc,
         string correlationId,
-        string auditResidueId)
+        string decisionReceiptId)
     {
         return DecisionReceiptLifecycleEvent.Create(
             DecisionReceiptLifecycleStage.DecisionEvaluated,
             correlationId,
-            auditResidueId,
+            decisionReceiptId,
             eventId,
             occurredUtc);
     }

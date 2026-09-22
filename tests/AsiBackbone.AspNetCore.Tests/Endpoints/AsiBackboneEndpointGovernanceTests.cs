@@ -18,7 +18,7 @@ namespace AsiBackbone.AspNetCore.Tests.Endpoints;
 public sealed class AsiBackboneEndpointGovernanceTests
 {
     /// <summary>
-    /// Verifies that the EndpointGovernanceDescriptor correctly reads governance metadata from an endpoint, including policy types, liability handshake requirement, capability scopes, and audit emission settings.
+    /// Verifies that the EndpointGovernanceDescriptor correctly reads governance metadata from an endpoint, including policy types, acknowledgment requirement, capability scopes, and audit emission settings.
     /// </summary>
     [Fact]
     public void DescriptorReadsAttributeMetadataFromEndpoint()
@@ -27,7 +27,7 @@ public sealed class AsiBackboneEndpointGovernanceTests
             static context => Task.CompletedTask,
             new EndpointMetadataCollection(
                 new GovernancePolicyAttribute(typeof(SamplePolicy)),
-                new RequireLiabilityHandshakeAttribute(),
+                new RequireAcknowledgmentAttribute(),
                 new RequireCapabilityGrantAttribute("robotics.execute"),
                 new EmitGovernanceAuditAttribute()),
             "sample.robotics.execute");
@@ -37,7 +37,7 @@ public sealed class AsiBackboneEndpointGovernanceTests
         Assert.True(descriptor.HasGovernanceMetadata);
         Assert.Equal("sample.robotics.execute", descriptor.OperationName);
         Assert.Contains(typeof(SamplePolicy), descriptor.PolicyTypes);
-        Assert.True(descriptor.RequiresLiabilityHandshake);
+        Assert.True(descriptor.RequiresAcknowledgment);
         Assert.Contains("robotics.execute", descriptor.CapabilityScopes);
         Assert.True(descriptor.EmitGovernanceAudit);
         Assert.Equal("sample.robotics.execute", descriptor.ToMetadata()["endpoint.operation_name"]);

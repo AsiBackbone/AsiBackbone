@@ -58,17 +58,17 @@ public sealed class InMemoryDecisionReceiptLifecycleStore : IDecisionReceiptLife
     }
 
     /// <inheritdoc />
-    public ValueTask<IReadOnlyList<DecisionReceiptLifecycleEvent>> FindByAuditResidueIdAsync(
-        string auditResidueId,
+    public ValueTask<IReadOnlyList<DecisionReceiptLifecycleEvent>> FindByDecisionReceiptIdAsync(
+        string decisionReceiptId,
         CancellationToken cancellationToken = default)
     {
-        ArgumentException.ThrowIfNullOrWhiteSpace(auditResidueId);
+        ArgumentException.ThrowIfNullOrWhiteSpace(decisionReceiptId);
         cancellationToken.ThrowIfCancellationRequested();
 
-        string normalizedAuditResidueId = auditResidueId.Trim();
+        string normalizedDecisionReceiptId = decisionReceiptId.Trim();
 
         IReadOnlyList<DecisionReceiptLifecycleEvent> matches = [.. events.Values
-            .Where(lifecycleEvent => string.Equals(lifecycleEvent.AuditResidueId, normalizedAuditResidueId, StringComparison.Ordinal))
+            .Where(lifecycleEvent => string.Equals(lifecycleEvent.DecisionReceiptId, normalizedDecisionReceiptId, StringComparison.Ordinal))
             .OrderBy(lifecycleEvent => lifecycleEvent.OccurredUtc)
             .ThenBy(lifecycleEvent => lifecycleEvent.EventId)];
 

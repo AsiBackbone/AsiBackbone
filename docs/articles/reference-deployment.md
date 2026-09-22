@@ -15,7 +15,7 @@ This page documents the in-repository reference deployment path for AsiBackbone:
 | Decision receipt | in-memory audit ledger | The decision is written to a local inspectable audit path. |
 | Durable host-owned ledger | SQLite through a host-owned EF Core `DbContext` | The host can persist audit ledger records while owning provider, connection string, migrations, and deployment. |
 | Signing-ready artifact | local-development signing service | Canonical hash, signature metadata, and verification output can be attached in a local validation path. |
-| Endpoint governance ergonomics | `/sample/ergonomic/minimal` and `/sample/ergonomic/controller` | Endpoint metadata can require governance policy, liability handshake, capability grant, and audit emission. |
+| Endpoint governance ergonomics | `/sample/ergonomic/minimal` and `/sample/ergonomic/controller` | Endpoint metadata can require governance policy, acknowledgment, capability grant, and audit emission. |
 
 ## Architecture
 
@@ -151,7 +151,7 @@ Those endpoints demonstrate the ASP.NET Core integration shape:
 
 ```csharp
 .MarkGovernancePolicy<SampleEndpointPolicy>()
-.RequireLiabilityHandshake()
+.RequireAcknowledgment()
 .RequireCapabilityGrant("sample.high-risk.execute")
 .EmitGovernanceAudit();
 ```
@@ -160,14 +160,14 @@ The controller version uses the equivalent attributes:
 
 ```csharp
 [GovernancePolicy(typeof(SampleEndpointPolicy))]
-[RequireLiabilityHandshake]
+[RequireAcknowledgment]
 [RequireCapabilityGrant("sample.high-risk.execute")]
 [EmitGovernanceAudit]
 ```
 
 These paths are useful as evidence that endpoint metadata can carry governance requirements into middleware, but the sample still keeps execution host-owned. The endpoint body returns only after endpoint-governance metadata has been evaluated by the ASP.NET Core integration path.
 
-The sample also exposes `POST /sample/acknowledgments/challenges` and `POST /sample/acknowledgments/responses` to demonstrate a complete host-owned acknowledgment round trip. The first endpoint creates and temporarily stores a challenge; the second retrieves it and calls `IAcknowledgmentChallengeService.HandleResponse`. This illustrative in-memory workflow is separate from `RequireLiabilityHandshake` metadata: the middleware returns `428 Precondition Required` when acknowledgment is required, while the host remains responsible for accepting the response, retaining protected challenge state, revalidating authority and current policy, and deciding whether execution may proceed.
+The sample also exposes `POST /sample/acknowledgments/challenges` and `POST /sample/acknowledgments/responses` to demonstrate a complete host-owned acknowledgment round trip. The first endpoint creates and temporarily stores a challenge; the second retrieves it and calls `IAcknowledgmentChallengeService.HandleResponse`. This illustrative in-memory workflow is separate from `RequireAcknowledgment` metadata: the middleware returns `428 Precondition Required` when acknowledgment is required, while the host remains responsible for accepting the response, retaining protected challenge state, revalidating authority and current policy, and deciding whether execution may proceed.
 
 ## What this reference deployment does not claim
 

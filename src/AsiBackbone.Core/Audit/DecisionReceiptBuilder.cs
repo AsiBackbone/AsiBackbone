@@ -25,7 +25,7 @@ public sealed class DecisionReceiptBuilder
     private string? traceId;
     private string? policyVersion;
     private string? policyHash;
-    private string? auditResidueId;
+    private string? decisionReceiptId;
     private string? spanId;
     private string? parentSpanId;
     private long? decisionLatencyMs;
@@ -213,9 +213,9 @@ public sealed class DecisionReceiptBuilder
     /// <summary>
     /// Sets the stable decision receipt identifier.
     /// </summary>
-    public DecisionReceiptBuilder WithAuditResidueId(string? value)
+    public DecisionReceiptBuilder WithDecisionReceiptId(string? value)
     {
-        auditResidueId = value;
+        decisionReceiptId = value;
         return this;
     }
 
@@ -371,7 +371,7 @@ public sealed class DecisionReceiptBuilder
             policyVersion,
             policyHash,
             metadata,
-            auditResidueId,
+            decisionReceiptId,
             spanId,
             parentSpanId,
             decisionLatencyMs,

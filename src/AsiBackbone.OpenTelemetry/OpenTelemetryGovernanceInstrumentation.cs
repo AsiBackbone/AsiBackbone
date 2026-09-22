@@ -68,7 +68,7 @@ public static class OpenTelemetryGovernanceInstrumentation
     /// <summary>
     /// Gets the audit-residue created event name.
     /// </summary>
-    public const string AuditResidueCreatedEventName = "asibackbone.audit_residue.created";
+    public const string DecisionReceiptCreatedEventName = "asibackbone.audit_residue.created";
 
     /// <summary>
     /// Gets the audit lifecycle recorded event name.

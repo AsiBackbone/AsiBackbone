@@ -212,7 +212,7 @@ public sealed class EfCoreAuditLedgerStore : IGovernanceAuditLedgerStore
             RecordId = record.RecordId,
             SchemaVersion = record.SchemaVersion,
             EventId = record.EventId,
-            AuditResidueId = record.AuditResidueId,
+            DecisionReceiptId = record.DecisionReceiptId,
             OccurredUtc = record.OccurredUtc,
             RecordedUtc = record.RecordedUtc,
             ActorId = record.ActorId,
@@ -291,9 +291,9 @@ public sealed class EfCoreAuditLedgerStore : IGovernanceAuditLedgerStore
         string[] reasonCodes = DeserializeReasonCodes(entity.ReasonCodesJson);
         ReadOnlyDictionary<string, string> metadata = DeserializeMetadata(entity.MetadataJson);
 
-        var residue = new EntityAuditResidue(
+        var residue = new EntityDecisionReceipt(
             entity.EventId,
-            entity.AuditResidueId,
+            entity.DecisionReceiptId,
             entity.SchemaVersion,
             entity.OccurredUtc,
             entity.ActorId,
@@ -362,9 +362,9 @@ public sealed class EfCoreAuditLedgerStore : IGovernanceAuditLedgerStore
             : new ReadOnlyDictionary<string, string>(new Dictionary<string, string>(metadata, StringComparer.Ordinal));
     }
 
-    private sealed class EntityAuditResidue(
+    private sealed class EntityDecisionReceipt(
         string eventId,
-        string? auditResidueId,
+        string? decisionReceiptId,
         string schemaVersion,
         DateTimeOffset occurredUtc,
         string actorId,
@@ -395,7 +395,7 @@ public sealed class EfCoreAuditLedgerStore : IGovernanceAuditLedgerStore
     {
         public string EventId { get; } = eventId;
 
-        public string? AuditResidueId { get; } = auditResidueId;
+        public string? DecisionReceiptId { get; } = decisionReceiptId;
 
         public string SchemaVersion { get; } = schemaVersion;
 

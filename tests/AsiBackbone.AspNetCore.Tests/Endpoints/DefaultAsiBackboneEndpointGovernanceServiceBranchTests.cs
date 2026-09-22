@@ -133,7 +133,7 @@ public sealed class DefaultAsiBackboneEndpointGovernanceServiceBranchTests
         Endpoint endpoint = CreateEndpoint(
             "policy.acknowledgment",
             new GovernancePolicyAttribute(typeof(SamplePolicy)),
-            new RequireLiabilityHandshakeAttribute());
+            new RequireAcknowledgmentAttribute());
         var descriptor =
             EndpointGovernanceDescriptor.FromEndpoint(endpoint);
         IEndpointGovernanceService service = scope.ServiceProvider
@@ -273,7 +273,7 @@ public sealed class DefaultAsiBackboneEndpointGovernanceServiceBranchTests
     }
 
     /// <summary>
-    /// Verifies requested audit emission fails closed when no audit sink is registered.
+    /// Verifies requested audit emission fails closed when no decision receipt sink is registered.
     /// </summary>
     [Fact]
     public async Task EvaluateAsyncFailsClosedWhenAuditSinkIsMissing()

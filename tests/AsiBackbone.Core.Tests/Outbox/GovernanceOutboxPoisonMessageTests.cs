@@ -189,12 +189,12 @@ public sealed class GovernanceOutboxPoisonMessageTests
     private static GovernanceEmissionEnvelope CreateEnvelope(string suffix)
     {
         return GovernanceEmissionEnvelope.Create(
-            GovernanceEmissionEventType.AuditResidue,
+            GovernanceEmissionEventType.DecisionReceipt,
             eventId: $"event-{suffix}",
             occurredUtc: new DateTimeOffset(2026, 7, 9, 11, 0, 0, TimeSpan.Zero),
             envelopeId: $"envelope-{suffix}",
             correlationId: $"correlation-{suffix}",
-            auditResidueId: $"residue-{suffix}",
+            decisionReceiptId: $"residue-{suffix}",
             traceId: $"trace-{suffix}",
             operationName: "governance.emit",
             emitterStatus: "pending",

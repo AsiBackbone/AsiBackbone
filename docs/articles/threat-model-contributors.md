@@ -158,7 +158,7 @@ These examples are illustrative. Hosts should define exact thresholds and outcom
 | Missing required metadata such as operation name, region, tenant, or correlation key | `InputMalformed` | `Denied` or `Deferred` | Missing shape should not become execution by default. |
 | Payload exceeds host-defined size or field-count budget | `InputOversized` | `Denied` | Size/shape guardrails protect policy evaluation and audit storage from unbounded input. |
 | Nonce missing, expired, or reused | `ReplayAttempt` | `Denied` or `EscalationRecommended` | Replay uncertainty should create a traceable stop or review path. |
-| Capability token does not match operation, subject, scope, region, or expiry | `CapabilityTokenMismatch` | `Denied` | Least-privilege boundaries should fail closed. |
+| Capability grant does not match operation, subject, scope, region, or expiry | `CapabilityTokenMismatch` | `Denied` | Least-privilege boundaries should fail closed. |
 | Request attempts to route around declared policy or endpoint governance metadata | `PolicyBypassAttempt` | `EscalationRecommended` or `Denied` | Bypass indicators should be visible to operators. |
 | Prompt-injection-like text appears in a tool or agent command request | `PromptInjectionLikeInput` | `AcknowledgmentRequired`, `EscalationRecommended`, or `Denied` | The host decides whether review, acknowledgment, or denial is appropriate for the action class. |
 | Region-specific rule cannot be resolved or conflicts with the requested action | `RegionPolicyMismatch` | `Deferred` or `EscalationRecommended` | Deferral is useful when another resolver or policy version may be needed. |

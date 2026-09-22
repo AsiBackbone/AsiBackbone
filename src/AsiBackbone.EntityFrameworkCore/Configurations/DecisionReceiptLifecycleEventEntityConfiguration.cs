@@ -52,7 +52,7 @@ public sealed class DecisionReceiptLifecycleEventEntityConfiguration
             .IsRequired()
             .HasMaxLength(IdentifierMaxLength);
 
-        _ = builder.Property(lifecycleEvent => lifecycleEvent.AuditResidueId)
+        _ = builder.Property(lifecycleEvent => lifecycleEvent.DecisionReceiptId)
             .HasMaxLength(IdentifierMaxLength);
 
         _ = builder.Property(lifecycleEvent => lifecycleEvent.TraceId)
@@ -78,7 +78,7 @@ public sealed class DecisionReceiptLifecycleEventEntityConfiguration
 
         _ = builder.HasIndex(lifecycleEvent => lifecycleEvent.CorrelationId);
 
-        _ = builder.HasIndex(lifecycleEvent => lifecycleEvent.AuditResidueId);
+        _ = builder.HasIndex(lifecycleEvent => lifecycleEvent.DecisionReceiptId);
 
         _ = builder.HasIndex(lifecycleEvent => lifecycleEvent.TraceId);
 
@@ -94,7 +94,7 @@ public sealed class DecisionReceiptLifecycleEventEntityConfiguration
 
         _ = builder.HasIndex(lifecycleEvent => new
         {
-            lifecycleEvent.AuditResidueId,
+            lifecycleEvent.DecisionReceiptId,
             lifecycleEvent.OccurredUtc
         });
     }

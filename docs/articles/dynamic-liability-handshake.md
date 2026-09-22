@@ -1,6 +1,6 @@
 # Acknowledgment Workflow
 
-The broader **Dynamic Liability Handshake** idea is taught in Learning through [Acknowledgment and Audit Residue](https://asibackbone.github.io/Learning/tutorials/acknowledgment-and-audit-residue.html) and the [Intent to Execution accountability pattern](https://asibackbone.github.io/Learning/architecture/intent-to-execution-accountability-pattern.html).
+The broader **Acknowledgment Workflow** idea is taught in Learning through [Acknowledgment and Audit Residue](https://asibackbone.github.io/Learning/tutorials/acknowledgment-and-audit-residue.html) and the [Intent to Execution accountability pattern](https://asibackbone.github.io/Learning/architecture/intent-to-execution-accountability-pattern.html).
 
 This page is authoritative for the concrete AsiBackbone acknowledgment workflow.
 
@@ -9,7 +9,7 @@ This page is authoritative for the concrete AsiBackbone acknowledgment workflow.
 
 ## Implemented product role
 
-Core exposes grounded responsibility-handshake records including `LiabilityHandshakeRequest` and `LiabilityHandshakeAcknowledgment`.
+Core exposes grounded responsibility-handshake records including `AcknowledgmentRequest` and `AcknowledgmentResponse`.
 
 A typical product flow is:
 

@@ -149,7 +149,7 @@ public sealed class GovernanceOutboxEntryEntityConfiguration
         _ = builder.Property(outboxEntry => outboxEntry.EnvelopeCorrelationId)
             .HasMaxLength(IdentifierMaxLength);
 
-        _ = builder.Property(outboxEntry => outboxEntry.EnvelopeAuditResidueId)
+        _ = builder.Property(outboxEntry => outboxEntry.EnvelopeDecisionReceiptId)
             .HasMaxLength(IdentifierMaxLength);
 
         _ = builder.Property(outboxEntry => outboxEntry.EnvelopeLifecycleStage)

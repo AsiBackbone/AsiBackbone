@@ -36,7 +36,7 @@ public sealed class DecisionReceiptLifecycleEventEntity : GovernanceEntity
     /// <summary>
     /// Gets or sets the related decision receipt identifier, when available.
     /// </summary>
-    public string? AuditResidueId { get; set; }
+    public string? DecisionReceiptId { get; set; }
 
     /// <summary>
     /// Gets or sets the trace identifier associated with the lifecycle event, when available.

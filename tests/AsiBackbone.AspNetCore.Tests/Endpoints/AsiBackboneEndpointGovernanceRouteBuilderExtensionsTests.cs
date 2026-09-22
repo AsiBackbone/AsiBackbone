@@ -62,14 +62,14 @@ public sealed class AsiBackboneEndpointGovernanceRouteBuilderExtensionsTests
     }
 
     /// <summary>
-    /// Tests that the <c>EndpointGovernanceRouteBuilderExtensions.RequireLiabilityHandshake(IEndpointConventionBuilder)</c> method adds the correct metadata to the endpoint and returns the same <see cref="IEndpointConventionBuilder"/> instance.
+    /// Tests that the <c>EndpointGovernanceRouteBuilderExtensions.RequireAcknowledgment(IEndpointConventionBuilder)</c> method adds the correct metadata to the endpoint and returns the same <see cref="IEndpointConventionBuilder"/> instance.
     /// </summary>
     [Fact]
-    public void RequireLiabilityHandshake_AddsMetadataAndReturnsSameBuilder()
+    public void RequireAcknowledgment_AddsMetadataAndReturnsSameBuilder()
     {
         var builder = new CapturingEndpointConventionBuilder();
 
-        CapturingEndpointConventionBuilder returned = builder.RequireLiabilityHandshake();
+        CapturingEndpointConventionBuilder returned = builder.RequireAcknowledgment();
 
         Assert.Same(builder, returned);
 
@@ -77,7 +77,7 @@ public sealed class AsiBackboneEndpointGovernanceRouteBuilderExtensionsTests
         Action<EndpointBuilder> convention = Assert.Single(builder.Conventions);
         convention(endpointBuilder);
 
-        _ = Assert.Single(endpointBuilder.Metadata.OfType<RequireLiabilityHandshakeAttribute>());
+        _ = Assert.Single(endpointBuilder.Metadata.OfType<RequireAcknowledgmentAttribute>());
     }
 
     /// <summary>
@@ -136,7 +136,7 @@ public sealed class AsiBackboneEndpointGovernanceRouteBuilderExtensionsTests
     }
 
     /// <summary>
-    /// Tests that the <c>EndpointGovernanceRouteBuilderExtensions.RequireLiabilityHandshake(IEndpointConventionBuilder)</c> method throws an <see cref="ArgumentNullException"/> when the builder is null.
+    /// Tests that the <c>EndpointGovernanceRouteBuilderExtensions.RequireAcknowledgment(IEndpointConventionBuilder)</c> method throws an <see cref="ArgumentNullException"/> when the builder is null.
     /// </summary>
     [Fact]
     public void MetadataExtensions_ThrowWhenBuilderIsNull()
@@ -144,7 +144,7 @@ public sealed class AsiBackboneEndpointGovernanceRouteBuilderExtensionsTests
         CapturingEndpointConventionBuilder? builder = null;
 
         ArgumentNullException exception = Assert.Throws<ArgumentNullException>(
-            () => builder!.RequireLiabilityHandshake());
+            () => builder!.RequireAcknowledgment());
 
         Assert.Equal("builder", exception.ParamName);
     }

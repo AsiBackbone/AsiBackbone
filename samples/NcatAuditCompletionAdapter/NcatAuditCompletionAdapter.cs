@@ -239,7 +239,7 @@ public sealed class NcatAuditCompletionAdapter
     {
         if (existing.Stage != candidate.Stage ||
             !string.Equals(existing.CorrelationId, candidate.CorrelationId, StringComparison.Ordinal) ||
-            !string.Equals(existing.AuditResidueId, candidate.AuditResidueId, StringComparison.Ordinal) ||
+            !string.Equals(existing.DecisionReceiptId, candidate.DecisionReceiptId, StringComparison.Ordinal) ||
             !string.Equals(existing.TraceId, candidate.TraceId, StringComparison.Ordinal) ||
             !string.Equals(existing.OperationName, candidate.OperationName, StringComparison.Ordinal) ||
             !string.Equals(existing.Outcome, candidate.Outcome, StringComparison.Ordinal))

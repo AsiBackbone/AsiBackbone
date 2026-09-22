@@ -53,10 +53,10 @@ public sealed class ShortCircuitOnFirstDenialAttribute(bool enabled = true) : At
 /// Marks an ASP.NET Core endpoint as requiring liability-handshake support when a governance decision requires acknowledgment.
 /// </summary>
 [AttributeUsage(AttributeTargets.Class | AttributeTargets.Method, AllowMultiple = false, Inherited = true)]
-public sealed class RequireLiabilityHandshakeAttribute : Attribute, IEndpointLiabilityHandshakeMetadata
+public sealed class RequireAcknowledgmentAttribute : Attribute, IEndpointAcknowledgmentMetadata
 {
     /// <inheritdoc />
-    public bool RequiresLiabilityHandshake => true;
+    public bool RequiresAcknowledgment => true;
 }
 
 /// <summary>

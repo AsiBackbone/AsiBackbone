@@ -129,7 +129,7 @@ Attribute names should be stable, lowercase, dotted, and namespaced. Use `asibac
 | Attribute | Source field | Guidance |
 | --- | --- | --- |
 | `asibackbone.correlation_id` | `CorrelationId` | Opaque host workflow join key. |
-| `asibackbone.audit_residue_id` | `AuditResidueId` | Opaque decision receipt identifier. |
+| `asibackbone.audit_residue_id` | `DecisionReceiptId` | Opaque decision receipt identifier. |
 | `asibackbone.event_id` | `EventId` | Opaque governance event identifier. |
 | `asibackbone.envelope_id` | `EnvelopeId` | Opaque emission envelope identifier. |
 | `asibackbone.schema_version` | `SchemaVersion` | Safe schema identity. |
@@ -239,7 +239,7 @@ The provider should normalize unexpected failures into `GovernanceEmissionError`
 
 The provider must not put these values into OpenTelemetry attributes, events, logs, metrics, baggage, or resource attributes:
 
-* raw capability tokens;
+* raw capability grants;
 * secrets, connection strings, API keys, credentials, or signing keys;
 * raw prompts, documents, request bodies, protected records, payload bodies, or user-submitted content;
 * raw personal data unless a host explicitly opts into that behavior;

@@ -52,7 +52,7 @@ sequenceDiagram
     participant Backbone as AsiBackbone evaluator
     participant Gateway as Operational gateway
     participant Edge as Edge or robot layer
-    participant Audit as Audit sink or ledger
+    participant Audit as Decision receipt sink or ledger
 
     Global->>Regional: Propose goal only
     Regional->>Regional: Apply local laws and operating constraints

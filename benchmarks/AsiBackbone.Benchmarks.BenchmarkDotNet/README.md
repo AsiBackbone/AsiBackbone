@@ -32,7 +32,7 @@ Policy evaluation scenarios:
 dotnet run -c Release --project benchmarks/AsiBackbone.Benchmarks.BenchmarkDotNet -- --filter "*Policy*"
 ```
 
-Audit residue scenario:
+Decision receipt scenario:
 
 ```powershell
 dotnet run -c Release --project benchmarks/AsiBackbone.Benchmarks.BenchmarkDotNet -- --filter "*DecisionReceipt*"
@@ -63,7 +63,7 @@ The current BenchmarkDotNet baseline covers:
 
 Use BenchmarkDotNet output for trend comparison on the same machine, runtime, build configuration, and repository revision. Prefer repeated runs or median-focused review before making optimization decisions.
 
-### Audit residue metadata allocation shape
+### Decision receipt metadata allocation shape
 
 The `audit_residue.builder_no_metadata`, `audit_residue.builder_one_metadata`, and `audit_residue.builder_many_metadata` scenarios intentionally exercise the fluent `DecisionReceiptBuilder` metadata path. The builder keeps its metadata storage lazy: the no-metadata path leaves the internal metadata dictionary unset, while the first metadata entry creates the builder dictionary. `Build()` then passes that metadata to `DecisionReceipt.Create`, where metadata is normalized, copied into a new ordinal dictionary, and wrapped as read-only residue metadata so the built value remains immutable and detached from later source or builder mutations.
 

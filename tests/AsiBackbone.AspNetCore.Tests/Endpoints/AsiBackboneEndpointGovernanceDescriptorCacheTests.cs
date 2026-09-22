@@ -19,7 +19,7 @@ public sealed class AsiBackboneEndpointGovernanceDescriptorCacheTests
             static _ => Task.CompletedTask,
             new EndpointMetadataCollection(
                 new GovernancePolicyAttribute(typeof(SamplePolicy)),
-                new RequireLiabilityHandshakeAttribute(),
+                new RequireAcknowledgmentAttribute(),
                 new RequireCapabilityGrantAttribute("robotics.execute"),
                 new EmitGovernanceAuditAttribute()),
             "sample.robotics.execute");

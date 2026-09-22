@@ -83,7 +83,7 @@ internal static class EfCoreGovernanceOutboxTestHost
             createdUtc: new DateTimeOffset(2026, 7, 12, 11, 0, 1, TimeSpan.Zero),
             schemaVersion: "1.0.0",
             correlationId: $"correlation-{eventId}",
-            auditResidueId: $"audit-{eventId}",
+            decisionReceiptId: $"audit-{eventId}",
             lifecycleStage: DecisionReceiptLifecycleStage.ExternalEmissionQueued,
             policyVersion: "2026.07",
             policyHash: "policy-hash-issue-578",

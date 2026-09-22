@@ -50,7 +50,7 @@ public sealed class ApplicationDbContext : DbContext
     public DbSet<GovernanceOutboxEntryEntity> AsiBackboneGovernanceOutboxEntries =>
         Set<GovernanceOutboxEntryEntity>();
 
-    public DbSet<DecisionReceiptLifecycleEventEntity> AsiBackboneAuditResidueLifecycleEvents =>
+    public DbSet<DecisionReceiptLifecycleEventEntity> AsiBackboneDecisionReceiptLifecycleEvents =>
         Set<DecisionReceiptLifecycleEventEntity>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -144,11 +144,11 @@ The EF Core adapter now includes durable local storage for provider-neutral outb
 The host migration generated from `ApplyAsiBackboneConfigurations()` should include, among the existing audit ledger and handshake tables:
 
 - `AsiBackboneGovernanceOutboxEntries`
-- `AsiBackboneAuditResidueLifecycleEvents`
+- `AsiBackboneDecisionReceiptLifecycleEvents`
 
 `AsiBackboneGovernanceOutboxEntries` stores the minimized governance emission envelope plus operational delivery state, including status, retry count, max retry count, next retry UTC, delivered UTC, provider name, provider record ID, last provider-neutral error fields, dead-letter reason, and safe metadata JSON.
 
-`AsiBackboneAuditResidueLifecycleEvents` stores append-oriented lifecycle progress such as decision evaluated, external emission queued, delivered, failed, or dead-lettered. These rows let hosts correlate the local outbox with original decision receipt without rewriting the original decision receipt.
+`AsiBackboneDecisionReceiptLifecycleEvents` stores append-oriented lifecycle progress such as decision evaluated, external emission queued, delivered, failed, or dead-lettered. These rows let hosts correlate the local outbox with original decision receipt without rewriting the original decision receipt.
 
 ## Durable outbox and downstream providers
 

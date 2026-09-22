@@ -11,11 +11,12 @@ This project follows the spirit of [Keep a Changelog](https://keepachangelog.com
 ### Release summary
 
 `7.0.0` is a major release for the AsiBackbone package family. It carries two
-security corrections that change stable contracts, so both require a major
-boundary rather than a `6.x` release.
+security corrections that change stable contracts, completes the 6.0 naming
+work by renaming the compatibility names that 6.0 retained, and renames five
+Entity Framework Core columns to match.
 
-The first binds liability handshake acknowledgments to the actor the challenge
-was issued to. The second moves the DLP classification enums off their
+The first security correction binds acknowledgment responses to the actor the
+challenge was issued to. The second moves the DLP classification enums off their
 permissive zero values, which changes the numeric value of every existing member
 of `DlpFailureBehavior` and `DlpIntentRiskLevel`. Under the repository's
 [API compatibility and SemVer contract](docs/articles/api-compatibility-and-semver.md),
@@ -24,19 +25,32 @@ an enum value change affects a stable package contract and cannot ship on the
 would otherwise load a library that reinterprets its inlined constants without
 any change in assembly identity.
 
-Package IDs, public namespaces, and the `net10.0` target remain unchanged.
-`AssemblyVersion` advances to `7.0.0.0`; package and file versions advance to
-`7.0.0` and `7.0.0.0` respectively.
+The `AuditResidue*`, `LiabilityHandshake*`, `Handshake*`, and `CapabilityToken*`
+names that 6.0 kept for compatibility are renamed to the decision receipt,
+acknowledgment, and capability grant vocabulary, and the `Handshakes` and
+`CapabilityTokens` namespaces become `Acknowledgments` and `CapabilityGrants`.
+No `[Obsolete]` forwarding aliases are provided. Signed and telemetry contracts
+keep their 6.x values: canonical artifact tags, signed payload bytes,
+OpenTelemetry event and attribute names, EF Core table names, reason codes,
+diagnostic IDs, and the `AddAsiBackbone*` registration methods are unchanged.
+JSON produced by serializing the renamed types uses the new property names, so
+`auditResidueId` becomes `decisionReceiptId`.
+
+Package IDs and the `net10.0` target remain unchanged. `AssemblyVersion`
+advances to `7.0.0.0`; package and file versions advance to `7.0.0` and
+`7.0.0.0` respectively.
 
 Consumers moving from `6.x` must follow the
-[6.x to 7.0 migration guide](docs/articles/upgrade-600-to-700.md).
+[6.x to 7.0 migration guide](docs/articles/upgrade-600-to-700.md). Hosts that
+use `AsiBackbone.EntityFrameworkCore` must add and review a database migration,
+and hosts that store or parse decision receipt JSON must update for the new key.
 
 ### Security
 
 * **Breaking (behavior):** `IAcknowledgmentChallengeService.HandleResponse` now binds the acknowledgment response to the
   challenged actor. The `actor` argument must match the `ActorId` and `ActorType` recorded by `CreateChallenge`, otherwise
   the response fails with the new `acknowledgment.challenge.actor_mismatch` reason code and no
-  `LiabilityHandshakeAcknowledgment` is produced. Previously the response was validated only against the handshake
+  `AcknowledgmentResponse` is produced. Previously the response was validated only against the handshake
   identifier and the required acknowledgment code, so any actor that could name an active challenge could satisfy it and
   the resulting acknowledgment attributed the liability to whoever answered rather than to whoever was challenged. Hosts
   that resolve the current actor per request must resolve the same principal on both legs of the round trip. This does not
@@ -57,6 +71,37 @@ Consumers moving from `6.x` must follow the
   `VersionPrefix` moves to `7.0.0`. The package validation baseline stays at `5.1.0`, so the intentional breaks in this
   release are recorded as exact suppressions in the package compatibility suppression files rather than by disabling
   validation.
+* **Breaking (source and binary):** Renamed the compatibility names that 6.0 retained. The namespaces
+  `AsiBackbone.Core.Handshakes`, `AsiBackbone.AspNetCore.Handshakes`, `AsiBackbone.Core.CapabilityTokens`, and
+  `AsiBackbone.Storage.InMemory.CapabilityTokens` become `.Acknowledgments` and `.CapabilityGrants`.
+  `LiabilityHandshakeRequest`, `LiabilityHandshakeAcknowledgment`, and `LiabilityHandshakeRiskLevel` become
+  `AcknowledgmentRequest`, `AcknowledgmentResponse`, and `AcknowledgmentRiskLevel`; `RequireLiabilityHandshakeAttribute`
+  and `IEndpointLiabilityHandshakeMetadata` become `RequireAcknowledgmentAttribute` and `IEndpointAcknowledgmentMetadata`;
+  `CapabilityTokenGrant` and `CapabilityTokenValidationCategory` become `CapabilityGrant` and
+  `CapabilityGrantValidationCategory`; and the `Handshake*Entity` persistence types become `AcknowledgmentRequest*Entity`
+  and `AcknowledgmentResponse*Entity`. Members and constants named `AuditResidue*`, including `AuditResidueId`,
+  `WithAuditResidueId`, `FindByAuditResidueIdAsync`, `CanonicalArtifactTypes.AuditResidue`,
+  `GovernanceEmissionEventType.AuditResidue`, and `AuditResidueCreatedEventName`, become `DecisionReceipt*`. The 6.0
+  naming record planned these for deprecation in `6.x` and removal at the next major version; they are renamed directly
+  with no forwarding aliases. `GovernanceEmissionEventType.DecisionReceipt` keeps the numeric value `500`. The complete
+  inventory is in the [6.x to 7.0 migration guide](docs/articles/upgrade-600-to-700.md#legacy-compatibility-names-are-renamed).
+* **Breaking (persisted schema):** Renamed five Entity Framework Core columns to match the renamed properties:
+  `AuditResidueId` becomes `DecisionReceiptId` in `AsiBackboneAuditLedgerRecords` and
+  `AsiBackboneAuditResidueLifecycleEvents`, `EnvelopeAuditResidueId` becomes `EnvelopeDecisionReceiptId` in
+  `AsiBackboneGovernanceOutboxEntries`, `HandshakeRequestId` becomes `AcknowledgmentRequestId` in
+  `AsiBackboneHandshakeRequestMetadata`, and `HandshakeAcknowledgmentId` becomes `AcknowledgmentResponseId` in
+  `AsiBackboneHandshakeAcknowledgmentMetadata`. The dependent indexes and foreign keys are renamed with them; table names
+  are unchanged. Hosts must add a migration and confirm it renames these columns rather than dropping and re-adding them,
+  which would delete existing data. The
+  [reference migration](docs/articles/upgrade-600-to-700.md#ef-core-schema-changes-migration-required) lists every
+  operation.
+* **Breaking (serialized):** JSON produced by serializing `DecisionReceipt`, `AuditLedgerRecord`, or
+  `GovernanceEmissionEnvelope` with `System.Text.Json` now uses `decisionReceiptId` where 6.x used `auditResidueId`
+  (`DecisionReceiptId` and `AuditResidueId` with default serializer options), because the property is renamed.
+  Canonical signed payloads use explicit key names and are unaffected. Stored 6.x JSON deserialized into a 7.0 type
+  leaves `DecisionReceiptId` `null`, because unrecognized members are ignored by default, so consumers must migrate or
+  translate stored documents and update queries that read the old key. See the
+  [migration guide](docs/articles/upgrade-600-to-700.md#decision-receipt-json-uses-decisionreceiptid).
 * **Breaking (binary):** `GovernanceOutboxDrain` and `GovernanceOutboxDrainHostedService` each take an optional trailing
   `TimeProvider? timeProvider = null` constructor parameter. Source that constructs them is unaffected; assemblies
   compiled against `6.0.0` must be rebuilt, which `7.0.0` already requires. Each type keeps a single constructor so

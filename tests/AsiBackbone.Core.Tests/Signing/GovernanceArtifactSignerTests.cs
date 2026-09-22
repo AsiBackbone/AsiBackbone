@@ -155,7 +155,7 @@ public sealed class GovernanceArtifactSignerTests
             correlationId: "correlation-1",
             policyVersion: "policy-v1",
             policyHash: "policy-hash",
-            auditResidueId: "residue-1");
+            decisionReceiptId: "residue-1");
 
         return AuditLedgerRecord.FromDecisionReceipt(
             residue,
@@ -175,13 +175,13 @@ public sealed class GovernanceArtifactSignerTests
             contentHash: "payload-hash",
             sizeBytes: 128);
         var envelope = GovernanceEmissionEnvelope.Create(
-            GovernanceEmissionEventType.AuditResidue,
+            GovernanceEmissionEventType.DecisionReceipt,
             eventId: "event-1",
             occurredUtc: new DateTimeOffset(2026, 6, 16, 12, 0, 0, TimeSpan.Zero),
             envelopeId: "envelope-1",
             createdUtc: new DateTimeOffset(2026, 6, 16, 12, 0, 1, TimeSpan.Zero),
             correlationId: "correlation-1",
-            auditResidueId: "residue-1",
+            decisionReceiptId: "residue-1",
             policyVersion: "policy-v1",
             policyHash: "policy-hash",
             payload: payload);

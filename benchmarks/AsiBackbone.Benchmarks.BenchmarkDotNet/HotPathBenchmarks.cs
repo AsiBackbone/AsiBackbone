@@ -394,11 +394,11 @@ public class AsiBackboneHotPathBenchmarks
     public int OutboxDrainScopedMediumBatch100() => scopedOutbox100.Drain(BenchmarkDrainUtc);
 
     /// <summary>
-    /// Benchmarks creating an audit residue directly from a governance decision and metadata.
+    /// Benchmarks creating an decision receipt directly from a governance decision and metadata.
     /// </summary>
     /// <returns>An integer checksum representing the policy evaluation outcome, used for validation in benchmarks.</returns>
     [Benchmark(Description = "audit_residue.from_decision")]
-    public int AuditResidueFromDecision()
+    public int DecisionReceiptFromDecision()
     {
         var residue = DecisionReceipt.FromDecision(
             actor,
@@ -418,11 +418,11 @@ public class AsiBackboneHotPathBenchmarks
     }
 
     /// <summary>
-    /// Benchmarks creating an audit residue through the builder without metadata.
+    /// Benchmarks creating an decision receipt through the builder without metadata.
     /// </summary>
     /// <returns>An integer checksum representing the policy evaluation outcome, used for validation in benchmarks.</returns>
     [Benchmark(Description = "audit_residue.builder_no_metadata")]
-    public int AuditResidueBuilderNoMetadata()
+    public int DecisionReceiptBuilderNoMetadata()
     {
         DecisionReceipt residue = DecisionReceiptBuilder.Create(actor, "benchmark.operation", "Allowed")
             .WithEventId("benchmark-builder-no-metadata")
@@ -437,11 +437,11 @@ public class AsiBackboneHotPathBenchmarks
     }
 
     /// <summary>
-    /// Benchmarks creating an audit residue through the builder with one metadata entry.
+    /// Benchmarks creating an decision receipt through the builder with one metadata entry.
     /// </summary>
     /// <returns>An integer checksum representing the policy evaluation outcome, used for validation in benchmarks.</returns>
     [Benchmark(Description = "audit_residue.builder_one_metadata")]
-    public int AuditResidueBuilderOneMetadata()
+    public int DecisionReceiptBuilderOneMetadata()
     {
         DecisionReceipt residue = DecisionReceiptBuilder.Create(actor, "benchmark.operation", "Allowed")
             .WithEventId("benchmark-builder-one-metadata")
@@ -457,11 +457,11 @@ public class AsiBackboneHotPathBenchmarks
     }
 
     /// <summary>
-    /// Benchmarks creating an audit residue through the builder with multiple metadata entries.
+    /// Benchmarks creating an decision receipt through the builder with multiple metadata entries.
     /// </summary>
     /// <returns>An integer checksum representing the policy evaluation outcome, used for validation in benchmarks.</returns>
     [Benchmark(Description = "audit_residue.builder_many_metadata")]
-    public int AuditResidueBuilderManyMetadata()
+    public int DecisionReceiptBuilderManyMetadata()
     {
         DecisionReceipt residue = DecisionReceiptBuilder.Create(actor, "benchmark.operation", "Allowed")
             .WithEventId("benchmark-builder-many-metadata")
@@ -532,7 +532,7 @@ public class AsiBackboneHotPathBenchmarks
             occurredUtc: new DateTimeOffset(2026, 6, 30, 17, 59, 0, TimeSpan.Zero),
             envelopeId: $"envelope-{suffix}",
             correlationId: $"correlation-{suffix}",
-            auditResidueId: $"residue-{suffix}",
+            decisionReceiptId: $"residue-{suffix}",
             lifecycleStage: DecisionReceiptLifecycleStage.ExternalEmissionQueued,
             policyVersion: "benchmark-policy-v1",
             policyHash: "benchmark-policy-hash",

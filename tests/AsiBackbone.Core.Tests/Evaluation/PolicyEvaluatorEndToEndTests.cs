@@ -10,7 +10,7 @@ namespace AsiBackbone.Core.Tests.Evaluation;
 
 /// <summary>
 /// End-to-end proof that Core primitives compose without a database or web host:
-/// intent and context -> constraint evaluation -> governance decision -> audit residue.
+/// intent and context -> constraint evaluation -> governance decision -> decision receipt.
 /// </summary>
 public sealed class PolicyEvaluatorEndToEndTests
 {
@@ -45,7 +45,7 @@ public sealed class PolicyEvaluatorEndToEndTests
     }
 
     /// <summary>
-    /// Verifies that a denying constraint wins and reason codes flow through decision and audit residue.
+    /// Verifies that a denying constraint wins and reason codes flow through decision and decision receipt.
     /// </summary>
     [Fact]
     public async Task UnauthenticatedActorIsDeniedAndAudited()

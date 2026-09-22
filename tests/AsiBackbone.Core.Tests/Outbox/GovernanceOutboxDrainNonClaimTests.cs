@@ -196,12 +196,12 @@ public sealed class GovernanceOutboxDrainNonClaimTests
     private static GovernanceEmissionEnvelope CreateEnvelope(string eventId, string correlationId)
     {
         return GovernanceEmissionEnvelope.Create(
-            GovernanceEmissionEventType.AuditResidue,
+            GovernanceEmissionEventType.DecisionReceipt,
             eventId: eventId,
             occurredUtc: new DateTimeOffset(2026, 6, 15, 14, 0, 0, TimeSpan.Zero),
             envelopeId: $"envelope-{eventId}",
             correlationId: correlationId,
-            auditResidueId: $"residue-{eventId}",
+            decisionReceiptId: $"residue-{eventId}",
             traceId: $"trace-{eventId}",
             operationName: "governance.emit",
             emitterStatus: "pending",

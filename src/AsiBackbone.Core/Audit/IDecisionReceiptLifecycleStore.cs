@@ -29,7 +29,7 @@ public interface IDecisionReceiptLifecycleStore
     /// <summary>
     /// Finds lifecycle events by decision receipt identifier.
     /// </summary>
-    ValueTask<IReadOnlyList<DecisionReceiptLifecycleEvent>> FindByAuditResidueIdAsync(
-        string auditResidueId,
+    ValueTask<IReadOnlyList<DecisionReceiptLifecycleEvent>> FindByDecisionReceiptIdAsync(
+        string decisionReceiptId,
         CancellationToken cancellationToken = default);
 }

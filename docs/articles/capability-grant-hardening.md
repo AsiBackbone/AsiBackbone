@@ -9,7 +9,7 @@ AsiBackbone can model short-lived, scoped grants for governed execution, but it 
 
 ## Grant metadata
 
-`CapabilityTokenGrant` models the metadata a host can protect, persist, and validate:
+`CapabilityGrant` models the metadata a host can protect, persist, and validate:
 
 | Field | Purpose |
 | --- | --- |
@@ -28,10 +28,10 @@ The grant model is not a wire format. Hosts decide whether they serialize it as 
 
 ## Canonical payload for a signed grant
 
-Use `CanonicalPayloadBuilder.ForCapabilityTokenGrant` to build the payload a grant is signed over:
+Use `CanonicalPayloadBuilder.ForCapabilityGrant` to build the payload a grant is signed over:
 
 ```csharp
-CanonicalPayload payload = CanonicalPayloadBuilder.ForCapabilityTokenGrant(grant);
+CanonicalPayload payload = CanonicalPayloadBuilder.ForCapabilityGrant(grant);
 CanonicalPayloadHash hash = CanonicalPayloadHasher.ComputeHash(payload);
 ```
 
@@ -42,7 +42,7 @@ The builder covers every field the grant carries, so the hash binds the whole gr
 >
 > ```csharp
 > CanonicalPayloadOptions options = CanonicalPayloadOptions.Create(metadataKeyAllowList: ["region"]);
-> CanonicalPayload payload = CanonicalPayloadBuilder.ForCapabilityTokenGrant(grant, options);
+> CanonicalPayload payload = CanonicalPayloadBuilder.ForCapabilityGrant(grant, options);
 > ```
 >
 > Use the same options wherever the payload is rebuilt, or the hashes will not agree.
@@ -194,7 +194,7 @@ For high-risk workflows, use checks should be atomic at the host storage boundar
 The following sample intentionally isolates bounded-use behavior and does not represent the complete execution-boundary profile:
 
 ```csharp
-using AsiBackbone.Storage.InMemory.CapabilityTokens;
+using AsiBackbone.Storage.InMemory.CapabilityGrants;
 
 var useStore = new InMemoryCapabilityGrantUseStore();
 

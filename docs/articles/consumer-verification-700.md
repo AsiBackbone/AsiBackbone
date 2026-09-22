@@ -32,14 +32,18 @@ For `7.0.0`, verify:
 - package version: `7.0.0`;
 - assembly and file versions: `7.0.0.0`;
 - repository URL: `https://github.com/AsiBackbone/AsiBackbone`; and
-- package IDs and public namespaces remain in the `AsiBackbone.*` family.
+- package IDs and public namespaces remain in the `AsiBackbone.*` family,
+  with the `Handshakes` and `CapabilityTokens` namespaces renamed to
+  `Acknowledgments` and `CapabilityGrants`.
 
-`7.0.0` is a major release with intentional binary and behavior breaks. Follow
-the [Upgrade from 6.x to 7.0](upgrade-600-to-700.md) guide, rebuild every
-dependent assembly, and run the host's governance, acknowledgment, persistence,
-DLP, and endpoint tests as applicable.
+`7.0.0` is a major release with intentional source, binary, behavior, schema,
+and serialization breaks. Follow the
+[Upgrade from 6.x to 7.0](upgrade-600-to-700.md) guide, rebuild every dependent
+assembly, apply and verify the database migration, and run the host's
+governance, acknowledgment, persistence, serialization, DLP, and endpoint tests
+as applicable.
 
-## Check the behavior changes before adoption
+## Check the breaking changes before adoption
 
 - **Actor-bound acknowledgment:** the actor answering a challenge must have the
   same `ActorId` and `ActorType` as the actor that received it. Confirm actor
@@ -51,6 +55,21 @@ DLP, and endpoint tests as applicable.
   remain stable.
 - **Incomplete DLP policy:** unassigned risk levels and behaviors now raise
   `ArgumentOutOfRangeException` instead of inheriting permissive behavior.
+- **Renamed API surface:** the retained `AuditResidue*`, `LiabilityHandshake*`,
+  `Handshake*`, and `CapabilityToken*` types and members are renamed with no
+  forwarding aliases. Confirm the host compiles against the new names and that
+  no string, reflection, or configuration reference still names an old type.
+- **EF Core schema:** five columns are renamed. Confirm the host's migration
+  renames them rather than dropping and re-adding them, and that row counts in
+  the affected tables are unchanged after applying it to a copy of production
+  data.
+- **Decision receipt JSON:** serialized decision receipts, ledger records, and
+  emission envelopes use `decisionReceiptId` instead of `auditResidueId`.
+  Confirm that queries and consumers read the new key and that stored `6.x`
+  JSON is migrated or translated before it is deserialized.
+- **Unchanged signed contracts:** confirm that an artifact signed by a `6.x`
+  host verifies under `7.0.0`, and that artifact tags and OpenTelemetry names
+  seen by existing dashboards are unchanged.
 
 ## Verify Source Link repository metadata
 

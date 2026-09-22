@@ -167,17 +167,17 @@ public sealed class AsiBackboneDecisionContractDefensiveTests
     }
 
     /// <summary>
-    /// Verifies required string properties on audit residue are validated.
+    /// Verifies required string properties on decision receipt are validated.
     /// </summary>
     [Theory]
-    [InlineData(nameof(TestAuditResidue.EventId), "event ID")]
-    [InlineData(nameof(TestAuditResidue.ActorId), "actor ID")]
-    [InlineData(nameof(TestAuditResidue.OperationName), "operation name")]
-    [InlineData(nameof(TestAuditResidue.Outcome), "outcome")]
+    [InlineData(nameof(TestDecisionReceipt.EventId), "event ID")]
+    [InlineData(nameof(TestDecisionReceipt.ActorId), "actor ID")]
+    [InlineData(nameof(TestDecisionReceipt.OperationName), "operation name")]
+    [InlineData(nameof(TestDecisionReceipt.Outcome), "outcome")]
     public void VerifyDecisionReceiptRejectsMissingRequiredStrings(string propertyName, string expectedMessagePart)
     {
-        var residue = new TestAuditResidue();
-        typeof(TestAuditResidue).GetProperty(propertyName)!.SetValue(residue, " ");
+        var residue = new TestDecisionReceipt();
+        typeof(TestDecisionReceipt).GetProperty(propertyName)!.SetValue(residue, " ");
 
         GovernanceContractViolationException exception = Assert.Throws<GovernanceContractViolationException>(
             () => GovernanceDecisionContract.VerifyDecisionReceipt(residue));
@@ -186,12 +186,12 @@ public sealed class AsiBackboneDecisionContractDefensiveTests
     }
 
     /// <summary>
-    /// Verifies audit residue rejects null reason-code collection.
+    /// Verifies decision receipt rejects null reason-code collection.
     /// </summary>
     [Fact]
     public void VerifyDecisionReceiptRejectsNullReasonCodes()
     {
-        var residue = new TestAuditResidue { ReasonCodes = null! };
+        var residue = new TestDecisionReceipt { ReasonCodes = null! };
 
         GovernanceContractViolationException exception = Assert.Throws<GovernanceContractViolationException>(
             () => GovernanceDecisionContract.VerifyDecisionReceipt(residue));
@@ -200,12 +200,12 @@ public sealed class AsiBackboneDecisionContractDefensiveTests
     }
 
     /// <summary>
-    /// Verifies audit residue rejects blank reason codes.
+    /// Verifies decision receipt rejects blank reason codes.
     /// </summary>
     [Fact]
     public void VerifyDecisionReceiptRejectsBlankReasonCode()
     {
-        var residue = new TestAuditResidue { ReasonCodes = new[] { "contract.reason", " " } };
+        var residue = new TestDecisionReceipt { ReasonCodes = new[] { "contract.reason", " " } };
 
         GovernanceContractViolationException exception = Assert.Throws<GovernanceContractViolationException>(
             () => GovernanceDecisionContract.VerifyDecisionReceipt(residue));
@@ -214,12 +214,12 @@ public sealed class AsiBackboneDecisionContractDefensiveTests
     }
 
     /// <summary>
-    /// Verifies audit residue rejects null metadata collection.
+    /// Verifies decision receipt rejects null metadata collection.
     /// </summary>
     [Fact]
     public void VerifyDecisionReceiptRejectsNullMetadata()
     {
-        var residue = new TestAuditResidue { Metadata = null! };
+        var residue = new TestDecisionReceipt { Metadata = null! };
 
         GovernanceContractViolationException exception = Assert.Throws<GovernanceContractViolationException>(
             () => GovernanceDecisionContract.VerifyDecisionReceipt(residue));
@@ -233,7 +233,7 @@ public sealed class AsiBackboneDecisionContractDefensiveTests
     [Fact]
     public void VerifyDecisionReceiptReturnsOriginalValidResidue()
     {
-        var residue = new TestAuditResidue();
+        var residue = new TestDecisionReceipt();
 
         IDecisionReceipt verified = GovernanceDecisionContract.VerifyDecisionReceipt(receipt: residue);
 
@@ -261,7 +261,7 @@ public sealed class AsiBackboneDecisionContractDefensiveTests
         field.SetValue(target, value);
     }
 
-    private sealed class TestAuditResidue : IDecisionReceipt
+    private sealed class TestDecisionReceipt : IDecisionReceipt
     {
         public string EventId { get; set; } = "contract-event";
         public DateTimeOffset OccurredUtc { get; set; } = DateTimeOffset.UtcNow;

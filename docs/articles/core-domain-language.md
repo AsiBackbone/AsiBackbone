@@ -34,16 +34,16 @@ Core defines the governance primitives for this lane. It does not own the extern
 | --- | --- | --- |
 | Actor context | [`IGovernanceActorContext`](xref:AsiBackbone.Core.Actors.IGovernanceActorContext) | Framework-neutral actor data supplied by the host. Core does not authenticate the actor. |
 | Policy context | [`IGovernanceEvaluationContext`](xref:AsiBackbone.Core.Constraints.IGovernanceEvaluationContext), [`GovernanceEvaluationContext`](xref:AsiBackbone.Core.Constraints.GovernanceEvaluationContext) | Carries the decision-relevant input used by constraints and evaluation. |
-| Constraint | [`IAsiBackkboneConstraint<TContext>`](xref:AsiBackbone.Core.Constraints.IGovernanceConstraint`1) | Evaluates one policy condition without performing the governed side effect. |
+| Constraint | [`IGovernanceConstraint<TContext>`](xref:AsiBackbone.Core.Constraints.IGovernanceConstraint`1) | Evaluates one policy condition without performing the governed side effect. |
 | Constraint result | [`ConstraintEvaluationResult`](xref:AsiBackbone.Core.Constraints.ConstraintEvaluationResult) | Carries the constraint's product result/reasons into decision composition. |
 | Policy evaluation | [`IGovernancePolicyEvaluator<TContext>`](xref:AsiBackbone.Core.Evaluation.IGovernancePolicyEvaluator`1) | Composes constraint results into a governance decision. |
 | Decision policy | [`IGovernanceDecisionPolicy<TContext>`](xref:AsiBackbone.Core.Evaluation.IGovernanceDecisionPolicy`1) | Optional post-composition policy hook that can reshape or raise the final decision. |
 | Decision outcome | [`GovernanceDecision`](xref:AsiBackbone.Core.Decisions.GovernanceDecision), [`GovernanceDecisionOutcome`](xref:AsiBackbone.Core.Decisions.GovernanceDecisionOutcome) | Structured product outcome, policy identity metadata, reason data, and correlation information. |
-| Acknowledgment | [`LiabilityHandshakeRequest`](xref:AsiBackbone.Core.Handshakes.LiabilityHandshakeRequest), [`LiabilityHandshakeAcknowledgment`](xref:AsiBackbone.Core.Handshakes.LiabilityHandshakeAcknowledgment) | Product acknowledgment request/response primitives. Naming is preserved for API compatibility and does not create legal protection. |
+| Acknowledgment | [`AcknowledgmentRequest`](xref:AsiBackbone.Core.Acknowledgments.AcknowledgmentRequest), [`AcknowledgmentResponse`](xref:AsiBackbone.Core.Acknowledgments.AcknowledgmentResponse) | Product acknowledgment request/response primitives. Naming is preserved for API compatibility and does not create legal protection. |
 | Decision receipt | [`DecisionReceipt`](xref:AsiBackbone.Core.Audit.DecisionReceipt) | Structured evidence of the governance decision. |
 | Audit ledger | [`AuditLedgerRecord`](xref:AsiBackbone.Core.Audit.AuditLedgerRecord), [`IGovernanceAuditLedgerStore`](xref:AsiBackbone.Core.Audit.IGovernanceAuditLedgerStore) | Storage-ready record and provider-neutral persistence contract. |
-| Audit sink | [`IDecisionReceiptSink`](xref:AsiBackbone.Core.Audit.IDecisionReceiptSink) | Provider-neutral boundary for receiving decision receipt. |
-| Scoped capability | [`CapabilityTokenGrant`](xref:AsiBackbone.Core.CapabilityTokens.CapabilityTokenGrant), [`CapabilityGrantValidator`](xref:AsiBackbone.Core.CapabilityTokens.CapabilityGrantValidator) | Bounded grant data plus product validation logic. |
+| Decision receipt sink | [`IDecisionReceiptSink`](xref:AsiBackbone.Core.Audit.IDecisionReceiptSink) | Provider-neutral boundary for receiving decision receipt. |
+| Scoped capability | [`CapabilityGrant`](xref:AsiBackbone.Core.CapabilityGrants.CapabilityGrant), [`CapabilityGrantValidator`](xref:AsiBackbone.Core.CapabilityGrants.CapabilityGrantValidator) | Bounded grant data plus product validation logic. |
 | Operation result | [`OperationResult`](xref:AsiBackbone.Core.Results.OperationResult) | Package-operation success/failure, deliberately separate from governance outcome. |
 
 Not every architecture term maps to one class. **Policy decision pipeline**, **host-owned execution**, **operational gateway**, **decision provenance**, **active policy structure**, and similar terms describe relationships among APIs and host responsibilities rather than a required universal type.
@@ -71,11 +71,11 @@ Policy evaluation produces `GovernanceDecision`; Core does not perform the prote
 
 ### Acknowledgment is not authorization
 
-`LiabilityHandshakeAcknowledgment` records acknowledgment state. It does not authenticate an actor, override authorization, certify compliance, or automatically create execution authority.
+`AcknowledgmentResponse` records acknowledgment state. It does not authenticate an actor, override authorization, certify compliance, or automatically create execution authority.
 
 ### Capability grant is bounded authority data
 
-`CapabilityTokenGrant` is not a general-purpose command channel. Hosts remain responsible for validating the grant at the relevant execution boundary under the configured capability-validation policy.
+`CapabilityGrant` is not a general-purpose command channel. Hosts remain responsible for validating the grant at the relevant execution boundary under the configured capability-validation policy.
 
 ### Audit evidence does not imply storage guarantees
 

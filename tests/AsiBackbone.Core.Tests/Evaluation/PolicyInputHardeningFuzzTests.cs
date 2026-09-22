@@ -53,7 +53,7 @@ public sealed class PolicyInputHardeningFuzzTests
     /// <param name="expectedReasonCode">The expected reason code</param>
     /// <param name="region">The region value</param>
     /// <param name="capability">The capability value</param>
-    /// <param name="capabilityTokenCase">The capability token case</param>
+    /// <param name="capabilityTokenCase">The capability grant case</param>
     /// <param name="acknowledgment">The acknowledgment value</param>
     /// <param name="extraMetadataCase">The extra metadata case</param>
     /// <returns></returns>

@@ -15,7 +15,7 @@ In this scenario, the model or agent proposes intent. The host application conve
 | Host application | Owns the model runtime, tool registry, actor context, authorization, policy-context construction, final execution, and error handling. |
 | AsiBackbone | Evaluates the host-provided context through constraints and decision policy, then returns a governance decision. |
 | Acknowledgment layer | Handles host-presented acknowledgment for consequential actions when the decision requires it. |
-| Audit sink or ledger | Stores the decision receipt, reason codes, policy metadata, correlation identifiers, and host-provided metadata. |
+| Decision receipt sink or ledger | Stores the decision receipt, reason codes, policy metadata, correlation identifiers, and host-provided metadata. |
 | External tool or API | Executes only if the host decides the governed action may proceed. |
 
 ## Sequence
@@ -26,7 +26,7 @@ sequenceDiagram
     participant Host as Host application
     participant Backbone as AsiBackbone evaluator
     participant Ack as Acknowledgment flow
-    participant Audit as Audit sink or ledger
+    participant Audit as Decision receipt sink or ledger
     participant Tool as Host-owned tool or API
 
     Agent->>Host: Proposes intent or tool call

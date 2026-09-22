@@ -76,7 +76,7 @@ public sealed class AsiBackboneContractFixtureTests
     }
 
     /// <summary>
-    /// Verifies that the audit sink contract passes when using the test audit sink, ensuring that valid audit residues are accepted and recorded correctly.
+    /// Verifies that the decision receipt sink contract passes when using the test decision receipt sink, ensuring that valid decision receipts are accepted and recorded correctly.
     /// </summary>
     /// <returns>
     /// A task representing the asynchronous operation.
@@ -94,15 +94,15 @@ public sealed class AsiBackboneContractFixtureTests
     }
 
     /// <summary>
-    /// Verifies that the audit sink contract fails when an audit residue is missing a required event ID, ensuring that the contract correctly identifies this violation.
+    /// Verifies that the decision receipt sink contract fails when an decision receipt is missing a required event ID, ensuring that the contract correctly identifies this violation.
     /// </summary>
     /// <returns>
     /// A task representing the asynchronous operation.
     /// </returns>
     [Fact]
-    public void DecisionContractRejectsAuditResidueWithoutEventId()
+    public void DecisionContractRejectsDecisionReceiptWithoutEventId()
     {
-        var residue = new TestAuditResidue
+        var residue = new TestDecisionReceipt
         {
             EventId = ""
         };
@@ -150,7 +150,7 @@ public sealed class AsiBackboneContractFixtureTests
 
         protected override IDecisionReceipt CreateDecisionReceipt()
         {
-            return new TestAuditResidue();
+            return new TestDecisionReceipt();
         }
     }
 
@@ -170,7 +170,7 @@ public sealed class AsiBackboneContractFixtureTests
         }
     }
 
-    private sealed class TestAuditResidue : IDecisionReceipt
+    private sealed class TestDecisionReceipt : IDecisionReceipt
     {
         public string EventId { get; init; } = "contract-event";
 

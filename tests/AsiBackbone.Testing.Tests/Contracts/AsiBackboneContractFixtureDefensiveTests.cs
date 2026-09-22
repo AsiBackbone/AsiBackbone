@@ -255,12 +255,12 @@ public sealed class AsiBackboneContractFixtureDefensiveTests
     }
 
     /// <summary>
-    /// Verifies audit sink contracts reject null factories and residues.
+    /// Verifies decision receipt sink contracts reject null factories and residues.
     /// </summary>
     [Fact]
     public async Task AuditSinkRejectsNullFactories()
     {
-        var nullSink = new AuditSinkContract(sink: null, residue: new TestAuditResidue());
+        var nullSink = new AuditSinkContract(sink: null, residue: new TestDecisionReceipt());
         var nullResidue = new AuditSinkContract(new AcceptingAuditSink(), residue: null);
 
         Assert.Contains(
@@ -276,17 +276,17 @@ public sealed class AsiBackboneContractFixtureDefensiveTests
     }
 
     /// <summary>
-    /// Verifies audit sink contracts propagate cancellations and contract violations.
+    /// Verifies decision receipt sink contracts propagate cancellations and contract violations.
     /// </summary>
     [Fact]
     public async Task AuditSinkPropagatesCancellationAndContractViolation()
     {
-        var canceling = new AuditSinkContract(new CancelingAuditSink(), new TestAuditResidue());
+        var canceling = new AuditSinkContract(new CancelingAuditSink(), new TestDecisionReceipt());
         _ = await Assert.ThrowsAsync<OperationCanceledException>(
             async () => await canceling.VerifyDecisionReceiptSinkAcceptsValidReceiptAsync(TestContext.Current.CancellationToken));
 
         var expected = new GovernanceContractViolationException("audit contract failure");
-        var violating = new AuditSinkContract(new ContractViolatingAuditSink(expected), new TestAuditResidue());
+        var violating = new AuditSinkContract(new ContractViolatingAuditSink(expected), new TestDecisionReceipt());
         GovernanceContractViolationException actual = await Assert.ThrowsAsync<GovernanceContractViolationException>(
             async () => await violating.VerifyDecisionReceiptSinkAcceptsValidReceiptAsync(TestContext.Current.CancellationToken));
 
@@ -704,7 +704,7 @@ public sealed class AsiBackboneContractFixtureDefensiveTests
         }
     }
 
-    private sealed class TestAuditResidue : IDecisionReceipt
+    private sealed class TestDecisionReceipt : IDecisionReceipt
     {
         public string EventId => "contract-event";
         public DateTimeOffset OccurredUtc => DateTimeOffset.UtcNow;

@@ -18,11 +18,11 @@ The API pages are produced by DocFX from the current public .NET surface. Use th
 
 ## Accountability and continuation APIs
 
-- [LiabilityHandshakeRequest](xref:AsiBackbone.Core.Handshakes.LiabilityHandshakeRequest)
-- [LiabilityHandshakeAcknowledgment](xref:AsiBackbone.Core.Handshakes.LiabilityHandshakeAcknowledgment)
+- [AcknowledgmentRequest](xref:AsiBackbone.Core.Acknowledgments.AcknowledgmentRequest)
+- [AcknowledgmentResponse](xref:AsiBackbone.Core.Acknowledgments.AcknowledgmentResponse)
 - [DecisionReceipt](xref:AsiBackbone.Core.Audit.DecisionReceipt)
 - [AuditLedgerRecord](xref:AsiBackbone.Core.Audit.AuditLedgerRecord)
-- [CapabilityTokenGrant](xref:AsiBackbone.Core.CapabilityTokens.CapabilityTokenGrant)
+- [CapabilityGrant](xref:AsiBackbone.Core.CapabilityGrants.CapabilityGrant)
 - [OperationResult](xref:AsiBackbone.Core.Results.OperationResult)
 
 ## Read with the implementation guides

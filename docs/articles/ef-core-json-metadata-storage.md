@@ -31,7 +31,7 @@ Manual string JSON remains the chosen baseline because it gives the package:
 | Host-owned migrations | Does not force a provider-specific JSON column type, generated migration, or compatibility level. |
 | Stable package model | Keeps the public persistence shape simple and backward-compatible. |
 | Metadata flexibility | Allows unknown future metadata keys to round-trip as dictionary entries. |
-| Safe default querying | Encourages hosts to query stable first-class columns such as `EnvelopeId`, `EnvelopeCorrelationId`, `EnvelopeAuditResidueId`, `EnvelopePolicyVersion`, `EnvelopePolicyHash`, `EnvelopeTraceId`, status, and timestamps. |
+| Safe default querying | Encourages hosts to query stable first-class columns such as `EnvelopeId`, `EnvelopeCorrelationId`, `EnvelopeDecisionReceiptId`, `EnvelopePolicyVersion`, `EnvelopePolicyHash`, `EnvelopeTraceId`, status, and timestamps. |
 | Native JSON optionality | Allows provider-specific hosts to add computed columns, JSON indexes, check constraints, generated columns, or custom migrations without changing the package contract. |
 
 ## Why native EF Core JSON mapping is not adopted yet
@@ -81,7 +81,7 @@ Prefer first-class columns for operational, compliance, and dashboard queries:
 - `EnvelopeId`
 - `EnvelopeEventId`
 - `EnvelopeCorrelationId`
-- `EnvelopeAuditResidueId`
+- `EnvelopeDecisionReceiptId`
 - `EnvelopePolicyVersion`
 - `EnvelopePolicyHash`
 - `EnvelopeTraceId`

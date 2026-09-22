@@ -108,7 +108,7 @@ Recommended envelope-level fields:
 | `EventId` | Stable governance event identifier. |
 | `OccurredUtc` / `CreatedUtc` | Event occurrence and envelope creation timestamps. |
 | `CorrelationId` | Host workflow or request join key. |
-| `AuditResidueId` | Opaque identifier for the durable decision receipt record. |
+| `DecisionReceiptId` | Opaque identifier for the durable decision receipt record. |
 | `LifecycleStage` / `LifecycleStageSequence` | Lifecycle stage and stable sequence when available. |
 | `PolicyVersion` / `PolicyHash` | Policy version and hash that shaped the decision. |
 | `TraceId`, `SpanId`, `ParentSpanId` | Distributed tracing join fields when supplied by the host. |
@@ -140,7 +140,7 @@ A future provider should map stable envelope fields to Event Hubs message proper
 | `ContentType` | envelope content type | Use the versioned content type. |
 | `Properties["asibackbone.event_type"]` | `EventType` | Controlled event type only. |
 | `Properties["asibackbone.schema_version"]` | `SchemaVersion` | Safe schema identity. |
-| `Properties["asibackbone.audit_residue_id"]` | `AuditResidueId` | Opaque decision receipt identifier. |
+| `Properties["asibackbone.audit_residue_id"]` | `DecisionReceiptId` | Opaque decision receipt identifier. |
 | `Properties["asibackbone.envelope_id"]` | `EnvelopeId` | Opaque envelope identifier. |
 | `Properties["asibackbone.policy.version"]` | `PolicyVersion` | Stable policy version. |
 | `Properties["asibackbone.policy.hash"]` | `PolicyHash` | Hash only; never raw policy content. |
@@ -244,7 +244,7 @@ Failed Event Hubs emission must not lose local audit records. The local decision
 
 The provider must not put these values into Event Hubs message bodies, properties, partition keys, or logs by default:
 
-* raw capability tokens;
+* raw capability grants;
 * secrets, connection strings, API keys, credentials, signing keys, or managed identity details;
 * raw prompts, documents, request bodies, protected records, payload bodies, or user-submitted content;
 * raw personal data unless a host explicitly opts into that behavior;
@@ -290,7 +290,7 @@ The design should be testable without live Azure resources.
 Recommended tests:
 
 * envelope serialization produces stable JSON for schema version `1.0`;
-* message mapping preserves `CorrelationId`, `AuditResidueId`, `EventId`, `EnvelopeId`, `SchemaVersion`, `EventType`, `PolicyVersion`, `PolicyHash`, lifecycle stage, gateway ID, outcome, and outbox sequence when present;
+* message mapping preserves `CorrelationId`, `DecisionReceiptId`, `EventId`, `EnvelopeId`, `SchemaVersion`, `EventType`, `PolicyVersion`, `PolicyHash`, lifecycle stage, gateway ID, outcome, and outbox sequence when present;
 * content type is versioned and stable;
 * message properties do not contain raw tokens, secrets, payload bodies, or protected content;
 * partition-key strategy avoids high-cardinality sensitive defaults;

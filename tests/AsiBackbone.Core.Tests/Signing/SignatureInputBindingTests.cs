@@ -255,7 +255,7 @@ public sealed class SignatureInputBindingTests
             correlationId: "correlation-1",
             policyVersion: "policy-v1",
             policyHash: "policy-hash-1",
-            auditResidueId: "residue-1");
+            decisionReceiptId: "residue-1");
 
         return AuditLedgerRecord.FromDecisionReceipt(
             residue,

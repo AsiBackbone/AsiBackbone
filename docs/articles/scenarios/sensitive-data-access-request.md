@@ -15,7 +15,7 @@ This scenario applies to systems where access depends on more than identity alon
 | Host application | Owns identity, authorization, classification, retrieval, presentation, and final response. |
 | AsiBackbone | Evaluates the host-provided policy context and returns a governance decision. |
 | Acknowledgment layer | Handles responsibility acknowledgment when the decision requires it. |
-| Audit sink or ledger | Preserves reason codes, policy metadata, correlation identifiers, and decision receipt. |
+| Decision receipt sink or ledger | Preserves reason codes, policy metadata, correlation identifiers, and decision receipt. |
 
 ## Sequence
 

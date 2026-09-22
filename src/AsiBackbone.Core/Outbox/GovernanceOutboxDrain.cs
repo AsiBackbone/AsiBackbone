@@ -637,7 +637,7 @@ public sealed class GovernanceOutboxDrain(
             ResolveEmitterProvider(entry),
             nextRetryUtc,
             entry.Envelope.CorrelationId,
-            entry.Envelope.AuditResidueId,
+            entry.Envelope.DecisionReceiptId,
             exception);
     }
 

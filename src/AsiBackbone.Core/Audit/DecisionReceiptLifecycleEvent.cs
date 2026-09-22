@@ -6,7 +6,7 @@ namespace AsiBackbone.Core.Audit;
 /// Represents a framework-neutral lifecycle event linked to a governed decision receipt flow.
 /// </summary>
 /// <remarks>
-/// Lifecycle events are append-only progress records. They allow acknowledgment, capability token, gateway, outbox, and provider delivery activity to be recorded without rewriting the original decision receipt.
+/// Lifecycle events are append-only progress records. They allow acknowledgment, capability grant, gateway, outbox, and provider delivery activity to be recorded without rewriting the original decision receipt.
 /// </remarks>
 public sealed class DecisionReceiptLifecycleEvent
 {
@@ -19,7 +19,7 @@ public sealed class DecisionReceiptLifecycleEvent
         DecisionReceiptLifecycleStage stage,
         DateTimeOffset occurredUtc,
         string correlationId,
-        string? auditResidueId,
+        string? decisionReceiptId,
         string? traceId,
         string? operationName,
         string? outcome,
@@ -37,7 +37,7 @@ public sealed class DecisionReceiptLifecycleEvent
         Stage = stage;
         OccurredUtc = occurredUtc.ToUniversalTime();
         CorrelationId = correlationId.Trim();
-        AuditResidueId = NormalizeOptional(auditResidueId);
+        DecisionReceiptId = NormalizeOptional(decisionReceiptId);
         TraceId = NormalizeOptional(traceId);
         OperationName = NormalizeOptional(operationName);
         Outcome = NormalizeOptional(outcome);
@@ -72,7 +72,7 @@ public sealed class DecisionReceiptLifecycleEvent
     /// <summary>
     /// Gets the related decision receipt identifier when the original decision receipt is available.
     /// </summary>
-    public string? AuditResidueId { get; }
+    public string? DecisionReceiptId { get; }
 
     /// <summary>
     /// Gets the trace identifier associated with the lifecycle event, when supplied by the host or original residue.
@@ -97,7 +97,7 @@ public sealed class DecisionReceiptLifecycleEvent
     /// <summary>
     /// Gets a value indicating whether this lifecycle event is linked to an decision receipt identifier.
     /// </summary>
-    public bool HasAuditResidueId => AuditResidueId is not null;
+    public bool HasDecisionReceiptId => DecisionReceiptId is not null;
 
     /// <summary>
     /// Gets a value indicating whether this lifecycle event contains metadata.
@@ -109,7 +109,7 @@ public sealed class DecisionReceiptLifecycleEvent
     /// </summary>
     /// <param name="stage">The lifecycle stage represented by this event.</param>
     /// <param name="correlationId">The correlation identifier linking the event to the original decision context.</param>
-    /// <param name="auditResidueId">Optional decision receipt identifier when the original decision receipt is available.</param>
+    /// <param name="decisionReceiptId">Optional decision receipt identifier when the original decision receipt is available.</param>
     /// <param name="eventId">Optional lifecycle event identifier. When omitted, a new identifier is generated.</param>
     /// <param name="occurredUtc">Optional lifecycle timestamp. When omitted, the current UTC timestamp is used.</param>
     /// <param name="traceId">Optional trace identifier.</param>
@@ -120,7 +120,7 @@ public sealed class DecisionReceiptLifecycleEvent
     public static DecisionReceiptLifecycleEvent Create(
         DecisionReceiptLifecycleStage stage,
         string correlationId,
-        string? auditResidueId = null,
+        string? decisionReceiptId = null,
         string? eventId = null,
         DateTimeOffset? occurredUtc = null,
         string? traceId = null,
@@ -133,7 +133,7 @@ public sealed class DecisionReceiptLifecycleEvent
             stage,
             occurredUtc ?? DateTimeOffset.UtcNow,
             correlationId,
-            auditResidueId,
+            decisionReceiptId,
             traceId,
             operationName,
             outcome,
@@ -146,7 +146,7 @@ public sealed class DecisionReceiptLifecycleEvent
     /// <param name="stage">The lifecycle stage represented by this event.</param>
     /// <param name="receipt">The original decision receipt to correlate with the lifecycle event.</param>
     /// <param name="correlationId">Optional correlation identifier override. When omitted, the receipt correlation identifier is used.</param>
-    /// <param name="auditResidueId">Optional decision receipt identifier override. When omitted, the receipt event identifier is used.</param>
+    /// <param name="decisionReceiptId">Optional decision receipt identifier override. When omitted, the receipt event identifier is used.</param>
     /// <param name="eventId">Optional lifecycle event identifier. When omitted, a new identifier is generated.</param>
     /// <param name="occurredUtc">Optional lifecycle timestamp. When omitted, the current UTC timestamp is used.</param>
     /// <param name="outcome">Optional lifecycle or host-defined outcome. When omitted, the receipt outcome is used.</param>
@@ -156,7 +156,7 @@ public sealed class DecisionReceiptLifecycleEvent
         DecisionReceiptLifecycleStage stage,
         IDecisionReceipt receipt,
         string? correlationId = null,
-        string? auditResidueId = null,
+        string? decisionReceiptId = null,
         string? eventId = null,
         DateTimeOffset? occurredUtc = null,
         string? outcome = null,
@@ -173,7 +173,7 @@ public sealed class DecisionReceiptLifecycleEvent
             stage,
             occurredUtc ?? DateTimeOffset.UtcNow,
             effectiveCorrelationId ?? throw new ArgumentException("A lifecycle event requires a correlation identifier from the receipt or an explicit override.", nameof(correlationId)),
-            string.IsNullOrWhiteSpace(auditResidueId) ? receipt.EventId : auditResidueId,
+            string.IsNullOrWhiteSpace(decisionReceiptId) ? receipt.EventId : decisionReceiptId,
             receipt.TraceId,
             receipt.OperationName,
             string.IsNullOrWhiteSpace(outcome) ? receipt.Outcome : outcome,

@@ -1,5 +1,5 @@
 using System.Reflection;
-using AsiBackbone.Core.CapabilityTokens;
+using AsiBackbone.Core.CapabilityGrants;
 using AsiBackbone.Core.Signing;
 using Xunit;
 
@@ -23,7 +23,7 @@ public sealed class SignedArtifactContentBindingTests
     [Fact]
     public async Task VerifyAsyncAllowsArtifactWhosePayloadHashesToTheSignedHash()
     {
-        SignedGovernanceArtifact<CapabilityTokenGrant> artifact = CreateSignedGrant(CreateGrant());
+        SignedGovernanceArtifact<CapabilityGrant> artifact = CreateSignedGrant(CreateGrant());
         var verifier = new AlwaysValidVerificationService();
 
         VerificationPolicyOutcome outcome = await GovernanceArtifactVerifier.VerifyAsync(artifact, verifier, cancellationToken: TestContext.Current.CancellationToken);
@@ -42,12 +42,12 @@ public sealed class SignedArtifactContentBindingTests
     [Fact]
     public async Task VerifyAsyncDeniesArtifactWhosePayloadWasReplacedAfterSigning()
     {
-        SignedGovernanceArtifact<CapabilityTokenGrant> signed = CreateSignedGrant(CreateGrant());
+        SignedGovernanceArtifact<CapabilityGrant> signed = CreateSignedGrant(CreateGrant());
 
-        CapabilityTokenGrant tamperedGrant = CreateGrant(scopes: ["robotics.execute", "robotics.admin"]);
-        SignedGovernanceArtifact<CapabilityTokenGrant> tampered = SignedGovernanceArtifacts.FromSigningMetadata(
+        CapabilityGrant tamperedGrant = CreateGrant(scopes: ["robotics.execute", "robotics.admin"]);
+        SignedGovernanceArtifact<CapabilityGrant> tampered = SignedGovernanceArtifacts.FromSigningMetadata(
             tamperedGrant,
-            CanonicalPayloadBuilder.ForCapabilityTokenGrant(tamperedGrant),
+            CanonicalPayloadBuilder.ForCapabilityGrant(tamperedGrant),
             signed.CanonicalHash,
             signed.SigningMetadata);
 
@@ -68,8 +68,8 @@ public sealed class SignedArtifactContentBindingTests
     [Fact]
     public async Task VerifyAsyncDeniesArtifactMissingACanonicalDescriptor()
     {
-        CapabilityTokenGrant grant = CreateGrant();
-        CanonicalPayload payload = CanonicalPayloadBuilder.ForCapabilityTokenGrant(grant);
+        CapabilityGrant grant = CreateGrant();
+        CanonicalPayload payload = CanonicalPayloadBuilder.ForCapabilityGrant(grant);
         CanonicalPayloadHash hash = CanonicalPayloadHasher.ComputeHash(payload);
 
         var metadataWithoutArtifactType = new Dictionary<string, string>(StringComparer.Ordinal)
@@ -79,7 +79,7 @@ public sealed class SignedArtifactContentBindingTests
             ["payload_schema_version"] = hash.PayloadSchemaVersion
         };
 
-        SignedGovernanceArtifact<CapabilityTokenGrant> artifact = CreateUncheckedArtifact(
+        SignedGovernanceArtifact<CapabilityGrant> artifact = CreateUncheckedArtifact(
             grant,
             payload,
             hash,
@@ -102,12 +102,12 @@ public sealed class SignedArtifactContentBindingTests
     [Fact]
     public void RehydrateRejectsAPayloadThatDoesNotHashToTheStoredHash()
     {
-        SignedGovernanceArtifact<CapabilityTokenGrant> signed = CreateSignedGrant(CreateGrant());
-        CapabilityTokenGrant tamperedGrant = CreateGrant(audience: "gateway-2");
+        SignedGovernanceArtifact<CapabilityGrant> signed = CreateSignedGrant(CreateGrant());
+        CapabilityGrant tamperedGrant = CreateGrant(audience: "gateway-2");
 
         ArgumentException exception = Assert.Throws<ArgumentException>(() => SignedGovernanceArtifacts.Rehydrate(
             tamperedGrant,
-            CanonicalPayloadBuilder.ForCapabilityTokenGrant(tamperedGrant),
+            CanonicalPayloadBuilder.ForCapabilityGrant(tamperedGrant),
             signed.CanonicalHash,
             signed.SigningMetadata));
 
@@ -120,25 +120,25 @@ public sealed class SignedArtifactContentBindingTests
     [Fact]
     public void RehydrateAcceptsAPayloadThatHashesToTheStoredHash()
     {
-        CapabilityTokenGrant grant = CreateGrant();
-        SignedGovernanceArtifact<CapabilityTokenGrant> signed = CreateSignedGrant(grant);
+        CapabilityGrant grant = CreateGrant();
+        SignedGovernanceArtifact<CapabilityGrant> signed = CreateSignedGrant(grant);
 
-        SignedGovernanceArtifact<CapabilityTokenGrant> rehydrated = SignedGovernanceArtifacts.Rehydrate(
+        SignedGovernanceArtifact<CapabilityGrant> rehydrated = SignedGovernanceArtifacts.Rehydrate(
             grant,
-            CanonicalPayloadBuilder.ForCapabilityTokenGrant(grant),
+            CanonicalPayloadBuilder.ForCapabilityGrant(grant),
             signed.CanonicalHash,
             signed.SigningMetadata);
 
         Assert.Equal(signed.SigningHash, rehydrated.SigningHash);
     }
 
-    private static CapabilityTokenGrant CreateGrant(
+    private static CapabilityGrant CreateGrant(
         string tokenId = "grant-content-binding",
         string issuer = "issuer-1",
         string audience = "gateway-1",
         IEnumerable<string>? scopes = null)
     {
-        return CapabilityTokenGrant.Create(
+        return CapabilityGrant.Create(
             tokenId: tokenId,
             issuer: issuer,
             audience: audience,
@@ -149,9 +149,9 @@ public sealed class SignedArtifactContentBindingTests
             policyHash: "policy-hash");
     }
 
-    private static SignedGovernanceArtifact<CapabilityTokenGrant> CreateSignedGrant(CapabilityTokenGrant grant)
+    private static SignedGovernanceArtifact<CapabilityGrant> CreateSignedGrant(CapabilityGrant grant)
     {
-        CanonicalPayload payload = CanonicalPayloadBuilder.ForCapabilityTokenGrant(grant);
+        CanonicalPayload payload = CanonicalPayloadBuilder.ForCapabilityGrant(grant);
         CanonicalPayloadHash hash = CanonicalPayloadHasher.ComputeHash(payload);
 
         var signingMetadata = SigningMetadata.Create(
@@ -175,8 +175,8 @@ public sealed class SignedArtifactContentBindingTests
     /// through the public surface. Constructing it directly exercises the verifier's own guard for artifacts that reach it
     /// from outside those factories.
     /// </remarks>
-    private static SignedGovernanceArtifact<CapabilityTokenGrant> CreateUncheckedArtifact(
-        CapabilityTokenGrant grant,
+    private static SignedGovernanceArtifact<CapabilityGrant> CreateUncheckedArtifact(
+        CapabilityGrant grant,
         CanonicalPayload payload,
         CanonicalPayloadHash hash,
         IReadOnlyDictionary<string, string> metadata)
@@ -192,14 +192,14 @@ public sealed class SignedArtifactContentBindingTests
             signedUtc: IssuedUtc,
             metadata: metadata);
 
-        ConstructorInfo constructor = typeof(SignedGovernanceArtifact<CapabilityTokenGrant>).GetConstructor(
+        ConstructorInfo constructor = typeof(SignedGovernanceArtifact<CapabilityGrant>).GetConstructor(
             BindingFlags.Instance | BindingFlags.NonPublic,
             binder: null,
-            types: [typeof(CapabilityTokenGrant), typeof(CanonicalPayload), typeof(CanonicalPayloadHash), typeof(SigningMetadata)],
+            types: [typeof(CapabilityGrant), typeof(CanonicalPayload), typeof(CanonicalPayloadHash), typeof(SigningMetadata)],
             modifiers: null)
             ?? throw new InvalidOperationException("SignedGovernanceArtifact constructor could not be located.");
 
-        return (SignedGovernanceArtifact<CapabilityTokenGrant>)constructor.Invoke(
+        return (SignedGovernanceArtifact<CapabilityGrant>)constructor.Invoke(
         [
             grant,
             payload,

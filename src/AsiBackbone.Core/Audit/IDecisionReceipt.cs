@@ -19,7 +19,7 @@ public interface IDecisionReceipt
     /// <remarks>
     /// Existing residue implementations may use <see cref="EventId" /> as the residue identifier.
     /// </remarks>
-    string? AuditResidueId => EventId;
+    string? DecisionReceiptId => EventId;
 
     /// <summary>
     /// Gets the serialized schema version for the decision receipt shape.

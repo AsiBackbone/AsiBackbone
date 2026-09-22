@@ -314,7 +314,7 @@ public sealed class EfCoreOutboxConcurrencyValidationTests
             createdUtc: new DateTimeOffset(2026, 6, 19, 11, 0, 1, TimeSpan.Zero).AddSeconds(index),
             schemaVersion: "1.0.0",
             correlationId: "efcore-concurrency-validation",
-            auditResidueId: $"audit-concurrency-{index:D3}",
+            decisionReceiptId: $"audit-concurrency-{index:D3}",
             lifecycleStage: DecisionReceiptLifecycleStage.ExternalEmissionQueued,
             policyVersion: "2026.06",
             policyHash: "policy-hash-concurrency",
@@ -413,7 +413,7 @@ public sealed class EfCoreOutboxConcurrencyValidationTests
         public DbSet<GovernanceOutboxEntryEntity> GovernanceOutboxEntries =>
             Set<GovernanceOutboxEntryEntity>();
 
-        public DbSet<DecisionReceiptLifecycleEventEntity> AuditResidueLifecycleEvents =>
+        public DbSet<DecisionReceiptLifecycleEventEntity> DecisionReceiptLifecycleEvents =>
             Set<DecisionReceiptLifecycleEventEntity>();
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)

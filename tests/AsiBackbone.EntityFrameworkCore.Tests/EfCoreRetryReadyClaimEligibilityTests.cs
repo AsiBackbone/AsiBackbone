@@ -453,7 +453,7 @@ public sealed class EfCoreRetryReadyClaimEligibilityTests
             createdUtc: utcNow.AddHours(-1).AddSeconds(1),
             schemaVersion: "1.0.0",
             correlationId: "efcore-retry-claim-eligibility",
-            auditResidueId: $"audit-{outboxEntryId}",
+            decisionReceiptId: $"audit-{outboxEntryId}",
             lifecycleStage: DecisionReceiptLifecycleStage.ExternalEmissionQueued,
             policyVersion: "2026.07",
             policyHash: "policy-hash-retry-claim",

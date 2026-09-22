@@ -163,7 +163,7 @@ public sealed class OpenTelemetryGovernanceEmitter : IGovernanceEmitter
         AddTag(tags, OpenTelemetryGovernanceAttributes.EventType, envelope.EventType.ToString());
         AddTag(tags, OpenTelemetryGovernanceAttributes.EventId, envelope.EventId);
         AddTag(tags, OpenTelemetryGovernanceAttributes.CorrelationId, envelope.CorrelationId);
-        AddTag(tags, OpenTelemetryGovernanceAttributes.AuditResidueId, envelope.AuditResidueId);
+        AddTag(tags, OpenTelemetryGovernanceAttributes.DecisionReceiptId, envelope.DecisionReceiptId);
         AddTag(tags, OpenTelemetryGovernanceAttributes.TraceId, envelope.TraceId);
         AddTag(tags, OpenTelemetryGovernanceAttributes.SpanId, envelope.SpanId);
         AddTag(tags, OpenTelemetryGovernanceAttributes.ParentSpanId, envelope.ParentSpanId);

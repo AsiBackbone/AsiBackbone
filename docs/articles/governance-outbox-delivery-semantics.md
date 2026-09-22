@@ -41,7 +41,7 @@ Use these identifiers when designing provider delivery and recovery:
 | `GovernanceOutboxEntry.OutboxEntryId` | Stable local outbox record identifier and primary package-level idempotency boundary. |
 | `GovernanceEmissionEnvelope.EnvelopeId` | Stable provider-neutral emission envelope identifier. Useful as a provider idempotency key when accepted by the provider. |
 | `GovernanceEmissionEnvelope.EventId` | Source governance event identifier, when available. Useful for reconciling source events to outbox records. |
-| `GovernanceEmissionEnvelope.AuditResidueId` | Links provider emission back to local decision receipt. |
+| `GovernanceEmissionEnvelope.DecisionReceiptId` | Links provider emission back to local decision receipt. |
 | `GovernanceEmissionEnvelope.CorrelationId` | Cross-request or operation correlation. Useful for diagnostics, not by itself a uniqueness guarantee. |
 | `GovernanceEmissionEnvelope.OutboxSequence` | Optional host-supplied sequence hint. Useful for diagnostics or host-owned ordering, but not a package-owned ordering guarantee. |
 | `GovernanceOutboxEntry.ProviderRecordId` | Provider-returned delivery identifier, when safe to store. Useful for reconciliation after provider acceptance. |

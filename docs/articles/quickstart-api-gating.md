@@ -48,7 +48,7 @@ Package roles:
 | --- | --- |
 | `AsiBackbone.Core` | Defines constraints, evaluation context, decisions, and decision receipt. |
 | `AsiBackbone.AspNetCore` | Provides ASP.NET Core registration helpers, result mapping, and endpoint metadata helpers. |
-| `AsiBackbone.Storage.InMemory` | Gives the sample a non-durable local audit sink so you can see records immediately. |
+| `AsiBackbone.Storage.InMemory` | Gives the sample a non-durable local decision receipt sink so you can see records immediately. |
 
 ## Replace `Program.cs`
 

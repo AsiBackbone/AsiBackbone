@@ -161,7 +161,7 @@ See [Outbox Multi-Worker Concurrency](outbox-multi-worker-concurrency.md) for gu
 
 ## Privacy and provider boundaries
 
-Outbox entries should contain minimized provider-neutral metadata only. Do not store raw capability tokens, secrets, connection strings, provider credentials, raw prompts, protected document bodies, or unredacted sensitive records in the outbox payload or metadata.
+Outbox entries should contain minimized provider-neutral metadata only. Do not store raw capability grants, secrets, connection strings, provider credentials, raw prompts, protected document bodies, or unredacted sensitive records in the outbox payload or metadata.
 
 Use opaque identifiers, hashes, policy versions, policy hashes, lifecycle stage values, correlation identifiers, and trace identifiers that are safe under host policy.
 

@@ -45,7 +45,7 @@ Configuration order still matters. Later `Configure<TOptions>(...)` calls can in
 | `GovernancePolicyOptions.PreventThreatAssessmentAllowDowngrade` | `true` | Actionable threat assessment outcomes remain protected from being downgraded to pure allow decisions. |
 | `EndpointGovernanceOptions.FailClosedWhenPolicyEvaluatorMissing` | `true` | Endpoints that require policy evaluation fail closed when no evaluator is configured. |
 | `EndpointGovernanceOptions.FailClosedWhenCapabilityValidatorMissing` | `true` | Capability-gated endpoints fail closed when no capability validator is configured. |
-| `EndpointGovernanceOptions.FailClosedWhenAuditSinkMissing` | `true` | Audit-emitting endpoints fail closed when no host-owned audit sink is configured. |
+| `EndpointGovernanceOptions.FailClosedWhenAuditSinkMissing` | `true` | Audit-emitting endpoints fail closed when no host-owned decision receipt sink is configured. |
 | `EndpointGovernanceOptions.RequireGovernanceMetadata` | `true` | Selected endpoints without governance metadata are blocked unless explicitly marked as allowed to omit governance metadata. |
 
 ## Empty-policy behavior

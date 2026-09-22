@@ -223,7 +223,7 @@ public sealed class NcatAuditCompletionAdapterTests
         IDecisionReceiptLifecycleStore store,
         NcatAuditCompletionAdapterOptions? options = null)
     {
-        return new NcatAuditCompletionAdapter(store, new StubResolver(new TestAuditResidue()), options);
+        return new NcatAuditCompletionAdapter(store, new StubResolver(new TestDecisionReceipt()), options);
     }
 
     private static NcatAuditCompletionHandoff CreateCommittedHandoff()
@@ -279,18 +279,18 @@ public sealed class NcatAuditCompletionAdapterTests
             return ValueTask.FromResult<IReadOnlyList<DecisionReceiptLifecycleEvent>>([]);
         }
 
-        public ValueTask<IReadOnlyList<DecisionReceiptLifecycleEvent>> FindByAuditResidueIdAsync(
-            string auditResidueId,
+        public ValueTask<IReadOnlyList<DecisionReceiptLifecycleEvent>> FindByDecisionReceiptIdAsync(
+            string decisionReceiptId,
             CancellationToken cancellationToken = default)
         {
             return ValueTask.FromResult<IReadOnlyList<DecisionReceiptLifecycleEvent>>([]);
         }
     }
 
-    private sealed class TestAuditResidue : IDecisionReceipt
+    private sealed class TestDecisionReceipt : IDecisionReceipt
     {
         public string EventId => "decision-1";
-        public string? AuditResidueId => "decision-1";
+        public string? DecisionReceiptId => "decision-1";
         public DateTimeOffset OccurredUtc => DateTimeOffset.UtcNow;
         public string ActorId => "actor-1";
         public GovernanceActorType ActorType => GovernanceActorType.Human;

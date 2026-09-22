@@ -76,8 +76,8 @@ The namespace layout was acceptable for `1.0.0` and is corrected here for the pu
 | `AsiBackbone.Core.Decisions` | Clear home for composed governance decisions and outcomes. |
 | `AsiBackbone.Core.Evaluation` | Clear home for evaluator and decision policy contracts. |
 | `AsiBackbone.Core.Audit` | Clear home for decision receipt, ledger records, lifecycle events, and ledger store contracts. |
-| `AsiBackbone.Core.Handshakes` | Clear home for acknowledgment and responsibility-handshake primitives. |
-| `AsiBackbone.Core.CapabilityTokens` | Clear home for capability token abstractions. |
+| `AsiBackbone.Core.Acknowledgments` | Clear home for acknowledgment and responsibility-handshake primitives. |
+| `AsiBackbone.Core.CapabilityGrants` | Clear home for capability grant abstractions. |
 | `AsiBackbone.Core.Emissions` | Clear home for provider-neutral governance emission contracts and envelopes. |
 | `AsiBackbone.Core.Outbox` | Clear home for provider-neutral durable outbox contracts and records. |
 | `AsiBackbone.Core.Classification` | Clear home for DLP/classification policy primitives. |
@@ -90,7 +90,7 @@ The namespace layout was acceptable for `1.0.0` and is corrected here for the pu
 | `AsiBackbone.Signing.LocalDevelopment` | Clear local-development signing provider boundary. |
 | `AsiBackbone.Signing.ManagedKey` | Clear managed-key signing adapter boundary. |
 
-The stale `AsiBackbone.Core.Tokens` reference from the historical review is corrected to `AsiBackbone.Core.CapabilityTokens`.
+The stale `AsiBackbone.Core.Tokens` reference from the historical review is corrected to `AsiBackbone.Core.CapabilityGrants`.
 
 ## Dependency direction review
 
@@ -157,7 +157,7 @@ Reviewed artifact families include:
 - audit ledger records;
 - decision receipt lifecycle events;
 - acknowledgment and responsibility-handshake records;
-- capability token records;
+- capability grant records;
 - governance emission envelopes and payload descriptors;
 - governance outbox records;
 - signing-ready metadata and canonical payload/hash artifacts;

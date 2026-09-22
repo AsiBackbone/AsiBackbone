@@ -35,7 +35,7 @@ public sealed class ApplicationDbContext : DbContext
     public DbSet<GovernanceOutboxEntryEntity> GovernanceOutboxEntries =>
         Set<GovernanceOutboxEntryEntity>();
 
-    public DbSet<DecisionReceiptLifecycleEventEntity> AuditResidueLifecycleEvents =>
+    public DbSet<DecisionReceiptLifecycleEventEntity> DecisionReceiptLifecycleEvents =>
         Set<DecisionReceiptLifecycleEventEntity>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
