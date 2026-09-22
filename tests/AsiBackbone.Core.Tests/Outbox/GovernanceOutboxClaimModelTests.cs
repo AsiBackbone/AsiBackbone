@@ -138,7 +138,7 @@ public sealed class GovernanceOutboxClaimModelTests
     private static GovernanceOutboxEntry CreateEntry()
     {
         return GovernanceOutboxEntry.Create(GovernanceEmissionEnvelope.Create(
-            GovernanceEmissionEventType.AuditResidue,
+            GovernanceEmissionEventType.DecisionReceipt,
             eventId: "event-1",
             occurredUtc: new DateTimeOffset(2026, 7, 8, 12, 0, 0, TimeSpan.Zero),
             envelopeId: "envelope-1"));

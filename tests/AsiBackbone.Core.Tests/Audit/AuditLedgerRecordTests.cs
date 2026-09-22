@@ -13,7 +13,7 @@ public sealed class AuditLedgerRecordTests
     /// Verifies that <see cref="AuditLedgerRecord.FromDecisionReceipt"/> correctly copies all relevant fields from an <see cref="IDecisionReceipt"/> instance, including normalization of string fields and proper handling of timestamps and metadata. This test ensures that the resulting <see cref="AuditLedgerRecord"/> accurately reflects the information contained in the source residue while also applying any necessary transformations or defaults for missing optional fields.
     /// </summary>
     [Fact]
-    public void FromDecisionReceiptCopiesAuditResidueFieldsAndLedgerReferences()
+    public void FromDecisionReceiptCopiesDecisionReceiptFieldsAndLedgerReferences()
     {
         var actor = GovernanceActorContext.Human(" user-123 ", " Chris ");
         DateTimeOffset occurredUtc = new(2026, 6, 4, 7, 0, 0, TimeSpan.FromHours(-5));
@@ -76,10 +76,10 @@ public sealed class AuditLedgerRecordTests
     }
 
     /// <summary>
-    /// Verifies that the object returned by <see cref="AuditLedgerRecord.FromDecisionReceipt"/> implements the <see cref="IDecisionReceipt"/> interface, ensuring that it can be used interchangeably with other audit residue implementations in contexts where the interface is expected. This test confirms that the factory method produces an object that adheres to the required contract for audit residues, allowing it to be seamlessly integrated into existing systems and workflows that rely on the <see cref="IDecisionReceipt"/> abstraction.
+    /// Verifies that the object returned by <see cref="AuditLedgerRecord.FromDecisionReceipt"/> implements the <see cref="IDecisionReceipt"/> interface, ensuring that it can be used interchangeably with other decision receipt implementations in contexts where the interface is expected. This test confirms that the factory method produces an object that adheres to the required contract for decision receipts, allowing it to be seamlessly integrated into existing systems and workflows that rely on the <see cref="IDecisionReceipt"/> abstraction.
     /// </summary>
     [Fact]
-    public void FromDecisionReceiptImplementsAuditResidueContract()
+    public void FromDecisionReceiptImplementsDecisionReceiptContract()
     {
         var record = AuditLedgerRecord.FromDecisionReceipt(CreateValidResidue());
 
@@ -163,7 +163,7 @@ public sealed class AuditLedgerRecordTests
     [Fact]
     public void FromDecisionReceiptFiltersNullAndBlankReasonCodesFromCustomResidue()
     {
-        TestAuditResidue residue = CreateValidResidue();
+        TestDecisionReceipt residue = CreateValidResidue();
         residue.ReasonCodes = [" risk.high ", null!, "", "   ", " policy.warning "];
 
         var record = AuditLedgerRecord.FromDecisionReceipt(residue);
@@ -178,7 +178,7 @@ public sealed class AuditLedgerRecordTests
     [Fact]
     public void FromDecisionReceiptWithNoReasonCodesHasNoReasonCodes()
     {
-        TestAuditResidue residue = CreateValidResidue();
+        TestDecisionReceipt residue = CreateValidResidue();
         residue.ReasonCodes = [];
 
         var record = AuditLedgerRecord.FromDecisionReceipt(residue);
@@ -193,7 +193,7 @@ public sealed class AuditLedgerRecordTests
     [Fact]
     public void FromDecisionReceiptMergesResidueAndLedgerMetadataAndLedgerOverridesDuplicateKeys()
     {
-        TestAuditResidue residue = CreateValidResidue();
+        TestDecisionReceipt residue = CreateValidResidue();
         residue.Metadata = new Dictionary<string, string>
         {
             [" source "] = " residue ",
@@ -220,7 +220,7 @@ public sealed class AuditLedgerRecordTests
     [Fact]
     public void FromDecisionReceiptIgnoresBlankMetadataKeysAndStoresNullMetadataValuesAsEmptyStrings()
     {
-        TestAuditResidue residue = CreateValidResidue();
+        TestDecisionReceipt residue = CreateValidResidue();
         residue.Metadata = new Dictionary<string, string>
         {
             [" "] = "ignored",
@@ -249,7 +249,7 @@ public sealed class AuditLedgerRecordTests
     [Fact]
     public void FromDecisionReceiptWithNullMetadataSourcesHasNoMetadata()
     {
-        TestAuditResidue residue = CreateValidResidue();
+        TestDecisionReceipt residue = CreateValidResidue();
         residue.Metadata = null!;
 
         var record = AuditLedgerRecord.FromDecisionReceipt(residue);
@@ -264,7 +264,7 @@ public sealed class AuditLedgerRecordTests
     [Fact]
     public void FromDecisionReceiptWithEmptyMetadataSourcesHasNoMetadata()
     {
-        TestAuditResidue residue = CreateValidResidue();
+        TestDecisionReceipt residue = CreateValidResidue();
         residue.Metadata = new Dictionary<string, string>();
 
         var record = AuditLedgerRecord.FromDecisionReceipt(
@@ -293,7 +293,7 @@ public sealed class AuditLedgerRecordTests
             [" ledger "] = " record "
         };
 
-        TestAuditResidue residue = CreateValidResidue();
+        TestDecisionReceipt residue = CreateValidResidue();
         residue.ReasonCodes = reasonCodes;
         residue.Metadata = residueMetadata;
 
@@ -340,7 +340,7 @@ public sealed class AuditLedgerRecordTests
     [Fact]
     public void EmptyMetadataCannotBeMutatedThroughDictionaryCasts()
     {
-        TestAuditResidue residue = CreateValidResidue();
+        TestDecisionReceipt residue = CreateValidResidue();
         residue.Metadata = new Dictionary<string, string>();
 
         var record = AuditLedgerRecord.FromDecisionReceipt(residue);
@@ -352,7 +352,7 @@ public sealed class AuditLedgerRecordTests
     }
 
     /// <summary>
-    /// Verifies that <see cref="AuditLedgerRecord.FromDecisionReceipt"/> throws an <see cref="ArgumentNullException"/> when the input <see cref="IDecisionReceipt"/> parameter is null. This test ensures that the factory method enforces the requirement for a valid audit residue to create an audit ledger record, and that it provides a clear and specific exception when this precondition is not met. Proper handling of null inputs is critical for preventing unexpected errors and maintaining the robustness of the audit logging system.
+    /// Verifies that <see cref="AuditLedgerRecord.FromDecisionReceipt"/> throws an <see cref="ArgumentNullException"/> when the input <see cref="IDecisionReceipt"/> parameter is null. This test ensures that the factory method enforces the requirement for a valid decision receipt to create an audit ledger record, and that it provides a clear and specific exception when this precondition is not met. Proper handling of null inputs is critical for preventing unexpected errors and maintaining the robustness of the audit logging system.
     /// </summary>
     [Fact]
     public void FromDecisionReceiptThrowsForMissingResidue()
@@ -374,7 +374,7 @@ public sealed class AuditLedgerRecordTests
     [InlineData("Outcome")]
     public void FromDecisionReceiptThrowsForInvalidRequiredResidueFields(string fieldName)
     {
-        TestAuditResidue residue = CreateValidResidue();
+        TestDecisionReceipt residue = CreateValidResidue();
 
         switch (fieldName)
         {
@@ -407,7 +407,7 @@ public sealed class AuditLedgerRecordTests
     [Fact]
     public void FromDecisionReceiptWithNullReasonCodesHasNoReasonCodes()
     {
-        TestAuditResidue residue = CreateValidResidue();
+        TestDecisionReceipt residue = CreateValidResidue();
         residue.ReasonCodes = null!;
 
         var record = AuditLedgerRecord.FromDecisionReceipt(residue);
@@ -422,7 +422,7 @@ public sealed class AuditLedgerRecordTests
     [Fact]
     public void FromDecisionReceiptUsesLedgerMetadataWhenResidueMetadataIsNull()
     {
-        TestAuditResidue residue = CreateValidResidue();
+        TestDecisionReceipt residue = CreateValidResidue();
         residue.Metadata = null!;
 
         var record = AuditLedgerRecord.FromDecisionReceipt(
@@ -443,7 +443,7 @@ public sealed class AuditLedgerRecordTests
     [Fact]
     public void FromDecisionReceiptNormalizesOptionalResidueFieldsToNull()
     {
-        TestAuditResidue residue = CreateValidResidue();
+        TestDecisionReceipt residue = CreateValidResidue();
         residue.ActorDisplayName = " ";
         residue.CorrelationId = "";
         residue.TraceId = "\t";
@@ -459,9 +459,9 @@ public sealed class AuditLedgerRecordTests
         Assert.Null(record.PolicyHash);
     }
 
-    private static TestAuditResidue CreateValidResidue()
+    private static TestDecisionReceipt CreateValidResidue()
     {
-        return new TestAuditResidue
+        return new TestDecisionReceipt
         {
             EventId = "event-123",
             OccurredUtc = new DateTimeOffset(2026, 6, 4, 12, 0, 0, TimeSpan.Zero),
@@ -482,7 +482,7 @@ public sealed class AuditLedgerRecordTests
         };
     }
 
-    private sealed class TestAuditResidue : IDecisionReceipt
+    private sealed class TestDecisionReceipt : IDecisionReceipt
     {
         public string EventId { get; set; } = "event-123";
 

@@ -48,7 +48,7 @@ app.UseAsiBackboneEndpointGovernance();
 
 app.MapPost("/high-risk-action", handler)
     .MarkGovernancePolicy<MyStrictPolicy>()
-    .RequireLiabilityHandshake()
+    .RequireAcknowledgment()
     .RequireCapabilityGrant("robotics.execute")
     .EmitGovernanceAudit();
 ```
@@ -57,7 +57,7 @@ Controller/action attributes are also available:
 
 ```csharp
 [GovernancePolicy(typeof(MyStrictPolicy))]
-[RequireLiabilityHandshake]
+[RequireAcknowledgment]
 [RequireCapabilityGrant("robotics.execute")]
 [EmitGovernanceAudit]
 public IActionResult ExecuteHighRiskAction()

@@ -269,7 +269,7 @@ public sealed class AsiBackboneGovernanceOutboxDrainHostedServiceTests
             occurredUtc: new DateTimeOffset(2026, 6, 15, 17, 59, 0, TimeSpan.Zero),
             envelopeId: $"envelope-{suffix}",
             correlationId: $"correlation-{suffix}",
-            auditResidueId: $"residue-{suffix}",
+            decisionReceiptId: $"residue-{suffix}",
             lifecycleStage: DecisionReceiptLifecycleStage.ExternalEmissionQueued,
             policyVersion: "v1",
             policyHash: $"hash-{suffix}",

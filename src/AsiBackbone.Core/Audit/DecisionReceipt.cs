@@ -28,7 +28,7 @@ public sealed class DecisionReceipt : IDecisionReceipt
 
     private DecisionReceipt(
         string eventId,
-        string auditResidueId,
+        string decisionReceiptId,
         string schemaVersion,
         DateTimeOffset occurredUtc,
         string actorId,
@@ -58,13 +58,13 @@ public sealed class DecisionReceipt : IDecisionReceipt
         IReadOnlyDictionary<string, string> metadata)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(eventId);
-        ArgumentException.ThrowIfNullOrWhiteSpace(auditResidueId);
+        ArgumentException.ThrowIfNullOrWhiteSpace(decisionReceiptId);
         ArgumentException.ThrowIfNullOrWhiteSpace(actorId);
         ArgumentException.ThrowIfNullOrWhiteSpace(operationName);
         ArgumentException.ThrowIfNullOrWhiteSpace(outcome);
 
         EventId = eventId.Trim();
-        AuditResidueId = auditResidueId.Trim();
+        DecisionReceiptId = decisionReceiptId.Trim();
         SchemaVersion = GovernanceSchemaVersions.Normalize(schemaVersion);
         OccurredUtc = occurredUtc.ToUniversalTime();
         ActorId = actorId.Trim();
@@ -98,7 +98,7 @@ public sealed class DecisionReceipt : IDecisionReceipt
     public string EventId { get; }
 
     /// <inheritdoc />
-    public string AuditResidueId { get; }
+    public string DecisionReceiptId { get; }
 
     /// <inheritdoc />
     public string SchemaVersion { get; }
@@ -205,7 +205,7 @@ public sealed class DecisionReceipt : IDecisionReceipt
     /// <param name="policyVersion">Optional policy version.</param>
     /// <param name="policyHash">Optional policy hash.</param>
     /// <param name="metadata">Optional host-provided audit metadata.</param>
-    /// <param name="auditResidueId">Optional decision receipt identifier. When omitted, the normalized event identifier is used.</param>
+    /// <param name="decisionReceiptId">Optional decision receipt identifier. When omitted, the normalized event identifier is used.</param>
     /// <param name="spanId">Optional span identifier.</param>
     /// <param name="parentSpanId">Optional parent span identifier.</param>
     /// <param name="decisionLatencyMs">Optional decision latency in milliseconds.</param>
@@ -234,7 +234,7 @@ public sealed class DecisionReceipt : IDecisionReceipt
         string? policyVersion = null,
         string? policyHash = null,
         IReadOnlyDictionary<string, string>? metadata = null,
-        string? auditResidueId = null,
+        string? decisionReceiptId = null,
         string? spanId = null,
         string? parentSpanId = null,
         long? decisionLatencyMs = null,
@@ -263,7 +263,7 @@ public sealed class DecisionReceipt : IDecisionReceipt
             policyVersion,
             policyHash,
             metadata,
-            auditResidueId,
+            decisionReceiptId,
             spanId,
             parentSpanId,
             decisionLatencyMs,
@@ -290,7 +290,7 @@ public sealed class DecisionReceipt : IDecisionReceipt
     /// <param name="eventId">Optional audit event identifier. When omitted, a new identifier is generated.</param>
     /// <param name="occurredUtc">Optional event timestamp. When omitted, the current UTC timestamp is used.</param>
     /// <param name="metadata">Optional host-provided audit metadata.</param>
-    /// <param name="auditResidueId">Optional decision receipt identifier. When omitted, the normalized event identifier is used.</param>
+    /// <param name="decisionReceiptId">Optional decision receipt identifier. When omitted, the normalized event identifier is used.</param>
     /// <param name="spanId">Optional span identifier.</param>
     /// <param name="parentSpanId">Optional parent span identifier.</param>
     /// <param name="decisionLatencyMs">Optional decision latency in milliseconds.</param>
@@ -314,7 +314,7 @@ public sealed class DecisionReceipt : IDecisionReceipt
         string? eventId = null,
         DateTimeOffset? occurredUtc = null,
         IReadOnlyDictionary<string, string>? metadata = null,
-        string? auditResidueId = null,
+        string? decisionReceiptId = null,
         string? spanId = null,
         string? parentSpanId = null,
         long? decisionLatencyMs = null,
@@ -345,7 +345,7 @@ public sealed class DecisionReceipt : IDecisionReceipt
             decision.PolicyVersion,
             decision.PolicyHash,
             metadata,
-            auditResidueId,
+            decisionReceiptId,
             spanId,
             parentSpanId,
             decisionLatencyMs,
@@ -376,7 +376,7 @@ public sealed class DecisionReceipt : IDecisionReceipt
     /// <param name="policyVersion">Optional policy version.</param>
     /// <param name="policyHash">Optional policy hash.</param>
     /// <param name="metadata">Optional host-provided audit metadata.</param>
-    /// <param name="auditResidueId">Optional decision receipt identifier. When omitted, the normalized event identifier is used.</param>
+    /// <param name="decisionReceiptId">Optional decision receipt identifier. When omitted, the normalized event identifier is used.</param>
     /// <param name="spanId">Optional span identifier.</param>
     /// <param name="parentSpanId">Optional parent span identifier.</param>
     /// <param name="decisionLatencyMs">Optional decision latency in milliseconds.</param>
@@ -404,7 +404,7 @@ public sealed class DecisionReceipt : IDecisionReceipt
         string? policyVersion = null,
         string? policyHash = null,
         IReadOnlyDictionary<string, string>? metadata = null,
-        string? auditResidueId = null,
+        string? decisionReceiptId = null,
         string? spanId = null,
         string? parentSpanId = null,
         long? decisionLatencyMs = null,
@@ -435,7 +435,7 @@ public sealed class DecisionReceipt : IDecisionReceipt
             policyVersion,
             policyHash,
             metadata,
-            auditResidueId,
+            decisionReceiptId,
             spanId,
             parentSpanId,
             decisionLatencyMs,
@@ -465,7 +465,7 @@ public sealed class DecisionReceipt : IDecisionReceipt
         string? policyVersion,
         string? policyHash,
         IReadOnlyDictionary<string, string>? metadata,
-        string? auditResidueId,
+        string? decisionReceiptId,
         string? spanId,
         string? parentSpanId,
         long? decisionLatencyMs,
@@ -488,7 +488,7 @@ public sealed class DecisionReceipt : IDecisionReceipt
 
         return new DecisionReceipt(
             normalizedEventId,
-            NormalizeAuditResidueId(auditResidueId, normalizedEventId),
+            NormalizeDecisionReceiptId(decisionReceiptId, normalizedEventId),
             schemaVersion ?? GovernanceSchemaVersions.StableArtifactsV1,
             occurredUtc ?? DateTimeOffset.UtcNow,
             actor.ActorId,
@@ -525,11 +525,11 @@ public sealed class DecisionReceipt : IDecisionReceipt
             : identifier.Trim();
     }
 
-    private static string NormalizeAuditResidueId(string? auditResidueId, string eventId)
+    private static string NormalizeDecisionReceiptId(string? decisionReceiptId, string eventId)
     {
-        return string.IsNullOrWhiteSpace(auditResidueId)
+        return string.IsNullOrWhiteSpace(decisionReceiptId)
             ? eventId
-            : auditResidueId.Trim();
+            : decisionReceiptId.Trim();
     }
 
     private static string? NormalizeOptional(string? value)

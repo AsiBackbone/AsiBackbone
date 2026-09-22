@@ -1,9 +1,9 @@
 using AsiBackbone.Core.Audit;
-using AsiBackbone.Core.CapabilityTokens;
+using AsiBackbone.Core.CapabilityGrants;
 using AsiBackbone.Core.Outbox;
 using AsiBackbone.DependencyInjection;
 using AsiBackbone.Storage.InMemory.Audit;
-using AsiBackbone.Storage.InMemory.CapabilityTokens;
+using AsiBackbone.Storage.InMemory.CapabilityGrants;
 using AsiBackbone.Storage.InMemory.Outbox;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -15,7 +15,7 @@ namespace AsiBackbone.Storage.InMemory;
 public static class InMemoryStorageBuilderExtensions
 {
     /// <summary>
-    /// Adds the non-durable in-memory audit sink through the AsiBackbone builder facade.
+    /// Adds the non-durable in-memory decision receipt sink through the AsiBackbone builder facade.
     /// </summary>
     public static IAsiBackboneBuilder UseInMemoryAuditLedger(this IAsiBackboneBuilder builder)
     {

@@ -19,7 +19,7 @@ public enum GovernanceEmissionEventType
     Acknowledgment = 200,
 
     /// <summary>
-    /// A capability token event occurred.
+    /// A capability grant event occurred.
     /// </summary>
     CapabilityToken = 300,
 
@@ -31,7 +31,7 @@ public enum GovernanceEmissionEventType
     /// <summary>
     /// Decision receipt or an audit ledger record is being emitted.
     /// </summary>
-    AuditResidue = 500,
+    DecisionReceipt = 500,
 
     /// <summary>
     /// An decision receipt lifecycle event is being emitted.

@@ -8,7 +8,7 @@ public static class CanonicalArtifactTypes
     /// <summary>
     /// Identifies a framework-neutral decision receipt payload.
     /// </summary>
-    public const string AuditResidue = "asibackbone.audit-residue";
+    public const string DecisionReceipt = "asibackbone.audit-residue";
 
     /// <summary>
     /// Identifies a persistence-ready audit ledger record payload.
@@ -18,7 +18,7 @@ public static class CanonicalArtifactTypes
     /// <summary>
     /// Identifies an decision receipt lifecycle event payload.
     /// </summary>
-    public const string AuditResidueLifecycleEvent = "asibackbone.audit-residue-lifecycle-event";
+    public const string DecisionReceiptLifecycleEvent = "asibackbone.audit-residue-lifecycle-event";
 
     /// <summary>
     /// Identifies a provider-neutral governance emission envelope payload.
@@ -33,7 +33,7 @@ public static class CanonicalArtifactTypes
     /// <summary>
     /// Identifies a provider-neutral capability-token grant payload.
     /// </summary>
-    public const string CapabilityTokenGrant = "asibackbone.capability-token-grant";
+    public const string CapabilityGrant = "asibackbone.capability-token-grant";
 
     /// <summary>
     /// Identifies a provider-neutral audit integrity chain link payload.

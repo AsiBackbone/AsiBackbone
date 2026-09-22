@@ -153,7 +153,7 @@ public sealed class EfCoreGovernanceOutboxSemanticsTests
             createdUtc: new DateTimeOffset(2026, 7, 7, 8, 0, 1, TimeSpan.Zero),
             schemaVersion: "1.0.0",
             correlationId: "outbox-semantics-validation",
-            auditResidueId: "audit-outbox-semantics",
+            decisionReceiptId: "audit-outbox-semantics",
             lifecycleStage: DecisionReceiptLifecycleStage.ExternalEmissionQueued,
             policyVersion: "2026.07",
             policyHash: "policy-hash-semantics",

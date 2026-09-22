@@ -187,7 +187,7 @@ Exit criteria:
 
 Child issue: #225. Status: capability-token primitives exist; production issuer/custody/replay validation remains host/provider-owned.
 
-Capability tokens should remain short-lived, scoped, and checked at the execution boundary.
+Capability grants should remain short-lived, scoped, and checked at the execution boundary.
 
 Recommended checks include issuer, audience, expiration, not-before, scope, policy version/hash, acknowledgment or handshake reference, token ID or nonce, cancellation/revocation state, and reuse state for single-use or bounded-use workflows.
 

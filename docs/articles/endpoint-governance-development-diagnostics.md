@@ -101,7 +101,7 @@ builder.Services.AddSingleton<IEndpointCapabilityGrantValidator, MyCapabilityGra
 
 The endpoint requested `.EmitGovernanceAudit()` or `[EmitGovernanceAudit]`, but no `IDecisionReceiptSink` is registered.
 
-Register a host-owned audit sink. For local-only validation, `AsiBackbone.Storage.InMemory` can provide non-durable inspection. Production hosts should use durable host-owned persistence when records must survive restart.
+Register a host-owned decision receipt sink. For local-only validation, `AsiBackbone.Storage.InMemory` can provide non-durable inspection. Production hosts should use durable host-owned persistence when records must survive restart.
 
 ### Bodyless `403 Forbidden`
 

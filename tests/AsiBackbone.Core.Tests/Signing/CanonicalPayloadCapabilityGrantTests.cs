@@ -1,11 +1,11 @@
-using AsiBackbone.Core.CapabilityTokens;
+using AsiBackbone.Core.CapabilityGrants;
 using AsiBackbone.Core.Signing;
 using Xunit;
 
 namespace AsiBackbone.Core.Tests.Signing;
 
 /// <summary>
-/// Tests that the capability token grant canonical payload binds every field the validator enforces.
+/// Tests that the capability grant grant canonical payload binds every field the validator enforces.
 /// </summary>
 public sealed class CanonicalPayloadCapabilityGrantTests
 {
@@ -38,11 +38,11 @@ public sealed class CanonicalPayloadCapabilityGrantTests
     /// Verifies the payload carries the artifact descriptors that identify what was signed.
     /// </summary>
     [Fact]
-    public void ForCapabilityTokenGrantSetsArtifactDescriptors()
+    public void ForCapabilityGrantSetsArtifactDescriptors()
     {
-        CanonicalPayload payload = CanonicalPayloadBuilder.ForCapabilityTokenGrant(CreateGrant());
+        CanonicalPayload payload = CanonicalPayloadBuilder.ForCapabilityGrant(CreateGrant());
 
-        Assert.Equal(CanonicalArtifactTypes.CapabilityTokenGrant, payload.ArtifactType);
+        Assert.Equal(CanonicalArtifactTypes.CapabilityGrant, payload.ArtifactType);
         Assert.Equal("token-1", payload.ArtifactId);
     }
 
@@ -52,9 +52,9 @@ public sealed class CanonicalPayloadCapabilityGrantTests
     /// <param name="fieldName">The canonical content key expected to be present.</param>
     [Theory]
     [MemberData(nameof(BoundFieldNames))]
-    public void ForCapabilityTokenGrantBindsEveryGrantField(string fieldName)
+    public void ForCapabilityGrantBindsEveryGrantField(string fieldName)
     {
-        CanonicalPayload payload = CanonicalPayloadBuilder.ForCapabilityTokenGrant(CreateGrant());
+        CanonicalPayload payload = CanonicalPayloadBuilder.ForCapabilityGrant(CreateGrant());
 
         Assert.Contains($"\"{fieldName}\":", payload.CanonicalJson, StringComparison.Ordinal);
     }
@@ -117,10 +117,10 @@ public sealed class CanonicalPayloadCapabilityGrantTests
         Assert.NotEqual(withRegion, withDifferentRegion);
     }
 
-    private static string HashWith(CapabilityTokenGrant grant, CanonicalPayloadOptions options)
+    private static string HashWith(CapabilityGrant grant, CanonicalPayloadOptions options)
     {
         return CanonicalPayloadHasher
-            .ComputeHash(CanonicalPayloadBuilder.ForCapabilityTokenGrant(grant, options))
+            .ComputeHash(CanonicalPayloadBuilder.ForCapabilityGrant(grant, options))
             .HashValue;
     }
 
@@ -153,18 +153,18 @@ public sealed class CanonicalPayloadCapabilityGrantTests
     /// Verifies that the builder rejects a null grant.
     /// </summary>
     [Fact]
-    public void ForCapabilityTokenGrantRejectsNullGrant()
+    public void ForCapabilityGrantRejectsNullGrant()
     {
         _ = Assert.Throws<ArgumentNullException>(
-            () => CanonicalPayloadBuilder.ForCapabilityTokenGrant(null!));
+            () => CanonicalPayloadBuilder.ForCapabilityGrant(null!));
     }
 
-    private static string HashOf(CapabilityTokenGrant grant)
+    private static string HashOf(CapabilityGrant grant)
     {
-        return CanonicalPayloadHasher.ComputeHash(CanonicalPayloadBuilder.ForCapabilityTokenGrant(grant)).HashValue;
+        return CanonicalPayloadHasher.ComputeHash(CanonicalPayloadBuilder.ForCapabilityGrant(grant)).HashValue;
     }
 
-    private static CapabilityTokenGrant CreateGrant(
+    private static CapabilityGrant CreateGrant(
         IEnumerable<string>? scopes = null,
         DateTimeOffset? issuedUtc = null,
         DateTimeOffset? notBeforeUtc = null,
@@ -178,7 +178,7 @@ public sealed class CanonicalPayloadCapabilityGrantTests
         string? resourceBinding = "resource-1",
         IReadOnlyDictionary<string, string>? metadata = null)
     {
-        return CapabilityTokenGrant.Create(
+        return CapabilityGrant.Create(
             tokenId: "token-1",
             issuer: "issuer-1",
             audience: "audience-1",

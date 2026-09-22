@@ -144,7 +144,7 @@ using System.Net.Http.Json;
 using AsiBackbone.AspNetCore.Actors;
 using AsiBackbone.AspNetCore.Correlation;
 using AsiBackbone.AspNetCore.DependencyInjection;
-using AsiBackbone.AspNetCore.Handshakes;
+using AsiBackbone.AspNetCore.Acknowledgments;
 using AsiBackbone.Core.Actors;
 using AsiBackbone.Core.Audit;
 using AsiBackbone.Core.Constraints;
@@ -286,7 +286,7 @@ internal static class SmokeHost
             string mode,
             HttpContext httpContext,
             IGovernancePolicyEvaluator<GovernanceEvaluationContext> evaluator,
-            IDecisionReceiptSink auditSink,
+            IDecisionReceiptSink receiptSink,
             IGovernanceAuditLedgerStore ledgerStore,
             CancellationToken cancellationToken) =>
         {
@@ -307,15 +307,15 @@ internal static class SmokeHost
                 "external-consumer-user",
                 "External Consumer User");
 
-            DecisionReceipt residue = DecisionReceipt.FromDecision(
+            DecisionReceipt receipt = DecisionReceipt.FromDecision(
                 actor,
                 $"external-consumer.{mode}",
                 decision,
                 metadata: context.Metadata);
 
-            await auditSink.WriteAsync(residue, cancellationToken).ConfigureAwait(false);
+            await receiptSink.WriteAsync(receipt, cancellationToken).ConfigureAwait(false);
 
-            AuditLedgerRecord record = AuditLedgerRecord.FromDecisionReceipt(residue);
+            AuditLedgerRecord record = AuditLedgerRecord.FromDecisionReceipt(receipt);
             OperationResult<AuditLedgerRecord> appendResult = await ledgerStore
                 .AppendAsync(record, cancellationToken)
                 .ConfigureAwait(false);
@@ -335,7 +335,7 @@ internal static class SmokeHost
                 RequiresAcknowledgment: decision.RequiresAcknowledgment,
                 ReasonCodes: [.. decision.ReasonCodes],
                 CorrelationId: correlationId,
-                AuditEventId: residue.EventId,
+                DecisionReceiptEventId: receipt.EventId,
                 LedgerRecordId: appendResult.Value.RecordId,
                 EfLedgerRecordCount: efLedgerRecord is null ? 0 : 1));
         });
@@ -440,7 +440,7 @@ internal sealed record SmokeDecisionResponse(
     bool RequiresAcknowledgment,
     string[] ReasonCodes,
     string CorrelationId,
-    string AuditEventId,
+    string DecisionReceiptEventId,
     string LedgerRecordId,
     int EfLedgerRecordCount);
 CSHARP

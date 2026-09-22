@@ -1,6 +1,6 @@
+using AsiBackbone.AspNetCore.Acknowledgments;
 using AsiBackbone.AspNetCore.DependencyInjection;
 using AsiBackbone.AspNetCore.Endpoints;
-using AsiBackbone.AspNetCore.Handshakes;
 using AsiBackbone.Core.Actors;
 using AsiBackbone.Core.Audit;
 using AsiBackbone.Core.Constraints;
@@ -74,7 +74,7 @@ app.MapPost("/sample/ergonomic/minimal", () => Results.Ok(new
 }))
 .WithDisplayName("sample.ergonomic.minimal")
 .MarkGovernancePolicy(typeof(SampleEndpointPolicy))
-.RequireLiabilityHandshake()
+.RequireAcknowledgment()
 .RequireCapabilityGrant("sample.high-risk.execute")
 .EmitGovernanceAudit();
 
@@ -373,7 +373,7 @@ internal sealed class InternalSampleGovernanceController : ControllerBase
 {
     [HttpPost]
     [GovernancePolicy(typeof(SampleEndpointPolicy))]
-    [RequireLiabilityHandshake]
+    [RequireAcknowledgment]
     [RequireCapabilityGrant("sample.high-risk.execute")]
     [EmitGovernanceAudit]
     public IActionResult ExecuteHighRiskAction()

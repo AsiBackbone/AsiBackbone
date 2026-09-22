@@ -48,7 +48,7 @@ public sealed class GovernanceOutboxStoreTests
         var lifecycleEvent = DecisionReceiptLifecycleEvent.Create(
             DecisionReceiptLifecycleStage.ExternalEmissionQueued,
             "correlation-1",
-            auditResidueId: "residue-1",
+            decisionReceiptId: "residue-1",
             eventId: "lifecycle-1",
             traceId: "trace-1",
             operationName: "governance.emit");
@@ -78,7 +78,7 @@ public sealed class GovernanceOutboxStoreTests
 
         Assert.NotNull(storedLifecycleEvent);
         Assert.Equal("correlation-1", storedLifecycleEvent.CorrelationId);
-        Assert.Equal("residue-1", storedLifecycleEvent.AuditResidueId);
+        Assert.Equal("residue-1", storedLifecycleEvent.DecisionReceiptId);
         Assert.Equal(GovernanceEmissionStatus.RetryableFailure, failedEntry.Status);
         Assert.Equal(1, failedEntry.RetryCount);
         Assert.Equal("test-provider", failedEntry.ProviderName);
@@ -635,12 +635,12 @@ public sealed class GovernanceOutboxStoreTests
     private static GovernanceEmissionEnvelope CreateEnvelope(string eventId, string correlationId)
     {
         return GovernanceEmissionEnvelope.Create(
-            GovernanceEmissionEventType.AuditResidue,
+            GovernanceEmissionEventType.DecisionReceipt,
             eventId: eventId,
             occurredUtc: new DateTimeOffset(2026, 6, 15, 14, 0, 0, TimeSpan.Zero),
             envelopeId: $"envelope-{eventId}",
             correlationId: correlationId,
-            auditResidueId: $"residue-{eventId}",
+            decisionReceiptId: $"residue-{eventId}",
             traceId: $"trace-{eventId}",
             operationName: "governance.emit",
             emitterStatus: "pending",

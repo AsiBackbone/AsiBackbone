@@ -51,7 +51,7 @@ app.UseAsiBackboneEndpointGovernance();
 | `GovernancePolicyOptions.PreventThreatAssessmentAllowDowngrade` | `true` | Actionable threat outcomes cannot be reduced to a pure allow decision. |
 | `EndpointGovernanceOptions.FailClosedWhenPolicyEvaluatorMissing` | `true` | Endpoints requesting policy evaluation fail closed when the evaluator is absent. |
 | `EndpointGovernanceOptions.FailClosedWhenCapabilityValidatorMissing` | `true` | Capability-gated endpoints fail closed when the host validator is absent. |
-| `EndpointGovernanceOptions.FailClosedWhenAuditSinkMissing` | `true` | Endpoints requesting governance audit fail closed when the host audit sink is absent. |
+| `EndpointGovernanceOptions.FailClosedWhenAuditSinkMissing` | `true` | Endpoints requesting governance audit fail closed when the host decision receipt sink is absent. |
 | `EndpointGovernanceOptions.RequireGovernanceMetadata` | `true` | Endpoints must be governed or explicitly marked as intentionally exempt. |
 | `EndpointGovernanceOptions.IncludeDevelopmentDiagnosticsMetadataValues` | `false` | Development diagnostics may retain bounded keys, but metadata values remain redacted. |
 
@@ -100,7 +100,7 @@ Production replay protection should be durable, concurrency-safe, and atomic for
 
 ## Audit, persistence, and signing
 
-The profile requires an audit sink only when an endpoint requests governance audit. The host still owns:
+The profile requires an decision receipt sink only when an endpoint requests governance audit. The host still owns:
 
 - durable audit and outbox persistence before external emission;
 - transaction boundaries and failure recovery;
@@ -126,11 +126,11 @@ Governed endpoints should state their required policy, capability, acknowledgmen
 app.MapPost("/payments/{id}/approve", ApprovePayment)
     .MarkGovernancePolicy<PaymentApprovalPolicy>()
     .RequireCapabilityGrant("payments.approve")
-    .RequireLiabilityHandshake()
+    .RequireAcknowledgment()
     .EmitGovernanceAudit();
 ```
 
-A missing policy evaluator, capability validator, or audit sink blocks the request when the corresponding endpoint metadata is present.
+A missing policy evaluator, capability validator, or decision receipt sink blocks the request when the corresponding endpoint metadata is present.
 
 ## Progressive-adoption alternative
 
@@ -150,7 +150,7 @@ They may then add strict options, sanitation, capability validation, durable sto
 - [ ] Register real policy constraints, threat contributors, and a DI-configured evaluator.
 - [ ] Register a capability validator that verifies proof, scope, expiry, binding, and replay/use state where applicable.
 - [ ] Register reviewed metadata classifiers and use sanitation before every durable or external boundary.
-- [ ] Register a durable audit sink and outbox strategy for production evidence.
+- [ ] Register a durable decision receipt sink and outbox strategy for production evidence.
 - [ ] Use managed-key/provider-neutral production signing rather than local-development signing.
 - [ ] Keep expanded diagnostics restricted to Development and keep metadata values redacted.
 - [ ] Validate the complete deployed host against its legal, regulatory, privacy, security, and operational obligations.

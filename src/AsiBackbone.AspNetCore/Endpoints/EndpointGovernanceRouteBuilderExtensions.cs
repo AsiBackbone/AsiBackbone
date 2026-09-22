@@ -68,10 +68,10 @@ public static class EndpointGovernanceRouteBuilderExtensions
     /// <typeparam name="TBuilder">The endpoint convention builder type.</typeparam>
     /// <param name="builder">The endpoint convention builder.</param>
     /// <returns>The same builder so calls can be chained.</returns>
-    public static TBuilder RequireLiabilityHandshake<TBuilder>(this TBuilder builder)
+    public static TBuilder RequireAcknowledgment<TBuilder>(this TBuilder builder)
         where TBuilder : IEndpointConventionBuilder
     {
-        return AddEndpointMetadata(builder, new RequireLiabilityHandshakeAttribute());
+        return AddEndpointMetadata(builder, new RequireAcknowledgmentAttribute());
     }
 
     /// <summary>

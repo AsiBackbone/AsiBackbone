@@ -11,7 +11,7 @@ using Xunit;
 namespace AsiBackbone.EntityFrameworkCore.Tests;
 
 /// <summary>
-/// Integration tests for durable governance outbox and audit residue lifecycle persistence through host-owned EF Core contexts.
+/// Integration tests for durable governance outbox and decision receipt lifecycle persistence through host-owned EF Core contexts.
 /// </summary>
 public sealed class EfCoreGovernanceOutboxPersistenceTests
 {
@@ -48,7 +48,7 @@ public sealed class EfCoreGovernanceOutboxPersistenceTests
             Assert.Equal(GovernanceEmissionStatus.Pending, found.Status);
             Assert.Equal("event-pending", found.Envelope.EventId);
             Assert.Equal("correlation-123", found.Envelope.CorrelationId);
-            Assert.Equal("audit-123", found.Envelope.AuditResidueId);
+            Assert.Equal("audit-123", found.Envelope.DecisionReceiptId);
             Assert.Equal("2026.06", found.Envelope.PolicyVersion);
             Assert.Equal("policy-hash-123", found.Envelope.PolicyHash);
             Assert.Equal("trace-123", found.Envelope.TraceId);
@@ -249,11 +249,11 @@ public sealed class EfCoreGovernanceOutboxPersistenceTests
     }
 
     /// <summary>
-    /// Verifies append and lookup behavior for EF Core audit residue lifecycle persistence.
+    /// Verifies append and lookup behavior for EF Core decision receipt lifecycle persistence.
     /// </summary>
     /// <returns>A task that represents the asynchronous test operation.</returns>
     [Fact]
-    public async Task LifecycleStoreAppendsAndFindsByEventCorrelationAndAuditResidue()
+    public async Task LifecycleStoreAppendsAndFindsByEventCorrelationAndDecisionReceipt()
     {
         await using SqliteConnection connection = await OpenConnectionAsync();
         DbContextOptions<HostOwnedGovernanceDbContext> options = CreateOptions(connection);
@@ -288,14 +288,14 @@ public sealed class EfCoreGovernanceOutboxPersistenceTests
 
         DecisionReceiptLifecycleEvent? found = await store.FindByEventIdAsync("lifecycle-1", TestContext.Current.CancellationToken);
         IReadOnlyList<DecisionReceiptLifecycleEvent> correlationMatches = await store.FindByCorrelationIdAsync("correlation-shared", TestContext.Current.CancellationToken);
-        IReadOnlyList<DecisionReceiptLifecycleEvent> auditResidueMatches = await store.FindByAuditResidueIdAsync("audit-shared", TestContext.Current.CancellationToken);
+        IReadOnlyList<DecisionReceiptLifecycleEvent> decisionReceiptMatches = await store.FindByDecisionReceiptIdAsync("audit-shared", TestContext.Current.CancellationToken);
 
         Assert.NotNull(found);
         Assert.Equal(DecisionReceiptLifecycleStage.ExternalEmissionQueued, found.Stage);
         Assert.Equal("trace-lifecycle-1", found.TraceId);
         Assert.Equal("test", found.Metadata["source"]);
         Assert.Equal(["lifecycle-1", "lifecycle-2"], [.. correlationMatches.Select(match => match.EventId)]);
-        Assert.Equal(["lifecycle-1", "lifecycle-2"], [.. auditResidueMatches.Select(match => match.EventId)]);
+        Assert.Equal(["lifecycle-1", "lifecycle-2"], [.. decisionReceiptMatches.Select(match => match.EventId)]);
     }
 
     private static async Task<SqliteConnection> OpenConnectionAsync()
@@ -333,7 +333,7 @@ public sealed class EfCoreGovernanceOutboxPersistenceTests
     private static GovernanceEmissionEnvelope CreateEnvelope(
         string eventId,
         string correlationId,
-        string auditResidueId)
+        string decisionReceiptId)
     {
         return GovernanceEmissionEnvelope.Create(
             GovernanceEmissionEventType.AuditLifecycle,
@@ -343,7 +343,7 @@ public sealed class EfCoreGovernanceOutboxPersistenceTests
             createdUtc: new DateTimeOffset(2026, 6, 15, 9, 0, 1, TimeSpan.Zero),
             schemaVersion: "1.0.0",
             correlationId: correlationId,
-            auditResidueId: auditResidueId,
+            decisionReceiptId: decisionReceiptId,
             lifecycleStage: DecisionReceiptLifecycleStage.ExternalEmissionQueued,
             policyVersion: "2026.06",
             policyHash: "policy-hash-123",
@@ -378,13 +378,13 @@ public sealed class EfCoreGovernanceOutboxPersistenceTests
         string eventId,
         DecisionReceiptLifecycleStage stage,
         string correlationId,
-        string auditResidueId,
+        string decisionReceiptId,
         DateTimeOffset occurredUtc)
     {
         return DecisionReceiptLifecycleEvent.Create(
             stage,
             correlationId,
-            auditResidueId,
+            decisionReceiptId,
             eventId,
             occurredUtc,
             traceId: $"trace-{eventId}",
@@ -402,7 +402,7 @@ public sealed class EfCoreGovernanceOutboxPersistenceTests
         public DbSet<GovernanceOutboxEntryEntity> GovernanceOutboxEntries =>
             Set<GovernanceOutboxEntryEntity>();
 
-        public DbSet<DecisionReceiptLifecycleEventEntity> AuditResidueLifecycleEvents =>
+        public DbSet<DecisionReceiptLifecycleEventEntity> DecisionReceiptLifecycleEvents =>
             Set<DecisionReceiptLifecycleEventEntity>();
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)

@@ -193,7 +193,7 @@ public sealed class GatewayReadinessDecisionPolicy<TContext> : IGovernanceDecisi
 }
 ```
 
-This policy still does not validate the capability token, sign the receipt, or call the external gateway. Those steps remain host-owned. The policy only checks safe facts that the host placed into the evaluation context.
+This policy still does not validate the capability grant, sign the receipt, or call the external gateway. Those steps remain host-owned. The policy only checks safe facts that the host placed into the evaluation context.
 
 ## Example 4: latency-sensitive orchestration
 

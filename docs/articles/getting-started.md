@@ -43,7 +43,7 @@ The current implementation direction is:
 3. Decision result model
 4. Acknowledgment/handshake workflow
 5. Decision receipt and audit ledger contracts
-6. Capability token abstractions
+6. Capability grant abstractions
 7. In-memory local validation storage
 8. EF Core host-owned persistence integration
 9. ASP.NET Core host integration
@@ -108,7 +108,7 @@ Intent or request
   -> Decision result
   -> Optional acknowledgment
   -> Audit receipt
-  -> Optional capability token
+  -> Optional capability grant
   -> Local audit/outbox persistence
   -> Optional signing or verification
   -> Optional provider emission
@@ -182,7 +182,7 @@ A decision result should answer:
 
 Some actions may require a user or system acknowledgment before proceeding.
 
-This workflow supports the broader Dynamic Liability Handshake concept while allowing the public API to use implementation-focused names such as acknowledgment, responsibility handshake, or reflexive acknowledgment.
+This workflow supports the broader Acknowledgment Workflow concept while allowing the public API to use implementation-focused names such as acknowledgment, responsibility handshake, or reflexive acknowledgment.
 
 An acknowledgment workflow may include:
 

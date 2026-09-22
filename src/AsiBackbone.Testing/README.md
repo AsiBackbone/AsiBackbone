@@ -62,7 +62,7 @@ GovernanceTestDecisionReceiptSink auditSink = services.GetRequiredService<Govern
 Assert.Single(auditSink.Entries);
 ```
 
-The audit sink is in-memory and process-local. It is intended for assertion-friendly automated tests, not durable records or tamper-evidence.
+The decision receipt sink is in-memory and process-local. It is intended for assertion-friendly automated tests, not durable records or tamper-evidence.
 
 ## Reusable contract fixtures
 
@@ -136,4 +136,4 @@ Use this pattern when a host application already calls `AddAsiBackboneAspNetCore
 
 ## Production boundary
 
-This package is intentionally scoped to automated tests, samples, and local developer validation. Production applications should register real policy evaluators, capability validators, audit sinks, durable outbox stores, signing providers, and storage providers appropriate to their risk profile.
+This package is intentionally scoped to automated tests, samples, and local developer validation. Production applications should register real policy evaluators, capability validators, decision receipt sinks, durable outbox stores, signing providers, and storage providers appropriate to their risk profile.

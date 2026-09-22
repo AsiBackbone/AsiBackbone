@@ -39,12 +39,12 @@ public sealed class GovernanceArtifactSignerLineCoverageTests
             cancellationToken: TestContext.Current.CancellationToken);
 
         Assert.True(unsigned.HasNoSignature);
-        Assert.Equal(CanonicalArtifactTypes.AuditResidue, unsigned.ArtifactType);
+        Assert.Equal(CanonicalArtifactTypes.DecisionReceipt, unsigned.ArtifactType);
         Assert.Equal("residue-1", unsigned.ArtifactId);
         Assert.Equal(CanonicalPayloadOptions.DefaultHashAlgorithm, unsigned.HashAlgorithm);
 
         Assert.True(signingReady.IsSigningReady);
-        Assert.Equal(CanonicalArtifactTypes.AuditResidue, signingReady.SigningMetadata.Metadata["artifact_type"]);
+        Assert.Equal(CanonicalArtifactTypes.DecisionReceipt, signingReady.SigningMetadata.Metadata["artifact_type"]);
         Assert.Equal("residue-1", signingReady.SigningMetadata.Metadata["artifact_id"]);
         Assert.Equal("audit-residue-ready", signingReady.SigningMetadata.Metadata["workflow"]);
 
@@ -81,11 +81,11 @@ public sealed class GovernanceArtifactSignerLineCoverageTests
             cancellationToken: TestContext.Current.CancellationToken);
 
         Assert.True(unsigned.HasNoSignature);
-        Assert.Equal(CanonicalArtifactTypes.AuditResidueLifecycleEvent, unsigned.ArtifactType);
+        Assert.Equal(CanonicalArtifactTypes.DecisionReceiptLifecycleEvent, unsigned.ArtifactType);
         Assert.Equal("lifecycle-1", unsigned.ArtifactId);
 
         Assert.True(signingReady.IsSigningReady);
-        Assert.Equal(CanonicalArtifactTypes.AuditResidueLifecycleEvent, signingReady.SigningMetadata.Metadata["artifact_type"]);
+        Assert.Equal(CanonicalArtifactTypes.DecisionReceiptLifecycleEvent, signingReady.SigningMetadata.Metadata["artifact_type"]);
         Assert.Equal("lifecycle-1", signingReady.SigningMetadata.Metadata["artifact_id"]);
         Assert.Equal("lifecycle-ready", signingReady.SigningMetadata.Metadata["workflow"]);
 
@@ -209,7 +209,7 @@ public sealed class GovernanceArtifactSignerLineCoverageTests
             correlationId: "correlation-1",
             policyVersion: "policy-v1",
             policyHash: "policy-hash",
-            auditResidueId: "residue-1");
+            decisionReceiptId: "residue-1");
     }
 
     private static DecisionReceiptLifecycleEvent CreateLifecycleEvent()
@@ -217,7 +217,7 @@ public sealed class GovernanceArtifactSignerLineCoverageTests
         return DecisionReceiptLifecycleEvent.Create(
             DecisionReceiptLifecycleStage.ExternalEmissionQueued,
             "correlation-1",
-            auditResidueId: "residue-1",
+            decisionReceiptId: "residue-1",
             eventId: "lifecycle-1",
             occurredUtc: new DateTimeOffset(2026, 6, 16, 12, 0, 3, TimeSpan.Zero),
             operationName: "gateway.emit",
@@ -234,13 +234,13 @@ public sealed class GovernanceArtifactSignerLineCoverageTests
             sizeBytes: 128);
 
         return GovernanceEmissionEnvelope.Create(
-            GovernanceEmissionEventType.AuditResidue,
+            GovernanceEmissionEventType.DecisionReceipt,
             eventId: "event-1",
             occurredUtc: new DateTimeOffset(2026, 6, 16, 12, 0, 0, TimeSpan.Zero),
             envelopeId: "envelope-1",
             createdUtc: new DateTimeOffset(2026, 6, 16, 12, 0, 1, TimeSpan.Zero),
             correlationId: "correlation-1",
-            auditResidueId: "residue-1",
+            decisionReceiptId: "residue-1",
             policyVersion: "policy-v1",
             policyHash: "policy-hash",
             payload: payload);

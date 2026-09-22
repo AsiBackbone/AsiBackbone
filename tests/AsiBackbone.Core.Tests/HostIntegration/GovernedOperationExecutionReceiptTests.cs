@@ -104,7 +104,7 @@ public sealed class GovernedOperationExecutionReceiptTests
     [Fact]
     public void CompletionLifecycleEventPreservesDecisionCorrelation()
     {
-        var residue = new TestAuditResidue();
+        var residue = new TestDecisionReceipt();
         var receipt = GovernedOperationExecutionReceipt.Create(
             "operation-1",
             GovernedOperationPersistenceOutcome.Committed,
@@ -124,7 +124,7 @@ public sealed class GovernedOperationExecutionReceiptTests
         Assert.Equal(DecisionReceiptLifecycleStage.GatewayExecutionCompleted, lifecycleEvent.Stage);
         Assert.Equal("correlation-1", lifecycleEvent.CorrelationId);
         Assert.Equal("trace-1", lifecycleEvent.TraceId);
-        Assert.Equal("audit-1", lifecycleEvent.AuditResidueId);
+        Assert.Equal("audit-1", lifecycleEvent.DecisionReceiptId);
         Assert.Equal("orders.approve", lifecycleEvent.OperationName);
         Assert.Equal("Committed", lifecycleEvent.Outcome);
         Assert.Equal("2026-07-17T17:00:00.0000000+00:00", lifecycleEvent.OccurredUtc.ToString("O"));
@@ -183,10 +183,10 @@ public sealed class GovernedOperationExecutionReceiptTests
             metadata: metadata);
     }
 
-    private sealed class TestAuditResidue : IDecisionReceipt
+    private sealed class TestDecisionReceipt : IDecisionReceipt
     {
         public string EventId => "audit-1";
-        public string? AuditResidueId => "audit-1";
+        public string? DecisionReceiptId => "audit-1";
         public DateTimeOffset OccurredUtc => DateTimeOffset.UtcNow;
         public string ActorId => "actor-1";
         public GovernanceActorType ActorType => GovernanceActorType.Human;

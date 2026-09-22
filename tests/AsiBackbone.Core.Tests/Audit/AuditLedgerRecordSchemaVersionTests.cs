@@ -48,9 +48,9 @@ public sealed class AuditLedgerRecordSchemaVersionTests
         return document.RootElement.GetProperty("schemaVersion").GetString()!;
     }
 
-    private static TestAuditResidue CreateValidResidue()
+    private static TestDecisionReceipt CreateValidResidue()
     {
-        return new TestAuditResidue
+        return new TestDecisionReceipt
         {
             EventId = "event-123",
             OccurredUtc = new DateTimeOffset(2026, 6, 4, 12, 0, 0, TimeSpan.Zero),
@@ -71,7 +71,7 @@ public sealed class AuditLedgerRecordSchemaVersionTests
         };
     }
 
-    private sealed class TestAuditResidue : IDecisionReceipt
+    private sealed class TestDecisionReceipt : IDecisionReceipt
     {
         public string EventId { get; set; } = "event-123";
 

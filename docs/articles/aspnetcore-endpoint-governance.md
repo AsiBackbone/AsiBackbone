@@ -18,7 +18,7 @@ Place `UseAsiBackboneEndpointGovernance()` after routing has selected an endpoin
 
 Hosts that use policy metadata should register an `IGovernancePolicyEvaluator<GovernanceEvaluationContext>`. Hosts that use capability metadata should register an `IEndpointCapabilityGrantValidator`. Hosts that request audit emission should register a host-owned `IDecisionReceiptSink`.
 
-Because those services may run before the protected endpoint executes, their implementation choices affect request throughput. Keep request-time evaluators, validators, and audit sinks async, cancellable, bounded, and free of blocking calls such as `.Result`, `.Wait()`, `Thread.Sleep`, synchronous network calls, synchronous database calls, or unbounded `Task.Run` work. See [High-Throughput Host Service Guidance](high-throughput-host-services.md) for request hot-path examples, anti-patterns, queue/backpressure guidance, and the framework/host responsibility boundary.
+Because those services may run before the protected endpoint executes, their implementation choices affect request throughput. Keep request-time evaluators, validators, and decision receipt sinks async, cancellable, bounded, and free of blocking calls such as `.Result`, `.Wait()`, `Thread.Sleep`, synchronous network calls, synchronous database calls, or unbounded `Task.Run` work. See [High-Throughput Host Service Guidance](high-throughput-host-services.md) for request hot-path examples, anti-patterns, queue/backpressure guidance, and the framework/host responsibility boundary.
 
 ## Middleware ordering
 
@@ -59,7 +59,7 @@ Hosts that intentionally mutate options at runtime should validate their mutatio
 ```csharp
 app.MapPost("/high-risk-action", handler)
     .MarkGovernancePolicy<MyStrictPolicy>()
-    .RequireLiabilityHandshake()
+    .RequireAcknowledgment()
     .RequireCapabilityGrant("robotics.execute")
     .EmitGovernanceAudit();
 ```
@@ -107,7 +107,7 @@ The descriptor exposes this as `ShortCircuitOnFirstDenial` and includes `endpoin
 
 ```csharp
 [GovernancePolicy(typeof(MyStrictPolicy))]
-[RequireLiabilityHandshake]
+[RequireAcknowledgment]
 [RequireCapabilityGrant("robotics.execute")]
 [EmitGovernanceAudit]
 public IActionResult ExecuteHighRiskAction()
@@ -137,7 +137,7 @@ When endpoint governance metadata is present, the middleware can:
 2. Build a safe `GovernanceEvaluationContext` using HTTP request correlation data.
 3. Invoke the host-registered policy evaluator when policy metadata exists.
 4. Invoke the host-registered capability validator when capability scopes exist.
-5. Emit `DecisionReceipt` through the host-owned audit sink when audit emission is requested.
+5. Emit `DecisionReceipt` through the host-owned decision receipt sink when audit emission is requested.
 6. Return an acknowledgment challenge when the governance decision requires acknowledgment and the endpoint requested liability-handshake support.
 7. Block execution with a safe HTTP result when policy, capability, or configuration checks fail closed.
 
@@ -150,7 +150,7 @@ The ergonomic endpoint layer deliberately does not own persistence. Durable audi
 | Endpoint metadata and middleware orchestration | `AsiBackbone.AspNetCore` |
 | Policy constraints and decision policy | Host/Core evaluator registration |
 | Capability-grant source, proof validation, and replay handling | Host-owned `IEndpointCapabilityGrantValidator` |
-| Audit sink, ledger store, outbox store, and transactions | Host-owned storage/integration layer |
+| Decision receipt sink, ledger store, outbox store, and transactions | Host-owned storage/integration layer |
 | Legal/compliance interpretation | Host governance process |
 
 High-throughput hosts should treat every host-owned row in this table as production code that can dominate latency. If a host needs expensive provider delivery, DLP/classification, signing, or SIEM export, prefer a local durable record plus outbox handoff instead of performing that work synchronously inside request middleware.
@@ -208,7 +208,7 @@ builder.Services.Configure<EndpointGovernanceOptions>(options =>
 });
 ```
 
-`Reduced` mode forwards only `endpoint.operation_name` through the metadata dictionary. The descriptor still uses the full ASP.NET Core endpoint metadata internally to decide whether policy evaluation, capability validation, audit emission, or acknowledgment handling should run. The tradeoff is that host policy evaluators, audit sinks, acknowledgment stores, and development diagnostics will not receive the omitted metadata values through `GovernanceEvaluationContext.Metadata` or related metadata payloads.
+`Reduced` mode forwards only `endpoint.operation_name` through the metadata dictionary. The descriptor still uses the full ASP.NET Core endpoint metadata internally to decide whether policy evaluation, capability validation, audit emission, or acknowledgment handling should run. The tradeoff is that host policy evaluators, decision receipt sinks, acknowledgment stores, and development diagnostics will not receive the omitted metadata values through `GovernanceEvaluationContext.Metadata` or related metadata payloads.
 
 Do not enable reduced metadata if host policies depend on `endpoint.policy_types`, `endpoint.capability_scopes`, or other endpoint metadata values. Prefer the default `Full` mode until benchmark output shows that the reduced path is worth the loss of diagnostic context.
 

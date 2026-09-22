@@ -19,7 +19,7 @@ The current stable package-family ownership model is:
 
 | Area | Responsibility |
 | --- | --- |
-| `AsiBackbone.Core` | Policy evaluator contracts, the default evaluator, decision composition, constraint contracts, decisions, decision receipt, and audit sink contracts. |
+| `AsiBackbone.Core` | Policy evaluator contracts, the default evaluator, decision composition, constraint contracts, decisions, decision receipt, and decision receipt sink contracts. |
 | `AsiBackbone.Storage.InMemory` | In-process audit ledger support for tests, samples, and local validation hosts. |
 | `AsiBackbone.AspNetCore` | Thin HTTP host adapters for service registration, current actor resolution, request correlation, audit enrichment, HTTP result mapping, and acknowledgment challenge helpers. |
 | `AsiBackbone.EntityFrameworkCore` | EF Core model configuration and durable accountability persistence while preserving host-owned `DbContext`, provider, migrations, and database lifecycle. |
@@ -193,7 +193,7 @@ var evaluator = DefaultGovernancePolicyEvaluator.CreateBuilder<MyPolicyContext>(
 
 Use this mode only when the host explicitly prefers latency or throughput over complete constraint visibility. Keep the default full-evaluation mode for audit-heavy, diagnostic, or reviewer-facing paths.
 
-After the decision is produced, a host or gateway can create decision receipt and write it through an audit sink:
+After the decision is produced, a host or gateway can create decision receipt and write it through an decision receipt sink:
 
 ```csharp
 DecisionReceipt receipt = DecisionReceipt.FromDecision(

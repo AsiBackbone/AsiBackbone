@@ -25,7 +25,7 @@ flowchart LR
     Ack -->|"Rejected or incomplete"| PersistNoExecution["Persist governed outcome and do not execute"]
     Decision -->|"Denied Deferred EscalationRecommended"| PersistNoExecution
 
-    PersistBeforeExecution --> OptionalToken["Optional scoped capability token"]
+    PersistBeforeExecution --> OptionalToken["Optional scoped capability grant"]
     OptionalToken --> HostExecution["Host-owned execution boundary"]
     PersistBeforeExecution --> HostExecution
     HostExecution --> FollowUp["Optional reconciliation and review"]
@@ -56,9 +56,9 @@ flowchart LR
 
 **Caption:** The evaluator returns structured decision data. It does not execute the requested operation and does not replace host authorization or business-policy enforcement.
 
-## Dynamic Liability Handshake sequence
+## Acknowledgment Workflow sequence
 
-The Dynamic Liability Handshake is a reflexive acknowledgment pattern for consequential actions. It records that an actor was presented with a structured challenge and responded, but it is not by itself a legal waiver, authorization grant, or production compliance guarantee.
+The Acknowledgment Workflow is a reflexive acknowledgment pattern for consequential actions. It records that an actor was presented with a structured challenge and responded, but it is not by itself a legal waiver, authorization grant, or production compliance guarantee.
 
 ```mermaid
 flowchart LR
@@ -69,14 +69,14 @@ flowchart LR
     Handshake -->|"Present consequences and acknowledgment text"| Actor
     Actor -->|"Accepts or rejects challenge"| Handshake
     Handshake -->|"Acknowledgment result"| Host
-    Host -->|"Persist decision receipt and acknowledgment record"| Audit["Audit sink or outbox"]
+    Host -->|"Persist decision receipt and acknowledgment record"| Audit["Decision receipt sink or outbox"]
     Host -->|"Accepted and host policy permits"| Execute["Continue through host-owned execution boundary"]
     Host -->|"Missing, rejected, expired, or host policy blocks"| Stop["Do not execute governed action"]
 ```
 
 **Caption:** The handshake makes acknowledgment explicit and auditable. The host still owns identity, authorization, UI, response handling, persistence, and final execution behavior.
 
-## Capability token scoping and expiration
+## Capability grant scoping and expiration
 
 Capability-token primitives can help model a narrow grant after a governance decision, but the host or provider implementation must still enforce scope, expiry, replay handling, custody, and downstream authorization.
 
@@ -85,7 +85,7 @@ flowchart LR
     Decision["Allowed decision or acknowledged continuation"] --> GrantRequest["Capability grant request"]
     GrantRequest --> Scope["Scope operation target actor policy"]
     Scope --> Expiry["Expiration and metadata"]
-    Expiry --> Token["Capability token or grant artifact"]
+    Expiry --> Token["Capability grant or grant artifact"]
 
     Token --> Presented["Presented to downstream host boundary"]
     Presented --> Validate["Host validates scope, expiry, actor, replay policy, and local authorization"]
@@ -122,8 +122,8 @@ flowchart LR
 | --- | --- | --- |
 | Intent-to-execution spine | First explanation of the governance backbone shape. | Host owns execution. |
 | Policy evaluator pipeline | Core policy and constraint composition. | Evaluator returns decisions only. |
-| Dynamic Liability Handshake | Acknowledgment-required decisions. | Acknowledgment is auditable intent recognition, not authorization by itself. |
-| Capability token scoping | Scoped continuation after an allowed or acknowledged decision. | Host must validate scope and expiration. |
+| Acknowledgment Workflow | Acknowledgment-required decisions. | Acknowledgment is auditable intent recognition, not authorization by itself. |
+| Capability grant scoping | Scoped continuation after an allowed or acknowledged decision. | Host must validate scope and expiration. |
 | Durable outbox and governance emission | Audit persistence and provider emission. | External systems are additive; design-only providers are labeled as such. |
 
 These diagrams are meant to reduce onboarding friction without expanding implementation claims beyond the shipped package boundaries.

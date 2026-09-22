@@ -84,16 +84,16 @@ public sealed class EfCoreDecisionReceiptLifecycleStore : IDecisionReceiptLifecy
     }
 
     /// <inheritdoc />
-    public async ValueTask<IReadOnlyList<DecisionReceiptLifecycleEvent>> FindByAuditResidueIdAsync(
-        string auditResidueId,
+    public async ValueTask<IReadOnlyList<DecisionReceiptLifecycleEvent>> FindByDecisionReceiptIdAsync(
+        string decisionReceiptId,
         CancellationToken cancellationToken = default)
     {
-        ArgumentException.ThrowIfNullOrWhiteSpace(auditResidueId);
+        ArgumentException.ThrowIfNullOrWhiteSpace(decisionReceiptId);
 
-        string normalizedAuditResidueId = auditResidueId.Trim();
+        string normalizedDecisionReceiptId = decisionReceiptId.Trim();
 
         List<DecisionReceiptLifecycleEventEntity> entities = await LifecycleEvents()
-            .Where(lifecycleEvent => lifecycleEvent.AuditResidueId == normalizedAuditResidueId)
+            .Where(lifecycleEvent => lifecycleEvent.DecisionReceiptId == normalizedDecisionReceiptId)
             .ToListAsync(cancellationToken)
             .ConfigureAwait(false);
 
@@ -116,7 +116,7 @@ public sealed class EfCoreDecisionReceiptLifecycleStore : IDecisionReceiptLifecy
             StageSequence = lifecycleEvent.StageSequence,
             OccurredUtc = lifecycleEvent.OccurredUtc,
             CorrelationId = lifecycleEvent.CorrelationId,
-            AuditResidueId = lifecycleEvent.AuditResidueId,
+            DecisionReceiptId = lifecycleEvent.DecisionReceiptId,
             TraceId = lifecycleEvent.TraceId,
             OperationName = lifecycleEvent.OperationName,
             Outcome = lifecycleEvent.Outcome,
@@ -134,7 +134,7 @@ public sealed class EfCoreDecisionReceiptLifecycleStore : IDecisionReceiptLifecy
         return DecisionReceiptLifecycleEvent.Create(
             entity.Stage,
             entity.CorrelationId,
-            entity.AuditResidueId,
+            entity.DecisionReceiptId,
             entity.EventId,
             entity.OccurredUtc,
             entity.TraceId,

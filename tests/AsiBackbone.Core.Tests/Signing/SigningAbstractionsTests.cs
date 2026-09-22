@@ -113,7 +113,7 @@ public sealed class SigningAbstractionsTests
     }
 
     /// <summary>
-    /// Tests that an audit ledger record can carry signing metadata and a reference to a capability token, and that the properties are correctly set and normalized.
+    /// Tests that an audit ledger record can carry signing metadata and a reference to a capability grant, and that the properties are correctly set and normalized.
     /// </summary>
     [Fact]
     public void AuditLedgerRecordCarriesSigningMetadataAndCapabilityTokenReference()

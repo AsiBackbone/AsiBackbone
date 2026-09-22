@@ -1,16 +1,25 @@
 # Upgrade from 6.x to 7.0
 
-Version 7.0 carries two security corrections that change stable contracts. It binds liability handshake acknowledgment responses to the actor the challenge was issued to, and it moves `DlpFailureBehavior` and `DlpIntentRiskLevel` off their permissive zero values, which changes the numeric value of every existing member of both enums. These are intentional major-version breaks. Rebuild consumers against the 7.0 packages after migrating.
+Version 7.0 is a major release with three groups of breaking changes:
 
-No public type, namespace, or package was renamed or removed in this release. Two public constructors were replaced: `GovernanceOutboxDrain` and `GovernanceOutboxDrainHostedService` each gained an optional trailing `TimeProvider` parameter, which removes their previous signatures from the compiled assemblies. Code that compiles against 6.x continues to compile against 7.0 unless it relies on one of the behaviors below, but assemblies compiled against 6.x must be rebuilt. The acknowledgment and DLP changes are the two security corrections that required the major boundary; [Other changes that affect hosts](#other-changes-that-affect-hosts) covers the remaining adjustments.
+* **Two security corrections that change stable contracts.** It binds acknowledgment responses to the actor the challenge was issued to, and it moves `DlpFailureBehavior` and `DlpIntentRiskLevel` off their permissive zero values, which changes the numeric value of every existing member of both enums.
+* **Completion of the 6.0 naming work.** The compatibility names that 6.0 retained (`AuditResidue*`, `LiabilityHandshake*`, `Handshake*`, and `CapabilityToken*`) are renamed to the current vocabulary: decision receipt, acknowledgment, and capability grant. Two namespaces change with them. No `[Obsolete]` forwarding aliases are provided.
+* **An EF Core schema change.** Five columns are renamed to match the new property names. Hosts that use `AsiBackbone.EntityFrameworkCore` must add and review a migration before deploying 7.0.
+* **A JSON property name change.** Types serialized with `System.Text.Json` now emit the renamed property names, so `auditResidueId` becomes `decisionReceiptId`. Consumers that parse or store this JSON must update. See [Decision receipt JSON uses `decisionReceiptId`](#decision-receipt-json-uses-decisionreceiptid).
+
+Signed and telemetry contracts are not renamed. Canonical artifact tags, signed payload bytes, OpenTelemetry event and attribute names, EF Core table names, reason codes, diagnostic IDs, and the `AddAsiBackbone*` registration methods keep their 6.x values, so artifacts signed by 6.x verify under 7.0 and existing dashboards keep working. See [What does not change](#what-does-not-change).
+
+Two public constructors were also replaced: `GovernanceOutboxDrain` and `GovernanceOutboxDrainHostedService` each gained an optional trailing `TimeProvider` parameter. All assemblies compiled against 6.x must be rebuilt against 7.0, and most consumers will need source changes for the renames. [Other changes that affect hosts](#other-changes-that-affect-hosts) covers the remaining adjustments.
 
 ## Why these changes required a major release
 
-The repository's [API compatibility and SemVer contract](api-compatibility-and-semver.md) treats a change to a public enum value as affecting a stable package contract. The `6.x` line also pins `AssemblyVersion` at `6.0.0.0` for every compatible release, so a consumer compiled against `6.0.0` binds the same assembly identity regardless of package version. Shipping the enum renumbering on `6.x` would have let that consumer load a library that reinterprets the constants the compiler already inlined into its own assembly, with nothing in the assembly identity to signal the change. `7.0.0` advances `AssemblyVersion` to `7.0.0.0`, so the boundary is explicit.
+The repository's [API compatibility and SemVer contract](api-compatibility-and-semver.md) treats a change to a public enum value, and the renaming or removal of a public type, member, or namespace, as affecting a stable package contract. The `6.x` line also pins `AssemblyVersion` at `6.0.0.0` for every compatible release, so a consumer compiled against `6.0.0` binds the same assembly identity regardless of package version. Shipping the enum renumbering on `6.x` would have let that consumer load a library that reinterprets the constants the compiler already inlined into its own assembly, with nothing in the assembly identity to signal the change. `7.0.0` advances `AssemblyVersion` to `7.0.0.0`, so the boundary is explicit.
+
+The 6.0 naming record ([Public API Naming in 6.0](public-api-naming-600.md)) planned to deprecate the retained compatibility names during `6.x` and remove them at the next major version. Because 7.0 is that major version, the names are renamed directly rather than passing through a deprecation release.
 
 ## Acknowledgment responses are bound to the challenged actor
 
-`IAcknowledgmentChallengeService.HandleResponse` now verifies that the responding actor is the actor the challenge was issued to before it produces a `LiabilityHandshakeAcknowledgment`.
+`IAcknowledgmentChallengeService.HandleResponse` now verifies that the responding actor is the actor the challenge was issued to before it produces an `AcknowledgmentResponse`.
 
 In 6.x the response was validated only against the handshake identifier and the required acknowledgment code. Any actor that could name an active challenge could satisfy a challenge issued to a different actor, and the resulting acknowledgment recorded whichever actor answered. For a package whose purpose is attributing accountability, that made the acknowledgment unreliable as evidence.
 
@@ -104,11 +113,261 @@ Supplying `Unspecified` raises `ArgumentOutOfRangeException` at each boundary ra
 
 An incomplete policy now fails loudly where it previously proceeded. Hosts that relied on an unset risk level being treated as `Low`, or an unset behavior being treated as `Allow`, must now assign those values explicitly. That is the intended effect of the change: the previous behavior was indistinguishable from a deliberate decision to allow.
 
+## Legacy compatibility names are renamed
+
+6.0 renamed most of the public surface to the current vocabulary but kept a set of names for compatibility. 7.0 renames those as well. The renames are mechanical: behavior and validation are unchanged, and signed contract values keep their 6.x form. JSON produced by serializing these types uses the new property names; see [Decision receipt JSON uses `decisionReceiptId`](#decision-receipt-json-uses-decisionreceiptid).
+
+### Namespaces
+
+| 6.x namespace | 7.0 namespace |
+| --- | --- |
+| `AsiBackbone.Core.Handshakes` | `AsiBackbone.Core.Acknowledgments` |
+| `AsiBackbone.AspNetCore.Handshakes` | `AsiBackbone.AspNetCore.Acknowledgments` |
+| `AsiBackbone.Core.CapabilityTokens` | `AsiBackbone.Core.CapabilityGrants` |
+| `AsiBackbone.Storage.InMemory.CapabilityTokens` | `AsiBackbone.Storage.InMemory.CapabilityGrants` |
+
+Update `using` directives and fully qualified references. Types that stay in these namespaces without being renamed, such as `AcknowledgmentChallenge` and `AcknowledgmentChallengeResult`, still need the new `using`.
+
+### Types
+
+| 6.x type | 7.0 type |
+| --- | --- |
+| `LiabilityHandshakeRequest` | `AcknowledgmentRequest` |
+| `LiabilityHandshakeAcknowledgment` | `AcknowledgmentResponse` |
+| `LiabilityHandshakeRiskLevel` | `AcknowledgmentRiskLevel` |
+| `RequireLiabilityHandshakeAttribute` (`[RequireLiabilityHandshake]`) | `RequireAcknowledgmentAttribute` (`[RequireAcknowledgment]`) |
+| `IEndpointLiabilityHandshakeMetadata` | `IEndpointAcknowledgmentMetadata` |
+| `CapabilityTokenGrant` | `CapabilityGrant` |
+| `CapabilityTokenValidationCategory` | `CapabilityGrantValidationCategory` |
+| `HandshakeRequestEntity` | `AcknowledgmentRequestEntity` |
+| `HandshakeRequestMetadataEntity` | `AcknowledgmentRequestMetadataEntity` |
+| `HandshakeAcknowledgmentEntity` | `AcknowledgmentResponseEntity` |
+| `HandshakeAcknowledgmentMetadataEntity` | `AcknowledgmentResponseMetadataEntity` |
+
+Other types whose names contained `LiabilityHandshake`, `HandshakeRequest`, `HandshakeAcknowledgment`, or `CapabilityTokenGrant` follow the same pattern, for example `HandshakeRequestEntityConfiguration` becomes `AcknowledgmentRequestEntityConfiguration`.
+
+### Members and constants
+
+| 6.x member | 7.0 member |
+| --- | --- |
+| `AuditResidueId` (on lifecycle events, envelopes, and ledger records) | `DecisionReceiptId` |
+| `DecisionReceiptBuilder.WithAuditResidueId` | `DecisionReceiptBuilder.WithDecisionReceiptId` |
+| `FindByAuditResidueIdAsync` | `FindByDecisionReceiptIdAsync` |
+| `CanonicalArtifactTypes.AuditResidue` | `CanonicalArtifactTypes.DecisionReceipt` |
+| `CanonicalArtifactTypes.AuditResidueLifecycleEvent` | `CanonicalArtifactTypes.DecisionReceiptLifecycleEvent` |
+| `GovernanceEmissionEventType.AuditResidue` | `GovernanceEmissionEventType.DecisionReceipt` |
+| `OpenTelemetryGovernanceInstrumentation.AuditResidueCreatedEventName` | `OpenTelemetryGovernanceInstrumentation.DecisionReceiptCreatedEventName` |
+| `OpenTelemetryGovernanceAttributes.AuditResidueId` | `OpenTelemetryGovernanceAttributes.DecisionReceiptId` |
+| `CanonicalPayloadBuilder.ForCapabilityTokenGrant` | `CanonicalPayloadBuilder.ForCapabilityGrant` |
+| `EnvelopeAuditResidueId` (outbox entity) | `EnvelopeDecisionReceiptId` |
+| `HandshakeRequestId` (request metadata entity) | `AcknowledgmentRequestId` |
+| `HandshakeAcknowledgmentId` (acknowledgment metadata entity) | `AcknowledgmentResponseId` |
+
+Parameters named `auditResidueId` are renamed to `decisionReceiptId`. Callers that pass that argument by name must update the argument name.
+
+### What to change
+
+1. Update `using` directives and replace the old names using the tables above. The compiler reports every remaining reference.
+2. Search for old names that the compiler cannot see: string literals, reflection, `Type.GetType` calls, configuration keys, log queries, and test assertions that name these types or members.
+3. `GovernanceEmissionEventType.DecisionReceipt` keeps the numeric value `500`. If you persist or transmit this enum by **name**, stored `"AuditResidue"` values must be mapped to `"DecisionReceipt"`. Values stored by number need no change.
+4. If your host serializes decision receipts, ledger records, or emission envelopes to JSON, follow [Decision receipt JSON uses `decisionReceiptId`](#decision-receipt-json-uses-decisionreceiptid).
+5. If your host maps AsiBackbone entities into its own `DbContext`, follow [EF Core schema changes](#ef-core-schema-changes-migration-required) before deploying.
+
+### What does not change
+
+These values are wire, signature, or persistence contracts and keep their 6.x values in 7.0:
+
+| Contract | Value kept |
+| --- | --- |
+| Decision receipt artifact tag | `asibackbone.audit-residue` |
+| Decision receipt lifecycle artifact tag | `asibackbone.audit-residue-lifecycle-event` |
+| OpenTelemetry event name | `asibackbone.audit_residue.created` |
+| `GovernanceEmissionEventType.DecisionReceipt` numeric value | `500` |
+| EF Core table names | `AsiBackboneAuditResidueLifecycleEvents`, `AsiBackboneHandshake*`, `AsiBackboneAuditLedger*`, `AsiBackboneGovernanceOutboxEntries` |
+| EF Core `HandshakeId` and `CapabilityTokenId` columns | Unchanged |
+| Diagnostic IDs | `ASIB*` |
+| Registration methods | `AddAsiBackbone*` |
+
+Canonical payload bytes are unchanged, so artifacts signed under 6.x verify under 7.0 without re-signing. `HandshakeId` keeps its name because it identifies the acknowledgment handshake protocol itself, which the [6.0 terminology guidance](terminology-600.md) permits.
+
+## Decision receipt JSON uses `decisionReceiptId`
+
+`System.Text.Json` names JSON properties after the C# property names. Because `AuditResidueId` is renamed to `DecisionReceiptId`, JSON produced by serializing a public type that exposes that property changes with it. This includes `DecisionReceipt`, `AuditLedgerRecord`, and `GovernanceEmissionEnvelope`.
+
+| Serializer options | 6.x key | 7.0 key |
+| --- | --- | --- |
+| `JsonSerializerDefaults.Web` or a camel-case naming policy | `auditResidueId` | `decisionReceiptId` |
+| Default options | `AuditResidueId` | `DecisionReceiptId` |
+
+This does not affect signatures. Canonical signed payloads are built with explicit key names, not by serializing these types, so their bytes are unchanged.
+
+### What to change
+
+1. Update log queries, dashboards, SIEM rules, message consumers, and stored-document queries that read `auditResidueId` to read `decisionReceiptId`.
+2. **Migrate or translate stored 6.x JSON before deserializing it with 7.0.** By default, `System.Text.Json` ignores members it does not recognize, so a 6.x document deserialized into a 7.0 type comes back with `DecisionReceiptId` set to `null` and no error. If your options set `UnmappedMemberHandling.Disallow`, deserialization throws instead.
+
+   Rename the key in stored documents, or translate each document as you read it:
+
+   ```csharp
+   JsonObject node = JsonNode.Parse(storedJson)!.AsObject();
+   if (node.Remove("auditResidueId", out JsonNode? value))
+   {
+       node["decisionReceiptId"] = value;
+   }
+   ```
+
+3. Producers and consumers that exchange this JSON should upgrade together, or consumers should accept both keys during the transition.
+
+## EF Core schema changes (migration required)
+
+Five columns in the `AsiBackbone.EntityFrameworkCore` model are renamed to match the renamed properties. EF Core renames the dependent indexes and foreign keys with them. Table names do not change.
+
+| Table | 6.x column | 7.0 column | Also renamed |
+| --- | --- | --- | --- |
+| `AsiBackboneAuditLedgerRecords` | `AuditResidueId` | `DecisionReceiptId` | — |
+| `AsiBackboneAuditResidueLifecycleEvents` | `AuditResidueId` | `DecisionReceiptId` | 2 indexes |
+| `AsiBackboneGovernanceOutboxEntries` | `EnvelopeAuditResidueId` | `EnvelopeDecisionReceiptId` | — |
+| `AsiBackboneHandshakeRequestMetadata` | `HandshakeRequestId` | `AcknowledgmentRequestId` | 2 indexes, 1 foreign key |
+| `AsiBackboneHandshakeAcknowledgmentMetadata` | `HandshakeAcknowledgmentId` | `AcknowledgmentResponseId` | 2 indexes, 1 foreign key |
+
+Hosts own their migrations, so each host that maps these entities must add one.
+
+### What to change
+
+1. After updating the package references, add a migration in the host project:
+
+   ```bash
+   dotnet ef migrations add AsiBackbone700
+   ```
+
+2. **Review the generated migration before applying it.** EF Core can interpret a renamed property as a dropped column plus a new column. If the migration contains `DropColumn` or `AddColumn` for any of the five columns above, applying it deletes the existing decision receipt identifiers, acknowledgment metadata links, and the receipt identifiers of outbox entries that have not yet been drained. Replace those operations with the `RenameColumn` operations below.
+3. Apply the migration to a copy of production data first, and confirm that the row counts in the five tables are unchanged.
+
+### Reference migration
+
+The generated migration should be equivalent to the following. If your host uses a schema other than the default, add the `schema:` argument to each operation.
+
+```csharp
+protected override void Up(MigrationBuilder migrationBuilder)
+{
+    migrationBuilder.DropForeignKey(
+        name: "FK_AsiBackboneHandshakeRequestMetadata_AsiBackboneHandshakeRequests_HandshakeRequestId",
+        table: "AsiBackboneHandshakeRequestMetadata");
+    migrationBuilder.DropForeignKey(
+        name: "FK_AsiBackboneHandshakeAcknowledgmentMetadata_AsiBackboneHandshakeAcknowledgments_HandshakeAcknowledgmentId",
+        table: "AsiBackboneHandshakeAcknowledgmentMetadata");
+
+    migrationBuilder.RenameColumn(name: "AuditResidueId", table: "AsiBackboneAuditLedgerRecords", newName: "DecisionReceiptId");
+    migrationBuilder.RenameColumn(name: "AuditResidueId", table: "AsiBackboneAuditResidueLifecycleEvents", newName: "DecisionReceiptId");
+    migrationBuilder.RenameColumn(name: "EnvelopeAuditResidueId", table: "AsiBackboneGovernanceOutboxEntries", newName: "EnvelopeDecisionReceiptId");
+    migrationBuilder.RenameColumn(name: "HandshakeRequestId", table: "AsiBackboneHandshakeRequestMetadata", newName: "AcknowledgmentRequestId");
+    migrationBuilder.RenameColumn(name: "HandshakeAcknowledgmentId", table: "AsiBackboneHandshakeAcknowledgmentMetadata", newName: "AcknowledgmentResponseId");
+
+    migrationBuilder.RenameIndex(
+        name: "IX_AsiBackboneAuditResidueLifecycleEvents_AuditResidueId",
+        table: "AsiBackboneAuditResidueLifecycleEvents",
+        newName: "IX_AsiBackboneAuditResidueLifecycleEvents_DecisionReceiptId");
+    migrationBuilder.RenameIndex(
+        name: "IX_AsiBackboneAuditResidueLifecycleEvents_AuditResidueId_OccurredUtc",
+        table: "AsiBackboneAuditResidueLifecycleEvents",
+        newName: "IX_AsiBackboneAuditResidueLifecycleEvents_DecisionReceiptId_OccurredUtc");
+    migrationBuilder.RenameIndex(
+        name: "IX_AsiBackboneHandshakeRequestMetadata_HandshakeRequestId",
+        table: "AsiBackboneHandshakeRequestMetadata",
+        newName: "IX_AsiBackboneHandshakeRequestMetadata_AcknowledgmentRequestId");
+    migrationBuilder.RenameIndex(
+        name: "IX_AsiBackboneHandshakeRequestMetadata_HandshakeRequestId_MetadataKey",
+        table: "AsiBackboneHandshakeRequestMetadata",
+        newName: "IX_AsiBackboneHandshakeRequestMetadata_AcknowledgmentRequestId_MetadataKey");
+    migrationBuilder.RenameIndex(
+        name: "IX_AsiBackboneHandshakeAcknowledgmentMetadata_HandshakeAcknowledgmentId",
+        table: "AsiBackboneHandshakeAcknowledgmentMetadata",
+        newName: "IX_AsiBackboneHandshakeAcknowledgmentMetadata_AcknowledgmentResponseId");
+    migrationBuilder.RenameIndex(
+        name: "IX_AsiBackboneHandshakeAcknowledgmentMetadata_HandshakeAcknowledgmentId_MetadataKey",
+        table: "AsiBackboneHandshakeAcknowledgmentMetadata",
+        newName: "IX_AsiBackboneHandshakeAcknowledgmentMetadata_AcknowledgmentResponseId_MetadataKey");
+
+    migrationBuilder.AddForeignKey(
+        name: "FK_AsiBackboneHandshakeRequestMetadata_AsiBackboneHandshakeRequests_AcknowledgmentRequestId",
+        table: "AsiBackboneHandshakeRequestMetadata",
+        column: "AcknowledgmentRequestId",
+        principalTable: "AsiBackboneHandshakeRequests",
+        principalColumn: "Id",
+        onDelete: ReferentialAction.Cascade);
+    migrationBuilder.AddForeignKey(
+        name: "FK_AsiBackboneHandshakeAcknowledgmentMetadata_AsiBackboneHandshakeAcknowledgments_AcknowledgmentResponseId",
+        table: "AsiBackboneHandshakeAcknowledgmentMetadata",
+        column: "AcknowledgmentResponseId",
+        principalTable: "AsiBackboneHandshakeAcknowledgments",
+        principalColumn: "Id",
+        onDelete: ReferentialAction.Cascade);
+}
+
+protected override void Down(MigrationBuilder migrationBuilder)
+{
+    migrationBuilder.DropForeignKey(
+        name: "FK_AsiBackboneHandshakeRequestMetadata_AsiBackboneHandshakeRequests_AcknowledgmentRequestId",
+        table: "AsiBackboneHandshakeRequestMetadata");
+    migrationBuilder.DropForeignKey(
+        name: "FK_AsiBackboneHandshakeAcknowledgmentMetadata_AsiBackboneHandshakeAcknowledgments_AcknowledgmentResponseId",
+        table: "AsiBackboneHandshakeAcknowledgmentMetadata");
+
+    migrationBuilder.RenameColumn(name: "DecisionReceiptId", table: "AsiBackboneAuditLedgerRecords", newName: "AuditResidueId");
+    migrationBuilder.RenameColumn(name: "DecisionReceiptId", table: "AsiBackboneAuditResidueLifecycleEvents", newName: "AuditResidueId");
+    migrationBuilder.RenameColumn(name: "EnvelopeDecisionReceiptId", table: "AsiBackboneGovernanceOutboxEntries", newName: "EnvelopeAuditResidueId");
+    migrationBuilder.RenameColumn(name: "AcknowledgmentRequestId", table: "AsiBackboneHandshakeRequestMetadata", newName: "HandshakeRequestId");
+    migrationBuilder.RenameColumn(name: "AcknowledgmentResponseId", table: "AsiBackboneHandshakeAcknowledgmentMetadata", newName: "HandshakeAcknowledgmentId");
+
+    migrationBuilder.RenameIndex(
+        name: "IX_AsiBackboneAuditResidueLifecycleEvents_DecisionReceiptId",
+        table: "AsiBackboneAuditResidueLifecycleEvents",
+        newName: "IX_AsiBackboneAuditResidueLifecycleEvents_AuditResidueId");
+    migrationBuilder.RenameIndex(
+        name: "IX_AsiBackboneAuditResidueLifecycleEvents_DecisionReceiptId_OccurredUtc",
+        table: "AsiBackboneAuditResidueLifecycleEvents",
+        newName: "IX_AsiBackboneAuditResidueLifecycleEvents_AuditResidueId_OccurredUtc");
+    migrationBuilder.RenameIndex(
+        name: "IX_AsiBackboneHandshakeRequestMetadata_AcknowledgmentRequestId",
+        table: "AsiBackboneHandshakeRequestMetadata",
+        newName: "IX_AsiBackboneHandshakeRequestMetadata_HandshakeRequestId");
+    migrationBuilder.RenameIndex(
+        name: "IX_AsiBackboneHandshakeRequestMetadata_AcknowledgmentRequestId_MetadataKey",
+        table: "AsiBackboneHandshakeRequestMetadata",
+        newName: "IX_AsiBackboneHandshakeRequestMetadata_HandshakeRequestId_MetadataKey");
+    migrationBuilder.RenameIndex(
+        name: "IX_AsiBackboneHandshakeAcknowledgmentMetadata_AcknowledgmentResponseId",
+        table: "AsiBackboneHandshakeAcknowledgmentMetadata",
+        newName: "IX_AsiBackboneHandshakeAcknowledgmentMetadata_HandshakeAcknowledgmentId");
+    migrationBuilder.RenameIndex(
+        name: "IX_AsiBackboneHandshakeAcknowledgmentMetadata_AcknowledgmentResponseId_MetadataKey",
+        table: "AsiBackboneHandshakeAcknowledgmentMetadata",
+        newName: "IX_AsiBackboneHandshakeAcknowledgmentMetadata_HandshakeAcknowledgmentId_MetadataKey");
+
+    migrationBuilder.AddForeignKey(
+        name: "FK_AsiBackboneHandshakeRequestMetadata_AsiBackboneHandshakeRequests_HandshakeRequestId",
+        table: "AsiBackboneHandshakeRequestMetadata",
+        column: "HandshakeRequestId",
+        principalTable: "AsiBackboneHandshakeRequests",
+        principalColumn: "Id",
+        onDelete: ReferentialAction.Cascade);
+    migrationBuilder.AddForeignKey(
+        name: "FK_AsiBackboneHandshakeAcknowledgmentMetadata_AsiBackboneHandshakeAcknowledgments_HandshakeAcknowledgmentId",
+        table: "AsiBackboneHandshakeAcknowledgmentMetadata",
+        column: "HandshakeAcknowledgmentId",
+        principalTable: "AsiBackboneHandshakeAcknowledgments",
+        principalColumn: "Id",
+        onDelete: ReferentialAction.Cascade);
+}
+```
+
+On SQLite, EF Core applies the foreign key changes by rebuilding the affected tables. The data is copied during the rebuild, but review the generated SQL (`dotnet ef migrations script`) before running it against a large database.
+
 ## Other changes that affect hosts
 
 ### Gate acknowledged operations on `CanProceed`
 
-`AcknowledgmentChallengeResult.Succeeded` is `true` whenever the response was handled, including when the actor explicitly declined, because a refusal is recorded as a `LiabilityHandshakeAcknowledgment` just like an acceptance. A host that gated the consequential operation on `Succeeded` therefore proceeded after a decline. Gate on the new `CanProceed` property instead, which is `true` only for a handled acceptance:
+`AcknowledgmentChallengeResult.Succeeded` is `true` whenever the response was handled, including when the actor explicitly declined, because a refusal is recorded as an `AcknowledgmentResponse` just like an acceptance. A host that gated the consequential operation on `Succeeded` therefore proceeded after a decline. Gate on the new `CanProceed` property instead, which is `true` only for a handled acceptance:
 
 ```csharp
 AcknowledgmentChallengeResult result = challengeService.HandleResponse(challenge, currentActor, response);
@@ -139,11 +398,13 @@ A key size that passes validation but that the platform RSA provider cannot gene
 
 ## Validation
 
-Package validation continues to run against the `5.1.0` baseline so the complete `5.1.0`-to-`7.0.0` compatibility surface remains checked. The intentional enum value changes are recorded as exact `CP0011` suppressions in `src/AsiBackbone.Core/CompatibilitySuppressions.xml`; the exact suppressions for the reviewed 6.0 major-boundary changes remain in place and all other package compatibility checks remain enabled.
+Package validation continues to run against the `5.1.0` baseline so the complete `5.1.0`-to-`7.0.0` compatibility surface remains checked. The intentional enum value changes and the type, member, and namespace renames are recorded as exact suppressions in each affected package's `CompatibilitySuppressions.xml`; the exact suppressions for the reviewed 6.0 major-boundary changes remain in place, and all other package compatibility checks remain enabled.
 
 ## Related documentation
 
 * [API Compatibility and SemVer](api-compatibility-and-semver.md)
+* [Public API Naming in 6.0](public-api-naming-600.md)
+* [Terminology in 6.0](terminology-600.md)
 * [DLP and Classification Failure Policy](dlp-classification-failure-policy.md)
 * [ASP.NET Core Integration Boundary](aspnetcore-integration-boundary.md)
 * [Upgrade from 5.x to 6.0](upgrade-500-to-600.md)

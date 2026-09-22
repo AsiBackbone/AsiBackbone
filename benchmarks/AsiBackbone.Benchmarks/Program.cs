@@ -99,7 +99,7 @@ internal static class Program
                 "outbox_drain.scoped_medium_batch_100",
                 "Create a DI scope, resolve GovernanceOutboxDrain, and drain 100 pending entries.",
                 batchSize: 100),
-            new AuditResidueFromDecisionScenario()
+            new DecisionReceiptFromDecisionScenario()
         ];
 
         Console.WriteLine("# AsiBackbone hot-path benchmark baseline");
@@ -239,7 +239,7 @@ internal static class Program
             occurredUtc: new DateTimeOffset(2026, 6, 30, 17, 59, 0, TimeSpan.Zero),
             envelopeId: $"envelope-{suffix}",
             correlationId: $"correlation-{suffix}",
-            auditResidueId: $"residue-{suffix}",
+            decisionReceiptId: $"residue-{suffix}",
             lifecycleStage: DecisionReceiptLifecycleStage.ExternalEmissionQueued,
             policyVersion: "benchmark-policy-v1",
             policyHash: "benchmark-policy-hash",
@@ -509,7 +509,7 @@ internal static class Program
         }
     }
 
-    private sealed class AuditResidueFromDecisionScenario : IBenchmarkScenario
+    private sealed class DecisionReceiptFromDecisionScenario : IBenchmarkScenario
     {
         private readonly IGovernanceActorContext actor = GovernanceActorContext.Service("benchmark-service");
 

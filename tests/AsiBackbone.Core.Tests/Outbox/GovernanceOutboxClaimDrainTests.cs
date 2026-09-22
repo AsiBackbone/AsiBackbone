@@ -287,7 +287,7 @@ public sealed class GovernanceOutboxClaimDrainTests
     private static GovernanceEmissionEnvelope CreateEnvelope(string eventId)
     {
         return GovernanceEmissionEnvelope.Create(
-            GovernanceEmissionEventType.AuditResidue,
+            GovernanceEmissionEventType.DecisionReceipt,
             eventId: eventId,
             occurredUtc: new DateTimeOffset(2026, 7, 8, 12, 0, 0, TimeSpan.Zero),
             envelopeId: $"envelope-{eventId}");

@@ -81,7 +81,7 @@ public sealed class GovernanceOutboxDrainTimeProviderTests
     private static GovernanceEmissionEnvelope CreateEnvelope()
     {
         return GovernanceEmissionEnvelope.Create(
-            GovernanceEmissionEventType.AuditResidue,
+            GovernanceEmissionEventType.DecisionReceipt,
             eventId: "event-clock",
             occurredUtc: NextRetryUtc.AddHours(-1),
             envelopeId: "envelope-clock",

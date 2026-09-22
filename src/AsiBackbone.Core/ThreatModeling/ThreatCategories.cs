@@ -39,7 +39,7 @@ public static class ThreatCategories
     public const string ReplayAttempt = "ReplayAttempt";
 
     /// <summary>
-    /// Indicates mismatch between the request and a capability token.
+    /// Indicates mismatch between the request and a capability grant.
     /// </summary>
     public const string CapabilityTokenMismatch = "CapabilityTokenMismatch";
 

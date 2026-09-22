@@ -31,8 +31,8 @@ public sealed class GovernanceEmissionBranchTests
     /// <param name="traceId">
     /// The trace ID for the emission envelope.
     /// </param>
-    /// <param name="auditResidueId">
-    /// The audit residue ID for the emission envelope.
+    /// <param name="decisionReceiptId">
+    /// The decision receipt ID for the emission envelope.
     /// </param>
     /// <param name="expectedHasCorrelation">
     /// The expected value of the HasCorrelation property.
@@ -45,20 +45,20 @@ public sealed class GovernanceEmissionBranchTests
     public void CreateReportsHasCorrelationFromAnySupportedCorrelationField(
         string? correlationId,
         string? traceId,
-        string? auditResidueId,
+        string? decisionReceiptId,
         bool expectedHasCorrelation)
     {
         var envelope = GovernanceEmissionEnvelope.Create(
             GovernanceEmissionEventType.Decision,
             correlationId: correlationId,
             traceId: traceId,
-            auditResidueId: auditResidueId);
+            decisionReceiptId: decisionReceiptId);
 
         Assert.Equal(expectedHasCorrelation, envelope.HasCorrelation);
     }
 
     /// <summary>
-    /// Tests that when creating a governance emission envelope from an audit residue, if the caller-supplied metadata contains keys that overlap with the residue's metadata, the caller's values take precedence in the resulting envelope's metadata.
+    /// Tests that when creating a governance emission envelope from an decision receipt, if the caller-supplied metadata contains keys that overlap with the residue's metadata, the caller's values take precedence in the resulting envelope's metadata.
     /// </summary>
     [Fact]
     public void FromDecisionReceiptUsesCallerMetadataWhenKeysOverlapResidueMetadata()
@@ -74,7 +74,7 @@ public sealed class GovernanceEmissionBranchTests
                 [" shared "] = " residue ",
                 ["residue-only"] = " retained "
             },
-            auditResidueId: "residue-123");
+            decisionReceiptId: "residue-123");
 
         var envelope = GovernanceEmissionEnvelope.FromDecisionReceipt(
             residue,
@@ -90,7 +90,7 @@ public sealed class GovernanceEmissionBranchTests
     }
 
     /// <summary>
-    /// Tests that when creating a governance emission envelope from an audit residue lifecycle event, if the caller-supplied metadata contains keys that overlap with the lifecycle event's metadata, the caller's values take precedence in the resulting envelope's metadata.
+    /// Tests that when creating a governance emission envelope from an decision receipt lifecycle event, if the caller-supplied metadata contains keys that overlap with the lifecycle event's metadata, the caller's values take precedence in the resulting envelope's metadata.
     /// </summary>
     [Fact]
     public void FromLifecycleEventUsesCallerMetadataWhenKeysOverlapLifecycleMetadata()
@@ -98,7 +98,7 @@ public sealed class GovernanceEmissionBranchTests
         var lifecycleEvent = DecisionReceiptLifecycleEvent.Create(
             DecisionReceiptLifecycleStage.ExternalEmissionQueued,
             "correlation-123",
-            auditResidueId: "residue-123",
+            decisionReceiptId: "residue-123",
             eventId: "lifecycle-123",
             metadata: new Dictionary<string, string>
             {
@@ -157,7 +157,7 @@ public sealed class GovernanceEmissionBranchTests
             eventId: " event-123 ",
             envelopeId: " envelope-123 ",
             correlationId: " ",
-            auditResidueId: " residue-123 ",
+            decisionReceiptId: " residue-123 ",
             policyVersion: " v1 ",
             policyHash: " ",
             traceId: " trace-123 ",
@@ -174,7 +174,7 @@ public sealed class GovernanceEmissionBranchTests
         Assert.Equal("event-123", envelope.EventId);
         Assert.Equal("envelope-123", envelope.EnvelopeId);
         Assert.Null(envelope.CorrelationId);
-        Assert.Equal("residue-123", envelope.AuditResidueId);
+        Assert.Equal("residue-123", envelope.DecisionReceiptId);
         Assert.Equal("v1", envelope.PolicyVersion);
         Assert.Null(envelope.PolicyHash);
         Assert.Equal("trace-123", envelope.TraceId);

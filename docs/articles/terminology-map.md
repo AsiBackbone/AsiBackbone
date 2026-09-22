@@ -34,10 +34,10 @@ This repository does not maintain a second organization-level teaching glossary.
 | Constraint | Independently evaluated product rule | [`IGovernanceConstraint<TContext>`](xref:AsiBackbone.Core.Constraints.IGovernanceConstraint`1) | Constraint evaluation is separated from side-effect execution. |
 | Policy evaluation | Constraint composition into a governance decision | [`IGovernancePolicyEvaluator<TContext>`](xref:AsiBackbone.Core.Evaluation.IGovernancePolicyEvaluator`1) | Evaluator output is decision data, not execution. |
 | Decision outcome | Product decision plus enum outcome | [`GovernanceDecision`](xref:AsiBackbone.Core.Decisions.GovernanceDecision), [`GovernanceDecisionOutcome`](xref:AsiBackbone.Core.Decisions.GovernanceDecisionOutcome) | Product includes the `Warning` outcome in addition to the foundational Learning set. |
-| Acknowledgment | Confirmation plus host challenge integration | [`LiabilityHandshakeRequest`](xref:AsiBackbone.Core.Handshakes.LiabilityHandshakeRequest), [`LiabilityHandshakeAcknowledgment`](xref:AsiBackbone.Core.Handshakes.LiabilityHandshakeAcknowledgment) | The retained API names describe the multi-step request/response protocol; documentation does not claim legal protection. |
+| Acknowledgment | Confirmation plus host challenge integration | [`AcknowledgmentRequest`](xref:AsiBackbone.Core.Acknowledgments.AcknowledgmentRequest), [`AcknowledgmentResponse`](xref:AsiBackbone.Core.Acknowledgments.AcknowledgmentResponse) | The retained API names describe the multi-step request/response protocol; documentation does not claim legal protection. |
 | Decision receipt | Structured product decision evidence | [`DecisionReceipt`](xref:AsiBackbone.Core.Audit.DecisionReceipt) | Storage and integrity guarantees depend on the configured host/provider path. |
 | Decision provenance | Correlated decision, audit, acknowledgment, capability, lifecycle, and execution records | Audit/lifecycle/outbox APIs | Provenance is a relationship across records, not one universal type. |
-| Scoped capability | Bounded grant plus validation | [`CapabilityTokenGrant`](xref:AsiBackbone.Core.CapabilityTokens.CapabilityTokenGrant), [`CapabilityGrantValidator`](xref:AsiBackbone.Core.CapabilityTokens.CapabilityGrantValidator) | The implementation uses a grant/token vocabulary; scope and validation semantics matter more than token format. |
+| Scoped capability | Bounded grant plus validation | [`CapabilityGrant`](xref:AsiBackbone.Core.CapabilityGrants.CapabilityGrant), [`CapabilityGrantValidator`](xref:AsiBackbone.Core.CapabilityGrants.CapabilityGrantValidator) | The implementation uses a grant/token vocabulary; scope and validation semantics matter more than token format. |
 | Host-owned execution | Application or gateway performs the real side effect | [Host-Owned Execution Enforcement](host-owned-execution-enforcement.md) | Core intentionally does not own a universal executor. |
 | Operational gateway | Host mediation before an external tool/API/device/workflow side effect | [AI Agent Gateway Scenario](scenarios/ai-agent-gateway.md) | Pattern-level mapping; no mandatory universal gateway base type. |
 | Policy version | Readable policy generation | `GovernanceDecision.PolicyVersion` | Version is a label, not exact content identity. |
@@ -82,8 +82,8 @@ These distinctions are enforced by the product documentation even when Learning 
 
 - `GovernanceDecision` is a policy result; it does not perform the side effect.
 - `OperationResult` reports package operation success/failure and is not a governance outcome.
-- `LiabilityHandshakeAcknowledgment` records acknowledgment and does not override authorization.
-- `CapabilityTokenGrant` represents bounded authority but still requires execution-boundary validation.
+- `AcknowledgmentResponse` records acknowledgment and does not override authorization.
+- `CapabilityGrant` represents bounded authority but still requires execution-boundary validation.
 - `DecisionReceipt` does not promise durable, immutable, signed, or tamper-evident storage by itself.
 - `GovernanceDecision.PolicyVersion` and `GovernanceDecision.PolicyHash` are separate fields.
 - Host-owned execution and operational gateway are architectural relationships rather than one required class hierarchy.

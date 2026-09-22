@@ -185,7 +185,7 @@ public sealed class SigningPolicyResultBranchTests
     private static CanonicalPayload CreatePayload(string artifactId)
     {
         return CanonicalPayload.Create(
-            CanonicalArtifactTypes.AuditResidue,
+            CanonicalArtifactTypes.DecisionReceipt,
             artifactId,
             "schema-v1",
             CanonicalPayloadOptions.DefaultCanonicalizationVersion,

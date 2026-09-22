@@ -9,7 +9,7 @@ using Xunit;
 namespace AsiBackbone.Core.Tests.Signing;
 
 /// <summary>
-/// This class contains unit tests for verifying the behavior of canonical payload hashing in the AsiBackbone.Core library. It ensures that equivalent audit ledger records, audit residues, governance emission envelopes, and governance outbox entries produce stable canonical payloads and hashes, while meaningful changes result in different hashes. The tests also validate that allow-listed metadata participates in the hash computation, while other metadata does not. Additionally, it checks that signing metadata correctly reflects the signing hash and algorithm without implying a signature is present.
+/// This class contains unit tests for verifying the behavior of canonical payload hashing in the AsiBackbone.Core library. It ensures that equivalent audit ledger records, decision receipts, governance emission envelopes, and governance outbox entries produce stable canonical payloads and hashes, while meaningful changes result in different hashes. The tests also validate that allow-listed metadata participates in the hash computation, while other metadata does not. Additionally, it checks that signing metadata correctly reflects the signing hash and algorithm without implying a signature is present.
 /// </summary>
 public sealed class CanonicalPayloadHashingTests
 {
@@ -98,16 +98,16 @@ public sealed class CanonicalPayloadHashingTests
     private static readonly string[] Expected = ["alpha", "beta"];
 
     /// <summary>
-    /// This test verifies that when an DecisionReceipt has a blank AuditResidueId, the canonical payload uses the EventId as the artifact identifier. It also checks that reason codes are normalized (trimmed and deduplicated) and that metadata is filtered according to the allow-list specified in the CanonicalPayloadOptions. The test ensures that the canonical payload correctly reflects these transformations and produces the expected artifact type and identifier.
+    /// This test verifies that when an DecisionReceipt has a blank DecisionReceiptId, the canonical payload uses the EventId as the artifact identifier. It also checks that reason codes are normalized (trimmed and deduplicated) and that metadata is filtered according to the allow-list specified in the CanonicalPayloadOptions. The test ensures that the canonical payload correctly reflects these transformations and produces the expected artifact type and identifier.
     /// </summary>
     [Fact]
-    public void AuditResiduePayloadUsesEventIdWhenResidueIdIsBlankAndNormalizesReasonCodesAndMetadata()
+    public void DecisionReceiptPayloadUsesEventIdWhenResidueIdIsBlankAndNormalizesReasonCodesAndMetadata()
     {
         var options = CanonicalPayloadOptions.Create(["allowed", "safe"]);
-        var residue = new TestAuditResidue
+        var residue = new TestDecisionReceipt
         {
             EventId = "event-fallback",
-            AuditResidueId = "   ",
+            DecisionReceiptId = "   ",
             OccurredUtc = new DateTimeOffset(2026, 6, 16, 8, 0, 0, TimeSpan.FromHours(-5)),
             ReasonCodes = [" beta ", "", "alpha", "beta", " alpha "],
             Metadata = new Dictionary<string, string>
@@ -122,7 +122,7 @@ public sealed class CanonicalPayloadHashingTests
             receipt: residue,
             options: options);
 
-        Assert.Equal(CanonicalArtifactTypes.AuditResidue, payload.ArtifactType);
+        Assert.Equal(CanonicalArtifactTypes.DecisionReceipt, payload.ArtifactType);
         Assert.Equal("event-fallback", payload.ArtifactId);
 
         using JsonDocument document = Parse(payload);
@@ -142,13 +142,13 @@ public sealed class CanonicalPayloadHashingTests
     /// This test verifies that the canonical payload for an DecisionReceiptLifecycleEvent correctly preserves the stage, correlation ID, and occurred UTC timestamp, while also filtering metadata according to the allow-list specified in the CanonicalPayloadOptions. It ensures that the canonical payload reflects the expected artifact type and identifier, and that only allow-listed metadata keys are included in the final payload.
     /// </summary>
     [Fact]
-    public void AuditResidueLifecyclePayloadPreservesStageCorrelationUtcAndFilteredMetadata()
+    public void DecisionReceiptLifecyclePayloadPreservesStageCorrelationUtcAndFilteredMetadata()
     {
         var options = CanonicalPayloadOptions.Create(["safe"]);
         var lifecycleEvent = DecisionReceiptLifecycleEvent.Create(
             DecisionReceiptLifecycleStage.ExternalEmissionQueued,
             correlationId: " correlation-1 ",
-            auditResidueId: " residue-1 ",
+            decisionReceiptId: " residue-1 ",
             eventId: " lifecycle-event-1 ",
             occurredUtc: new DateTimeOffset(2026, 6, 16, 8, 15, 16, 123, TimeSpan.FromHours(-5)),
             traceId: " trace-1 ",
@@ -162,7 +162,7 @@ public sealed class CanonicalPayloadHashingTests
 
         CanonicalPayload payload = CanonicalPayloadBuilder.ForDecisionReceiptLifecycleEvent(lifecycleEvent, options);
 
-        Assert.Equal(CanonicalArtifactTypes.AuditResidueLifecycleEvent, payload.ArtifactType);
+        Assert.Equal(CanonicalArtifactTypes.DecisionReceiptLifecycleEvent, payload.ArtifactType);
         Assert.Equal("lifecycle-event-1", payload.ArtifactId);
 
         using JsonDocument document = Parse(payload);
@@ -207,7 +207,7 @@ public sealed class CanonicalPayloadHashingTests
             envelopeId: " envelope-1 ",
             createdUtc: new DateTimeOffset(2026, 6, 16, 13, 0, 1, TimeSpan.Zero),
             correlationId: " correlation-1 ",
-            auditResidueId: " residue-1 ",
+            decisionReceiptId: " residue-1 ",
             lifecycleStage: DecisionReceiptLifecycleStage.ExternalEmissionQueued,
             policyVersion: " policy-v1 ",
             policyHash: " policy-hash ",
@@ -263,7 +263,7 @@ public sealed class CanonicalPayloadHashingTests
     public void GovernanceEmissionEnvelopePayloadWritesNullPayloadAndLifecycleFieldsWhenOmitted()
     {
         var envelope = GovernanceEmissionEnvelope.Create(
-            GovernanceEmissionEventType.AuditResidue,
+            GovernanceEmissionEventType.DecisionReceipt,
             eventId: "event-1",
             occurredUtc: new DateTimeOffset(2026, 6, 16, 8, 0, 0, TimeSpan.FromHours(-5)),
             envelopeId: "envelope-without-payload",
@@ -422,13 +422,13 @@ public sealed class CanonicalPayloadHashingTests
                 ["safe"] = "payload-metadata"
             });
         var envelope = GovernanceEmissionEnvelope.Create(
-            GovernanceEmissionEventType.AuditResidue,
+            GovernanceEmissionEventType.DecisionReceipt,
             eventId: "event-1",
             occurredUtc: new DateTimeOffset(2026, 6, 16, 8, 0, 0, TimeSpan.FromHours(-5)),
             envelopeId: "envelope-1",
             createdUtc: new DateTimeOffset(2026, 6, 16, 13, 0, 1, TimeSpan.Zero),
             correlationId: "correlation-1",
-            auditResidueId: "residue-1",
+            decisionReceiptId: "residue-1",
             policyVersion: "policy-v1",
             policyHash: "policy-hash",
             payload: payload,
@@ -523,7 +523,7 @@ public sealed class CanonicalPayloadHashingTests
             policyVersion: "policy-v1",
             policyHash: "policy-hash",
             metadata: metadata,
-            auditResidueId: "residue-1",
+            decisionReceiptId: "residue-1",
             spanId: "span-1",
             parentSpanId: "parent-span-1",
             decisionLatencyMs: 42,
@@ -563,13 +563,13 @@ public sealed class CanonicalPayloadHashingTests
             metadata: payloadMetadata ?? new Dictionary<string, string>());
 
         return GovernanceEmissionEnvelope.Create(
-            GovernanceEmissionEventType.AuditResidue,
+            GovernanceEmissionEventType.DecisionReceipt,
             eventId: "event-1",
             occurredUtc: new DateTimeOffset(2026, 6, 16, 8, 0, 0, TimeSpan.FromHours(-5)),
             envelopeId: envelopeId,
             createdUtc: new DateTimeOffset(2026, 6, 16, 13, 0, 1, TimeSpan.Zero),
             correlationId: "correlation-1",
-            auditResidueId: "residue-1",
+            decisionReceiptId: "residue-1",
             policyVersion: "policy-v1",
             policyHash: "policy-hash",
             payload: payload);
@@ -585,11 +585,11 @@ public sealed class CanonicalPayloadHashingTests
         return [.. arrayElement.EnumerateArray().Select(item => item.GetString() ?? string.Empty)];
     }
 
-    private sealed class TestAuditResidue : IDecisionReceipt
+    private sealed class TestDecisionReceipt : IDecisionReceipt
     {
         public string EventId { get; init; } = "event-1";
 
-        public string? AuditResidueId { get; init; } = "residue-1";
+        public string? DecisionReceiptId { get; init; } = "residue-1";
 
         public string SchemaVersion { get; init; } = "asibackbone.stable-artifacts.v1";
 

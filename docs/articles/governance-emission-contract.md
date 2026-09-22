@@ -53,7 +53,7 @@ Provider packages and host-owned adapters depend on Core. Core must not depend o
 | `GovernanceEmissionResult` | Provider-neutral result shape for delivered, pending, deferred, failed, retryable, and dead-letter outcomes. |
 | `GovernanceEmissionStatus` | Stable status vocabulary for local/outbox/provider handoff. |
 | `GovernanceEmissionError` | Provider-neutral error code, message, retryability, provider name, and safe provider error code. |
-| `GovernanceEmissionEventType` | Stable event category vocabulary for decision, acknowledgment, capability token, gateway, decision receipt, lifecycle, outbox, and provider emission events. |
+| `GovernanceEmissionEventType` | Stable event category vocabulary for decision, acknowledgment, capability grant, gateway, decision receipt, lifecycle, outbox, and provider emission events. |
 
 ## Envelope guidance
 
@@ -67,7 +67,7 @@ The envelope can carry:
 * `EventId`
 * `OccurredUtc` / `CreatedUtc`
 * `CorrelationId`
-* `AuditResidueId`
+* `DecisionReceiptId`
 * `LifecycleStage` / `LifecycleStageSequence`
 * `PolicyVersion` / `PolicyHash`
 * `TraceId`, `SpanId`, `ParentSpanId`
@@ -111,7 +111,7 @@ Provider-specific exception types, HTTP codes, SDK error objects, and backend pa
 
 Emission envelopes should not contain:
 
-* raw capability tokens;
+* raw capability grants;
 * secrets, connection strings, API keys, or credentials;
 * raw prompts, documents, payload bodies, protected records, or sensitive content;
 * raw personal data unless host policy explicitly permits it;

@@ -48,7 +48,7 @@ The host integrates AsiBackbone where governance is needed and leaves the rest o
 | Constraint evaluation | Provides abstractions and decision outcome language. | Defines and registers domain-specific constraints. |
 | Acknowledgment flow | Provides acknowledgment and audit primitives. | Chooses UI, UX, authorization, and workflow behavior. |
 | Decision receipt | Provides structured audit models and sinks/stores. | Chooses durability, retention, access controls, and operational review. |
-| Capability tokens | Provides scoped grant concepts and package primitives where available. | Chooses when a grant is trusted and how execution is performed. |
+| Capability grants | Provides scoped grant concepts and package primitives where available. | Chooses when a grant is trusted and how execution is performed. |
 | Web application structure | Does not own routing, controllers, middleware, or UI. | Owns the host application shape and request pipeline. |
 | Persistence lifecycle | Contributes persistence shape/configuration where EF Core is used. | Owns `DbContext`, provider, connection strings, migrations, deployment, and operations. |
 | Execution | Does not execute external, infrastructure, AI, robotics, or physical-control actions. | Owns whether and how an allowed decision becomes real execution. |

@@ -115,7 +115,7 @@ The provider maps the following envelope fields when present:
 | Field | Attribute |
 | --- | --- |
 | `CorrelationId` | `asibackbone.correlation_id` |
-| `AuditResidueId` | `asibackbone.audit_residue_id` |
+| `DecisionReceiptId` | `asibackbone.audit_residue_id` |
 | `EventId` | `asibackbone.event_id` |
 | `EnvelopeId` | `asibackbone.envelope_id` |
 | `SchemaVersion` | `asibackbone.schema_version` |

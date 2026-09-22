@@ -24,7 +24,7 @@ public sealed class GovernanceEmissionEnvelope
         DateTimeOffset occurredUtc,
         DateTimeOffset createdUtc,
         string? correlationId,
-        string? auditResidueId,
+        string? decisionReceiptId,
         DecisionReceiptLifecycleStage? lifecycleStage,
         string? policyVersion,
         string? policyHash,
@@ -61,7 +61,7 @@ public sealed class GovernanceEmissionEnvelope
         OccurredUtc = occurredUtc.ToUniversalTime();
         CreatedUtc = createdUtc.ToUniversalTime();
         CorrelationId = NormalizeOptional(correlationId);
-        AuditResidueId = NormalizeOptional(auditResidueId);
+        DecisionReceiptId = NormalizeOptional(decisionReceiptId);
         LifecycleStage = lifecycleStage;
         LifecycleStageSequence = lifecycleStage.HasValue ? (int)lifecycleStage.Value : null;
         PolicyVersion = NormalizeOptional(policyVersion);
@@ -119,7 +119,7 @@ public sealed class GovernanceEmissionEnvelope
     /// <summary>
     /// Gets the decision receipt identifier linked to this emission, when available.
     /// </summary>
-    public string? AuditResidueId { get; }
+    public string? DecisionReceiptId { get; }
 
     /// <summary>
     /// Gets the decision receipt lifecycle stage linked to this emission, when available.
@@ -209,7 +209,7 @@ public sealed class GovernanceEmissionEnvelope
     /// <summary>
     /// Gets a value indicating whether correlation metadata is available.
     /// </summary>
-    public bool HasCorrelation => CorrelationId is not null || TraceId is not null || AuditResidueId is not null;
+    public bool HasCorrelation => CorrelationId is not null || TraceId is not null || DecisionReceiptId is not null;
 
     /// <summary>
     /// Gets a value indicating whether envelope metadata is present.
@@ -227,7 +227,7 @@ public sealed class GovernanceEmissionEnvelope
         DateTimeOffset? createdUtc = null,
         string? schemaVersion = null,
         string? correlationId = null,
-        string? auditResidueId = null,
+        string? decisionReceiptId = null,
         DecisionReceiptLifecycleStage? lifecycleStage = null,
         string? policyVersion = null,
         string? policyHash = null,
@@ -253,7 +253,7 @@ public sealed class GovernanceEmissionEnvelope
             occurredUtc ?? DateTimeOffset.UtcNow,
             createdUtc ?? DateTimeOffset.UtcNow,
             correlationId,
-            auditResidueId,
+            decisionReceiptId,
             lifecycleStage,
             policyVersion,
             policyHash,
@@ -277,7 +277,7 @@ public sealed class GovernanceEmissionEnvelope
     /// </summary>
     public static GovernanceEmissionEnvelope FromDecisionReceipt(
         IDecisionReceipt receipt,
-        GovernanceEmissionEventType eventType = GovernanceEmissionEventType.AuditResidue,
+        GovernanceEmissionEventType eventType = GovernanceEmissionEventType.DecisionReceipt,
         string? envelopeId = null,
         DateTimeOffset? createdUtc = null,
         GovernanceEmissionPayload? payload = null,
@@ -293,7 +293,7 @@ public sealed class GovernanceEmissionEnvelope
             receipt.OccurredUtc,
             createdUtc ?? DateTimeOffset.UtcNow,
             receipt.CorrelationId,
-            receipt.AuditResidueId,
+            receipt.DecisionReceiptId,
             null,
             receipt.PolicyVersion,
             receipt.PolicyHash,
@@ -332,7 +332,7 @@ public sealed class GovernanceEmissionEnvelope
             lifecycleEvent.OccurredUtc,
             createdUtc ?? DateTimeOffset.UtcNow,
             lifecycleEvent.CorrelationId,
-            lifecycleEvent.AuditResidueId,
+            lifecycleEvent.DecisionReceiptId,
             lifecycleEvent.Stage,
             null,
             null,

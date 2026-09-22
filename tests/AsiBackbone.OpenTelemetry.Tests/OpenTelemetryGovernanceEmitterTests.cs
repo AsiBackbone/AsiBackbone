@@ -44,7 +44,7 @@ public sealed class OpenTelemetryGovernanceEmitterTests
         var tags = activity.TagObjects.ToDictionary(static tag => tag.Key, static tag => tag.Value, StringComparer.Ordinal);
         Assert.Equal(envelope.EnvelopeId, tags[OpenTelemetryGovernanceAttributes.EnvelopeId]?.ToString());
         Assert.Equal(envelope.CorrelationId, tags[OpenTelemetryGovernanceAttributes.CorrelationId]?.ToString());
-        Assert.Equal(envelope.AuditResidueId, tags[OpenTelemetryGovernanceAttributes.AuditResidueId]?.ToString());
+        Assert.Equal(envelope.DecisionReceiptId, tags[OpenTelemetryGovernanceAttributes.DecisionReceiptId]?.ToString());
         Assert.Equal(envelope.PolicyVersion, tags[OpenTelemetryGovernanceAttributes.PolicyVersion]?.ToString());
         Assert.Equal(envelope.PolicyHash, tags[OpenTelemetryGovernanceAttributes.PolicyHash]?.ToString());
         Assert.Equal(envelope.TraceId, tags[OpenTelemetryGovernanceAttributes.TraceId]?.ToString());
@@ -131,7 +131,7 @@ public sealed class OpenTelemetryGovernanceEmitterTests
             createdUtc: new DateTimeOffset(2026, 6, 15, 12, 0, 1, TimeSpan.Zero),
             schemaVersion: "1.0.0",
             correlationId: "correlation-197",
-            auditResidueId: "audit-residue-197",
+            decisionReceiptId: "audit-residue-197",
             lifecycleStage: DecisionReceiptLifecycleStage.DecisionEvaluated,
             policyVersion: "policy-v1",
             policyHash: "policy-hash-197",

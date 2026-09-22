@@ -1,5 +1,5 @@
+using AsiBackbone.Core.Acknowledgments;
 using AsiBackbone.Core.Actors;
-using AsiBackbone.Core.Handshakes;
 using AsiBackbone.EntityFrameworkCore.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
@@ -33,10 +33,10 @@ public sealed class AsiBackboneEntityConfigurationsTests
     {
         using HostOwnedDbContext context = CreateContext();
 
-        Assert.NotNull(context.Model.FindEntityType(typeof(HandshakeRequestEntity)));
-        Assert.NotNull(context.Model.FindEntityType(typeof(HandshakeRequestMetadataEntity)));
-        Assert.NotNull(context.Model.FindEntityType(typeof(HandshakeAcknowledgmentEntity)));
-        Assert.NotNull(context.Model.FindEntityType(typeof(HandshakeAcknowledgmentMetadataEntity)));
+        Assert.NotNull(context.Model.FindEntityType(typeof(AcknowledgmentRequestEntity)));
+        Assert.NotNull(context.Model.FindEntityType(typeof(AcknowledgmentRequestMetadataEntity)));
+        Assert.NotNull(context.Model.FindEntityType(typeof(AcknowledgmentResponseEntity)));
+        Assert.NotNull(context.Model.FindEntityType(typeof(AcknowledgmentResponseMetadataEntity)));
     }
 
     /// <summary>
@@ -182,181 +182,181 @@ public sealed class AsiBackboneEntityConfigurationsTests
     /// Verifies that the entity configuration for the handshake request entity defines the expected keys, properties, and indexes according to the design of the handshake request. This includes verifying that required properties are configured as required, string properties have the expected maximum lengths, enum properties are stored as strings, and that indexes are defined on commonly queried properties to optimize performance. Additionally, verifies that composite indexes are defined on combinations of properties that are commonly queried together to further optimize query performance.
     /// </summary>
     [Fact]
-    public void HandshakeRequestConfigurationDefinesKeysPropertiesAndIndexes()
+    public void AcknowledgmentRequestConfigurationDefinesKeysPropertiesAndIndexes()
     {
         using HostOwnedDbContext context = CreateContext();
 
-        IEntityType entityType = GetEntityType<HandshakeRequestEntity>(context);
+        IEntityType entityType = GetEntityType<AcknowledgmentRequestEntity>(context);
 
         Assert.Equal("AsiBackboneHandshakeRequests", entityType.GetTableName());
-        AssertPrimaryKey(entityType, nameof(HandshakeRequestEntity.Id));
-        AssertValueGeneratedNever(entityType, nameof(HandshakeRequestEntity.Id));
+        AssertPrimaryKey(entityType, nameof(AcknowledgmentRequestEntity.Id));
+        AssertValueGeneratedNever(entityType, nameof(AcknowledgmentRequestEntity.Id));
         AssertConcurrencyStamp(entityType);
 
-        AssertRequiredMaxLength(entityType, nameof(HandshakeRequestEntity.HandshakeId), 128);
-        AssertRequiredMaxLength(entityType, nameof(HandshakeRequestEntity.ActorId), 128);
-        AssertRequiredMaxLength(entityType, nameof(HandshakeRequestEntity.ActorType), 64);
-        AssertStoresEnumAsString(entityType, nameof(HandshakeRequestEntity.ActorType));
-        AssertOptionalMaxLength(entityType, nameof(HandshakeRequestEntity.ActorDisplayName), 256);
-        AssertRequiredMaxLength(entityType, nameof(HandshakeRequestEntity.OperationName), 256);
-        AssertRequiredMaxLength(entityType, nameof(HandshakeRequestEntity.ReasonCode), 256);
-        AssertRequired(entityType, nameof(HandshakeRequestEntity.Message));
-        AssertRequiredMaxLength(entityType, nameof(HandshakeRequestEntity.RequiredAcknowledgmentCode), 128);
-        AssertRequired(entityType, nameof(HandshakeRequestEntity.RequiredAcknowledgmentText));
-        AssertRequiredMaxLength(entityType, nameof(HandshakeRequestEntity.RiskLevel), 64);
-        AssertStoresEnumAsString(entityType, nameof(HandshakeRequestEntity.RiskLevel));
-        AssertOptionalMaxLength(entityType, nameof(HandshakeRequestEntity.RiskCategory), 128);
-        AssertOptionalMaxLength(entityType, nameof(HandshakeRequestEntity.CorrelationId), 128);
-        AssertOptionalMaxLength(entityType, nameof(HandshakeRequestEntity.TraceId), 128);
-        AssertOptionalMaxLength(entityType, nameof(HandshakeRequestEntity.PolicyVersion), 128);
-        AssertOptionalMaxLength(entityType, nameof(HandshakeRequestEntity.PolicyHash), 512);
+        AssertRequiredMaxLength(entityType, nameof(AcknowledgmentRequestEntity.HandshakeId), 128);
+        AssertRequiredMaxLength(entityType, nameof(AcknowledgmentRequestEntity.ActorId), 128);
+        AssertRequiredMaxLength(entityType, nameof(AcknowledgmentRequestEntity.ActorType), 64);
+        AssertStoresEnumAsString(entityType, nameof(AcknowledgmentRequestEntity.ActorType));
+        AssertOptionalMaxLength(entityType, nameof(AcknowledgmentRequestEntity.ActorDisplayName), 256);
+        AssertRequiredMaxLength(entityType, nameof(AcknowledgmentRequestEntity.OperationName), 256);
+        AssertRequiredMaxLength(entityType, nameof(AcknowledgmentRequestEntity.ReasonCode), 256);
+        AssertRequired(entityType, nameof(AcknowledgmentRequestEntity.Message));
+        AssertRequiredMaxLength(entityType, nameof(AcknowledgmentRequestEntity.RequiredAcknowledgmentCode), 128);
+        AssertRequired(entityType, nameof(AcknowledgmentRequestEntity.RequiredAcknowledgmentText));
+        AssertRequiredMaxLength(entityType, nameof(AcknowledgmentRequestEntity.RiskLevel), 64);
+        AssertStoresEnumAsString(entityType, nameof(AcknowledgmentRequestEntity.RiskLevel));
+        AssertOptionalMaxLength(entityType, nameof(AcknowledgmentRequestEntity.RiskCategory), 128);
+        AssertOptionalMaxLength(entityType, nameof(AcknowledgmentRequestEntity.CorrelationId), 128);
+        AssertOptionalMaxLength(entityType, nameof(AcknowledgmentRequestEntity.TraceId), 128);
+        AssertOptionalMaxLength(entityType, nameof(AcknowledgmentRequestEntity.PolicyVersion), 128);
+        AssertOptionalMaxLength(entityType, nameof(AcknowledgmentRequestEntity.PolicyHash), 512);
 
-        AssertHasUniqueIndex(entityType, nameof(HandshakeRequestEntity.HandshakeId));
-        AssertHasIndex(entityType, nameof(HandshakeRequestEntity.ActorId));
-        AssertHasIndex(entityType, nameof(HandshakeRequestEntity.ActorType));
-        AssertHasIndex(entityType, nameof(HandshakeRequestEntity.OperationName));
-        AssertHasIndex(entityType, nameof(HandshakeRequestEntity.ReasonCode));
-        AssertHasIndex(entityType, nameof(HandshakeRequestEntity.RequiredAcknowledgmentCode));
-        AssertHasIndex(entityType, nameof(HandshakeRequestEntity.RiskLevel));
-        AssertHasIndex(entityType, nameof(HandshakeRequestEntity.RiskCategory));
-        AssertHasIndex(entityType, nameof(HandshakeRequestEntity.CorrelationId));
-        AssertHasIndex(entityType, nameof(HandshakeRequestEntity.TraceId));
-        AssertHasIndex(entityType, nameof(HandshakeRequestEntity.PolicyVersion));
-        AssertHasIndex(entityType, nameof(HandshakeRequestEntity.PolicyHash));
-
-        AssertHasIndex(
-            entityType,
-            nameof(HandshakeRequestEntity.ActorId),
-            nameof(HandshakeRequestEntity.OperationName));
+        AssertHasUniqueIndex(entityType, nameof(AcknowledgmentRequestEntity.HandshakeId));
+        AssertHasIndex(entityType, nameof(AcknowledgmentRequestEntity.ActorId));
+        AssertHasIndex(entityType, nameof(AcknowledgmentRequestEntity.ActorType));
+        AssertHasIndex(entityType, nameof(AcknowledgmentRequestEntity.OperationName));
+        AssertHasIndex(entityType, nameof(AcknowledgmentRequestEntity.ReasonCode));
+        AssertHasIndex(entityType, nameof(AcknowledgmentRequestEntity.RequiredAcknowledgmentCode));
+        AssertHasIndex(entityType, nameof(AcknowledgmentRequestEntity.RiskLevel));
+        AssertHasIndex(entityType, nameof(AcknowledgmentRequestEntity.RiskCategory));
+        AssertHasIndex(entityType, nameof(AcknowledgmentRequestEntity.CorrelationId));
+        AssertHasIndex(entityType, nameof(AcknowledgmentRequestEntity.TraceId));
+        AssertHasIndex(entityType, nameof(AcknowledgmentRequestEntity.PolicyVersion));
+        AssertHasIndex(entityType, nameof(AcknowledgmentRequestEntity.PolicyHash));
 
         AssertHasIndex(
             entityType,
-            nameof(HandshakeRequestEntity.CorrelationId),
-            nameof(HandshakeRequestEntity.OperationName));
+            nameof(AcknowledgmentRequestEntity.ActorId),
+            nameof(AcknowledgmentRequestEntity.OperationName));
 
         AssertHasIndex(
             entityType,
-            nameof(HandshakeRequestEntity.PolicyVersion),
-            nameof(HandshakeRequestEntity.PolicyHash));
+            nameof(AcknowledgmentRequestEntity.CorrelationId),
+            nameof(AcknowledgmentRequestEntity.OperationName));
+
+        AssertHasIndex(
+            entityType,
+            nameof(AcknowledgmentRequestEntity.PolicyVersion),
+            nameof(AcknowledgmentRequestEntity.PolicyHash));
     }
 
     /// <summary>
     /// Verifies that the entity configuration for the handshake request metadata entity defines the expected keys, properties, relationships, and indexes according to the design of the handshake request metadata. This includes verifying that required properties are configured as required, string properties have the expected maximum lengths, that a required relationship is defined to the handshake request with cascade delete behavior, and that indexes are defined on commonly queried properties to optimize performance. Additionally, verifies that a unique index is defined on the combination of the foreign key to the handshake request and the metadata key to enforce uniqueness of metadata keys within each handshake request.
     /// </summary>
     [Fact]
-    public void HandshakeRequestMetadataConfigurationDefinesRelationshipIndexesAndCascadeDelete()
+    public void AcknowledgmentRequestMetadataConfigurationDefinesRelationshipIndexesAndCascadeDelete()
     {
         using HostOwnedDbContext context = CreateContext();
 
-        IEntityType entityType = GetEntityType<HandshakeRequestMetadataEntity>(context);
+        IEntityType entityType = GetEntityType<AcknowledgmentRequestMetadataEntity>(context);
 
         Assert.Equal("AsiBackboneHandshakeRequestMetadata", entityType.GetTableName());
-        AssertPrimaryKey(entityType, nameof(HandshakeRequestMetadataEntity.Id));
-        AssertValueGeneratedNever(entityType, nameof(HandshakeRequestMetadataEntity.Id));
+        AssertPrimaryKey(entityType, nameof(AcknowledgmentRequestMetadataEntity.Id));
+        AssertValueGeneratedNever(entityType, nameof(AcknowledgmentRequestMetadataEntity.Id));
         AssertConcurrencyStamp(entityType);
 
-        AssertRequired(entityType, nameof(HandshakeRequestMetadataEntity.HandshakeRequestId));
-        AssertRequiredMaxLength(entityType, nameof(HandshakeRequestMetadataEntity.MetadataKey), 256);
-        AssertRequiredMaxLength(entityType, nameof(HandshakeRequestMetadataEntity.MetadataValue), 4096);
+        AssertRequired(entityType, nameof(AcknowledgmentRequestMetadataEntity.AcknowledgmentRequestId));
+        AssertRequiredMaxLength(entityType, nameof(AcknowledgmentRequestMetadataEntity.MetadataKey), 256);
+        AssertRequiredMaxLength(entityType, nameof(AcknowledgmentRequestMetadataEntity.MetadataValue), 4096);
 
         AssertHasCascadeForeignKey(
             entityType,
-            typeof(HandshakeRequestEntity),
-            nameof(HandshakeRequestMetadataEntity.HandshakeRequestId));
+            typeof(AcknowledgmentRequestEntity),
+            nameof(AcknowledgmentRequestMetadataEntity.AcknowledgmentRequestId));
 
-        AssertHasIndex(entityType, nameof(HandshakeRequestMetadataEntity.HandshakeRequestId));
-        AssertHasIndex(entityType, nameof(HandshakeRequestMetadataEntity.MetadataKey));
+        AssertHasIndex(entityType, nameof(AcknowledgmentRequestMetadataEntity.AcknowledgmentRequestId));
+        AssertHasIndex(entityType, nameof(AcknowledgmentRequestMetadataEntity.MetadataKey));
 
         AssertHasUniqueIndex(
             entityType,
-            nameof(HandshakeRequestMetadataEntity.HandshakeRequestId),
-            nameof(HandshakeRequestMetadataEntity.MetadataKey));
+            nameof(AcknowledgmentRequestMetadataEntity.AcknowledgmentRequestId),
+            nameof(AcknowledgmentRequestMetadataEntity.MetadataKey));
     }
 
     /// <summary>
     /// Verifies that the entity configuration for the handshake acknowledgment entity defines the expected keys, properties, and indexes according to the design of the handshake acknowledgment. This includes verifying that required properties are configured as required, string properties have the expected maximum lengths, enum properties are stored as strings, and that indexes are defined on commonly queried properties to optimize performance. Additionally, verifies that composite indexes are defined on combinations of properties that are commonly queried together to further optimize query performance.
     /// </summary>
     [Fact]
-    public void HandshakeAcknowledgmentConfigurationDefinesKeysPropertiesAndIndexes()
+    public void AcknowledgmentResponseConfigurationDefinesKeysPropertiesAndIndexes()
     {
         using HostOwnedDbContext context = CreateContext();
 
-        IEntityType entityType = GetEntityType<HandshakeAcknowledgmentEntity>(context);
+        IEntityType entityType = GetEntityType<AcknowledgmentResponseEntity>(context);
 
         Assert.Equal("AsiBackboneHandshakeAcknowledgments", entityType.GetTableName());
-        AssertPrimaryKey(entityType, nameof(HandshakeAcknowledgmentEntity.Id));
-        AssertValueGeneratedNever(entityType, nameof(HandshakeAcknowledgmentEntity.Id));
+        AssertPrimaryKey(entityType, nameof(AcknowledgmentResponseEntity.Id));
+        AssertValueGeneratedNever(entityType, nameof(AcknowledgmentResponseEntity.Id));
         AssertConcurrencyStamp(entityType);
 
-        AssertRequiredMaxLength(entityType, nameof(HandshakeAcknowledgmentEntity.AcknowledgmentId), 128);
-        AssertRequiredMaxLength(entityType, nameof(HandshakeAcknowledgmentEntity.HandshakeId), 128);
-        AssertRequiredMaxLength(entityType, nameof(HandshakeAcknowledgmentEntity.ActorId), 128);
-        AssertRequiredMaxLength(entityType, nameof(HandshakeAcknowledgmentEntity.ActorType), 64);
-        AssertStoresEnumAsString(entityType, nameof(HandshakeAcknowledgmentEntity.ActorType));
-        AssertOptionalMaxLength(entityType, nameof(HandshakeAcknowledgmentEntity.ActorDisplayName), 256);
-        AssertRequiredMaxLength(entityType, nameof(HandshakeAcknowledgmentEntity.AcknowledgmentCode), 128);
-        AssertRequired(entityType, nameof(HandshakeAcknowledgmentEntity.Acknowledged));
-        AssertRequired(entityType, nameof(HandshakeAcknowledgmentEntity.OccurredUtc));
-        AssertOptionalMaxLength(entityType, nameof(HandshakeAcknowledgmentEntity.CorrelationId), 128);
-        AssertOptionalMaxLength(entityType, nameof(HandshakeAcknowledgmentEntity.TraceId), 128);
+        AssertRequiredMaxLength(entityType, nameof(AcknowledgmentResponseEntity.AcknowledgmentId), 128);
+        AssertRequiredMaxLength(entityType, nameof(AcknowledgmentResponseEntity.HandshakeId), 128);
+        AssertRequiredMaxLength(entityType, nameof(AcknowledgmentResponseEntity.ActorId), 128);
+        AssertRequiredMaxLength(entityType, nameof(AcknowledgmentResponseEntity.ActorType), 64);
+        AssertStoresEnumAsString(entityType, nameof(AcknowledgmentResponseEntity.ActorType));
+        AssertOptionalMaxLength(entityType, nameof(AcknowledgmentResponseEntity.ActorDisplayName), 256);
+        AssertRequiredMaxLength(entityType, nameof(AcknowledgmentResponseEntity.AcknowledgmentCode), 128);
+        AssertRequired(entityType, nameof(AcknowledgmentResponseEntity.Acknowledged));
+        AssertRequired(entityType, nameof(AcknowledgmentResponseEntity.OccurredUtc));
+        AssertOptionalMaxLength(entityType, nameof(AcknowledgmentResponseEntity.CorrelationId), 128);
+        AssertOptionalMaxLength(entityType, nameof(AcknowledgmentResponseEntity.TraceId), 128);
 
-        AssertHasUniqueIndex(entityType, nameof(HandshakeAcknowledgmentEntity.AcknowledgmentId));
-        AssertHasIndex(entityType, nameof(HandshakeAcknowledgmentEntity.HandshakeId));
-        AssertHasIndex(entityType, nameof(HandshakeAcknowledgmentEntity.ActorId));
-        AssertHasIndex(entityType, nameof(HandshakeAcknowledgmentEntity.ActorType));
-        AssertHasIndex(entityType, nameof(HandshakeAcknowledgmentEntity.AcknowledgmentCode));
-        AssertHasIndex(entityType, nameof(HandshakeAcknowledgmentEntity.Acknowledged));
-        AssertHasIndex(entityType, nameof(HandshakeAcknowledgmentEntity.OccurredUtc));
-        AssertHasIndex(entityType, nameof(HandshakeAcknowledgmentEntity.CorrelationId));
-        AssertHasIndex(entityType, nameof(HandshakeAcknowledgmentEntity.TraceId));
-
-        AssertHasIndex(
-            entityType,
-            nameof(HandshakeAcknowledgmentEntity.HandshakeId),
-            nameof(HandshakeAcknowledgmentEntity.OccurredUtc));
+        AssertHasUniqueIndex(entityType, nameof(AcknowledgmentResponseEntity.AcknowledgmentId));
+        AssertHasIndex(entityType, nameof(AcknowledgmentResponseEntity.HandshakeId));
+        AssertHasIndex(entityType, nameof(AcknowledgmentResponseEntity.ActorId));
+        AssertHasIndex(entityType, nameof(AcknowledgmentResponseEntity.ActorType));
+        AssertHasIndex(entityType, nameof(AcknowledgmentResponseEntity.AcknowledgmentCode));
+        AssertHasIndex(entityType, nameof(AcknowledgmentResponseEntity.Acknowledged));
+        AssertHasIndex(entityType, nameof(AcknowledgmentResponseEntity.OccurredUtc));
+        AssertHasIndex(entityType, nameof(AcknowledgmentResponseEntity.CorrelationId));
+        AssertHasIndex(entityType, nameof(AcknowledgmentResponseEntity.TraceId));
 
         AssertHasIndex(
             entityType,
-            nameof(HandshakeAcknowledgmentEntity.ActorId),
-            nameof(HandshakeAcknowledgmentEntity.OccurredUtc));
+            nameof(AcknowledgmentResponseEntity.HandshakeId),
+            nameof(AcknowledgmentResponseEntity.OccurredUtc));
 
         AssertHasIndex(
             entityType,
-            nameof(HandshakeAcknowledgmentEntity.CorrelationId),
-            nameof(HandshakeAcknowledgmentEntity.OccurredUtc));
+            nameof(AcknowledgmentResponseEntity.ActorId),
+            nameof(AcknowledgmentResponseEntity.OccurredUtc));
+
+        AssertHasIndex(
+            entityType,
+            nameof(AcknowledgmentResponseEntity.CorrelationId),
+            nameof(AcknowledgmentResponseEntity.OccurredUtc));
     }
 
     /// <summary>
     /// Verifies that the entity configuration for the handshake acknowledgment metadata entity defines the expected keys, properties, relationships, and indexes according to the design of the handshake acknowledgment metadata. This includes verifying that required properties are configured as required, string properties have the expected maximum lengths, that a required relationship is defined to the handshake acknowledgment with cascade delete behavior, and that indexes are defined on commonly queried properties to optimize performance. Additionally, verifies that a unique index is defined on the combination of the foreign key to the handshake acknowledgment and the metadata key to enforce uniqueness of metadata keys within each handshake acknowledgment.
     /// </summary>
     [Fact]
-    public void HandshakeAcknowledgmentMetadataConfigurationDefinesRelationshipIndexesAndCascadeDelete()
+    public void AcknowledgmentResponseMetadataConfigurationDefinesRelationshipIndexesAndCascadeDelete()
     {
         using HostOwnedDbContext context = CreateContext();
 
-        IEntityType entityType = GetEntityType<HandshakeAcknowledgmentMetadataEntity>(context);
+        IEntityType entityType = GetEntityType<AcknowledgmentResponseMetadataEntity>(context);
 
         Assert.Equal("AsiBackboneHandshakeAcknowledgmentMetadata", entityType.GetTableName());
-        AssertPrimaryKey(entityType, nameof(HandshakeAcknowledgmentMetadataEntity.Id));
-        AssertValueGeneratedNever(entityType, nameof(HandshakeAcknowledgmentMetadataEntity.Id));
+        AssertPrimaryKey(entityType, nameof(AcknowledgmentResponseMetadataEntity.Id));
+        AssertValueGeneratedNever(entityType, nameof(AcknowledgmentResponseMetadataEntity.Id));
         AssertConcurrencyStamp(entityType);
 
-        AssertRequired(entityType, nameof(HandshakeAcknowledgmentMetadataEntity.HandshakeAcknowledgmentId));
-        AssertRequiredMaxLength(entityType, nameof(HandshakeAcknowledgmentMetadataEntity.MetadataKey), 256);
-        AssertRequiredMaxLength(entityType, nameof(HandshakeAcknowledgmentMetadataEntity.MetadataValue), 4096);
+        AssertRequired(entityType, nameof(AcknowledgmentResponseMetadataEntity.AcknowledgmentResponseId));
+        AssertRequiredMaxLength(entityType, nameof(AcknowledgmentResponseMetadataEntity.MetadataKey), 256);
+        AssertRequiredMaxLength(entityType, nameof(AcknowledgmentResponseMetadataEntity.MetadataValue), 4096);
 
         AssertHasCascadeForeignKey(
             entityType,
-            typeof(HandshakeAcknowledgmentEntity),
-            nameof(HandshakeAcknowledgmentMetadataEntity.HandshakeAcknowledgmentId));
+            typeof(AcknowledgmentResponseEntity),
+            nameof(AcknowledgmentResponseMetadataEntity.AcknowledgmentResponseId));
 
-        AssertHasIndex(entityType, nameof(HandshakeAcknowledgmentMetadataEntity.HandshakeAcknowledgmentId));
-        AssertHasIndex(entityType, nameof(HandshakeAcknowledgmentMetadataEntity.MetadataKey));
+        AssertHasIndex(entityType, nameof(AcknowledgmentResponseMetadataEntity.AcknowledgmentResponseId));
+        AssertHasIndex(entityType, nameof(AcknowledgmentResponseMetadataEntity.MetadataKey));
 
         AssertHasUniqueIndex(
             entityType,
-            nameof(HandshakeAcknowledgmentMetadataEntity.HandshakeAcknowledgmentId),
-            nameof(HandshakeAcknowledgmentMetadataEntity.MetadataKey));
+            nameof(AcknowledgmentResponseMetadataEntity.AcknowledgmentResponseId),
+            nameof(AcknowledgmentResponseMetadataEntity.MetadataKey));
     }
 
     /// <summary>
@@ -418,7 +418,7 @@ public sealed class AsiBackboneEntityConfigurationsTests
             MetadataValue = "unit-test"
         });
 
-        _ = context.HandshakeRequests.Add(new HandshakeRequestEntity
+        _ = context.AcknowledgmentRequests.Add(new AcknowledgmentRequestEntity
         {
             Id = handshakeRequestId,
             HandshakeId = "handshake-123",
@@ -430,7 +430,7 @@ public sealed class AsiBackboneEntityConfigurationsTests
             Message = "Acknowledgment is required.",
             RequiredAcknowledgmentCode = "ACK-001",
             RequiredAcknowledgmentText = "I understand this action is consequential.",
-            RiskLevel = LiabilityHandshakeRiskLevel.High,
+            RiskLevel = AcknowledgmentRiskLevel.High,
             RiskCategory = "administrative",
             CorrelationId = "correlation-123",
             TraceId = "trace-123",
@@ -438,15 +438,15 @@ public sealed class AsiBackboneEntityConfigurationsTests
             PolicyHash = "hash-123"
         });
 
-        _ = context.HandshakeRequestMetadata.Add(new HandshakeRequestMetadataEntity
+        _ = context.AcknowledgmentRequestMetadata.Add(new AcknowledgmentRequestMetadataEntity
         {
             Id = Guid.NewGuid(),
-            HandshakeRequestId = handshakeRequestId,
+            AcknowledgmentRequestId = handshakeRequestId,
             MetadataKey = "source",
             MetadataValue = "unit-test"
         });
 
-        _ = context.HandshakeAcknowledgments.Add(new HandshakeAcknowledgmentEntity
+        _ = context.AcknowledgmentResponses.Add(new AcknowledgmentResponseEntity
         {
             Id = handshakeAcknowledgmentId,
             AcknowledgmentId = "acknowledgment-123",
@@ -461,10 +461,10 @@ public sealed class AsiBackboneEntityConfigurationsTests
             TraceId = "trace-123"
         });
 
-        _ = context.HandshakeAcknowledgmentMetadata.Add(new HandshakeAcknowledgmentMetadataEntity
+        _ = context.AcknowledgmentResponseMetadata.Add(new AcknowledgmentResponseMetadataEntity
         {
             Id = Guid.NewGuid(),
-            HandshakeAcknowledgmentId = handshakeAcknowledgmentId,
+            AcknowledgmentResponseId = handshakeAcknowledgmentId,
             MetadataKey = "source",
             MetadataValue = "unit-test"
         });
@@ -476,18 +476,18 @@ public sealed class AsiBackboneEntityConfigurationsTests
         Assert.Equal(1, await context.AuditLedgerRecords.CountAsync(cancellationToken: TestContext.Current.CancellationToken));
         Assert.Equal(1, await context.AuditLedgerReasonCodes.CountAsync(cancellationToken: TestContext.Current.CancellationToken));
         Assert.Equal(1, await context.AuditLedgerMetadata.CountAsync(cancellationToken: TestContext.Current.CancellationToken));
-        Assert.Equal(1, await context.HandshakeRequests.CountAsync(cancellationToken: TestContext.Current.CancellationToken));
-        Assert.Equal(1, await context.HandshakeRequestMetadata.CountAsync(cancellationToken: TestContext.Current.CancellationToken));
-        Assert.Equal(1, await context.HandshakeAcknowledgments.CountAsync(cancellationToken: TestContext.Current.CancellationToken));
-        Assert.Equal(1, await context.HandshakeAcknowledgmentMetadata.CountAsync(cancellationToken: TestContext.Current.CancellationToken));
+        Assert.Equal(1, await context.AcknowledgmentRequests.CountAsync(cancellationToken: TestContext.Current.CancellationToken));
+        Assert.Equal(1, await context.AcknowledgmentRequestMetadata.CountAsync(cancellationToken: TestContext.Current.CancellationToken));
+        Assert.Equal(1, await context.AcknowledgmentResponses.CountAsync(cancellationToken: TestContext.Current.CancellationToken));
+        Assert.Equal(1, await context.AcknowledgmentResponseMetadata.CountAsync(cancellationToken: TestContext.Current.CancellationToken));
 
         AuditLedgerRecordEntity auditRecord = await context.AuditLedgerRecords.SingleAsync(cancellationToken: TestContext.Current.CancellationToken);
         Assert.Equal(GovernanceActorType.Service, auditRecord.ActorType);
 
-        HandshakeRequestEntity handshakeRequest = await context.HandshakeRequests.SingleAsync(cancellationToken: TestContext.Current.CancellationToken);
-        Assert.Equal(LiabilityHandshakeRiskLevel.High, handshakeRequest.RiskLevel);
+        AcknowledgmentRequestEntity handshakeRequest = await context.AcknowledgmentRequests.SingleAsync(cancellationToken: TestContext.Current.CancellationToken);
+        Assert.Equal(AcknowledgmentRiskLevel.High, handshakeRequest.RiskLevel);
 
-        HandshakeAcknowledgmentEntity acknowledgment = await context.HandshakeAcknowledgments.SingleAsync(cancellationToken: TestContext.Current.CancellationToken);
+        AcknowledgmentResponseEntity acknowledgment = await context.AcknowledgmentResponses.SingleAsync(cancellationToken: TestContext.Current.CancellationToken);
         Assert.True(acknowledgment.Acknowledged);
     }
 
@@ -618,17 +618,17 @@ public sealed class AsiBackboneEntityConfigurationsTests
         public DbSet<AuditLedgerMetadataEntity> AuditLedgerMetadata =>
             Set<AuditLedgerMetadataEntity>();
 
-        public DbSet<HandshakeRequestEntity> HandshakeRequests =>
-            Set<HandshakeRequestEntity>();
+        public DbSet<AcknowledgmentRequestEntity> AcknowledgmentRequests =>
+            Set<AcknowledgmentRequestEntity>();
 
-        public DbSet<HandshakeRequestMetadataEntity> HandshakeRequestMetadata =>
-            Set<HandshakeRequestMetadataEntity>();
+        public DbSet<AcknowledgmentRequestMetadataEntity> AcknowledgmentRequestMetadata =>
+            Set<AcknowledgmentRequestMetadataEntity>();
 
-        public DbSet<HandshakeAcknowledgmentEntity> HandshakeAcknowledgments =>
-            Set<HandshakeAcknowledgmentEntity>();
+        public DbSet<AcknowledgmentResponseEntity> AcknowledgmentResponses =>
+            Set<AcknowledgmentResponseEntity>();
 
-        public DbSet<HandshakeAcknowledgmentMetadataEntity> HandshakeAcknowledgmentMetadata =>
-            Set<HandshakeAcknowledgmentMetadataEntity>();
+        public DbSet<AcknowledgmentResponseMetadataEntity> AcknowledgmentResponseMetadata =>
+            Set<AcknowledgmentResponseMetadataEntity>();
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

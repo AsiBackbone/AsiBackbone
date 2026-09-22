@@ -27,7 +27,7 @@ public sealed class AuditLedgerRecordEntity : GovernanceEntity
     /// <summary>
     /// Gets or sets the stable decision receipt identifier.
     /// </summary>
-    public string? AuditResidueId { get; set; }
+    public string? DecisionReceiptId { get; set; }
 
     /// <summary>
     /// Gets or sets the UTC timestamp when the audited event occurred.
@@ -160,7 +160,7 @@ public sealed class AuditLedgerRecordEntity : GovernanceEntity
     public string? PolicyHash { get; set; }
 
     /// <summary>
-    /// Gets or sets the related responsibility or liability handshake identifier, when available.
+    /// Gets or sets the related responsibility or acknowledgment identifier, when available.
     /// </summary>
     public string? HandshakeId { get; set; }
 
@@ -170,7 +170,7 @@ public sealed class AuditLedgerRecordEntity : GovernanceEntity
     public string? AcknowledgmentId { get; set; }
 
     /// <summary>
-    /// Gets or sets the related capability token identifier, when available.
+    /// Gets or sets the related capability grant identifier, when available.
     /// </summary>
     public string? CapabilityTokenId { get; set; }
 

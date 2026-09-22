@@ -20,7 +20,7 @@ The primary architecture path is:
 ```text
 Decision
   -> Acknowledgment
-  -> Capability token
+  -> Capability grant
   -> Gateway execution boundary
   -> Decision receipt
   -> Durable local/outbox record
@@ -52,7 +52,7 @@ AsiBackbone.Core
   |
   | evaluates policy and returns governance decision
   | creates acknowledgment challenge when required
-  | creates scoped capability token when allowed
+  | creates scoped capability grant when allowed
   | creates decision receipt / decision receipt shape
   v
 Durable local store / outbox

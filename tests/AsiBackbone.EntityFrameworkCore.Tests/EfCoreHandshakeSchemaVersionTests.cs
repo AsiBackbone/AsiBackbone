@@ -1,5 +1,5 @@
+using AsiBackbone.Core.Acknowledgments;
 using AsiBackbone.Core.Actors;
-using AsiBackbone.Core.Handshakes;
 using AsiBackbone.Core.Serialization;
 using AsiBackbone.EntityFrameworkCore.Persistence;
 using Microsoft.EntityFrameworkCore;
@@ -17,11 +17,11 @@ public sealed class EfCoreHandshakeSchemaVersionTests
     /// </summary>
     /// <returns>A task that represents the asynchronous test operation.</returns>
     [Fact]
-    public async Task HandshakeRequestRoundTripsSchemaVersion()
+    public async Task AcknowledgmentRequestRoundTripsSchemaVersion()
     {
         await using HostOwnedHandshakeDbContext context = CreateContext();
 
-        _ = context.HandshakeRequests.Add(new HandshakeRequestEntity
+        _ = context.AcknowledgmentRequests.Add(new AcknowledgmentRequestEntity
         {
             HandshakeId = "handshake-123",
             SchemaVersion = "1.1-test",
@@ -33,7 +33,7 @@ public sealed class EfCoreHandshakeSchemaVersionTests
             Message = "Acknowledgment is required.",
             RequiredAcknowledgmentCode = "ACK-001",
             RequiredAcknowledgmentText = "I understand this action is consequential.",
-            RiskLevel = LiabilityHandshakeRiskLevel.High,
+            RiskLevel = AcknowledgmentRiskLevel.High,
             RiskCategory = "administrative",
             CorrelationId = "correlation-123",
             TraceId = "trace-456",
@@ -43,7 +43,7 @@ public sealed class EfCoreHandshakeSchemaVersionTests
 
         _ = await context.SaveChangesAsync(TestContext.Current.CancellationToken);
 
-        HandshakeRequestEntity found = await context.HandshakeRequests
+        AcknowledgmentRequestEntity found = await context.AcknowledgmentRequests
             .AsNoTracking()
             .SingleAsync(request => request.HandshakeId == "handshake-123", TestContext.Current.CancellationToken);
 
@@ -55,11 +55,11 @@ public sealed class EfCoreHandshakeSchemaVersionTests
     /// </summary>
     /// <returns>A task that represents the asynchronous test operation.</returns>
     [Fact]
-    public async Task HandshakeAcknowledgmentRoundTripsSchemaVersion()
+    public async Task AcknowledgmentResponseRoundTripsSchemaVersion()
     {
         await using HostOwnedHandshakeDbContext context = CreateContext();
 
-        _ = context.HandshakeAcknowledgments.Add(new HandshakeAcknowledgmentEntity
+        _ = context.AcknowledgmentResponses.Add(new AcknowledgmentResponseEntity
         {
             AcknowledgmentId = "ack-123",
             SchemaVersion = "1.1-test",
@@ -76,7 +76,7 @@ public sealed class EfCoreHandshakeSchemaVersionTests
 
         _ = await context.SaveChangesAsync(TestContext.Current.CancellationToken);
 
-        HandshakeAcknowledgmentEntity found = await context.HandshakeAcknowledgments
+        AcknowledgmentResponseEntity found = await context.AcknowledgmentResponses
             .AsNoTracking()
             .SingleAsync(acknowledgment => acknowledgment.AcknowledgmentId == "ack-123", TestContext.Current.CancellationToken);
 
@@ -91,11 +91,11 @@ public sealed class EfCoreHandshakeSchemaVersionTests
     {
         Assert.Equal(
             GovernanceSchemaVersions.StableArtifactsV1,
-            new HandshakeRequestEntity().SchemaVersion);
+            new AcknowledgmentRequestEntity().SchemaVersion);
 
         Assert.Equal(
             GovernanceSchemaVersions.StableArtifactsV1,
-            new HandshakeAcknowledgmentEntity().SchemaVersion);
+            new AcknowledgmentResponseEntity().SchemaVersion);
     }
 
     private static HostOwnedHandshakeDbContext CreateContext()
@@ -110,11 +110,11 @@ public sealed class EfCoreHandshakeSchemaVersionTests
     private sealed class HostOwnedHandshakeDbContext(DbContextOptions<HostOwnedHandshakeDbContext> options)
         : DbContext(options)
     {
-        public DbSet<HandshakeRequestEntity> HandshakeRequests =>
-            Set<HandshakeRequestEntity>();
+        public DbSet<AcknowledgmentRequestEntity> AcknowledgmentRequests =>
+            Set<AcknowledgmentRequestEntity>();
 
-        public DbSet<HandshakeAcknowledgmentEntity> HandshakeAcknowledgments =>
-            Set<HandshakeAcknowledgmentEntity>();
+        public DbSet<AcknowledgmentResponseEntity> AcknowledgmentResponses =>
+            Set<AcknowledgmentResponseEntity>();
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

@@ -234,7 +234,7 @@ Before approving a regulated or review-sensitive deployment, verify:
 - [ ] Warning decisions have documented policy for whether execution may continue.
 - [ ] Acknowledgment-required decisions pause until acknowledgment handling is complete under host policy.
 - [ ] Audit persistence or outbox enqueue behavior occurs before or at the required host-defined boundary.
-- [ ] Missing evaluator, missing constraints, missing capability validator, missing audit sink, and evaluation exceptions fail closed unless an explicit lower-risk exception is documented.
+- [ ] Missing evaluator, missing constraints, missing capability validator, missing decision receipt sink, and evaluation exceptions fail closed unless an explicit lower-risk exception is documented.
 - [ ] Tests cover allowed, warning, denied, deferred, missing-evaluator, and evaluation-failure paths.
 - [ ] Operators can trace the side effect back to the governance decision by correlation ID or equivalent reference.
 - [ ] Documentation states that AsiBackbone supports governance implementation, but does not certify compliance by itself.

@@ -77,7 +77,7 @@ Read these after the implementation route is clear:
 - [Equations and Toy Models](equations-and-toy-models.md)
 - Advanced scenario pages such as agent-gateway, robotics, or regional gateway examples
 
-When writing implementation docs, prefer the plain engineering terms first: policy decision pipeline, decision receipt, outbox pattern, scoped capability token, OpenTelemetry projection, and host-owned execution boundary.
+When writing implementation docs, prefer the plain engineering terms first: policy decision pipeline, decision receipt, outbox pattern, scoped capability grant, OpenTelemetry projection, and host-owned execution boundary.
 
 ## Read next
 

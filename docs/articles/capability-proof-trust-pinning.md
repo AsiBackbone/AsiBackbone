@@ -28,7 +28,7 @@ When supplied, the validator creates a provider-neutral `VerificationPolicyConte
 
 Grant policy expectations and signing policy expectations are deliberately separate:
 
-- `PolicyVersion` and `PolicyHash` validate the fields carried by `CapabilityTokenGrant`.
+- `PolicyVersion` and `PolicyHash` validate the fields carried by `CapabilityGrant`.
 - `ExpectedProofPolicyVersion` and `ExpectedProofPolicyHash` validate `policy_version` and `policy_hash` in the signed proof metadata.
 
 A host can validate either boundary independently or pin both when the grant payload and signing envelope are expected to carry the same policy identity. Keeping the settings separate preserves backward compatibility for signed grants whose proof metadata does not contain policy fields.

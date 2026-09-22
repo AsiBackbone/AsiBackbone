@@ -54,7 +54,7 @@ public sealed class GovernanceEmissionContractTests
     }
 
     /// <summary>
-    /// Verifies that an audit residue envelope preserves correlation, trace, policy, and safe diagnostic telemetry.
+    /// Verifies that an decision receipt envelope preserves correlation, trace, policy, and safe diagnostic telemetry.
     /// </summary>
     [Fact]
     public void FromDecisionReceiptPreservesCorrelationTracePolicyAndTelemetryFields()
@@ -83,7 +83,7 @@ public sealed class GovernanceEmissionContractTests
             {
                 [" source "] = " residue "
             },
-            auditResidueId: " residue-123 ",
+            decisionReceiptId: " residue-123 ",
             spanId: " span-789 ",
             parentSpanId: " parent-span ",
             emitterStatus: " queued ",
@@ -101,10 +101,10 @@ public sealed class GovernanceEmissionContractTests
                 [" emission "] = " pending "
             });
 
-        Assert.Equal(GovernanceEmissionEventType.AuditResidue, envelope.EventType);
+        Assert.Equal(GovernanceEmissionEventType.DecisionReceipt, envelope.EventType);
         Assert.Equal("event-123", envelope.EventId);
         Assert.Equal("correlation-123", envelope.CorrelationId);
-        Assert.Equal("residue-123", envelope.AuditResidueId);
+        Assert.Equal("residue-123", envelope.DecisionReceiptId);
         Assert.Equal("trace-456", envelope.TraceId);
         Assert.Equal("span-789", envelope.SpanId);
         Assert.Equal("parent-span", envelope.ParentSpanId);
@@ -133,7 +133,7 @@ public sealed class GovernanceEmissionContractTests
         var lifecycleEvent = DecisionReceiptLifecycleEvent.Create(
             DecisionReceiptLifecycleStage.ExternalEmissionFailed,
             " correlation-123 ",
-            auditResidueId: " residue-123 ",
+            decisionReceiptId: " residue-123 ",
             eventId: " lifecycle-123 ",
             traceId: " trace-456 ",
             operationName: " governance.emit ",
@@ -154,7 +154,7 @@ public sealed class GovernanceEmissionContractTests
         Assert.Equal(GovernanceEmissionEventType.AuditLifecycle, envelope.EventType);
         Assert.Equal("lifecycle-123", envelope.EventId);
         Assert.Equal("correlation-123", envelope.CorrelationId);
-        Assert.Equal("residue-123", envelope.AuditResidueId);
+        Assert.Equal("residue-123", envelope.DecisionReceiptId);
         Assert.Equal(DecisionReceiptLifecycleStage.ExternalEmissionFailed, envelope.LifecycleStage);
         Assert.Equal((int)DecisionReceiptLifecycleStage.ExternalEmissionFailed, envelope.LifecycleStageSequence);
         Assert.Equal("ExternalEmissionFailed", envelope.DecisionStage);

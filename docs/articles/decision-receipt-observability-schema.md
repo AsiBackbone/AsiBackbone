@@ -39,7 +39,7 @@ The builder is an ergonomic construction helper, not a mutable audit record. `Bu
 
 | Field | Purpose | PII-safe guidance |
 | --- | --- | --- |
-| `AuditResidueId` | Stable identifier for the decision receipt shape. Defaults to `EventId` when not supplied. | Use an opaque identifier. Do not embed actor names, email addresses, document names, or protected resource values. |
+| `DecisionReceiptId` | Stable identifier for the decision receipt shape. Defaults to `EventId` when not supplied. | Use an opaque identifier. Do not embed actor names, email addresses, document names, or protected resource values. |
 | `SchemaVersion` | Serialized schema version for forward-compatible envelopes. | Safe to emit when it contains only package schema identity. |
 | `TraceId` | Links the receipt to host or distributed tracing context. | Use standard trace identifiers. Do not place user or resource information in trace IDs. |
 | `SpanId` | Links the receipt to the active span or operation segment. | Use opaque span identifiers only. |
@@ -59,7 +59,7 @@ The builder is an ergonomic construction helper, not a mutable audit record. `Bu
 
 ## Correlation behavior
 
-`CorrelationId` remains the primary host workflow join key. `AuditResidueId` provides a stable receipt reference. `TraceId`, `SpanId`, and `ParentSpanId` let host applications or optional adapters project the same governance record into logs, traces, spans, events, and metrics.
+`CorrelationId` remains the primary host workflow join key. `DecisionReceiptId` provides a stable receipt reference. `TraceId`, `SpanId`, and `ParentSpanId` let host applications or optional adapters project the same governance record into logs, traces, spans, events, and metrics.
 
 A typical host path is:
 
@@ -68,7 +68,7 @@ Host request / workflow
   -> CorrelationId
   -> TraceId / SpanId
   -> Governance decision
-  -> AuditResidueId
+  -> DecisionReceiptId
   -> AuditLedgerRecord / outbox row
   -> Optional provider emission
 ```

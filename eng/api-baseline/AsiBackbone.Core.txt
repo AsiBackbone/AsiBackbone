@@ -4,6 +4,11 @@
 # Format: KIND | UID | C# declaration (or enum field display)
 # Update only after explicit API/SemVer review.
 
+FIELD | AsiBackbone.Core.Acknowledgments.AcknowledgmentRiskLevel | Critical = 4
+FIELD | AsiBackbone.Core.Acknowledgments.AcknowledgmentRiskLevel | High = 3
+FIELD | AsiBackbone.Core.Acknowledgments.AcknowledgmentRiskLevel | Low = 1
+FIELD | AsiBackbone.Core.Acknowledgments.AcknowledgmentRiskLevel | Medium = 2
+FIELD | AsiBackbone.Core.Acknowledgments.AcknowledgmentRiskLevel | Unspecified = 0
 FIELD | AsiBackbone.Core.Actors.GovernanceActorType | Agent = 4
 FIELD | AsiBackbone.Core.Actors.GovernanceActorType | Human = 1
 FIELD | AsiBackbone.Core.Actors.GovernanceActorType | Service = 3
@@ -20,31 +25,31 @@ FIELD | AsiBackbone.Core.Audit.DecisionReceiptLifecycleStage | ExternalEmissionQ
 FIELD | AsiBackbone.Core.Audit.DecisionReceiptLifecycleStage | GatewayExecutionCompleted = 410
 FIELD | AsiBackbone.Core.Audit.DecisionReceiptLifecycleStage | GatewayExecutionDenied = 420
 FIELD | AsiBackbone.Core.Audit.DecisionReceiptLifecycleStage | GatewayExecutionStarted = 400
-FIELD | AsiBackbone.Core.CapabilityTokens.CapabilityTokenValidationCategory | AcknowledgmentMismatch = 10
-FIELD | AsiBackbone.Core.CapabilityTokens.CapabilityTokenValidationCategory | Cancelled = 16
-FIELD | AsiBackbone.Core.CapabilityTokens.CapabilityTokenValidationCategory | Expired = 5
-FIELD | AsiBackbone.Core.CapabilityTokens.CapabilityTokenValidationCategory | Failed = 18
-FIELD | AsiBackbone.Core.CapabilityTokens.CapabilityTokenValidationCategory | GatewayMismatch = 12
-FIELD | AsiBackbone.Core.CapabilityTokens.CapabilityTokenValidationCategory | HandshakeMismatch = 11
-FIELD | AsiBackbone.Core.CapabilityTokens.CapabilityTokenValidationCategory | InvalidProof = 2
-FIELD | AsiBackbone.Core.CapabilityTokens.CapabilityTokenValidationCategory | MissingAcknowledgmentReference = 9
-FIELD | AsiBackbone.Core.CapabilityTokens.CapabilityTokenValidationCategory | MissingProof = 1
-FIELD | AsiBackbone.Core.CapabilityTokens.CapabilityTokenValidationCategory | NotYetValid = 6
-FIELD | AsiBackbone.Core.CapabilityTokens.CapabilityTokenValidationCategory | PolicyMismatch = 8
-FIELD | AsiBackbone.Core.CapabilityTokens.CapabilityTokenValidationCategory | ReplayStoreUnavailable = 17
-FIELD | AsiBackbone.Core.CapabilityTokens.CapabilityTokenValidationCategory | ResourceMismatch = 13
-FIELD | AsiBackbone.Core.CapabilityTokens.CapabilityTokenValidationCategory | ReuseLimitExceeded = 14
-FIELD | AsiBackbone.Core.CapabilityTokens.CapabilityTokenValidationCategory | Revoked = 15
-FIELD | AsiBackbone.Core.CapabilityTokens.CapabilityTokenValidationCategory | Valid = 0
-FIELD | AsiBackbone.Core.CapabilityTokens.CapabilityTokenValidationCategory | WrongAudience = 4
-FIELD | AsiBackbone.Core.CapabilityTokens.CapabilityTokenValidationCategory | WrongIssuer = 3
-FIELD | AsiBackbone.Core.CapabilityTokens.CapabilityTokenValidationCategory | WrongScope = 7
-FIELD | AsiBackbone.Core.CapabilityTokens.GrantUseState | Accepted = 5
-FIELD | AsiBackbone.Core.CapabilityTokens.GrantUseState | Cancelled = 3
-FIELD | AsiBackbone.Core.CapabilityTokens.GrantUseState | Stopped = 2
-FIELD | AsiBackbone.Core.CapabilityTokens.GrantUseState | Unavailable = 4
-FIELD | AsiBackbone.Core.CapabilityTokens.GrantUseState | Unspecified = 0
-FIELD | AsiBackbone.Core.CapabilityTokens.GrantUseState | UseLimitExceeded = 1
+FIELD | AsiBackbone.Core.CapabilityGrants.CapabilityGrantValidationCategory | AcknowledgmentMismatch = 10
+FIELD | AsiBackbone.Core.CapabilityGrants.CapabilityGrantValidationCategory | Cancelled = 16
+FIELD | AsiBackbone.Core.CapabilityGrants.CapabilityGrantValidationCategory | Expired = 5
+FIELD | AsiBackbone.Core.CapabilityGrants.CapabilityGrantValidationCategory | Failed = 18
+FIELD | AsiBackbone.Core.CapabilityGrants.CapabilityGrantValidationCategory | GatewayMismatch = 12
+FIELD | AsiBackbone.Core.CapabilityGrants.CapabilityGrantValidationCategory | HandshakeMismatch = 11
+FIELD | AsiBackbone.Core.CapabilityGrants.CapabilityGrantValidationCategory | InvalidProof = 2
+FIELD | AsiBackbone.Core.CapabilityGrants.CapabilityGrantValidationCategory | MissingAcknowledgmentReference = 9
+FIELD | AsiBackbone.Core.CapabilityGrants.CapabilityGrantValidationCategory | MissingProof = 1
+FIELD | AsiBackbone.Core.CapabilityGrants.CapabilityGrantValidationCategory | NotYetValid = 6
+FIELD | AsiBackbone.Core.CapabilityGrants.CapabilityGrantValidationCategory | PolicyMismatch = 8
+FIELD | AsiBackbone.Core.CapabilityGrants.CapabilityGrantValidationCategory | ReplayStoreUnavailable = 17
+FIELD | AsiBackbone.Core.CapabilityGrants.CapabilityGrantValidationCategory | ResourceMismatch = 13
+FIELD | AsiBackbone.Core.CapabilityGrants.CapabilityGrantValidationCategory | ReuseLimitExceeded = 14
+FIELD | AsiBackbone.Core.CapabilityGrants.CapabilityGrantValidationCategory | Revoked = 15
+FIELD | AsiBackbone.Core.CapabilityGrants.CapabilityGrantValidationCategory | Valid = 0
+FIELD | AsiBackbone.Core.CapabilityGrants.CapabilityGrantValidationCategory | WrongAudience = 4
+FIELD | AsiBackbone.Core.CapabilityGrants.CapabilityGrantValidationCategory | WrongIssuer = 3
+FIELD | AsiBackbone.Core.CapabilityGrants.CapabilityGrantValidationCategory | WrongScope = 7
+FIELD | AsiBackbone.Core.CapabilityGrants.GrantUseState | Accepted = 5
+FIELD | AsiBackbone.Core.CapabilityGrants.GrantUseState | Cancelled = 3
+FIELD | AsiBackbone.Core.CapabilityGrants.GrantUseState | Stopped = 2
+FIELD | AsiBackbone.Core.CapabilityGrants.GrantUseState | Unavailable = 4
+FIELD | AsiBackbone.Core.CapabilityGrants.GrantUseState | Unspecified = 0
+FIELD | AsiBackbone.Core.CapabilityGrants.GrantUseState | UseLimitExceeded = 1
 FIELD | AsiBackbone.Core.Classification.DlpClassificationFailureKind | BlockedResult = 3
 FIELD | AsiBackbone.Core.Classification.DlpClassificationFailureKind | ClassifiedResult = 4
 FIELD | AsiBackbone.Core.Classification.DlpClassificationFailureKind | IndeterminateResult = 2
@@ -73,9 +78,9 @@ FIELD | AsiBackbone.Core.Decisions.GovernanceDecisionOutcome | EscalationRecomme
 FIELD | AsiBackbone.Core.Decisions.GovernanceDecisionOutcome | Warning = 1
 FIELD | AsiBackbone.Core.Emissions.GovernanceEmissionEventType | Acknowledgment = 200
 FIELD | AsiBackbone.Core.Emissions.GovernanceEmissionEventType | AuditLifecycle = 510
-FIELD | AsiBackbone.Core.Emissions.GovernanceEmissionEventType | AuditResidue = 500
 FIELD | AsiBackbone.Core.Emissions.GovernanceEmissionEventType | CapabilityToken = 300
 FIELD | AsiBackbone.Core.Emissions.GovernanceEmissionEventType | Decision = 100
+FIELD | AsiBackbone.Core.Emissions.GovernanceEmissionEventType | DecisionReceipt = 500
 FIELD | AsiBackbone.Core.Emissions.GovernanceEmissionEventType | Gateway = 400
 FIELD | AsiBackbone.Core.Emissions.GovernanceEmissionEventType | Outbox = 600
 FIELD | AsiBackbone.Core.Emissions.GovernanceEmissionEventType | ProviderEmission = 700
@@ -85,11 +90,6 @@ FIELD | AsiBackbone.Core.Emissions.GovernanceEmissionStatus | Delivered = 200
 FIELD | AsiBackbone.Core.Emissions.GovernanceEmissionStatus | Failed = 400
 FIELD | AsiBackbone.Core.Emissions.GovernanceEmissionStatus | Pending = 100
 FIELD | AsiBackbone.Core.Emissions.GovernanceEmissionStatus | RetryableFailure = 410
-FIELD | AsiBackbone.Core.Handshakes.LiabilityHandshakeRiskLevel | Critical = 4
-FIELD | AsiBackbone.Core.Handshakes.LiabilityHandshakeRiskLevel | High = 3
-FIELD | AsiBackbone.Core.Handshakes.LiabilityHandshakeRiskLevel | Low = 1
-FIELD | AsiBackbone.Core.Handshakes.LiabilityHandshakeRiskLevel | Medium = 2
-FIELD | AsiBackbone.Core.Handshakes.LiabilityHandshakeRiskLevel | Unspecified = 0
 FIELD | AsiBackbone.Core.HostIntegration.GovernedOperationPersistenceOutcome | Committed = 100
 FIELD | AsiBackbone.Core.HostIntegration.GovernedOperationPersistenceOutcome | CompletedWithoutMutation = 400
 FIELD | AsiBackbone.Core.HostIntegration.GovernedOperationPersistenceOutcome | Failed = 200
@@ -143,6 +143,43 @@ FIELD | AsiBackbone.Core.ThreatModeling.ThreatSeverity | High = 3
 FIELD | AsiBackbone.Core.ThreatModeling.ThreatSeverity | Low = 1
 FIELD | AsiBackbone.Core.ThreatModeling.ThreatSeverity | Medium = 2
 FIELD | AsiBackbone.Core.ThreatModeling.ThreatSeverity | None = 0
+MEMBER | AsiBackbone.Core.Acknowledgments.AcknowledgmentRequest.ActorDisplayName | public string? ActorDisplayName { get; }
+MEMBER | AsiBackbone.Core.Acknowledgments.AcknowledgmentRequest.ActorId | public string ActorId { get; }
+MEMBER | AsiBackbone.Core.Acknowledgments.AcknowledgmentRequest.ActorType | public GovernanceActorType ActorType { get; }
+MEMBER | AsiBackbone.Core.Acknowledgments.AcknowledgmentRequest.CorrelationId | public string? CorrelationId { get; }
+MEMBER | AsiBackbone.Core.Acknowledgments.AcknowledgmentRequest.Create(AsiBackbone.Core.Actors.IGovernanceActorContext,System.String,System.String,System.String,System.String,System.String,AsiBackbone.Core.Acknowledgments.AcknowledgmentRiskLevel,System.String,System.String,System.String,System.String,System.String,System.String,System.Collections.Generic.IReadOnlyDictionary{System.String,System.String},System.String) | public static AcknowledgmentRequest Create(IGovernanceActorContext actor, string operationName, string reasonCode, string message, string requiredAcknowledgmentCode, string requiredAcknowledgmentText, AcknowledgmentRiskLevel riskLevel = AcknowledgmentRiskLevel.Unspecified, string? riskCategory = null, string? handshakeId = null, string? correlationId = null, string? traceId = null, string? policyVersion = null, string? policyHash = null, IReadOnlyDictionary<string, string>? metadata = null, string? schemaVersion = null)
+MEMBER | AsiBackbone.Core.Acknowledgments.AcknowledgmentRequest.FromDecision(AsiBackbone.Core.Actors.IGovernanceActorContext,System.String,AsiBackbone.Core.Decisions.GovernanceDecision,System.String,System.String,AsiBackbone.Core.Acknowledgments.AcknowledgmentRiskLevel,System.String,System.String,System.Collections.Generic.IReadOnlyDictionary{System.String,System.String},System.String) | public static AcknowledgmentRequest FromDecision(IGovernanceActorContext actor, string operationName, GovernanceDecision decision, string requiredAcknowledgmentCode, string requiredAcknowledgmentText, AcknowledgmentRiskLevel riskLevel = AcknowledgmentRiskLevel.Unspecified, string? riskCategory = null, string? handshakeId = null, IReadOnlyDictionary<string, string>? metadata = null, string? schemaVersion = null)
+MEMBER | AsiBackbone.Core.Acknowledgments.AcknowledgmentRequest.HandshakeId | public string HandshakeId { get; }
+MEMBER | AsiBackbone.Core.Acknowledgments.AcknowledgmentRequest.HasMetadata | public bool HasMetadata { get; }
+MEMBER | AsiBackbone.Core.Acknowledgments.AcknowledgmentRequest.Message | public string Message { get; }
+MEMBER | AsiBackbone.Core.Acknowledgments.AcknowledgmentRequest.Metadata | public IReadOnlyDictionary<string, string> Metadata { get; }
+MEMBER | AsiBackbone.Core.Acknowledgments.AcknowledgmentRequest.OperationName | public string OperationName { get; }
+MEMBER | AsiBackbone.Core.Acknowledgments.AcknowledgmentRequest.PolicyHash | public string? PolicyHash { get; }
+MEMBER | AsiBackbone.Core.Acknowledgments.AcknowledgmentRequest.PolicyVersion | public string? PolicyVersion { get; }
+MEMBER | AsiBackbone.Core.Acknowledgments.AcknowledgmentRequest.ReasonCode | public string ReasonCode { get; }
+MEMBER | AsiBackbone.Core.Acknowledgments.AcknowledgmentRequest.RequiredAcknowledgmentCode | public string RequiredAcknowledgmentCode { get; }
+MEMBER | AsiBackbone.Core.Acknowledgments.AcknowledgmentRequest.RequiredAcknowledgmentText | public string RequiredAcknowledgmentText { get; }
+MEMBER | AsiBackbone.Core.Acknowledgments.AcknowledgmentRequest.RiskCategory | public string? RiskCategory { get; }
+MEMBER | AsiBackbone.Core.Acknowledgments.AcknowledgmentRequest.RiskLevel | public AcknowledgmentRiskLevel RiskLevel { get; }
+MEMBER | AsiBackbone.Core.Acknowledgments.AcknowledgmentRequest.SchemaVersion | public string SchemaVersion { get; }
+MEMBER | AsiBackbone.Core.Acknowledgments.AcknowledgmentRequest.TraceId | public string? TraceId { get; }
+MEMBER | AsiBackbone.Core.Acknowledgments.AcknowledgmentResponse.Accept(AsiBackbone.Core.Acknowledgments.AcknowledgmentRequest,AsiBackbone.Core.Actors.IGovernanceActorContext,System.String,System.Nullable{System.DateTimeOffset},System.Collections.Generic.IReadOnlyDictionary{System.String,System.String},System.String) | public static AcknowledgmentResponse Accept(AcknowledgmentRequest request, IGovernanceActorContext actor, string? acknowledgmentId = null, DateTimeOffset? occurredUtc = null, IReadOnlyDictionary<string, string>? metadata = null, string? schemaVersion = null)
+MEMBER | AsiBackbone.Core.Acknowledgments.AcknowledgmentResponse.Acknowledged | public bool Acknowledged { get; }
+MEMBER | AsiBackbone.Core.Acknowledgments.AcknowledgmentResponse.AcknowledgmentCode | public string AcknowledgmentCode { get; }
+MEMBER | AsiBackbone.Core.Acknowledgments.AcknowledgmentResponse.AcknowledgmentId | public string AcknowledgmentId { get; }
+MEMBER | AsiBackbone.Core.Acknowledgments.AcknowledgmentResponse.ActorDisplayName | public string? ActorDisplayName { get; }
+MEMBER | AsiBackbone.Core.Acknowledgments.AcknowledgmentResponse.ActorId | public string ActorId { get; }
+MEMBER | AsiBackbone.Core.Acknowledgments.AcknowledgmentResponse.ActorType | public GovernanceActorType ActorType { get; }
+MEMBER | AsiBackbone.Core.Acknowledgments.AcknowledgmentResponse.CorrelationId | public string? CorrelationId { get; }
+MEMBER | AsiBackbone.Core.Acknowledgments.AcknowledgmentResponse.Create(AsiBackbone.Core.Acknowledgments.AcknowledgmentRequest,AsiBackbone.Core.Actors.IGovernanceActorContext,System.Boolean,System.String,System.Nullable{System.DateTimeOffset},System.Collections.Generic.IReadOnlyDictionary{System.String,System.String},System.String) | public static AcknowledgmentResponse Create(AcknowledgmentRequest request, IGovernanceActorContext actor, bool acknowledged, string? acknowledgmentId = null, DateTimeOffset? occurredUtc = null, IReadOnlyDictionary<string, string>? metadata = null, string? schemaVersion = null)
+MEMBER | AsiBackbone.Core.Acknowledgments.AcknowledgmentResponse.HandshakeId | public string HandshakeId { get; }
+MEMBER | AsiBackbone.Core.Acknowledgments.AcknowledgmentResponse.HasMetadata | public bool HasMetadata { get; }
+MEMBER | AsiBackbone.Core.Acknowledgments.AcknowledgmentResponse.Metadata | public IReadOnlyDictionary<string, string> Metadata { get; }
+MEMBER | AsiBackbone.Core.Acknowledgments.AcknowledgmentResponse.OccurredUtc | public DateTimeOffset OccurredUtc { get; }
+MEMBER | AsiBackbone.Core.Acknowledgments.AcknowledgmentResponse.Reject(AsiBackbone.Core.Acknowledgments.AcknowledgmentRequest,AsiBackbone.Core.Actors.IGovernanceActorContext,System.String,System.Nullable{System.DateTimeOffset},System.Collections.Generic.IReadOnlyDictionary{System.String,System.String},System.String) | public static AcknowledgmentResponse Reject(AcknowledgmentRequest request, IGovernanceActorContext actor, string? acknowledgmentId = null, DateTimeOffset? occurredUtc = null, IReadOnlyDictionary<string, string>? metadata = null, string? schemaVersion = null)
+MEMBER | AsiBackbone.Core.Acknowledgments.AcknowledgmentResponse.Rejected | public bool Rejected { get; }
+MEMBER | AsiBackbone.Core.Acknowledgments.AcknowledgmentResponse.SchemaVersion | public string SchemaVersion { get; }
+MEMBER | AsiBackbone.Core.Acknowledgments.AcknowledgmentResponse.TraceId | public string? TraceId { get; }
 MEMBER | AsiBackbone.Core.Actors.GovernanceActorContext.ActorId | public string ActorId { get; }
 MEMBER | AsiBackbone.Core.Actors.GovernanceActorContext.ActorType | public GovernanceActorType ActorType { get; }
 MEMBER | AsiBackbone.Core.Actors.GovernanceActorContext.Agent(System.String,System.String,System.Boolean) | public static GovernanceActorContext Agent(string actorId, string? displayName = null, bool isAuthenticated = true)
@@ -165,12 +202,12 @@ MEMBER | AsiBackbone.Core.Audit.AuditLedgerRecord.AcknowledgmentId | public stri
 MEMBER | AsiBackbone.Core.Audit.AuditLedgerRecord.ActorDisplayName | public string? ActorDisplayName { get; }
 MEMBER | AsiBackbone.Core.Audit.AuditLedgerRecord.ActorId | public string ActorId { get; }
 MEMBER | AsiBackbone.Core.Audit.AuditLedgerRecord.ActorType | public GovernanceActorType ActorType { get; }
-MEMBER | AsiBackbone.Core.Audit.AuditLedgerRecord.AuditResidueId | public string AuditResidueId { get; }
 MEMBER | AsiBackbone.Core.Audit.AuditLedgerRecord.CapabilityTokenId | public string? CapabilityTokenId { get; }
 MEMBER | AsiBackbone.Core.Audit.AuditLedgerRecord.ConstraintCount | public int? ConstraintCount { get; }
 MEMBER | AsiBackbone.Core.Audit.AuditLedgerRecord.ConstraintSetHash | public string? ConstraintSetHash { get; }
 MEMBER | AsiBackbone.Core.Audit.AuditLedgerRecord.CorrelationId | public string? CorrelationId { get; }
 MEMBER | AsiBackbone.Core.Audit.AuditLedgerRecord.DecisionLatencyMs | public long? DecisionLatencyMs { get; }
+MEMBER | AsiBackbone.Core.Audit.AuditLedgerRecord.DecisionReceiptId | public string DecisionReceiptId { get; }
 MEMBER | AsiBackbone.Core.Audit.AuditLedgerRecord.DecisionStage | public string? DecisionStage { get; }
 MEMBER | AsiBackbone.Core.Audit.AuditLedgerRecord.EmitterProvider | public string? EmitterProvider { get; }
 MEMBER | AsiBackbone.Core.Audit.AuditLedgerRecord.EmitterStatus | public string? EmitterStatus { get; }
@@ -211,18 +248,18 @@ MEMBER | AsiBackbone.Core.Audit.AuditLedgerRecord.TraceId | public string? Trace
 MEMBER | AsiBackbone.Core.Audit.DecisionReceipt.ActorDisplayName | public string? ActorDisplayName { get; }
 MEMBER | AsiBackbone.Core.Audit.DecisionReceipt.ActorId | public string ActorId { get; }
 MEMBER | AsiBackbone.Core.Audit.DecisionReceipt.ActorType | public GovernanceActorType ActorType { get; }
-MEMBER | AsiBackbone.Core.Audit.DecisionReceipt.AuditResidueId | public string AuditResidueId { get; }
 MEMBER | AsiBackbone.Core.Audit.DecisionReceipt.ConstraintCount | public int? ConstraintCount { get; }
 MEMBER | AsiBackbone.Core.Audit.DecisionReceipt.ConstraintSetHash | public string? ConstraintSetHash { get; }
 MEMBER | AsiBackbone.Core.Audit.DecisionReceipt.CorrelationId | public string? CorrelationId { get; }
-MEMBER | AsiBackbone.Core.Audit.DecisionReceipt.Create(AsiBackbone.Core.Actors.IGovernanceActorContext,System.String,System.String,System.Collections.Generic.IEnumerable{System.String},System.String,System.Nullable{System.DateTimeOffset},System.String,System.String,System.String,System.String,System.Collections.Generic.IReadOnlyDictionary{System.String,System.String},System.String,System.String,System.String,System.Nullable{System.Int64},System.String,System.Nullable{System.Int32},System.Nullable{System.Double},System.String,System.String,System.String,System.String,System.String,System.Nullable{System.Int64},System.String,System.String,System.String) | public static DecisionReceipt Create(IGovernanceActorContext actor, string operationName, string outcome, IEnumerable<string>? reasonCodes = null, string? eventId = null, DateTimeOffset? occurredUtc = null, string? correlationId = null, string? traceId = null, string? policyVersion = null, string? policyHash = null, IReadOnlyDictionary<string, string>? metadata = null, string? auditResidueId = null, string? spanId = null, string? parentSpanId = null, long? decisionLatencyMs = null, string? constraintSetHash = null, int? constraintCount = null, double? riskScore = null, string? policyScope = null, string? tenantHash = null, string? organizationHash = null, string? emitterStatus = null, string? emitterProvider = null, long? outboxSequence = null, string? gatewayExecutionId = null, string? decisionStage = null, string? schemaVersion = null)
+MEMBER | AsiBackbone.Core.Audit.DecisionReceipt.Create(AsiBackbone.Core.Actors.IGovernanceActorContext,System.String,System.String,System.Collections.Generic.IEnumerable{System.String},System.String,System.Nullable{System.DateTimeOffset},System.String,System.String,System.String,System.String,System.Collections.Generic.IReadOnlyDictionary{System.String,System.String},System.String,System.String,System.String,System.Nullable{System.Int64},System.String,System.Nullable{System.Int32},System.Nullable{System.Double},System.String,System.String,System.String,System.String,System.String,System.Nullable{System.Int64},System.String,System.String,System.String) | public static DecisionReceipt Create(IGovernanceActorContext actor, string operationName, string outcome, IEnumerable<string>? reasonCodes = null, string? eventId = null, DateTimeOffset? occurredUtc = null, string? correlationId = null, string? traceId = null, string? policyVersion = null, string? policyHash = null, IReadOnlyDictionary<string, string>? metadata = null, string? decisionReceiptId = null, string? spanId = null, string? parentSpanId = null, long? decisionLatencyMs = null, string? constraintSetHash = null, int? constraintCount = null, double? riskScore = null, string? policyScope = null, string? tenantHash = null, string? organizationHash = null, string? emitterStatus = null, string? emitterProvider = null, long? outboxSequence = null, string? gatewayExecutionId = null, string? decisionStage = null, string? schemaVersion = null)
 MEMBER | AsiBackbone.Core.Audit.DecisionReceipt.DecisionLatencyMs | public long? DecisionLatencyMs { get; }
+MEMBER | AsiBackbone.Core.Audit.DecisionReceipt.DecisionReceiptId | public string DecisionReceiptId { get; }
 MEMBER | AsiBackbone.Core.Audit.DecisionReceipt.DecisionStage | public string? DecisionStage { get; }
 MEMBER | AsiBackbone.Core.Audit.DecisionReceipt.EmitterProvider | public string? EmitterProvider { get; }
 MEMBER | AsiBackbone.Core.Audit.DecisionReceipt.EmitterStatus | public string? EmitterStatus { get; }
 MEMBER | AsiBackbone.Core.Audit.DecisionReceipt.EventId | public string EventId { get; }
-MEMBER | AsiBackbone.Core.Audit.DecisionReceipt.FromConstraint(AsiBackbone.Core.Actors.IGovernanceActorContext,System.String,AsiBackbone.Core.Constraints.ConstraintEvaluationResult,System.String,System.Nullable{System.DateTimeOffset},System.String,System.String,System.String,System.String,System.Collections.Generic.IReadOnlyDictionary{System.String,System.String},System.String,System.String,System.String,System.Nullable{System.Int64},System.String,System.Nullable{System.Int32},System.Nullable{System.Double},System.String,System.String,System.String,System.String,System.String,System.Nullable{System.Int64},System.String,System.String,System.String) | public static DecisionReceipt FromConstraint(IGovernanceActorContext actor, string operationName, ConstraintEvaluationResult constraintResult, string? eventId = null, DateTimeOffset? occurredUtc = null, string? correlationId = null, string? traceId = null, string? policyVersion = null, string? policyHash = null, IReadOnlyDictionary<string, string>? metadata = null, string? auditResidueId = null, string? spanId = null, string? parentSpanId = null, long? decisionLatencyMs = null, string? constraintSetHash = null, int? constraintCount = null, double? riskScore = null, string? policyScope = null, string? tenantHash = null, string? organizationHash = null, string? emitterStatus = null, string? emitterProvider = null, long? outboxSequence = null, string? gatewayExecutionId = null, string? decisionStage = null, string? schemaVersion = null)
-MEMBER | AsiBackbone.Core.Audit.DecisionReceipt.FromDecision(AsiBackbone.Core.Actors.IGovernanceActorContext,System.String,AsiBackbone.Core.Decisions.GovernanceDecision,System.String,System.Nullable{System.DateTimeOffset},System.Collections.Generic.IReadOnlyDictionary{System.String,System.String},System.String,System.String,System.String,System.Nullable{System.Int64},System.String,System.Nullable{System.Int32},System.Nullable{System.Double},System.String,System.String,System.String,System.String,System.String,System.Nullable{System.Int64},System.String,System.String,System.String) | public static DecisionReceipt FromDecision(IGovernanceActorContext actor, string operationName, GovernanceDecision decision, string? eventId = null, DateTimeOffset? occurredUtc = null, IReadOnlyDictionary<string, string>? metadata = null, string? auditResidueId = null, string? spanId = null, string? parentSpanId = null, long? decisionLatencyMs = null, string? constraintSetHash = null, int? constraintCount = null, double? riskScore = null, string? policyScope = null, string? tenantHash = null, string? organizationHash = null, string? emitterStatus = null, string? emitterProvider = null, long? outboxSequence = null, string? gatewayExecutionId = null, string? decisionStage = null, string? schemaVersion = null)
+MEMBER | AsiBackbone.Core.Audit.DecisionReceipt.FromConstraint(AsiBackbone.Core.Actors.IGovernanceActorContext,System.String,AsiBackbone.Core.Constraints.ConstraintEvaluationResult,System.String,System.Nullable{System.DateTimeOffset},System.String,System.String,System.String,System.String,System.Collections.Generic.IReadOnlyDictionary{System.String,System.String},System.String,System.String,System.String,System.Nullable{System.Int64},System.String,System.Nullable{System.Int32},System.Nullable{System.Double},System.String,System.String,System.String,System.String,System.String,System.Nullable{System.Int64},System.String,System.String,System.String) | public static DecisionReceipt FromConstraint(IGovernanceActorContext actor, string operationName, ConstraintEvaluationResult constraintResult, string? eventId = null, DateTimeOffset? occurredUtc = null, string? correlationId = null, string? traceId = null, string? policyVersion = null, string? policyHash = null, IReadOnlyDictionary<string, string>? metadata = null, string? decisionReceiptId = null, string? spanId = null, string? parentSpanId = null, long? decisionLatencyMs = null, string? constraintSetHash = null, int? constraintCount = null, double? riskScore = null, string? policyScope = null, string? tenantHash = null, string? organizationHash = null, string? emitterStatus = null, string? emitterProvider = null, long? outboxSequence = null, string? gatewayExecutionId = null, string? decisionStage = null, string? schemaVersion = null)
+MEMBER | AsiBackbone.Core.Audit.DecisionReceipt.FromDecision(AsiBackbone.Core.Actors.IGovernanceActorContext,System.String,AsiBackbone.Core.Decisions.GovernanceDecision,System.String,System.Nullable{System.DateTimeOffset},System.Collections.Generic.IReadOnlyDictionary{System.String,System.String},System.String,System.String,System.String,System.Nullable{System.Int64},System.String,System.Nullable{System.Int32},System.Nullable{System.Double},System.String,System.String,System.String,System.String,System.String,System.Nullable{System.Int64},System.String,System.String,System.String) | public static DecisionReceipt FromDecision(IGovernanceActorContext actor, string operationName, GovernanceDecision decision, string? eventId = null, DateTimeOffset? occurredUtc = null, IReadOnlyDictionary<string, string>? metadata = null, string? decisionReceiptId = null, string? spanId = null, string? parentSpanId = null, long? decisionLatencyMs = null, string? constraintSetHash = null, int? constraintCount = null, double? riskScore = null, string? policyScope = null, string? tenantHash = null, string? organizationHash = null, string? emitterStatus = null, string? emitterProvider = null, long? outboxSequence = null, string? gatewayExecutionId = null, string? decisionStage = null, string? schemaVersion = null)
 MEMBER | AsiBackbone.Core.Audit.DecisionReceipt.GatewayExecutionId | public string? GatewayExecutionId { get; }
 MEMBER | AsiBackbone.Core.Audit.DecisionReceipt.HasMetadata | public bool HasMetadata { get; }
 MEMBER | AsiBackbone.Core.Audit.DecisionReceipt.HasReasonCodes | public bool HasReasonCodes { get; }
@@ -248,11 +285,11 @@ MEMBER | AsiBackbone.Core.Audit.DecisionReceiptBuilder.Build | public DecisionRe
 MEMBER | AsiBackbone.Core.Audit.DecisionReceiptBuilder.Create(AsiBackbone.Core.Actors.IGovernanceActorContext,System.String,System.String) | public static DecisionReceiptBuilder Create(IGovernanceActorContext actor, string operationName, string outcome)
 MEMBER | AsiBackbone.Core.Audit.DecisionReceiptBuilder.FromConstraint(AsiBackbone.Core.Actors.IGovernanceActorContext,System.String,AsiBackbone.Core.Constraints.ConstraintEvaluationResult) | public static DecisionReceiptBuilder FromConstraint(IGovernanceActorContext actor, string operationName, ConstraintEvaluationResult constraintResult)
 MEMBER | AsiBackbone.Core.Audit.DecisionReceiptBuilder.FromDecision(AsiBackbone.Core.Actors.IGovernanceActorContext,System.String,AsiBackbone.Core.Decisions.GovernanceDecision) | public static DecisionReceiptBuilder FromDecision(IGovernanceActorContext actor, string operationName, GovernanceDecision decision)
-MEMBER | AsiBackbone.Core.Audit.DecisionReceiptBuilder.WithAuditResidueId(System.String) | public DecisionReceiptBuilder WithAuditResidueId(string? value)
 MEMBER | AsiBackbone.Core.Audit.DecisionReceiptBuilder.WithConstraintCount(System.Nullable{System.Int32}) | public DecisionReceiptBuilder WithConstraintCount(int? value)
 MEMBER | AsiBackbone.Core.Audit.DecisionReceiptBuilder.WithConstraintSetHash(System.String) | public DecisionReceiptBuilder WithConstraintSetHash(string? value)
 MEMBER | AsiBackbone.Core.Audit.DecisionReceiptBuilder.WithCorrelationId(System.String) | public DecisionReceiptBuilder WithCorrelationId(string? value)
 MEMBER | AsiBackbone.Core.Audit.DecisionReceiptBuilder.WithDecisionLatencyMs(System.Nullable{System.Int64}) | public DecisionReceiptBuilder WithDecisionLatencyMs(long? value)
+MEMBER | AsiBackbone.Core.Audit.DecisionReceiptBuilder.WithDecisionReceiptId(System.String) | public DecisionReceiptBuilder WithDecisionReceiptId(string? value)
 MEMBER | AsiBackbone.Core.Audit.DecisionReceiptBuilder.WithDecisionStage(System.String) | public DecisionReceiptBuilder WithDecisionStage(string? value)
 MEMBER | AsiBackbone.Core.Audit.DecisionReceiptBuilder.WithEmitterProvider(System.String) | public DecisionReceiptBuilder WithEmitterProvider(string? value)
 MEMBER | AsiBackbone.Core.Audit.DecisionReceiptBuilder.WithEmitterStatus(System.String) | public DecisionReceiptBuilder WithEmitterStatus(string? value)
@@ -272,12 +309,12 @@ MEMBER | AsiBackbone.Core.Audit.DecisionReceiptBuilder.WithSchemaVersion(System.
 MEMBER | AsiBackbone.Core.Audit.DecisionReceiptBuilder.WithSpanId(System.String) | public DecisionReceiptBuilder WithSpanId(string? value)
 MEMBER | AsiBackbone.Core.Audit.DecisionReceiptBuilder.WithTenantHash(System.String) | public DecisionReceiptBuilder WithTenantHash(string? value)
 MEMBER | AsiBackbone.Core.Audit.DecisionReceiptBuilder.WithTraceId(System.String) | public DecisionReceiptBuilder WithTraceId(string? value)
-MEMBER | AsiBackbone.Core.Audit.DecisionReceiptLifecycleEvent.AuditResidueId | public string? AuditResidueId { get; }
 MEMBER | AsiBackbone.Core.Audit.DecisionReceiptLifecycleEvent.CorrelationId | public string CorrelationId { get; }
-MEMBER | AsiBackbone.Core.Audit.DecisionReceiptLifecycleEvent.Create(AsiBackbone.Core.Audit.DecisionReceiptLifecycleStage,System.String,System.String,System.String,System.Nullable{System.DateTimeOffset},System.String,System.String,System.String,System.Collections.Generic.IReadOnlyDictionary{System.String,System.String}) | public static DecisionReceiptLifecycleEvent Create(DecisionReceiptLifecycleStage stage, string correlationId, string? auditResidueId = null, string? eventId = null, DateTimeOffset? occurredUtc = null, string? traceId = null, string? operationName = null, string? outcome = null, IReadOnlyDictionary<string, string>? metadata = null)
+MEMBER | AsiBackbone.Core.Audit.DecisionReceiptLifecycleEvent.Create(AsiBackbone.Core.Audit.DecisionReceiptLifecycleStage,System.String,System.String,System.String,System.Nullable{System.DateTimeOffset},System.String,System.String,System.String,System.Collections.Generic.IReadOnlyDictionary{System.String,System.String}) | public static DecisionReceiptLifecycleEvent Create(DecisionReceiptLifecycleStage stage, string correlationId, string? decisionReceiptId = null, string? eventId = null, DateTimeOffset? occurredUtc = null, string? traceId = null, string? operationName = null, string? outcome = null, IReadOnlyDictionary<string, string>? metadata = null)
+MEMBER | AsiBackbone.Core.Audit.DecisionReceiptLifecycleEvent.DecisionReceiptId | public string? DecisionReceiptId { get; }
 MEMBER | AsiBackbone.Core.Audit.DecisionReceiptLifecycleEvent.EventId | public string EventId { get; }
-MEMBER | AsiBackbone.Core.Audit.DecisionReceiptLifecycleEvent.FromDecisionReceipt(AsiBackbone.Core.Audit.DecisionReceiptLifecycleStage,AsiBackbone.Core.Audit.IDecisionReceipt,System.String,System.String,System.String,System.Nullable{System.DateTimeOffset},System.String,System.Collections.Generic.IReadOnlyDictionary{System.String,System.String}) | public static DecisionReceiptLifecycleEvent FromDecisionReceipt(DecisionReceiptLifecycleStage stage, IDecisionReceipt receipt, string? correlationId = null, string? auditResidueId = null, string? eventId = null, DateTimeOffset? occurredUtc = null, string? outcome = null, IReadOnlyDictionary<string, string>? metadata = null)
-MEMBER | AsiBackbone.Core.Audit.DecisionReceiptLifecycleEvent.HasAuditResidueId | public bool HasAuditResidueId { get; }
+MEMBER | AsiBackbone.Core.Audit.DecisionReceiptLifecycleEvent.FromDecisionReceipt(AsiBackbone.Core.Audit.DecisionReceiptLifecycleStage,AsiBackbone.Core.Audit.IDecisionReceipt,System.String,System.String,System.String,System.Nullable{System.DateTimeOffset},System.String,System.Collections.Generic.IReadOnlyDictionary{System.String,System.String}) | public static DecisionReceiptLifecycleEvent FromDecisionReceipt(DecisionReceiptLifecycleStage stage, IDecisionReceipt receipt, string? correlationId = null, string? decisionReceiptId = null, string? eventId = null, DateTimeOffset? occurredUtc = null, string? outcome = null, IReadOnlyDictionary<string, string>? metadata = null)
+MEMBER | AsiBackbone.Core.Audit.DecisionReceiptLifecycleEvent.HasDecisionReceiptId | public bool HasDecisionReceiptId { get; }
 MEMBER | AsiBackbone.Core.Audit.DecisionReceiptLifecycleEvent.HasMetadata | public bool HasMetadata { get; }
 MEMBER | AsiBackbone.Core.Audit.DecisionReceiptLifecycleEvent.Metadata | public IReadOnlyDictionary<string, string> Metadata { get; }
 MEMBER | AsiBackbone.Core.Audit.DecisionReceiptLifecycleEvent.OccurredUtc | public DateTimeOffset OccurredUtc { get; }
@@ -289,11 +326,11 @@ MEMBER | AsiBackbone.Core.Audit.DecisionReceiptLifecycleEvent.TraceId | public s
 MEMBER | AsiBackbone.Core.Audit.IDecisionReceipt.ActorDisplayName | string? ActorDisplayName { get; }
 MEMBER | AsiBackbone.Core.Audit.IDecisionReceipt.ActorId | string ActorId { get; }
 MEMBER | AsiBackbone.Core.Audit.IDecisionReceipt.ActorType | GovernanceActorType ActorType { get; }
-MEMBER | AsiBackbone.Core.Audit.IDecisionReceipt.AuditResidueId | string? AuditResidueId { get; }
 MEMBER | AsiBackbone.Core.Audit.IDecisionReceipt.ConstraintCount | int? ConstraintCount { get; }
 MEMBER | AsiBackbone.Core.Audit.IDecisionReceipt.ConstraintSetHash | string? ConstraintSetHash { get; }
 MEMBER | AsiBackbone.Core.Audit.IDecisionReceipt.CorrelationId | string? CorrelationId { get; }
 MEMBER | AsiBackbone.Core.Audit.IDecisionReceipt.DecisionLatencyMs | long? DecisionLatencyMs { get; }
+MEMBER | AsiBackbone.Core.Audit.IDecisionReceipt.DecisionReceiptId | string? DecisionReceiptId { get; }
 MEMBER | AsiBackbone.Core.Audit.IDecisionReceipt.DecisionStage | string? DecisionStage { get; }
 MEMBER | AsiBackbone.Core.Audit.IDecisionReceipt.EmitterProvider | string? EmitterProvider { get; }
 MEMBER | AsiBackbone.Core.Audit.IDecisionReceipt.EmitterStatus | string? EmitterStatus { get; }
@@ -316,8 +353,8 @@ MEMBER | AsiBackbone.Core.Audit.IDecisionReceipt.SpanId | string? SpanId { get; 
 MEMBER | AsiBackbone.Core.Audit.IDecisionReceipt.TenantHash | string? TenantHash { get; }
 MEMBER | AsiBackbone.Core.Audit.IDecisionReceipt.TraceId | string? TraceId { get; }
 MEMBER | AsiBackbone.Core.Audit.IDecisionReceiptLifecycleStore.AppendAsync(AsiBackbone.Core.Audit.DecisionReceiptLifecycleEvent,System.Threading.CancellationToken) | ValueTask<DecisionReceiptLifecycleEvent> AppendAsync(DecisionReceiptLifecycleEvent lifecycleEvent, CancellationToken cancellationToken = default)
-MEMBER | AsiBackbone.Core.Audit.IDecisionReceiptLifecycleStore.FindByAuditResidueIdAsync(System.String,System.Threading.CancellationToken) | ValueTask<IReadOnlyList<DecisionReceiptLifecycleEvent>> FindByAuditResidueIdAsync(string auditResidueId, CancellationToken cancellationToken = default)
 MEMBER | AsiBackbone.Core.Audit.IDecisionReceiptLifecycleStore.FindByCorrelationIdAsync(System.String,System.Threading.CancellationToken) | ValueTask<IReadOnlyList<DecisionReceiptLifecycleEvent>> FindByCorrelationIdAsync(string correlationId, CancellationToken cancellationToken = default)
+MEMBER | AsiBackbone.Core.Audit.IDecisionReceiptLifecycleStore.FindByDecisionReceiptIdAsync(System.String,System.Threading.CancellationToken) | ValueTask<IReadOnlyList<DecisionReceiptLifecycleEvent>> FindByDecisionReceiptIdAsync(string decisionReceiptId, CancellationToken cancellationToken = default)
 MEMBER | AsiBackbone.Core.Audit.IDecisionReceiptLifecycleStore.FindByEventIdAsync(System.String,System.Threading.CancellationToken) | ValueTask<DecisionReceiptLifecycleEvent?> FindByEventIdAsync(string eventId, CancellationToken cancellationToken = default)
 MEMBER | AsiBackbone.Core.Audit.IDecisionReceiptSink.WriteAsync(AsiBackbone.Core.Audit.IDecisionReceipt,System.Threading.CancellationToken) | ValueTask WriteAsync(IDecisionReceipt residue, CancellationToken cancellationToken = default)
 MEMBER | AsiBackbone.Core.Audit.IGovernanceAuditLedgerStore.AppendAsync(AsiBackbone.Core.Audit.AuditLedgerRecord,System.Threading.CancellationToken) | ValueTask<OperationResult<AuditLedgerRecord>> AppendAsync(AuditLedgerRecord record, CancellationToken cancellationToken = default)
@@ -326,77 +363,77 @@ MEMBER | AsiBackbone.Core.Audit.IGovernanceAuditLedgerStore.FindByCorrelationIdA
 MEMBER | AsiBackbone.Core.Audit.IGovernanceAuditLedgerStore.FindByRecordIdAsync(System.String,System.Threading.CancellationToken) | ValueTask<AuditLedgerRecord?> FindByRecordIdAsync(string recordId, CancellationToken cancellationToken = default)
 MEMBER | AsiBackbone.Core.Audit.IGovernanceAuditLedgerStore.FindByRecordedUtcRangeAsync(System.DateTimeOffset,System.DateTimeOffset,System.Threading.CancellationToken) | ValueTask<IReadOnlyList<AuditLedgerRecord>> FindByRecordedUtcRangeAsync(DateTimeOffset recordedFromUtc, DateTimeOffset recordedToUtc, CancellationToken cancellationToken = default)
 MEMBER | AsiBackbone.Core.Audit.IGovernanceAuditLedgerStore.FindByTraceIdAsync(System.String,System.Threading.CancellationToken) | ValueTask<IReadOnlyList<AuditLedgerRecord>> FindByTraceIdAsync(string traceId, CancellationToken cancellationToken = default)
-MEMBER | AsiBackbone.Core.CapabilityTokens.CapabilityGrantUseResult.Accepted(System.Int32) | public static CapabilityGrantUseResult Accepted(int useCount)
-MEMBER | AsiBackbone.Core.CapabilityTokens.CapabilityGrantUseResult.Cancelled(System.String) | public static CapabilityGrantUseResult Cancelled(string? failureMessage = null)
-MEMBER | AsiBackbone.Core.CapabilityTokens.CapabilityGrantUseResult.FailureCode | public string? FailureCode { get; }
-MEMBER | AsiBackbone.Core.CapabilityTokens.CapabilityGrantUseResult.FailureMessage | public string? FailureMessage { get; }
-MEMBER | AsiBackbone.Core.CapabilityTokens.CapabilityGrantUseResult.IsAccepted | public bool IsAccepted { get; }
-MEMBER | AsiBackbone.Core.CapabilityTokens.CapabilityGrantUseResult.RetentionElapsed(System.String) | public static CapabilityGrantUseResult RetentionElapsed(string? failureMessage = null)
-MEMBER | AsiBackbone.Core.CapabilityTokens.CapabilityGrantUseResult.State | public GrantUseState State { get; }
-MEMBER | AsiBackbone.Core.CapabilityTokens.CapabilityGrantUseResult.Stopped(System.String) | public static CapabilityGrantUseResult Stopped(string? failureMessage = null)
-MEMBER | AsiBackbone.Core.CapabilityTokens.CapabilityGrantUseResult.Unavailable(System.String) | public static CapabilityGrantUseResult Unavailable(string? failureMessage = null)
-MEMBER | AsiBackbone.Core.CapabilityTokens.CapabilityGrantUseResult.UseCount | public int UseCount { get; }
-MEMBER | AsiBackbone.Core.CapabilityTokens.CapabilityGrantUseResult.UseLimitExceeded(System.Int32,System.String) | public static CapabilityGrantUseResult UseLimitExceeded(int useCount, string? failureMessage = null)
-MEMBER | AsiBackbone.Core.CapabilityTokens.CapabilityGrantValidationOptions.AcknowledgmentId | public string? AcknowledgmentId { get; }
-MEMBER | AsiBackbone.Core.CapabilityTokens.CapabilityGrantValidationOptions.AllowedClockSkew | public TimeSpan AllowedClockSkew { get; }
-MEMBER | AsiBackbone.Core.CapabilityTokens.CapabilityGrantValidationOptions.Audience | public string? Audience { get; }
-MEMBER | AsiBackbone.Core.CapabilityTokens.CapabilityGrantValidationOptions.Create(System.String,System.String,System.Collections.Generic.IEnumerable{System.String},System.Nullable{System.DateTimeOffset},System.String,System.String,System.String,System.String,System.String,System.String,System.Boolean,System.Boolean,System.Boolean,System.Int32,System.TimeSpan,System.String,System.String,System.String,System.String,System.String,System.String,AsiBackbone.Core.Signing.CanonicalPayloadOptions) | public static CapabilityGrantValidationOptions Create(string? issuer = null, string? audience = null, IEnumerable<string>? scopes = null, DateTimeOffset? validationUtc = null, string? policyVersion = null, string? policyHash = null, string? acknowledgmentId = null, string? handshakeId = null, string? gatewayBinding = null, string? resourceBinding = null, bool requireProof = false, bool requireAcknowledgmentReference = false, bool requireUseCheck = false, int maxUseCount = 1, TimeSpan allowedClockSkew = default, string? expectedProofKeyId = null, string? expectedProofKeyVersion = null, string? expectedProofPolicyVersion = null, string? expectedProofPolicyHash = null, string? requiredProofProvider = null, string? requiredProofHashAlgorithm = null, CanonicalPayloadOptions? proofPayloadOptions = null)
-MEMBER | AsiBackbone.Core.CapabilityTokens.CapabilityGrantValidationOptions.CreateExecutionBoundary(System.String,System.String,System.Collections.Generic.IEnumerable{System.String},System.Nullable{System.DateTimeOffset},System.String,System.String,System.String,System.String,System.String,System.String,System.Boolean,System.Boolean,System.Int32,System.TimeSpan,System.String,System.String,System.String,System.String,System.String,System.String,AsiBackbone.Core.Signing.CanonicalPayloadOptions) | public static CapabilityGrantValidationOptions CreateExecutionBoundary(string? issuer = null, string? audience = null, IEnumerable<string>? scopes = null, DateTimeOffset? validationUtc = null, string? policyVersion = null, string? policyHash = null, string? acknowledgmentId = null, string? handshakeId = null, string? gatewayBinding = null, string? resourceBinding = null, bool requireAcknowledgmentReference = false, bool requireUseCheck = true, int maxUseCount = 1, TimeSpan allowedClockSkew = default, string? expectedProofKeyId = null, string? expectedProofKeyVersion = null, string? expectedProofPolicyVersion = null, string? expectedProofPolicyHash = null, string? requiredProofProvider = null, string? requiredProofHashAlgorithm = null, CanonicalPayloadOptions? proofPayloadOptions = null)
-MEMBER | AsiBackbone.Core.CapabilityTokens.CapabilityGrantValidationOptions.CreateMetadataValidation(System.String,System.String,System.Collections.Generic.IEnumerable{System.String},System.Nullable{System.DateTimeOffset},System.String,System.String,System.String,System.String,System.String,System.String,System.Boolean,System.TimeSpan) | public static CapabilityGrantValidationOptions CreateMetadataValidation(string? issuer = null, string? audience = null, IEnumerable<string>? scopes = null, DateTimeOffset? validationUtc = null, string? policyVersion = null, string? policyHash = null, string? acknowledgmentId = null, string? handshakeId = null, string? gatewayBinding = null, string? resourceBinding = null, bool requireAcknowledgmentReference = false, TimeSpan allowedClockSkew = default)
-MEMBER | AsiBackbone.Core.CapabilityTokens.CapabilityGrantValidationOptions.ExpectedProofKeyId | public string? ExpectedProofKeyId { get; }
-MEMBER | AsiBackbone.Core.CapabilityTokens.CapabilityGrantValidationOptions.ExpectedProofKeyVersion | public string? ExpectedProofKeyVersion { get; }
-MEMBER | AsiBackbone.Core.CapabilityTokens.CapabilityGrantValidationOptions.ExpectedProofPolicyHash | public string? ExpectedProofPolicyHash { get; }
-MEMBER | AsiBackbone.Core.CapabilityTokens.CapabilityGrantValidationOptions.ExpectedProofPolicyVersion | public string? ExpectedProofPolicyVersion { get; }
-MEMBER | AsiBackbone.Core.CapabilityTokens.CapabilityGrantValidationOptions.GatewayBinding | public string? GatewayBinding { get; }
-MEMBER | AsiBackbone.Core.CapabilityTokens.CapabilityGrantValidationOptions.HandshakeId | public string? HandshakeId { get; }
-MEMBER | AsiBackbone.Core.CapabilityTokens.CapabilityGrantValidationOptions.Issuer | public string? Issuer { get; }
-MEMBER | AsiBackbone.Core.CapabilityTokens.CapabilityGrantValidationOptions.MaxUseCount | public int MaxUseCount { get; }
-MEMBER | AsiBackbone.Core.CapabilityTokens.CapabilityGrantValidationOptions.PolicyHash | public string? PolicyHash { get; }
-MEMBER | AsiBackbone.Core.CapabilityTokens.CapabilityGrantValidationOptions.PolicyVersion | public string? PolicyVersion { get; }
-MEMBER | AsiBackbone.Core.CapabilityTokens.CapabilityGrantValidationOptions.ProofPayloadOptions | public CanonicalPayloadOptions? ProofPayloadOptions { get; }
-MEMBER | AsiBackbone.Core.CapabilityTokens.CapabilityGrantValidationOptions.RequireAcknowledgmentReference | public bool RequireAcknowledgmentReference { get; }
-MEMBER | AsiBackbone.Core.CapabilityTokens.CapabilityGrantValidationOptions.RequireProof | public bool RequireProof { get; }
-MEMBER | AsiBackbone.Core.CapabilityTokens.CapabilityGrantValidationOptions.RequireUseCheck | public bool RequireUseCheck { get; }
-MEMBER | AsiBackbone.Core.CapabilityTokens.CapabilityGrantValidationOptions.RequiredProofHashAlgorithm | public string? RequiredProofHashAlgorithm { get; }
-MEMBER | AsiBackbone.Core.CapabilityTokens.CapabilityGrantValidationOptions.RequiredProofProvider | public string? RequiredProofProvider { get; }
-MEMBER | AsiBackbone.Core.CapabilityTokens.CapabilityGrantValidationOptions.ResourceBinding | public string? ResourceBinding { get; }
-MEMBER | AsiBackbone.Core.CapabilityTokens.CapabilityGrantValidationOptions.Scopes | public IReadOnlyList<string> Scopes { get; }
-MEMBER | AsiBackbone.Core.CapabilityTokens.CapabilityGrantValidationOptions.ValidationUtc | public DateTimeOffset? ValidationUtc { get; }
-MEMBER | AsiBackbone.Core.CapabilityTokens.CapabilityGrantValidationResult.Action | public VerificationPolicyAction Action { get; }
-MEMBER | AsiBackbone.Core.CapabilityTokens.CapabilityGrantValidationResult.Category | public CapabilityTokenValidationCategory Category { get; }
-MEMBER | AsiBackbone.Core.CapabilityTokens.CapabilityGrantValidationResult.Failed(AsiBackbone.Core.CapabilityTokens.CapabilityTokenGrant,AsiBackbone.Core.CapabilityTokens.CapabilityTokenValidationCategory,AsiBackbone.Core.Signing.VerificationPolicyAction,System.String,System.String) | public static CapabilityGrantValidationResult Failed(CapabilityTokenGrant grant, CapabilityTokenValidationCategory category, VerificationPolicyAction action, string failureCode, string? failureMessage = null)
-MEMBER | AsiBackbone.Core.CapabilityTokens.CapabilityGrantValidationResult.FailureCode | public string? FailureCode { get; }
-MEMBER | AsiBackbone.Core.CapabilityTokens.CapabilityGrantValidationResult.FailureMessage | public string? FailureMessage { get; }
-MEMBER | AsiBackbone.Core.CapabilityTokens.CapabilityGrantValidationResult.IsValid | public bool IsValid { get; }
-MEMBER | AsiBackbone.Core.CapabilityTokens.CapabilityGrantValidationResult.SafeMetadata | public IReadOnlyDictionary<string, string> SafeMetadata { get; }
-MEMBER | AsiBackbone.Core.CapabilityTokens.CapabilityGrantValidationResult.ShouldAllow | public bool ShouldAllow { get; }
-MEMBER | AsiBackbone.Core.CapabilityTokens.CapabilityGrantValidationResult.Status | public string Status { get; }
-MEMBER | AsiBackbone.Core.CapabilityTokens.CapabilityGrantValidationResult.TokenId | public string TokenId { get; }
-MEMBER | AsiBackbone.Core.CapabilityTokens.CapabilityGrantValidationResult.Valid(AsiBackbone.Core.CapabilityTokens.CapabilityTokenGrant) | public static CapabilityGrantValidationResult Valid(CapabilityTokenGrant grant)
-MEMBER | AsiBackbone.Core.CapabilityTokens.CapabilityGrantValidator.ValidateAsync(AsiBackbone.Core.Signing.SignedGovernanceArtifact{AsiBackbone.Core.CapabilityTokens.CapabilityTokenGrant},AsiBackbone.Core.CapabilityTokens.CapabilityGrantValidationOptions,AsiBackbone.Core.Signing.IGovernanceSignatureVerificationService,AsiBackbone.Core.CapabilityTokens.ICapabilityGrantUseStore,System.Threading.CancellationToken) | public static ValueTask<CapabilityGrantValidationResult> ValidateAsync(SignedGovernanceArtifact<CapabilityTokenGrant> signedGrant, CapabilityGrantValidationOptions? options = null, IGovernanceSignatureVerificationService? verificationService = null, ICapabilityGrantUseStore? useStore = null, CancellationToken cancellationToken = default)
-MEMBER | AsiBackbone.Core.CapabilityTokens.CapabilityTokenGrant.AcknowledgmentId | public string? AcknowledgmentId { get; }
-MEMBER | AsiBackbone.Core.CapabilityTokens.CapabilityTokenGrant.Audience | public string Audience { get; }
-MEMBER | AsiBackbone.Core.CapabilityTokens.CapabilityTokenGrant.Create(System.String,System.String,System.String,System.Collections.Generic.IEnumerable{System.String},System.DateTimeOffset,System.DateTimeOffset,System.Nullable{System.DateTimeOffset},System.String,System.String,System.String,System.String,System.String,System.String,System.String,System.String,System.Collections.Generic.IReadOnlyDictionary{System.String,System.String},System.Nullable{System.Int32},System.String) | public static CapabilityTokenGrant Create(string tokenId, string issuer, string audience, IEnumerable<string> scopes, DateTimeOffset issuedUtc, DateTimeOffset expiresUtc, DateTimeOffset? notBeforeUtc = null, string? subjectId = null, string? operationName = null, string? policyVersion = null, string? policyHash = null, string? acknowledgmentId = null, string? handshakeId = null, string? gatewayBinding = null, string? resourceBinding = null, IReadOnlyDictionary<string, string>? metadata = null, int? maxUseCount = null, string? schemaVersion = null)
-MEMBER | AsiBackbone.Core.CapabilityTokens.CapabilityTokenGrant.ExpiresUtc | public DateTimeOffset ExpiresUtc { get; }
-MEMBER | AsiBackbone.Core.CapabilityTokens.CapabilityTokenGrant.GatewayBinding | public string? GatewayBinding { get; }
-MEMBER | AsiBackbone.Core.CapabilityTokens.CapabilityTokenGrant.HandshakeId | public string? HandshakeId { get; }
-MEMBER | AsiBackbone.Core.CapabilityTokens.CapabilityTokenGrant.HasAcknowledgmentReference | public bool HasAcknowledgmentReference { get; }
-MEMBER | AsiBackbone.Core.CapabilityTokens.CapabilityTokenGrant.HasHandshakeReference | public bool HasHandshakeReference { get; }
-MEMBER | AsiBackbone.Core.CapabilityTokens.CapabilityTokenGrant.HasMetadata | public bool HasMetadata { get; }
-MEMBER | AsiBackbone.Core.CapabilityTokens.CapabilityTokenGrant.IssuedUtc | public DateTimeOffset IssuedUtc { get; }
-MEMBER | AsiBackbone.Core.CapabilityTokens.CapabilityTokenGrant.Issuer | public string Issuer { get; }
-MEMBER | AsiBackbone.Core.CapabilityTokens.CapabilityTokenGrant.MaxUseCount | public int? MaxUseCount { get; }
-MEMBER | AsiBackbone.Core.CapabilityTokens.CapabilityTokenGrant.Metadata | public IReadOnlyDictionary<string, string> Metadata { get; }
-MEMBER | AsiBackbone.Core.CapabilityTokens.CapabilityTokenGrant.NotBeforeUtc | public DateTimeOffset? NotBeforeUtc { get; }
-MEMBER | AsiBackbone.Core.CapabilityTokens.CapabilityTokenGrant.OperationName | public string? OperationName { get; }
-MEMBER | AsiBackbone.Core.CapabilityTokens.CapabilityTokenGrant.PolicyHash | public string? PolicyHash { get; }
-MEMBER | AsiBackbone.Core.CapabilityTokens.CapabilityTokenGrant.PolicyVersion | public string? PolicyVersion { get; }
-MEMBER | AsiBackbone.Core.CapabilityTokens.CapabilityTokenGrant.ResourceBinding | public string? ResourceBinding { get; }
-MEMBER | AsiBackbone.Core.CapabilityTokens.CapabilityTokenGrant.SchemaVersion | public string SchemaVersion { get; }
-MEMBER | AsiBackbone.Core.CapabilityTokens.CapabilityTokenGrant.Scopes | public IReadOnlyList<string> Scopes { get; }
-MEMBER | AsiBackbone.Core.CapabilityTokens.CapabilityTokenGrant.SubjectId | public string? SubjectId { get; }
-MEMBER | AsiBackbone.Core.CapabilityTokens.CapabilityTokenGrant.TokenId | public string TokenId { get; }
-MEMBER | AsiBackbone.Core.CapabilityTokens.ICapabilityGrantUseStore.TryConsumeAsync(AsiBackbone.Core.CapabilityTokens.CapabilityTokenGrant,System.Int32,System.DateTimeOffset,System.Threading.CancellationToken) | ValueTask<CapabilityGrantUseResult> TryConsumeAsync(CapabilityTokenGrant grant, int maxUseCount, DateTimeOffset usedUtc, CancellationToken cancellationToken = default)
+MEMBER | AsiBackbone.Core.CapabilityGrants.CapabilityGrant.AcknowledgmentId | public string? AcknowledgmentId { get; }
+MEMBER | AsiBackbone.Core.CapabilityGrants.CapabilityGrant.Audience | public string Audience { get; }
+MEMBER | AsiBackbone.Core.CapabilityGrants.CapabilityGrant.Create(System.String,System.String,System.String,System.Collections.Generic.IEnumerable{System.String},System.DateTimeOffset,System.DateTimeOffset,System.Nullable{System.DateTimeOffset},System.String,System.String,System.String,System.String,System.String,System.String,System.String,System.String,System.Collections.Generic.IReadOnlyDictionary{System.String,System.String},System.Nullable{System.Int32},System.String) | public static CapabilityGrant Create(string tokenId, string issuer, string audience, IEnumerable<string> scopes, DateTimeOffset issuedUtc, DateTimeOffset expiresUtc, DateTimeOffset? notBeforeUtc = null, string? subjectId = null, string? operationName = null, string? policyVersion = null, string? policyHash = null, string? acknowledgmentId = null, string? handshakeId = null, string? gatewayBinding = null, string? resourceBinding = null, IReadOnlyDictionary<string, string>? metadata = null, int? maxUseCount = null, string? schemaVersion = null)
+MEMBER | AsiBackbone.Core.CapabilityGrants.CapabilityGrant.ExpiresUtc | public DateTimeOffset ExpiresUtc { get; }
+MEMBER | AsiBackbone.Core.CapabilityGrants.CapabilityGrant.GatewayBinding | public string? GatewayBinding { get; }
+MEMBER | AsiBackbone.Core.CapabilityGrants.CapabilityGrant.HandshakeId | public string? HandshakeId { get; }
+MEMBER | AsiBackbone.Core.CapabilityGrants.CapabilityGrant.HasAcknowledgmentReference | public bool HasAcknowledgmentReference { get; }
+MEMBER | AsiBackbone.Core.CapabilityGrants.CapabilityGrant.HasHandshakeReference | public bool HasHandshakeReference { get; }
+MEMBER | AsiBackbone.Core.CapabilityGrants.CapabilityGrant.HasMetadata | public bool HasMetadata { get; }
+MEMBER | AsiBackbone.Core.CapabilityGrants.CapabilityGrant.IssuedUtc | public DateTimeOffset IssuedUtc { get; }
+MEMBER | AsiBackbone.Core.CapabilityGrants.CapabilityGrant.Issuer | public string Issuer { get; }
+MEMBER | AsiBackbone.Core.CapabilityGrants.CapabilityGrant.MaxUseCount | public int? MaxUseCount { get; }
+MEMBER | AsiBackbone.Core.CapabilityGrants.CapabilityGrant.Metadata | public IReadOnlyDictionary<string, string> Metadata { get; }
+MEMBER | AsiBackbone.Core.CapabilityGrants.CapabilityGrant.NotBeforeUtc | public DateTimeOffset? NotBeforeUtc { get; }
+MEMBER | AsiBackbone.Core.CapabilityGrants.CapabilityGrant.OperationName | public string? OperationName { get; }
+MEMBER | AsiBackbone.Core.CapabilityGrants.CapabilityGrant.PolicyHash | public string? PolicyHash { get; }
+MEMBER | AsiBackbone.Core.CapabilityGrants.CapabilityGrant.PolicyVersion | public string? PolicyVersion { get; }
+MEMBER | AsiBackbone.Core.CapabilityGrants.CapabilityGrant.ResourceBinding | public string? ResourceBinding { get; }
+MEMBER | AsiBackbone.Core.CapabilityGrants.CapabilityGrant.SchemaVersion | public string SchemaVersion { get; }
+MEMBER | AsiBackbone.Core.CapabilityGrants.CapabilityGrant.Scopes | public IReadOnlyList<string> Scopes { get; }
+MEMBER | AsiBackbone.Core.CapabilityGrants.CapabilityGrant.SubjectId | public string? SubjectId { get; }
+MEMBER | AsiBackbone.Core.CapabilityGrants.CapabilityGrant.TokenId | public string TokenId { get; }
+MEMBER | AsiBackbone.Core.CapabilityGrants.CapabilityGrantUseResult.Accepted(System.Int32) | public static CapabilityGrantUseResult Accepted(int useCount)
+MEMBER | AsiBackbone.Core.CapabilityGrants.CapabilityGrantUseResult.Cancelled(System.String) | public static CapabilityGrantUseResult Cancelled(string? failureMessage = null)
+MEMBER | AsiBackbone.Core.CapabilityGrants.CapabilityGrantUseResult.FailureCode | public string? FailureCode { get; }
+MEMBER | AsiBackbone.Core.CapabilityGrants.CapabilityGrantUseResult.FailureMessage | public string? FailureMessage { get; }
+MEMBER | AsiBackbone.Core.CapabilityGrants.CapabilityGrantUseResult.IsAccepted | public bool IsAccepted { get; }
+MEMBER | AsiBackbone.Core.CapabilityGrants.CapabilityGrantUseResult.RetentionElapsed(System.String) | public static CapabilityGrantUseResult RetentionElapsed(string? failureMessage = null)
+MEMBER | AsiBackbone.Core.CapabilityGrants.CapabilityGrantUseResult.State | public GrantUseState State { get; }
+MEMBER | AsiBackbone.Core.CapabilityGrants.CapabilityGrantUseResult.Stopped(System.String) | public static CapabilityGrantUseResult Stopped(string? failureMessage = null)
+MEMBER | AsiBackbone.Core.CapabilityGrants.CapabilityGrantUseResult.Unavailable(System.String) | public static CapabilityGrantUseResult Unavailable(string? failureMessage = null)
+MEMBER | AsiBackbone.Core.CapabilityGrants.CapabilityGrantUseResult.UseCount | public int UseCount { get; }
+MEMBER | AsiBackbone.Core.CapabilityGrants.CapabilityGrantUseResult.UseLimitExceeded(System.Int32,System.String) | public static CapabilityGrantUseResult UseLimitExceeded(int useCount, string? failureMessage = null)
+MEMBER | AsiBackbone.Core.CapabilityGrants.CapabilityGrantValidationOptions.AcknowledgmentId | public string? AcknowledgmentId { get; }
+MEMBER | AsiBackbone.Core.CapabilityGrants.CapabilityGrantValidationOptions.AllowedClockSkew | public TimeSpan AllowedClockSkew { get; }
+MEMBER | AsiBackbone.Core.CapabilityGrants.CapabilityGrantValidationOptions.Audience | public string? Audience { get; }
+MEMBER | AsiBackbone.Core.CapabilityGrants.CapabilityGrantValidationOptions.Create(System.String,System.String,System.Collections.Generic.IEnumerable{System.String},System.Nullable{System.DateTimeOffset},System.String,System.String,System.String,System.String,System.String,System.String,System.Boolean,System.Boolean,System.Boolean,System.Int32,System.TimeSpan,System.String,System.String,System.String,System.String,System.String,System.String,AsiBackbone.Core.Signing.CanonicalPayloadOptions) | public static CapabilityGrantValidationOptions Create(string? issuer = null, string? audience = null, IEnumerable<string>? scopes = null, DateTimeOffset? validationUtc = null, string? policyVersion = null, string? policyHash = null, string? acknowledgmentId = null, string? handshakeId = null, string? gatewayBinding = null, string? resourceBinding = null, bool requireProof = false, bool requireAcknowledgmentReference = false, bool requireUseCheck = false, int maxUseCount = 1, TimeSpan allowedClockSkew = default, string? expectedProofKeyId = null, string? expectedProofKeyVersion = null, string? expectedProofPolicyVersion = null, string? expectedProofPolicyHash = null, string? requiredProofProvider = null, string? requiredProofHashAlgorithm = null, CanonicalPayloadOptions? proofPayloadOptions = null)
+MEMBER | AsiBackbone.Core.CapabilityGrants.CapabilityGrantValidationOptions.CreateExecutionBoundary(System.String,System.String,System.Collections.Generic.IEnumerable{System.String},System.Nullable{System.DateTimeOffset},System.String,System.String,System.String,System.String,System.String,System.String,System.Boolean,System.Boolean,System.Int32,System.TimeSpan,System.String,System.String,System.String,System.String,System.String,System.String,AsiBackbone.Core.Signing.CanonicalPayloadOptions) | public static CapabilityGrantValidationOptions CreateExecutionBoundary(string? issuer = null, string? audience = null, IEnumerable<string>? scopes = null, DateTimeOffset? validationUtc = null, string? policyVersion = null, string? policyHash = null, string? acknowledgmentId = null, string? handshakeId = null, string? gatewayBinding = null, string? resourceBinding = null, bool requireAcknowledgmentReference = false, bool requireUseCheck = true, int maxUseCount = 1, TimeSpan allowedClockSkew = default, string? expectedProofKeyId = null, string? expectedProofKeyVersion = null, string? expectedProofPolicyVersion = null, string? expectedProofPolicyHash = null, string? requiredProofProvider = null, string? requiredProofHashAlgorithm = null, CanonicalPayloadOptions? proofPayloadOptions = null)
+MEMBER | AsiBackbone.Core.CapabilityGrants.CapabilityGrantValidationOptions.CreateMetadataValidation(System.String,System.String,System.Collections.Generic.IEnumerable{System.String},System.Nullable{System.DateTimeOffset},System.String,System.String,System.String,System.String,System.String,System.String,System.Boolean,System.TimeSpan) | public static CapabilityGrantValidationOptions CreateMetadataValidation(string? issuer = null, string? audience = null, IEnumerable<string>? scopes = null, DateTimeOffset? validationUtc = null, string? policyVersion = null, string? policyHash = null, string? acknowledgmentId = null, string? handshakeId = null, string? gatewayBinding = null, string? resourceBinding = null, bool requireAcknowledgmentReference = false, TimeSpan allowedClockSkew = default)
+MEMBER | AsiBackbone.Core.CapabilityGrants.CapabilityGrantValidationOptions.ExpectedProofKeyId | public string? ExpectedProofKeyId { get; }
+MEMBER | AsiBackbone.Core.CapabilityGrants.CapabilityGrantValidationOptions.ExpectedProofKeyVersion | public string? ExpectedProofKeyVersion { get; }
+MEMBER | AsiBackbone.Core.CapabilityGrants.CapabilityGrantValidationOptions.ExpectedProofPolicyHash | public string? ExpectedProofPolicyHash { get; }
+MEMBER | AsiBackbone.Core.CapabilityGrants.CapabilityGrantValidationOptions.ExpectedProofPolicyVersion | public string? ExpectedProofPolicyVersion { get; }
+MEMBER | AsiBackbone.Core.CapabilityGrants.CapabilityGrantValidationOptions.GatewayBinding | public string? GatewayBinding { get; }
+MEMBER | AsiBackbone.Core.CapabilityGrants.CapabilityGrantValidationOptions.HandshakeId | public string? HandshakeId { get; }
+MEMBER | AsiBackbone.Core.CapabilityGrants.CapabilityGrantValidationOptions.Issuer | public string? Issuer { get; }
+MEMBER | AsiBackbone.Core.CapabilityGrants.CapabilityGrantValidationOptions.MaxUseCount | public int MaxUseCount { get; }
+MEMBER | AsiBackbone.Core.CapabilityGrants.CapabilityGrantValidationOptions.PolicyHash | public string? PolicyHash { get; }
+MEMBER | AsiBackbone.Core.CapabilityGrants.CapabilityGrantValidationOptions.PolicyVersion | public string? PolicyVersion { get; }
+MEMBER | AsiBackbone.Core.CapabilityGrants.CapabilityGrantValidationOptions.ProofPayloadOptions | public CanonicalPayloadOptions? ProofPayloadOptions { get; }
+MEMBER | AsiBackbone.Core.CapabilityGrants.CapabilityGrantValidationOptions.RequireAcknowledgmentReference | public bool RequireAcknowledgmentReference { get; }
+MEMBER | AsiBackbone.Core.CapabilityGrants.CapabilityGrantValidationOptions.RequireProof | public bool RequireProof { get; }
+MEMBER | AsiBackbone.Core.CapabilityGrants.CapabilityGrantValidationOptions.RequireUseCheck | public bool RequireUseCheck { get; }
+MEMBER | AsiBackbone.Core.CapabilityGrants.CapabilityGrantValidationOptions.RequiredProofHashAlgorithm | public string? RequiredProofHashAlgorithm { get; }
+MEMBER | AsiBackbone.Core.CapabilityGrants.CapabilityGrantValidationOptions.RequiredProofProvider | public string? RequiredProofProvider { get; }
+MEMBER | AsiBackbone.Core.CapabilityGrants.CapabilityGrantValidationOptions.ResourceBinding | public string? ResourceBinding { get; }
+MEMBER | AsiBackbone.Core.CapabilityGrants.CapabilityGrantValidationOptions.Scopes | public IReadOnlyList<string> Scopes { get; }
+MEMBER | AsiBackbone.Core.CapabilityGrants.CapabilityGrantValidationOptions.ValidationUtc | public DateTimeOffset? ValidationUtc { get; }
+MEMBER | AsiBackbone.Core.CapabilityGrants.CapabilityGrantValidationResult.Action | public VerificationPolicyAction Action { get; }
+MEMBER | AsiBackbone.Core.CapabilityGrants.CapabilityGrantValidationResult.Category | public CapabilityGrantValidationCategory Category { get; }
+MEMBER | AsiBackbone.Core.CapabilityGrants.CapabilityGrantValidationResult.Failed(AsiBackbone.Core.CapabilityGrants.CapabilityGrant,AsiBackbone.Core.CapabilityGrants.CapabilityGrantValidationCategory,AsiBackbone.Core.Signing.VerificationPolicyAction,System.String,System.String) | public static CapabilityGrantValidationResult Failed(CapabilityGrant grant, CapabilityGrantValidationCategory category, VerificationPolicyAction action, string failureCode, string? failureMessage = null)
+MEMBER | AsiBackbone.Core.CapabilityGrants.CapabilityGrantValidationResult.FailureCode | public string? FailureCode { get; }
+MEMBER | AsiBackbone.Core.CapabilityGrants.CapabilityGrantValidationResult.FailureMessage | public string? FailureMessage { get; }
+MEMBER | AsiBackbone.Core.CapabilityGrants.CapabilityGrantValidationResult.IsValid | public bool IsValid { get; }
+MEMBER | AsiBackbone.Core.CapabilityGrants.CapabilityGrantValidationResult.SafeMetadata | public IReadOnlyDictionary<string, string> SafeMetadata { get; }
+MEMBER | AsiBackbone.Core.CapabilityGrants.CapabilityGrantValidationResult.ShouldAllow | public bool ShouldAllow { get; }
+MEMBER | AsiBackbone.Core.CapabilityGrants.CapabilityGrantValidationResult.Status | public string Status { get; }
+MEMBER | AsiBackbone.Core.CapabilityGrants.CapabilityGrantValidationResult.TokenId | public string TokenId { get; }
+MEMBER | AsiBackbone.Core.CapabilityGrants.CapabilityGrantValidationResult.Valid(AsiBackbone.Core.CapabilityGrants.CapabilityGrant) | public static CapabilityGrantValidationResult Valid(CapabilityGrant grant)
+MEMBER | AsiBackbone.Core.CapabilityGrants.CapabilityGrantValidator.ValidateAsync(AsiBackbone.Core.Signing.SignedGovernanceArtifact{AsiBackbone.Core.CapabilityGrants.CapabilityGrant},AsiBackbone.Core.CapabilityGrants.CapabilityGrantValidationOptions,AsiBackbone.Core.Signing.IGovernanceSignatureVerificationService,AsiBackbone.Core.CapabilityGrants.ICapabilityGrantUseStore,System.Threading.CancellationToken) | public static ValueTask<CapabilityGrantValidationResult> ValidateAsync(SignedGovernanceArtifact<CapabilityGrant> signedGrant, CapabilityGrantValidationOptions? options = null, IGovernanceSignatureVerificationService? verificationService = null, ICapabilityGrantUseStore? useStore = null, CancellationToken cancellationToken = default)
+MEMBER | AsiBackbone.Core.CapabilityGrants.ICapabilityGrantUseStore.TryConsumeAsync(AsiBackbone.Core.CapabilityGrants.CapabilityGrant,System.Int32,System.DateTimeOffset,System.Threading.CancellationToken) | ValueTask<CapabilityGrantUseResult> TryConsumeAsync(CapabilityGrant grant, int maxUseCount, DateTimeOffset usedUtc, CancellationToken cancellationToken = default)
 MEMBER | AsiBackbone.Core.Classification.DefaultDlpFailurePolicyResolver.#ctor(AsiBackbone.Core.Classification.DlpFailurePolicyOptions) | public DefaultDlpFailurePolicyResolver(DlpFailurePolicyOptions? options = null)
 MEMBER | AsiBackbone.Core.Classification.DefaultDlpFailurePolicyResolver.ResolveAsync(AsiBackbone.Core.Classification.DlpFailurePolicyContext,System.Threading.CancellationToken) | public ValueTask<DlpFailurePolicyResolution> ResolveAsync(DlpFailurePolicyContext context, CancellationToken cancellationToken = default)
 MEMBER | AsiBackbone.Core.Classification.DlpFailurePolicyContext.CorrelationId | public string? CorrelationId { get; }
@@ -492,17 +529,17 @@ MEMBER | AsiBackbone.Core.Decisions.GovernanceDecision.Warning(AsiBackbone.Core.
 MEMBER | AsiBackbone.Core.Decisions.GovernanceDecision.Warning(System.Collections.Generic.IEnumerable{AsiBackbone.Core.Results.OperationReason},System.String,System.String,System.String,System.String) | public static GovernanceDecision Warning(IEnumerable<OperationReason> reasons, string? correlationId = null, string? traceId = null, string? policyVersion = null, string? policyHash = null)
 MEMBER | AsiBackbone.Core.Decisions.GovernanceDecision.Warning(System.String,System.String,System.String,System.String,System.String,System.String) | public static GovernanceDecision Warning(string code, string message, string? correlationId = null, string? traceId = null, string? policyVersion = null, string? policyHash = null)
 MEMBER | AsiBackbone.Core.Emissions.GovernanceEmissionEnvelope.ActorId | public string? ActorId { get; }
-MEMBER | AsiBackbone.Core.Emissions.GovernanceEmissionEnvelope.AuditResidueId | public string? AuditResidueId { get; }
 MEMBER | AsiBackbone.Core.Emissions.GovernanceEmissionEnvelope.CorrelationId | public string? CorrelationId { get; }
-MEMBER | AsiBackbone.Core.Emissions.GovernanceEmissionEnvelope.Create(AsiBackbone.Core.Emissions.GovernanceEmissionEventType,System.String,System.Nullable{System.DateTimeOffset},System.String,System.Nullable{System.DateTimeOffset},System.String,System.String,System.String,System.Nullable{AsiBackbone.Core.Audit.DecisionReceiptLifecycleStage},System.String,System.String,System.String,System.String,System.String,System.String,System.String,System.String,System.String,System.String,System.Nullable{System.Int64},System.String,System.String,AsiBackbone.Core.Emissions.GovernanceEmissionPayload,System.Collections.Generic.IReadOnlyDictionary{System.String,System.String}) | public static GovernanceEmissionEnvelope Create(GovernanceEmissionEventType eventType, string? eventId = null, DateTimeOffset? occurredUtc = null, string? envelopeId = null, DateTimeOffset? createdUtc = null, string? schemaVersion = null, string? correlationId = null, string? auditResidueId = null, DecisionReceiptLifecycleStage? lifecycleStage = null, string? policyVersion = null, string? policyHash = null, string? traceId = null, string? spanId = null, string? parentSpanId = null, string? operationName = null, string? outcome = null, string? actorId = null, string? emitterStatus = null, string? emitterProvider = null, long? outboxSequence = null, string? gatewayExecutionId = null, string? decisionStage = null, GovernanceEmissionPayload? payload = null, IReadOnlyDictionary<string, string>? metadata = null)
+MEMBER | AsiBackbone.Core.Emissions.GovernanceEmissionEnvelope.Create(AsiBackbone.Core.Emissions.GovernanceEmissionEventType,System.String,System.Nullable{System.DateTimeOffset},System.String,System.Nullable{System.DateTimeOffset},System.String,System.String,System.String,System.Nullable{AsiBackbone.Core.Audit.DecisionReceiptLifecycleStage},System.String,System.String,System.String,System.String,System.String,System.String,System.String,System.String,System.String,System.String,System.Nullable{System.Int64},System.String,System.String,AsiBackbone.Core.Emissions.GovernanceEmissionPayload,System.Collections.Generic.IReadOnlyDictionary{System.String,System.String}) | public static GovernanceEmissionEnvelope Create(GovernanceEmissionEventType eventType, string? eventId = null, DateTimeOffset? occurredUtc = null, string? envelopeId = null, DateTimeOffset? createdUtc = null, string? schemaVersion = null, string? correlationId = null, string? decisionReceiptId = null, DecisionReceiptLifecycleStage? lifecycleStage = null, string? policyVersion = null, string? policyHash = null, string? traceId = null, string? spanId = null, string? parentSpanId = null, string? operationName = null, string? outcome = null, string? actorId = null, string? emitterStatus = null, string? emitterProvider = null, long? outboxSequence = null, string? gatewayExecutionId = null, string? decisionStage = null, GovernanceEmissionPayload? payload = null, IReadOnlyDictionary<string, string>? metadata = null)
 MEMBER | AsiBackbone.Core.Emissions.GovernanceEmissionEnvelope.CreatedUtc | public DateTimeOffset CreatedUtc { get; }
+MEMBER | AsiBackbone.Core.Emissions.GovernanceEmissionEnvelope.DecisionReceiptId | public string? DecisionReceiptId { get; }
 MEMBER | AsiBackbone.Core.Emissions.GovernanceEmissionEnvelope.DecisionStage | public string? DecisionStage { get; }
 MEMBER | AsiBackbone.Core.Emissions.GovernanceEmissionEnvelope.EmitterProvider | public string? EmitterProvider { get; }
 MEMBER | AsiBackbone.Core.Emissions.GovernanceEmissionEnvelope.EmitterStatus | public string? EmitterStatus { get; }
 MEMBER | AsiBackbone.Core.Emissions.GovernanceEmissionEnvelope.EnvelopeId | public string EnvelopeId { get; }
 MEMBER | AsiBackbone.Core.Emissions.GovernanceEmissionEnvelope.EventId | public string? EventId { get; }
 MEMBER | AsiBackbone.Core.Emissions.GovernanceEmissionEnvelope.EventType | public GovernanceEmissionEventType EventType { get; }
-MEMBER | AsiBackbone.Core.Emissions.GovernanceEmissionEnvelope.FromDecisionReceipt(AsiBackbone.Core.Audit.IDecisionReceipt,AsiBackbone.Core.Emissions.GovernanceEmissionEventType,System.String,System.Nullable{System.DateTimeOffset},AsiBackbone.Core.Emissions.GovernanceEmissionPayload,System.Collections.Generic.IReadOnlyDictionary{System.String,System.String}) | public static GovernanceEmissionEnvelope FromDecisionReceipt(IDecisionReceipt receipt, GovernanceEmissionEventType eventType = GovernanceEmissionEventType.AuditResidue, string? envelopeId = null, DateTimeOffset? createdUtc = null, GovernanceEmissionPayload? payload = null, IReadOnlyDictionary<string, string>? metadata = null)
+MEMBER | AsiBackbone.Core.Emissions.GovernanceEmissionEnvelope.FromDecisionReceipt(AsiBackbone.Core.Audit.IDecisionReceipt,AsiBackbone.Core.Emissions.GovernanceEmissionEventType,System.String,System.Nullable{System.DateTimeOffset},AsiBackbone.Core.Emissions.GovernanceEmissionPayload,System.Collections.Generic.IReadOnlyDictionary{System.String,System.String}) | public static GovernanceEmissionEnvelope FromDecisionReceipt(IDecisionReceipt receipt, GovernanceEmissionEventType eventType = GovernanceEmissionEventType.DecisionReceipt, string? envelopeId = null, DateTimeOffset? createdUtc = null, GovernanceEmissionPayload? payload = null, IReadOnlyDictionary<string, string>? metadata = null)
 MEMBER | AsiBackbone.Core.Emissions.GovernanceEmissionEnvelope.FromLifecycleEvent(AsiBackbone.Core.Audit.DecisionReceiptLifecycleEvent,System.String,System.Nullable{System.DateTimeOffset},AsiBackbone.Core.Emissions.GovernanceEmissionPayload,System.Collections.Generic.IReadOnlyDictionary{System.String,System.String}) | public static GovernanceEmissionEnvelope FromLifecycleEvent(DecisionReceiptLifecycleEvent lifecycleEvent, string? envelopeId = null, DateTimeOffset? createdUtc = null, GovernanceEmissionPayload? payload = null, IReadOnlyDictionary<string, string>? metadata = null)
 MEMBER | AsiBackbone.Core.Emissions.GovernanceEmissionEnvelope.GatewayExecutionId | public string? GatewayExecutionId { get; }
 MEMBER | AsiBackbone.Core.Emissions.GovernanceEmissionEnvelope.HasCorrelation | public bool HasCorrelation { get; }
@@ -589,43 +626,6 @@ MEMBER | AsiBackbone.Core.Evaluation.GovernancePolicyOptions.Validate | public v
 MEMBER | AsiBackbone.Core.Evaluation.IGovernanceDecisionPolicy`1.ApplyAsync(`0,AsiBackbone.Core.Decisions.GovernanceDecision,System.Collections.Generic.IReadOnlyList{AsiBackbone.Core.Constraints.ConstraintEvaluationResult},System.Threading.CancellationToken) | ValueTask<GovernanceDecision> ApplyAsync(TContext context, GovernanceDecision composedDecision, IReadOnlyList<ConstraintEvaluationResult> constraintResults, CancellationToken cancellationToken = default)
 MEMBER | AsiBackbone.Core.Evaluation.IGovernancePolicyEvaluator`1.EvaluateAsync(`0,System.Threading.CancellationToken) | ValueTask<GovernanceDecision> EvaluateAsync(TContext context, CancellationToken cancellationToken = default)
 MEMBER | AsiBackbone.Core.GovernanceIdentifierLimits.MaximumLength | public const int MaximumLength = 128
-MEMBER | AsiBackbone.Core.Handshakes.LiabilityHandshakeAcknowledgment.Accept(AsiBackbone.Core.Handshakes.LiabilityHandshakeRequest,AsiBackbone.Core.Actors.IGovernanceActorContext,System.String,System.Nullable{System.DateTimeOffset},System.Collections.Generic.IReadOnlyDictionary{System.String,System.String},System.String) | public static LiabilityHandshakeAcknowledgment Accept(LiabilityHandshakeRequest request, IGovernanceActorContext actor, string? acknowledgmentId = null, DateTimeOffset? occurredUtc = null, IReadOnlyDictionary<string, string>? metadata = null, string? schemaVersion = null)
-MEMBER | AsiBackbone.Core.Handshakes.LiabilityHandshakeAcknowledgment.Acknowledged | public bool Acknowledged { get; }
-MEMBER | AsiBackbone.Core.Handshakes.LiabilityHandshakeAcknowledgment.AcknowledgmentCode | public string AcknowledgmentCode { get; }
-MEMBER | AsiBackbone.Core.Handshakes.LiabilityHandshakeAcknowledgment.AcknowledgmentId | public string AcknowledgmentId { get; }
-MEMBER | AsiBackbone.Core.Handshakes.LiabilityHandshakeAcknowledgment.ActorDisplayName | public string? ActorDisplayName { get; }
-MEMBER | AsiBackbone.Core.Handshakes.LiabilityHandshakeAcknowledgment.ActorId | public string ActorId { get; }
-MEMBER | AsiBackbone.Core.Handshakes.LiabilityHandshakeAcknowledgment.ActorType | public GovernanceActorType ActorType { get; }
-MEMBER | AsiBackbone.Core.Handshakes.LiabilityHandshakeAcknowledgment.CorrelationId | public string? CorrelationId { get; }
-MEMBER | AsiBackbone.Core.Handshakes.LiabilityHandshakeAcknowledgment.Create(AsiBackbone.Core.Handshakes.LiabilityHandshakeRequest,AsiBackbone.Core.Actors.IGovernanceActorContext,System.Boolean,System.String,System.Nullable{System.DateTimeOffset},System.Collections.Generic.IReadOnlyDictionary{System.String,System.String},System.String) | public static LiabilityHandshakeAcknowledgment Create(LiabilityHandshakeRequest request, IGovernanceActorContext actor, bool acknowledged, string? acknowledgmentId = null, DateTimeOffset? occurredUtc = null, IReadOnlyDictionary<string, string>? metadata = null, string? schemaVersion = null)
-MEMBER | AsiBackbone.Core.Handshakes.LiabilityHandshakeAcknowledgment.HandshakeId | public string HandshakeId { get; }
-MEMBER | AsiBackbone.Core.Handshakes.LiabilityHandshakeAcknowledgment.HasMetadata | public bool HasMetadata { get; }
-MEMBER | AsiBackbone.Core.Handshakes.LiabilityHandshakeAcknowledgment.Metadata | public IReadOnlyDictionary<string, string> Metadata { get; }
-MEMBER | AsiBackbone.Core.Handshakes.LiabilityHandshakeAcknowledgment.OccurredUtc | public DateTimeOffset OccurredUtc { get; }
-MEMBER | AsiBackbone.Core.Handshakes.LiabilityHandshakeAcknowledgment.Reject(AsiBackbone.Core.Handshakes.LiabilityHandshakeRequest,AsiBackbone.Core.Actors.IGovernanceActorContext,System.String,System.Nullable{System.DateTimeOffset},System.Collections.Generic.IReadOnlyDictionary{System.String,System.String},System.String) | public static LiabilityHandshakeAcknowledgment Reject(LiabilityHandshakeRequest request, IGovernanceActorContext actor, string? acknowledgmentId = null, DateTimeOffset? occurredUtc = null, IReadOnlyDictionary<string, string>? metadata = null, string? schemaVersion = null)
-MEMBER | AsiBackbone.Core.Handshakes.LiabilityHandshakeAcknowledgment.Rejected | public bool Rejected { get; }
-MEMBER | AsiBackbone.Core.Handshakes.LiabilityHandshakeAcknowledgment.SchemaVersion | public string SchemaVersion { get; }
-MEMBER | AsiBackbone.Core.Handshakes.LiabilityHandshakeAcknowledgment.TraceId | public string? TraceId { get; }
-MEMBER | AsiBackbone.Core.Handshakes.LiabilityHandshakeRequest.ActorDisplayName | public string? ActorDisplayName { get; }
-MEMBER | AsiBackbone.Core.Handshakes.LiabilityHandshakeRequest.ActorId | public string ActorId { get; }
-MEMBER | AsiBackbone.Core.Handshakes.LiabilityHandshakeRequest.ActorType | public GovernanceActorType ActorType { get; }
-MEMBER | AsiBackbone.Core.Handshakes.LiabilityHandshakeRequest.CorrelationId | public string? CorrelationId { get; }
-MEMBER | AsiBackbone.Core.Handshakes.LiabilityHandshakeRequest.Create(AsiBackbone.Core.Actors.IGovernanceActorContext,System.String,System.String,System.String,System.String,System.String,AsiBackbone.Core.Handshakes.LiabilityHandshakeRiskLevel,System.String,System.String,System.String,System.String,System.String,System.String,System.Collections.Generic.IReadOnlyDictionary{System.String,System.String},System.String) | public static LiabilityHandshakeRequest Create(IGovernanceActorContext actor, string operationName, string reasonCode, string message, string requiredAcknowledgmentCode, string requiredAcknowledgmentText, LiabilityHandshakeRiskLevel riskLevel = LiabilityHandshakeRiskLevel.Unspecified, string? riskCategory = null, string? handshakeId = null, string? correlationId = null, string? traceId = null, string? policyVersion = null, string? policyHash = null, IReadOnlyDictionary<string, string>? metadata = null, string? schemaVersion = null)
-MEMBER | AsiBackbone.Core.Handshakes.LiabilityHandshakeRequest.FromDecision(AsiBackbone.Core.Actors.IGovernanceActorContext,System.String,AsiBackbone.Core.Decisions.GovernanceDecision,System.String,System.String,AsiBackbone.Core.Handshakes.LiabilityHandshakeRiskLevel,System.String,System.String,System.Collections.Generic.IReadOnlyDictionary{System.String,System.String},System.String) | public static LiabilityHandshakeRequest FromDecision(IGovernanceActorContext actor, string operationName, GovernanceDecision decision, string requiredAcknowledgmentCode, string requiredAcknowledgmentText, LiabilityHandshakeRiskLevel riskLevel = LiabilityHandshakeRiskLevel.Unspecified, string? riskCategory = null, string? handshakeId = null, IReadOnlyDictionary<string, string>? metadata = null, string? schemaVersion = null)
-MEMBER | AsiBackbone.Core.Handshakes.LiabilityHandshakeRequest.HandshakeId | public string HandshakeId { get; }
-MEMBER | AsiBackbone.Core.Handshakes.LiabilityHandshakeRequest.HasMetadata | public bool HasMetadata { get; }
-MEMBER | AsiBackbone.Core.Handshakes.LiabilityHandshakeRequest.Message | public string Message { get; }
-MEMBER | AsiBackbone.Core.Handshakes.LiabilityHandshakeRequest.Metadata | public IReadOnlyDictionary<string, string> Metadata { get; }
-MEMBER | AsiBackbone.Core.Handshakes.LiabilityHandshakeRequest.OperationName | public string OperationName { get; }
-MEMBER | AsiBackbone.Core.Handshakes.LiabilityHandshakeRequest.PolicyHash | public string? PolicyHash { get; }
-MEMBER | AsiBackbone.Core.Handshakes.LiabilityHandshakeRequest.PolicyVersion | public string? PolicyVersion { get; }
-MEMBER | AsiBackbone.Core.Handshakes.LiabilityHandshakeRequest.ReasonCode | public string ReasonCode { get; }
-MEMBER | AsiBackbone.Core.Handshakes.LiabilityHandshakeRequest.RequiredAcknowledgmentCode | public string RequiredAcknowledgmentCode { get; }
-MEMBER | AsiBackbone.Core.Handshakes.LiabilityHandshakeRequest.RequiredAcknowledgmentText | public string RequiredAcknowledgmentText { get; }
-MEMBER | AsiBackbone.Core.Handshakes.LiabilityHandshakeRequest.RiskCategory | public string? RiskCategory { get; }
-MEMBER | AsiBackbone.Core.Handshakes.LiabilityHandshakeRequest.RiskLevel | public LiabilityHandshakeRiskLevel RiskLevel { get; }
-MEMBER | AsiBackbone.Core.Handshakes.LiabilityHandshakeRequest.SchemaVersion | public string SchemaVersion { get; }
-MEMBER | AsiBackbone.Core.Handshakes.LiabilityHandshakeRequest.TraceId | public string? TraceId { get; }
 MEMBER | AsiBackbone.Core.HostIntegration.GovernedOperationExecutionReceipt.CompletedUtc | public DateTimeOffset CompletedUtc { get; }
 MEMBER | AsiBackbone.Core.HostIntegration.GovernedOperationExecutionReceipt.CompletedWithoutMutation | public bool CompletedWithoutMutation { get; }
 MEMBER | AsiBackbone.Core.HostIntegration.GovernedOperationExecutionReceipt.Create(System.String,AsiBackbone.Core.HostIntegration.GovernedOperationPersistenceOutcome,System.String,System.String,System.Int32,System.String,System.String,System.Nullable{System.DateTimeOffset},System.String,System.String,System.Collections.Generic.IReadOnlyDictionary{System.String,System.String}) | public static GovernedOperationExecutionReceipt Create(string operationExecutionId, GovernedOperationPersistenceOutcome persistenceOutcome, string? executionAttemptId = null, string? mutationBatchId = null, int mutationRecordCount = 0, string? mutationManifestHash = null, string? mutationManifestAlgorithm = null, DateTimeOffset? completedUtc = null, string? persistenceProvider = null, string? decisionAuditRecordId = null, IReadOnlyDictionary<string, string>? metadata = null)
@@ -873,9 +873,9 @@ MEMBER | AsiBackbone.Core.Serialization.GovernanceSchemaVersions.StableArtifacts
 MEMBER | AsiBackbone.Core.Serialization.GovernanceSchemaVersions.StableArtifactsV2 | public const string StableArtifactsV2 = "2.0.0"
 MEMBER | AsiBackbone.Core.Signing.CanonicalArtifactTypes.AuditIntegrityLink | public const string AuditIntegrityLink = "asibackbone.audit-integrity-link"
 MEMBER | AsiBackbone.Core.Signing.CanonicalArtifactTypes.AuditLedgerRecord | public const string AuditLedgerRecord = "asibackbone.audit-ledger-record"
-MEMBER | AsiBackbone.Core.Signing.CanonicalArtifactTypes.AuditResidue | public const string AuditResidue = "asibackbone.audit-residue"
-MEMBER | AsiBackbone.Core.Signing.CanonicalArtifactTypes.AuditResidueLifecycleEvent | public const string AuditResidueLifecycleEvent = "asibackbone.audit-residue-lifecycle-event"
-MEMBER | AsiBackbone.Core.Signing.CanonicalArtifactTypes.CapabilityTokenGrant | public const string CapabilityTokenGrant = "asibackbone.capability-token-grant"
+MEMBER | AsiBackbone.Core.Signing.CanonicalArtifactTypes.CapabilityGrant | public const string CapabilityGrant = "asibackbone.capability-token-grant"
+MEMBER | AsiBackbone.Core.Signing.CanonicalArtifactTypes.DecisionReceipt | public const string DecisionReceipt = "asibackbone.audit-residue"
+MEMBER | AsiBackbone.Core.Signing.CanonicalArtifactTypes.DecisionReceiptLifecycleEvent | public const string DecisionReceiptLifecycleEvent = "asibackbone.audit-residue-lifecycle-event"
 MEMBER | AsiBackbone.Core.Signing.CanonicalArtifactTypes.GovernanceEmissionEnvelope | public const string GovernanceEmissionEnvelope = "asibackbone.governance-emission-envelope"
 MEMBER | AsiBackbone.Core.Signing.CanonicalArtifactTypes.GovernanceOutboxEntry | public const string GovernanceOutboxEntry = "asibackbone.governance-outbox-entry"
 MEMBER | AsiBackbone.Core.Signing.CanonicalArtifactTypes.GovernedOperationExecutionReceipt | public const string GovernedOperationExecutionReceipt = "asibackbone.governed-operation-execution-receipt"
@@ -889,7 +889,7 @@ MEMBER | AsiBackbone.Core.Signing.CanonicalPayload.HashAlgorithm | public string
 MEMBER | AsiBackbone.Core.Signing.CanonicalPayload.PayloadSchemaVersion | public string PayloadSchemaVersion { get; }
 MEMBER | AsiBackbone.Core.Signing.CanonicalPayload.ToUtf8Bytes | public byte[] ToUtf8Bytes()
 MEMBER | AsiBackbone.Core.Signing.CanonicalPayloadBuilder.ForAuditLedgerRecord(AsiBackbone.Core.Audit.AuditLedgerRecord,AsiBackbone.Core.Signing.CanonicalPayloadOptions) | public static CanonicalPayload ForAuditLedgerRecord(AuditLedgerRecord record, CanonicalPayloadOptions? options = null)
-MEMBER | AsiBackbone.Core.Signing.CanonicalPayloadBuilder.ForCapabilityTokenGrant(AsiBackbone.Core.CapabilityTokens.CapabilityTokenGrant,AsiBackbone.Core.Signing.CanonicalPayloadOptions) | public static CanonicalPayload ForCapabilityTokenGrant(CapabilityTokenGrant grant, CanonicalPayloadOptions? options = null)
+MEMBER | AsiBackbone.Core.Signing.CanonicalPayloadBuilder.ForCapabilityGrant(AsiBackbone.Core.CapabilityGrants.CapabilityGrant,AsiBackbone.Core.Signing.CanonicalPayloadOptions) | public static CanonicalPayload ForCapabilityGrant(CapabilityGrant grant, CanonicalPayloadOptions? options = null)
 MEMBER | AsiBackbone.Core.Signing.CanonicalPayloadBuilder.ForDecisionReceipt(AsiBackbone.Core.Audit.IDecisionReceipt,AsiBackbone.Core.Signing.CanonicalPayloadOptions) | public static CanonicalPayload ForDecisionReceipt(IDecisionReceipt receipt, CanonicalPayloadOptions? options = null)
 MEMBER | AsiBackbone.Core.Signing.CanonicalPayloadBuilder.ForDecisionReceiptLifecycleEvent(AsiBackbone.Core.Audit.DecisionReceiptLifecycleEvent,AsiBackbone.Core.Signing.CanonicalPayloadOptions) | public static CanonicalPayload ForDecisionReceiptLifecycleEvent(DecisionReceiptLifecycleEvent lifecycleEvent, CanonicalPayloadOptions? options = null)
 MEMBER | AsiBackbone.Core.Signing.CanonicalPayloadBuilder.ForGovernanceEmissionEnvelope(AsiBackbone.Core.Emissions.GovernanceEmissionEnvelope,AsiBackbone.Core.Signing.CanonicalPayloadOptions) | public static CanonicalPayload ForGovernanceEmissionEnvelope(GovernanceEmissionEnvelope envelope, CanonicalPayloadOptions? options = null)
@@ -1058,6 +1058,9 @@ MEMBER | AsiBackbone.Core.ThreatModeling.ThreatCategories.PromptInjectionLikeInp
 MEMBER | AsiBackbone.Core.ThreatModeling.ThreatCategories.RegionPolicyMismatch | public const string RegionPolicyMismatch = "RegionPolicyMismatch"
 MEMBER | AsiBackbone.Core.ThreatModeling.ThreatCategories.ReplayAttempt | public const string ReplayAttempt = "ReplayAttempt"
 MEMBER | AsiBackbone.Core.ThreatModeling.ThreatCategories.UnsafeExternalCommand | public const string UnsafeExternalCommand = "UnsafeExternalCommand"
+TYPE | AsiBackbone.Core.Acknowledgments.AcknowledgmentRequest | public sealed class AcknowledgmentRequest
+TYPE | AsiBackbone.Core.Acknowledgments.AcknowledgmentResponse | public sealed class AcknowledgmentResponse
+TYPE | AsiBackbone.Core.Acknowledgments.AcknowledgmentRiskLevel | public enum AcknowledgmentRiskLevel
 TYPE | AsiBackbone.Core.Actors.GovernanceActorContext | public sealed record GovernanceActorContext : IGovernanceActorContext, IEquatable<GovernanceActorContext>
 TYPE | AsiBackbone.Core.Actors.GovernanceActorType | public enum GovernanceActorType
 TYPE | AsiBackbone.Core.Actors.IGovernanceActorContext | public interface IGovernanceActorContext
@@ -1071,14 +1074,14 @@ TYPE | AsiBackbone.Core.Audit.IDecisionReceipt | public interface IDecisionRecei
 TYPE | AsiBackbone.Core.Audit.IDecisionReceiptLifecycleStore | public interface IDecisionReceiptLifecycleStore
 TYPE | AsiBackbone.Core.Audit.IDecisionReceiptSink | public interface IDecisionReceiptSink
 TYPE | AsiBackbone.Core.Audit.IGovernanceAuditLedgerStore | public interface IGovernanceAuditLedgerStore
-TYPE | AsiBackbone.Core.CapabilityTokens.CapabilityGrantUseResult | public sealed class CapabilityGrantUseResult
-TYPE | AsiBackbone.Core.CapabilityTokens.CapabilityGrantValidationOptions | public sealed class CapabilityGrantValidationOptions
-TYPE | AsiBackbone.Core.CapabilityTokens.CapabilityGrantValidationResult | public sealed class CapabilityGrantValidationResult
-TYPE | AsiBackbone.Core.CapabilityTokens.CapabilityGrantValidator | public static class CapabilityGrantValidator
-TYPE | AsiBackbone.Core.CapabilityTokens.CapabilityTokenGrant | public sealed class CapabilityTokenGrant
-TYPE | AsiBackbone.Core.CapabilityTokens.CapabilityTokenValidationCategory | public enum CapabilityTokenValidationCategory
-TYPE | AsiBackbone.Core.CapabilityTokens.GrantUseState | public enum GrantUseState
-TYPE | AsiBackbone.Core.CapabilityTokens.ICapabilityGrantUseStore | public interface ICapabilityGrantUseStore
+TYPE | AsiBackbone.Core.CapabilityGrants.CapabilityGrant | public sealed class CapabilityGrant
+TYPE | AsiBackbone.Core.CapabilityGrants.CapabilityGrantUseResult | public sealed class CapabilityGrantUseResult
+TYPE | AsiBackbone.Core.CapabilityGrants.CapabilityGrantValidationCategory | public enum CapabilityGrantValidationCategory
+TYPE | AsiBackbone.Core.CapabilityGrants.CapabilityGrantValidationOptions | public sealed class CapabilityGrantValidationOptions
+TYPE | AsiBackbone.Core.CapabilityGrants.CapabilityGrantValidationResult | public sealed class CapabilityGrantValidationResult
+TYPE | AsiBackbone.Core.CapabilityGrants.CapabilityGrantValidator | public static class CapabilityGrantValidator
+TYPE | AsiBackbone.Core.CapabilityGrants.GrantUseState | public enum GrantUseState
+TYPE | AsiBackbone.Core.CapabilityGrants.ICapabilityGrantUseStore | public interface ICapabilityGrantUseStore
 TYPE | AsiBackbone.Core.Classification.DefaultDlpFailurePolicyResolver | public sealed class DefaultDlpFailurePolicyResolver : IDlpFailurePolicyResolver
 TYPE | AsiBackbone.Core.Classification.DlpClassificationFailureKind | public enum DlpClassificationFailureKind
 TYPE | AsiBackbone.Core.Classification.DlpFailureBehavior | public enum DlpFailureBehavior
@@ -1114,9 +1117,6 @@ TYPE | AsiBackbone.Core.Evaluation.GovernancePolicyOptions | public sealed class
 TYPE | AsiBackbone.Core.Evaluation.IGovernanceDecisionPolicy`1 | public interface IGovernanceDecisionPolicy<in TContext> where TContext : IGovernanceEvaluationContext
 TYPE | AsiBackbone.Core.Evaluation.IGovernancePolicyEvaluator`1 | public interface IGovernancePolicyEvaluator<in TContext> where TContext : IGovernanceEvaluationContext
 TYPE | AsiBackbone.Core.GovernanceIdentifierLimits | public static class GovernanceIdentifierLimits
-TYPE | AsiBackbone.Core.Handshakes.LiabilityHandshakeAcknowledgment | public sealed class LiabilityHandshakeAcknowledgment
-TYPE | AsiBackbone.Core.Handshakes.LiabilityHandshakeRequest | public sealed class LiabilityHandshakeRequest
-TYPE | AsiBackbone.Core.Handshakes.LiabilityHandshakeRiskLevel | public enum LiabilityHandshakeRiskLevel
 TYPE | AsiBackbone.Core.HostIntegration.GovernedOperationExecutionReceipt | public sealed class GovernedOperationExecutionReceipt
 TYPE | AsiBackbone.Core.HostIntegration.GovernedOperationExecutionReceiptCanonicalPayload | public static class GovernedOperationExecutionReceiptCanonicalPayload
 TYPE | AsiBackbone.Core.HostIntegration.GovernedOperationPersistenceOutcome | public enum GovernedOperationPersistenceOutcome

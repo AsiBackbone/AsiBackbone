@@ -1,6 +1,6 @@
 using System.Globalization;
 using AsiBackbone.Core.Audit;
-using AsiBackbone.Core.CapabilityTokens;
+using AsiBackbone.Core.CapabilityGrants;
 using AsiBackbone.Core.Emissions;
 using AsiBackbone.Core.Outbox;
 using AsiBackbone.Core.Serialization;
@@ -19,15 +19,15 @@ public static class CanonicalPayloadBuilder
     {
         ArgumentNullException.ThrowIfNull(receipt);
         CanonicalPayloadOptions effectiveOptions = options ?? CanonicalPayloadOptions.Default;
-        string auditResidueId = GetAuditResidueId(receipt);
+        string decisionReceiptId = GetDecisionReceiptId(receipt);
 
         return CanonicalPayload.Create(
-            CanonicalArtifactTypes.AuditResidue,
-            auditResidueId,
+            CanonicalArtifactTypes.DecisionReceipt,
+            decisionReceiptId,
             receipt.SchemaVersion,
             effectiveOptions.CanonicalizationVersion,
             effectiveOptions.HashAlgorithm,
-            BuildDecisionReceiptContent(receipt, effectiveOptions, auditResidueId));
+            BuildDecisionReceiptContent(receipt, effectiveOptions, decisionReceiptId));
     }
 
     /// <summary>
@@ -38,7 +38,7 @@ public static class CanonicalPayloadBuilder
         ArgumentNullException.ThrowIfNull(record);
         CanonicalPayloadOptions effectiveOptions = options ?? CanonicalPayloadOptions.Default;
 
-        SortedDictionary<string, object?> content = BuildDecisionReceiptContent(record, effectiveOptions, record.AuditResidueId);
+        SortedDictionary<string, object?> content = BuildDecisionReceiptContent(record, effectiveOptions, record.DecisionReceiptId);
         content["acknowledgmentId"] = record.AcknowledgmentId;
         content["capabilityGrantId"] = record.CapabilityTokenId;
         content["handshakeId"] = record.HandshakeId;
@@ -65,7 +65,7 @@ public static class CanonicalPayloadBuilder
 
         SortedDictionary<string, object?> content = new(StringComparer.Ordinal)
         {
-            ["auditResidueId"] = lifecycleEvent.AuditResidueId,
+            ["auditResidueId"] = lifecycleEvent.DecisionReceiptId,
             ["correlationId"] = lifecycleEvent.CorrelationId,
             ["eventId"] = lifecycleEvent.EventId,
             ["metadata"] = FilterMetadata(lifecycleEvent.Metadata, effectiveOptions),
@@ -78,7 +78,7 @@ public static class CanonicalPayloadBuilder
         };
 
         return CanonicalPayload.Create(
-            CanonicalArtifactTypes.AuditResidueLifecycleEvent,
+            CanonicalArtifactTypes.DecisionReceiptLifecycleEvent,
             lifecycleEvent.EventId,
             GovernanceSchemaVersions.StableArtifactsV1,
             effectiveOptions.CanonicalizationVersion,
@@ -138,7 +138,7 @@ public static class CanonicalPayloadBuilder
     }
 
     /// <summary>
-    /// Builds a canonical payload for a capability token grant.
+    /// Builds a canonical payload for a capability grant grant.
     /// </summary>
     /// <remarks>
     /// <para>
@@ -156,10 +156,10 @@ public static class CanonicalPayloadBuilder
     /// that key is added to the allow-list.
     /// </para>
     /// </remarks>
-    /// <param name="grant">The capability token grant to canonicalize.</param>
+    /// <param name="grant">The capability grant grant to canonicalize.</param>
     /// <param name="options">Canonicalization options, including the metadata allow-list.</param>
     /// <returns>A deterministic canonical payload for the grant.</returns>
-    public static CanonicalPayload ForCapabilityTokenGrant(CapabilityTokenGrant grant, CanonicalPayloadOptions? options = null)
+    public static CanonicalPayload ForCapabilityGrant(CapabilityGrant grant, CanonicalPayloadOptions? options = null)
     {
         ArgumentNullException.ThrowIfNull(grant);
         CanonicalPayloadOptions effectiveOptions = options ?? CanonicalPayloadOptions.Default;
@@ -193,7 +193,7 @@ public static class CanonicalPayloadBuilder
         }
 
         return CanonicalPayload.Create(
-            CanonicalArtifactTypes.CapabilityTokenGrant,
+            CanonicalArtifactTypes.CapabilityGrant,
             grant.TokenId,
             grant.SchemaVersion,
             effectiveOptions.CanonicalizationVersion,
@@ -204,14 +204,14 @@ public static class CanonicalPayloadBuilder
     private static SortedDictionary<string, object?> BuildDecisionReceiptContent(
         IDecisionReceipt receipt,
         CanonicalPayloadOptions options,
-        string auditResidueId)
+        string decisionReceiptId)
     {
         return new SortedDictionary<string, object?>(StringComparer.Ordinal)
         {
             ["actorDisplayName"] = receipt.ActorDisplayName,
             ["actorId"] = receipt.ActorId,
             ["actorType"] = receipt.ActorType.ToString(),
-            ["auditResidueId"] = auditResidueId,
+            ["auditResidueId"] = decisionReceiptId,
             ["constraintCount"] = receipt.ConstraintCount,
             ["constraintSetHash"] = receipt.ConstraintSetHash,
             ["correlationId"] = receipt.CorrelationId,
@@ -245,7 +245,7 @@ public static class CanonicalPayloadBuilder
         return new SortedDictionary<string, object?>(StringComparer.Ordinal)
         {
             ["actorId"] = envelope.ActorId,
-            ["auditResidueId"] = envelope.AuditResidueId,
+            ["auditResidueId"] = envelope.DecisionReceiptId,
             ["correlationId"] = envelope.CorrelationId,
             ["createdUtc"] = FormatUtc(envelope.CreatedUtc),
             ["decisionStage"] = envelope.DecisionStage,
@@ -354,10 +354,10 @@ public static class CanonicalPayloadBuilder
         return timestamp.ToUniversalTime().ToString("yyyy-MM-dd'T'HH:mm:ss.fffffff'Z'", CultureInfo.InvariantCulture);
     }
 
-    private static string GetAuditResidueId(IDecisionReceipt receipt)
+    private static string GetDecisionReceiptId(IDecisionReceipt receipt)
     {
-        return string.IsNullOrWhiteSpace(receipt.AuditResidueId)
+        return string.IsNullOrWhiteSpace(receipt.DecisionReceiptId)
             ? receipt.EventId
-            : receipt.AuditResidueId;
+            : receipt.DecisionReceiptId;
     }
 }

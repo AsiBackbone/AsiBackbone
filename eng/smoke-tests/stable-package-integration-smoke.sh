@@ -149,10 +149,10 @@ using System.Net.Http.Json;
 using AsiBackbone.AspNetCore.Actors;
 using AsiBackbone.AspNetCore.Correlation;
 using AsiBackbone.AspNetCore.DependencyInjection;
-using AsiBackbone.AspNetCore.Handshakes;
+using AsiBackbone.AspNetCore.Acknowledgments;
 using AsiBackbone.Core.Actors;
 using AsiBackbone.Core.Audit;
-using AsiBackbone.Core.CapabilityTokens;
+using AsiBackbone.Core.CapabilityGrants;
 using AsiBackbone.Core.Constraints;
 using AsiBackbone.Core.Decisions;
 using AsiBackbone.Core.Evaluation;
@@ -161,7 +161,7 @@ using AsiBackbone.Core.Signing;
 using AsiBackbone.EntityFrameworkCore;
 using AsiBackbone.EntityFrameworkCore.Audit;
 using AsiBackbone.Storage.InMemory.Audit;
-using AsiBackbone.Storage.InMemory.CapabilityTokens;
+using AsiBackbone.Storage.InMemory.CapabilityGrants;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -177,7 +177,7 @@ public sealed class StablePackageIntegrationSmokeTests
     private static readonly DateTimeOffset CapabilityGrantNow = new(2026, 7, 9, 12, 0, 0, TimeSpan.Zero);
 
     [Fact]
-    public async Task CoreAndInMemoryAuditPackagesComposeDecisionAndStoreResidue()
+    public async Task CoreAndInMemoryAuditPackagesComposeDecisionAndStoreReceipt()
     {
         var evaluator = new DefaultGovernancePolicyEvaluator<GovernanceEvaluationContext>(
             [new StableRegionConstraint()], threatModelContributors: null, decisionPolicy: null, options: null, logger: null);
@@ -202,7 +202,7 @@ public sealed class StablePackageIntegrationSmokeTests
         Assert.Equal(correlationId, decision.CorrelationId);
 
         IGovernanceActorContext actor = GovernanceActorContext.Human("stable-user", "Stable User");
-        DecisionReceipt residue = DecisionReceipt.FromDecision(
+        DecisionReceipt receipt = DecisionReceipt.FromDecision(
             actor,
             "stable.core.allow",
             decision,
@@ -211,20 +211,20 @@ public sealed class StablePackageIntegrationSmokeTests
         var ledger = new InMemoryAuditLedger();
 
         await ledger.WriteAsync(
-            residue,
+            receipt,
             TestContext.Current.CancellationToken);
 
         IDecisionReceipt stored = Assert.Single(ledger.Records);
-        Assert.Equal(residue.EventId, stored.EventId);
+        Assert.Equal(receipt.EventId, stored.EventId);
         Assert.Equal(correlationId, stored.CorrelationId);
         Assert.Single(ledger.GetByCorrelationId(correlationId));
-        Assert.Same(stored, ledger.GetByEventId(residue.EventId));
+        Assert.Same(stored, ledger.GetByEventId(receipt.EventId));
     }
 
     [Fact]
     public async Task PackagedInMemoryCapabilityGrantUseStoreAcceptsFirstUseAndDeniesReplay()
     {
-        SignedGovernanceArtifact<CapabilityTokenGrant> signedGrant = CreateSignedCapabilityGrant();
+        SignedGovernanceArtifact<CapabilityGrant> signedGrant = CreateSignedCapabilityGrant();
         var useStore = new InMemoryCapabilityGrantUseStore();
         CapabilityGrantValidationOptions options = CapabilityGrantValidationOptions.Create(
             issuer: "stable-issuer",
@@ -250,17 +250,17 @@ public sealed class StablePackageIntegrationSmokeTests
         Assert.True(first.IsValid);
         Assert.True(first.ShouldAllow);
         Assert.False(second.IsValid);
-        Assert.Equal(CapabilityTokenValidationCategory.ReuseLimitExceeded, second.Category);
+        Assert.Equal(CapabilityGrantValidationCategory.ReuseLimitExceeded, second.Category);
         Assert.Equal(VerificationPolicyAction.Deny, second.Action);
         Assert.Equal("capability.use-limit-exceeded", second.FailureCode);
         Assert.Equal(1, useStore.GetUseCount(signedGrant.Artifact.TokenId));
     }
 
     [Fact]
-    public async Task StubbedAuditSinkCapturesResidueUsingPublicContract()
+    public async Task StubbedReceiptSinkCapturesReceiptUsingPublicContract()
     {
-        var sink = new CapturingAuditSink();
-        IDecisionReceiptSink auditSink = sink;
+        var sink = new CapturingReceiptSink();
+        IDecisionReceiptSink receiptSink = sink;
         string correlationId = $"stable-stub-{Guid.NewGuid():N}";
 
         GovernanceDecision decision = GovernanceDecision.RequireAcknowledgment(
@@ -270,7 +270,7 @@ public sealed class StablePackageIntegrationSmokeTests
             policyVersion: "stable-package-policy-v1",
             policyHash: "stable-package-policy-hash");
 
-        DecisionReceipt residue = DecisionReceipt.FromDecision(
+        DecisionReceipt receipt = DecisionReceipt.FromDecision(
             GovernanceActorContext.Service("stable-service", "Stable Service"),
             "stable.stubbed-sink.acknowledgment",
             decision,
@@ -280,12 +280,12 @@ public sealed class StablePackageIntegrationSmokeTests
                 ["release"] = "stable-package-smoke"
             });
 
-        await auditSink.WriteAsync(
-            residue,
+        await receiptSink.WriteAsync(
+            receipt,
             TestContext.Current.CancellationToken);
 
         IDecisionReceipt captured = Assert.Single(sink.Records);
-        Assert.Equal(residue.EventId, captured.EventId);
+        Assert.Equal(receipt.EventId, captured.EventId);
         Assert.Equal(correlationId, captured.CorrelationId);
         Assert.Equal(nameof(GovernanceDecisionOutcome.AcknowledgmentRequired), captured.Outcome);
         Assert.Contains("stable.acknowledgment.required", captured.ReasonCodes);
@@ -320,9 +320,9 @@ public sealed class StablePackageIntegrationSmokeTests
         return value;
     }
 
-    private static SignedGovernanceArtifact<CapabilityTokenGrant> CreateSignedCapabilityGrant()
+    private static SignedGovernanceArtifact<CapabilityGrant> CreateSignedCapabilityGrant()
     {
-        CapabilityTokenGrant grant = CapabilityTokenGrant.Create(
+        CapabilityGrant grant = CapabilityGrant.Create(
             tokenId: "stable-capability-grant",
             issuer: "stable-issuer",
             audience: "stable-gateway",
@@ -334,7 +334,7 @@ public sealed class StablePackageIntegrationSmokeTests
 
         // Built through the shared builder so the smoke test signs every grant field, matching what a
         // consumer of the stable package should do.
-        CanonicalPayload payload = CanonicalPayloadBuilder.ForCapabilityTokenGrant(grant);
+        CanonicalPayload payload = CanonicalPayloadBuilder.ForCapabilityGrant(grant);
         CanonicalPayloadHash hash = CanonicalPayloadHasher.ComputeHash(payload);
         var signingMetadata = SigningMetadata.Create(
             signingHash: hash.HashValue,
@@ -396,7 +396,7 @@ internal static class StableSmokeHost
                 policyVersion: "stable-http-policy-v1",
                 policyHash: "stable-http-policy-hash");
 
-            DecisionReceipt residue = DecisionReceipt.FromDecision(
+            DecisionReceipt receipt = DecisionReceipt.FromDecision(
                 GovernanceActorContext.Service("stable-http-host", "Stable HTTP Host"),
                 "stable.http.allow",
                 decision,
@@ -406,7 +406,7 @@ internal static class StableSmokeHost
                     ["storage"] = "sqlite"
                 });
 
-            AuditLedgerRecord record = AuditLedgerRecord.FromDecisionReceipt(residue);
+            AuditLedgerRecord record = AuditLedgerRecord.FromDecisionReceipt(receipt);
             OperationResult<AuditLedgerRecord> appendResult = await ledgerStore
                 .AppendAsync(record, cancellationToken)
                 .ConfigureAwait(false);
@@ -463,20 +463,20 @@ internal sealed class StableRegionConstraint : IGovernanceConstraint<GovernanceE
     }
 }
 
-internal sealed class CapturingAuditSink : IDecisionReceiptSink
+internal sealed class CapturingReceiptSink : IDecisionReceiptSink
 {
     private readonly List<IDecisionReceipt> records = [];
 
     public IReadOnlyList<IDecisionReceipt> Records => records.AsReadOnly();
 
     public ValueTask WriteAsync(
-        IDecisionReceipt residue,
+        IDecisionReceipt receipt,
         CancellationToken cancellationToken = default)
     {
-        ArgumentNullException.ThrowIfNull(residue);
+        ArgumentNullException.ThrowIfNull(receipt);
         cancellationToken.ThrowIfCancellationRequested();
 
-        records.Add(residue);
+        records.Add(receipt);
 
         return ValueTask.CompletedTask;
     }

@@ -356,7 +356,7 @@ public sealed class GovernanceOutboxEntryTests
             occurredUtc: new DateTimeOffset(2026, 6, 17, 12, 55, 0, TimeSpan.Zero),
             envelopeId: "envelope-249",
             correlationId: "correlation-249",
-            auditResidueId: "residue-249",
+            decisionReceiptId: "residue-249",
             lifecycleStage: DecisionReceiptLifecycleStage.ExternalEmissionQueued,
             policyVersion: "v1",
             policyHash: "hash-249",

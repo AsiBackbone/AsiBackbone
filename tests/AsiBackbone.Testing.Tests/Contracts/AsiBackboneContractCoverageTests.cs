@@ -211,7 +211,7 @@ public sealed class AsiBackboneContractCoverageTests
     }
 
     /// <summary>
-    /// Verifies that the AuditSinkContract wraps any exceptions thrown by the audit sink and throws an GovernanceContractViolationException with an appropriate message and inner exception.
+    /// Verifies that the AuditSinkContract wraps any exceptions thrown by the decision receipt sink and throws an GovernanceContractViolationException with an appropriate message and inner exception.
     /// </summary>
     /// <returns>
     /// A task representing the asynchronous operation.
@@ -362,7 +362,7 @@ public sealed class AsiBackboneContractCoverageTests
 
         protected override IDecisionReceipt CreateDecisionReceipt()
         {
-            return new TestAuditResidue();
+            return new TestDecisionReceipt();
         }
     }
 
@@ -480,7 +480,7 @@ public sealed class AsiBackboneContractCoverageTests
         }
     }
 
-    private sealed class TestAuditResidue : IDecisionReceipt
+    private sealed class TestDecisionReceipt : IDecisionReceipt
     {
         public string EventId => "contract-event";
 

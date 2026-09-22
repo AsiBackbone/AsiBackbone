@@ -144,7 +144,7 @@ Use this for:
 
 Start with:
 
-- [Dynamic Liability Handshake](dynamic-liability-handshake.md)
+- [Acknowledgment Workflow](dynamic-liability-handshake.md)
 - [Core Domain Language](core-domain-language.md)
 - [First 15 Minutes: Standard API Gating](quickstart-api-gating.md)
 

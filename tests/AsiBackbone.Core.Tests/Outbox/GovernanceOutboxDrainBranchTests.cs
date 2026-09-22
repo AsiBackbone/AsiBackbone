@@ -287,7 +287,7 @@ public sealed class GovernanceOutboxDrainBranchTests
             occurredUtc: CreatedUtc,
             envelopeId: $"envelope-{eventId}",
             correlationId: $"correlation-{eventId}",
-            auditResidueId: $"residue-{eventId}",
+            decisionReceiptId: $"residue-{eventId}",
             lifecycleStage: DecisionReceiptLifecycleStage.ExternalEmissionQueued,
             policyVersion: "v1",
             policyHash: "hash",

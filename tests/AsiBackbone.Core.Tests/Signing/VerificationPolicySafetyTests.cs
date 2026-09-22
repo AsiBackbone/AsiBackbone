@@ -1,4 +1,4 @@
-using AsiBackbone.Core.CapabilityTokens;
+using AsiBackbone.Core.CapabilityGrants;
 using AsiBackbone.Core.Signing;
 using Xunit;
 

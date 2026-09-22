@@ -18,7 +18,7 @@ public sealed class EndpointGovernanceDescriptor
         string operationName,
         IReadOnlyList<Type> policyTypes,
         bool? shortCircuitOnFirstDenial,
-        bool requiresLiabilityHandshake,
+        bool requiresAcknowledgment,
         IReadOnlyList<string> capabilityScopes,
         bool emitGovernanceAudit)
     {
@@ -27,7 +27,7 @@ public sealed class EndpointGovernanceDescriptor
         OperationName = operationName.Trim();
         PolicyTypes = policyTypes;
         ShortCircuitOnFirstDenial = shortCircuitOnFirstDenial;
-        RequiresLiabilityHandshake = requiresLiabilityHandshake;
+        RequiresAcknowledgment = requiresAcknowledgment;
         CapabilityScopes = capabilityScopes;
         EmitGovernanceAudit = emitGovernanceAudit;
         reducedMetadata = CreateReducedMetadata(OperationName, PolicyTypes);
@@ -52,7 +52,7 @@ public sealed class EndpointGovernanceDescriptor
     /// <summary>
     /// Gets a value indicating whether liability-handshake support is requested.
     /// </summary>
-    public bool RequiresLiabilityHandshake { get; }
+    public bool RequiresAcknowledgment { get; }
 
     /// <summary>
     /// Gets the required capability-grant scopes attached to the endpoint.
@@ -69,7 +69,7 @@ public sealed class EndpointGovernanceDescriptor
     /// </summary>
     public bool HasGovernanceMetadata => PolicyTypes.Count > 0
         || ShortCircuitOnFirstDenial.HasValue
-        || RequiresLiabilityHandshake
+        || RequiresAcknowledgment
         || CapabilityScopes.Count > 0
         || EmitGovernanceAudit;
 
@@ -121,12 +121,12 @@ public sealed class EndpointGovernanceDescriptor
             shortCircuitOnFirstDenial = metadata.ShortCircuitOnFirstDenial;
         }
 
-        bool requiresLiabilityHandshake = false;
-        foreach (IEndpointLiabilityHandshakeMetadata metadata in endpoint.Metadata.GetOrderedMetadata<IEndpointLiabilityHandshakeMetadata>())
+        bool requiresAcknowledgment = false;
+        foreach (IEndpointAcknowledgmentMetadata metadata in endpoint.Metadata.GetOrderedMetadata<IEndpointAcknowledgmentMetadata>())
         {
-            if (metadata.RequiresLiabilityHandshake)
+            if (metadata.RequiresAcknowledgment)
             {
-                requiresLiabilityHandshake = true;
+                requiresAcknowledgment = true;
                 break;
             }
         }
@@ -145,7 +145,7 @@ public sealed class EndpointGovernanceDescriptor
             ResolveOperationName(endpoint),
             policyTypes is null ? EmptyPolicyTypes : Array.AsReadOnly(policyTypes.ToArray()),
             shortCircuitOnFirstDenial,
-            requiresLiabilityHandshake,
+            requiresAcknowledgment,
             capabilityScopes is null ? EmptyScopes : Array.AsReadOnly(capabilityScopes.ToArray()),
             emitGovernanceAudit);
     }
@@ -161,7 +161,7 @@ public sealed class EndpointGovernanceDescriptor
             operationName,
             EmptyPolicyTypes,
             shortCircuitOnFirstDenial: null,
-            requiresLiabilityHandshake: false,
+            requiresAcknowledgment: false,
             EmptyScopes,
             emitGovernanceAudit: false);
     }
@@ -236,7 +236,7 @@ public sealed class EndpointGovernanceDescriptor
         var metadata = new Dictionary<string, string>(metadataCapacity, StringComparer.Ordinal)
         {
             ["endpoint.operation_name"] = OperationName,
-            ["endpoint.requires_liability_handshake"] = RequiresLiabilityHandshake ? "true" : "false",
+            ["endpoint.requires_liability_handshake"] = RequiresAcknowledgment ? "true" : "false",
             ["endpoint.emit_governance_audit"] = EmitGovernanceAudit ? "true" : "false"
         };
 

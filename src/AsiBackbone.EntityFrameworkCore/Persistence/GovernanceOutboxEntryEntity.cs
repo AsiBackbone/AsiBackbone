@@ -158,7 +158,7 @@ public sealed class GovernanceOutboxEntryEntity : GovernanceEntity
     /// <summary>
     /// Gets or sets the envelope decision receipt identifier, when available.
     /// </summary>
-    public string? EnvelopeAuditResidueId { get; set; }
+    public string? EnvelopeDecisionReceiptId { get; set; }
 
     /// <summary>
     /// Gets or sets the envelope lifecycle stage, when available.

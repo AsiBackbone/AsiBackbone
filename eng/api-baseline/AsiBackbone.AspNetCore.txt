@@ -6,6 +6,46 @@
 
 FIELD | AsiBackbone.AspNetCore.Endpoints.EndpointGovernanceMetadataMode | Full = 0
 FIELD | AsiBackbone.AspNetCore.Endpoints.EndpointGovernanceMetadataMode | Reduced = 1
+MEMBER | AsiBackbone.AspNetCore.Acknowledgments.AcknowledgmentChallenge.AcknowledgmentRequest | public AcknowledgmentRequest AcknowledgmentRequest { get; }
+MEMBER | AsiBackbone.AspNetCore.Acknowledgments.AcknowledgmentChallenge.CorrelationId | public string? CorrelationId { get; }
+MEMBER | AsiBackbone.AspNetCore.Acknowledgments.AcknowledgmentChallenge.FromAcknowledgmentRequest(AsiBackbone.Core.Acknowledgments.AcknowledgmentRequest,AsiBackbone.AspNetCore.Acknowledgments.AcknowledgmentChallengeOptions) | public static AcknowledgmentChallenge FromAcknowledgmentRequest(AcknowledgmentRequest request, AcknowledgmentChallengeOptions? options = null)
+MEMBER | AsiBackbone.AspNetCore.Acknowledgments.AcknowledgmentChallenge.HandshakeId | public string HandshakeId { get; }
+MEMBER | AsiBackbone.AspNetCore.Acknowledgments.AcknowledgmentChallenge.Metadata | public IReadOnlyDictionary<string, string> Metadata { get; }
+MEMBER | AsiBackbone.AspNetCore.Acknowledgments.AcknowledgmentChallenge.OperationName | public string OperationName { get; }
+MEMBER | AsiBackbone.AspNetCore.Acknowledgments.AcknowledgmentChallenge.PolicyHash | public string? PolicyHash { get; }
+MEMBER | AsiBackbone.AspNetCore.Acknowledgments.AcknowledgmentChallenge.PolicyVersion | public string? PolicyVersion { get; }
+MEMBER | AsiBackbone.AspNetCore.Acknowledgments.AcknowledgmentChallenge.ReasonCode | public string ReasonCode { get; }
+MEMBER | AsiBackbone.AspNetCore.Acknowledgments.AcknowledgmentChallenge.ReasonMessage | public string? ReasonMessage { get; }
+MEMBER | AsiBackbone.AspNetCore.Acknowledgments.AcknowledgmentChallenge.RequiredAcknowledgmentCode | public string RequiredAcknowledgmentCode { get; }
+MEMBER | AsiBackbone.AspNetCore.Acknowledgments.AcknowledgmentChallenge.RequiredAcknowledgmentText | public string RequiredAcknowledgmentText { get; }
+MEMBER | AsiBackbone.AspNetCore.Acknowledgments.AcknowledgmentChallenge.RiskCategory | public string? RiskCategory { get; }
+MEMBER | AsiBackbone.AspNetCore.Acknowledgments.AcknowledgmentChallenge.RiskLevel | public AcknowledgmentRiskLevel RiskLevel { get; }
+MEMBER | AsiBackbone.AspNetCore.Acknowledgments.AcknowledgmentChallenge.TraceId | public string? TraceId { get; }
+MEMBER | AsiBackbone.AspNetCore.Acknowledgments.AcknowledgmentChallengeOptions.IncludePolicyMetadata | public bool IncludePolicyMetadata { get; set; }
+MEMBER | AsiBackbone.AspNetCore.Acknowledgments.AcknowledgmentChallengeOptions.IncludeReasonMessage | public bool IncludeReasonMessage { get; set; }
+MEMBER | AsiBackbone.AspNetCore.Acknowledgments.AcknowledgmentChallengeOptions.IncludeTraceId | public bool IncludeTraceId { get; set; }
+MEMBER | AsiBackbone.AspNetCore.Acknowledgments.AcknowledgmentChallengeOptions.RequiredAcknowledgmentCode | public string RequiredAcknowledgmentCode { get; set; }
+MEMBER | AsiBackbone.AspNetCore.Acknowledgments.AcknowledgmentChallengeOptions.RequiredAcknowledgmentText | public string RequiredAcknowledgmentText { get; set; }
+MEMBER | AsiBackbone.AspNetCore.Acknowledgments.AcknowledgmentChallengeOptions.RiskCategory | public string? RiskCategory { get; set; }
+MEMBER | AsiBackbone.AspNetCore.Acknowledgments.AcknowledgmentChallengeOptions.RiskLevel | public AcknowledgmentRiskLevel RiskLevel { get; set; }
+MEMBER | AsiBackbone.AspNetCore.Acknowledgments.AcknowledgmentChallengeOptions.Validate | public void Validate()
+MEMBER | AsiBackbone.AspNetCore.Acknowledgments.AcknowledgmentChallengeRequest.Acknowledged | public bool Acknowledged { get; set; }
+MEMBER | AsiBackbone.AspNetCore.Acknowledgments.AcknowledgmentChallengeRequest.AcknowledgmentCode | public string? AcknowledgmentCode { get; set; }
+MEMBER | AsiBackbone.AspNetCore.Acknowledgments.AcknowledgmentChallengeRequest.HandshakeId | public string? HandshakeId { get; set; }
+MEMBER | AsiBackbone.AspNetCore.Acknowledgments.AcknowledgmentChallengeRequest.Metadata | public IReadOnlyDictionary<string, string>? Metadata { get; set; }
+MEMBER | AsiBackbone.AspNetCore.Acknowledgments.AcknowledgmentChallengeResult.Acknowledged | public bool Acknowledged { get; }
+MEMBER | AsiBackbone.AspNetCore.Acknowledgments.AcknowledgmentChallengeResult.Acknowledgment | public AcknowledgmentResponse? Acknowledgment { get; }
+MEMBER | AsiBackbone.AspNetCore.Acknowledgments.AcknowledgmentChallengeResult.CanProceed | public bool CanProceed { get; }
+MEMBER | AsiBackbone.AspNetCore.Acknowledgments.AcknowledgmentChallengeResult.Failure(System.String,System.String) | public static AcknowledgmentChallengeResult Failure(string code, string message)
+MEMBER | AsiBackbone.AspNetCore.Acknowledgments.AcknowledgmentChallengeResult.Rejected | public bool Rejected { get; }
+MEMBER | AsiBackbone.AspNetCore.Acknowledgments.AcknowledgmentChallengeResult.Result | public OperationResult Result { get; }
+MEMBER | AsiBackbone.AspNetCore.Acknowledgments.AcknowledgmentChallengeResult.Succeeded | public bool Succeeded { get; }
+MEMBER | AsiBackbone.AspNetCore.Acknowledgments.AcknowledgmentChallengeResult.Success(AsiBackbone.Core.Acknowledgments.AcknowledgmentResponse) | public static AcknowledgmentChallengeResult Success(AcknowledgmentResponse acknowledgment)
+MEMBER | AsiBackbone.AspNetCore.Acknowledgments.DefaultAcknowledgmentChallengeService.#ctor(Microsoft.Extensions.Options.IOptions{AsiBackbone.AspNetCore.Acknowledgments.AcknowledgmentChallengeOptions}) | public DefaultAcknowledgmentChallengeService(IOptions<AcknowledgmentChallengeOptions> options)
+MEMBER | AsiBackbone.AspNetCore.Acknowledgments.DefaultAcknowledgmentChallengeService.CreateChallenge(AsiBackbone.Core.Actors.IGovernanceActorContext,System.String,AsiBackbone.Core.Decisions.GovernanceDecision,System.Collections.Generic.IReadOnlyDictionary{System.String,System.String}) | public AcknowledgmentChallenge CreateChallenge(IGovernanceActorContext actor, string operationName, GovernanceDecision decision, IReadOnlyDictionary<string, string>? metadata = null)
+MEMBER | AsiBackbone.AspNetCore.Acknowledgments.DefaultAcknowledgmentChallengeService.HandleResponse(AsiBackbone.AspNetCore.Acknowledgments.AcknowledgmentChallenge,AsiBackbone.Core.Actors.IGovernanceActorContext,AsiBackbone.AspNetCore.Acknowledgments.AcknowledgmentChallengeRequest,System.Nullable{System.DateTimeOffset}) | public AcknowledgmentChallengeResult HandleResponse(AcknowledgmentChallenge challenge, IGovernanceActorContext actor, AcknowledgmentChallengeRequest response, DateTimeOffset? occurredUtc = null)
+MEMBER | AsiBackbone.AspNetCore.Acknowledgments.IAcknowledgmentChallengeService.CreateChallenge(AsiBackbone.Core.Actors.IGovernanceActorContext,System.String,AsiBackbone.Core.Decisions.GovernanceDecision,System.Collections.Generic.IReadOnlyDictionary{System.String,System.String}) | AcknowledgmentChallenge CreateChallenge(IGovernanceActorContext actor, string operationName, GovernanceDecision decision, IReadOnlyDictionary<string, string>? metadata = null)
+MEMBER | AsiBackbone.AspNetCore.Acknowledgments.IAcknowledgmentChallengeService.HandleResponse(AsiBackbone.AspNetCore.Acknowledgments.AcknowledgmentChallenge,AsiBackbone.Core.Actors.IGovernanceActorContext,AsiBackbone.AspNetCore.Acknowledgments.AcknowledgmentChallengeRequest,System.Nullable{System.DateTimeOffset}) | AcknowledgmentChallengeResult HandleResponse(AcknowledgmentChallenge challenge, IGovernanceActorContext actor, AcknowledgmentChallengeRequest response, DateTimeOffset? occurredUtc = null)
 MEMBER | AsiBackbone.AspNetCore.Actors.HttpContextGovernanceActorContextResolver.#ctor(Microsoft.AspNetCore.Http.IHttpContextAccessor,Microsoft.Extensions.Options.IOptions{AsiBackbone.AspNetCore.Actors.HttpGovernanceActorContextOptions}) | public HttpContextGovernanceActorContextResolver(IHttpContextAccessor httpContextAccessor, IOptions<HttpGovernanceActorContextOptions> options)
 MEMBER | AsiBackbone.AspNetCore.Actors.HttpContextGovernanceActorContextResolver.ResolveActorContext | public IGovernanceActorContext ResolveActorContext()
 MEMBER | AsiBackbone.AspNetCore.Actors.HttpGovernanceActorContextOptions.ActorIdClaimTypes | public IList<string> ActorIdClaimTypes { get; set; }
@@ -60,7 +100,7 @@ MEMBER | AsiBackbone.AspNetCore.DependencyInjection.AspNetCoreGovernanceOptions.
 MEMBER | AsiBackbone.AspNetCore.DependencyInjection.AspNetCoreGovernanceOptions.TrustInboundCorrelationIdHeaders | public bool TrustInboundCorrelationIdHeaders { get; set; }
 MEMBER | AsiBackbone.AspNetCore.DependencyInjection.AspNetCoreGovernanceOptions.UseHttpContextTraceIdentifierAsCorrelationId | public bool UseHttpContextTraceIdentifierAsCorrelationId { get; set; }
 MEMBER | AsiBackbone.AspNetCore.DependencyInjection.AspNetCoreGovernanceOptions.Validate | public void Validate()
-MEMBER | AsiBackbone.AspNetCore.Endpoints.DefaultEndpointGovernanceService.#ctor(System.IServiceProvider,AsiBackbone.AspNetCore.Actors.IHttpGovernanceActorContextResolver,AsiBackbone.AspNetCore.Correlation.IHttpGovernanceRequestCorrelationResolver,AsiBackbone.AspNetCore.Handshakes.IAcknowledgmentChallengeService,Microsoft.Extensions.Options.IOptions{AsiBackbone.AspNetCore.Endpoints.EndpointGovernanceOptions},Microsoft.Extensions.Options.IOptions{AsiBackbone.AspNetCore.Results.GovernanceHttpResultMappingOptions}) | public DefaultEndpointGovernanceService(IServiceProvider serviceProvider, IHttpGovernanceActorContextResolver actorContextResolver, IHttpGovernanceRequestCorrelationResolver requestCorrelationResolver, IAcknowledgmentChallengeService acknowledgmentChallengeService, IOptions<EndpointGovernanceOptions> endpointOptions, IOptions<GovernanceHttpResultMappingOptions> resultOptions)
+MEMBER | AsiBackbone.AspNetCore.Endpoints.DefaultEndpointGovernanceService.#ctor(System.IServiceProvider,AsiBackbone.AspNetCore.Actors.IHttpGovernanceActorContextResolver,AsiBackbone.AspNetCore.Correlation.IHttpGovernanceRequestCorrelationResolver,AsiBackbone.AspNetCore.Acknowledgments.IAcknowledgmentChallengeService,Microsoft.Extensions.Options.IOptions{AsiBackbone.AspNetCore.Endpoints.EndpointGovernanceOptions},Microsoft.Extensions.Options.IOptions{AsiBackbone.AspNetCore.Results.GovernanceHttpResultMappingOptions}) | public DefaultEndpointGovernanceService(IServiceProvider serviceProvider, IHttpGovernanceActorContextResolver actorContextResolver, IHttpGovernanceRequestCorrelationResolver requestCorrelationResolver, IAcknowledgmentChallengeService acknowledgmentChallengeService, IOptions<EndpointGovernanceOptions> endpointOptions, IOptions<GovernanceHttpResultMappingOptions> resultOptions)
 MEMBER | AsiBackbone.AspNetCore.Endpoints.DefaultEndpointGovernanceService.EvaluateAsync(Microsoft.AspNetCore.Http.HttpContext,AsiBackbone.AspNetCore.Endpoints.EndpointGovernanceDescriptor,System.Threading.CancellationToken) | public ValueTask<EndpointGovernanceResult> EvaluateAsync(HttpContext httpContext, EndpointGovernanceDescriptor descriptor, CancellationToken cancellationToken = default)
 MEMBER | AsiBackbone.AspNetCore.Endpoints.EmitGovernanceAuditAttribute.EmitGovernanceAudit | public bool EmitGovernanceAudit { get; }
 MEMBER | AsiBackbone.AspNetCore.Endpoints.EndpointGovernanceApplicationBuilderExtensions.UseAsiBackboneEndpointGovernance(Microsoft.AspNetCore.Builder.IApplicationBuilder,System.Boolean) | public static IApplicationBuilder UseAsiBackboneEndpointGovernance(this IApplicationBuilder app, bool requireEndpointRoutingRegistered = false)
@@ -71,7 +111,7 @@ MEMBER | AsiBackbone.AspNetCore.Endpoints.EndpointGovernanceDescriptor.HasGovern
 MEMBER | AsiBackbone.AspNetCore.Endpoints.EndpointGovernanceDescriptor.None(System.String) | public static EndpointGovernanceDescriptor None(string operationName)
 MEMBER | AsiBackbone.AspNetCore.Endpoints.EndpointGovernanceDescriptor.OperationName | public string OperationName { get; }
 MEMBER | AsiBackbone.AspNetCore.Endpoints.EndpointGovernanceDescriptor.PolicyTypes | public IReadOnlyList<Type> PolicyTypes { get; }
-MEMBER | AsiBackbone.AspNetCore.Endpoints.EndpointGovernanceDescriptor.RequiresLiabilityHandshake | public bool RequiresLiabilityHandshake { get; }
+MEMBER | AsiBackbone.AspNetCore.Endpoints.EndpointGovernanceDescriptor.RequiresAcknowledgment | public bool RequiresAcknowledgment { get; }
 MEMBER | AsiBackbone.AspNetCore.Endpoints.EndpointGovernanceDescriptor.ShortCircuitOnFirstDenial | public bool? ShortCircuitOnFirstDenial { get; }
 MEMBER | AsiBackbone.AspNetCore.Endpoints.EndpointGovernanceDescriptor.ToMetadata | public IReadOnlyDictionary<string, string> ToMetadata()
 MEMBER | AsiBackbone.AspNetCore.Endpoints.EndpointGovernanceDescriptor.ToMetadata(AsiBackbone.AspNetCore.Endpoints.EndpointGovernanceMetadataMode) | public IReadOnlyDictionary<string, string> ToMetadata(EndpointGovernanceMetadataMode metadataMode)
@@ -98,70 +138,30 @@ MEMBER | AsiBackbone.AspNetCore.Endpoints.EndpointGovernanceResult.Allow(AsiBack
 MEMBER | AsiBackbone.AspNetCore.Endpoints.EndpointGovernanceResult.Block(Microsoft.AspNetCore.Http.IResult,AsiBackbone.Core.Decisions.GovernanceDecision) | public static EndpointGovernanceResult Block(IResult failureResult, GovernanceDecision? decision = null)
 MEMBER | AsiBackbone.AspNetCore.Endpoints.EndpointGovernanceResult.BlockWithDefaultFailure(AsiBackbone.Core.Decisions.GovernanceDecision) | public static EndpointGovernanceResult BlockWithDefaultFailure(GovernanceDecision? decision = null)
 MEMBER | AsiBackbone.AspNetCore.Endpoints.EndpointGovernanceResult.CanExecute | public bool CanExecute { get; }
-MEMBER | AsiBackbone.AspNetCore.Endpoints.EndpointGovernanceResult.Challenge(AsiBackbone.AspNetCore.Handshakes.AcknowledgmentChallenge,Microsoft.AspNetCore.Http.IResult,AsiBackbone.Core.Decisions.GovernanceDecision) | public static EndpointGovernanceResult Challenge(AcknowledgmentChallenge challenge, IResult failureResult, GovernanceDecision decision)
+MEMBER | AsiBackbone.AspNetCore.Endpoints.EndpointGovernanceResult.Challenge(AsiBackbone.AspNetCore.Acknowledgments.AcknowledgmentChallenge,Microsoft.AspNetCore.Http.IResult,AsiBackbone.Core.Decisions.GovernanceDecision) | public static EndpointGovernanceResult Challenge(AcknowledgmentChallenge challenge, IResult failureResult, GovernanceDecision decision)
 MEMBER | AsiBackbone.AspNetCore.Endpoints.EndpointGovernanceResult.Decision | public GovernanceDecision? Decision { get; }
 MEMBER | AsiBackbone.AspNetCore.Endpoints.EndpointGovernanceResult.FailureResult | public IResult? FailureResult { get; }
 MEMBER | AsiBackbone.AspNetCore.Endpoints.EndpointGovernanceRouteBuilderExtensions.AllowMissingGovernanceMetadata``1(``0) | public static TBuilder AllowMissingGovernanceMetadata<TBuilder>(this TBuilder builder) where TBuilder : IEndpointConventionBuilder
 MEMBER | AsiBackbone.AspNetCore.Endpoints.EndpointGovernanceRouteBuilderExtensions.EmitGovernanceAudit``1(``0) | public static TBuilder EmitGovernanceAudit<TBuilder>(this TBuilder builder) where TBuilder : IEndpointConventionBuilder
 MEMBER | AsiBackbone.AspNetCore.Endpoints.EndpointGovernanceRouteBuilderExtensions.MarkGovernancePolicy``1(Microsoft.AspNetCore.Builder.RouteHandlerBuilder) | public static RouteHandlerBuilder MarkGovernancePolicy<TPolicy>(this RouteHandlerBuilder builder) where TPolicy : IGovernanceDecisionPolicy<GovernanceEvaluationContext>
 MEMBER | AsiBackbone.AspNetCore.Endpoints.EndpointGovernanceRouteBuilderExtensions.MarkGovernancePolicy``1(``0,System.Type) | public static TBuilder MarkGovernancePolicy<TBuilder>(this TBuilder builder, Type policyType) where TBuilder : IEndpointConventionBuilder
+MEMBER | AsiBackbone.AspNetCore.Endpoints.EndpointGovernanceRouteBuilderExtensions.RequireAcknowledgment``1(``0) | public static TBuilder RequireAcknowledgment<TBuilder>(this TBuilder builder) where TBuilder : IEndpointConventionBuilder
 MEMBER | AsiBackbone.AspNetCore.Endpoints.EndpointGovernanceRouteBuilderExtensions.RequireCapabilityGrant``1(``0,System.String) | public static TBuilder RequireCapabilityGrant<TBuilder>(this TBuilder builder, string scope) where TBuilder : IEndpointConventionBuilder
-MEMBER | AsiBackbone.AspNetCore.Endpoints.EndpointGovernanceRouteBuilderExtensions.RequireLiabilityHandshake``1(``0) | public static TBuilder RequireLiabilityHandshake<TBuilder>(this TBuilder builder) where TBuilder : IEndpointConventionBuilder
 MEMBER | AsiBackbone.AspNetCore.Endpoints.EndpointGovernanceRouteBuilderExtensions.ShortCircuitOnFirstDenial``1(``0,System.Boolean) | public static TBuilder ShortCircuitOnFirstDenial<TBuilder>(this TBuilder builder, bool enabled = true) where TBuilder : IEndpointConventionBuilder
 MEMBER | AsiBackbone.AspNetCore.Endpoints.GovernancePolicyAttribute.#ctor(System.Type) | public GovernancePolicyAttribute(Type policyType)
 MEMBER | AsiBackbone.AspNetCore.Endpoints.GovernancePolicyAttribute.PolicyType | public Type PolicyType { get; }
+MEMBER | AsiBackbone.AspNetCore.Endpoints.IEndpointAcknowledgmentMetadata.RequiresAcknowledgment | bool RequiresAcknowledgment { get; }
 MEMBER | AsiBackbone.AspNetCore.Endpoints.IEndpointAuditEmissionMetadata.EmitGovernanceAudit | bool EmitGovernanceAudit { get; }
 MEMBER | AsiBackbone.AspNetCore.Endpoints.IEndpointCapabilityGrantMetadata.Scope | string Scope { get; }
 MEMBER | AsiBackbone.AspNetCore.Endpoints.IEndpointCapabilityGrantValidator.ValidateAsync(Microsoft.AspNetCore.Http.HttpContext,AsiBackbone.AspNetCore.Endpoints.EndpointGovernanceDescriptor,AsiBackbone.Core.Decisions.GovernanceDecision,System.Threading.CancellationToken) | ValueTask<GovernanceDecision> ValidateAsync(HttpContext httpContext, EndpointGovernanceDescriptor descriptor, GovernanceDecision currentDecision, CancellationToken cancellationToken = default)
 MEMBER | AsiBackbone.AspNetCore.Endpoints.IEndpointGovernancePolicyMetadata.PolicyType | Type PolicyType { get; }
 MEMBER | AsiBackbone.AspNetCore.Endpoints.IEndpointGovernanceService.EvaluateAsync(Microsoft.AspNetCore.Http.HttpContext,AsiBackbone.AspNetCore.Endpoints.EndpointGovernanceDescriptor,System.Threading.CancellationToken) | ValueTask<EndpointGovernanceResult> EvaluateAsync(HttpContext httpContext, EndpointGovernanceDescriptor descriptor, CancellationToken cancellationToken = default)
-MEMBER | AsiBackbone.AspNetCore.Endpoints.IEndpointLiabilityHandshakeMetadata.RequiresLiabilityHandshake | bool RequiresLiabilityHandshake { get; }
 MEMBER | AsiBackbone.AspNetCore.Endpoints.IEndpointPolicyEvaluationOptionsMetadata.ShortCircuitOnFirstDenial | bool? ShortCircuitOnFirstDenial { get; }
+MEMBER | AsiBackbone.AspNetCore.Endpoints.RequireAcknowledgmentAttribute.RequiresAcknowledgment | public bool RequiresAcknowledgment { get; }
 MEMBER | AsiBackbone.AspNetCore.Endpoints.RequireCapabilityGrantAttribute.#ctor(System.String) | public RequireCapabilityGrantAttribute(string scope)
 MEMBER | AsiBackbone.AspNetCore.Endpoints.RequireCapabilityGrantAttribute.Scope | public string Scope { get; }
-MEMBER | AsiBackbone.AspNetCore.Endpoints.RequireLiabilityHandshakeAttribute.RequiresLiabilityHandshake | public bool RequiresLiabilityHandshake { get; }
 MEMBER | AsiBackbone.AspNetCore.Endpoints.ShortCircuitOnFirstDenialAttribute.#ctor(System.Boolean) | public ShortCircuitOnFirstDenialAttribute(bool enabled = true)
 MEMBER | AsiBackbone.AspNetCore.Endpoints.ShortCircuitOnFirstDenialAttribute.ShortCircuitOnFirstDenial | public bool? ShortCircuitOnFirstDenial { get; }
-MEMBER | AsiBackbone.AspNetCore.Handshakes.AcknowledgmentChallenge.CorrelationId | public string? CorrelationId { get; }
-MEMBER | AsiBackbone.AspNetCore.Handshakes.AcknowledgmentChallenge.FromHandshakeRequest(AsiBackbone.Core.Handshakes.LiabilityHandshakeRequest,AsiBackbone.AspNetCore.Handshakes.AcknowledgmentChallengeOptions) | public static AcknowledgmentChallenge FromHandshakeRequest(LiabilityHandshakeRequest request, AcknowledgmentChallengeOptions? options = null)
-MEMBER | AsiBackbone.AspNetCore.Handshakes.AcknowledgmentChallenge.HandshakeId | public string HandshakeId { get; }
-MEMBER | AsiBackbone.AspNetCore.Handshakes.AcknowledgmentChallenge.HandshakeRequest | public LiabilityHandshakeRequest HandshakeRequest { get; }
-MEMBER | AsiBackbone.AspNetCore.Handshakes.AcknowledgmentChallenge.Metadata | public IReadOnlyDictionary<string, string> Metadata { get; }
-MEMBER | AsiBackbone.AspNetCore.Handshakes.AcknowledgmentChallenge.OperationName | public string OperationName { get; }
-MEMBER | AsiBackbone.AspNetCore.Handshakes.AcknowledgmentChallenge.PolicyHash | public string? PolicyHash { get; }
-MEMBER | AsiBackbone.AspNetCore.Handshakes.AcknowledgmentChallenge.PolicyVersion | public string? PolicyVersion { get; }
-MEMBER | AsiBackbone.AspNetCore.Handshakes.AcknowledgmentChallenge.ReasonCode | public string ReasonCode { get; }
-MEMBER | AsiBackbone.AspNetCore.Handshakes.AcknowledgmentChallenge.ReasonMessage | public string? ReasonMessage { get; }
-MEMBER | AsiBackbone.AspNetCore.Handshakes.AcknowledgmentChallenge.RequiredAcknowledgmentCode | public string RequiredAcknowledgmentCode { get; }
-MEMBER | AsiBackbone.AspNetCore.Handshakes.AcknowledgmentChallenge.RequiredAcknowledgmentText | public string RequiredAcknowledgmentText { get; }
-MEMBER | AsiBackbone.AspNetCore.Handshakes.AcknowledgmentChallenge.RiskCategory | public string? RiskCategory { get; }
-MEMBER | AsiBackbone.AspNetCore.Handshakes.AcknowledgmentChallenge.RiskLevel | public LiabilityHandshakeRiskLevel RiskLevel { get; }
-MEMBER | AsiBackbone.AspNetCore.Handshakes.AcknowledgmentChallenge.TraceId | public string? TraceId { get; }
-MEMBER | AsiBackbone.AspNetCore.Handshakes.AcknowledgmentChallengeOptions.IncludePolicyMetadata | public bool IncludePolicyMetadata { get; set; }
-MEMBER | AsiBackbone.AspNetCore.Handshakes.AcknowledgmentChallengeOptions.IncludeReasonMessage | public bool IncludeReasonMessage { get; set; }
-MEMBER | AsiBackbone.AspNetCore.Handshakes.AcknowledgmentChallengeOptions.IncludeTraceId | public bool IncludeTraceId { get; set; }
-MEMBER | AsiBackbone.AspNetCore.Handshakes.AcknowledgmentChallengeOptions.RequiredAcknowledgmentCode | public string RequiredAcknowledgmentCode { get; set; }
-MEMBER | AsiBackbone.AspNetCore.Handshakes.AcknowledgmentChallengeOptions.RequiredAcknowledgmentText | public string RequiredAcknowledgmentText { get; set; }
-MEMBER | AsiBackbone.AspNetCore.Handshakes.AcknowledgmentChallengeOptions.RiskCategory | public string? RiskCategory { get; set; }
-MEMBER | AsiBackbone.AspNetCore.Handshakes.AcknowledgmentChallengeOptions.RiskLevel | public LiabilityHandshakeRiskLevel RiskLevel { get; set; }
-MEMBER | AsiBackbone.AspNetCore.Handshakes.AcknowledgmentChallengeOptions.Validate | public void Validate()
-MEMBER | AsiBackbone.AspNetCore.Handshakes.AcknowledgmentChallengeRequest.Acknowledged | public bool Acknowledged { get; set; }
-MEMBER | AsiBackbone.AspNetCore.Handshakes.AcknowledgmentChallengeRequest.AcknowledgmentCode | public string? AcknowledgmentCode { get; set; }
-MEMBER | AsiBackbone.AspNetCore.Handshakes.AcknowledgmentChallengeRequest.HandshakeId | public string? HandshakeId { get; set; }
-MEMBER | AsiBackbone.AspNetCore.Handshakes.AcknowledgmentChallengeRequest.Metadata | public IReadOnlyDictionary<string, string>? Metadata { get; set; }
-MEMBER | AsiBackbone.AspNetCore.Handshakes.AcknowledgmentChallengeResult.Acknowledged | public bool Acknowledged { get; }
-MEMBER | AsiBackbone.AspNetCore.Handshakes.AcknowledgmentChallengeResult.Acknowledgment | public LiabilityHandshakeAcknowledgment? Acknowledgment { get; }
-MEMBER | AsiBackbone.AspNetCore.Handshakes.AcknowledgmentChallengeResult.CanProceed | public bool CanProceed { get; }
-MEMBER | AsiBackbone.AspNetCore.Handshakes.AcknowledgmentChallengeResult.Failure(System.String,System.String) | public static AcknowledgmentChallengeResult Failure(string code, string message)
-MEMBER | AsiBackbone.AspNetCore.Handshakes.AcknowledgmentChallengeResult.Rejected | public bool Rejected { get; }
-MEMBER | AsiBackbone.AspNetCore.Handshakes.AcknowledgmentChallengeResult.Result | public OperationResult Result { get; }
-MEMBER | AsiBackbone.AspNetCore.Handshakes.AcknowledgmentChallengeResult.Succeeded | public bool Succeeded { get; }
-MEMBER | AsiBackbone.AspNetCore.Handshakes.AcknowledgmentChallengeResult.Success(AsiBackbone.Core.Handshakes.LiabilityHandshakeAcknowledgment) | public static AcknowledgmentChallengeResult Success(LiabilityHandshakeAcknowledgment acknowledgment)
-MEMBER | AsiBackbone.AspNetCore.Handshakes.DefaultAcknowledgmentChallengeService.#ctor(Microsoft.Extensions.Options.IOptions{AsiBackbone.AspNetCore.Handshakes.AcknowledgmentChallengeOptions}) | public DefaultAcknowledgmentChallengeService(IOptions<AcknowledgmentChallengeOptions> options)
-MEMBER | AsiBackbone.AspNetCore.Handshakes.DefaultAcknowledgmentChallengeService.CreateChallenge(AsiBackbone.Core.Actors.IGovernanceActorContext,System.String,AsiBackbone.Core.Decisions.GovernanceDecision,System.Collections.Generic.IReadOnlyDictionary{System.String,System.String}) | public AcknowledgmentChallenge CreateChallenge(IGovernanceActorContext actor, string operationName, GovernanceDecision decision, IReadOnlyDictionary<string, string>? metadata = null)
-MEMBER | AsiBackbone.AspNetCore.Handshakes.DefaultAcknowledgmentChallengeService.HandleResponse(AsiBackbone.AspNetCore.Handshakes.AcknowledgmentChallenge,AsiBackbone.Core.Actors.IGovernanceActorContext,AsiBackbone.AspNetCore.Handshakes.AcknowledgmentChallengeRequest,System.Nullable{System.DateTimeOffset}) | public AcknowledgmentChallengeResult HandleResponse(AcknowledgmentChallenge challenge, IGovernanceActorContext actor, AcknowledgmentChallengeRequest response, DateTimeOffset? occurredUtc = null)
-MEMBER | AsiBackbone.AspNetCore.Handshakes.IAcknowledgmentChallengeService.CreateChallenge(AsiBackbone.Core.Actors.IGovernanceActorContext,System.String,AsiBackbone.Core.Decisions.GovernanceDecision,System.Collections.Generic.IReadOnlyDictionary{System.String,System.String}) | AcknowledgmentChallenge CreateChallenge(IGovernanceActorContext actor, string operationName, GovernanceDecision decision, IReadOnlyDictionary<string, string>? metadata = null)
-MEMBER | AsiBackbone.AspNetCore.Handshakes.IAcknowledgmentChallengeService.HandleResponse(AsiBackbone.AspNetCore.Handshakes.AcknowledgmentChallenge,AsiBackbone.Core.Actors.IGovernanceActorContext,AsiBackbone.AspNetCore.Handshakes.AcknowledgmentChallengeRequest,System.Nullable{System.DateTimeOffset}) | AcknowledgmentChallengeResult HandleResponse(AcknowledgmentChallenge challenge, IGovernanceActorContext actor, AcknowledgmentChallengeRequest response, DateTimeOffset? occurredUtc = null)
 MEMBER | AsiBackbone.AspNetCore.Outbox.GovernanceOutboxDrainHostedService.#ctor(Microsoft.Extensions.DependencyInjection.IServiceScopeFactory,Microsoft.Extensions.Options.IOptionsMonitor{AsiBackbone.AspNetCore.Outbox.GovernanceOutboxDrainWorkerOptions},Microsoft.Extensions.Logging.ILogger{AsiBackbone.AspNetCore.Outbox.GovernanceOutboxDrainHostedService},System.TimeProvider) | public GovernanceOutboxDrainHostedService(IServiceScopeFactory scopeFactory, IOptionsMonitor<GovernanceOutboxDrainWorkerOptions> optionsMonitor, ILogger<GovernanceOutboxDrainHostedService> logger, TimeProvider? timeProvider = null)
 MEMBER | AsiBackbone.AspNetCore.Outbox.GovernanceOutboxDrainHostedService.ExecuteAsync(System.Threading.CancellationToken) | protected override Task ExecuteAsync(CancellationToken stoppingToken)
 MEMBER | AsiBackbone.AspNetCore.Outbox.GovernanceOutboxDrainHostedService.StartAsync(System.Threading.CancellationToken) | public override Task StartAsync(CancellationToken cancellationToken)
@@ -191,6 +191,12 @@ MEMBER | AsiBackbone.AspNetCore.Results.GovernanceHttpResultMappingOptions.Opera
 MEMBER | AsiBackbone.AspNetCore.Results.GovernanceHttpResultMappingOptions.SuccessStatusCode | public int SuccessStatusCode { get; set; }
 MEMBER | AsiBackbone.AspNetCore.Results.GovernanceHttpResultMappingOptions.Validate | public void Validate()
 MEMBER | AsiBackbone.AspNetCore.Results.GovernanceHttpResultMappingOptions.WarningStatusCode | public int WarningStatusCode { get; set; }
+TYPE | AsiBackbone.AspNetCore.Acknowledgments.AcknowledgmentChallenge | public sealed class AcknowledgmentChallenge
+TYPE | AsiBackbone.AspNetCore.Acknowledgments.AcknowledgmentChallengeOptions | public sealed class AcknowledgmentChallengeOptions
+TYPE | AsiBackbone.AspNetCore.Acknowledgments.AcknowledgmentChallengeRequest | public sealed class AcknowledgmentChallengeRequest
+TYPE | AsiBackbone.AspNetCore.Acknowledgments.AcknowledgmentChallengeResult | public sealed class AcknowledgmentChallengeResult
+TYPE | AsiBackbone.AspNetCore.Acknowledgments.DefaultAcknowledgmentChallengeService | public sealed class DefaultAcknowledgmentChallengeService : IAcknowledgmentChallengeService
+TYPE | AsiBackbone.AspNetCore.Acknowledgments.IAcknowledgmentChallengeService | public interface IAcknowledgmentChallengeService
 TYPE | AsiBackbone.AspNetCore.Actors.HttpContextGovernanceActorContextResolver | public sealed class HttpContextGovernanceActorContextResolver : IHttpGovernanceActorContextResolver
 TYPE | AsiBackbone.AspNetCore.Actors.HttpGovernanceActorContextOptions | public sealed class HttpGovernanceActorContextOptions
 TYPE | AsiBackbone.AspNetCore.Actors.IHttpGovernanceActorContextResolver | public interface IHttpGovernanceActorContextResolver
@@ -216,23 +222,17 @@ TYPE | AsiBackbone.AspNetCore.Endpoints.EndpointGovernanceOptions | public seale
 TYPE | AsiBackbone.AspNetCore.Endpoints.EndpointGovernanceResult | public sealed class EndpointGovernanceResult
 TYPE | AsiBackbone.AspNetCore.Endpoints.EndpointGovernanceRouteBuilderExtensions | public static class EndpointGovernanceRouteBuilderExtensions
 TYPE | AsiBackbone.AspNetCore.Endpoints.GovernancePolicyAttribute | [AttributeUsage(AttributeTargets.Class|AttributeTargets.Method, AllowMultiple = true, Inherited = true)] public sealed class GovernancePolicyAttribute : Attribute, IEndpointGovernancePolicyMetadata, IEndpointGovernanceMetadata
+TYPE | AsiBackbone.AspNetCore.Endpoints.IEndpointAcknowledgmentMetadata | public interface IEndpointAcknowledgmentMetadata : IEndpointGovernanceMetadata
 TYPE | AsiBackbone.AspNetCore.Endpoints.IEndpointAuditEmissionMetadata | public interface IEndpointAuditEmissionMetadata : IEndpointGovernanceMetadata
 TYPE | AsiBackbone.AspNetCore.Endpoints.IEndpointCapabilityGrantMetadata | public interface IEndpointCapabilityGrantMetadata : IEndpointGovernanceMetadata
 TYPE | AsiBackbone.AspNetCore.Endpoints.IEndpointCapabilityGrantValidator | public interface IEndpointCapabilityGrantValidator
 TYPE | AsiBackbone.AspNetCore.Endpoints.IEndpointGovernanceMetadata | public interface IEndpointGovernanceMetadata
 TYPE | AsiBackbone.AspNetCore.Endpoints.IEndpointGovernancePolicyMetadata | public interface IEndpointGovernancePolicyMetadata : IEndpointGovernanceMetadata
 TYPE | AsiBackbone.AspNetCore.Endpoints.IEndpointGovernanceService | public interface IEndpointGovernanceService
-TYPE | AsiBackbone.AspNetCore.Endpoints.IEndpointLiabilityHandshakeMetadata | public interface IEndpointLiabilityHandshakeMetadata : IEndpointGovernanceMetadata
 TYPE | AsiBackbone.AspNetCore.Endpoints.IEndpointPolicyEvaluationOptionsMetadata | public interface IEndpointPolicyEvaluationOptionsMetadata : IEndpointGovernanceMetadata
+TYPE | AsiBackbone.AspNetCore.Endpoints.RequireAcknowledgmentAttribute | [AttributeUsage(AttributeTargets.Class|AttributeTargets.Method, AllowMultiple = false, Inherited = true)] public sealed class RequireAcknowledgmentAttribute : Attribute, IEndpointAcknowledgmentMetadata, IEndpointGovernanceMetadata
 TYPE | AsiBackbone.AspNetCore.Endpoints.RequireCapabilityGrantAttribute | [AttributeUsage(AttributeTargets.Class|AttributeTargets.Method, AllowMultiple = true, Inherited = true)] public sealed class RequireCapabilityGrantAttribute : Attribute, IEndpointCapabilityGrantMetadata, IEndpointGovernanceMetadata
-TYPE | AsiBackbone.AspNetCore.Endpoints.RequireLiabilityHandshakeAttribute | [AttributeUsage(AttributeTargets.Class|AttributeTargets.Method, AllowMultiple = false, Inherited = true)] public sealed class RequireLiabilityHandshakeAttribute : Attribute, IEndpointLiabilityHandshakeMetadata, IEndpointGovernanceMetadata
 TYPE | AsiBackbone.AspNetCore.Endpoints.ShortCircuitOnFirstDenialAttribute | [AttributeUsage(AttributeTargets.Class|AttributeTargets.Method, AllowMultiple = false, Inherited = true)] public sealed class ShortCircuitOnFirstDenialAttribute : Attribute, IEndpointPolicyEvaluationOptionsMetadata, IEndpointGovernanceMetadata
-TYPE | AsiBackbone.AspNetCore.Handshakes.AcknowledgmentChallenge | public sealed class AcknowledgmentChallenge
-TYPE | AsiBackbone.AspNetCore.Handshakes.AcknowledgmentChallengeOptions | public sealed class AcknowledgmentChallengeOptions
-TYPE | AsiBackbone.AspNetCore.Handshakes.AcknowledgmentChallengeRequest | public sealed class AcknowledgmentChallengeRequest
-TYPE | AsiBackbone.AspNetCore.Handshakes.AcknowledgmentChallengeResult | public sealed class AcknowledgmentChallengeResult
-TYPE | AsiBackbone.AspNetCore.Handshakes.DefaultAcknowledgmentChallengeService | public sealed class DefaultAcknowledgmentChallengeService : IAcknowledgmentChallengeService
-TYPE | AsiBackbone.AspNetCore.Handshakes.IAcknowledgmentChallengeService | public interface IAcknowledgmentChallengeService
 TYPE | AsiBackbone.AspNetCore.Outbox.GovernanceOutboxDrainHostedService | public sealed class GovernanceOutboxDrainHostedService : BackgroundService, IHostedService, IDisposable
 TYPE | AsiBackbone.AspNetCore.Outbox.GovernanceOutboxDrainWorkerOptions | public sealed class GovernanceOutboxDrainWorkerOptions
 TYPE | AsiBackbone.AspNetCore.Results.GovernanceHttpResultMappingExtensions | public static class GovernanceHttpResultMappingExtensions

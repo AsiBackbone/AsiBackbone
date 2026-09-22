@@ -21,7 +21,7 @@ public sealed class AuditLedgerRecord : IDecisionReceipt
         string recordId,
         string? schemaVersion,
         string eventId,
-        string? auditResidueId,
+        string? decisionReceiptId,
         DateTimeOffset occurredUtc,
         DateTimeOffset recordedUtc,
         string actorId,
@@ -71,7 +71,7 @@ public sealed class AuditLedgerRecord : IDecisionReceipt
         RecordId = recordId.Trim();
         SchemaVersion = GovernanceSchemaVersions.Normalize(schemaVersion);
         EventId = eventId.Trim();
-        AuditResidueId = NormalizeOptional(auditResidueId) ?? EventId;
+        DecisionReceiptId = NormalizeOptional(decisionReceiptId) ?? EventId;
         OccurredUtc = occurredUtc.ToUniversalTime();
         RecordedUtc = recordedUtc.ToUniversalTime();
         ActorId = actorId.Trim();
@@ -128,7 +128,7 @@ public sealed class AuditLedgerRecord : IDecisionReceipt
 
     public string EventId { get; }
 
-    public string AuditResidueId { get; }
+    public string DecisionReceiptId { get; }
 
     public DateTimeOffset OccurredUtc { get; }
 
@@ -239,7 +239,7 @@ public sealed class AuditLedgerRecord : IDecisionReceipt
             NormalizeIdentifier(recordId),
             schemaVersion ?? receipt.SchemaVersion,
             receipt.EventId,
-            receipt.AuditResidueId,
+            receipt.DecisionReceiptId,
             receipt.OccurredUtc,
             recordedUtc ?? DateTimeOffset.UtcNow,
             receipt.ActorId,

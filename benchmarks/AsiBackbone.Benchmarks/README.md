@@ -44,10 +44,10 @@ The current baseline covers:
 - endpoint governance allow, warning, and deny decisions;
 - outbox drain batches of 25 and 100 pending entries;
 - scoped outbox drain for a 100-entry batch;
-- audit residue creation from a governance decision.
+- decision receipt creation from a governance decision.
 
 ## Interpretation
 
 Benchmark results are useful for trend detection on the same machine, runtime, build configuration, and repository version. They are not absolute performance guarantees and should not be compared across unrelated machines without context.
 
-Use the BenchmarkDotNet runner to decide whether proposed caching, pooling, short-circuit, or allocation-reduction work is justified by measured policy, endpoint governance, audit residue, or outbox activity.
+Use the BenchmarkDotNet runner to decide whether proposed caching, pooling, short-circuit, or allocation-reduction work is justified by measured policy, endpoint governance, decision receipt, or outbox activity.

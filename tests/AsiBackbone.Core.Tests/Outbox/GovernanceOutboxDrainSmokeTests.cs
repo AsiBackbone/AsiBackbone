@@ -66,7 +66,7 @@ public sealed class GovernanceOutboxDrainSmokeTests
         Assert.Equal(NoOpGovernanceEmitter.ProviderName, deliveredEntry.ProviderName);
         Assert.Equal(envelope.EnvelopeId, deliveredEntry.ProviderRecordId);
         Assert.Equal("correlation-193", deliveredEntry.Envelope.CorrelationId);
-        Assert.Equal("residue-193", deliveredEntry.Envelope.AuditResidueId);
+        Assert.Equal("residue-193", deliveredEntry.Envelope.DecisionReceiptId);
         Assert.Equal(DecisionReceiptLifecycleStage.ExternalEmissionQueued, deliveredEntry.Envelope.LifecycleStage);
         Assert.Equal(envelope.SchemaVersion, deliveredEntry.Envelope.SchemaVersion);
         Assert.Equal("noop", deliveredEntry.Metadata["emitter.kind"]);
@@ -118,7 +118,7 @@ public sealed class GovernanceOutboxDrainSmokeTests
         Assert.Equal("test-sink", failedEntry.ProviderName);
         Assert.Equal("provider.unavailable", failedEntry.LastError?.Code);
         Assert.Equal("correlation-193", storedEntry.Envelope.CorrelationId);
-        Assert.Equal("residue-193", storedEntry.Envelope.AuditResidueId);
+        Assert.Equal("residue-193", storedEntry.Envelope.DecisionReceiptId);
         Assert.DoesNotContain(retryReadyBefore, retryReadyEntry => retryReadyEntry.OutboxEntryId == entry.OutboxEntryId);
         Assert.Contains(retryReadyAfter, retryReadyEntry => retryReadyEntry.OutboxEntryId == entry.OutboxEntryId);
     }
@@ -131,7 +131,7 @@ public sealed class GovernanceOutboxDrainSmokeTests
             occurredUtc: new DateTimeOffset(2026, 6, 15, 15, 59, 0, TimeSpan.Zero),
             envelopeId: "envelope-193",
             correlationId: "correlation-193",
-            auditResidueId: "residue-193",
+            decisionReceiptId: "residue-193",
             lifecycleStage: DecisionReceiptLifecycleStage.ExternalEmissionQueued,
             policyVersion: "v1",
             policyHash: "hash-193",

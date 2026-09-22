@@ -123,7 +123,7 @@ public sealed class LocalDevelopmentSigningServiceTests
     }
 
     /// <summary>
-    /// Tests that a canonical audit ledger record can be signed and verified end-to-end using the <see cref="LocalDevelopmentSigningService"/>. This test creates an audit residue, converts it to an audit ledger record, computes its canonical payload hash, signs it, and then verifies the signature.
+    /// Tests that a canonical audit ledger record can be signed and verified end-to-end using the <see cref="LocalDevelopmentSigningService"/>. This test creates an decision receipt, converts it to an audit ledger record, computes its canonical payload hash, signs it, and then verifies the signature.
     /// </summary>
     /// <returns>
     /// A task that represents the asynchronous operation of signing and verifying a canonical audit ledger record end-to-end.

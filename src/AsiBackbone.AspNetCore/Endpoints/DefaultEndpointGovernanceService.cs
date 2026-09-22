@@ -1,6 +1,6 @@
+using AsiBackbone.AspNetCore.Acknowledgments;
 using AsiBackbone.AspNetCore.Actors;
 using AsiBackbone.AspNetCore.Correlation;
-using AsiBackbone.AspNetCore.Handshakes;
 using AsiBackbone.AspNetCore.Results;
 using AsiBackbone.Core.Actors;
 using AsiBackbone.Core.Audit;
@@ -289,7 +289,7 @@ public sealed class DefaultEndpointGovernanceService : IEndpointGovernanceServic
         GovernanceDecision decision,
         IGovernanceActorContext? actor)
     {
-        if (decision.RequiresAcknowledgment && descriptor.RequiresLiabilityHandshake)
+        if (decision.RequiresAcknowledgment && descriptor.RequiresAcknowledgment)
         {
             actor ??= actorContextResolver.ResolveActorContext();
             AcknowledgmentChallenge challenge = acknowledgmentChallengeService.CreateChallenge(

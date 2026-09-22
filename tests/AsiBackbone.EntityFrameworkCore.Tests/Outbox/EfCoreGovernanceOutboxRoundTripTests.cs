@@ -120,7 +120,7 @@ public sealed class EfCoreGovernanceOutboxRoundTripTests
         Assert.Equal(new DateTimeOffset(2026, 7, 12, 11, 0, 0, TimeSpan.Zero), persistedEnvelope.OccurredUtc);
         Assert.Equal(new DateTimeOffset(2026, 7, 12, 11, 0, 1, TimeSpan.Zero), persistedEnvelope.CreatedUtc);
         Assert.Equal("correlation-full-round-trip", persistedEnvelope.CorrelationId);
-        Assert.Equal("audit-full-round-trip", persistedEnvelope.AuditResidueId);
+        Assert.Equal("audit-full-round-trip", persistedEnvelope.DecisionReceiptId);
         Assert.Equal(DecisionReceiptLifecycleStage.ExternalEmissionQueued, persistedEnvelope.LifecycleStage);
         Assert.Equal((int)DecisionReceiptLifecycleStage.ExternalEmissionQueued, persistedEnvelope.LifecycleStageSequence);
         Assert.Equal("2026.07", persistedEnvelope.PolicyVersion);

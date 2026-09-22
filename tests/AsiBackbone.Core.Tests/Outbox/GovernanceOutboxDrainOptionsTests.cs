@@ -155,7 +155,7 @@ public sealed class GovernanceOutboxDrainOptionsTests
             occurredUtc: DrainUtc.AddMinutes(-1),
             envelopeId: $"envelope-{suffix}",
             correlationId: $"correlation-{suffix}",
-            auditResidueId: $"residue-{suffix}",
+            decisionReceiptId: $"residue-{suffix}",
             lifecycleStage: DecisionReceiptLifecycleStage.ExternalEmissionQueued,
             policyVersion: "v1",
             policyHash: "hash",

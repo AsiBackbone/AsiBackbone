@@ -136,7 +136,7 @@ Provider-specific cryptographic verification still happens through `IGovernanceS
 
 ### Before execution
 
-Verify before consequential execution when a capability token, acknowledgment, or signed audit artifact is required to authorize the action.
+Verify before consequential execution when a capability grant, acknowledgment, or signed audit artifact is required to authorize the action.
 
 Recommended default behavior:
 
