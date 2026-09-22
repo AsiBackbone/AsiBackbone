@@ -149,7 +149,7 @@ using System.Net.Http.Json;
 using AsiBackbone.AspNetCore.Actors;
 using AsiBackbone.AspNetCore.Correlation;
 using AsiBackbone.AspNetCore.DependencyInjection;
-using AsiBackbone.AspNetCore.Handshakes;
+using AsiBackbone.AspNetCore.Acknowledgments;
 using AsiBackbone.Core.Actors;
 using AsiBackbone.Core.Audit;
 using AsiBackbone.Core.CapabilityTokens;
