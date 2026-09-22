@@ -136,7 +136,10 @@ public static class SignedGovernanceArtifacts
     /// Use this factory when rehydrating a previously signed artifact from storage, a queue, or any other channel outside the
     /// signing call itself. <see cref="FromSigningMetadata{TArtifact}" /> accepts the hash a caller supplies, which is correct
     /// immediately after signing but does not establish that a stored payload still hashes to a stored hash. Rehydration
-    /// recomputes the hash and rejects the triple when payload and hash disagree.
+    /// recomputes the hash and rejects the retained payload/hash pair when they disagree. It does not rebuild a payload from
+    /// <paramref name="artifact" /> and therefore does not authenticate that separately supplied typed object. Callers that
+    /// consume the typed object should use <see cref="GovernanceArtifactVerifier.VerifyTypedAsync{TArtifact}" /> with the
+    /// applicable canonical payload builder before trusting its values.
     /// </remarks>
     /// <exception cref="ArgumentException">The canonical payload does not hash to <paramref name="canonicalHash" />.</exception>
     /// <exception cref="NotSupportedException">The canonical hash algorithm is not supported by the built-in hasher.</exception>

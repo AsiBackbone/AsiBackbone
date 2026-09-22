@@ -84,10 +84,16 @@ Do not overwrite original signing metadata during key rotation, re-verification,
 - [ ] Recompute the canonical hash from the retained artifact.
 - [ ] Compare the recomputed hash with the signing hash before cryptographic verification.
 
-`GovernanceArtifactVerifier.VerifyAsync` performs that recompute-and-compare step itself and fails closed before calling the
-provider, so the three boxes above are satisfied for artifacts verified through it. A host still owns them when it reconstructs
-a payload outside that call. Use `SignedGovernanceArtifacts.Rehydrate` rather than `FromSigningMetadata` when rebuilding a
-signed artifact from storage or a queue, so a stored payload and stored hash that disagree are rejected at construction.
+`GovernanceArtifactVerifier.VerifyTypedAsync` performs that recompute-and-compare step from the typed artifact itself and
+fails closed before calling the provider. Supply the matching `CanonicalPayloadBuilder` and capture the same
+`CanonicalPayloadOptions` used when signing. The older `VerifyAsync` overload recomputes only the retained
+`CanonicalPayload`; it proves that payload matches the signed hash, but does not prove that the separately materialized
+`Artifact` property contains the same values.
+
+Likewise, use `SignedGovernanceArtifacts.Rehydrate` rather than `FromSigningMetadata` when rebuilding a signed artifact
+from storage or a queue so a stored payload and stored hash that disagree are rejected at construction. `Rehydrate` is a
+payload-only structural check: it does not rebuild canonical content from the supplied typed object. Before consuming that
+object, pass the rehydrated wrapper through `VerifyTypedAsync`.
 
 - [ ] Resolve the exact provider, key ID, and key version recorded at signing time.
 - [ ] Check active, retired, revoked, disabled, expired, and unknown key states according to host policy.
@@ -96,12 +102,18 @@ signed artifact from storage or a queue, so a stored payload and stored hash tha
 - [ ] Persist the verification attempt, category, action, timestamp, and safe failure code separately from signing metadata.
 - [ ] Reverify samples after key rotation, provider migration, restore testing, or canonicalization changes.
 
-`GovernanceArtifactVerifier` already provides the provider-neutral preflight and policy-mapping helper. It checks missing signing metadata, hash mismatches, hash-algorithm mismatches, canonical artifact descriptors, expected key ID or version, provider expectations, and policy context before calling the configured verifier.
+`GovernanceArtifactVerifier` already provides the provider-neutral preflight and policy-mapping helper. Its typed path checks
+the typed object binding in addition to missing signing metadata, retained payload hash mismatches, hash-algorithm
+mismatches, canonical artifact descriptors, expected key ID or version, provider expectations, and policy context before
+calling the configured verifier.
 
 ```csharp
-VerificationPolicyOutcome outcome = await GovernanceArtifactVerifier.VerifyAsync(
+CanonicalPayloadOptions payloadOptions = CanonicalPayloadOptions.Default;
+
+VerificationPolicyOutcome outcome = await GovernanceArtifactVerifier.VerifyTypedAsync(
     signedArtifact,
     verificationService,
+    artifact => CanonicalPayloadBuilder.ForAuditLedgerRecord(artifact, payloadOptions),
     VerificationPolicyOptions.Default,
     VerificationPolicyContext.Create(
         purpose: signedArtifact.ArtifactType,

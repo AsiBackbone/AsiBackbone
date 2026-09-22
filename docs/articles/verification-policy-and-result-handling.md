@@ -85,12 +85,16 @@ VerificationPolicyOptions options = VerificationPolicyOptions.Create(
 
 ## Verifying signed artifacts
 
-`GovernanceArtifactVerifier` wraps the existing verification service with preflight checks and policy mapping.
+`GovernanceArtifactVerifier` wraps the existing verification service with preflight checks and policy mapping. Use the
+typed path when application code will consume `signedArtifact.Artifact` after verification:
 
 ```csharp
-VerificationPolicyOutcome outcome = await GovernanceArtifactVerifier.VerifyAsync(
+CanonicalPayloadOptions payloadOptions = CanonicalPayloadOptions.Default;
+
+VerificationPolicyOutcome outcome = await GovernanceArtifactVerifier.VerifyTypedAsync(
     signedArtifact,
     verificationService,
+    artifact => CanonicalPayloadBuilder.ForAuditLedgerRecord(artifact, payloadOptions),
     VerificationPolicyOptions.Default,
     VerificationPolicyContext.Create(
         purpose: signedArtifact.ArtifactType,
@@ -119,6 +123,11 @@ switch (outcome.Action)
         break;
 }
 ```
+
+The canonical builder must use the same payload options and versioning rules used at signing. `VerifyTypedAsync` rebuilds
+the payload from the typed object and fails with `signature.typed-artifact-mismatch`/`HashMismatch` when its hash differs
+from the signed canonical hash. `VerifyAsync` remains available for payload-only structural verification, but it authenticates
+only the retained `CanonicalPayload`; it does not bind a separately supplied typed `Artifact` to those signed bytes.
 
 The wrapper performs provider-neutral preflight checks before calling the verifier:
 

@@ -9,8 +9,14 @@ namespace AsiBackbone.Core.Signing;
 public static class GovernanceArtifactVerifier
 {
     /// <summary>
-    /// Verifies a signed governance artifact and maps the result to a host-facing policy outcome.
+    /// Verifies a signed governance artifact's retained canonical payload and maps the result to a host-facing policy outcome.
     /// </summary>
+    /// <remarks>
+    /// This payload-only path establishes that <see cref="SignedGovernanceArtifact{TArtifact}.CanonicalPayload" /> hashes to
+    /// the signed canonical hash. It does not establish that <see cref="SignedGovernanceArtifact{TArtifact}.Artifact" />
+    /// corresponds to that payload. Use <see cref="VerifyTypedAsync{TArtifact}" /> when the typed artifact will be consumed
+    /// after verification.
+    /// </remarks>
     public static async ValueTask<VerificationPolicyOutcome> VerifyAsync<TArtifact>(
         SignedGovernanceArtifact<TArtifact> artifact,
         IGovernanceSignatureVerificationService verificationService,
@@ -18,12 +24,61 @@ public static class GovernanceArtifactVerifier
         VerificationPolicyContext? context = null,
         CancellationToken cancellationToken = default)
     {
+        return await VerifyCoreAsync(
+            artifact,
+            verificationService,
+            canonicalPayloadBuilder: null,
+            options,
+            context,
+            cancellationToken).ConfigureAwait(false);
+    }
+
+    /// <summary>
+    /// Verifies a signed governance artifact, binds its typed artifact to the signed canonical payload, and maps the result
+    /// to a host-facing policy outcome.
+    /// </summary>
+    /// <remarks>
+    /// The supplied builder must use the same canonicalization options and schema rules that were used when the artifact
+    /// was signed. The rebuilt payload is hashed with the recorded hash algorithm and compared with the signed canonical
+    /// hash before the verification provider is called. A mismatch fails closed with
+    /// <c>signature.typed-artifact-mismatch</c> in the <see cref="SignatureVerificationCategory.HashMismatch" /> category.
+    /// </remarks>
+    public static async ValueTask<VerificationPolicyOutcome> VerifyTypedAsync<TArtifact>(
+        SignedGovernanceArtifact<TArtifact> artifact,
+        IGovernanceSignatureVerificationService verificationService,
+        Func<TArtifact, CanonicalPayload> canonicalPayloadBuilder,
+        VerificationPolicyOptions? options = null,
+        VerificationPolicyContext? context = null,
+        CancellationToken cancellationToken = default)
+    {
+        ArgumentNullException.ThrowIfNull(canonicalPayloadBuilder);
+
+        return await VerifyCoreAsync(
+            artifact,
+            verificationService,
+            canonicalPayloadBuilder,
+            options,
+            context,
+            cancellationToken).ConfigureAwait(false);
+    }
+
+    private static async ValueTask<VerificationPolicyOutcome> VerifyCoreAsync<TArtifact>(
+        SignedGovernanceArtifact<TArtifact> artifact,
+        IGovernanceSignatureVerificationService verificationService,
+        Func<TArtifact, CanonicalPayload>? canonicalPayloadBuilder,
+        VerificationPolicyOptions? options,
+        VerificationPolicyContext? context,
+        CancellationToken cancellationToken)
+    {
         ArgumentNullException.ThrowIfNull(artifact);
         ArgumentNullException.ThrowIfNull(verificationService);
         cancellationToken.ThrowIfCancellationRequested();
 
         VerificationPolicyContext effectiveContext = context ?? VerificationPolicyContext.Default;
-        SignatureVerificationResult? preflightResult = ValidateBeforeProvider(artifact, effectiveContext);
+        SignatureVerificationResult? preflightResult = ValidateBeforeProvider(
+            artifact,
+            effectiveContext,
+            canonicalPayloadBuilder);
 
         if (preflightResult is not null)
         {
@@ -137,11 +192,40 @@ public static class GovernanceArtifactVerifier
 
     private static SignatureVerificationResult? ValidateBeforeProvider<TArtifact>(
         SignedGovernanceArtifact<TArtifact> artifact,
-        VerificationPolicyContext context)
+        VerificationPolicyContext context,
+        Func<TArtifact, CanonicalPayload>? canonicalPayloadBuilder)
     {
         SignatureVerificationResult? metadataResult = ValidateSigningMetadata(artifact, context);
 
-        return metadataResult ?? ValidateCanonicalBinding(artifact);
+        if (metadataResult is not null)
+        {
+            return metadataResult;
+        }
+
+        SignatureVerificationResult? canonicalBindingResult = ValidateCanonicalBinding(artifact);
+
+        return canonicalBindingResult ?? ValidateTypedArtifactBinding(artifact, canonicalPayloadBuilder);
+    }
+
+    private static SignatureVerificationResult? ValidateTypedArtifactBinding<TArtifact>(
+        SignedGovernanceArtifact<TArtifact> artifact,
+        Func<TArtifact, CanonicalPayload>? canonicalPayloadBuilder)
+    {
+        if (canonicalPayloadBuilder is null)
+        {
+            return null;
+        }
+
+        CanonicalPayload rebuiltPayload = canonicalPayloadBuilder(artifact.Artifact)
+            ?? throw new InvalidOperationException("The canonical payload builder returned null.");
+        CanonicalPayloadHash rebuiltHash = CanonicalPayloadHasher.ComputeHash(rebuiltPayload, artifact.HashAlgorithm);
+
+        return string.Equals(rebuiltHash.HashValue, artifact.CanonicalHash.HashValue, StringComparison.Ordinal)
+            ? null
+            : SignatureVerificationResult.Failed(
+                "signature.typed-artifact-mismatch",
+                SignatureVerificationCategory.HashMismatch,
+                "The typed artifact does not rebuild to the signed canonical payload hash.");
     }
 
     /// <summary>
