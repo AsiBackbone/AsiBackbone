@@ -152,7 +152,7 @@ using AsiBackbone.AspNetCore.DependencyInjection;
 using AsiBackbone.AspNetCore.Acknowledgments;
 using AsiBackbone.Core.Actors;
 using AsiBackbone.Core.Audit;
-using AsiBackbone.Core.CapabilityTokens;
+using AsiBackbone.Core.CapabilityGrants;
 using AsiBackbone.Core.Constraints;
 using AsiBackbone.Core.Decisions;
 using AsiBackbone.Core.Evaluation;
@@ -161,7 +161,7 @@ using AsiBackbone.Core.Signing;
 using AsiBackbone.EntityFrameworkCore;
 using AsiBackbone.EntityFrameworkCore.Audit;
 using AsiBackbone.Storage.InMemory.Audit;
-using AsiBackbone.Storage.InMemory.CapabilityTokens;
+using AsiBackbone.Storage.InMemory.CapabilityGrants;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -224,7 +224,7 @@ public sealed class StablePackageIntegrationSmokeTests
     [Fact]
     public async Task PackagedInMemoryCapabilityGrantUseStoreAcceptsFirstUseAndDeniesReplay()
     {
-        SignedGovernanceArtifact<CapabilityTokenGrant> signedGrant = CreateSignedCapabilityGrant();
+        SignedGovernanceArtifact<CapabilityGrant> signedGrant = CreateSignedCapabilityGrant();
         var useStore = new InMemoryCapabilityGrantUseStore();
         CapabilityGrantValidationOptions options = CapabilityGrantValidationOptions.Create(
             issuer: "stable-issuer",
@@ -250,7 +250,7 @@ public sealed class StablePackageIntegrationSmokeTests
         Assert.True(first.IsValid);
         Assert.True(first.ShouldAllow);
         Assert.False(second.IsValid);
-        Assert.Equal(CapabilityTokenValidationCategory.ReuseLimitExceeded, second.Category);
+        Assert.Equal(CapabilityGrantValidationCategory.ReuseLimitExceeded, second.Category);
         Assert.Equal(VerificationPolicyAction.Deny, second.Action);
         Assert.Equal("capability.use-limit-exceeded", second.FailureCode);
         Assert.Equal(1, useStore.GetUseCount(signedGrant.Artifact.TokenId));
@@ -320,9 +320,9 @@ public sealed class StablePackageIntegrationSmokeTests
         return value;
     }
 
-    private static SignedGovernanceArtifact<CapabilityTokenGrant> CreateSignedCapabilityGrant()
+    private static SignedGovernanceArtifact<CapabilityGrant> CreateSignedCapabilityGrant()
     {
-        CapabilityTokenGrant grant = CapabilityTokenGrant.Create(
+        CapabilityGrant grant = CapabilityGrant.Create(
             tokenId: "stable-capability-grant",
             issuer: "stable-issuer",
             audience: "stable-gateway",
@@ -334,7 +334,7 @@ public sealed class StablePackageIntegrationSmokeTests
 
         // Built through the shared builder so the smoke test signs every grant field, matching what a
         // consumer of the stable package should do.
-        CanonicalPayload payload = CanonicalPayloadBuilder.ForCapabilityTokenGrant(grant);
+        CanonicalPayload payload = CanonicalPayloadBuilder.ForCapabilityGrant(grant);
         CanonicalPayloadHash hash = CanonicalPayloadHasher.ComputeHash(payload);
         var signingMetadata = SigningMetadata.Create(
             signingHash: hash.HashValue,
