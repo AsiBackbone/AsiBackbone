@@ -122,6 +122,102 @@ the ruleset is active. Its administrator exemption is not the canonical bypass
 mechanism: ordinary administrators are still constrained by the active ruleset,
 and the ruleset contains only the explicit pull-request-only bypass actor above.
 
+## Project automation GitHub App
+
+The project-status workflows use a dedicated GitHub App installation token rather
+than a long-lived personal access token. The App token is minted only for the job
+that needs it and is passed directly to GitHub CLI through `GH_TOKEN`.
+
+The workflow-level `permissions:` block applies only to the built-in
+`GITHUB_TOKEN`; it does not constrain a GitHub App installation token. Both
+project automation workflows therefore use `permissions: {}` and request only
+the App permissions required for their GraphQL operations.
+
+### Required App installation and permissions
+
+Create a dedicated GitHub App for AsiBackbone project automation and install it
+on the `AsiBackbone` organization with repository access limited to
+`AsiBackbone`.
+
+Grant only these App permissions:
+
+- Organization permissions:
+  - **Projects: Read and write**
+- Repository permissions:
+  - **Issues: Read-only**
+  - **Pull requests: Read-only**
+  - **Metadata: Read-only** (GitHub grants this baseline permission)
+
+The pull-request status workflow requests Projects write, Issues read, and Pull
+requests read. The branch-status workflow requests only Projects write and Issues
+read. Neither workflow requests repository contents write, administration, or
+other unrelated permissions.
+
+Configure these repository values:
+
+| Type | Name | Purpose |
+| --- | --- | --- |
+| Repository variable | `PROJECT_APP_CLIENT_ID` | GitHub App client ID. This identifier is not secret. |
+| Repository secret | `PROJECT_APP_PRIVATE_KEY` | PEM private key used only to mint short-lived installation tokens. |
+
+Keep the existing project configuration variables:
+
+- `PROJECT_OWNER`
+- `PROJECT_NUMBER`
+- `PROJECT_REVIEW_STATUS`
+- `PROJECT_IN_PROGRESS_STATUS`
+
+Do not store an installation access token as a repository or organization
+secret. `actions/create-github-app-token` creates a short-lived token for each
+job, and the workflows pass that value directly to `gh` through `GH_TOKEN`.
+
+### Dependabot and fork pull requests
+
+The pull-request project automation deliberately skips Dependabot pull requests
+and pull requests whose head repository is a fork. Those event types do not
+receive repository Actions secrets under the normal GitHub security model, so
+they must not attempt to mint the project App token.
+
+Skipping the project-status mutation does not skip normal validation of those
+pull requests. It only prevents the credentialed organization-project mutation
+from running in an event context that cannot receive the App private key.
+
+The branch-status workflow runs on `create` events in this repository and also
+excludes `dependabot/` branches. A branch created only in an external fork does
+not create a branch in `AsiBackbone/AsiBackbone` and therefore does not receive
+this repository's project-automation credential.
+
+### Migration from `PROJECT_TOKEN`
+
+After the GitHub App is installed and both project workflows have completed
+successfully:
+
+1. Delete the legacy `PROJECT_TOKEN` repository secret.
+2. Revoke the personal access token that previously backed that secret.
+3. Confirm no other repository or organization automation still depends on the
+   PAT before removing any associated authorization.
+
+There is no PAT fallback in the project-status workflows. A future fallback
+requires separate security review and must not silently restore a broad,
+long-lived classic PAT.
+
+### Rotation and validation
+
+Rotate the App private key by generating a new key in the GitHub App settings,
+updating `PROJECT_APP_PRIVATE_KEY`, validating both automation workflows, and
+then deleting the previous key from the App. For emergency revocation, delete
+the active private key or suspend/uninstall the App installation.
+
+After configuration or rotation, validate both behavioral paths:
+
+1. create an `issue-<number>-work` branch and confirm the corresponding project
+   item moves to `PROJECT_IN_PROGRESS_STATUS`;
+2. open a non-draft pull request with `Closes #<number>` and confirm the linked
+   issue moves to `PROJECT_REVIEW_STATUS`;
+3. confirm a Dependabot pull request and a fork pull request do not run the
+   credential-minting step;
+4. run the repository workflow-security checks, including actionlint and zizmor.
+
 ## Emergency bypass procedure
 
 Bypass is for an urgent failure of the repository control plane, not a shortcut

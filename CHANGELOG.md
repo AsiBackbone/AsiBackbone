@@ -25,6 +25,12 @@ This project follows the spirit of [Keep a Changelog](https://keepachangelog.com
 
 ### Security
 
+* Replaced the long-lived `PROJECT_TOKEN` PAT used by project-status automation
+  with SHA-pinned `actions/create-github-app-token` installation tokens. The
+  project App is limited to organization Projects write plus repository Issues
+  and, where required, Pull requests read. Dependabot and fork pull requests do
+  not mint the credential, and maintainer guidance now documents App setup,
+  private-key rotation, PAT retirement, and behavioral validation (#815).
 * Acknowledgment challenge binding now fails closed for unknown, unauthenticated, `Unknown`-typed, or shared
   `"unknown"` actors. Direct challenge creation rejects an insufficient actor binding, response handling returns the
   stable `acknowledgment.challenge.actor_unbound` failure code, and endpoint governance returns a coded `403` without
