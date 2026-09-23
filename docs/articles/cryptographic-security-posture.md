@@ -190,7 +190,7 @@ Recommended verification outcomes:
 
 ## What the signature covers
 
-Since 6.0, signing providers sign and verification providers verify a versioned **signature input**, not the hash text alone. `GovernanceSignatureInput.CreateV1` builds it as canonical JSON (the same serializer and ordinal key order as canonical payload JSON v1) with these properties:
+Since 6.0, signing providers sign and verification providers verify a versioned **signature input**, not the hash text alone. `GovernanceSignatureInput.CreateV1` builds it as canonical JSON (the same serializer and ordinal key order as canonical payload JSON v1, specified in [Canonical JSON v1 Format](canonical-json-v1.md)) with these properties:
 
 | Property | Source |
 | --- | --- |
