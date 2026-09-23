@@ -1,6 +1,7 @@
 using System.Collections.ObjectModel;
 using AsiBackbone.Core.Audit;
 using AsiBackbone.Core.Serialization;
+using AsiBackbone.Core.Signing;
 
 namespace AsiBackbone.Core.Emissions;
 
@@ -346,7 +347,7 @@ public sealed class GovernanceEmissionEnvelope
             null,
             null,
             null,
-            lifecycleEvent.Stage.ToString(),
+            CanonicalEnumWireNames.ForLifecycleStage(lifecycleEvent.Stage),
             payload,
             NormalizeMetadata(lifecycleEvent.Metadata, metadata));
     }

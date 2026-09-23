@@ -3,6 +3,7 @@ using AsiBackbone.Core.Actors;
 using AsiBackbone.Core.Constraints;
 using AsiBackbone.Core.Decisions;
 using AsiBackbone.Core.Serialization;
+using AsiBackbone.Core.Signing;
 
 namespace AsiBackbone.Core.Audit;
 
@@ -11,14 +12,6 @@ namespace AsiBackbone.Core.Audit;
 /// </summary>
 public sealed class DecisionReceipt : IDecisionReceipt
 {
-    private const string OutcomeAcknowledgmentRequired = "AcknowledgmentRequired";
-    private const string OutcomeAllowed = "Allowed";
-    private const string OutcomeDenied = "Denied";
-    private const string OutcomeDeferred = "Deferred";
-    private const string OutcomeEscalationRecommended = "EscalationRecommended";
-    private const string OutcomeNotApplicable = "NotApplicable";
-    private const string OutcomeWarning = "Warning";
-
     private static readonly ReadOnlyCollection<string> EmptyReasonCodes =
         Array.AsReadOnly(Array.Empty<string>());
 
@@ -336,7 +329,7 @@ public sealed class DecisionReceipt : IDecisionReceipt
         return CreateCore(
             actor,
             operationName,
-            GetOutcomeName(decision.Outcome),
+            CanonicalEnumWireNames.ForDecisionOutcome(decision.Outcome),
             UseTrustedReasonCodes(decision.ReasonCodes),
             eventId,
             occurredUtc,
@@ -426,7 +419,7 @@ public sealed class DecisionReceipt : IDecisionReceipt
         return CreateCore(
             actor,
             operationName,
-            GetOutcomeName(constraintResult.Outcome),
+            CanonicalEnumWireNames.ForConstraintOutcome(constraintResult.Outcome),
             UseTrustedReasonCodes(constraintResult.ReasonCodes),
             eventId,
             occurredUtc,
@@ -644,32 +637,6 @@ public sealed class DecisionReceipt : IDecisionReceipt
         Array.Copy(normalizedReasonCodes, filteredReasonCodes, normalizedCount);
 
         return Array.AsReadOnly(filteredReasonCodes);
-    }
-
-    private static string GetOutcomeName(GovernanceDecisionOutcome outcome)
-    {
-        return outcome switch
-        {
-            GovernanceDecisionOutcome.Allowed => OutcomeAllowed,
-            GovernanceDecisionOutcome.Warning => OutcomeWarning,
-            GovernanceDecisionOutcome.Denied => OutcomeDenied,
-            GovernanceDecisionOutcome.Deferred => OutcomeDeferred,
-            GovernanceDecisionOutcome.AcknowledgmentRequired => OutcomeAcknowledgmentRequired,
-            GovernanceDecisionOutcome.EscalationRecommended => OutcomeEscalationRecommended,
-            _ => outcome.ToString()
-        };
-    }
-
-    private static string GetOutcomeName(ConstraintEvaluationOutcome outcome)
-    {
-        return outcome switch
-        {
-            ConstraintEvaluationOutcome.NotApplicable => OutcomeNotApplicable,
-            ConstraintEvaluationOutcome.Allowed => OutcomeAllowed,
-            ConstraintEvaluationOutcome.Warning => OutcomeWarning,
-            ConstraintEvaluationOutcome.Denied => OutcomeDenied,
-            _ => outcome.ToString()
-        };
     }
 
     private static IReadOnlyDictionary<string, string> NormalizeMetadata(

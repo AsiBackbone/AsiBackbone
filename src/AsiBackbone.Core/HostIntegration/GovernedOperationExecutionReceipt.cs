@@ -1,5 +1,6 @@
 using System.Collections.ObjectModel;
 using System.Globalization;
+using AsiBackbone.Core.Signing;
 
 namespace AsiBackbone.Core.HostIntegration;
 
@@ -156,7 +157,8 @@ public sealed class GovernedOperationExecutionReceipt
 
         values[HostAccountabilityMetadataKeys.OperationExecutionId] = OperationExecutionId;
         values[HostAccountabilityMetadataKeys.MutationRecordCount] = MutationRecordCount.ToString(CultureInfo.InvariantCulture);
-        values[HostAccountabilityMetadataKeys.PersistenceOutcome] = PersistenceOutcome.ToString();
+        values[HostAccountabilityMetadataKeys.PersistenceOutcome] =
+            CanonicalEnumWireNames.ForPersistenceOutcome(PersistenceOutcome);
         values[HostAccountabilityMetadataKeys.CompletedWithoutMutation] = CompletedWithoutMutation ? "true" : "false";
 
         AddOptional(values, HostAccountabilityMetadataKeys.ExecutionAttemptId, ExecutionAttemptId);

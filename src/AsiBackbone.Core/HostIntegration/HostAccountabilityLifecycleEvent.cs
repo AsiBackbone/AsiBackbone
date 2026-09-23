@@ -1,5 +1,6 @@
 using System.Collections.ObjectModel;
 using AsiBackbone.Core.Audit;
+using AsiBackbone.Core.Signing;
 
 namespace AsiBackbone.Core.HostIntegration;
 
@@ -60,7 +61,7 @@ public static class HostAccountabilityLifecycleEvent
             residue,
             eventId: eventId,
             occurredUtc: receipt.CompletedUtc,
-            outcome: receipt.PersistenceOutcome.ToString(),
+            outcome: CanonicalEnumWireNames.ForPersistenceOutcome(receipt.PersistenceOutcome),
             metadata: receipt.ToLifecycleMetadata(metadata));
     }
 

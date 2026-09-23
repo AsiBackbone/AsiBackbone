@@ -31,7 +31,7 @@ public static class GovernedOperationExecutionReceiptCanonicalPayload
             ["mutationManifestHash"] = receipt.MutationManifestHash,
             ["mutationRecordCount"] = receipt.MutationRecordCount,
             ["operationExecutionId"] = receipt.OperationExecutionId,
-            ["persistenceOutcome"] = receipt.PersistenceOutcome.ToString(),
+            ["persistenceOutcome"] = CanonicalEnumWireNames.ForPersistenceOutcome(receipt.PersistenceOutcome),
             ["persistenceProvider"] = receipt.PersistenceProvider
         };
 

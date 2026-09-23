@@ -88,6 +88,31 @@ public sealed class GovernanceHttpRequestCorrelationDecisionReceiptExtensionsTes
     }
 
     /// <summary>
+    /// Verifies that correlation enrichment preserves the stable signed wire name for every decision outcome.
+    /// </summary>
+    [Theory]
+    [InlineData(GovernanceDecisionOutcome.Allowed, "Allowed")]
+    [InlineData(GovernanceDecisionOutcome.Warning, "Warning")]
+    [InlineData(GovernanceDecisionOutcome.Denied, "Denied")]
+    [InlineData(GovernanceDecisionOutcome.Deferred, "Deferred")]
+    [InlineData(GovernanceDecisionOutcome.AcknowledgmentRequired, "AcknowledgmentRequired")]
+    [InlineData(GovernanceDecisionOutcome.EscalationRecommended, "EscalationRecommended")]
+    public void CreateDecisionReceiptUsesStableOutcomeWireNames(
+        GovernanceDecisionOutcome value,
+        string expectedWireName)
+    {
+        GovernanceHttpRequestCorrelation correlation = new(correlationId: "request-correlation");
+        GovernanceDecision decision = CreateDecision(value);
+
+        DecisionReceipt residue = correlation.CreateDecisionReceipt(
+            GovernanceActorContext.System,
+            "operate",
+            decision);
+
+        Assert.Equal(expectedWireName, residue.Outcome);
+    }
+
+    /// <summary>
     /// Tests that the <see cref="GovernanceHttpRequestCorrelation.ToEvaluationContext"/> method propagates the correlation ID, policy version, policy hash, and safe request metadata to the evaluation context.
     /// </summary>
     [Fact]
@@ -114,5 +139,23 @@ public sealed class GovernanceHttpRequestCorrelationDecisionReceiptExtensionsTes
         Assert.Equal("hash-2", context.PolicyHash);
         Assert.Equal("GET", context.Metadata[GovernanceHttpRequestMetadataKeys.Method]);
         Assert.Equal("policy", context.Metadata["operation.scope"]);
+    }
+
+    private static GovernanceDecision CreateDecision(GovernanceDecisionOutcome value)
+    {
+        return value switch
+        {
+            GovernanceDecisionOutcome.Allowed => GovernanceDecision.Allow(),
+            GovernanceDecisionOutcome.Warning => GovernanceDecision.Warning("wire.warning", "Wire-name fixture."),
+            GovernanceDecisionOutcome.Denied => GovernanceDecision.Deny("wire.denied", "Wire-name fixture."),
+            GovernanceDecisionOutcome.Deferred => GovernanceDecision.Defer("wire.deferred", "Wire-name fixture."),
+            GovernanceDecisionOutcome.AcknowledgmentRequired => GovernanceDecision.RequireAcknowledgment(
+                "wire.acknowledgment-required",
+                "Wire-name fixture."),
+            GovernanceDecisionOutcome.EscalationRecommended => GovernanceDecision.Escalate(
+                "wire.escalation-recommended",
+                "Wire-name fixture."),
+            _ => throw new ArgumentOutOfRangeException(nameof(value), value, "Test decision outcome must be defined.")
+        };
     }
 }
