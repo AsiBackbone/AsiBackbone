@@ -55,7 +55,7 @@ The builder covers every field the grant carries, so the hash binds the whole gr
 
 | Profile | Subject/operation binding | Proof | Acknowledgment reference | Bounded-use/replay check | Intended use |
 | --- | --- | --- | --- | --- | --- |
-| `CreateExecutionBoundary(...)` | Subject required; operation optional | Required | Optional; caller can require it | Required by default; caller must explicitly disable it when another boundary owns replay/use enforcement | Operational gateways and other consequential execution boundaries |
+| `CreateBoundExecutionBoundary(...)` | Subject required; operation optional | Required | Optional; caller can require it | Required by default; caller must explicitly disable it when another boundary owns replay/use enforcement | Operational gateways and other consequential execution boundaries |
 | `CreateMetadataValidation(...)` | Optional | Not performed | Optional; caller can require it | Not performed | Structural, temporal, policy, scope, and binding validation where proof/use enforcement is intentionally out of scope |
 | `Create(...)` | Optional | Configurable; default is off | Configurable; default is off | Configurable; default is off | Fully configurable validation path |
 
@@ -74,7 +74,7 @@ omitted or blank, so later option customization cannot silently downgrade the pr
 The metadata-validation profile keeps `expectedSubjectId` and `expectedOperationName` optional and intentionally does not
 expose proof or use-check switches. Omitting those expectations means that validation result makes no claim that the grant
 belongs to the current subject or requested operation. If proof or bounded-use behavior is needed, use
-`CreateExecutionBoundary(...)` or the fully configurable `Create(...)` factory instead.
+`CreateBoundExecutionBoundary(...)` or the fully configurable `Create(...)` factory instead.
 
 ## Validation at the execution boundary
 
@@ -94,7 +94,7 @@ Use the explicit execution-boundary profile for consequential execution:
 ```csharp
 CapabilityGrantValidationResult result = await CapabilityGrantValidator.ValidateAsync(
     signedGrant,
-    CapabilityGrantValidationOptions.CreateExecutionBoundary(
+    CapabilityGrantValidationOptions.CreateBoundExecutionBoundary(
         CapabilityGrantBindingExpectations.Create(authenticatedSubjectId, "robotics.execute"),
         issuer: "policy-engine",
         audience: "robotics-gateway",
@@ -136,7 +136,7 @@ The explicit profiles are additive and do not silently change existing 3.x behav
 
 - Existing calls to `CapabilityGrantValidationOptions.Create(...)` continue to honor their current arguments and defaults.
 - Existing calls to `ValidateAsync(signedGrant)` continue to use the legacy default options where proof, acknowledgment-reference, and bounded-use checks are disabled.
-- New operational-gateway and consequential-execution code should prefer `CreateExecutionBoundary(...)`.
+- New operational-gateway and consequential-execution code should prefer `CreateBoundExecutionBoundary(...)`.
 - Supply `CapabilityGrantBindingExpectations` built from the authenticated current subject; existing execution-boundary
   calls must add this required argument. The retained legacy overload throws instead of creating a subject-unbound
   profile. Include the requested operation when the issuer restricted the grant to an operation.

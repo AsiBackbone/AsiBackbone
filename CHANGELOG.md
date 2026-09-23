@@ -10,10 +10,10 @@ This project follows the spirit of [Keep a Changelog](https://keepachangelog.com
 
 * **Breaking (behavior):** `CapabilityGrantValidator` now compares the signed grant's `SubjectId` and `OperationName` with normalized host
   expectations. Mismatches fail closed with the new `SubjectMismatch`/`capability.subject-mismatch` and
-  `OperationMismatch`/`capability.operation-mismatch` results. `CreateExecutionBoundary` now requires
+  `OperationMismatch`/`capability.operation-mismatch` results. `CreateBoundExecutionBoundary` requires
   `CapabilityGrantBindingExpectations` that populate `ExpectedSubjectId`, preventing consequential execution from
   accidentally omitting the current-subject binding. The
-  retained no-subject overload throws rather than constructing an unbound profile, preserving its source and binary
+  retained `CreateExecutionBoundary` method throws rather than constructing an unbound profile, preserving its source and binary
   signature while failing closed. `Create` and `CreateMetadataValidation` can opt into either expectation through
   `WithExpectedBindings`; omitting them remains explicit for reduced validation paths. Callers must pass the authenticated
   current subject and should pass the requested operation when the grant is operation-bound (#810).

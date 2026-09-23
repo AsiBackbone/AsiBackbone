@@ -240,7 +240,7 @@ public sealed class CapabilityGrantValidationOptions
     /// Creates the legacy execution-boundary profile without a subject expectation.
     /// </summary>
     /// <remarks>
-    /// This overload now fails closed. Use the overload whose required first argument is
+    /// This method now fails closed. Use <see cref="CreateBoundExecutionBoundary" />, whose required first argument is
     /// <see cref="CapabilityGrantBindingExpectations" />.
     /// </remarks>
     public static CapabilityGrantValidationOptions CreateExecutionBoundary(
@@ -267,13 +267,13 @@ public sealed class CapabilityGrantValidationOptions
         CanonicalPayloadOptions? proofPayloadOptions = null)
     {
         throw new InvalidOperationException(
-            "Execution-boundary validation requires subject binding expectations. Use the binding-aware CreateExecutionBoundary overload.");
+            "Execution-boundary validation requires subject binding expectations. Use CreateBoundExecutionBoundary.");
     }
 
     /// <summary>
     /// Creates a proof-verifying execution-boundary profile with authoritative host binding expectations.
     /// </summary>
-    public static CapabilityGrantValidationOptions CreateExecutionBoundary(
+    public static CapabilityGrantValidationOptions CreateBoundExecutionBoundary(
         CapabilityGrantBindingExpectations bindingExpectations,
         string? issuer = null,
         string? audience = null,

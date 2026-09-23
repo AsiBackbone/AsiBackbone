@@ -15,9 +15,9 @@ public sealed class CapabilityGrantValidationProfileTests
     /// Verifies that the execution-boundary profile requires proof and bounded-use validation by default.
     /// </summary>
     [Fact]
-    public void CreateExecutionBoundaryRequiresProofAndBoundedUseByDefault()
+    public void CreateBoundExecutionBoundaryRequiresProofAndBoundedUseByDefault()
     {
-        var options = CapabilityGrantValidationOptions.CreateExecutionBoundary(
+        var options = CapabilityGrantValidationOptions.CreateBoundExecutionBoundary(
             CapabilityGrantBindingExpectations.Create(" subject-1 ", " robotics.execute "),
             issuer: " issuer-1 ",
             audience: " gateway-1 ",
@@ -42,9 +42,9 @@ public sealed class CapabilityGrantValidationProfileTests
     /// Verifies that callers can explicitly disable bounded-use validation when another trusted boundary owns that responsibility.
     /// </summary>
     [Fact]
-    public void CreateExecutionBoundaryAllowsCallerToMakeBoundedUseExplicitlyOptional()
+    public void CreateBoundExecutionBoundaryAllowsCallerToMakeBoundedUseExplicitlyOptional()
     {
-        var options = CapabilityGrantValidationOptions.CreateExecutionBoundary(
+        var options = CapabilityGrantValidationOptions.CreateBoundExecutionBoundary(
             CapabilityGrantBindingExpectations.Create("subject-1"),
             audience: "gateway-1",
             requireUseCheck: false,
@@ -61,7 +61,7 @@ public sealed class CapabilityGrantValidationProfileTests
     [Fact]
     public void WithExpectedBindingsPreservesRequiredExecutionSubject()
     {
-        var options = CapabilityGrantValidationOptions.CreateExecutionBoundary(
+        var options = CapabilityGrantValidationOptions.CreateBoundExecutionBoundary(
             CapabilityGrantBindingExpectations.Create("subject-1", "robotics.execute"),
             audience: "gateway-1");
 
@@ -84,7 +84,7 @@ public sealed class CapabilityGrantValidationProfileTests
     [InlineData(null)]
     [InlineData("")]
     [InlineData("   ")]
-    public void CreateExecutionBoundaryRejectsMissingSubjectExpectation(string? expectedSubjectId)
+    public void CreateBoundExecutionBoundaryRejectsMissingSubjectExpectation(string? expectedSubjectId)
     {
         _ = Assert.ThrowsAny<ArgumentException>(() =>
             CapabilityGrantBindingExpectations.Create(expectedSubjectId!));
@@ -98,16 +98,18 @@ public sealed class CapabilityGrantValidationProfileTests
     {
         _ = Assert.Throws<InvalidOperationException>(() =>
             CapabilityGrantValidationOptions.CreateExecutionBoundary());
+        _ = Assert.Throws<InvalidOperationException>(() =>
+            CapabilityGrantValidationOptions.CreateExecutionBoundary(null));
     }
 
     /// <summary>
     /// Verifies that the binding-aware execution profile rejects a null expectation object.
     /// </summary>
     [Fact]
-    public void CreateExecutionBoundaryRejectsNullBindingExpectations()
+    public void CreateBoundExecutionBoundaryRejectsNullBindingExpectations()
     {
         _ = Assert.Throws<ArgumentNullException>(() =>
-            CapabilityGrantValidationOptions.CreateExecutionBoundary(bindingExpectations: null!));
+            CapabilityGrantValidationOptions.CreateBoundExecutionBoundary(bindingExpectations: null!));
     }
 
     /// <summary>
@@ -138,7 +140,7 @@ public sealed class CapabilityGrantValidationProfileTests
 
         CapabilityGrantValidationResult result = await CapabilityGrantValidator.ValidateAsync(
             signedGrant,
-            CapabilityGrantValidationOptions.CreateExecutionBoundary(
+            CapabilityGrantValidationOptions.CreateBoundExecutionBoundary(
                 CapabilityGrantBindingExpectations.Create("subject-1"),
                 audience: "gateway-1",
                 validationUtc: Now),
@@ -162,7 +164,7 @@ public sealed class CapabilityGrantValidationProfileTests
 
         CapabilityGrantValidationResult result = await CapabilityGrantValidator.ValidateAsync(
             signedGrant,
-            CapabilityGrantValidationOptions.CreateExecutionBoundary(
+            CapabilityGrantValidationOptions.CreateBoundExecutionBoundary(
                 CapabilityGrantBindingExpectations.Create("subject-1"),
                 audience: "gateway-1",
                 validationUtc: Now),
