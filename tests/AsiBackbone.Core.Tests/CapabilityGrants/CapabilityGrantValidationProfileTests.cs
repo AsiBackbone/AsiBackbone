@@ -56,6 +56,28 @@ public sealed class CapabilityGrantValidationProfileTests
     }
 
     /// <summary>
+    /// Verifies that cloning an execution-boundary profile cannot remove its required subject binding.
+    /// </summary>
+    [Fact]
+    public void WithExpectedBindingsPreservesRequiredExecutionSubject()
+    {
+        var options = CapabilityGrantValidationOptions.CreateExecutionBoundary(
+            CapabilityGrantBindingExpectations.Create("subject-1", "robotics.execute"),
+            audience: "gateway-1");
+
+        CapabilityGrantValidationOptions omittedSubject = options.WithExpectedBindings(
+            expectedOperationName: "robotics.inspect");
+        CapabilityGrantValidationOptions blankSubject = options.WithExpectedBindings(
+            expectedSubjectId: " ",
+            expectedOperationName: "robotics.inspect");
+
+        Assert.Equal("subject-1", omittedSubject.ExpectedSubjectId);
+        Assert.Equal("robotics.inspect", omittedSubject.ExpectedOperationName);
+        Assert.Equal("subject-1", blankSubject.ExpectedSubjectId);
+        Assert.Equal("robotics.inspect", blankSubject.ExpectedOperationName);
+    }
+
+    /// <summary>
     /// Verifies that the execution-boundary profile cannot be created without a nonblank authoritative subject.
     /// </summary>
     [Theory]

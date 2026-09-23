@@ -20,6 +20,7 @@ public sealed class CapabilityGrantValidationOptions
         string? resourceBinding,
         string? expectedSubjectId,
         string? expectedOperationName,
+        bool requireSubjectBinding,
         bool requireProof,
         bool requireAcknowledgmentReference,
         bool requireUseCheck,
@@ -67,7 +68,15 @@ public sealed class CapabilityGrantValidationOptions
         GatewayBinding = NormalizeOptional(gatewayBinding);
         ResourceBinding = NormalizeOptional(resourceBinding);
         ExpectedSubjectId = NormalizeOptional(expectedSubjectId);
+        if (requireSubjectBinding && ExpectedSubjectId is null)
+        {
+            throw new ArgumentException(
+                "A subject expectation is required for this validation profile.",
+                nameof(expectedSubjectId));
+        }
+
         ExpectedOperationName = NormalizeOptional(expectedOperationName);
+        RequireSubjectBinding = requireSubjectBinding;
         RequireProof = requireProof;
         RequireAcknowledgmentReference = requireAcknowledgmentReference;
         RequireUseCheck = requireUseCheck;
@@ -153,6 +162,7 @@ public sealed class CapabilityGrantValidationOptions
             resourceBinding,
             expectedSubjectId: null,
             expectedOperationName: null,
+            requireSubjectBinding: false,
             requireProof,
             requireAcknowledgmentReference,
             requireUseCheck,
@@ -173,6 +183,23 @@ public sealed class CapabilityGrantValidationOptions
         string? expectedSubjectId = null,
         string? expectedOperationName = null)
     {
+        string? normalizedSubjectId = NormalizeOptional(expectedSubjectId);
+        if (RequireSubjectBinding && normalizedSubjectId is null)
+        {
+            normalizedSubjectId = ExpectedSubjectId;
+        }
+
+        return WithExpectedBindingsCore(
+            normalizedSubjectId,
+            expectedOperationName,
+            RequireSubjectBinding);
+    }
+
+    private CapabilityGrantValidationOptions WithExpectedBindingsCore(
+        string? expectedSubjectId,
+        string? expectedOperationName,
+        bool requireSubjectBinding)
+    {
         return new CapabilityGrantValidationOptions(
             Issuer,
             Audience,
@@ -187,6 +214,7 @@ public sealed class CapabilityGrantValidationOptions
             ResourceBinding,
             expectedSubjectId,
             expectedOperationName,
+            requireSubjectBinding,
             RequireProof,
             RequireAcknowledgmentReference,
             RequireUseCheck,
@@ -283,7 +311,10 @@ public sealed class CapabilityGrantValidationOptions
             requiredProofProvider: requiredProofProvider,
             requiredProofHashAlgorithm: requiredProofHashAlgorithm,
             proofPayloadOptions: proofPayloadOptions)
-            .WithExpectedBindings(bindingExpectations.SubjectId, bindingExpectations.OperationName);
+            .WithExpectedBindingsCore(
+                bindingExpectations.SubjectId,
+                bindingExpectations.OperationName,
+                requireSubjectBinding: true);
     }
 
     public static CapabilityGrantValidationOptions CreateMetadataValidation(
@@ -338,4 +369,6 @@ public sealed class CapabilityGrantValidationOptions
     {
         return string.IsNullOrWhiteSpace(value) ? null : value.Trim();
     }
+
+    private bool RequireSubjectBinding { get; }
 }

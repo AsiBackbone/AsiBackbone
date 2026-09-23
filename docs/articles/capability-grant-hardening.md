@@ -68,6 +68,8 @@ operation. Both
 comparisons are ordinal and fail closed when the grant value is missing or differs. Bounded-use validation is enabled by
 default with `maxUseCount: 1`, but the host can explicitly set `requireUseCheck: false` when replay/use enforcement is
 performed atomically by another trusted execution boundary. That opt-out should be intentional and documented by the host.
+Copies created through `WithExpectedBindings` preserve the execution profile's required subject when the replacement is
+omitted or blank, so later option customization cannot silently downgrade the profile to subject-unbound validation.
 
 The metadata-validation profile keeps `expectedSubjectId` and `expectedOperationName` optional and intentionally does not
 expose proof or use-check switches. Omitting those expectations means that validation result makes no claim that the grant
