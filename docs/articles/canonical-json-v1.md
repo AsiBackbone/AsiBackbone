@@ -70,7 +70,7 @@ A finite binary64 value is formatted as follows. This is the invariant-culture g
 5. **Fixed notation.** When `k <= 0`, write `0.`, then `-k` zeroes, then the digits. When `0 < k < n`, write the first `k` digits, `.`, and the remaining digits. When `k >= n`, write the digits followed by `k - n` zeroes, with no decimal point.
 6. **Scientific notation.** Write `d1`; if `n > 1`, write `.` and `d2...dn`. Then write `E`, the exponent sign (`+` or `-`, always present), and the absolute value of `k - 1` with at least two digits.
 
-The layout differs from both JCS and ECMAScript, which use fixed notation from `1e-7` up to `1e21`. Verifiers must implement the layout above rather than reuse a JavaScript or JCS number serializer; only the digit generation in step 3 can be shared.
+The layout differs from both JCS and ECMAScript, which use fixed notation for magnitudes from `1e-6` (inclusive) up to `1e21` (exclusive). Verifiers must implement the layout above rather than reuse a JavaScript or JCS number serializer; only the digit generation in step 3 can be shared.
 
 | Value | Canonical v1 text |
 | --- | --- |
@@ -117,7 +117,7 @@ Builders emit enumeration values as fixed protocol strings from `CanonicalEnumWi
 
 ## Metadata filtering and normalization
 
-Metadata dictionaries on decision receipts, audit ledger records, lifecycle events, emission envelopes and payloads, outbox entries, and capability grants pass through the same filter before hashing:
+Metadata dictionaries on decision receipts, audit ledger records, lifecycle events, emission envelopes and payloads, outbox entries, capability grants, and governed operation execution receipts pass through the same filter before hashing. Every built-in canonical payload builder, including `GovernedOperationExecutionReceiptCanonicalPayload`, uses this one implementation:
 
 1. **Allow-list.** An entry is included only when its key, trimmed, is in `CanonicalPayloadOptions.MetadataKeyAllowList` by ordinal comparison. The default allow-list is empty, so with default options no metadata is hashed.
 2. **Key trimming.** Included keys are trimmed of leading and trailing white space.
@@ -252,6 +252,40 @@ SHA-256:
 
 ```text
 9636918eea3a4d7e121499e4def36588950427de5250739df5d4fe9c4e01a6b5
+```
+
+### Vector 4: governed operation execution receipt
+
+This vector exercises `GovernedOperationExecutionReceiptCanonicalPayload.Create` with the metadata allow-list `safe`. `GovernedOperationExecutionReceipt.Create` trims metadata when the receipt is created, and the canonical filter then applies the rules above.
+
+Inputs:
+
+```text
+operationExecutionId: operation-1
+executionAttemptId: attempt-1 (artifact identifier is operationExecutionId:executionAttemptId)
+persistenceOutcome: Committed
+mutationBatchId: batch-1
+mutationRecordCount: 2
+mutationManifestHash: ABCDEF (the receipt stores it in lowercase)
+mutationManifestAlgorithm: SHA-256
+completedUtc: 2026-09-22T12:00:00Z
+persistenceProvider: efcore
+decisionAuditRecordId: record-1
+metadata:
+  " safe ": "  included  "
+  "ignored": "x"
+```
+
+Canonical JSON:
+
+```json
+{"artifactId":"operation-1:attempt-1","artifactType":"asibackbone.governed-operation-execution-receipt","canonicalizationVersion":"asibackbone.canonical-json.v1","content":{"completedUtc":"2026-09-22T12:00:00.0000000Z","completedWithoutMutation":false,"decisionAuditRecordId":"record-1","executionAttemptId":"attempt-1","metadata":{"safe":"included"},"mutationBatchId":"batch-1","mutationManifestAlgorithm":"SHA-256","mutationManifestHash":"abcdef","mutationRecordCount":2,"operationExecutionId":"operation-1","persistenceOutcome":"Committed","persistenceProvider":"efcore"},"payloadSchemaVersion":"1.0.0"}
+```
+
+SHA-256:
+
+```text
+9f9614b15817b0728fdb7f81f311e4d1578a5173d1cd1d52d5ae3cacb2b15d11
 ```
 
 ## Hash selection

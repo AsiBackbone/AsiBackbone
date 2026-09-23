@@ -14,9 +14,12 @@ This project follows the spirit of [Keep a Changelog](https://keepachangelog.com
   enumeration wire strings, and metadata filtering and normalization. It records as a contract decision that
   leading and trailing white space in allow-listed metadata keys and values is insignificant and that runtime null,
   empty, and white-space-only metadata values are equivalent. No canonical bytes change, so the version stays
-  `asibackbone.canonical-json.v1`. Two further golden vectors, one covering escaping and integers and one covering
-  decision receipt builder normalization, are published with SHA-256 values and locked by
-  `CanonicalJsonV1InteroperabilityTests`. Signing, verification, managed-key, and signed-record documentation and
+  `asibackbone.canonical-json.v1`. Three further golden vectors, covering escaping and integers, decision receipt builder normalization, and a
+  governed operation execution receipt, are published with SHA-256 values and locked by
+  `CanonicalJsonV1InteroperabilityTests`. `GovernedOperationExecutionReceiptCanonicalPayload` now uses the same metadata filter as `CanonicalPayloadBuilder`;
+  receipts built through `GovernedOperationExecutionReceipt.Create` already carry trimmed, non-null metadata, so their
+  canonical bytes are unchanged, and a fourth vector locks that output. Signing, verification, managed-key, and
+  signed-record documentation and
   the `AsiBackbone.Signing.ManagedKey` package README now link to the specification (#814).
 
 ### Security

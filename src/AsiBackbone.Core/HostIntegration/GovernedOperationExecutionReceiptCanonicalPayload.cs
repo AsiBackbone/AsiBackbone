@@ -25,7 +25,7 @@ public static class GovernedOperationExecutionReceiptCanonicalPayload
             ["completedWithoutMutation"] = receipt.CompletedWithoutMutation,
             ["decisionAuditRecordId"] = receipt.DecisionAuditRecordId,
             ["executionAttemptId"] = receipt.ExecutionAttemptId,
-            ["metadata"] = FilterMetadata(receipt.Metadata, effectiveOptions),
+            ["metadata"] = CanonicalPayloadBuilder.FilterMetadata(receipt.Metadata, effectiveOptions),
             ["mutationBatchId"] = receipt.MutationBatchId,
             ["mutationManifestAlgorithm"] = receipt.MutationManifestAlgorithm,
             ["mutationManifestHash"] = receipt.MutationManifestHash,
@@ -48,21 +48,5 @@ public static class GovernedOperationExecutionReceiptCanonicalPayload
         return receipt.ExecutionAttemptId is null
             ? receipt.OperationExecutionId
             : $"{receipt.OperationExecutionId}:{receipt.ExecutionAttemptId}";
-    }
-
-    private static SortedDictionary<string, object?> FilterMetadata(
-        IReadOnlyDictionary<string, string> metadata,
-        CanonicalPayloadOptions options)
-    {
-        SortedDictionary<string, object?> filtered = new(StringComparer.Ordinal);
-        foreach (KeyValuePair<string, string> item in metadata)
-        {
-            if (options.AllowsMetadataKey(item.Key))
-            {
-                filtered[item.Key] = item.Value;
-            }
-        }
-
-        return filtered;
     }
 }

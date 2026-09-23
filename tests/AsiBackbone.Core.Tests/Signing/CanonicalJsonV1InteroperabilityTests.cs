@@ -1,5 +1,6 @@
 using AsiBackbone.Core.Actors;
 using AsiBackbone.Core.Audit;
+using AsiBackbone.Core.HostIntegration;
 using AsiBackbone.Core.Signing;
 using Xunit;
 
@@ -22,6 +23,12 @@ public sealed class CanonicalJsonV1InteroperabilityTests
     private const string DecisionReceiptVectorJson = /*lang=json,strict*/ "{\"artifactId\":\"receipt-1\",\"artifactType\":\"asibackbone.audit-residue\",\"canonicalizationVersion\":\"asibackbone.canonical-json.v1\",\"content\":{\"actorDisplayName\":null,\"actorId\":\"actor-1\",\"actorType\":\"Human\",\"auditResidueId\":\"receipt-1\",\"constraintCount\":null,\"constraintSetHash\":null,\"correlationId\":\"correlation-1\",\"decisionLatencyMs\":42,\"decisionStage\":null,\"emitterProvider\":null,\"emitterStatus\":null,\"eventId\":\"receipt-1\",\"gatewayExecutionId\":null,\"metadata\":{\"blank\":\"\",\"note\":\"two  words\",\"region\":\"us-east\",\"tier\":\"\"},\"occurredUtc\":\"2026-09-22T12:34:56.1234567Z\",\"operationName\":\"orders.approve\",\"organizationHash\":null,\"outboxSequence\":null,\"outcome\":\"Allowed\",\"parentSpanId\":null,\"policyHash\":null,\"policyScope\":null,\"policyVersion\":\"policy-v1\",\"reasonCodes\":[\"policy.a\",\"policy.b\"],\"riskScore\":0.5,\"schemaVersion\":\"1.0.0\",\"spanId\":null,\"tenantHash\":null,\"traceId\":null},\"payloadSchemaVersion\":\"1.0.0\"}";
 
     private const string DecisionReceiptVectorSha256 = "9636918eea3a4d7e121499e4def36588950427de5250739df5d4fe9c4e01a6b5";
+
+    private const string ExecutionReceiptVectorJson = /*lang=json,strict*/ "{\"artifactId\":\"operation-1:attempt-1\",\"artifactType\":\"asibackbone.governed-operation-execution-receipt\",\"canonicalizationVersion\":\"asibackbone.canonical-json.v1\",\"content\":{\"completedUtc\":\"2026-09-22T12:00:00.0000000Z\",\"completedWithoutMutation\":false,\"decisionAuditRecordId\":\"record-1\",\"executionAttemptId\":\"attempt-1\",\"metadata\":{\"safe\":\"included\"},\"mutationBatchId\":\"batch-1\",\"mutationManifestAlgorithm\":\"SHA-256\",\"mutationManifestHash\":\"abcdef\",\"mutationRecordCount\":2,\"operationExecutionId\":\"operation-1\",\"persistenceOutcome\":\"Committed\",\"persistenceProvider\":\"efcore\"},\"payloadSchemaVersion\":\"1.0.0\"}";
+
+    private const string ExecutionReceiptVectorSha256 = "9f9614b15817b0728fdb7f81f311e4d1578a5173d1cd1d52d5ae3cacb2b15d11";
+
+    private static readonly string[] SafeAllowList = ["safe"];
 
     private static readonly string[] VectorMetadataAllowList = ["region", "tier", "blank", "note"];
 
@@ -140,6 +147,37 @@ public sealed class CanonicalJsonV1InteroperabilityTests
 
         Assert.Equal(DecisionReceiptVectorJson, payload.CanonicalJson);
         Assert.Equal(DecisionReceiptVectorSha256, CanonicalPayloadHasher.ComputeHash(payload).HashValue);
+    }
+
+    /// <summary>
+    /// Locks the governed operation execution receipt vector, which uses the shared metadata filter.
+    /// </summary>
+    [Fact]
+    public void ExecutionReceiptVectorMatchesPublishedBytesAndHash()
+    {
+        GovernedOperationExecutionReceipt receipt = GovernedOperationExecutionReceipt.Create(
+            "operation-1",
+            GovernedOperationPersistenceOutcome.Committed,
+            executionAttemptId: "attempt-1",
+            mutationBatchId: "batch-1",
+            mutationRecordCount: 2,
+            mutationManifestHash: "ABCDEF",
+            mutationManifestAlgorithm: "SHA-256",
+            completedUtc: new DateTimeOffset(2026, 9, 22, 12, 0, 0, TimeSpan.Zero),
+            persistenceProvider: "efcore",
+            decisionAuditRecordId: "record-1",
+            metadata: new Dictionary<string, string>(StringComparer.Ordinal)
+            {
+                [" safe "] = "  included  ",
+                ["ignored"] = "x"
+            });
+
+        CanonicalPayload payload = GovernedOperationExecutionReceiptCanonicalPayload.Create(
+            receipt,
+            CanonicalPayloadOptions.Create(SafeAllowList));
+
+        Assert.Equal(ExecutionReceiptVectorJson, payload.CanonicalJson);
+        Assert.Equal(ExecutionReceiptVectorSha256, CanonicalPayloadHasher.ComputeHash(payload).HashValue);
     }
 
     /// <summary>

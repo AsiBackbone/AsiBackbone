@@ -303,7 +303,9 @@ public static class CanonicalPayloadBuilder
             };
     }
 
-    private static SortedDictionary<string, object?> FilterMetadata(IReadOnlyDictionary<string, string>? metadata, CanonicalPayloadOptions options)
+    // Shared by every canonical payload builder in this assembly so all artifacts apply the metadata filtering and
+    // normalization rules published for asibackbone.canonical-json.v1.
+    internal static SortedDictionary<string, object?> FilterMetadata(IReadOnlyDictionary<string, string>? metadata, CanonicalPayloadOptions options)
     {
         SortedDictionary<string, object?> filteredMetadata = new(StringComparer.Ordinal);
 
