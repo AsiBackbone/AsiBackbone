@@ -1,5 +1,7 @@
 using AsiBackbone.Core.Actors;
 using AsiBackbone.Core.Audit;
+using AsiBackbone.Core.Constraints;
+using AsiBackbone.Core.Decisions;
 using AsiBackbone.Core.Emissions;
 using AsiBackbone.Core.HostIntegration;
 
@@ -42,6 +44,32 @@ internal static class CanonicalEnumWireNames
             DecisionReceiptLifecycleStage.ExternalEmissionDelivered => "ExternalEmissionDelivered",
             DecisionReceiptLifecycleStage.ExternalEmissionFailed => "ExternalEmissionFailed",
             DecisionReceiptLifecycleStage.ExternalEmissionDeadLettered => "ExternalEmissionDeadLettered",
+            _ => ThrowUndefined(value)
+        };
+    }
+
+    public static string ForDecisionOutcome(GovernanceDecisionOutcome value)
+    {
+        return value switch
+        {
+            GovernanceDecisionOutcome.Allowed => "Allowed",
+            GovernanceDecisionOutcome.Warning => "Warning",
+            GovernanceDecisionOutcome.Denied => "Denied",
+            GovernanceDecisionOutcome.Deferred => "Deferred",
+            GovernanceDecisionOutcome.AcknowledgmentRequired => "AcknowledgmentRequired",
+            GovernanceDecisionOutcome.EscalationRecommended => "EscalationRecommended",
+            _ => ThrowUndefined(value)
+        };
+    }
+
+    public static string ForConstraintOutcome(ConstraintEvaluationOutcome value)
+    {
+        return value switch
+        {
+            ConstraintEvaluationOutcome.NotApplicable => "NotApplicable",
+            ConstraintEvaluationOutcome.Allowed => "Allowed",
+            ConstraintEvaluationOutcome.Warning => "Warning",
+            ConstraintEvaluationOutcome.Denied => "Denied",
             _ => ThrowUndefined(value)
         };
     }

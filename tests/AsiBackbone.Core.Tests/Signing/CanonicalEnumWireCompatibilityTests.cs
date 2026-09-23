@@ -1,6 +1,8 @@
 using System.Text.Json;
 using AsiBackbone.Core.Actors;
 using AsiBackbone.Core.Audit;
+using AsiBackbone.Core.Constraints;
+using AsiBackbone.Core.Decisions;
 using AsiBackbone.Core.Emissions;
 using AsiBackbone.Core.HostIntegration;
 using AsiBackbone.Core.Outbox;
@@ -123,9 +125,80 @@ public sealed class CanonicalEnumWireCompatibilityTests
         CanonicalPayload lifecyclePayload = CanonicalPayloadBuilder.ForDecisionReceiptLifecycleEvent(lifecycleEvent);
         CanonicalPayload envelopePayload = CanonicalPayloadBuilder.ForGovernanceEmissionEnvelope(
             CreateEnvelope(GovernanceEmissionEventType.AuditLifecycle, lifecycleStage: value));
+        CanonicalPayload derivedEnvelopePayload = CanonicalPayloadBuilder.ForGovernanceEmissionEnvelope(
+            GovernanceEmissionEnvelope.FromLifecycleEvent(lifecycleEvent));
 
         Assert.Equal(expectedWireName, ReadContentString(lifecyclePayload, "stage"));
         Assert.Equal(expectedWireName, ReadContentString(envelopePayload, "lifecycleStage"));
+        Assert.Equal(expectedWireName, ReadContentString(derivedEnvelopePayload, "decisionStage"));
+    }
+
+    /// <summary>
+    /// Locks governance decision outcomes created through every typed receipt path to explicit v1 wire names.
+    /// </summary>
+    [Theory]
+    [InlineData(GovernanceDecisionOutcome.Allowed, "Allowed")]
+    [InlineData(GovernanceDecisionOutcome.Warning, "Warning")]
+    [InlineData(GovernanceDecisionOutcome.Denied, "Denied")]
+    [InlineData(GovernanceDecisionOutcome.Deferred, "Deferred")]
+    [InlineData(GovernanceDecisionOutcome.AcknowledgmentRequired, "AcknowledgmentRequired")]
+    [InlineData(GovernanceDecisionOutcome.EscalationRecommended, "EscalationRecommended")]
+    public void GovernanceDecisionOutcomesUseStableV1WireNames(
+        GovernanceDecisionOutcome value,
+        string expectedWireName)
+    {
+        GovernanceDecision decision = CreateDecision(value);
+        var directReceipt = DecisionReceipt.FromDecision(
+            GovernanceActorContext.System,
+            "orders.approve",
+            decision,
+            eventId: "event-decision-direct");
+        DecisionReceipt builderReceipt = DecisionReceiptBuilder.FromDecision(
+                GovernanceActorContext.System,
+                "orders.approve",
+                decision)
+            .WithEventId("event-decision-builder")
+            .Build();
+
+        Assert.Equal(expectedWireName, ReadContentString(
+            CanonicalPayloadBuilder.ForDecisionReceipt(directReceipt),
+            "outcome"));
+        Assert.Equal(expectedWireName, ReadContentString(
+            CanonicalPayloadBuilder.ForDecisionReceipt(builderReceipt),
+            "outcome"));
+    }
+
+    /// <summary>
+    /// Locks constraint outcomes created through every typed receipt path to explicit v1 wire names.
+    /// </summary>
+    [Theory]
+    [InlineData(ConstraintEvaluationOutcome.NotApplicable, "NotApplicable")]
+    [InlineData(ConstraintEvaluationOutcome.Allowed, "Allowed")]
+    [InlineData(ConstraintEvaluationOutcome.Warning, "Warning")]
+    [InlineData(ConstraintEvaluationOutcome.Denied, "Denied")]
+    public void ConstraintOutcomesUseStableV1WireNames(
+        ConstraintEvaluationOutcome value,
+        string expectedWireName)
+    {
+        ConstraintEvaluationResult constraintResult = CreateConstraintResult(value);
+        var directReceipt = DecisionReceipt.FromConstraint(
+            GovernanceActorContext.System,
+            "orders.approve",
+            constraintResult,
+            eventId: "event-constraint-direct");
+        DecisionReceipt builderReceipt = DecisionReceiptBuilder.FromConstraint(
+                GovernanceActorContext.System,
+                "orders.approve",
+                constraintResult)
+            .WithEventId("event-constraint-builder")
+            .Build();
+
+        Assert.Equal(expectedWireName, ReadContentString(
+            CanonicalPayloadBuilder.ForDecisionReceipt(directReceipt),
+            "outcome"));
+        Assert.Equal(expectedWireName, ReadContentString(
+            CanonicalPayloadBuilder.ForDecisionReceipt(builderReceipt),
+            "outcome"));
     }
 
     /// <summary>
@@ -243,6 +316,40 @@ public sealed class CanonicalEnumWireCompatibilityTests
             GovernanceActorType.Service => GovernanceActorContext.Service("service-1"),
             GovernanceActorType.Agent => GovernanceActorContext.Agent("agent-1"),
             _ => throw new ArgumentOutOfRangeException(nameof(value), value, "Test actor type must be defined.")
+        };
+    }
+
+    private static GovernanceDecision CreateDecision(GovernanceDecisionOutcome value)
+    {
+        return value switch
+        {
+            GovernanceDecisionOutcome.Allowed => GovernanceDecision.Allow(),
+            GovernanceDecisionOutcome.Warning => GovernanceDecision.Warning("wire.warning", "Wire-name fixture."),
+            GovernanceDecisionOutcome.Denied => GovernanceDecision.Deny("wire.denied", "Wire-name fixture."),
+            GovernanceDecisionOutcome.Deferred => GovernanceDecision.Defer("wire.deferred", "Wire-name fixture."),
+            GovernanceDecisionOutcome.AcknowledgmentRequired => GovernanceDecision.RequireAcknowledgment(
+                "wire.acknowledgment-required",
+                "Wire-name fixture."),
+            GovernanceDecisionOutcome.EscalationRecommended => GovernanceDecision.Escalate(
+                "wire.escalation-recommended",
+                "Wire-name fixture."),
+            _ => throw new ArgumentOutOfRangeException(nameof(value), value, "Test decision outcome must be defined.")
+        };
+    }
+
+    private static ConstraintEvaluationResult CreateConstraintResult(ConstraintEvaluationOutcome value)
+    {
+        return value switch
+        {
+            ConstraintEvaluationOutcome.NotApplicable => ConstraintEvaluationResult.NotApplicable(),
+            ConstraintEvaluationOutcome.Allowed => ConstraintEvaluationResult.Allow(),
+            ConstraintEvaluationOutcome.Warning => ConstraintEvaluationResult.Warning(
+                "wire.warning",
+                "Wire-name fixture."),
+            ConstraintEvaluationOutcome.Denied => ConstraintEvaluationResult.Deny(
+                "wire.denied",
+                "Wire-name fixture."),
+            _ => throw new ArgumentOutOfRangeException(nameof(value), value, "Test constraint outcome must be defined.")
         };
     }
 

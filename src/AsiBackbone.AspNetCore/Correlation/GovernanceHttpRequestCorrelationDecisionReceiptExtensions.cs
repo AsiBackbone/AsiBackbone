@@ -32,17 +32,12 @@ public static class GovernanceHttpRequestCorrelationDecisionReceiptExtensions
         ArgumentNullException.ThrowIfNull(correlation);
         ArgumentNullException.ThrowIfNull(decision);
 
-        return DecisionReceipt.Create(
-            actor,
-            operationName,
-            decision.Outcome.ToString(),
-            decision.ReasonCodes,
-            eventId,
-            occurredUtc,
-            correlation.CorrelationId ?? decision.CorrelationId,
-            correlation.TraceId ?? decision.TraceId,
-            decision.PolicyVersion,
-            decision.PolicyHash,
-            correlation.MergeMetadata(metadata));
+        return DecisionReceiptBuilder.FromDecision(actor, operationName, decision)
+            .WithEventId(eventId)
+            .WithOccurredUtc(occurredUtc)
+            .WithCorrelationId(correlation.CorrelationId ?? decision.CorrelationId)
+            .WithTraceId(correlation.TraceId ?? decision.TraceId)
+            .WithMetadata(correlation.MergeMetadata(metadata))
+            .Build();
     }
 }

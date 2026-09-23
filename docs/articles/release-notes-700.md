@@ -124,7 +124,9 @@ Canonical v1 retains the 6.0 wire string `"AuditResidue"` for event type `500`,
 so a 6.0 governance-emission payload reconstructs to the same bytes and hash
 under 7.0. All enum-derived signed fields now use explicit stable mappings
 rather than CLR `Enum.ToString()`: actor type, lifecycle stage, emission event
-type, emission/outbox status, and governed-operation persistence outcome.
+type, governance decision and constraint outcomes, emission/outbox status, and
+governed-operation persistence outcome. This includes lifecycle-derived
+`decisionStage` and typed receipt `outcome` construction paths.
 
 ### Entity Framework Core columns are renamed
 

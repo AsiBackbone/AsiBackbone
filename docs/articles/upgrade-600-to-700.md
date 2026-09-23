@@ -195,9 +195,11 @@ does not derive enum wire strings from mutable CLR member names. The complete in
 | Signed field | Enum family | Canonical v1 wire values |
 | --- | --- | --- |
 | `actorType` | `GovernanceActorType` | Explicit 6.0 member names |
-| `stage`, `lifecycleStage` | `DecisionReceiptLifecycleStage` | Explicit 6.0 member names |
+| `stage`, `lifecycleStage`, lifecycle-derived `decisionStage` | `DecisionReceiptLifecycleStage` | Explicit 6.0 member names |
 | `eventType` | `GovernanceEmissionEventType` | Explicit 6.0 member names, including `AuditResidue` for value `500` |
 | `status` | `GovernanceEmissionStatus` | Explicit 6.0 member names |
+| Typed receipt `outcome` | `GovernanceDecisionOutcome` | Explicit 6.0 member names, including ASP.NET correlation helpers |
+| Typed receipt `outcome` | `ConstraintEvaluationOutcome` | Explicit 6.0 member names |
 | `persistenceOutcome`, execution-receipt lifecycle `outcome` | `GovernedOperationPersistenceOutcome` | Explicit 6.0 member names, including lifecycle metadata |
 
 These strings are signature protocol constants even when a public CLR member is renamed. This guarantee applies to

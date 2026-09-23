@@ -10,10 +10,10 @@ This project follows the spirit of [Keep a Changelog](https://keepachangelog.com
 
 * Fixed canonical signed payload reconstruction across the 6.x to 7.0 rename boundary. Canonical v1 now maps every
   enum-derived signed field through explicit protocol constants instead of CLR `Enum.ToString()`: governance actor type,
-  decision-receipt lifecycle stage, governance emission event type, emission/outbox status, and governed-operation
-  persistence outcome. In particular, `GovernanceEmissionEventType.DecisionReceipt` (`500`) retains the 6.0 canonical
-  wire value `"AuditResidue"`, so retained 6.0 governance-emission payloads and hashes reconstruct and verify under 7.0
-  without re-signing. Golden vectors lock every affected value family (#813).
+  decision and constraint outcomes, decision-receipt lifecycle stage, governance emission event type, emission/outbox
+  status, and governed-operation persistence outcome. In particular, `GovernanceEmissionEventType.DecisionReceipt`
+  (`500`) retains the 6.0 canonical wire value `"AuditResidue"`, so retained 6.0 governance-emission payloads and hashes
+  reconstruct and verify under 7.0 without re-signing. Golden vectors lock every affected value family (#813).
 * **Breaking (behavior):** `CapabilityGrantValidator` now compares the signed grant's `SubjectId` and `OperationName` with normalized host
   expectations. Mismatches fail closed with the new `SubjectMismatch`/`capability.subject-mismatch` and
   `OperationMismatch`/`capability.operation-mismatch` results. `CreateBoundExecutionBoundary` requires

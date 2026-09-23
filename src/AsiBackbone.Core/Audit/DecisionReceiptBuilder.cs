@@ -1,6 +1,7 @@
 using AsiBackbone.Core.Actors;
 using AsiBackbone.Core.Constraints;
 using AsiBackbone.Core.Decisions;
+using AsiBackbone.Core.Signing;
 
 namespace AsiBackbone.Core.Audit;
 
@@ -80,7 +81,7 @@ public sealed class DecisionReceiptBuilder
         return new DecisionReceiptBuilder(
             actor,
             operationName,
-            decision.Outcome.ToString(),
+            CanonicalEnumWireNames.ForDecisionOutcome(decision.Outcome),
             decision.ReasonCodes)
             .WithCorrelationId(decision.CorrelationId)
             .WithTraceId(decision.TraceId)
@@ -101,7 +102,7 @@ public sealed class DecisionReceiptBuilder
         return new DecisionReceiptBuilder(
             actor,
             operationName,
-            constraintResult.Outcome.ToString(),
+            CanonicalEnumWireNames.ForConstraintOutcome(constraintResult.Outcome),
             constraintResult.ReasonCodes);
     }
 
