@@ -155,7 +155,7 @@ public sealed class CanonicalJsonV1InteroperabilityTests
     [Fact]
     public void ExecutionReceiptVectorMatchesPublishedBytesAndHash()
     {
-        GovernedOperationExecutionReceipt receipt = GovernedOperationExecutionReceipt.Create(
+        var receipt = GovernedOperationExecutionReceipt.Create(
             "operation-1",
             GovernedOperationPersistenceOutcome.Committed,
             executionAttemptId: "attempt-1",
@@ -259,7 +259,7 @@ public sealed class CanonicalJsonV1InteroperabilityTests
     {
         const string prefix = "\"content\":{\"n\":";
 
-        CanonicalPayload payload = CanonicalPayload.Create(
+        var payload = CanonicalPayload.Create(
             "artifact-type",
             "artifact-number",
             "schema-v1",
