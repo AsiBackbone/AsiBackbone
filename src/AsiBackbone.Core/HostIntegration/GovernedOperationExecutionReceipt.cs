@@ -234,6 +234,13 @@ public sealed class GovernedOperationExecutionReceipt
         {
             string key = NormalizeRequired(item.Key, nameof(metadata), MaximumMetadataKeyLength);
             string value = Normalize(item.Value ?? string.Empty, nameof(metadata), MaximumMetadataValueLength);
+            if (normalized.ContainsKey(key))
+            {
+                throw new ArgumentException(
+                    $"Execution receipt metadata contains keys that collide after trimming: '{key}'.",
+                    nameof(metadata));
+            }
+
             normalized[key] = value;
         }
 

@@ -189,6 +189,8 @@ Downstream verifiers can use the preserved metadata:
 
 Hosts should provide a matching verification service when signed records must be trusted later. A signed artifact should not be treated as verified merely because the managed-key adapter returned signature metadata.
 
+A verifier that recomputes the signing hash from an artifact, including one written outside .NET, must follow [Canonical JSON v1 Format](canonical-json-v1.md) exactly. The format is AsiBackbone-defined, is not RFC 8785 JCS, and normalizes metadata before hashing.
+
 ## Operational prerequisites
 
 Before production use, hosts should document:
@@ -227,6 +229,7 @@ Avoid wording such as:
 
 ## Related articles
 
+- [Canonical JSON v1 Format](canonical-json-v1.md)
 - [Production Managed-Key Integration Guide](production-managed-key-integration.md)
 - [Signing Provider Package Boundary](signing-provider-package-boundary.md)
 - [Signing-Ready Receipts and Key Handling](signing-ready-receipts-and-key-handling.md)

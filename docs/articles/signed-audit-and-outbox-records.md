@@ -212,6 +212,7 @@ Provider packages implement `IGovernanceSigningService`. Host applications decid
 
 ## Related documentation
 
+- [Canonical JSON v1 Format](canonical-json-v1.md)
 - [Production Wording and Stable Signing Boundaries](production-wording-and-alpha-limitations.md)
 - [Signing-Ready Receipts and Key Handling](signing-ready-receipts-and-key-handling.md)
 - [Signing Provider Package Boundary](signing-provider-package-boundary.md)

@@ -144,7 +144,7 @@ A signed record should preserve:
 - signed UTC timestamp;
 - safe provider operation ID when available.
 
-A host that needs to trust records later must provide a verification path that can resolve the recorded key reference, use the recorded algorithm family, account for retired-key verification, and distinguish invalid signatures from provider unavailability.
+A host that needs to trust records later must provide a verification path that can resolve the recorded key reference, use the recorded algorithm family, account for retired-key verification, and distinguish invalid signatures from provider unavailability. A verification path that recomputes hashes, including one implemented outside .NET, must reproduce [Canonical JSON v1 Format](canonical-json-v1.md) byte-for-byte rather than use a generic JSON canonicalizer.
 
 ## Safe wording
 
@@ -183,6 +183,7 @@ AsiBackbone does not provide:
 
 ## Related articles
 
+- [Canonical JSON v1 Format](canonical-json-v1.md)
 - [Signing Provider Package Boundary](signing-provider-package-boundary.md)
 - [Managed-Key Signing Provider](managed-key-signing-provider.md)
 - [Signing-Ready Receipts and Key Handling](signing-ready-receipts-and-key-handling.md)

@@ -6,6 +6,23 @@ This project follows the spirit of [Keep a Changelog](https://keepachangelog.com
 
 ## [Unreleased]
 
+### Documentation
+
+* Expanded [Canonical JSON v1 Format](docs/articles/canonical-json-v1.md) into the normative specification for
+  `asibackbone.canonical-json.v1`. It now covers envelope descriptor trimming, property ordering, the full string
+  escaping table, integer handling, an exact double formatting algorithm with a locked table of boundary values, array order and string-set normalization, timestamp formatting,
+  enumeration wire strings, and metadata filtering and normalization. It records as a contract decision that
+  leading and trailing white space in allow-listed metadata keys and values is insignificant and that runtime null,
+  empty, and white-space-only metadata values are equivalent. No canonical bytes change, so the version stays
+  `asibackbone.canonical-json.v1`. Three further golden vectors, covering escaping and integers, decision receipt builder normalization, and a
+  governed operation execution receipt, are published with SHA-256 values and locked by
+  `CanonicalJsonV1InteroperabilityTests`. `GovernedOperationExecutionReceiptCanonicalPayload` now uses the same metadata filter as `CanonicalPayloadBuilder`;
+  `DecisionReceipt.Create` and `GovernedOperationExecutionReceipt.Create` reject metadata keys that collide after
+  trimming so no value can be discarded before canonical filtering. Existing non-colliding receipt canonical bytes
+  are unchanged, and a fourth vector locks the governed-operation output. Signing, verification, managed-key, and
+  signed-record documentation and
+  the `AsiBackbone.Signing.ManagedKey` package README now link to the specification (#814).
+
 ### Security
 
 * Acknowledgment challenge binding now fails closed for unknown, unauthenticated, `Unknown`-typed, or shared

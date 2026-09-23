@@ -124,7 +124,7 @@ switch (outcome.Action)
 }
 ```
 
-The canonical builder must use the same payload options and versioning rules used at signing. `VerifyTypedAsync` rebuilds
+The canonical builder must use the same payload options and versioning rules used at signing. Verifiers outside .NET must reproduce the byte and normalization rules in [Canonical JSON v1 Format](canonical-json-v1.md); a generic or RFC 8785 JSON canonicalizer does not produce the same bytes. `VerifyTypedAsync` rebuilds
 the payload from the typed object and fails with `signature.typed-artifact-mismatch`/`HashMismatch` when its hash differs
 from the signed canonical hash. `VerifyAsync` remains available for payload-only structural verification, but it authenticates
 only the retained `CanonicalPayload`; it does not bind a separately supplied typed `Artifact` to those signed bytes.
@@ -212,3 +212,9 @@ Core remains provider-neutral. It does not:
 - make a signed audit trail tamper-evident by itself.
 
 Use the phrase **verified** only when verification was explicitly performed and the policy outcome supports that statement. Use **tamper-evident** only when the deployed system also includes durable storage controls, hash chaining or equivalent integrity strategy, verification, and any required external anchoring.
+
+## Related documentation
+
+- [Canonical JSON v1 Format](canonical-json-v1.md)
+- [Signing-Ready Receipts and Key Handling](signing-ready-receipts-and-key-handling.md)
+- [Key Rotation and Retired-Key Verification](key-rotation-and-retired-key-verification.md)

@@ -656,7 +656,15 @@ public sealed class DecisionReceipt : IDecisionReceipt
                 continue;
             }
 
-            normalizedMetadata[item.Key.Trim()] = item.Value?.Trim() ?? string.Empty;
+            string normalizedKey = item.Key.Trim();
+            if (normalizedMetadata.ContainsKey(normalizedKey))
+            {
+                throw new ArgumentException(
+                    $"Decision receipt metadata contains keys that collide after trimming: '{normalizedKey}'.",
+                    nameof(metadata));
+            }
+
+            normalizedMetadata[normalizedKey] = item.Value?.Trim() ?? string.Empty;
         }
 
         return normalizedMetadata.Count == 0
