@@ -26,13 +26,39 @@ Major releases should be rare. They should be reserved for identity, namespace, 
 
 ## Current `7.x` stabilization posture
 
-`7.x` is the current stable package line, and `7.0.0` is the current release. `7.0.0` is prepared for release and is not yet tagged or published.
+`7.x` is the stable package line maintained on `main`. The latest published stable release is `6.0.0`; `7.0.0` is the prepared next release and is not yet tagged or published.
 
 The `7.0.0` release preserves the package IDs, namespaces, and `net10.0` target while advancing the binary identity to `7.0.0.0`. It binds acknowledgment responses to the challenged actor and removes permissive zero defaults from the DLP failure-behavior and intent-risk enums.
 
 `7.0.0` is a young major line. Future `7.x` releases should prioritize compatibility, documentation clarity, patch-level release correction, and carefully scoped additive improvements. Additional breaking changes should be avoided unless strongly justified by consumer safety, correctness, maintainability, or a documented architectural boundary that cannot be preserved compatibly.
 
 For cautious consumers, a young major line should be interpreted as canonical but still settling. The project should let that line stabilize through release validation, documentation currency, package metadata correction, consumer smoke testing, and real issue triage before introducing another broad breaking change.
+
+## Prepared and published release wording
+
+Repository `main` can carry a version that is prepared but not yet tagged or published. Evergreen documentation must keep that prepared version distinct from the latest release that NuGet consumers can install.
+
+The publication state is declared in `eng/documentation-release-claims.json`:
+
+```json
+"publication": {
+  "state": "prepared",
+  "latestPublishedVersion": "6.0.0"
+}
+```
+
+| State | Meaning | Required wording |
+| --- | --- | --- |
+| `prepared` | `Directory.Build.props` names a version that has not been tagged or published. `latestPublishedVersion` names the latest published stable release and must be lower. | Describe the repository version as the prepared next release and name `latestPublishedVersion` as the latest published stable release. Do not call the prepared version the current release, and do not imply that its APIs are available from NuGet. |
+| `released` | The repository version is the release being tagged and published. `latestPublishedVersion` must equal the `Directory.Build.props` version. | Describe the repository version as the current release, and remove prepared, unpublished, and "not yet tagged or published" wording. |
+
+Switching from `prepared` to `released` is an explicit step in the release-preparation pull request, made on the final release-candidate commit before the release tag is created. The switch belongs in that pull request rather than after publication because the tagged commit's README files are packed into the published packages: a tagged commit that still described its own version as prepared would ship that wording to NuGet. The Version Consistency, Stable Release Validation, and package-publishing workflows run the documentation release-claim validator with the release tag, and the validator rejects a stable tag whose commit is still in the `prepared` state. Packages are published only from a tag ref.
+
+Prerelease tags such as `v7.0.0-rc.1` are the exception: they publish prerelease packages only, so the stable version is still unpublished and the tagged commit stays in the `prepared` state.
+
+When the next version begins on `main`, the pull request that advances `Directory.Build.props` switches the state back to `prepared` and sets `latestPublishedVersion` to the release that was just published.
+
+In both states the validator reports every line that still uses the other state's wording, so the switch works as a checklist rather than a search. See [Documentation Release-Claim Validation](../quality/documentation-release-claim-validation.md) for the rules.
 
 ## Stabilization window after a major release
 
@@ -73,6 +99,7 @@ Before tagging a stable release, the release PR or release-readiness record shou
 | Compatibility | Public API compatibility, stable package boundaries, assembly-version policy, durable schema/version guidance, and provider/package wording are reviewed. |
 | Migration | Breaking changes include migration guidance, old/new package IDs, old/new namespaces, representative `PackageReference` and `using` updates, and previous-line support/deprecation posture. |
 | Deferred checks | Any intentionally deferred release-critical check records the reason, accepted risk, follow-up issue, and whether release notes need to mention it. |
+| Publication wording | The release-preparation pull request switches `eng/documentation-release-claims.json` from `prepared` to `released`, sets `latestPublishedVersion` to the release version, and replaces prepared-release wording so the documentation release-claim validator passes with the release tag. |
 
 ## Package identity and namespace changes
 

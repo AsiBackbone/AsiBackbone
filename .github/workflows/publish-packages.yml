@@ -69,6 +69,29 @@ jobs:
           REF_TYPE: ${{ github.ref_type }}
           REF_NAME: ${{ github.ref_name }}
 
+      # README files are packed into the packages, so a published version must
+      # come from a release tag whose documentation publication state matches
+      # it. Branch dispatches are pack-only.
+      - name: Validate documentation publication state
+        shell: pwsh
+        run: |
+          $arguments = @{}
+
+          if ($env:REF_TYPE -eq 'tag') {
+              $arguments['ReleaseTag'] = $env:REF_NAME
+          }
+          elseif ($env:EVENT_NAME -eq 'workflow_dispatch' -and $env:SKIP_PUBLISH -ne 'true') {
+              Write-Host "::error::Package publication requires a release tag ref, but this run was dispatched from $($env:REF_TYPE) '$($env:REF_NAME)'. Dispatch from a vMAJOR.MINOR.PATCH tag to publish, or enable skip_publish for a pack-only run."
+              exit 1
+          }
+
+          ./scripts/Validate-DocumentationReleaseClaims.ps1 @arguments
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          REF_TYPE: ${{ github.ref_type }}
+          REF_NAME: ${{ github.ref_name }}
+          SKIP_PUBLISH: ${{ inputs.skip_publish }}
+
       - name: Restore dependencies
         run: dotnet restore "${{ env.SOLUTION_PATH }}" --locked-mode -p:Configuration="${{ env.CONFIGURATION }}"
 
@@ -188,7 +211,7 @@ jobs:
     environment:
       name: package-publish
 
-    if: github.event_name == 'push' || inputs.skip_publish == false
+    if: github.ref_type == 'tag' && (github.event_name == 'push' || inputs.skip_publish == false)
 
     steps:
       - name: Checkout source

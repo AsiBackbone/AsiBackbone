@@ -58,8 +58,13 @@ commit.
   surface.
 - [ ] `CHANGELOG.md`, release notes, and the upgrade guide describe the same
   change set and compatibility boundary.
-- [ ] Evergreen documentation identifies `7.0.0` as the current release, uses
-  the 7.0 names, and preserves prior records as historical evidence.
+- [x] Until publication, evergreen documentation identifies `7.0.0` as the
+  prepared next release and `6.0.0` as the latest published stable release,
+  with `eng/documentation-release-claims.json` in the `prepared` state.
+- [ ] The release-preparation pull request switches the publication state to
+  `released` with `latestPublishedVersion` `7.0.0`, and evergreen documentation
+  identifies `7.0.0` as the current release, uses the 7.0 names, and preserves
+  prior records as historical evidence.
 
 ## Required validation before tag
 
@@ -131,25 +136,30 @@ Before publication, confirm that:
 ## Release sequence
 
 1. Complete every required validation above on the final candidate commit.
-2. Merge the release-preparation pull request after required checks pass.
-3. Confirm `main` contains the final `7.0.0` metadata and documentation.
-4. Create the annotated tag `v7.0.0` from the validated commit.
-5. Run the stable release workflow against that tag.
-6. Confirm all expected NuGet and symbol packages are published.
-7. Confirm build packages, SBOMs, manifests, and release notes are attached to
+2. In the release-preparation pull request, switch
+   `eng/documentation-release-claims.json` to `"state": "released"` with
+   `"latestPublishedVersion": "7.0.0"`, replace the prepared-release wording
+   that the documentation release-claim validator reports, and run
+   `./scripts/Validate-DocumentationReleaseClaims.ps1 -ReleaseTag v7.0.0`.
+3. Merge the release-preparation pull request after required checks pass.
+4. Confirm `main` contains the final `7.0.0` metadata and documentation.
+5. Create the annotated tag `v7.0.0` from the validated commit.
+6. Run the stable release workflow against that tag.
+7. Confirm all expected NuGet and symbol packages are published.
+8. Confirm build packages, SBOMs, manifests, and release notes are attached to
    the GitHub release.
-8. Verify package/SBOM attestations by subject digest.
-9. Confirm documentation deployment succeeds.
-10. Run post-publication Source Link validation:
+9. Verify package/SBOM attestations by subject digest.
+10. Confirm documentation deployment succeeds.
+11. Run post-publication Source Link validation:
 
 ```powershell
 ./scripts/Validate-Source-Link-commit-metadata.ps1 -Version 7.0.0
 ```
 
-11. Verify package repository commit metadata resolves to the tagged source
+12. Verify package repository commit metadata resolves to the tagged source
     commit.
-12. Advance the package-validation baseline only after `7.0.0` is published.
-13. Record any release exception explicitly rather than weakening a gate.
+13. Advance the package-validation baseline only after `7.0.0` is published.
+14. Record any release exception explicitly rather than weakening a gate.
 
 ## Related documentation
 

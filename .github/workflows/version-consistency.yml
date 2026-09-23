@@ -52,4 +52,14 @@ jobs:
 
       - name: Validate documentation release claims
         shell: pwsh
-        run: ./scripts/Validate-DocumentationReleaseClaims.ps1
+        run: |
+          $arguments = @{}
+
+          if ($env:REF_TYPE -eq 'tag') {
+              $arguments['ReleaseTag'] = $env:REF_NAME
+          }
+
+          ./scripts/Validate-DocumentationReleaseClaims.ps1 @arguments
+        env:
+          REF_TYPE: ${{ github.ref_type }}
+          REF_NAME: ${{ github.ref_name }}
