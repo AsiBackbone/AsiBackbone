@@ -15,9 +15,10 @@ public sealed class CapabilityGrantValidationProfileTests
     /// Verifies that the execution-boundary profile requires proof and bounded-use validation by default.
     /// </summary>
     [Fact]
-    public void CreateExecutionBoundaryRequiresProofAndBoundedUseByDefault()
+    public void CreateBoundExecutionBoundaryRequiresProofAndBoundedUseByDefault()
     {
-        var options = CapabilityGrantValidationOptions.CreateExecutionBoundary(
+        var options = CapabilityGrantValidationOptions.CreateBoundExecutionBoundary(
+            CapabilityGrantBindingExpectations.Create(" subject-1 ", " robotics.execute "),
             issuer: " issuer-1 ",
             audience: " gateway-1 ",
             scopes: [" robotics.execute ", "robotics.execute"],
@@ -26,6 +27,8 @@ public sealed class CapabilityGrantValidationProfileTests
 
         Assert.Equal("issuer-1", options.Issuer);
         Assert.Equal("gateway-1", options.Audience);
+        Assert.Equal("subject-1", options.ExpectedSubjectId);
+        Assert.Equal("robotics.execute", options.ExpectedOperationName);
         string scope = Assert.Single(options.Scopes);
         Assert.Equal("robotics.execute", scope);
         Assert.True(options.RequireProof);
@@ -39,9 +42,10 @@ public sealed class CapabilityGrantValidationProfileTests
     /// Verifies that callers can explicitly disable bounded-use validation when another trusted boundary owns that responsibility.
     /// </summary>
     [Fact]
-    public void CreateExecutionBoundaryAllowsCallerToMakeBoundedUseExplicitlyOptional()
+    public void CreateBoundExecutionBoundaryAllowsCallerToMakeBoundedUseExplicitlyOptional()
     {
-        var options = CapabilityGrantValidationOptions.CreateExecutionBoundary(
+        var options = CapabilityGrantValidationOptions.CreateBoundExecutionBoundary(
+            CapabilityGrantBindingExpectations.Create("subject-1"),
             audience: "gateway-1",
             requireUseCheck: false,
             maxUseCount: 4);
@@ -49,6 +53,63 @@ public sealed class CapabilityGrantValidationProfileTests
         Assert.True(options.RequireProof);
         Assert.False(options.RequireUseCheck);
         Assert.Equal(4, options.MaxUseCount);
+    }
+
+    /// <summary>
+    /// Verifies that cloning an execution-boundary profile cannot remove its required subject binding.
+    /// </summary>
+    [Fact]
+    public void WithExpectedBindingsPreservesRequiredExecutionSubject()
+    {
+        var options = CapabilityGrantValidationOptions.CreateBoundExecutionBoundary(
+            CapabilityGrantBindingExpectations.Create("subject-1", "robotics.execute"),
+            audience: "gateway-1");
+
+        CapabilityGrantValidationOptions omittedSubject = options.WithExpectedBindings(
+            expectedOperationName: "robotics.inspect");
+        CapabilityGrantValidationOptions blankSubject = options.WithExpectedBindings(
+            expectedSubjectId: " ",
+            expectedOperationName: "robotics.inspect");
+
+        Assert.Equal("subject-1", omittedSubject.ExpectedSubjectId);
+        Assert.Equal("robotics.inspect", omittedSubject.ExpectedOperationName);
+        Assert.Equal("subject-1", blankSubject.ExpectedSubjectId);
+        Assert.Equal("robotics.inspect", blankSubject.ExpectedOperationName);
+    }
+
+    /// <summary>
+    /// Verifies that the execution-boundary profile cannot be created without a nonblank authoritative subject.
+    /// </summary>
+    [Theory]
+    [InlineData(null)]
+    [InlineData("")]
+    [InlineData("   ")]
+    public void CreateBoundExecutionBoundaryRejectsMissingSubjectExpectation(string? expectedSubjectId)
+    {
+        _ = Assert.ThrowsAny<ArgumentException>(() =>
+            CapabilityGrantBindingExpectations.Create(expectedSubjectId!));
+    }
+
+    /// <summary>
+    /// Verifies that the binary-compatible legacy overload fails closed instead of creating an unbound execution profile.
+    /// </summary>
+    [Fact]
+    public void LegacyCreateExecutionBoundaryOverloadFailsClosed()
+    {
+        _ = Assert.Throws<InvalidOperationException>(() =>
+            CapabilityGrantValidationOptions.CreateExecutionBoundary());
+        _ = Assert.Throws<InvalidOperationException>(() =>
+            CapabilityGrantValidationOptions.CreateExecutionBoundary(null));
+    }
+
+    /// <summary>
+    /// Verifies that the binding-aware execution profile rejects a null expectation object.
+    /// </summary>
+    [Fact]
+    public void CreateBoundExecutionBoundaryRejectsNullBindingExpectations()
+    {
+        _ = Assert.Throws<ArgumentNullException>(() =>
+            CapabilityGrantValidationOptions.CreateBoundExecutionBoundary(bindingExpectations: null!));
     }
 
     /// <summary>
@@ -79,7 +140,10 @@ public sealed class CapabilityGrantValidationProfileTests
 
         CapabilityGrantValidationResult result = await CapabilityGrantValidator.ValidateAsync(
             signedGrant,
-            CapabilityGrantValidationOptions.CreateExecutionBoundary(audience: "gateway-1", validationUtc: Now),
+            CapabilityGrantValidationOptions.CreateBoundExecutionBoundary(
+                CapabilityGrantBindingExpectations.Create("subject-1"),
+                audience: "gateway-1",
+                validationUtc: Now),
             cancellationToken: TestContext.Current.CancellationToken);
 
         Assert.False(result.ShouldAllow);
@@ -100,7 +164,10 @@ public sealed class CapabilityGrantValidationProfileTests
 
         CapabilityGrantValidationResult result = await CapabilityGrantValidator.ValidateAsync(
             signedGrant,
-            CapabilityGrantValidationOptions.CreateExecutionBoundary(audience: "gateway-1", validationUtc: Now),
+            CapabilityGrantValidationOptions.CreateBoundExecutionBoundary(
+                CapabilityGrantBindingExpectations.Create("subject-1"),
+                audience: "gateway-1",
+                validationUtc: Now),
             verifier,
             cancellationToken: TestContext.Current.CancellationToken);
 
@@ -169,7 +236,9 @@ public sealed class CapabilityGrantValidationProfileTests
             audience: "gateway-1",
             scopes: ["robotics.execute"],
             issuedUtc: Now.AddMinutes(-5),
-            expiresUtc: Now.AddMinutes(5));
+            expiresUtc: Now.AddMinutes(5),
+            subjectId: "subject-1",
+            operationName: "robotics.execute");
     }
 
     private static SignedGovernanceArtifact<CapabilityGrant> CreateSignedGrant(CapabilityGrant grant)

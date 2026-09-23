@@ -19,6 +19,10 @@ public sealed class CapabilityGrantValidatorTests
     public static TheoryData<string, CapabilityGrantValidationCategory, VerificationPolicyAction, string> MetadataFailureCases => new()
     {
         { "wrong-issuer", CapabilityGrantValidationCategory.WrongIssuer, VerificationPolicyAction.Deny, "capability.issuer-mismatch" },
+        { "subject-mismatch", CapabilityGrantValidationCategory.SubjectMismatch, VerificationPolicyAction.Deny, "capability.subject-mismatch" },
+        { "subject-missing", CapabilityGrantValidationCategory.SubjectMismatch, VerificationPolicyAction.Deny, "capability.subject-mismatch" },
+        { "operation-mismatch", CapabilityGrantValidationCategory.OperationMismatch, VerificationPolicyAction.Deny, "capability.operation-mismatch" },
+        { "operation-missing", CapabilityGrantValidationCategory.OperationMismatch, VerificationPolicyAction.Deny, "capability.operation-mismatch" },
         { "not-yet-valid", CapabilityGrantValidationCategory.NotYetValid, VerificationPolicyAction.Defer, "capability.not-yet-valid" },
         { "policy-version-mismatch", CapabilityGrantValidationCategory.PolicyMismatch, VerificationPolicyAction.Deny, "capability.policy-mismatch" },
         { "policy-hash-mismatch", CapabilityGrantValidationCategory.PolicyMismatch, VerificationPolicyAction.Deny, "capability.policy-mismatch" },
@@ -116,6 +120,46 @@ public sealed class CapabilityGrantValidatorTests
             CapabilityGrantValidationCategory.WrongAudience,
             VerificationPolicyAction.Deny,
             "capability.audience-mismatch");
+    }
+
+    /// <summary>
+    /// Proves that a grant issued for one subject cannot authorize a different current subject.
+    /// </summary>
+    [Fact]
+    public async Task ValidateAsyncDeniesGrantIssuedForADifferentSubject()
+    {
+        SignedGovernanceArtifact<CapabilityGrant> grant = CreateSignedGrant(CreateGrant(subjectId: "subject-a"));
+
+        CapabilityGrantValidationResult result = await CapabilityGrantValidator.ValidateAsync(
+            grant,
+            CreateOptions(expectedSubjectId: "subject-b"),
+            cancellationToken: TestContext.Current.CancellationToken);
+
+        AssertFailure(
+            result,
+            CapabilityGrantValidationCategory.SubjectMismatch,
+            VerificationPolicyAction.Deny,
+            "capability.subject-mismatch");
+    }
+
+    /// <summary>
+    /// Proves that a grant issued for one operation cannot authorize a different requested operation.
+    /// </summary>
+    [Fact]
+    public async Task ValidateAsyncDeniesGrantIssuedForADifferentOperation()
+    {
+        SignedGovernanceArtifact<CapabilityGrant> grant = CreateSignedGrant(CreateGrant(operationName: "operation-a"));
+
+        CapabilityGrantValidationResult result = await CapabilityGrantValidator.ValidateAsync(
+            grant,
+            CreateOptions(expectedOperationName: "operation-b"),
+            cancellationToken: TestContext.Current.CancellationToken);
+
+        AssertFailure(
+            result,
+            CapabilityGrantValidationCategory.OperationMismatch,
+            VerificationPolicyAction.Deny,
+            "capability.operation-mismatch");
     }
 
     /// <summary>
@@ -475,7 +519,9 @@ public sealed class CapabilityGrantValidatorTests
         string acknowledgmentId = "ack-1",
         string handshakeId = "handshake-1",
         string gatewayBinding = "gateway-1",
-        string resourceBinding = "robot-arm-1")
+        string resourceBinding = "robot-arm-1",
+        string expectedSubjectId = "subject-1",
+        string expectedOperationName = "robotics.execute")
     {
         return CapabilityGrantValidationOptions.Create(
             issuer: issuer,
@@ -491,7 +537,8 @@ public sealed class CapabilityGrantValidatorTests
             requireProof: requireProof,
             requireAcknowledgmentReference: requireAcknowledgmentReference,
             requireUseCheck: requireUseCheck,
-            maxUseCount: 1);
+            maxUseCount: 1)
+            .WithExpectedBindings(expectedSubjectId, expectedOperationName);
     }
 
     private static CapabilityGrant CreateGrant(
@@ -505,7 +552,9 @@ public sealed class CapabilityGrantValidatorTests
         string? policyVersion = "policy-v1",
         string? policyHash = "policy-hash",
         string? gatewayBinding = "gateway-1",
-        string? resourceBinding = "robot-arm-1")
+        string? resourceBinding = "robot-arm-1",
+        string? subjectId = "subject-1",
+        string? operationName = "robotics.execute")
     {
         return CapabilityGrant.Create(
             tokenId: "grant-1",
@@ -520,7 +569,9 @@ public sealed class CapabilityGrantValidatorTests
             policyVersion: policyVersion,
             policyHash: policyHash,
             gatewayBinding: gatewayBinding,
-            resourceBinding: resourceBinding);
+            resourceBinding: resourceBinding,
+            subjectId: subjectId,
+            operationName: operationName);
     }
 
     private static CapabilityGrant CreateGrantForMetadataFailure(string scenario)
@@ -528,6 +579,10 @@ public sealed class CapabilityGrantValidatorTests
         return scenario switch
         {
             "wrong-issuer" => CreateGrant(issuer: "other-issuer"),
+            "subject-mismatch" => CreateGrant(subjectId: "subject-2"),
+            "subject-missing" => CreateGrant(subjectId: null),
+            "operation-mismatch" => CreateGrant(operationName: "robotics.admin"),
+            "operation-missing" => CreateGrant(operationName: null),
             "not-yet-valid" => CreateGrant(notBeforeUtc: Now.AddMinutes(1)),
             "policy-version-mismatch" => CreateGrant(policyVersion: "policy-v2"),
             "policy-hash-mismatch" => CreateGrant(policyHash: "policy-hash-v2"),
