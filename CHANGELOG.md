@@ -44,9 +44,11 @@ This project follows the spirit of [Keep a Changelog](https://keepachangelog.com
   release. `eng/documentation-release-claims.json` now declares a `publication` state (`prepared` or `released`) and
   the latest published version. The documentation release-claim validator rejects prepared-version "current release"
   claims while prepared, rejects leftover prepared or older latest-published wording once released, and accepts a new
-  `-ReleaseTag` parameter that fails unless the tagged commit is in the `released` state. The Version Consistency and
-  package-publishing workflows pass the tag on tag pushes, and the release process now switches the state in the
-  release-preparation pull request (#812).
+  `-ReleaseTag` parameter that uses the repository's release-tag grammar: stable tags require the `released` state and
+  prerelease tags such as `v7.0.0-rc.1` require the `prepared` state. The Version Consistency, Stable Release
+  Validation, and package-publishing workflows pass the tag on tag refs; package publication now requires a tag ref, so
+  branch dispatches are pack-only. The release process switches the state in the release-preparation pull request
+  (#812).
 
 ## [7.0.0] - 2026-09-20
 

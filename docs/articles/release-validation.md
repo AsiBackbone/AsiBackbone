@@ -86,8 +86,8 @@ The following workflows form the reusable gate for stable release candidates:
 - `External Consumer Smoke Test` validates package-consumer wiring through the external consumer and stable package integration smoke scripts.
 - `OWASP Dependency-Check software composition analysis` restores with the SDK selected by `global.json`, publishes its reports, and fails when an unsuppressed dependency finding has CVSS 7 or higher.
 - `Publish Documentation` validates the DocFX build used for the documentation site.
-- `Stable Release Validation` provides a single release-candidate gate for version metadata, Debug solution build coverage, locked restore, build, formatting, tests, DocFX, stable public API baseline validation, package creation, generated package version validation, generated NuGet metadata validation, SBOM generation, template package smoke validation, smoke checks, and provenance handling where supported.
-- `Publish AsiBackbone Packages` repeats release-critical validation, including the public API baseline, before package publish. For stable tags it then attaches durable release evidence and verifies every required GitHub release asset.
+- `Stable Release Validation` provides a single release-candidate gate for version metadata, documentation release claims and publication state, Debug solution build coverage, locked restore, build, formatting, tests, DocFX, stable public API baseline validation, package creation, generated package version validation, generated NuGet metadata validation, SBOM generation, template package smoke validation, smoke checks, and provenance handling where supported.
+- `Publish AsiBackbone Packages` repeats release-critical validation, including the public API baseline and documentation publication state, before package publish. It publishes only from a release tag; branch dispatches are pack-only. For stable tags it then attaches durable release evidence and verifies every required GitHub release asset.
 
 ## Tagging rule
 

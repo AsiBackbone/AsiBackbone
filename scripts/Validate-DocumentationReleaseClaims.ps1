@@ -42,6 +42,16 @@ if (-not $versionPrefixMatch.Success) {
     throw "VersionPrefix '$versionPrefix' must use MAJOR.MINOR.PATCH format."
 }
 
+$versionSuffixNodes = @(
+    $directoryBuildProps.Project.PropertyGroup.ChildNodes |
+        Where-Object {
+            $_.NodeType -eq [System.Xml.XmlNodeType]::Element -and
+            $_.Name -eq 'VersionSuffix'
+        }
+)
+$versionSuffix = if ($versionSuffixNodes.Count -gt 0) { $versionSuffixNodes[0].InnerText.Trim() } else { '' }
+$resolvedVersion = if ([string]::IsNullOrEmpty($versionSuffix)) { $versionPrefix } else { "$versionPrefix-$versionSuffix" }
+
 $currentMajor = $versionPrefixMatch.Groups['major'].Value
 $currentMajorLine = "$currentMajor.x"
 
@@ -184,13 +194,33 @@ if (-not [string]::IsNullOrWhiteSpace($ReleaseTag)) {
         $releaseTagName = $releaseTagName.Substring('refs/tags/'.Length)
     }
 
-    $releaseTagVersion = $releaseTagName -replace '^[vV]', ''
-    if (-not [string]::Equals($releaseTagVersion, $versionPrefix, [System.StringComparison]::Ordinal)) {
-        $publicationStateErrors.Add("Release tag '$releaseTagName' does not match Directory.Build.props VersionPrefix '$versionPrefix'.")
-    }
+    # Same tag grammar as scripts/Validate-VersionConsistency.ps1:
+    # vMAJOR.MINOR.PATCH with an optional prerelease suffix.
+    $releaseTagMatch = [regex]::Match(
+        $releaseTagName,
+        '^v(?<version>\d+\.\d+\.\d+(?:-(?<suffix>[0-9A-Za-z][0-9A-Za-z.-]*))?)$',
+        [System.Text.RegularExpressions.RegexOptions]::CultureInvariant)
 
-    if ($publicationState -ne 'released') {
-        $publicationStateErrors.Add("Release tag '$releaseTagName' requires publication.state 'released'. The release-preparation pull request must switch publication.state to 'released' and replace prepared-release wording before the tag is created, because the tagged commit's README files are packed into the published packages.")
+    if (-not $releaseTagMatch.Success) {
+        $publicationStateErrors.Add("Release tag '$releaseTagName' is not a supported release tag. Use vMAJOR.MINOR.PATCH with an optional prerelease suffix.")
+    }
+    else {
+        $releaseTagVersion = $releaseTagMatch.Groups['version'].Value
+        if (-not [string]::Equals($releaseTagVersion, $resolvedVersion, [System.StringComparison]::Ordinal)) {
+            $publicationStateErrors.Add("Release tag '$releaseTagName' does not match Directory.Build.props version '$resolvedVersion'.")
+        }
+
+        if ($releaseTagMatch.Groups['suffix'].Success) {
+            # A prerelease tag publishes prerelease packages only. The stable
+            # VersionPrefix release is still unpublished, so the documentation
+            # packed into those packages must keep the prepared wording.
+            if ($publicationState -ne 'prepared') {
+                $publicationStateErrors.Add("Prerelease tag '$releaseTagName' requires publication.state 'prepared'. A prerelease tag does not publish '$versionPrefix' as a stable release, so the documentation packed into its packages must keep describing '$versionPrefix' as the prepared next release.")
+            }
+        }
+        elseif ($publicationState -ne 'released') {
+            $publicationStateErrors.Add("Release tag '$releaseTagName' requires publication.state 'released'. The release-preparation pull request must switch publication.state to 'released' and replace prepared-release wording before the tag is created, because the tagged commit's README files are packed into the published packages.")
+        }
     }
 }
 

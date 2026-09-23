@@ -96,6 +96,8 @@ Assert-FixturePasses 'excluded-historical'
 Assert-FixturePasses 'prepared-valid'
 Assert-FixturePasses 'released-valid'
 Assert-FixturePasses 'released-valid' @('-ReleaseTag', 'v3.0.0')
+Assert-FixturePasses 'prepared-prerelease'
+Assert-FixturePasses 'prepared-prerelease' @('-ReleaseTag', 'v3.0.0-rc.1')
 
 Assert-FixtureFails 'prepared-current-claim' @(
     'README.md:1',
@@ -113,7 +115,10 @@ Assert-FixtureFails 'released-stale-wording' @(
     "prepared-release claim '3.0.0'")
 
 Assert-FixtureFails 'prepared-valid' @("Release tag 'v3.0.0' requires publication.state 'released'") @('-ReleaseTag', 'v3.0.0')
-Assert-FixtureFails 'released-valid' @("Release tag 'v3.0.1' does not match Directory.Build.props VersionPrefix '3.0.0'") @('-ReleaseTag', 'v3.0.1')
+Assert-FixtureFails 'released-valid' @("Release tag 'v3.0.1' does not match Directory.Build.props version '3.0.0'") @('-ReleaseTag', 'v3.0.1')
+Assert-FixtureFails 'released-valid' @("Release tag 'v3.0.0-rc.1' does not match Directory.Build.props version '3.0.0'") @('-ReleaseTag', 'v3.0.0-rc.1')
+Assert-FixtureFails 'released-valid' @("Release tag 'release-3.0.0' is not a supported release tag") @('-ReleaseTag', 'release-3.0.0')
+Assert-FixtureFails 'released-prerelease' @("Prerelease tag 'v3.0.0-rc.1' requires publication.state 'prepared'") @('-ReleaseTag', 'v3.0.0-rc.1')
 
 $staleResult = Invoke-ValidationFixture 'stale-current'
 if ($staleResult.ExitCode -eq 0) {

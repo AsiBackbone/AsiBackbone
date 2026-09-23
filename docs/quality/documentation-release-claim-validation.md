@@ -24,7 +24,9 @@ Run the deterministic fixture suite with:
 ./scripts/Test-DocumentationReleaseClaims.ps1
 ```
 
-Both commands run in the **Version Consistency** workflow. On a `v*.*.*` tag push, that workflow and the **Publish AsiBackbone Packages** workflow pass the tag name as `-ReleaseTag`, so packages are not packed from a commit whose documentation still describes its version as prepared.
+Both commands run in the **Version Consistency** workflow. The repository validator also runs in the **Stable Release Validation** and **Publish AsiBackbone Packages** workflows. On a `v*.*.*` tag, all three workflows pass the tag name as `-ReleaseTag`, so a tagged commit cannot pass release validation or be packed while its documentation publication state contradicts the tag.
+
+**Publish AsiBackbone Packages** publishes only from a tag ref. A manual dispatch from a branch must keep `skip_publish` enabled and is pack-only; a branch dispatch with publication enabled fails before packing, and the publish job itself also requires a tag ref.
 
 ## Source of truth
 
@@ -62,7 +64,7 @@ The validator applies three kinds of line checks:
 
 Status phrases are attributed to the nearest version on the line; a match does not reach across another version token.
 
-`-ReleaseTag` requires the tag version to equal the repository version and the publication state to be `released`. The release-preparation pull request makes that switch because the tagged commit's README files are packed into the published packages. See [Release Cadence and Readiness](../articles/release-cadence-and-readiness.md#prepared-and-published-release-wording) for the release sequence.
+`-ReleaseTag` accepts the same tag grammar as `scripts/Validate-VersionConsistency.ps1`: `vMAJOR.MINOR.PATCH` with an optional prerelease suffix. The tag version must equal the `Directory.Build.props` version, including any `VersionSuffix`. A stable tag such as `v7.0.0` requires the `released` state. A prerelease tag such as `v7.0.0-rc.1` requires the `prepared` state, because it publishes prerelease packages only and the stable version remains unpublished. The release-preparation pull request makes that switch because the tagged commit's README files are packed into the published packages. See [Release Cadence and Readiness](../articles/release-cadence-and-readiness.md#prepared-and-published-release-wording) for the release sequence.
 
 ## Scanned documentation
 
@@ -110,7 +112,9 @@ The deterministic fixtures verify that:
 - a prepared-state claim that the prepared version is the current release fails;
 - a prepared state whose latest published version is not lower than the repository version fails;
 - released-state documentation that retains prepared or latest-published wording for an older version fails;
-- `-ReleaseTag` fails for a `prepared` state or a mismatched tag and passes for a matching `released` state.
+- `-ReleaseTag` with a stable tag passes for a matching `released` state and fails for a `prepared` state;
+- `-ReleaseTag` with a prerelease tag passes for a matching `prepared` state and fails for a `released` state;
+- `-ReleaseTag` fails for a tag that does not match the `Directory.Build.props` version, including its prerelease suffix, and for a tag outside the supported grammar.
 
 The fixture runner starts a child PowerShell process for each scenario so the validator's success and failure exit codes are tested exactly as CI observes them.
 
