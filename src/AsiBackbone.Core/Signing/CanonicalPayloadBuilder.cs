@@ -72,7 +72,7 @@ public static class CanonicalPayloadBuilder
             ["occurredUtc"] = FormatUtc(lifecycleEvent.OccurredUtc),
             ["operationName"] = lifecycleEvent.OperationName,
             ["outcome"] = lifecycleEvent.Outcome,
-            ["stage"] = lifecycleEvent.Stage.ToString(),
+            ["stage"] = CanonicalEnumWireNames.ForLifecycleStage(lifecycleEvent.Stage),
             ["stageSequence"] = lifecycleEvent.StageSequence,
             ["traceId"] = lifecycleEvent.TraceId
         };
@@ -124,7 +124,7 @@ public static class CanonicalPayloadBuilder
             ["providerName"] = entry.ProviderName,
             ["providerRecordId"] = entry.ProviderRecordId,
             ["retryCount"] = entry.RetryCount,
-            ["status"] = entry.Status.ToString(),
+            ["status"] = CanonicalEnumWireNames.ForEmissionStatus(entry.Status),
             ["updatedUtc"] = FormatUtc(entry.UpdatedUtc)
         };
 
@@ -210,7 +210,7 @@ public static class CanonicalPayloadBuilder
         {
             ["actorDisplayName"] = receipt.ActorDisplayName,
             ["actorId"] = receipt.ActorId,
-            ["actorType"] = receipt.ActorType.ToString(),
+            ["actorType"] = CanonicalEnumWireNames.ForActorType(receipt.ActorType),
             ["auditResidueId"] = decisionReceiptId,
             ["constraintCount"] = receipt.ConstraintCount,
             ["constraintSetHash"] = receipt.ConstraintSetHash,
@@ -253,9 +253,11 @@ public static class CanonicalPayloadBuilder
             ["emitterStatus"] = envelope.EmitterStatus,
             ["envelopeId"] = envelope.EnvelopeId,
             ["eventId"] = envelope.EventId,
-            ["eventType"] = envelope.EventType.ToString(),
+            ["eventType"] = CanonicalEnumWireNames.ForEmissionEventType(envelope.EventType),
             ["gatewayExecutionId"] = envelope.GatewayExecutionId,
-            ["lifecycleStage"] = envelope.LifecycleStage?.ToString(),
+            ["lifecycleStage"] = envelope.LifecycleStage.HasValue
+                ? CanonicalEnumWireNames.ForLifecycleStage(envelope.LifecycleStage.Value)
+                : null,
             ["lifecycleStageSequence"] = envelope.LifecycleStageSequence,
             ["metadata"] = FilterMetadata(envelope.Metadata, options),
             ["occurredUtc"] = FormatUtc(envelope.OccurredUtc),

@@ -119,6 +119,13 @@ values. See
 [Legacy compatibility names are renamed](upgrade-600-to-700.md#legacy-compatibility-names-are-renamed)
 for the complete inventory and the contracts that do not change.
 
+Canonical signing payloads are a deliberate exception to that name migration.
+Canonical v1 retains the 6.0 wire string `"AuditResidue"` for event type `500`,
+so a 6.0 governance-emission payload reconstructs to the same bytes and hash
+under 7.0. All enum-derived signed fields now use explicit stable mappings
+rather than CLR `Enum.ToString()`: actor type, lifecycle stage, emission event
+type, emission/outbox status, and governed-operation persistence outcome.
+
 ### Entity Framework Core columns are renamed
 
 Five columns are renamed to match the renamed properties. The dependent indexes

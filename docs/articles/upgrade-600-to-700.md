@@ -169,7 +169,7 @@ Parameters named `auditResidueId` are renamed to `decisionReceiptId`. Callers th
 
 1. Update `using` directives and replace the old names using the tables above. The compiler reports every remaining reference.
 2. Search for old names that the compiler cannot see: string literals, reflection, `Type.GetType` calls, configuration keys, log queries, and test assertions that name these types or members.
-3. `GovernanceEmissionEventType.DecisionReceipt` keeps the numeric value `500`. If you persist or transmit this enum by **name**, stored `"AuditResidue"` values must be mapped to `"DecisionReceipt"`. Values stored by number need no change.
+3. `GovernanceEmissionEventType.DecisionReceipt` keeps the numeric value `500`. If you persist or transmit this enum by **name** outside canonical signing payloads, stored `"AuditResidue"` values must be mapped to `"DecisionReceipt"`. Values stored by number need no change. Canonical v1 is the deliberate exception: its stable wire value remains `"AuditResidue"`, as described below.
 4. If your host serializes decision receipts, ledger records, or emission envelopes to JSON, follow [Decision receipt JSON uses `decisionReceiptId`](#decision-receipt-json-uses-decisionreceiptid).
 5. If your host maps AsiBackbone entities into its own `DbContext`, follow [EF Core schema changes](#ef-core-schema-changes-migration-required) before deploying.
 
@@ -183,12 +183,27 @@ These values are wire, signature, or persistence contracts and keep their 6.x va
 | Decision receipt lifecycle artifact tag | `asibackbone.audit-residue-lifecycle-event` |
 | OpenTelemetry event name | `asibackbone.audit_residue.created` |
 | `GovernanceEmissionEventType.DecisionReceipt` numeric value | `500` |
+| Canonical v1 `eventType` for value `500` | `AuditResidue` |
 | EF Core table names | `AsiBackboneAuditResidueLifecycleEvents`, `AsiBackboneHandshake*`, `AsiBackboneAuditLedger*`, `AsiBackboneGovernanceOutboxEntries` |
 | EF Core `HandshakeId` and `CapabilityTokenId` columns | Unchanged |
 | Diagnostic IDs | `ASIB*` |
 | Registration methods | `AddAsiBackbone*` |
 
-Canonical payload bytes are unchanged, so artifacts signed under 6.x verify under 7.0 without re-signing. `HandshakeId` keeps its name because it identifies the acknowledgment handshake protocol itself, which the [6.0 terminology guidance](terminology-600.md) permits.
+Canonical payload bytes are unchanged, so artifacts signed under 6.x verify under 7.0 without re-signing. Canonical v1
+does not derive enum wire strings from mutable CLR member names. The complete inventory of enum-derived signed fields is:
+
+| Signed field | Enum family | Canonical v1 wire values |
+| --- | --- | --- |
+| `actorType` | `GovernanceActorType` | Explicit 6.0 member names |
+| `stage`, `lifecycleStage` | `DecisionReceiptLifecycleStage` | Explicit 6.0 member names |
+| `eventType` | `GovernanceEmissionEventType` | Explicit 6.0 member names, including `AuditResidue` for value `500` |
+| `status` | `GovernanceEmissionStatus` | Explicit 6.0 member names |
+| `persistenceOutcome`, execution-receipt lifecycle `outcome` | `GovernedOperationPersistenceOutcome` | Explicit 6.0 member names, including lifecycle metadata |
+
+These strings are signature protocol constants even when a public CLR member is renamed. This guarantee applies to
+payloads built with the shipped canonical builders; ordinary JSON serialization of the enum by name follows the current
+CLR member name. `HandshakeId` keeps its name because it identifies the acknowledgment handshake protocol itself, which
+the [6.0 terminology guidance](terminology-600.md) permits.
 
 ## Decision receipt JSON uses `decisionReceiptId`
 
