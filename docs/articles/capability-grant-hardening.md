@@ -16,6 +16,8 @@ AsiBackbone can model short-lived, scoped grants for governed execution, but it 
 | Token ID | Stable grant identifier for validation and bounded-use checks. |
 | Issuer | Host or service that created the grant. |
 | Audience | Intended execution gateway, service, or host boundary. |
+| Subject ID | Optional authenticated principal the issuer authorizes. It has effect only when the relying party compares it with the current subject. |
+| Operation name | Optional operation the issuer authorizes. It has effect only when the relying party compares it with the requested operation. |
 | Scopes | Least-privilege actions allowed by the grant. |
 | Issued UTC | Timestamp when the grant was created. |
 | Not-before UTC | Optional timestamp before which the grant is not valid. |
@@ -51,18 +53,26 @@ The builder covers every field the grant carries, so the hash binds the whole gr
 
 `CapabilityGrantValidationOptions` provides explicit profiles so callers can communicate whether validation is occurring at a consequential execution boundary or is intentionally limited to metadata and time-bound checks.
 
-| Profile | Proof | Acknowledgment reference | Bounded-use/replay check | Intended use |
-| --- | --- | --- | --- | --- |
-| `CreateExecutionBoundary(...)` | Required | Optional; caller can require it | Required by default; caller must explicitly disable it when another boundary owns replay/use enforcement | Operational gateways and other consequential execution boundaries |
-| `CreateMetadataValidation(...)` | Not performed | Optional; caller can require it | Not performed | Structural, temporal, policy, scope, and binding validation where proof/use enforcement is intentionally out of scope |
-| `Create(...)` | Configurable; default is off | Configurable; default is off | Configurable; default is off | Backward-compatible 3.x configuration path |
+| Profile | Subject/operation binding | Proof | Acknowledgment reference | Bounded-use/replay check | Intended use |
+| --- | --- | --- | --- | --- | --- |
+| `CreateExecutionBoundary(...)` | Subject required; operation optional | Required | Optional; caller can require it | Required by default; caller must explicitly disable it when another boundary owns replay/use enforcement | Operational gateways and other consequential execution boundaries |
+| `CreateMetadataValidation(...)` | Optional | Not performed | Optional; caller can require it | Not performed | Structural, temporal, policy, scope, and binding validation where proof/use enforcement is intentionally out of scope |
+| `Create(...)` | Optional | Configurable; default is off | Configurable; default is off | Configurable; default is off | Fully configurable validation path |
 
 > [!CAUTION]
 > Calling `CapabilityGrantValidator.ValidateAsync(signedGrant)` without explicit options preserves the existing 3.x behavior. It validates metadata and temporal constraints using `CapabilityGrantValidationOptions.Create()` defaults, but it does **not** verify the signed artifact proof and does **not** perform a bounded-use/replay check. Do not treat the no-options path as execution-boundary validation.
 
-The execution-boundary profile always requires proof verification. Bounded-use validation is enabled by default with `maxUseCount: 1`, but the host can explicitly set `requireUseCheck: false` when replay/use enforcement is performed atomically by another trusted execution boundary. That opt-out should be intentional and documented by the host.
+The execution-boundary profile requires `CapabilityGrantBindingExpectations` built from the authenticated current subject
+and always requires proof verification. Include the requested operation whenever the grant is intended for a specific
+operation. Both
+comparisons are ordinal and fail closed when the grant value is missing or differs. Bounded-use validation is enabled by
+default with `maxUseCount: 1`, but the host can explicitly set `requireUseCheck: false` when replay/use enforcement is
+performed atomically by another trusted execution boundary. That opt-out should be intentional and documented by the host.
 
-The metadata-validation profile intentionally does not expose proof or use-check switches. If proof or bounded-use behavior is needed, use `CreateExecutionBoundary(...)` or the fully configurable `Create(...)` factory instead.
+The metadata-validation profile keeps `expectedSubjectId` and `expectedOperationName` optional and intentionally does not
+expose proof or use-check switches. Omitting those expectations means that validation result makes no claim that the grant
+belongs to the current subject or requested operation. If proof or bounded-use behavior is needed, use
+`CreateExecutionBoundary(...)` or the fully configurable `Create(...)` factory instead.
 
 ## Validation at the execution boundary
 
@@ -83,6 +93,7 @@ Use the explicit execution-boundary profile for consequential execution:
 CapabilityGrantValidationResult result = await CapabilityGrantValidator.ValidateAsync(
     signedGrant,
     CapabilityGrantValidationOptions.CreateExecutionBoundary(
+        CapabilityGrantBindingExpectations.Create(authenticatedSubjectId, "robotics.execute"),
         issuer: "policy-engine",
         audience: "robotics-gateway",
         scopes: ["robotics.execute"],
@@ -110,7 +121,8 @@ CapabilityGrantValidationResult metadataResult = await CapabilityGrantValidator.
         audience: "robotics-gateway",
         scopes: ["robotics.execute"],
         policyVersion: "policy-v1",
-        policyHash: "policy-hash"),
+        policyHash: "policy-hash")
+        .WithExpectedBindings(authenticatedSubjectId, "robotics.execute"),
     cancellationToken: cancellationToken);
 ```
 
@@ -123,6 +135,9 @@ The explicit profiles are additive and do not silently change existing 3.x behav
 - Existing calls to `CapabilityGrantValidationOptions.Create(...)` continue to honor their current arguments and defaults.
 - Existing calls to `ValidateAsync(signedGrant)` continue to use the legacy default options where proof, acknowledgment-reference, and bounded-use checks are disabled.
 - New operational-gateway and consequential-execution code should prefer `CreateExecutionBoundary(...)`.
+- Supply `CapabilityGrantBindingExpectations` built from the authenticated current subject; existing execution-boundary
+  calls must add this required argument. The retained legacy overload throws instead of creating a subject-unbound
+  profile. Include the requested operation when the issuer restricted the grant to an operation.
 - Code that intentionally performs only structural or temporal validation should prefer `CreateMetadataValidation(...)` so the reduced validation contract is visible in code review.
 - Hosts migrating an existing execution boundary should supply both an `IGovernanceSignatureVerificationService` and, when the profile keeps its default bounded-use requirement, an `ICapabilityGrantUseStore`.
 
@@ -159,6 +174,8 @@ Capability grant validation maps failures to host-facing actions from the verifi
 | Missing proof when required | `MissingProof` | `Deny` |
 | Invalid proof | `InvalidProof` | `Deny` |
 | Wrong issuer or audience | `WrongIssuer`, `WrongAudience` | `Deny` |
+| Wrong or missing subject | `SubjectMismatch` | `Deny` |
+| Wrong or missing operation | `OperationMismatch` | `Deny` |
 | Expired grant | `Expired` | `Deny` |
 | Not yet valid | `NotYetValid` | `Defer` |
 | Required scope missing | `WrongScope` | `Deny` |

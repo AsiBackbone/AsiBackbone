@@ -98,5 +98,15 @@ public enum CapabilityGrantValidationCategory
     /// <summary>
     /// Validation failed but no more specific category could be inferred safely.
     /// </summary>
-    Failed = 18
+    Failed = 18,
+
+    /// <summary>
+    /// The grant subject did not match the configured expectation.
+    /// </summary>
+    SubjectMismatch = 19,
+
+    /// <summary>
+    /// The grant operation did not match the configured expectation.
+    /// </summary>
+    OperationMismatch = 20
 }

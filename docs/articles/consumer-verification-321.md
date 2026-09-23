@@ -131,11 +131,18 @@ available in `3.2.1` without an intentional behavioral change.
 Consequential-execution and operational-gateway code should prefer:
 
 ```csharp
-CapabilityGrantValidationOptions.CreateExecutionBoundary(...)
+CapabilityGrantValidationOptions.CreateExecutionBoundary(
+    CapabilityGrantBindingExpectations.Create(authenticatedSubjectId, requestedOperation),
+    ...)
 ```
 
 This profile requires signed-artifact proof verification and enables
-bounded-use validation by default with `maxUseCount: 1`.
+bounded-use validation by default with `maxUseCount: 1`. The subject expectation
+is required and must come from the host's authenticated execution context. The
+operation expectation is optional, but hosts should supply it whenever the
+issuer restricts the grant to a particular operation. Both mismatches deny.
+The retained overload without binding expectations throws rather
+than creating a subject-unbound execution profile.
 
 If a host explicitly sets:
 
@@ -162,7 +169,9 @@ CapabilityGrantValidationOptions.CreateMetadataValidation(...)
 ```
 
 only when proof verification and bounded-use enforcement are intentionally
-outside the current validation step.
+outside the current validation step. Subject and operation expectations are
+optional on this profile through `WithExpectedBindings`; when omitted, the
+result does not establish either binding.
 
 A successful metadata-only result establishes only that the configured
 structural, temporal, scope, policy, acknowledgment, handshake, gateway,

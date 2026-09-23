@@ -18,6 +18,8 @@ public sealed class CapabilityGrantValidationOptions
         string? handshakeId,
         string? gatewayBinding,
         string? resourceBinding,
+        string? expectedSubjectId,
+        string? expectedOperationName,
         bool requireProof,
         bool requireAcknowledgmentReference,
         bool requireUseCheck,
@@ -64,6 +66,8 @@ public sealed class CapabilityGrantValidationOptions
         HandshakeId = NormalizeOptional(handshakeId);
         GatewayBinding = NormalizeOptional(gatewayBinding);
         ResourceBinding = NormalizeOptional(resourceBinding);
+        ExpectedSubjectId = NormalizeOptional(expectedSubjectId);
+        ExpectedOperationName = NormalizeOptional(expectedOperationName);
         RequireProof = requireProof;
         RequireAcknowledgmentReference = requireAcknowledgmentReference;
         RequireUseCheck = requireUseCheck;
@@ -88,6 +92,8 @@ public sealed class CapabilityGrantValidationOptions
     public string? HandshakeId { get; }
     public string? GatewayBinding { get; }
     public string? ResourceBinding { get; }
+    public string? ExpectedSubjectId { get; }
+    public string? ExpectedOperationName { get; }
     public bool RequireProof { get; }
     public bool RequireAcknowledgmentReference { get; }
     public bool RequireUseCheck { get; }
@@ -145,6 +151,8 @@ public sealed class CapabilityGrantValidationOptions
             handshakeId,
             gatewayBinding,
             resourceBinding,
+            expectedSubjectId: null,
+            expectedOperationName: null,
             requireProof,
             requireAcknowledgmentReference,
             requireUseCheck,
@@ -158,6 +166,47 @@ public sealed class CapabilityGrantValidationOptions
             proofPayloadOptions);
     }
 
+    /// <summary>
+    /// Creates a copy with optional host expectations for the authenticated subject and requested operation.
+    /// </summary>
+    public CapabilityGrantValidationOptions WithExpectedBindings(
+        string? expectedSubjectId = null,
+        string? expectedOperationName = null)
+    {
+        return new CapabilityGrantValidationOptions(
+            Issuer,
+            Audience,
+            Scopes,
+            ValidationUtc,
+            AllowedClockSkew,
+            PolicyVersion,
+            PolicyHash,
+            AcknowledgmentId,
+            HandshakeId,
+            GatewayBinding,
+            ResourceBinding,
+            expectedSubjectId,
+            expectedOperationName,
+            RequireProof,
+            RequireAcknowledgmentReference,
+            RequireUseCheck,
+            MaxUseCount,
+            ExpectedProofKeyId,
+            ExpectedProofKeyVersion,
+            ExpectedProofPolicyVersion,
+            ExpectedProofPolicyHash,
+            RequiredProofProvider,
+            RequiredProofHashAlgorithm,
+            ProofPayloadOptions);
+    }
+
+    /// <summary>
+    /// Creates the legacy execution-boundary profile without a subject expectation.
+    /// </summary>
+    /// <remarks>
+    /// This overload now fails closed. Use the overload whose required first argument is
+    /// <see cref="CapabilityGrantBindingExpectations" />.
+    /// </remarks>
     public static CapabilityGrantValidationOptions CreateExecutionBoundary(
         string? issuer = null,
         string? audience = null,
@@ -181,6 +230,36 @@ public sealed class CapabilityGrantValidationOptions
         string? requiredProofHashAlgorithm = null,
         CanonicalPayloadOptions? proofPayloadOptions = null)
     {
+        throw new InvalidOperationException(
+            "Execution-boundary validation requires subject binding expectations. Use the binding-aware CreateExecutionBoundary overload.");
+    }
+
+    public static CapabilityGrantValidationOptions CreateExecutionBoundary(
+        CapabilityGrantBindingExpectations bindingExpectations,
+        string? issuer = null,
+        string? audience = null,
+        IEnumerable<string>? scopes = null,
+        DateTimeOffset? validationUtc = null,
+        string? policyVersion = null,
+        string? policyHash = null,
+        string? acknowledgmentId = null,
+        string? handshakeId = null,
+        string? gatewayBinding = null,
+        string? resourceBinding = null,
+        bool requireAcknowledgmentReference = false,
+        bool requireUseCheck = true,
+        int maxUseCount = 1,
+        TimeSpan allowedClockSkew = default,
+        string? expectedProofKeyId = null,
+        string? expectedProofKeyVersion = null,
+        string? expectedProofPolicyVersion = null,
+        string? expectedProofPolicyHash = null,
+        string? requiredProofProvider = null,
+        string? requiredProofHashAlgorithm = null,
+        CanonicalPayloadOptions? proofPayloadOptions = null)
+    {
+        ArgumentNullException.ThrowIfNull(bindingExpectations);
+
         return Create(
             issuer: issuer,
             audience: audience,
@@ -203,7 +282,8 @@ public sealed class CapabilityGrantValidationOptions
             expectedProofPolicyHash: expectedProofPolicyHash,
             requiredProofProvider: requiredProofProvider,
             requiredProofHashAlgorithm: requiredProofHashAlgorithm,
-            proofPayloadOptions: proofPayloadOptions);
+            proofPayloadOptions: proofPayloadOptions)
+            .WithExpectedBindings(bindingExpectations.SubjectId, bindingExpectations.OperationName);
     }
 
     public static CapabilityGrantValidationOptions CreateMetadataValidation(

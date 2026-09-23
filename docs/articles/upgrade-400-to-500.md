@@ -73,6 +73,7 @@ Supply options describing what the grant must satisfy:
 CapabilityGrantValidationResult result = await CapabilityGrantValidator.ValidateAsync(
     signedGrant,
     CapabilityGrantValidationOptions.CreateExecutionBoundary(
+        CapabilityGrantBindingExpectations.Create(authenticatedSubjectId, "robotics.execute"),
         issuer: "https://issuer.example",
         audience: "gateway-1",
         scopes: ["robotics.execute"]),
@@ -80,6 +81,12 @@ CapabilityGrantValidationResult result = await CapabilityGrantValidator.Validate
     useStore,
     cancellationToken);
 ```
+
+The execution-boundary profile now requires `CapabilityGrantBindingExpectations`. The retained legacy overload throws
+instead of constructing a subject-unbound profile, so existing calls must add the new binding argument. Build it from the
+host's authenticated principal rather than from presenter-controlled grant data, and include the requested operation when
+the grant is operation-bound. Metadata-only validation can opt into either check through
+`WithExpectedBindings`; omitting them means the result does not establish a subject or operation binding.
 
 Requiring proof or a bounded-use check without an audience expectation is also
 refused, because proof establishes that a grant was signed rather than that it

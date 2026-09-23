@@ -16,7 +16,7 @@ public sealed class CapabilityGrantValidationOptionsTests
     {
         DateTimeOffset localValidationTime = new(2026, 6, 16, 7, 0, 0, TimeSpan.FromHours(-5));
 
-        var options = CapabilityGrantValidationOptions.Create(
+        CapabilityGrantValidationOptions options = CapabilityGrantValidationOptions.Create(
             issuer: " issuer-1 ",
             audience: " gateway-1 ",
             scopes: [" robotics.write ", "robotics.read", " ", "robotics.read"],
@@ -30,7 +30,8 @@ public sealed class CapabilityGrantValidationOptionsTests
             requireProof: true,
             requireAcknowledgmentReference: true,
             requireUseCheck: true,
-            maxUseCount: 3);
+            maxUseCount: 3)
+            .WithExpectedBindings(" subject-1 ", " robotics.execute ");
 
         Assert.Equal("issuer-1", options.Issuer);
         Assert.Equal("gateway-1", options.Audience);
@@ -45,6 +46,8 @@ public sealed class CapabilityGrantValidationOptionsTests
         Assert.Equal("handshake-1", options.HandshakeId);
         Assert.Equal("gateway-binding", options.GatewayBinding);
         Assert.Equal("robot-arm-1", options.ResourceBinding);
+        Assert.Equal("subject-1", options.ExpectedSubjectId);
+        Assert.Equal("robotics.execute", options.ExpectedOperationName);
         Assert.True(options.RequireProof);
         Assert.True(options.RequireAcknowledgmentReference);
         Assert.True(options.RequireUseCheck);
@@ -57,7 +60,7 @@ public sealed class CapabilityGrantValidationOptionsTests
     [Fact]
     public void CreateUsesEmptyScopesAndNullBindingsForMissingOrWhitespaceInputs()
     {
-        var options = CapabilityGrantValidationOptions.Create(
+        CapabilityGrantValidationOptions options = CapabilityGrantValidationOptions.Create(
             issuer: " ",
             audience: " ",
             scopes: null,
@@ -66,7 +69,8 @@ public sealed class CapabilityGrantValidationOptionsTests
             acknowledgmentId: " ",
             handshakeId: " ",
             gatewayBinding: " ",
-            resourceBinding: " ");
+            resourceBinding: " ")
+            .WithExpectedBindings(" ", " ");
 
         Assert.Null(options.Issuer);
         Assert.Null(options.Audience);
@@ -78,6 +82,8 @@ public sealed class CapabilityGrantValidationOptionsTests
         Assert.Null(options.HandshakeId);
         Assert.Null(options.GatewayBinding);
         Assert.Null(options.ResourceBinding);
+        Assert.Null(options.ExpectedSubjectId);
+        Assert.Null(options.ExpectedOperationName);
         Assert.False(options.RequireProof);
         Assert.False(options.RequireAcknowledgmentReference);
         Assert.False(options.RequireUseCheck);

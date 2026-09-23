@@ -8,6 +8,15 @@ This project follows the spirit of [Keep a Changelog](https://keepachangelog.com
 
 ### Security
 
+* **Breaking (behavior):** `CapabilityGrantValidator` now compares the signed grant's `SubjectId` and `OperationName` with normalized host
+  expectations. Mismatches fail closed with the new `SubjectMismatch`/`capability.subject-mismatch` and
+  `OperationMismatch`/`capability.operation-mismatch` results. `CreateExecutionBoundary` now requires
+  `CapabilityGrantBindingExpectations` that populate `ExpectedSubjectId`, preventing consequential execution from
+  accidentally omitting the current-subject binding. The
+  retained no-subject overload throws rather than constructing an unbound profile, preserving its source and binary
+  signature while failing closed. `Create` and `CreateMetadataValidation` can opt into either expectation through
+  `WithExpectedBindings`; omitting them remains explicit for reduced validation paths. Callers must pass the authenticated
+  current subject and should pass the requested operation when the grant is operation-bound (#810).
 * Added `GovernanceArtifactVerifier.VerifyTypedAsync`, which rebuilds the canonical payload from
   `SignedGovernanceArtifact<TArtifact>.Artifact` through a caller-supplied `Func<TArtifact, CanonicalPayload>` and compares
   the rebuilt hash with the signed canonical hash before invoking the verification provider. A typed artifact paired with
@@ -489,7 +498,7 @@ endpoint metadata and correlation hardening, and EF Core persistence fixes.
 
 * Added 4.0.0 release notes, migration guidance, consumer verification, and a release-readiness record.
 
-* Added `CanonicalPayloadBuilder.ForCapabilityTokenGrant`, covering every field a `CapabilityTokenGrant` carries (#699). `CanonicalArtifactTypes.CapabilityTokenGrant` existed but had no builder, so every consumer invented its own payload. The repository's own reference implementations in the validator tests and the stable-package smoke script hashed four fields — `audience`, `expiresUtc`, `issuer`, and `scopes` — while `CapabilityGrantValidator` enforces `NotBeforeUtc`, `PolicyVersion`, `PolicyHash`, `AcknowledgmentId`, `HandshakeId`, `GatewayBinding`, `ResourceBinding`, `SubjectId`, `OperationName`, and `IssuedUtc` as well. Fields outside the payload are outside the proof, so a value changed after signing still validated. Scopes are normalized to a sorted, de-duplicated, ordinal set; grant metadata remains filtered through `CanonicalPayloadOptions.AllowsMetadataKey`, whose allow-list is empty by default, so metadata is unbound unless a host opts a key in. Both reference implementations now use the builder.
+* Added `CanonicalPayloadBuilder.ForCapabilityTokenGrant`, covering every field a `CapabilityTokenGrant` carries (#699). `CanonicalArtifactTypes.CapabilityTokenGrant` existed but had no builder, so every consumer invented its own payload. The repository's own reference implementations in the validator tests and the stable-package smoke script hashed four fields — `audience`, `expiresUtc`, `issuer`, and `scopes` — while `CapabilityGrantValidator` also enforced `NotBeforeUtc`, `PolicyVersion`, `PolicyHash`, `AcknowledgmentId`, `HandshakeId`, `GatewayBinding`, and `ResourceBinding`. `SubjectId`, `OperationName`, and `IssuedUtc` were included in the canonical payload but were not compared with host expectations by the 4.0 validator. Fields outside the payload are outside the proof, so a value changed after signing still validated. Scopes are normalized to a sorted, de-duplicated, ordinal set; grant metadata remains filtered through `CanonicalPayloadOptions.AllowsMetadataKey`, whose allow-list is empty by default, so metadata is unbound unless a host opts a key in. Both reference implementations now use the builder.
 
 ### Deprecated
 
