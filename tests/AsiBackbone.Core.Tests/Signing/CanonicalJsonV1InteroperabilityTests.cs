@@ -37,7 +37,7 @@ public sealed class CanonicalJsonV1InteroperabilityTests
     [Fact]
     public void EscapingVectorMatchesPublishedBytesAndHash()
     {
-        CanonicalPayload payload = CanonicalPayload.Create(
+        var payload = CanonicalPayload.Create(
             "  artifact-type  ",
             "  artifact-2  ",
             " schema-v1 ",
@@ -63,7 +63,7 @@ public sealed class CanonicalJsonV1InteroperabilityTests
     [Fact]
     public void SpecifiedEscapesOutsideTheGoldenVectorsAreLocked()
     {
-        CanonicalPayload payload = CanonicalPayload.Create(
+        var payload = CanonicalPayload.Create(
             "artifact-type",
             "artifact-3",
             "schema-v1",
