@@ -6,6 +6,17 @@ This project follows the spirit of [Keep a Changelog](https://keepachangelog.com
 
 ## [Unreleased]
 
+### Security
+
+* Added `GovernanceArtifactVerifier.VerifyTypedAsync`, which rebuilds the canonical payload from
+  `SignedGovernanceArtifact<TArtifact>.Artifact` through a caller-supplied `Func<TArtifact, CanonicalPayload>` and compares
+  the rebuilt hash with the signed canonical hash before invoking the verification provider. A typed artifact paired with
+  an authentic but different retained payload/hash/signature now fails closed as `signature.typed-artifact-mismatch` in
+  the `HashMismatch` category. The existing `VerifyAsync` and `SignedGovernanceArtifacts.Rehydrate` paths remain explicit
+  payload-only structural checks for compatibility; their documentation now states that they do not authenticate the
+  separately supplied typed object. Hosts that consume `Artifact` after verification should use `VerifyTypedAsync` with
+  the matching first-party `CanonicalPayloadBuilder` and the same payload options used when signing (#809).
+
 ## [7.0.0] - 2026-09-20
 
 ### Release summary

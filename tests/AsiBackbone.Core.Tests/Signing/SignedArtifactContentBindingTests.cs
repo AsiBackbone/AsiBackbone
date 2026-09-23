@@ -1,5 +1,9 @@
 using System.Reflection;
+using AsiBackbone.Core.Actors;
+using AsiBackbone.Core.Audit;
 using AsiBackbone.Core.CapabilityGrants;
+using AsiBackbone.Core.Emissions;
+using AsiBackbone.Core.Outbox;
 using AsiBackbone.Core.Signing;
 using Xunit;
 
@@ -30,6 +34,108 @@ public sealed class SignedArtifactContentBindingTests
 
         Assert.True(outcome.ShouldAllow);
         Assert.True(verifier.WasCalled);
+    }
+
+    /// <summary>
+    /// Verifies that the typed binding path accepts matching content and reaches the provider.
+    /// </summary>
+    [Fact]
+    public async Task VerifyTypedAsyncAllowsArtifactThatRebuildsToTheSignedHash()
+    {
+        SignedGovernanceArtifact<CapabilityGrant> artifact = CreateSignedGrant(CreateGrant());
+        var verifier = new AlwaysValidVerificationService();
+
+        VerificationPolicyOutcome outcome = await GovernanceArtifactVerifier.VerifyTypedAsync(
+            artifact,
+            verifier,
+            grant => CanonicalPayloadBuilder.ForCapabilityGrant(grant),
+            cancellationToken: TestContext.Current.CancellationToken);
+
+        Assert.True(outcome.ShouldAllow);
+        Assert.True(verifier.WasCalled);
+    }
+
+    /// <summary>
+    /// Verifies that an authentic retained payload, hash, and signature cannot authenticate a different typed artifact.
+    /// </summary>
+    [Fact]
+    public async Task VerifyTypedAsyncDeniesTypedArtifactThatDiffersFromTheAuthenticPayload()
+    {
+        SignedGovernanceArtifact<CapabilityGrant> signed = CreateSignedGrant(CreateGrant());
+        CapabilityGrant tamperedGrant = CreateGrant(audience: "gateway-2");
+        SignedGovernanceArtifact<CapabilityGrant> tampered = SignedGovernanceArtifacts.FromSigningMetadata(
+            tamperedGrant,
+            signed.CanonicalPayload,
+            signed.CanonicalHash,
+            signed.SigningMetadata);
+        var verifier = new AlwaysValidVerificationService();
+
+        VerificationPolicyOutcome outcome = await GovernanceArtifactVerifier.VerifyTypedAsync(
+            tampered,
+            verifier,
+            grant => CanonicalPayloadBuilder.ForCapabilityGrant(grant),
+            cancellationToken: TestContext.Current.CancellationToken);
+
+        Assert.False(outcome.ShouldAllow);
+        Assert.Equal(VerificationPolicyAction.Deny, outcome.Action);
+        Assert.Equal(SignatureVerificationCategory.HashMismatch, outcome.Category);
+        Assert.Equal("signature.typed-artifact-mismatch", outcome.FailureCode);
+        Assert.False(verifier.WasCalled);
+    }
+
+    /// <summary>
+    /// Documents that the compatibility verification path authenticates only the retained canonical payload.
+    /// </summary>
+    [Fact]
+    public async Task VerifyAsyncPayloadOnlyPathDoesNotBindTheSeparatelySuppliedTypedArtifact()
+    {
+        SignedGovernanceArtifact<CapabilityGrant> signed = CreateSignedGrant(CreateGrant());
+        SignedGovernanceArtifact<CapabilityGrant> structurallyValid = SignedGovernanceArtifacts.FromSigningMetadata(
+            CreateGrant(audience: "gateway-2"),
+            signed.CanonicalPayload,
+            signed.CanonicalHash,
+            signed.SigningMetadata);
+        var verifier = new AlwaysValidVerificationService();
+
+        VerificationPolicyOutcome outcome = await GovernanceArtifactVerifier.VerifyAsync(
+            structurallyValid,
+            verifier,
+            cancellationToken: TestContext.Current.CancellationToken);
+
+        Assert.True(outcome.ShouldAllow);
+        Assert.True(verifier.WasCalled);
+    }
+
+    /// <summary>
+    /// Covers the typed binding path with every first-party canonical builder used by the generic signed artifact wrapper.
+    /// </summary>
+    [Fact]
+    public async Task VerifyTypedAsyncSupportsEveryFirstPartyCanonicalBuilder()
+    {
+        DecisionReceipt receipt = CreateDecisionReceipt();
+        var ledgerRecord = AuditLedgerRecord.FromDecisionReceipt(
+            receipt,
+            recordId: "record-content-binding",
+            recordedUtc: IssuedUtc.AddSeconds(1));
+        var lifecycleEvent = DecisionReceiptLifecycleEvent.Create(
+            DecisionReceiptLifecycleStage.ExternalEmissionQueued,
+            "correlation-content-binding",
+            decisionReceiptId: receipt.DecisionReceiptId,
+            eventId: "lifecycle-content-binding",
+            occurredUtc: IssuedUtc.AddSeconds(2));
+        GovernanceEmissionEnvelope envelope = CreateEnvelope();
+        var outboxEntry = GovernanceOutboxEntry.Create(
+            envelope,
+            outboxEntryId: "outbox-content-binding",
+            createdUtc: IssuedUtc.AddSeconds(4));
+        CapabilityGrant grant = CreateGrant();
+
+        await AssertTypedBuilderAllowsAsync(receipt, value => CanonicalPayloadBuilder.ForDecisionReceipt(value));
+        await AssertTypedBuilderAllowsAsync(ledgerRecord, value => CanonicalPayloadBuilder.ForAuditLedgerRecord(value));
+        await AssertTypedBuilderAllowsAsync(lifecycleEvent, value => CanonicalPayloadBuilder.ForDecisionReceiptLifecycleEvent(value));
+        await AssertTypedBuilderAllowsAsync(envelope, value => CanonicalPayloadBuilder.ForGovernanceEmissionEnvelope(value));
+        await AssertTypedBuilderAllowsAsync(outboxEntry, value => CanonicalPayloadBuilder.ForGovernanceOutboxEntry(value));
+        await AssertTypedBuilderAllowsAsync(grant, value => CanonicalPayloadBuilder.ForCapabilityGrant(value));
     }
 
     /// <summary>
@@ -149,9 +255,73 @@ public sealed class SignedArtifactContentBindingTests
             policyHash: "policy-hash");
     }
 
+    private static DecisionReceipt CreateDecisionReceipt()
+    {
+        IGovernanceActorContext actor = GovernanceActorContext.Service("system-content-binding", "System");
+
+        return DecisionReceipt.Create(
+            actor,
+            "gateway.execute",
+            "Allowed",
+            reasonCodes: ["policy.allowed"],
+            eventId: "event-content-binding",
+            occurredUtc: IssuedUtc,
+            correlationId: "correlation-content-binding",
+            policyVersion: "policy-v1",
+            policyHash: "policy-hash",
+            decisionReceiptId: "receipt-content-binding");
+    }
+
+    private static GovernanceEmissionEnvelope CreateEnvelope()
+    {
+        var payload = GovernanceEmissionPayload.Create(
+            "audit-summary",
+            schemaVersion: "v1",
+            contentType: "application/json",
+            contentHash: "payload-hash",
+            sizeBytes: 128);
+
+        return GovernanceEmissionEnvelope.Create(
+            GovernanceEmissionEventType.DecisionReceipt,
+            eventId: "event-content-binding",
+            occurredUtc: IssuedUtc,
+            envelopeId: "envelope-content-binding",
+            createdUtc: IssuedUtc.AddSeconds(3),
+            correlationId: "correlation-content-binding",
+            decisionReceiptId: "receipt-content-binding",
+            policyVersion: "policy-v1",
+            policyHash: "policy-hash",
+            payload: payload);
+    }
+
+    private static async Task AssertTypedBuilderAllowsAsync<TArtifact>(
+        TArtifact artifact,
+        Func<TArtifact, CanonicalPayload> canonicalPayloadBuilder)
+    {
+        CanonicalPayload payload = canonicalPayloadBuilder(artifact);
+        SignedGovernanceArtifact<TArtifact> signed = CreateSignedArtifact(artifact, payload);
+        var verifier = new AlwaysValidVerificationService();
+
+        VerificationPolicyOutcome outcome = await GovernanceArtifactVerifier.VerifyTypedAsync(
+            signed,
+            verifier,
+            canonicalPayloadBuilder,
+            cancellationToken: TestContext.Current.CancellationToken);
+
+        Assert.True(outcome.ShouldAllow);
+        Assert.True(verifier.WasCalled);
+    }
+
     private static SignedGovernanceArtifact<CapabilityGrant> CreateSignedGrant(CapabilityGrant grant)
     {
         CanonicalPayload payload = CanonicalPayloadBuilder.ForCapabilityGrant(grant);
+        return CreateSignedArtifact(grant, payload);
+    }
+
+    private static SignedGovernanceArtifact<TArtifact> CreateSignedArtifact<TArtifact>(
+        TArtifact artifact,
+        CanonicalPayload payload)
+    {
         CanonicalPayloadHash hash = CanonicalPayloadHasher.ComputeHash(payload);
 
         var signingMetadata = SigningMetadata.Create(
@@ -164,7 +334,7 @@ public sealed class SignedArtifactContentBindingTests
             provider: "fake-provider",
             signedUtc: IssuedUtc);
 
-        return SignedGovernanceArtifacts.FromSigningMetadata(grant, payload, hash, signingMetadata);
+        return SignedGovernanceArtifacts.FromSigningMetadata(artifact, payload, hash, signingMetadata);
     }
 
     /// <summary>
