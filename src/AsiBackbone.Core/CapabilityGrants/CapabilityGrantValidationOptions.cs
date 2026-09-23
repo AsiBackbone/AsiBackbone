@@ -101,7 +101,15 @@ public sealed class CapabilityGrantValidationOptions
     public string? HandshakeId { get; }
     public string? GatewayBinding { get; }
     public string? ResourceBinding { get; }
+
+    /// <summary>
+    /// Gets the authenticated subject that the grant must identify, when subject binding is configured.
+    /// </summary>
     public string? ExpectedSubjectId { get; }
+
+    /// <summary>
+    /// Gets the requested operation that the grant must identify, when operation binding is configured.
+    /// </summary>
     public string? ExpectedOperationName { get; }
     public bool RequireProof { get; }
     public bool RequireAcknowledgmentReference { get; }
@@ -262,6 +270,9 @@ public sealed class CapabilityGrantValidationOptions
             "Execution-boundary validation requires subject binding expectations. Use the binding-aware CreateExecutionBoundary overload.");
     }
 
+    /// <summary>
+    /// Creates a proof-verifying execution-boundary profile with authoritative host binding expectations.
+    /// </summary>
     public static CapabilityGrantValidationOptions CreateExecutionBoundary(
         CapabilityGrantBindingExpectations bindingExpectations,
         string? issuer = null,
