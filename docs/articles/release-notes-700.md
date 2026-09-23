@@ -55,6 +55,15 @@ the failure to determine which component differed.
 Hosts that resolve the current actor per request must resolve the same principal
 on both legs of the round trip.
 
+Challenge creation and response handling also require a known, authenticated
+actor whose type is not `Unknown` and whose identifier is not the shared
+`"unknown"` sentinel. An insufficient binding fails as
+`acknowledgment.challenge.actor_unbound`; endpoint governance returns `403`
+without issuing a challenge. A configured unauthenticated display name does not
+create a distinct identity. Hosts that deliberately establish another binding
+must provide a distinct, authenticated actor context through their actor
+resolver and document the binding's security properties.
+
 This change does not add challenge expiry or single-use enforcement. Bounded
 challenge lifetime, revalidating authorization, and revalidating current policy
 before the consequential operation remain host responsibilities.

@@ -8,6 +8,11 @@ This project follows the spirit of [Keep a Changelog](https://keepachangelog.com
 
 ### Security
 
+* Acknowledgment challenge binding now fails closed for unknown, unauthenticated, `Unknown`-typed, or shared
+  `"unknown"` actors. Direct challenge creation rejects an insufficient actor binding, response handling returns the
+  stable `acknowledgment.challenge.actor_unbound` failure code, and endpoint governance returns a coded `403` without
+  issuing a challenge. Hosts that intentionally establish a distinct binding must supply a known, authenticated actor
+  context through their actor resolver (#811).
 * Fixed canonical signed payload reconstruction across the 6.x to 7.0 rename boundary. Canonical v1 now maps every
   enum-derived signed field through explicit protocol constants instead of CLR `Enum.ToString()`: governance actor type,
   decision and constraint outcomes, decision-receipt lifecycle stage, governance emission event type, emission/outbox

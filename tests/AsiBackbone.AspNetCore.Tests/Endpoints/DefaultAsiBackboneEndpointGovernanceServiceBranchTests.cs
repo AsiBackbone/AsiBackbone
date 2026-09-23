@@ -1,3 +1,4 @@
+using System.Security.Claims;
 using AsiBackbone.AspNetCore.DependencyInjection;
 using AsiBackbone.AspNetCore.Endpoints;
 using AsiBackbone.Core.Constraints;
@@ -130,6 +131,9 @@ public sealed class DefaultAsiBackboneEndpointGovernanceServiceBranchTests
         using ServiceProvider services = CreateServices(evaluator);
         using IServiceScope scope = services.CreateScope();
         DefaultHttpContext httpContext = CreateHttpContext(scope.ServiceProvider);
+        httpContext.User = new ClaimsPrincipal(new ClaimsIdentity(
+            [new Claim(ClaimTypes.NameIdentifier, "user-123")],
+            authenticationType: "test"));
         Endpoint endpoint = CreateEndpoint(
             "policy.acknowledgment",
             new GovernancePolicyAttribute(typeof(SamplePolicy)),
@@ -155,6 +159,46 @@ public sealed class DefaultAsiBackboneEndpointGovernanceServiceBranchTests
         Assert.Equal(StatusCodes.Status428PreconditionRequired, httpContext.Response.StatusCode);
         Assert.True(httpContext.Response.Body.Length > 0);
         Assert.Equal(1, evaluator.CallCount);
+    }
+
+    /// <summary>
+    /// Verifies an acknowledgment-required endpoint fails closed with a stable code when the request is anonymous.
+    /// </summary>
+    [Fact]
+    public async Task EvaluateAsyncRejectsAnonymousAcknowledgmentChallenge()
+    {
+        var evaluator = new DelegatePolicyEvaluator(static (context, _) =>
+            ValueTask.FromResult(GovernanceDecision.RequireAcknowledgment(
+                "acknowledgment.required",
+                "The operation requires acknowledgment.",
+                correlationId: context.CorrelationId)));
+        using ServiceProvider services = CreateServices(evaluator);
+        using IServiceScope scope = services.CreateScope();
+        DefaultHttpContext httpContext = CreateHttpContext(scope.ServiceProvider);
+        Endpoint endpoint = CreateEndpoint(
+            "policy.anonymous-acknowledgment",
+            new GovernancePolicyAttribute(typeof(SamplePolicy)),
+            new RequireAcknowledgmentAttribute());
+        var descriptor = EndpointGovernanceDescriptor.FromEndpoint(endpoint);
+        IEndpointGovernanceService service = scope.ServiceProvider
+            .GetRequiredService<IEndpointGovernanceService>();
+
+        EndpointGovernanceResult result = await service.EvaluateAsync(
+            httpContext,
+            descriptor,
+            TestContext.Current.CancellationToken);
+
+        Assert.False(result.CanExecute);
+        Assert.Null(result.AcknowledgmentChallenge);
+        Assert.NotNull(result.FailureResult);
+
+        await result.FailureResult.ExecuteAsync(httpContext);
+        httpContext.Response.Body.Position = 0;
+        using var reader = new StreamReader(httpContext.Response.Body, leaveOpen: true);
+        string responseBody = await reader.ReadToEndAsync(TestContext.Current.CancellationToken);
+
+        Assert.Equal(StatusCodes.Status403Forbidden, httpContext.Response.StatusCode);
+        Assert.Contains("acknowledgment.challenge.actor_unbound", responseBody, StringComparison.Ordinal);
     }
 
     /// <summary>

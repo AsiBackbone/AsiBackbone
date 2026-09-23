@@ -41,6 +41,12 @@ public sealed class DefaultAcknowledgmentChallengeService : IAcknowledgmentChall
             throw new InvalidOperationException("Only acknowledgment-required governance decisions can be converted into acknowledgment challenges.");
         }
 
+        if (!AcknowledgmentActorBinding.IsSufficient(actor))
+        {
+            throw new InvalidOperationException(
+                $"{AcknowledgmentActorBinding.FailureCode}: {AcknowledgmentActorBinding.FailureMessage}");
+        }
+
         var request = AcknowledgmentRequest.FromDecision(
             actor,
             operationName,
@@ -70,6 +76,14 @@ public sealed class DefaultAcknowledgmentChallengeService : IAcknowledgmentChall
             return AcknowledgmentChallengeResult.Failure(
                 ChallengeMismatchCode,
                 "The acknowledgment response did not match the active challenge.");
+        }
+
+        if (!AcknowledgmentActorBinding.IsSufficient(challenge.AcknowledgmentRequest)
+            || !AcknowledgmentActorBinding.IsSufficient(actor))
+        {
+            return AcknowledgmentChallengeResult.Failure(
+                AcknowledgmentActorBinding.FailureCode,
+                AcknowledgmentActorBinding.FailureMessage);
         }
 
         // The acknowledgment is the accountability record for the operation, so it must be produced by the actor the
