@@ -10,7 +10,7 @@ This project follows the spirit of [Keep a Changelog](https://keepachangelog.com
 
 * Expanded [Canonical JSON v1 Format](docs/articles/canonical-json-v1.md) into the normative specification for
   `asibackbone.canonical-json.v1`. It now covers envelope descriptor trimming, property ordering, the full string
-  escaping table, integer and double handling, array order and string-set normalization, timestamp formatting,
+  escaping table, integer handling, an exact double formatting algorithm with a locked table of boundary values, array order and string-set normalization, timestamp formatting,
   enumeration wire strings, and metadata filtering and normalization. It records as a contract decision that
   leading and trailing white space in allow-listed metadata keys and values is insignificant and that runtime null,
   empty, and white-space-only metadata values are equivalent. No canonical bytes change, so the version stays

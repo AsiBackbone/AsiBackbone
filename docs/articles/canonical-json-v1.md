@@ -54,10 +54,43 @@ Strings containing unpaired UTF-16 surrogates are not valid canonical input, and
 The supported values are null, Boolean, string, signed 32-bit integer, signed 64-bit integer, finite IEEE 754 binary64 (`double`), objects with string keys, and arrays containing supported values.
 
 - Integers are emitted as base-10 JSON numbers without leading zeroes, a plus sign, a fraction, or an exponent. The full signed 64-bit range is exact; verifiers in languages whose default number type is binary64 must not parse and re-emit integers larger than 2^53.
-- Finite doubles use the shortest round-trippable representation emitted by `Utf8JsonWriter.WriteNumberValue(double)` on the supported .NET runtime. Values with short exact decimal forms, such as `0.25` and `0.5`, are emitted as written. The formatting of very large, very small, and non-terminating values follows .NET rather than JCS and is an interoperability hazard; hosts that need portable verification should keep hashed double values within short decimal forms.
+- Finite doubles are emitted with the exact algorithm in [Double formatting](#double-formatting). Every finite binary64 value has one defined representation.
 - NaN and positive or negative infinity are rejected.
 - No implicit conversion is performed for decimal, date/time, enum, or arbitrary object values; the writer rejects them. Artifact builders convert their supported domain values before serialization, as described below.
 - Null values are emitted as `null`, and properties whose value is null are retained rather than omitted.
+
+### Double formatting
+
+A finite binary64 value is formatted as follows. This is the invariant-culture general format that `Utf8JsonWriter.WriteNumberValue(double)` produces on .NET Core 3.0 and later, including the `net10.0` target, and it is part of the v1 contract rather than a property of any particular runtime.
+
+1. **Zero.** Positive zero is `0`. Negative zero is `-0`; the sign of zero is preserved and is significant.
+2. **Sign.** A negative value is written as `-` followed by the formatting of its magnitude.
+3. **Digits.** Compute the shortest decimal significand `d` (digits `d1 d2 ... dn`, with no leading or trailing zeroes) that round-trips to the same binary64 value. When more than one shortest significand round-trips, use the one closest to the exact binary value. These are the same digits produced by ECMAScript `Number.prototype.toString`, Python `repr`, and Ryu-style shortest formatters. Let `k` be the decimal exponent such that the value equals `0.d1d2...dn × 10^k`.
+4. **Notation.** Let `m = max(n, 15)`. Use scientific notation when `k > m` or `k < -3`; otherwise use fixed notation.
+5. **Fixed notation.** When `k <= 0`, write `0.`, then `-k` zeroes, then the digits. When `0 < k < n`, write the first `k` digits, `.`, and the remaining digits. When `k >= n`, write the digits followed by `k - n` zeroes, with no decimal point.
+6. **Scientific notation.** Write `d1`; if `n > 1`, write `.` and `d2...dn`. Then write `E`, the exponent sign (`+` or `-`, always present), and the absolute value of `k - 1` with at least two digits.
+
+The layout differs from both JCS and ECMAScript, which use fixed notation from `1e-7` up to `1e21`. Verifiers must implement the layout above rather than reuse a JavaScript or JCS number serializer; only the digit generation in step 3 can be shared.
+
+| Value | Canonical v1 text |
+| --- | --- |
+| 0.25 | `0.25` |
+| 1.0 | `1` |
+| -1.5 | `-1.5` |
+| 1.0 / 3.0 | `0.3333333333333333` |
+| 0.0001 | `0.0001` |
+| 0.00001 | `1E-05` |
+| 1e14 | `100000000000000` |
+| 1e15 | `1E+15` |
+| 2^53 (9007199254740992) | `9007199254740992` |
+| 12345678901234568 | `12345678901234568` |
+| 123456789012345680 | `1.2345678901234568E+17` |
+| 1e21 | `1E+21` |
+| Largest finite value | `1.7976931348623157E+308` |
+| Smallest subnormal value | `5E-324` |
+| Negative zero | `-0` |
+
+These values are locked by `CanonicalJsonV1InteroperabilityTests`. The only double among the built-in builder fields is the decision receipt and audit ledger record `riskScore`; host-supplied content may contain others.
 
 ## Arrays and string sets
 
@@ -229,7 +262,7 @@ The hash algorithm is not part of the canonical JSON envelope. The same canonica
 
 ## Versioning rule
 
-Bug fixes that do not alter canonical bytes may retain `asibackbone.canonical-json.v1`. Any change that can alter the bytes for an existing artifact requires a new canonicalization version and new golden vectors. That includes property ordering, escaping, number formatting, value support, null handling, UTF-8 encoding, timestamp formatting, enumeration wire strings, string-set normalization, and the metadata filtering and normalization rules above.
+Bug fixes that do not alter canonical bytes may retain `asibackbone.canonical-json.v1`. Any change that can alter the bytes for an existing artifact requires a new canonicalization version and new golden vectors. That includes property ordering, escaping, number formatting (including the double layout rule), value support, null handling, UTF-8 encoding, timestamp formatting, enumeration wire strings, string-set normalization, and the metadata filtering and normalization rules above.
 
 ## Related documentation
 

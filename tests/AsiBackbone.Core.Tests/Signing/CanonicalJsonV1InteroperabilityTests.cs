@@ -77,6 +77,43 @@ public sealed class CanonicalJsonV1InteroperabilityTests
     }
 
     /// <summary>
+    /// Locks the double formatting table in the specification, including the fixed/scientific notation boundaries.
+    /// </summary>
+    /// <param name="value">The double to serialize.</param>
+    /// <param name="expected">The published canonical text.</param>
+    [Theory]
+    [InlineData(0.25d, "0.25")]
+    [InlineData(1.0d, "1")]
+    [InlineData(-1.5d, "-1.5")]
+    [InlineData(1.0d / 3.0d, "0.3333333333333333")]
+    [InlineData(0.0001d, "0.0001")]
+    [InlineData(0.00001d, "1E-05")]
+    [InlineData(1e14d, "100000000000000")]
+    [InlineData(1e15d, "1E+15")]
+    [InlineData(9007199254740992d, "9007199254740992")]
+    [InlineData(12345678901234568d, "12345678901234568")]
+    [InlineData(123456789012345680d, "1.2345678901234568E+17")]
+    [InlineData(1e21d, "1E+21")]
+    [InlineData(double.MaxValue, "1.7976931348623157E+308")]
+    [InlineData(double.Epsilon, "5E-324")]
+    [InlineData(0.0d, "0")]
+    public void DoubleFormattingMatchesPublishedTable(double value, string expected)
+    {
+        Assert.Equal(expected, SerializeNumber(value));
+    }
+
+    /// <summary>
+    /// Negative zero keeps its sign. The value is built from its bit pattern so the compiler cannot fold it to zero.
+    /// </summary>
+    [Fact]
+    public void NegativeZeroIsEmittedWithSign()
+    {
+        double negativeZero = BitConverter.Int64BitsToDouble(long.MinValue);
+
+        Assert.Equal("-0", SerializeNumber(negativeZero));
+    }
+
+    /// <summary>
     /// Locks a builder-level vector covering timestamp formatting, enum wire names, string-set normalization, and
     /// metadata filtering, trimming, and runtime-null handling.
     /// </summary>
@@ -178,6 +215,26 @@ public sealed class CanonicalJsonV1InteroperabilityTests
         CanonicalPayload payload = CanonicalPayloadBuilder.ForDecisionReceipt(receipt);
 
         Assert.Contains("\"metadata\":{}", payload.CanonicalJson, StringComparison.Ordinal);
+    }
+
+    private static string SerializeNumber(double value)
+    {
+        const string prefix = "\"content\":{\"n\":";
+
+        CanonicalPayload payload = CanonicalPayload.Create(
+            "artifact-type",
+            "artifact-number",
+            "schema-v1",
+            CanonicalPayloadOptions.DefaultCanonicalizationVersion,
+            new Dictionary<string, object?>
+            {
+                ["n"] = value
+            });
+
+        int start = payload.CanonicalJson.IndexOf(prefix, StringComparison.Ordinal) + prefix.Length;
+        int end = payload.CanonicalJson.IndexOf('}', start);
+
+        return payload.CanonicalJson[start..end];
     }
 
     private static string HashReceiptWithRegion(string key, string? value)
