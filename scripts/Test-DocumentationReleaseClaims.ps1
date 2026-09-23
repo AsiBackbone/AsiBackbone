@@ -17,7 +17,10 @@ foreach ($requiredPath in @($validatorPath, $fixturesRoot, $pwshPath)) {
 }
 
 function Invoke-ValidationFixture {
-    param([string]$FixtureName)
+    param(
+        [string]$FixtureName,
+        [string[]]$AdditionalArguments = @()
+    )
 
     $fixturePath = Join-Path $fixturesRoot $FixtureName
     if (-not (Test-Path -LiteralPath $fixturePath -PathType Container)) {
@@ -36,6 +39,10 @@ function Invoke-ValidationFixture {
     $startInfo.ArgumentList.Add('-RepositoryRoot')
     $startInfo.ArgumentList.Add($fixturePath)
 
+    foreach ($additionalArgument in $AdditionalArguments) {
+        $startInfo.ArgumentList.Add($additionalArgument)
+    }
+
     $process = [System.Diagnostics.Process]::Start($startInfo)
     if ($null -eq $process) {
         throw "Failed to start PowerShell for fixture '$FixtureName'."
@@ -53,17 +60,60 @@ function Invoke-ValidationFixture {
 }
 
 function Assert-FixturePasses {
-    param([string]$FixtureName)
+    param(
+        [string]$FixtureName,
+        [string[]]$AdditionalArguments = @()
+    )
 
-    $result = Invoke-ValidationFixture $FixtureName
+    $result = Invoke-ValidationFixture $FixtureName $AdditionalArguments
     if ($result.ExitCode -ne 0) {
         throw "Fixture '$FixtureName' should pass but exited with $($result.ExitCode).`n$($result.Output)"
+    }
+}
+
+function Assert-FixtureFails {
+    param(
+        [string]$FixtureName,
+        [string[]]$ExpectedText,
+        [string[]]$AdditionalArguments = @()
+    )
+
+    $result = Invoke-ValidationFixture $FixtureName $AdditionalArguments
+    if ($result.ExitCode -eq 0) {
+        throw "Fixture '$FixtureName' should fail but passed.`n$($result.Output)"
+    }
+
+    foreach ($expected in $ExpectedText) {
+        if (-not $result.Output.Contains($expected, [System.StringComparison]::Ordinal)) {
+            throw "Fixture '$FixtureName' output did not contain '$expected'.`n$($result.Output)"
+        }
     }
 }
 
 Assert-FixturePasses 'valid-current'
 Assert-FixturePasses 'historical-mention'
 Assert-FixturePasses 'excluded-historical'
+Assert-FixturePasses 'prepared-valid'
+Assert-FixturePasses 'released-valid'
+Assert-FixturePasses 'released-valid' @('-ReleaseTag', 'v3.0.0')
+
+Assert-FixtureFails 'prepared-current-claim' @(
+    'README.md:1',
+    "release claim '3.0.0' presents the prepared, unpublished version as the current release",
+    "Expected '2.0.0' from publication.latestPublishedVersion '2.0.0'")
+
+Assert-FixtureFails 'prepared-invalid-latest' @(
+    'eng/documentation-release-claims.json',
+    "publication.latestPublishedVersion '3.0.0' must be lower")
+
+Assert-FixtureFails 'released-stale-wording' @(
+    'README.md:2',
+    "published-release claim '2.0.0'",
+    'README.md:3',
+    "prepared-release claim '3.0.0'")
+
+Assert-FixtureFails 'prepared-valid' @("Release tag 'v3.0.0' requires publication.state 'released'") @('-ReleaseTag', 'v3.0.0')
+Assert-FixtureFails 'released-valid' @("Release tag 'v3.0.1' does not match Directory.Build.props VersionPrefix '3.0.0'") @('-ReleaseTag', 'v3.0.1')
 
 $staleResult = Invoke-ValidationFixture 'stale-current'
 if ($staleResult.ExitCode -eq 0) {

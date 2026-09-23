@@ -1,7 +1,8 @@
 [CmdletBinding()]
 param(
     [string]$RepositoryRoot,
-    [string]$ConfigurationPath = 'eng/documentation-release-claims.json'
+    [string]$ConfigurationPath = 'eng/documentation-release-claims.json',
+    [string]$ReleaseTag
 )
 
 Set-StrictMode -Version Latest
@@ -42,9 +43,38 @@ if (-not $versionPrefixMatch.Success) {
 }
 
 $currentMajor = $versionPrefixMatch.Groups['major'].Value
-$currentMinor = $versionPrefixMatch.Groups['minor'].Value
 $currentMajorLine = "$currentMajor.x"
-$currentMinorLine = "$currentMajor.$currentMinor.x"
+
+function Get-VersionLineTokens {
+    param([string]$Version)
+
+    $versionMatch = [regex]::Match(
+        $Version,
+        '^(?<major>\d+)\.(?<minor>\d+)\.(?<patch>\d+)$',
+        [System.Text.RegularExpressions.RegexOptions]::CultureInvariant)
+
+    if (-not $versionMatch.Success) {
+        return $null
+    }
+
+    $major = $versionMatch.Groups['major'].Value
+    $minor = $versionMatch.Groups['minor'].Value
+
+    return [pscustomobject]@{
+        Exact = $Version
+        MinorLine = "$major.$minor.x"
+        MajorLine = "$major.x"
+    }
+}
+
+$repositoryVersionTokens = Get-VersionLineTokens $versionPrefix
+
+# Publication state distinguishes the version prepared on this branch from the
+# latest version actually tagged and published. Without configuration the
+# repository version is treated as released, which preserves the original rule.
+$publicationState = 'released'
+$latestPublishedVersion = $versionPrefix
+$publicationStateErrors = [System.Collections.Generic.List[string]]::new()
 
 $excludedPathPatterns = @()
 $allowedClaims = @()
@@ -109,6 +139,59 @@ if (Test-Path -LiteralPath $configurationFilePath -PathType Leaf) {
             }
         })
     }
+
+    if ($null -ne $configuration.PSObject.Properties['publication']) {
+        $publication = $configuration.publication
+        $stateProperty = if ($null -ne $publication) { $publication.PSObject.Properties['state'] } else { $null }
+        $latestPublishedProperty = if ($null -ne $publication) { $publication.PSObject.Properties['latestPublishedVersion'] } else { $null }
+
+        if ($null -eq $stateProperty -or [string]::IsNullOrWhiteSpace([string]$stateProperty.Value)) {
+            throw "Documentation release-claim publication.state must be 'prepared' or 'released'."
+        }
+
+        $publicationState = ([string]$stateProperty.Value).Trim().ToLowerInvariant()
+        if ($publicationState -cnotin @('prepared', 'released')) {
+            throw "Documentation release-claim publication.state '$($stateProperty.Value)' must be 'prepared' or 'released'."
+        }
+
+        if ($null -eq $latestPublishedProperty -or [string]::IsNullOrWhiteSpace([string]$latestPublishedProperty.Value)) {
+            throw 'Documentation release-claim publication.latestPublishedVersion must be defined.'
+        }
+
+        $latestPublishedVersion = ([string]$latestPublishedProperty.Value).Trim()
+    }
+}
+
+$configurationRelativePath = [System.IO.Path]::GetRelativePath($repoRoot, $configurationFilePath).Replace('\', '/')
+$publishedVersionTokens = Get-VersionLineTokens $latestPublishedVersion
+
+if ($null -eq $publishedVersionTokens) {
+    throw "Documentation release-claim publication.latestPublishedVersion '$latestPublishedVersion' must use MAJOR.MINOR.PATCH format."
+}
+
+if ($publicationState -eq 'released' -and
+    -not [string]::Equals($latestPublishedVersion, $versionPrefix, [System.StringComparison]::Ordinal)) {
+    $publicationStateErrors.Add("publication.state is 'released', so publication.latestPublishedVersion '$latestPublishedVersion' must equal Directory.Build.props VersionPrefix '$versionPrefix'.")
+}
+
+if ($publicationState -eq 'prepared' -and [version]$latestPublishedVersion -ge [version]$versionPrefix) {
+    $publicationStateErrors.Add("publication.state is 'prepared', so publication.latestPublishedVersion '$latestPublishedVersion' must be lower than the prepared Directory.Build.props VersionPrefix '$versionPrefix'.")
+}
+
+if (-not [string]::IsNullOrWhiteSpace($ReleaseTag)) {
+    $releaseTagName = $ReleaseTag.Trim()
+    if ($releaseTagName.StartsWith('refs/tags/', [System.StringComparison]::Ordinal)) {
+        $releaseTagName = $releaseTagName.Substring('refs/tags/'.Length)
+    }
+
+    $releaseTagVersion = $releaseTagName -replace '^[vV]', ''
+    if (-not [string]::Equals($releaseTagVersion, $versionPrefix, [System.StringComparison]::Ordinal)) {
+        $publicationStateErrors.Add("Release tag '$releaseTagName' does not match Directory.Build.props VersionPrefix '$versionPrefix'.")
+    }
+
+    if ($publicationState -ne 'released') {
+        $publicationStateErrors.Add("Release tag '$releaseTagName' requires publication.state 'released'. The release-preparation pull request must switch publication.state to 'released' and replace prepared-release wording before the tag is created, because the tagged commit's README files are packed into the published packages.")
+    }
 }
 
 function Test-ExcludedPath {
@@ -139,17 +222,30 @@ function Test-AllowedClaim {
 }
 
 function Get-ExpectedVersionToken {
-    param([string]$VersionToken)
+    param(
+        [string]$VersionToken,
+        [object]$VersionTokens
+    )
 
     if ($VersionToken -match '^\d+\.[xX]$') {
-        return $currentMajorLine
+        return $VersionTokens.MajorLine
     }
 
     if ($VersionToken -match '^\d+\.\d+\.[xX]$') {
-        return $currentMinorLine
+        return $VersionTokens.MinorLine
     }
 
-    return $versionPrefix
+    return $VersionTokens.Exact
+}
+
+function Test-VersionTokenMatches {
+    param(
+        [string]$VersionToken,
+        [object]$VersionTokens
+    )
+
+    $expectedToken = Get-ExpectedVersionToken $VersionToken $VersionTokens
+    return [string]::Equals($VersionToken, $expectedToken, [System.StringComparison]::OrdinalIgnoreCase)
 }
 
 function ConvertTo-GitHubCommandValue {
@@ -210,6 +306,136 @@ $claimPatterns = @(
         '\bstable\b[^\r\n]{0,50}?[`*_~]*v?(?<version>' + $versionPattern + ')[`*_~]*[^\r\n]{0,50}?\b(?:package\s+family|package\s+lineup|release\s+line|stable\s+line|major\s+release)\b',
         $regexOptions)
 )
+
+# A bounded gap that cannot cross another version token, so a status phrase is
+# attributed to the nearest version rather than to one earlier in the line.
+function New-VersionFreeGap {
+    param([int]$MaximumLength)
+
+    return '(?:(?!v?' + $versionPattern + ')[^\r\n]){0,' + $MaximumLength + '}?'
+}
+
+$versionCapture = '[`*_~]*v?(?<version>' + $versionPattern + ')[`*_~]*'
+$publishedClaimPatterns = @(
+    [regex]::new(
+        '\b(?:latest|most\s+recently)\s+published\b' + (New-VersionFreeGap 80) + $versionCapture,
+        $regexOptions),
+    [regex]::new(
+        $versionCapture + (New-VersionFreeGap 60) + '\b(?:is|remains)\s+(?:the\s+)?(?:latest|most\s+recently)\s+published\b',
+        $regexOptions)
+)
+$preparedClaimPatterns = @(
+    [regex]::new(
+        '\b(?:prepared|unpublished)\b' + (New-VersionFreeGap 40) + $versionCapture,
+        $regexOptions),
+    [regex]::new(
+        $versionCapture + (New-VersionFreeGap 60) + '\b(?:(?:is|remains)\s+(?:the\s+)?(?:prepared|unpublished)\b|prepared\s+(?:next\s+)?release\b|not\s+yet\s+(?:tagged|published)\b)',
+        $regexOptions)
+)
+$claimRules = @(
+    foreach ($claimPattern in $claimPatterns) {
+        [pscustomobject]@{ Kind = 'current'; Pattern = $claimPattern }
+    }
+
+    foreach ($claimPattern in $publishedClaimPatterns) {
+        [pscustomobject]@{ Kind = 'published'; Pattern = $claimPattern }
+    }
+
+    foreach ($claimPattern in $preparedClaimPatterns) {
+        [pscustomobject]@{ Kind = 'prepared'; Pattern = $claimPattern }
+    }
+)
+
+$releasePublicationPhrasePattern = [regex]::new(
+    '\b(?:current|active|canonical)\s+(?:stable\s+)?release\b(?!\s+line)',
+    $regexOptions)
+
+# An exact-version currency claim, or a "current release" phrase at or just
+# after the match, asserts that a version is published rather than describing
+# the release line the branch maintains.
+function Test-ReleasePublicationClaim {
+    param(
+        [string]$VersionToken,
+        [string]$Line,
+        [System.Text.RegularExpressions.Match]$ClaimMatch
+    )
+
+    if ($VersionToken -match '^\d+\.\d+\.\d+$') {
+        return $true
+    }
+
+    $claimLength = [Math]::Min($Line.Length - $ClaimMatch.Index, $ClaimMatch.Length + 24)
+    return $releasePublicationPhrasePattern.IsMatch($Line.Substring($ClaimMatch.Index, $claimLength))
+}
+
+function Get-ClaimFailureDetail {
+    param(
+        [string]$Kind,
+        [string]$VersionToken,
+        [string]$DisplayLine,
+        [string]$Line,
+        [System.Text.RegularExpressions.Match]$ClaimMatch
+    )
+
+    switch ($Kind) {
+        'current' {
+            if ($publicationState -eq 'released') {
+                if (Test-VersionTokenMatches $VersionToken $repositoryVersionTokens) {
+                    return $null
+                }
+
+                $expectedToken = Get-ExpectedVersionToken $VersionToken $repositoryVersionTokens
+                return "release claim '$VersionToken' is stale in '$DisplayLine'. Expected '$expectedToken' from Directory.Build.props VersionPrefix '$versionPrefix'."
+            }
+
+            # Prepared state: the branch may keep describing the line it
+            # maintains (for example "stable 7.x package family"), but it must
+            # not present the prepared version as the current release.
+            $isReleaseClaim = Test-ReleasePublicationClaim $VersionToken $Line $ClaimMatch
+            if (Test-VersionTokenMatches $VersionToken $repositoryVersionTokens) {
+                if (-not $isReleaseClaim) {
+                    return $null
+                }
+
+                $expectedToken = Get-ExpectedVersionToken $VersionToken $publishedVersionTokens
+                return "release claim '$VersionToken' presents the prepared, unpublished version as the current release in '$DisplayLine'. Expected '$expectedToken' from publication.latestPublishedVersion '$latestPublishedVersion' while publication.state is 'prepared'; describe '$VersionToken' as the prepared next release until the release-preparation pull request switches publication.state to 'released'."
+            }
+
+            if (Test-VersionTokenMatches $VersionToken $publishedVersionTokens) {
+                return $null
+            }
+
+            $repositoryExpectedToken = Get-ExpectedVersionToken $VersionToken $repositoryVersionTokens
+            $publishedExpectedToken = Get-ExpectedVersionToken $VersionToken $publishedVersionTokens
+            return "release claim '$VersionToken' is stale in '$DisplayLine'. Expected '$repositoryExpectedToken' from prepared Directory.Build.props VersionPrefix '$versionPrefix' or '$publishedExpectedToken' from publication.latestPublishedVersion '$latestPublishedVersion'."
+        }
+
+        'published' {
+            if (Test-VersionTokenMatches $VersionToken $publishedVersionTokens) {
+                return $null
+            }
+
+            $expectedToken = Get-ExpectedVersionToken $VersionToken $publishedVersionTokens
+            return "published-release claim '$VersionToken' is stale in '$DisplayLine'. Expected '$expectedToken' from publication.latestPublishedVersion '$latestPublishedVersion'."
+        }
+
+        'prepared' {
+            if ($publicationState -eq 'released') {
+                return "prepared-release claim '$VersionToken' remains in '$DisplayLine', but publication.state is 'released'. Replace prepared or unpublished wording with released wording for '$versionPrefix'."
+            }
+
+            if (Test-VersionTokenMatches $VersionToken $repositoryVersionTokens) {
+                return $null
+            }
+
+            $expectedToken = Get-ExpectedVersionToken $VersionToken $repositoryVersionTokens
+            return "prepared-release claim '$VersionToken' is stale in '$DisplayLine'. Expected '$expectedToken' from Directory.Build.props VersionPrefix '$versionPrefix'."
+        }
+    }
+
+    throw "Unknown documentation release-claim kind '$Kind'."
+}
+
 $historicalContextPattern = [regex]::new(
     '\b(?:historical|original|initial|previous|prior|superseded|final stable patch|releases? expanded|release established)\b',
     $regexOptions)
@@ -238,13 +464,18 @@ foreach ($documentationFile in @($documentationFiles | Sort-Object FullName)) {
             continue
         }
 
-        foreach ($claimPattern in $claimPatterns) {
-            foreach ($claimMatch in $claimPattern.Matches($line)) {
+        $displayLine = $line.Trim()
+        if ($displayLine.Length -gt 240) {
+            $displayLine = $displayLine.Substring(0, 237) + '...'
+        }
+
+        foreach ($claimRule in $claimRules) {
+            foreach ($claimMatch in $claimRule.Pattern.Matches($line)) {
                 $versionGroup = $claimMatch.Groups['version']
                 $versionToken = $versionGroup.Value
-                $expectedToken = Get-ExpectedVersionToken $versionToken
+                $detail = Get-ClaimFailureDetail $claimRule.Kind $versionToken $displayLine $line $claimMatch
 
-                if ([string]::Equals($versionToken, $expectedToken, [System.StringComparison]::OrdinalIgnoreCase)) {
+                if ($null -eq $detail) {
                     continue
                 }
 
@@ -253,33 +484,32 @@ foreach ($documentationFile in @($documentationFiles | Sort-Object FullName)) {
                 }
 
                 $lineNumber = $lineIndex + 1
-                $matchKey = "$relativePath|$lineNumber|$($versionGroup.Index)|$versionToken"
+                $matchKey = "$relativePath|$lineNumber|$($claimRule.Kind)|$($versionGroup.Index)|$versionToken"
                 if (-not $reportedMatches.Add($matchKey)) {
                     continue
-                }
-
-                $displayLine = $line.Trim()
-                if ($displayLine.Length -gt 240) {
-                    $displayLine = $displayLine.Substring(0, 237) + '...'
                 }
 
                 $failures.Add([pscustomobject]@{
                     Path = $relativePath
                     LineNumber = $lineNumber
-                    Version = $versionToken
-                    Expected = $expectedToken
-                    Text = $displayLine
+                    Detail = $detail
                 })
             }
         }
     }
 }
 
-if ($failures.Count -gt 0) {
-    Write-Host "Documentation release-claim validation failed for VersionPrefix '$versionPrefix'."
+if ($publicationStateErrors.Count -gt 0 -or $failures.Count -gt 0) {
+    Write-Host "Documentation release-claim validation failed for VersionPrefix '$versionPrefix' (publication.state '$publicationState', latest published '$latestPublishedVersion')."
+
+    foreach ($stateError in $publicationStateErrors) {
+        $message = "$($configurationRelativePath): $stateError"
+        Write-Host "::error file=$($configurationRelativePath)::$((ConvertTo-GitHubCommandValue $message))"
+        Write-Host "- $message"
+    }
 
     foreach ($failure in $failures) {
-        $message = "$($failure.Path):$($failure.LineNumber): release claim '$($failure.Version)' is stale in '$($failure.Text)'. Expected '$($failure.Expected)' from Directory.Build.props VersionPrefix '$versionPrefix'."
+        $message = "$($failure.Path):$($failure.LineNumber): $($failure.Detail)"
         Write-Host "::error file=$($failure.Path),line=$($failure.LineNumber)::$((ConvertTo-GitHubCommandValue $message))"
         Write-Host "- $message"
     }
@@ -287,4 +517,4 @@ if ($failures.Count -gt 0) {
     exit 1
 }
 
-Write-Host "Documentation release-claim validation passed for VersionPrefix '$versionPrefix' ($currentMajorLine); scanned $($documentationFiles.Count) file(s)."
+Write-Host "Documentation release-claim validation passed for VersionPrefix '$versionPrefix' ($currentMajorLine; publication.state '$publicationState', latest published '$latestPublishedVersion'); scanned $($documentationFiles.Count) file(s)."

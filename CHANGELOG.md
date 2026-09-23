@@ -37,6 +37,17 @@ This project follows the spirit of [Keep a Changelog](https://keepachangelog.com
   separately supplied typed object. Hosts that consume `Artifact` after verification should use `VerifyTypedAsync` with
   the matching first-party `CanonicalPayloadBuilder` and the same payload options used when signing (#809).
 
+### Documentation
+
+* Corrected pre-release wording for `7.0.0`. Evergreen documentation no longer calls the unpublished `7.0.0` the current
+  release; it describes `7.0.0` as the prepared next release on `main` and `6.0.0` as the latest published stable
+  release. `eng/documentation-release-claims.json` now declares a `publication` state (`prepared` or `released`) and
+  the latest published version. The documentation release-claim validator rejects prepared-version "current release"
+  claims while prepared, rejects leftover prepared or older latest-published wording once released, and accepts a new
+  `-ReleaseTag` parameter that fails unless the tagged commit is in the `released` state. The Version Consistency and
+  package-publishing workflows pass the tag on tag pushes, and the release process now switches the state in the
+  release-preparation pull request (#812).
+
 ## [7.0.0] - 2026-09-20
 
 ### Release summary

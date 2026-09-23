@@ -11,15 +11,17 @@ General architectural education belongs in [ASI Backbone Learning](https://asiba
 
 ## Current stable package posture
 
-Stable `7.x` package family. `7.0.0` is the current release. It binds
-acknowledgment responses to the challenged actor and makes unconfigured DLP
-failure behavior and risk levels fail explicitly instead of inheriting a
-permissive zero value. Package IDs, public namespaces, and the `net10.0` target
-remain unchanged; the binary assembly identity advances to `7.0.0.0`.
+Stable `7.x` package family. The latest published stable release is `6.0.0`.
+Repository `main` targets `7.0.0`, the prepared next release, which is not yet
+tagged or published. NuGet consumers remain on `6.0.0` until the release
+readiness checklist completes, `v7.0.0` is tagged, and its packages are
+published.
 
-`7.0.0` is prepared for release and is not yet tagged or published. Published
-packages remain on the previous stable line until the release readiness
-checklist completes and `v7.0.0` is tagged.
+`7.0.0` binds acknowledgment responses to the challenged actor and makes
+unconfigured DLP failure behavior and risk levels fail explicitly instead of
+inheriting a permissive zero value. Package IDs, public namespaces, and the
+`net10.0` target remain unchanged; the binary assembly identity advances to
+`7.0.0.0`.
 
 Released stable package surfaces include Core, DependencyInjection,
 Storage.InMemory, EntityFrameworkCore, AspNetCore, Testing, Templates,
