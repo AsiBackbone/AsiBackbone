@@ -292,6 +292,22 @@ public sealed class DefaultEndpointGovernanceService : IEndpointGovernanceServic
         if (decision.RequiresAcknowledgment && descriptor.RequiresAcknowledgment)
         {
             actor ??= actorContextResolver.ResolveActorContext();
+
+            if (!AcknowledgmentActorBinding.IsSufficient(actor))
+            {
+                return EndpointGovernanceResult.Block(
+                    Microsoft.AspNetCore.Http.Results.Problem(
+                        title: "Acknowledgment challenge actor binding failed.",
+                        detail: AcknowledgmentActorBinding.FailureMessage,
+                        statusCode: StatusCodes.Status403Forbidden,
+                        extensions: new Dictionary<string, object?>(StringComparer.Ordinal)
+                        {
+                            ["reasonCodes"] = new[] { AcknowledgmentActorBinding.FailureCode },
+                            ["outcome"] = decision.Outcome.ToString()
+                        }),
+                    decision);
+            }
+
             AcknowledgmentChallenge challenge = acknowledgmentChallengeService.CreateChallenge(
                 actor,
                 descriptor.OperationName,

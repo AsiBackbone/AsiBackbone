@@ -1,7 +1,9 @@
 using AsiBackbone.AspNetCore.Acknowledgments;
+using AsiBackbone.AspNetCore.Actors;
 using AsiBackbone.Core.Acknowledgments;
 using AsiBackbone.Core.Actors;
 using AsiBackbone.Core.Decisions;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
 using Xunit;
 
@@ -118,6 +120,38 @@ public sealed class AsiBackboneAcknowledgmentChallengeServiceTests
             service.CreateChallenge(actor, "RunOperation", decision));
 
         Assert.Contains("acknowledgment-required", exception.Message, StringComparison.OrdinalIgnoreCase);
+    }
+
+    /// <summary>
+    /// Verifies challenge creation fails closed unless the host supplies a known, authenticated, distinct actor binding.
+    /// </summary>
+    [Theory]
+    [InlineData("unknown", GovernanceActorType.Unknown, false, false)]
+    [InlineData("anonymous-distinct", GovernanceActorType.Human, false, false)]
+    [InlineData("anonymous-session", GovernanceActorType.Human, true, false)]
+    [InlineData("known-but-untrusted", GovernanceActorType.Human, false, true)]
+    [InlineData("unknown", GovernanceActorType.Human, true, true)]
+    [InlineData("typed-as-unknown", GovernanceActorType.Unknown, true, true)]
+    public void CreateChallengeRejectsInsufficientActorBinding(
+        string actorId,
+        GovernanceActorType actorType,
+        bool isKnown,
+        bool isAuthenticated)
+    {
+        IGovernanceActorContext actor = new TestActorContext(
+            actorId,
+            actorType,
+            isKnown,
+            isAuthenticated);
+        var decision = GovernanceDecision.RequireAcknowledgment(
+            "ack.required",
+            "Acknowledgment required.");
+        DefaultAcknowledgmentChallengeService service = CreateService();
+
+        InvalidOperationException exception = Assert.Throws<InvalidOperationException>(() =>
+            service.CreateChallenge(actor, "RunOperation", decision));
+
+        Assert.Contains("acknowledgment.challenge.actor_unbound", exception.Message, StringComparison.Ordinal);
     }
 
     /// <summary>
@@ -260,6 +294,76 @@ public sealed class AsiBackboneAcknowledgmentChallengeServiceTests
         Assert.False(result.Succeeded);
         Assert.Null(result.Acknowledgment);
         Assert.Contains("acknowledgment.challenge.actor_mismatch", result.Result.ReasonCodes);
+    }
+
+    /// <summary>
+    /// Proves two unrelated anonymous requests that collapse to the shared unknown identity cannot satisfy each other's
+    /// acknowledgment challenges, including challenges retained from before the fail-closed creation rule.
+    /// </summary>
+    [Theory]
+    [InlineData(null)]
+    [InlineData("Anonymous visitor")]
+    public void HandleResponseRejectsSecondAnonymousRequestSharingUnknownIdentity(string? unauthenticatedDisplayName)
+    {
+        IGovernanceActorContext firstAnonymousRequest = ResolveAnonymousActor(unauthenticatedDisplayName);
+        IGovernanceActorContext secondAnonymousRequest = ResolveAnonymousActor(unauthenticatedDisplayName);
+        var decision = GovernanceDecision.RequireAcknowledgment(
+            "ack.required",
+            "Acknowledgment required.");
+        var retainedRequest = AcknowledgmentRequest.FromDecision(
+            firstAnonymousRequest,
+            "RunOperation",
+            decision,
+            "CONFIRM",
+            "Confirm responsibility before continuing.");
+        var retainedChallenge = AcknowledgmentChallenge.FromAcknowledgmentRequest(retainedRequest);
+        var response = new AcknowledgmentChallengeRequest
+        {
+            HandshakeId = retainedChallenge.HandshakeId,
+            AcknowledgmentCode = retainedChallenge.RequiredAcknowledgmentCode,
+            Acknowledged = true,
+        };
+        DefaultAcknowledgmentChallengeService service = CreateService();
+
+        AcknowledgmentChallengeResult result = service.HandleResponse(
+            retainedChallenge,
+            secondAnonymousRequest,
+            response);
+
+        Assert.False(result.Succeeded);
+        Assert.False(result.CanProceed);
+        Assert.Null(result.Acknowledgment);
+        Assert.Contains("acknowledgment.challenge.actor_unbound", result.Result.ReasonCodes);
+    }
+
+    /// <summary>
+    /// Verifies an unauthenticated responder cannot satisfy a challenge even when it presents the challenged identifier.
+    /// </summary>
+    [Fact]
+    public void HandleResponseRejectsUnauthenticatedActorWithMatchingIdentifier()
+    {
+        var challengedActor = GovernanceActorContext.Human("user-123");
+        IGovernanceActorContext unauthenticatedActor = new TestActorContext(
+            "user-123",
+            GovernanceActorType.Human,
+            IsKnown: true,
+            IsAuthenticated: false);
+        var decision = GovernanceDecision.RequireAcknowledgment("ack.required", "Acknowledgment required.");
+        DefaultAcknowledgmentChallengeService service = CreateService();
+        AcknowledgmentChallenge challenge = service.CreateChallenge(challengedActor, "RunOperation", decision);
+        var response = new AcknowledgmentChallengeRequest
+        {
+            HandshakeId = challenge.HandshakeId,
+            AcknowledgmentCode = challenge.RequiredAcknowledgmentCode,
+            Acknowledged = true,
+        };
+
+        AcknowledgmentChallengeResult result = service.HandleResponse(challenge, unauthenticatedActor, response);
+
+        Assert.False(result.Succeeded);
+        Assert.Null(result.Acknowledgment);
+        Assert.Contains("acknowledgment.challenge.actor_unbound", result.Result.ReasonCodes);
+        Assert.DoesNotContain("acknowledgment.challenge.actor_mismatch", result.Result.ReasonCodes);
     }
 
     /// <summary>
@@ -412,12 +516,29 @@ public sealed class AsiBackboneAcknowledgmentChallengeServiceTests
             Options.Create(options ?? new AcknowledgmentChallengeOptions()));
     }
 
-    private sealed record TestActorContext(string ActorId, GovernanceActorType ActorType) : IGovernanceActorContext
+    private static IGovernanceActorContext ResolveAnonymousActor(string? unauthenticatedDisplayName)
+    {
+        var accessor = new HttpContextAccessor
+        {
+            HttpContext = new DefaultHttpContext()
+        };
+        var actorOptions = new HttpGovernanceActorContextOptions
+        {
+            UnauthenticatedDisplayName = unauthenticatedDisplayName
+        };
+        var resolver = new HttpContextGovernanceActorContextResolver(
+            accessor,
+            Options.Create(actorOptions));
+
+        return resolver.ResolveActorContext();
+    }
+
+    private sealed record TestActorContext(
+        string ActorId,
+        GovernanceActorType ActorType,
+        bool IsKnown = true,
+        bool IsAuthenticated = true) : IGovernanceActorContext
     {
         public string? DisplayName => null;
-
-        public bool IsKnown => true;
-
-        public bool IsAuthenticated => true;
     }
 }

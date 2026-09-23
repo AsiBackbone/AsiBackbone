@@ -16,6 +16,10 @@ public interface IAcknowledgmentChallengeService
     /// <param name="decision">The governance decision requiring acknowledgment.</param>
     /// <param name="metadata">Optional host-provided challenge metadata.</param>
     /// <returns>A host-friendly acknowledgment challenge.</returns>
+    /// <exception cref="InvalidOperationException">
+    /// Thrown when the decision does not require acknowledgment or the actor lacks a distinct, known, authenticated
+    /// binding. The latter failure includes the stable <c>acknowledgment.challenge.actor_unbound</c> code.
+    /// </exception>
     AcknowledgmentChallenge CreateChallenge(
         IGovernanceActorContext actor,
         string operationName,
@@ -29,7 +33,10 @@ public interface IAcknowledgmentChallengeService
     /// <param name="actor">The actor responding to the challenge.</param>
     /// <param name="response">The submitted response.</param>
     /// <param name="occurredUtc">Optional response timestamp.</param>
-    /// <returns>The result of handling the response.</returns>
+    /// <returns>
+    /// The result of handling the response. An insufficient challenged or responding actor binding fails with
+    /// <c>acknowledgment.challenge.actor_unbound</c> and does not create an acknowledgment.
+    /// </returns>
     AcknowledgmentChallengeResult HandleResponse(
         AcknowledgmentChallenge challenge,
         IGovernanceActorContext actor,

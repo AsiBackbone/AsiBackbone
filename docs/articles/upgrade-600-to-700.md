@@ -25,6 +25,13 @@ In 6.x the response was validated only against the handshake identifier and the 
 
 In 7.0 the `actor` argument must match both the `ActorId` and the `ActorType` that `CreateChallenge` recorded. `ActorId` is compared ordinally after trimming; `ActorType` must be equal, because the same identifier under a different actor type is a different principal. A mismatch returns a failed result carrying the new `acknowledgment.challenge.actor_mismatch` reason code, and no acknowledgment is created. A single reason code covers both comparisons so a caller cannot use the failure to determine which component differed.
 
+The challenged and responding actors must also be known and authenticated, must not use `GovernanceActorType.Unknown`,
+and must not use the shared `GovernanceActorContext.UnknownActorId` (`"unknown"`) identifier. `CreateChallenge` rejects
+an insufficient binding, while `HandleResponse` returns a failed result carrying
+`acknowledgment.challenge.actor_unbound`. Default endpoint governance returns a coded `403` and does not issue a
+challenge. This prevents two unrelated anonymous requests, which the default ASP.NET Core resolver deliberately maps to
+the same sentinel identity, from satisfying each other's challenges.
+
 ### What to change
 
 A host that resolves the current actor per request must resolve the same principal on both legs of the round trip:
@@ -45,17 +52,29 @@ AcknowledgmentChallengeResult result = challengeService.HandleResponse(
 
 Hosts that stored the challenge and rehydrated it for a later request should confirm that their actor resolution is stable across those requests. If the host resolves an actor from an authentication ticket, the identifier and actor type must survive the round trip unchanged.
 
+The default `HttpContextGovernanceActorContextResolver` does not support acknowledgment challenges for anonymous
+requests. Setting `UnauthenticatedDisplayName` changes only presentation; the actor remains unauthenticated and retains
+the shared `"unknown"` identifier. A host that intentionally establishes a safer non-default binding must provide a
+distinct, known, authenticated actor context through its actor resolver and document how that binding resists
+cross-request impersonation. Do not derive the binding from user-controlled request data.
+
 Handle the new reason code where response failures are surfaced:
 
 | Reason code | Meaning |
 | --- | --- |
 | `acknowledgment.challenge.mismatch` | The response did not name the active challenge. |
+| `acknowledgment.challenge.actor_unbound` | Challenge creation or response lacked a distinct, known, authenticated actor binding. |
 | `acknowledgment.challenge.actor_mismatch` | The response was submitted by an actor other than the challenged actor. |
 | `acknowledgment.challenge.code_mismatch` | The response did not carry the required acknowledgment code. |
 
 ### What this change does not do
 
-Actor binding is not challenge expiry and not single-use enforcement. `AcknowledgmentChallenge` still carries no expiry, and nothing consumes a challenge when it is used, so a stored response payload remains replayable. Bounded-lifetime challenge state, revalidating authorization, and revalidating current policy before the consequential operation all remain host responsibilities. See [ASP.NET Core Integration Boundary](aspnetcore-integration-boundary.md).
+Actor identity, challenge expiry, single-use enforcement, authorization, and current-policy validation are separate
+controls. The known/authenticated actor requirement prevents the shared anonymous sentinel from acting as an identity;
+it does not establish challenge lifetime or consume a challenge. `AcknowledgmentChallenge` still carries no expiry, and
+nothing consumes a challenge when it is used, so a stored response payload remains replayable. Bounded-lifetime
+challenge state, revalidating authorization, and revalidating current policy before the consequential operation all
+remain host responsibilities. See [ASP.NET Core Integration Boundary](aspnetcore-integration-boundary.md).
 
 ## DLP classification enums no longer default to a permissive value
 

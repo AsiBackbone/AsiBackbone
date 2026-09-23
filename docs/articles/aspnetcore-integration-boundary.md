@@ -214,6 +214,15 @@ AcknowledgmentChallenge challenge = acknowledgmentChallengeService.CreateChallen
 
 The challenge preserves safe round-trip fields such as handshake identifier, operation name, reason code, required acknowledgment code/text, risk level, risk category, and correlation identifier. Trace identifiers and policy metadata are hidden by default and can be enabled through `AcknowledgmentChallengeOptions` only when the host intentionally wants to expose those diagnostics.
 
+The default challenge service requires a distinct actor binding: `IsKnown` and `IsAuthenticated` must both be `true`,
+the actor type must not be `Unknown`, and the actor identifier must not be the shared `"unknown"` sentinel. Direct
+challenge creation throws with the stable `acknowledgment.challenge.actor_unbound` code when this requirement is not
+met; endpoint governance instead returns a coded `403` without issuing a challenge. `HandleResponse` applies the same
+rule before accepting a response, including for retained challenges. The default HTTP actor resolver therefore does not
+support anonymous acknowledgment. `UnauthenticatedDisplayName` is only a label and does not make anonymous requests
+distinct. A host-provided resolver may establish another binding only by returning a distinct, known, authenticated
+actor context from a trusted boundary rather than user-controlled request data.
+
 Hosts can round-trip a submitted acknowledgment response back into Core handshake models:
 
 ```csharp
@@ -232,7 +241,7 @@ A successful challenge result contains a Core `AcknowledgmentResponse`. Failed r
 
 Gate the consequential operation on `result.CanProceed`, not `result.Succeeded`. `Succeeded` reports only that the response was valid and produced an acknowledgment record, and a refusal is recorded as an acknowledgment too, so `Succeeded` is `true` when the actor explicitly declined. `CanProceed` is `true` only when the response was handled and the actor accepted, matching `GovernanceDecision.CanProceed`.
 
-`HandleResponse` binds the response to the challenged actor. The `actor` argument must resolve to the same `ActorId` and `ActorType` that `CreateChallenge` recorded, otherwise the response fails with `acknowledgment.challenge.actor_mismatch` and no acknowledgment is produced. This keeps the acknowledgment attributed to the actor the challenge was issued to rather than to whichever actor happened to submit the response, so a host that resolves the current actor per request must resolve the same principal on both legs of the round trip. Actor binding is not a substitute for challenge expiry or single-use enforcement: the package still does not bound challenge lifetime or consume a challenge on use, so hosts remain responsible for bounded-lifetime challenge state and for revalidating authorization and current policy before performing the consequential operation.
+`HandleResponse` binds the response to the challenged actor. The `actor` argument must resolve to the same `ActorId` and `ActorType` that `CreateChallenge` recorded, otherwise the response fails with `acknowledgment.challenge.actor_mismatch` and no acknowledgment is produced. This keeps the acknowledgment attributed to the actor the challenge was issued to rather than to whichever actor happened to submit the response, so a host that resolves the current actor per request must resolve the same principal on both legs of the round trip. Actor identity, challenge expiry, single-use enforcement, authorization revalidation, and current-policy validation are separate controls. The package still does not bound challenge lifetime or consume a challenge on use, so hosts remain responsible for bounded-lifetime challenge state and for revalidating authorization and current policy before performing the consequential operation.
 
 `RequireAcknowledgment` metadata creates and returns a challenge when policy evaluation requires acknowledgment; it does not, by itself, consume a later response or replay the original endpoint. Without host-owned challenge storage and a response path that calls `HandleResponse`, repeating the governed request continues to return `428 Precondition Required`. The Plain ASP.NET Core Host sample demonstrates the complete host-owned round trip with `POST /sample/acknowledgments/challenges` and `POST /sample/acknowledgments/responses`. Its in-memory challenge store is illustrative only; production hosts should use protected, bounded-lifetime state and revalidate authorization and policy before performing the consequential operation.
 
