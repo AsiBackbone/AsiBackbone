@@ -96,7 +96,7 @@ public sealed class CanonicalJsonV1InteroperabilityTests
     [InlineData(0.0001d, "0.0001")]
     [InlineData(0.00001d, "1E-05")]
     [InlineData(1e14d, "100000000000000")]
-    [InlineData(1e15d, "1E+15")]
+    [InlineData(1e15d, "1000000000000000")]
     [InlineData(9007199254740992d, "9007199254740992")]
     [InlineData(12345678901234568d, "12345678901234568")]
     [InlineData(123456789012345680d, "1.2345678901234568E+17")]
@@ -235,6 +235,48 @@ public sealed class CanonicalJsonV1InteroperabilityTests
         _ = Assert.Throws<ArgumentException>(() =>
             CanonicalPayloadBuilder.ForDecisionReceipt(receipt, CanonicalPayloadOptions.Create(RegionAllowList)));
     }
+
+    /// <summary>
+    /// Public decision receipt creation rejects metadata keys that would collide after trimming so the artifact cannot
+    /// discard one value before canonical filtering runs.
+    /// </summary>
+    [Fact]
+    public void DecisionReceiptCreationRejectsMetadataKeysThatCollideAfterTrimming()
+    {
+        var metadata = new Dictionary<string, string>(StringComparer.Ordinal)
+        {
+            ["region"] = "us-east",
+            [" region "] = "us-west"
+        };
+
+        _ = Assert.Throws<ArgumentException>(() =>
+            DecisionReceipt.Create(
+                GovernanceActorContext.Human("actor-1"),
+                "orders.approve",
+                "Allowed",
+                metadata: metadata));
+    }
+
+    /// <summary>
+    /// Public governed-operation receipt creation rejects metadata keys that would collide after trimming so the
+    /// artifact cannot discard one value before canonical filtering runs.
+    /// </summary>
+    [Fact]
+    public void GovernedOperationExecutionReceiptCreationRejectsMetadataKeysThatCollideAfterTrimming()
+    {
+        var metadata = new Dictionary<string, string>(StringComparer.Ordinal)
+        {
+            ["safe"] = "included",
+            [" safe "] = "different"
+        };
+
+        _ = Assert.Throws<ArgumentException>(() =>
+            GovernedOperationExecutionReceipt.Create(
+                "operation-1",
+                GovernedOperationPersistenceOutcome.CompletedWithoutMutation,
+                metadata: metadata));
+    }
+
 
     /// <summary>
     /// With default options no metadata reaches the payload, and the metadata property is emitted as an empty object.

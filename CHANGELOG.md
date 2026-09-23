@@ -17,8 +17,9 @@ This project follows the spirit of [Keep a Changelog](https://keepachangelog.com
   `asibackbone.canonical-json.v1`. Three further golden vectors, covering escaping and integers, decision receipt builder normalization, and a
   governed operation execution receipt, are published with SHA-256 values and locked by
   `CanonicalJsonV1InteroperabilityTests`. `GovernedOperationExecutionReceiptCanonicalPayload` now uses the same metadata filter as `CanonicalPayloadBuilder`;
-  receipts built through `GovernedOperationExecutionReceipt.Create` already carry trimmed, non-null metadata, so their
-  canonical bytes are unchanged, and a fourth vector locks that output. Signing, verification, managed-key, and
+  `DecisionReceipt.Create` and `GovernedOperationExecutionReceipt.Create` reject metadata keys that collide after
+  trimming so no value can be discarded before canonical filtering. Existing non-colliding receipt canonical bytes
+  are unchanged, and a fourth vector locks the governed-operation output. Signing, verification, managed-key, and
   signed-record documentation and
   the `AsiBackbone.Signing.ManagedKey` package README now link to the specification (#814).
 

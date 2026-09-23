@@ -66,7 +66,7 @@ A finite binary64 value is formatted as follows. This is the invariant-culture g
 1. **Zero.** Positive zero is `0`. Negative zero is `-0`; the sign of zero is preserved and is significant.
 2. **Sign.** A negative value is written as `-` followed by the formatting of its magnitude.
 3. **Digits.** Compute the shortest decimal significand `d` (digits `d1 d2 ... dn`, with no leading or trailing zeroes) that round-trips to the same binary64 value. When more than one shortest significand round-trips, use the one closest to the exact binary value. These are the same digits produced by ECMAScript `Number.prototype.toString`, Python `repr`, and Ryu-style shortest formatters. Let `k` be the decimal exponent such that the value equals `0.d1d2...dn × 10^k`.
-4. **Notation.** Let `m = max(n, 15)`. Use scientific notation when `k > m` or `k < -3`; otherwise use fixed notation.
+4. **Notation.** Let `m = max(n, 16)`. Use scientific notation when `k > m` or `k < -3`; otherwise use fixed notation.
 5. **Fixed notation.** When `k <= 0`, write `0.`, then `-k` zeroes, then the digits. When `0 < k < n`, write the first `k` digits, `.`, and the remaining digits. When `k >= n`, write the digits followed by `k - n` zeroes, with no decimal point.
 6. **Scientific notation.** Write `d1`; if `n > 1`, write `.` and `d2...dn`. Then write `E`, the exponent sign (`+` or `-`, always present), and the absolute value of `k - 1` with at least two digits.
 
@@ -81,7 +81,7 @@ The layout differs from both JCS and ECMAScript, which use fixed notation for ma
 | 0.0001 | `0.0001` |
 | 0.00001 | `1E-05` |
 | 1e14 | `100000000000000` |
-| 1e15 | `1E+15` |
+| 1e15 | `1000000000000000` |
 | 2^53 (9007199254740992) | `9007199254740992` |
 | 12345678901234568 | `12345678901234568` |
 | 123456789012345680 | `1.2345678901234568E+17` |
@@ -117,17 +117,21 @@ Builders emit enumeration values as fixed protocol strings from `CanonicalEnumWi
 
 ## Metadata filtering and normalization
 
-Metadata dictionaries on decision receipts, audit ledger records, lifecycle events, emission envelopes and payloads, outbox entries, capability grants, and governed operation execution receipts pass through the same filter before hashing. Every built-in canonical payload builder, including `GovernedOperationExecutionReceiptCanonicalPayload`, uses this one implementation:
+Metadata carried by decision receipts, audit ledger records, lifecycle events, emission envelopes and payloads, outbox entries, capability grants, and governed operation execution receipts passes through the same canonical filter before hashing. Every built-in canonical payload builder, including `GovernedOperationExecutionReceiptCanonicalPayload`, uses this one implementation once it receives the artifact metadata:
 
 1. **Allow-list.** An entry is included only when its key, trimmed, is in `CanonicalPayloadOptions.MetadataKeyAllowList` by ordinal comparison. The default allow-list is empty, so with default options no metadata is hashed.
 2. **Key trimming.** Included keys are trimmed of leading and trailing white space.
-3. **Collision rejection.** If two included keys are identical after trimming, canonicalization fails with an `ArgumentException` instead of letting enumeration order choose a value.
+3. **Collision rejection at the canonical boundary.** If two included keys reach the canonical filter and are identical after trimming, canonicalization fails with an `ArgumentException` instead of letting enumeration order choose a value.
 4. **Value normalization.** Values are trimmed of leading and trailing white space. A runtime null value is converted to the empty string.
 5. **Emission.** The result is emitted as an object whose property values are all strings, ordered as described above. The `metadata` property is always present; when no entry survives filtering it is the empty object `{}`.
 
 "White space" means every character for which .NET `char.IsWhiteSpace` returns true, which is what `string.Trim()` removes: the Unicode `White_Space` characters, including U+0009 to U+000D, U+0020, U+0085, U+00A0, U+1680, U+2000 to U+200A, U+2028, U+2029, U+202F, U+205F, and U+3000. Zero-width characters such as U+200B and U+FEFF are not white space and are preserved.
 
-Several artifact types also normalize their own metadata when the artifact is created, for example by dropping blank keys. That creation-time normalization changes the artifact before it is hashed; the rules above are what the canonical builder applies to whatever metadata the artifact carries.
+Several artifact types also normalize their own metadata when the artifact is created, for example by dropping blank keys or merging metadata from a source artifact with host-provided metadata. That creation-time normalization changes the artifact before it is hashed; the rules above are what the canonical builder applies to whatever metadata the artifact carries.
+
+`DecisionReceipt.Create` and `GovernedOperationExecutionReceipt.Create` trim metadata keys as part of public artifact creation. They reject two keys from the same input dictionary that become identical after trimming, so a collision cannot be silently collapsed before the canonical filter sees the artifact. Their interoperability tests lock this behavior.
+
+Other artifact factories that intentionally merge multiple metadata sources may apply their documented merge semantics before canonicalization. The v1 byte contract is defined over the metadata carried by the resulting artifact plus the canonical filtering rules above; it does not retroactively authenticate source-dictionary distinctions that an artifact factory intentionally resolved before the artifact existed.
 
 ### Equivalences by contract
 
