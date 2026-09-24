@@ -11,12 +11,12 @@ namespace AsiBackbone.EntityFrameworkCore.Tests.Outbox.Providers;
 public enum OutboxContentionProvider
 {
     /// <summary>
-    /// SQL Server with <c>READ_COMMITTED_SNAPSHOT OFF</c>, the default for a new database on a standalone instance.
+    /// SQL Server with <c>READ_COMMITTED_SNAPSHOT OFF</c>, set explicitly on the test database.
     /// </summary>
     SqlServerLockingReadCommitted,
 
     /// <summary>
-    /// SQL Server with <c>READ_COMMITTED_SNAPSHOT ON</c>, the default for Azure SQL Database.
+    /// SQL Server with <c>READ_COMMITTED_SNAPSHOT ON</c>, set explicitly on the test database; the Azure SQL Database default.
     /// </summary>
     SqlServerReadCommittedSnapshot,
 

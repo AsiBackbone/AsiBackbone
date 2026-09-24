@@ -57,6 +57,10 @@ internal sealed class ProviderOutboxDatabase(
         "DECLARE @statement nvarchar(max) = N'ALTER DATABASE ' + QUOTENAME(@databaseName) " +
         "+ N' SET READ_COMMITTED_SNAPSHOT ON WITH ROLLBACK IMMEDIATE'; EXEC (@statement);";
 
+    private const string SqlServerDisableReadCommittedSnapshotSql =
+        "DECLARE @statement nvarchar(max) = N'ALTER DATABASE ' + QUOTENAME(@databaseName) " +
+        "+ N' SET READ_COMMITTED_SNAPSHOT OFF WITH ROLLBACK IMMEDIATE'; EXEC (@statement);";
+
     private const string PostgreSqlIsolationSql = "SHOW default_transaction_isolation";
 
     /// <summary>
@@ -87,9 +91,13 @@ internal sealed class ProviderOutboxDatabase(
             _ = await context.Database.EnsureCreatedAsync(cancellationToken);
         }
 
-        if (provider is OutboxContentionProvider.SqlServerReadCommittedSnapshot)
+        // Set the snapshot mode explicitly for both SQL Server configurations rather than relying on the database
+        // default, which depends on the server and its model database and was observed to be ON in CI.
+        if (provider is OutboxContentionProvider.SqlServerLockingReadCommitted or OutboxContentionProvider.SqlServerReadCommittedSnapshot)
         {
-            await database.EnableReadCommittedSnapshotAsync(cancellationToken);
+            await database.SetReadCommittedSnapshotAsync(
+                enabled: provider is OutboxContentionProvider.SqlServerReadCommittedSnapshot,
+                cancellationToken);
         }
 
         await database.AssertIsolationPreconditionAsync(cancellationToken);
@@ -177,13 +185,18 @@ internal sealed class ProviderOutboxDatabase(
         };
     }
 
-    private async Task EnableReadCommittedSnapshotAsync(CancellationToken cancellationToken)
+    private async Task SetReadCommittedSnapshotAsync(bool enabled, CancellationToken cancellationToken)
     {
         await using var connection = new SqlConnection(serverConnectionString);
         await connection.OpenAsync(cancellationToken);
 
         await using SqlCommand command = connection.CreateCommand();
-        command.CommandText = SqlServerEnableReadCommittedSnapshotSql;
+
+        // Both branches are constants, so the command text never carries caller-supplied input.
+        command.CommandText = enabled
+            ? SqlServerEnableReadCommittedSnapshotSql
+            : SqlServerDisableReadCommittedSnapshotSql;
+
         _ = command.Parameters.AddWithValue("@databaseName", databaseName);
         _ = await command.ExecuteNonQueryAsync(cancellationToken);
 
