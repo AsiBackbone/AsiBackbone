@@ -237,12 +237,18 @@ public sealed class CapabilityGrantValidationOptions
     }
 
     /// <summary>
-    /// Creates the legacy execution-boundary profile without a subject expectation.
+    /// Obsolete. Retains the legacy execution-boundary signature for binary compatibility and always fails closed.
     /// </summary>
     /// <remarks>
-    /// This method now fails closed. Use <see cref="CreateBoundExecutionBoundary" />, whose required first argument is
-    /// <see cref="CapabilityGrantBindingExpectations" />.
+    /// This method is retained only for compatibility and always throws <see cref="InvalidOperationException" />.
+    /// Replace calls with <c>CreateBoundExecutionBoundary(CapabilityGrantBindingExpectations, ...)</c>, whose required
+    /// first argument supplies the authoritative subject and optional operation binding. The warning remains non-error
+    /// in the 7.x line; removal is planned for the next permitted major version.
     /// </remarks>
+    [Obsolete(
+        "CreateExecutionBoundary always fails closed and is retained only for binary compatibility. Use CreateBoundExecutionBoundary(CapabilityGrantBindingExpectations, ...) instead. Planned removal in 8.0.",
+        DiagnosticId = "ASIB901",
+        UrlFormat = "https://asibackbone.github.io/AsiBackbone/articles/capability-grant-hardening.html#legacy-createexecutionboundary-deprecation")]
     public static CapabilityGrantValidationOptions CreateExecutionBoundary(
         string? issuer = null,
         string? audience = null,
