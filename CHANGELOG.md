@@ -33,6 +33,21 @@ This project follows the spirit of [Keep a Changelog](https://keepachangelog.com
   signed-record documentation and
   the `AsiBackbone.Signing.ManagedKey` package README now link to the specification (#814).
 
+### Fixed
+
+* `EfCoreGovernanceOutboxStore` claim acquisition now restates claim eligibility on the rows the set-based claim
+  update writes, not only in the candidate subquery that chooses them. Under SQL Server and PostgreSQL row locking,
+  a worker whose claim waited on another worker's row locks could otherwise resume with candidates it chose before
+  the other claim was visible, overwrite that worker's claim token, and leave two workers holding the same entry.
+  The waiting worker now skips rows claimed while it waited and may receive a smaller or empty batch. The change is
+  provider-neutral LINQ and adds no provider-specific SQL. New opt-in contention tests exercise SQL Server with
+  `READ_COMMITTED_SNAPSHOT` off and on, and PostgreSQL, covering pending, retry-ready, and expired-lease claims plus
+  unscripted multi-worker contention. They are skipped unless `ASIBACKBONE_TEST_SQLSERVER_CONNECTION` or
+  `ASIBACKBONE_TEST_POSTGRES_CONNECTION` is set, and the new `EF Core provider contention` CI job runs them against
+  service containers with `ASIBACKBONE_TEST_PROVIDERS_REQUIRED=true` so they cannot pass by skipping. The multi-worker
+  concurrency guidance now records the claim guarantee for each provider and names the tests that evidence it; other
+  relational providers are listed as unverified (#823).
+
 ### Security
 
 * Replaced the long-lived `PROJECT_TOKEN` PAT used by project-status automation

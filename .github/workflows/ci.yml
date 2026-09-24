@@ -237,6 +237,70 @@ jobs:
           path: ${{ env.XML_DOCS_OUTPUT }}/cs1591-inventory.md
           if-no-files-found: warn
 
+  efcore-provider-contention:
+    name: EF Core provider contention
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    permissions:
+      contents: read
+
+    # Real-provider claim contention evidence for EfCoreGovernanceOutboxStore (issue #823). SQLite serializes writers,
+    # so these tests only prove anything against servers that lock rows. The credentials below belong to throwaway
+    # service containers that exist only for the lifetime of this job.
+    services:
+      sqlserver:
+        image: mcr.microsoft.com/mssql/server:2022-latest
+        env:
+          ACCEPT_EULA: "Y"
+          MSSQL_SA_PASSWORD: "AsiBackbone-ci-823!"
+        ports:
+          - 1433:1433
+        options: >-
+          --health-cmd "/opt/mssql-tools18/bin/sqlcmd -C -S localhost -U sa -P 'AsiBackbone-ci-823!' -Q 'SELECT 1' -b"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 12
+
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_PASSWORD: "asibackbone-ci-823"
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 12
+
+    env:
+      EFCORE_TEST_PROJECT: tests/AsiBackbone.EntityFrameworkCore.Tests/AsiBackbone.EntityFrameworkCore.Tests.csproj
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@a98b56852c35b8e3190ac28c8c2271da59106c68 # v6.0.0
+        with:
+          global-json-file: global.json
+
+      - name: Restore
+        run: dotnet restore "$EFCORE_TEST_PROJECT" --locked-mode -p:Configuration="$CONFIGURATION"
+
+      - name: Build
+        run: dotnet build "$EFCORE_TEST_PROJECT" --configuration "$CONFIGURATION" --no-restore
+
+      - name: Test EF Core outbox against SQL Server and PostgreSQL
+        env:
+          ASIBACKBONE_TEST_SQLSERVER_CONNECTION: "Server=localhost,1433;User Id=sa;Password=AsiBackbone-ci-823!;TrustServerCertificate=True;Encrypt=False"
+          ASIBACKBONE_TEST_POSTGRES_CONNECTION: "Host=localhost;Port=5432;Username=postgres;Password=asibackbone-ci-823"
+          ASIBACKBONE_TEST_PROVIDERS_REQUIRED: "true"
+        run: dotnet test --project "$EFCORE_TEST_PROJECT" --configuration "$CONFIGURATION" --no-build
+
   codeql-analysis:
     name: CodeQL analysis
     runs-on: ubuntu-latest

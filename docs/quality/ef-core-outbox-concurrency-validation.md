@@ -36,6 +36,47 @@ To run only the concurrency validation tests:
 dotnet test ./tests/AsiBackbone.EntityFrameworkCore.Tests/AsiBackbone.EntityFrameworkCore.Tests.csproj --configuration Release --filter FullyQualifiedName~EfCoreOutboxConcurrencyValidationTests
 ```
 
+## Real-provider claim contention (issue #823)
+
+SQLite serializes writers at the database level, so the SQLite tests above cannot show what SQL Server or PostgreSQL do when two workers' claim statements genuinely overlap. An opt-in suite runs the claim path against real servers:
+
+```text
+tests/AsiBackbone.EntityFrameworkCore.Tests/Outbox/Providers/EfCoreGovernanceOutboxProviderContentionTests.cs
+```
+
+It covers three provider configurations: SQL Server with `READ_COMMITTED_SNAPSHOT OFF`, SQL Server with `READ_COMMITTED_SNAPSHOT ON`, and PostgreSQL at its default read committed isolation. SQL Server is covered twice because the snapshot setting changes whether a statement reads locked rows or their last committed versions.
+
+| Scenario | How the overlap is established | Invariant checked |
+| --- | --- | --- |
+| Pending claims | The holder claims inside an open transaction. The contender starts its claim, and the holder commits only after the database reports the contender waiting on a lock (or the contender finishes first). | The two claim sets are disjoint, their total does not exceed the eligible rows, and every returned claim is still the active claim on its row. |
+| Retry-ready claims | The same overlap, over entries made retry-ready with a retryable failure. | The same invariants. |
+| Reclaim after lease expiry | Entries are claimed by a worker whose lease then expires; two workers reclaim them with the same overlap. | The same invariants, and no returned claim carries the expired token. |
+| Unscripted autocommit contention | Several workers start together and claim small batches until the backlog is empty. | No entry is claimed by more than one worker, and every entry is claimed exactly once. |
+
+The "still the active claim" check matters on its own. A claim statement that overwrote another worker's owner and token after that worker had read its claims back would leave both workers holding the entry even though the two returned sets never overlap.
+
+Deadlock or serialization victims in the unscripted test retry on the worker's next attempt and are reported in the failure message. They are not an overlap.
+
+### How to run locally
+
+Each provider is enabled by a server-level connection string. The login needs permission to create and drop databases, and on SQL Server `VIEW SERVER STATE`, which the test uses to detect a blocked claim. Each test creates and drops its own database.
+
+```bash
+docker run -d --name asib-mssql -e ACCEPT_EULA=Y -e 'MSSQL_SA_PASSWORD=AsiBackbone-local-823!' -p 1433:1433 mcr.microsoft.com/mssql/server:2022-latest
+docker run -d --name asib-postgres -e POSTGRES_PASSWORD=asibackbone-local-823 -p 5432:5432 postgres:17
+
+# docker run -d returns before either server accepts connections; wait until both are ready.
+until docker exec asib-mssql /opt/mssql-tools18/bin/sqlcmd -C -S localhost -U sa -P 'AsiBackbone-local-823!' -Q 'SELECT 1' -b > /dev/null 2>&1; do sleep 2; done
+until docker exec asib-postgres pg_isready -U postgres > /dev/null 2>&1; do sleep 1; done
+
+export ASIBACKBONE_TEST_SQLSERVER_CONNECTION='Server=localhost,1433;User Id=sa;Password=AsiBackbone-local-823!;TrustServerCertificate=True;Encrypt=False'
+export ASIBACKBONE_TEST_POSTGRES_CONNECTION='Host=localhost;Port=5432;Username=postgres;Password=asibackbone-local-823'
+
+dotnet test --project ./tests/AsiBackbone.EntityFrameworkCore.Tests/AsiBackbone.EntityFrameworkCore.Tests.csproj --configuration Release
+```
+
+The CI job gets the same readiness guarantee from the service containers' health checks. Without the environment variables the provider tests are skipped, so the default local and CI test runs are unaffected. Setting `ASIBACKBONE_TEST_PROVIDERS_REQUIRED=true` turns a missing connection string into a failure. The `EF Core provider contention` job in `.github/workflows/ci.yml` sets it, runs both servers as service containers, and runs the EF Core test project against them.
+
 ## Expected interpretation
 
 Passing tests support the following bounded claims:
