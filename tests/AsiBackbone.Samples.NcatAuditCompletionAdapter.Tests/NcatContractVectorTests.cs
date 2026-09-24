@@ -250,7 +250,7 @@ public sealed class NcatContractVectorTests
     [InlineData("{}")]
     [InlineData(" 1")]
     [InlineData("\n\"trailing\"")]
-    [InlineData("\n{\"schemaVersion\":\"1.0\"}\n")]
+    [InlineData(/*lang=json,strict*/ "\n{\"schemaVersion\":\"1.0\"}\n")]
     public void ManifestWithTrailingJsonValueIsRejected(string trailingContent)
     {
         ContractVector vector = GetSupportedVector("committed-single-record-all-identifiers");
