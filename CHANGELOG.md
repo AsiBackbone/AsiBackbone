@@ -45,7 +45,8 @@ This project follows the spirit of [Keep a Changelog](https://keepachangelog.com
   unscripted multi-worker contention. They are skipped unless `ASIBACKBONE_TEST_SQLSERVER_CONNECTION` or
   `ASIBACKBONE_TEST_POSTGRES_CONNECTION` is set, and the new `EF Core provider contention` CI job runs them against
   service containers with `ASIBACKBONE_TEST_PROVIDERS_REQUIRED=true` so they cannot pass by skipping. The multi-worker
-  concurrency guidance now records the verified guarantee for each provider (#823).
+  concurrency guidance now records the claim guarantee for each provider and names the tests that evidence it; other
+  relational providers are listed as unverified (#823).
 
 ### Security
 

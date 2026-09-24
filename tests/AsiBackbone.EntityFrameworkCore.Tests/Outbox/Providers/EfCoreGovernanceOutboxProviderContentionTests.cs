@@ -46,6 +46,7 @@ public sealed class EfCoreGovernanceOutboxProviderContentionTests
     private static readonly TimeSpan LeaseDuration = TimeSpan.FromMinutes(5);
     private static readonly TimeSpan InterleavingTimeout = TimeSpan.FromSeconds(30);
     private static readonly TimeSpan PollInterval = TimeSpan.FromMilliseconds(50);
+    private static readonly TimeSpan StressEmptyBatchRetryDelay = TimeSpan.FromMilliseconds(20);
 
     private delegate ValueTask<IReadOnlyList<GovernanceOutboxClaim>> ClaimOperation(
         EfCoreGovernanceOutboxStore store,
@@ -165,6 +166,12 @@ public sealed class EfCoreGovernanceOutboxProviderContentionTests
     /// expires at the fixed claim time and nothing completes, so any entry claimed twice was claimed concurrently. A
     /// worker that the database chooses as a deadlock or serialization victim retries on its next attempt; those
     /// retries are counted and reported, not treated as success.
+    /// <para>
+    /// An empty batch does not end a worker. A worker that waited on rows another worker claimed can legitimately
+    /// receive an empty batch while other entries are still eligible, so workers stop only once the shared claimed
+    /// count reaches the seeded backlog. A worker that exhausts its attempts first reports itself incomplete, which
+    /// keeps a claim path that stops making progress from hanging the test.
+    /// </para>
     /// </remarks>
     [Theory(Timeout = TestTimeoutMilliseconds)]
     [InlineData(OutboxContentionProvider.SqlServerLockingReadCommitted)]
@@ -177,9 +184,10 @@ public sealed class EfCoreGovernanceOutboxProviderContentionTests
         string[] eligibleIds = await SeedPendingAsync(database, "stress", StressRowCount, cancellationToken);
 
         var start = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
+        var progress = new StressProgress();
         Task<StressWorkerResult>[] workers = [.. Enumerable
             .Range(0, StressWorkerCount)
-            .Select(index => RunStressWorkerAsync(database, $"worker-{index:D2}", start.Task, cancellationToken))];
+            .Select(index => RunStressWorkerAsync(database, $"worker-{index:D2}", start.Task, progress, cancellationToken))];
 
         start.SetResult();
         StressWorkerResult[] results = await Task.WhenAll(workers);
@@ -316,6 +324,7 @@ public sealed class EfCoreGovernanceOutboxProviderContentionTests
         ProviderOutboxDatabase database,
         string workerId,
         Task start,
+        StressProgress progress,
         CancellationToken cancellationToken)
     {
         await using GovernanceOutboxTestDbContext context = database.CreateContext();
@@ -342,12 +351,21 @@ public sealed class EfCoreGovernanceOutboxProviderContentionTests
                 continue;
             }
 
-            if (batch.Count == 0)
+            if (batch.Count > 0)
+            {
+                claims.AddRange(batch);
+                progress.Record(batch.Count);
+                continue;
+            }
+
+            // An empty batch can mean this worker lost its candidates to another worker while other entries remain
+            // eligible, so only the shared claimed count decides that the backlog is drained.
+            if (progress.Claimed >= StressRowCount)
             {
                 return new StressWorkerResult(workerId, claims, transientContentionCount, Completed: true);
             }
 
-            claims.AddRange(batch);
+            await Task.Delay(StressEmptyBatchRetryDelay, cancellationToken);
         }
 
         return new StressWorkerResult(workerId, claims, transientContentionCount, Completed: false);
@@ -400,6 +418,18 @@ public sealed class EfCoreGovernanceOutboxProviderContentionTests
         IReadOnlyList<GovernanceOutboxClaim> ContenderClaims)
     {
         public IEnumerable<GovernanceOutboxClaim> AllClaims => HolderClaims.Concat(ContenderClaims);
+    }
+
+    private sealed class StressProgress
+    {
+        private int claimed;
+
+        public int Claimed => Volatile.Read(ref claimed);
+
+        public void Record(int count)
+        {
+            _ = Interlocked.Add(ref claimed, count);
+        }
     }
 
     private sealed record StressWorkerResult(
