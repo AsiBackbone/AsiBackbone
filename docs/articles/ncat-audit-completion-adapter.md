@@ -117,6 +117,21 @@ else
 
 The source entry is acknowledged only after the lifecycle event has been durably appended, or when an equivalent lifecycle event already exists.
 
+A host that receives NCAT's `ApplicationAuditCompletionMessage` through an `IApplicationAuditCompletionPublisher` can instead model it as `NcatAuditCompletionMessage` and validate it before translation:
+
+```csharp
+if (!NcatAuditCompletionContract.TryCreateHandoff(
+        message,
+        deliveryAttempt,
+        out NcatAuditCompletionHandoff? handoff,
+        out string? reasonCode))
+{
+    // Contract violation: report a terminal publish failure to NCAT with reasonCode.
+}
+```
+
+`TryCreateHandoff` applies version 1 of NCAT's audit-completion contract and uses the message idempotency key as the completion entry identifier. Hosts that retain the canonical manifest text can also call `TryVerifyCanonicalManifest` to confirm the batch, record count, schema version, and SHA-256 digest. The contract rules are described in [NCAT contract vectors](#ncat-contract-vectors).
+
 ## Delivery dispositions
 
 | Disposition | Meaning | Acknowledge NCAT source entry? |
@@ -153,8 +168,44 @@ The adapter carries only opaque identifiers, counts, hashes, outcome, provider l
 
 Failure results expose only the exception type name. Detailed diagnostics should remain in the host's protected local logs.
 
+## NCAT contract vectors
+
+The adapter models NCAT independently, so both repositories could drift while their own tests stay green. To prevent that, the sample tests replay NCAT's published, machine-readable [audit-completion contract vectors](https://github.com/AsiBackbone/NetCoreApplicationTemplate/blob/main/contracts/audit-completion/README.md). Neither product takes a compile-time dependency on the other.
+
+The vectors are vendored from a pinned NCAT commit:
+
+| File | Purpose |
+| --- | --- |
+| `tests/AsiBackbone.Samples.NcatAuditCompletionAdapter.Tests/ContractVectors/ncat/v1/audit-completion-vectors.json` | Exact bytes of NCAT's `contracts/audit-completion/v1/audit-completion-vectors.json` at the pinned revision |
+| `tests/AsiBackbone.Samples.NcatAuditCompletionAdapter.Tests/ContractVectors/ncat/ncat-contract-pin.json` | NCAT repository, pinned commit SHA, source path, and SHA-256 of the vendored file |
+
+`NcatContractVectorTests` checks that:
+
+- the vendored file matches the pinned SHA-256;
+- the contract version, schema versions, digest algorithm, idempotency prefix, and supported outcomes match `NcatAuditCompletionContract`;
+- each valid vector's canonical manifest bytes reproduce its expected digest and its idempotency key is recomputed from the destination and the trimmed mutation batch ID;
+- each valid vector's receipt and message agree, pass `TryCreateHandoff`, and deliver with the operation, attempt, decision, correlation, trace, batch, count, algorithm, digest, and timestamp preserved. Vectors without an operation or decision identifier are rejected with the adapter's documented reason codes;
+- each published invalid message is rejected with a specific reason code;
+- the no-mutation, failed, and rolled-back scenarios cannot carry committed batch evidence.
+
+A test fails with review guidance when NCAT publishes a vector name, outcome, or contract major version the adapter does not recognize.
+
+### Drift reporting
+
+The `NCAT Contract Vectors` workflow runs weekly, on demand, and on pull requests that change the vendored vectors. `scripts/Test-NcatContractVectorPin.ps1` confirms that the vendored bytes still match the pinned NCAT revision. It then compares them with NCAT `main` and fails with a summary when NCAT publishes different vectors, removes them, or adds a newer contract major version. The weekly failure is the signal that the pin needs review; it does not block unrelated pull requests.
+
+### Updating the pinned vectors
+
+1. Read the NCAT change and its compatibility classification in NCAT's contract README.
+2. Copy `contracts/audit-completion/v1/audit-completion-vectors.json` from the new NCAT commit or release tag without modifying it. `.gitattributes` keeps the vendored JSON as LF, so the bytes match upstream.
+3. Update `revision` and `sha256` in `ncat-contract-pin.json`. Use the full commit SHA.
+4. Run the sample tests. Extend `NcatAuditCompletionContract` and `NcatContractVectorTests` for any new vector, reason, outcome, or schema version.
+5. For a new contract major version, vendor the new `vN/` directory alongside the existing one until the adapter supports it.
+6. Run `./scripts/Test-NcatContractVectorPin.ps1` and confirm it reports no drift.
+
 ## Related work
 
 - AsiBackbone issue #634 introduced the framework-neutral governed execution receipt and lifecycle helpers.
 - NCAT issue #367 owns the privacy-safe canonical mutation manifest and hash.
 - NCAT issues #368 through #370 own transaction coordination, completion outbox/dispatch, reconciliation, health checks, and metrics.
+- NCAT issue #580 publishes the versioned audit-completion contract vectors, and AsiBackbone issue #826 replays them against this adapter.

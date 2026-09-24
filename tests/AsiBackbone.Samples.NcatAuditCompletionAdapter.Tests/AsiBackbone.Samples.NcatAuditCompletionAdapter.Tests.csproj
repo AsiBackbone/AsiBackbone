@@ -24,6 +24,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Include="ContractVectors/**/*.json" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="../../samples/NcatAuditCompletionAdapter/AsiBackbone.Samples.NcatAuditCompletionAdapter.csproj" />
     <ProjectReference Include="../../src/AsiBackbone.Core/AsiBackbone.Core.csproj" />
     <ProjectReference Include="../../src/AsiBackbone.Storage.InMemory/AsiBackbone.Storage.InMemory.csproj" />

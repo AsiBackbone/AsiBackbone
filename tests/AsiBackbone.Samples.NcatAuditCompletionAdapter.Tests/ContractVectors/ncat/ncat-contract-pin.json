@@ -1,0 +1,7 @@
+{
+  "repository": "AsiBackbone/NetCoreApplicationTemplate",
+  "revision": "8aec7d32438907e73b09f283d4f61221a6b0cedc",
+  "sourcePath": "contracts/audit-completion/v1/audit-completion-vectors.json",
+  "vendoredPath": "v1/audit-completion-vectors.json",
+  "sha256": "8421cec20271ce88b132de7c95b73877d9e14e3d20b93f45c4922eecd0a4898e"
+}
