@@ -4,13 +4,15 @@ This design record captures the selected direction for multi-worker outbox claim
 
 Issue: [#407](https://github.com/AsiBackbone/AsiBackbone/issues/407), implemented baseline for [#464](https://github.com/AsiBackbone/AsiBackbone/issues/464)
 
-Status: **Accepted design direction; initial provider-neutral claim contracts and opt-in drain/store support implemented.** Provider-specific stronger atomic claim patterns remain host/provider-owned.
+Status: **Accepted design direction; provider-neutral claim contracts and claim-capable drain/store support implemented. Claim leasing is enabled by default by `GovernanceOutboxOptions.UseClaimLeases`.** Provider-specific stronger atomic claim patterns remain host/provider-owned.
+
+The claim contracts remain explicit and additive, but the drain no longer requires a host to opt into claim leasing. Since #697, a newly constructed `GovernanceOutboxOptions` uses claim leases by default. Hosts use the legacy non-claiming candidate path only when they explicitly set `UseClaimLeases = false`.
 
 ## Context
 
 The provider-neutral outbox drain can read pending or retry-ready entries, emit each envelope to a provider, and then save the resulting delivered, deferred, failed, retryable-failure, or dead-lettered state.
 
-That default behavior remains appropriate for a single active worker or a host that partitions workers so each worker reads a disjoint durable outbox slice. It is not sufficient by itself for multiple workers reading the same durable outbox rows.
+The original non-claiming candidate behavior remains appropriate for a single active worker or a host that partitions workers so each worker reads a disjoint durable outbox slice. It is not sufficient by itself for multiple workers reading the same durable outbox rows. That behavior is no longer the drain default; it is an explicit compatibility opt-out.
 
 The risk is duplicate provider emission:
 
@@ -27,17 +29,17 @@ Optimistic concurrency can protect the persisted row from some conflicting final
 
 ## Decision
 
-Claim and lease support is treated as an explicit durable outbox capability, not as a silent behavior change to the existing `FindPendingAsync`, `FindRetryReadyAsync`, or default drain APIs.
+Claim and lease support is treated as an explicit durable outbox capability. The claim APIs remain separate from the selection-only `FindPendingAsync` and `FindRetryReadyAsync` APIs, while the default drain uses the claim-capable path because `GovernanceOutboxOptions.UseClaimLeases` defaults to `true`.
 
 The implemented baseline direction is:
 
 1. Keep current single-worker selection APIs supported.
-2. Add opt-in Core claim/lease contracts so the concept remains provider-neutral.
-3. Add an opt-in drain path that uses claim leases only when `GovernanceOutboxOptions.UseClaimLeases` is enabled.
+2. Keep Core claim/lease contracts explicit and provider-neutral.
+3. Use the claim-capable drain path by default; `UseClaimLeases = false` explicitly selects the non-claiming compatibility path.
 4. Implement baseline claim/lease behavior in the in-memory and EF Core stores.
 5. Continue requiring provider-side idempotency guidance because claim/lease reduces duplicate selection risk but does not create universal exactly-once delivery.
 
-This preserves existing package behavior while creating a path for scaled durable drains.
+The claim contracts remain additive, but #697 intentionally changed the drain default so cooperating workers claim before provider emission. Hosts that opt out restore the earlier duplicate-selection risk and must provide an appropriate single-worker, partitioning, or idempotency strategy.
 
 ## Implemented contract shape
 
@@ -83,7 +85,7 @@ public interface IGovernanceOutboxClaimStore : IGovernanceOutboxStore
 }
 ```
 
-The important design boundary remains that claim operations are explicit. A host should know when it has opted into a claim-capable durable path.
+The important design boundary remains that claim operations are explicit. The drain invokes them by default, while hosts that deliberately disable claim leasing should understand that they are selecting the non-claiming compatibility path.
 
 ## Claim model fields
 
@@ -170,13 +172,14 @@ Claim/lease support can reduce duplicate selection risk. It does not by itself p
 
 ## Compatibility and migration boundaries
 
-Claim support is introduced as a backward-compatible additive feature where possible:
+Claim support was introduced as an additive API feature where possible. The later #697 default change intentionally made claim leasing the safe default for the drain:
 
-* Existing single-worker drains continue to use the current APIs by default.
-* New claim-capable APIs are opt-in.
+* Existing selection-only store APIs remain available.
+* Claim-capable APIs remain explicit and additive.
+* `GovernanceOutboxOptions.UseClaimLeases` defaults to `true`, so the drain takes the claim-capable path unless the host explicitly opts out.
 * EF Core claim fields require an explicit host migration.
-* Hosts that do not add claim columns should continue to use the existing durable outbox behavior until they opt into claim leases.
-* Release notes should identify claim support as a minor release feature unless a breaking schema/API decision is made.
+* Hosts that cannot add claim columns must explicitly set `UseClaimLeases = false` and accept the duplicate-emission risk of the non-claiming path.
+* The package still does not apply or mutate a host-owned database schema automatically.
 
 The package does not silently change an existing host's deployed database without a host-owned migration.
 
@@ -185,8 +188,8 @@ The package does not silently change an existing host's deployed database withou
 With the initial claim/lease support available, the recommended production guidance is:
 
 * use one active worker per durable outbox partition when simple operations are preferred;
-* use disjoint partitions when running multiple workers without claim leases;
-* enable the claim-capable drain path only when the configured store implements `IGovernanceOutboxClaimStore` and the host has applied any required schema migration;
+* use the default claim-capable drain path when the configured store implements `IGovernanceOutboxClaimStore` and the host has applied any required schema migration;
+* if claim leases are explicitly disabled, use one active worker, disjoint partitions, or another coordination strategy to address duplicate selection;
 * use provider-side idempotency keys wherever the downstream provider supports them.
 
 This design record records the implemented baseline without overstating runtime guarantees.
