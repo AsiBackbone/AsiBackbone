@@ -85,6 +85,9 @@
 *.example   text eol=crlf
 *.editorconfig text eol=crlf
 
+# Vendored NCAT contract vectors keep the published LF bytes so their pinned SHA-256 stays stable.
+tests/AsiBackbone.Samples.NcatAuditCompletionAdapter.Tests/ContractVectors/**/*.json text eol=lf
+
 
 ###############################################################################
 # SQL / database scripts (Windows/Visual Studio-oriented files)

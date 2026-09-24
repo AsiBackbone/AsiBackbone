@@ -1,0 +1,42 @@
+name: NCAT Contract Vectors
+
+on:
+  workflow_dispatch:
+
+  # Every Monday morning, so NCAT contract changes surface without blocking unrelated work.
+  schedule:
+    - cron: '30 7 * * 1'
+
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'tests/AsiBackbone.Samples.NcatAuditCompletionAdapter.Tests/ContractVectors/**'
+      - 'scripts/Test-NcatContractVectorPin.ps1'
+      - '.github/workflows/ncat-contract-vectors.yml'
+
+permissions: {}
+
+jobs:
+  check-pin:
+    name: Check pinned NCAT contract vectors
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      # The NCAT raw file and contents listing are public, so the script works unauthenticated. The token only
+      # raises the API rate limit, and is withheld from pull requests because they run contributor-controlled
+      # copies of the script and this workflow.
+      - name: Compare vendored vectors with NCAT
+        env:
+          GH_TOKEN: ${{ github.event_name != 'pull_request' && github.token || '' }}
+        shell: pwsh
+        run: ./scripts/Test-NcatContractVectorPin.ps1

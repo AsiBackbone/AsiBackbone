@@ -6,6 +6,16 @@ This project follows the spirit of [Keep a Changelog](https://keepachangelog.com
 
 ## [Unreleased]
 
+### Added
+
+* The NCAT audit-completion adapter sample now validates NCAT completion messages against NCAT's versioned,
+  pinned [audit-completion contract vectors](docs/articles/ncat-audit-completion-adapter.md#ncat-contract-vectors).
+  `NcatAuditCompletionContract` checks schema versions, the digest algorithm and format, the persistence outcome,
+  idempotency key derivation, and canonical manifest evidence before a message becomes an adapter handoff.
+  `NcatContractVectorTests` replays every valid vector, invalid message, and no-message outcome from the vendored
+  NCAT fixture. The weekly `NCAT Contract Vectors` workflow reports when NCAT advances the contract past the pin.
+  Neither repository references the other at compile time, and no packaged product changes (#826).
+
 ### Documentation
 
 * Expanded [Canonical JSON v1 Format](docs/articles/canonical-json-v1.md) into the normative specification for
