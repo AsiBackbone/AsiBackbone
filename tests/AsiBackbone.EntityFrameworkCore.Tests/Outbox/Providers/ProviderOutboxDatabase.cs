@@ -86,21 +86,28 @@ internal sealed class ProviderOutboxDatabase(
         DbContextOptions<GovernanceOutboxTestDbContext> options = CreateOptions(provider, serverConnectionString, databaseName);
         var database = new ProviderOutboxDatabase(provider, serverConnectionString, databaseName, options);
 
-        await using (GovernanceOutboxTestDbContext context = database.CreateContext())
+        try
         {
-            _ = await context.Database.EnsureCreatedAsync(cancellationToken);
+            await database.InitializeAsync(cancellationToken);
         }
-
-        // Set the snapshot mode explicitly for both SQL Server configurations rather than relying on the database
-        // default, which depends on the server and its model database and was observed to be ON in CI.
-        if (provider is OutboxContentionProvider.SqlServerLockingReadCommitted or OutboxContentionProvider.SqlServerReadCommittedSnapshot)
+        catch (Exception setupFailure)
         {
-            await database.SetReadCommittedSnapshotAsync(
-                enabled: provider is OutboxContentionProvider.SqlServerReadCommittedSnapshot,
-                cancellationToken);
-        }
+            // The caller never receives the object when setup fails, so drop the partially created database here
+            // rather than leaving a randomly named database on the shared server.
+            try
+            {
+                await database.DisposeAsync();
+            }
+            catch (Exception cleanupFailure)
+            {
+                throw new AggregateException(
+                    $"Setting up the {provider} test database failed, and dropping it afterward also failed.",
+                    setupFailure,
+                    cleanupFailure);
+            }
 
-        await database.AssertIsolationPreconditionAsync(cancellationToken);
+            throw;
+        }
 
         return database;
     }
@@ -183,6 +190,25 @@ internal sealed class ProviderOutboxDatabase(
                 .Options,
             _ => throw new ArgumentOutOfRangeException(nameof(provider), provider, "Unsupported contention provider."),
         };
+    }
+
+    private async Task InitializeAsync(CancellationToken cancellationToken)
+    {
+        await using (GovernanceOutboxTestDbContext context = CreateContext())
+        {
+            _ = await context.Database.EnsureCreatedAsync(cancellationToken);
+        }
+
+        // Set the snapshot mode explicitly for both SQL Server configurations rather than relying on the database
+        // default, which depends on the server and its model database and was observed to be ON in CI.
+        if (Provider is OutboxContentionProvider.SqlServerLockingReadCommitted or OutboxContentionProvider.SqlServerReadCommittedSnapshot)
+        {
+            await SetReadCommittedSnapshotAsync(
+                enabled: Provider is OutboxContentionProvider.SqlServerReadCommittedSnapshot,
+                cancellationToken);
+        }
+
+        await AssertIsolationPreconditionAsync(cancellationToken);
     }
 
     private async Task SetReadCommittedSnapshotAsync(bool enabled, CancellationToken cancellationToken)

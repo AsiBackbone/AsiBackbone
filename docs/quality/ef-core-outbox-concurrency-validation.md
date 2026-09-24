@@ -65,13 +65,17 @@ Each provider is enabled by a server-level connection string. The login needs pe
 docker run -d --name asib-mssql -e ACCEPT_EULA=Y -e 'MSSQL_SA_PASSWORD=AsiBackbone-local-823!' -p 1433:1433 mcr.microsoft.com/mssql/server:2022-latest
 docker run -d --name asib-postgres -e POSTGRES_PASSWORD=asibackbone-local-823 -p 5432:5432 postgres:17
 
+# docker run -d returns before either server accepts connections; wait until both are ready.
+until docker exec asib-mssql /opt/mssql-tools18/bin/sqlcmd -C -S localhost -U sa -P 'AsiBackbone-local-823!' -Q 'SELECT 1' -b > /dev/null 2>&1; do sleep 2; done
+until docker exec asib-postgres pg_isready -U postgres > /dev/null 2>&1; do sleep 1; done
+
 export ASIBACKBONE_TEST_SQLSERVER_CONNECTION='Server=localhost,1433;User Id=sa;Password=AsiBackbone-local-823!;TrustServerCertificate=True;Encrypt=False'
 export ASIBACKBONE_TEST_POSTGRES_CONNECTION='Host=localhost;Port=5432;Username=postgres;Password=asibackbone-local-823'
 
 dotnet test --project ./tests/AsiBackbone.EntityFrameworkCore.Tests/AsiBackbone.EntityFrameworkCore.Tests.csproj --configuration Release
 ```
 
-Without the environment variables the provider tests are skipped, so the default local and CI test runs are unaffected. Setting `ASIBACKBONE_TEST_PROVIDERS_REQUIRED=true` turns a missing connection string into a failure. The `EF Core provider contention` job in `.github/workflows/ci.yml` sets it, runs both servers as service containers, and runs the EF Core test project against them.
+The CI job gets the same readiness guarantee from the service containers' health checks. Without the environment variables the provider tests are skipped, so the default local and CI test runs are unaffected. Setting `ASIBACKBONE_TEST_PROVIDERS_REQUIRED=true` turns a missing connection string into a failure. The `EF Core provider contention` job in `.github/workflows/ci.yml` sets it, runs both servers as service containers, and runs the EF Core test project against them.
 
 ## Expected interpretation
 
