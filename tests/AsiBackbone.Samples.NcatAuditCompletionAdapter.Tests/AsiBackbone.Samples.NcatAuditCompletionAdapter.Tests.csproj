@@ -24,7 +24,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Include="ContractVectors/**/*.json" CopyToOutputDirectory="PreserveNewest" />
+    <None Update="ContractVectors/**/*.json" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 
   <ItemGroup>

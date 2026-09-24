@@ -130,7 +130,7 @@ if (!NcatAuditCompletionContract.TryCreateHandoff(
 }
 ```
 
-`TryCreateHandoff` applies version 1 of NCAT's audit-completion contract and uses the message idempotency key as the completion entry identifier. Hosts that retain the canonical manifest text can also call `TryVerifyCanonicalManifest` to confirm the batch, record count, schema version, and SHA-256 digest. The contract rules are described in [NCAT contract vectors](#ncat-contract-vectors).
+`TryCreateHandoff` applies version 1 of NCAT's audit-completion contract and uses the message idempotency key as the completion entry identifier. Hosts that retain the canonical manifest text can also call `TryVerifyCanonicalManifest` to confirm that the manifest is a single JSON value and to confirm the batch, record count, schema version, and SHA-256 digest. The contract rules are described in [NCAT contract vectors](#ncat-contract-vectors).
 
 ## Delivery dispositions
 
@@ -188,7 +188,7 @@ The vectors are vendored from a pinned NCAT commit:
 - each published invalid message is rejected with a specific reason code;
 - the no-mutation, failed, and rolled-back scenarios cannot carry committed batch evidence.
 
-A test fails with review guidance when NCAT publishes a vector name, outcome, or contract major version the adapter does not recognize.
+Valid vectors are replayed from an explicit allowlist in `NcatContractVectorTests`, not discovered from the fixture. A test fails with review guidance when NCAT publishes or removes a vector name, or publishes an outcome or contract major version the adapter does not recognize.
 
 ### Drift reporting
 
@@ -199,7 +199,7 @@ The `NCAT Contract Vectors` workflow runs weekly, on demand, and on pull request
 1. Read the NCAT change and its compatibility classification in NCAT's contract README.
 2. Copy `contracts/audit-completion/v1/audit-completion-vectors.json` from the new NCAT commit or release tag without modifying it. `.gitattributes` keeps the vendored JSON as LF, so the bytes match upstream.
 3. Update `revision` and `sha256` in `ncat-contract-pin.json`. Use the full commit SHA.
-4. Run the sample tests. Extend `NcatAuditCompletionContract` and `NcatContractVectorTests` for any new vector, reason, outcome, or schema version.
+4. Run the sample tests. Extend `NcatAuditCompletionContract` and `NcatContractVectorTests` for any new vector, reason, outcome, or schema version. Add a reviewed vector name to the supported-vector allowlist only after the adapter handles it.
 5. For a new contract major version, vendor the new `vN/` directory alongside the existing one until the adapter supports it.
 6. Run `./scripts/Test-NcatContractVectorPin.ps1` and confirm it reports no drift.
 

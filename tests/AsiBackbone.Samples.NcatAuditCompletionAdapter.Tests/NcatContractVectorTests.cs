@@ -26,6 +26,16 @@ public sealed class NcatContractVectorTests
 
     private static readonly JsonSerializerOptions MessageJsonOptions = new(JsonSerializerDefaults.Web);
 
+    // Explicit allowlist: a vector NCAT adds must be reviewed here before it becomes a test case.
+    private static readonly HashSet<string> SupportedVectorNames =
+        new(StringComparer.Ordinal)
+        {
+            "committed-single-record-all-identifiers",
+            "committed-multi-record-canonical-ordering",
+            "committed-null-identifiers-custom-destination",
+            "committed-padded-mutation-batch-id"
+        };
+
     private static readonly Dictionary<string, string> ExpectedInvalidReasons =
         new(StringComparer.Ordinal)
         {
@@ -50,8 +60,12 @@ public sealed class NcatContractVectorTests
             ["rolled-back"] = GovernedOperationPersistenceOutcome.RolledBack
         };
 
-    /// <summary>Gets the names of the valid NCAT vectors.</summary>
-    public static TheoryData<string> VectorNames => [.. Fixture.Value.Vectors.Keys];
+    /// <summary>Gets the names of the valid NCAT vectors this adapter has reviewed.</summary>
+    /// <remarks>
+    /// Drawn from the supported-vector allowlist rather than the fixture, so a newly published vector fails
+    /// <see cref="FixtureVectorNamesMatchSupportedAllowlist" /> instead of silently becoming a test case.
+    /// </remarks>
+    public static TheoryData<string> VectorNames => [.. SupportedVectorNames.Order(StringComparer.Ordinal)];
 
     /// <summary>Gets the names of the invalid NCAT messages.</summary>
     public static TheoryData<string> InvalidMessageNames => [.. Fixture.Value.InvalidMessages.Keys];
@@ -105,13 +119,35 @@ public sealed class NcatContractVectorTests
     }
 
     /// <summary>
+    /// Verifies the pinned fixture publishes exactly the valid vectors this adapter has reviewed.
+    /// </summary>
+    [Fact]
+    public void FixtureVectorNamesMatchSupportedAllowlist()
+    {
+        IReadOnlyDictionary<string, ContractVector> vectors = Fixture.Value.Vectors;
+        string[] unrecognized = [.. vectors.Keys
+            .Where(name => !SupportedVectorNames.Contains(name))
+            .Order(StringComparer.Ordinal)];
+        string[] missing = [.. SupportedVectorNames
+            .Where(name => !vectors.ContainsKey(name))
+            .Order(StringComparer.Ordinal)];
+
+        Assert.True(
+            unrecognized.Length == 0,
+            $"NCAT publishes unrecognized vectors [{string.Join(", ", unrecognized)}]. {ReviewGuidance}");
+        Assert.True(
+            missing.Length == 0,
+            $"NCAT no longer publishes vectors [{string.Join(", ", missing)}]. {ReviewGuidance}");
+    }
+
+    /// <summary>
     /// Verifies each valid vector's canonical manifest bytes, digest, and idempotency key.
     /// </summary>
     [Theory]
     [MemberData(nameof(VectorNames))]
     public void ValidVectorEvidenceIsReproducible(string vectorName)
     {
-        ContractVector vector = Fixture.Value.Vectors[vectorName];
+        ContractVector vector = GetSupportedVector(vectorName);
         byte[] manifestBytes = new UTF8Encoding(false).GetBytes(vector.CanonicalManifestJson);
 
         Assert.Equal(vector.CanonicalManifestByteLength, manifestBytes.Length);
@@ -132,7 +168,7 @@ public sealed class NcatContractVectorTests
     [MemberData(nameof(VectorNames))]
     public void ValidVectorReceiptAndMessageAgree(string vectorName)
     {
-        ContractVector vector = Fixture.Value.Vectors[vectorName];
+        ContractVector vector = GetSupportedVector(vectorName);
         JsonElement receipt = vector.Receipt;
         NcatAuditCompletionMessage message = vector.Message;
 
@@ -158,7 +194,7 @@ public sealed class NcatContractVectorTests
     [MemberData(nameof(VectorNames))]
     public async Task ValidVectorIsAcceptedAndDeliveredWithBoundEvidence(string vectorName)
     {
-        NcatAuditCompletionMessage message = Fixture.Value.Vectors[vectorName].Message;
+        NcatAuditCompletionMessage message = GetSupportedVector(vectorName).Message;
 
         Assert.True(
             NcatAuditCompletionContract.TryCreateHandoff(message, deliveryAttempt: 1, out NcatAuditCompletionHandoff? handoff, out string? reason),
@@ -204,6 +240,28 @@ public sealed class NcatContractVectorTests
         NcatAuditCompletionDeliveryResult duplicate = await adapter.DeliverAsync(handoff, TestContext.Current.CancellationToken);
         Assert.Equal(NcatAuditCompletionDeliveryDisposition.Duplicate, duplicate.Disposition);
         Assert.Equal(result.LifecycleEventId, duplicate.LifecycleEventId);
+    }
+
+    /// <summary>
+    /// Verifies a retained manifest followed by another JSON value is rejected even when the digest covers the
+    /// combined bytes.
+    /// </summary>
+    [Theory]
+    [InlineData("{}")]
+    [InlineData(" 1")]
+    [InlineData("\n\"trailing\"")]
+    [InlineData("\n{\"schemaVersion\":\"1.0\"}\n")]
+    public void ManifestWithTrailingJsonValueIsRejected(string trailingContent)
+    {
+        ContractVector vector = GetSupportedVector("committed-single-record-all-identifiers");
+        byte[] manifestBytes = new UTF8Encoding(false).GetBytes(vector.CanonicalManifestJson + trailingContent);
+        NcatAuditCompletionMessage message = vector.Message with
+        {
+            MutationManifestHash = Convert.ToHexString(SHA256.HashData(manifestBytes))
+        };
+
+        Assert.False(NcatAuditCompletionContract.TryVerifyCanonicalManifest(message, manifestBytes, out string? reason));
+        Assert.Equal("manifest-malformed", reason);
     }
 
     /// <summary>
@@ -275,6 +333,16 @@ public sealed class NcatContractVectorTests
         Assert.Equal(NcatAuditCompletionDeliveryDisposition.Delivered, withoutEvidence.Disposition);
         Assert.Equal(expectedOutcome, withoutEvidence.Receipt!.PersistenceOutcome);
         Assert.False(withoutEvidence.Receipt.HasCommittedMutation);
+    }
+
+    private static ContractVector GetSupportedVector(string vectorName)
+    {
+        if (!Fixture.Value.Vectors.TryGetValue(vectorName, out ContractVector? vector))
+        {
+            Assert.Fail($"NCAT no longer publishes supported vector '{vectorName}'. {ReviewGuidance}");
+        }
+
+        return vector;
     }
 
     private static void AssertTerminal(NcatAuditCompletionDeliveryResult result, string reasonCode)

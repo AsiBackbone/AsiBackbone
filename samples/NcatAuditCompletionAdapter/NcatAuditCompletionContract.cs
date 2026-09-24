@@ -204,6 +204,14 @@ public static class NcatAuditCompletionContract
         {
             Utf8JsonReader reader = new(canonicalManifestUtf8);
             using var document = JsonDocument.ParseValue(ref reader);
+
+            // A canonical manifest is exactly one JSON value. Trailing whitespace is skipped by the reader;
+            // any further token means the digest covers content other than the manifest.
+            if (reader.Read())
+            {
+                return false;
+            }
+
             JsonElement root = document.RootElement;
 
             if (root.ValueKind != JsonValueKind.Object ||
