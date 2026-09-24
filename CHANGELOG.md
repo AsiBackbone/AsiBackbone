@@ -16,6 +16,14 @@ This project follows the spirit of [Keep a Changelog](https://keepachangelog.com
   NCAT fixture. The weekly `NCAT Contract Vectors` workflow reports when NCAT advances the contract past the pin.
   Neither repository references the other at compile time, and no packaged product changes (#826).
 
+### Changed
+
+* Marked the retained `CapabilityGrantValidationOptions.CreateExecutionBoundary(...)` factory obsolete with the
+  warning diagnostic `ASIB901`. The method still exists and still fails closed at runtime for binary compatibility,
+  but new source now receives a compiler/IDE warning directing callers to
+  `CreateBoundExecutionBoundary(CapabilityGrantBindingExpectations, ...)`. The warning is intentionally not an error
+  in the `7.x` line; removal is deferred to the next permitted major version (`8.0`) (#825).
+
 ### Documentation
 
 * Corrected [Outbox Multi-Worker Concurrency Guidance](docs/articles/outbox-multi-worker-concurrency.md) so the

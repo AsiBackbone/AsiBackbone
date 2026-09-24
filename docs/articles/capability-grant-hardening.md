@@ -132,18 +132,53 @@ A successful metadata-only result means only that the configured structural and 
 
 ## 3.x migration guidance
 
-The explicit profiles are additive and do not silently change existing 3.x behavior.
+The explicit profiles were introduced additively and do not silently change the historical 3.x behavior.
 
 - Existing calls to `CapabilityGrantValidationOptions.Create(...)` continue to honor their current arguments and defaults.
 - Existing calls to `ValidateAsync(signedGrant)` continue to use the legacy default options where proof, acknowledgment-reference, and bounded-use checks are disabled.
-- New operational-gateway and consequential-execution code should prefer `CreateBoundExecutionBoundary(...)`.
-- Supply `CapabilityGrantBindingExpectations` built from the authenticated current subject; existing execution-boundary
-  calls must add this required argument. The retained legacy overload throws instead of creating a subject-unbound
-  profile. Include the requested operation when the issuer restricted the grant to an operation.
+- New operational-gateway and consequential-execution code should use `CreateBoundExecutionBoundary(...)`.
+- Replace existing `CreateExecutionBoundary(...)` calls with `CreateBoundExecutionBoundary(...)` and pass
+  `CapabilityGrantBindingExpectations` built from the authenticated current subject as the required first argument.
+  Include the requested operation when the issuer restricted the grant to an operation.
 - Code that intentionally performs only structural or temporal validation should prefer `CreateMetadataValidation(...)` so the reduced validation contract is visible in code review.
 - Hosts migrating an existing execution boundary should supply both an `IGovernanceSignatureVerificationService` and, when the profile keeps its default bounded-use requirement, an `ICapabilityGrantUseStore`.
 
 The ambiguous no-options path remains available for 3.x compatibility. A future major version may tighten or remove that path; such a change would require explicit migration guidance rather than a silent behavioral change.
+
+## Legacy `CreateExecutionBoundary` deprecation
+
+`CapabilityGrantValidationOptions.CreateExecutionBoundary(...)` is retained in the `7.x` binary surface but is not a
+usable execution-boundary factory. It always throws `InvalidOperationException` because consequential execution now
+requires an authoritative subject binding.
+
+The retained method is marked obsolete with warning diagnostic `ASIB901`. The warning is intentionally not an error in
+`7.x`: changing it to `error: true` would turn previously compilable source into a build failure within the same stable
+major line. The method is planned for removal in `8.0`, where removal is permitted as a major-version API break.
+
+Migrate by replacing `CreateExecutionBoundary(...)` with `CreateBoundExecutionBoundary(...)` and passing
+`CapabilityGrantBindingExpectations` as the required first argument:
+
+```csharp
+// Legacy: compiles with ASIB901 in 7.x, then fails closed if executed.
+CapabilityGrantValidationOptions.CreateExecutionBoundary(
+    issuer: "policy-engine",
+    audience: "robotics-gateway",
+    scopes: ["robotics.execute"]);
+
+// Replacement: authoritative subject binding is required.
+CapabilityGrantValidationOptions.CreateBoundExecutionBoundary(
+    CapabilityGrantBindingExpectations.Create(
+        authenticatedSubjectId,
+        "robotics.execute"),
+    issuer: "policy-engine",
+    audience: "robotics-gateway",
+    scopes: ["robotics.execute"]);
+```
+
+`CapabilityGrantBindingExpectations.Create(...)` requires the authenticated current subject. Supply the requested
+operation when the grant is operation-bound. Existing binaries that reference `CreateExecutionBoundary(...)` continue
+to resolve the method in `7.x` and retain its fail-closed runtime behavior; consumers should migrate source before the
+next major version removes the legacy entry point.
 
 ## Clock-skew tolerance
 
