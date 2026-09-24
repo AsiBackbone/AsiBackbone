@@ -212,6 +212,121 @@ public sealed class CapabilityGrantValidatorTests
     }
 
     /// <summary>
+    /// Locks the first-failure ordering between identity expectations when more than one field is invalid.
+    /// </summary>
+    [Fact]
+    public async Task ValidateAsyncReturnsIssuerFailureBeforeLaterIdentityFailures()
+    {
+        SignedGovernanceArtifact<CapabilityGrant> grant = CreateSignedGrant(
+            CreateGrant(
+                issuer: "other-issuer",
+                audience: "other-audience",
+                subjectId: "other-subject",
+                operationName: "other-operation"));
+
+        CapabilityGrantValidationResult result = await CapabilityGrantValidator.ValidateAsync(
+            grant,
+            CreateOptions(),
+            cancellationToken: TestContext.Current.CancellationToken);
+
+        AssertFailure(
+            result,
+            CapabilityGrantValidationCategory.WrongIssuer,
+            VerificationPolicyAction.Deny,
+            "capability.issuer-mismatch");
+    }
+
+    /// <summary>
+    /// Locks subject-before-operation precedence when both execution bindings are invalid.
+    /// </summary>
+    [Fact]
+    public async Task ValidateAsyncReturnsSubjectFailureBeforeOperationFailure()
+    {
+        SignedGovernanceArtifact<CapabilityGrant> grant = CreateSignedGrant(
+            CreateGrant(
+                subjectId: "other-subject",
+                operationName: "other-operation"));
+
+        CapabilityGrantValidationResult result = await CapabilityGrantValidator.ValidateAsync(
+            grant,
+            CreateOptions(),
+            cancellationToken: TestContext.Current.CancellationToken);
+
+        AssertFailure(
+            result,
+            CapabilityGrantValidationCategory.SubjectMismatch,
+            VerificationPolicyAction.Deny,
+            "capability.subject-mismatch");
+    }
+
+    /// <summary>
+    /// Locks scope-before-policy precedence when both checks fail.
+    /// </summary>
+    [Fact]
+    public async Task ValidateAsyncReturnsScopeFailureBeforePolicyFailure()
+    {
+        SignedGovernanceArtifact<CapabilityGrant> grant = CreateSignedGrant(
+            CreateGrant(
+                scopes: ["robotics.read"],
+                policyVersion: "policy-v2"));
+
+        CapabilityGrantValidationResult result = await CapabilityGrantValidator.ValidateAsync(
+            grant,
+            CreateOptions(),
+            cancellationToken: TestContext.Current.CancellationToken);
+
+        AssertFailure(
+            result,
+            CapabilityGrantValidationCategory.WrongScope,
+            VerificationPolicyAction.Deny,
+            "capability.scope-missing");
+    }
+
+    /// <summary>
+    /// Locks missing-acknowledgment-before-mismatch precedence when the grant has no acknowledgment reference.
+    /// </summary>
+    [Fact]
+    public async Task ValidateAsyncReturnsMissingAcknowledgmentBeforeAcknowledgmentMismatch()
+    {
+        SignedGovernanceArtifact<CapabilityGrant> grant = CreateSignedGrant(
+            CreateGrant(acknowledgmentId: null));
+
+        CapabilityGrantValidationResult result = await CapabilityGrantValidator.ValidateAsync(
+            grant,
+            CreateOptions(requireAcknowledgmentReference: true),
+            cancellationToken: TestContext.Current.CancellationToken);
+
+        AssertFailure(
+            result,
+            CapabilityGrantValidationCategory.MissingAcknowledgmentReference,
+            VerificationPolicyAction.RequireAcknowledgment,
+            "capability.acknowledgment-missing");
+    }
+
+    /// <summary>
+    /// Locks gateway-before-resource precedence when both external bindings are invalid.
+    /// </summary>
+    [Fact]
+    public async Task ValidateAsyncReturnsGatewayFailureBeforeResourceFailure()
+    {
+        SignedGovernanceArtifact<CapabilityGrant> grant = CreateSignedGrant(
+            CreateGrant(
+                gatewayBinding: "gateway-2",
+                resourceBinding: "robot-arm-2"));
+
+        CapabilityGrantValidationResult result = await CapabilityGrantValidator.ValidateAsync(
+            grant,
+            CreateOptions(),
+            cancellationToken: TestContext.Current.CancellationToken);
+
+        AssertFailure(
+            result,
+            CapabilityGrantValidationCategory.GatewayMismatch,
+            VerificationPolicyAction.Deny,
+            "capability.gateway-mismatch");
+    }
+
+    /// <summary>
     /// Validates that a capability grant grant is denied when any required scope is missing from the provided scopes, even if other required scopes are present.
     /// </summary>
     /// <returns>

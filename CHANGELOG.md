@@ -18,6 +18,9 @@ This project follows the spirit of [Keep a Changelog](https://keepachangelog.com
 
 ### Changed
 
+* Refactored `CapabilityGrantValidator.ValidateMetadata` into explicit ordered guard clauses while preserving the
+  existing first-failure precedence, validation categories, policy actions, failure codes, messages, and success
+  behavior. Focused tests now lock precedence when multiple metadata fields are invalid (#827).
 * Marked the retained `CapabilityGrantValidationOptions.CreateExecutionBoundary(...)` factory obsolete with the
   warning diagnostic `ASIB901`. The method still exists and still fails closed at runtime for binary compatibility,
   but new source now receives a compiler/IDE warning directing callers to

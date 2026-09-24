@@ -199,33 +199,96 @@ public static class CapabilityGrantValidator
         CapabilityGrantValidationOptions options,
         DateTimeOffset validationUtc)
     {
-        return options.Issuer is not null && !string.Equals(options.Issuer, grant.Issuer, StringComparison.Ordinal)
-            ? CapabilityGrantValidationResult.Failed(grant, CapabilityGrantValidationCategory.WrongIssuer, VerificationPolicyAction.Deny, "capability.issuer-mismatch")
-            : options.Audience is not null && !string.Equals(options.Audience, grant.Audience, StringComparison.Ordinal)
-            ? CapabilityGrantValidationResult.Failed(grant, CapabilityGrantValidationCategory.WrongAudience, VerificationPolicyAction.Deny, "capability.audience-mismatch")
-            : options.ExpectedSubjectId is not null && !string.Equals(options.ExpectedSubjectId, grant.SubjectId, StringComparison.Ordinal)
-            ? CapabilityGrantValidationResult.Failed(grant, CapabilityGrantValidationCategory.SubjectMismatch, VerificationPolicyAction.Deny, "capability.subject-mismatch")
-            : options.ExpectedOperationName is not null && !string.Equals(options.ExpectedOperationName, grant.OperationName, StringComparison.Ordinal)
-            ? CapabilityGrantValidationResult.Failed(grant, CapabilityGrantValidationCategory.OperationMismatch, VerificationPolicyAction.Deny, "capability.operation-mismatch")
+        return options.Issuer is not null
+            && !string.Equals(options.Issuer, grant.Issuer, StringComparison.Ordinal)
+            ? CapabilityGrantValidationResult.Failed(
+                grant,
+                CapabilityGrantValidationCategory.WrongIssuer,
+                VerificationPolicyAction.Deny,
+                "capability.issuer-mismatch")
+            : options.Audience is not null
+            && !string.Equals(options.Audience, grant.Audience, StringComparison.Ordinal)
+            ? CapabilityGrantValidationResult.Failed(
+                grant,
+                CapabilityGrantValidationCategory.WrongAudience,
+                VerificationPolicyAction.Deny,
+                "capability.audience-mismatch")
+            : options.ExpectedSubjectId is not null
+            && !string.Equals(options.ExpectedSubjectId, grant.SubjectId, StringComparison.Ordinal)
+            ? CapabilityGrantValidationResult.Failed(
+                grant,
+                CapabilityGrantValidationCategory.SubjectMismatch,
+                VerificationPolicyAction.Deny,
+                "capability.subject-mismatch")
+            : options.ExpectedOperationName is not null
+            && !string.Equals(options.ExpectedOperationName, grant.OperationName, StringComparison.Ordinal)
+            ? CapabilityGrantValidationResult.Failed(
+                grant,
+                CapabilityGrantValidationCategory.OperationMismatch,
+                VerificationPolicyAction.Deny,
+                "capability.operation-mismatch")
             : IsNotYetValid(grant, validationUtc, options.AllowedClockSkew)
-            ? CapabilityGrantValidationResult.Failed(grant, CapabilityGrantValidationCategory.NotYetValid, VerificationPolicyAction.Defer, "capability.not-yet-valid")
+            ? CapabilityGrantValidationResult.Failed(
+                grant,
+                CapabilityGrantValidationCategory.NotYetValid,
+                VerificationPolicyAction.Defer,
+                "capability.not-yet-valid")
             : IsExpired(grant, validationUtc, options.AllowedClockSkew)
-            ? CapabilityGrantValidationResult.Failed(grant, CapabilityGrantValidationCategory.Expired, VerificationPolicyAction.Deny, "capability.expired")
-            : options.Scopes.Count > 0 && !ContainsRequiredScopes(grant.Scopes, options.Scopes)
-            ? CapabilityGrantValidationResult.Failed(grant, CapabilityGrantValidationCategory.WrongScope, VerificationPolicyAction.Deny, "capability.scope-missing")
-            : (options.PolicyVersion is not null && !string.Equals(options.PolicyVersion, grant.PolicyVersion, StringComparison.Ordinal))
-            || (options.PolicyHash is not null && !string.Equals(options.PolicyHash, grant.PolicyHash, StringComparison.Ordinal))
-            ? CapabilityGrantValidationResult.Failed(grant, CapabilityGrantValidationCategory.PolicyMismatch, VerificationPolicyAction.Deny, "capability.policy-mismatch")
+            ? CapabilityGrantValidationResult.Failed(
+                grant,
+                CapabilityGrantValidationCategory.Expired,
+                VerificationPolicyAction.Deny,
+                "capability.expired")
+            : options.Scopes.Count > 0
+            && !ContainsRequiredScopes(grant.Scopes, options.Scopes)
+            ? CapabilityGrantValidationResult.Failed(
+                grant,
+                CapabilityGrantValidationCategory.WrongScope,
+                VerificationPolicyAction.Deny,
+                "capability.scope-missing")
+            : (options.PolicyVersion is not null
+                && !string.Equals(options.PolicyVersion, grant.PolicyVersion, StringComparison.Ordinal))
+            || (options.PolicyHash is not null
+                && !string.Equals(options.PolicyHash, grant.PolicyHash, StringComparison.Ordinal))
+            ? CapabilityGrantValidationResult.Failed(
+                grant,
+                CapabilityGrantValidationCategory.PolicyMismatch,
+                VerificationPolicyAction.Deny,
+                "capability.policy-mismatch")
             : options.RequireAcknowledgmentReference && !grant.HasAcknowledgmentReference
-            ? CapabilityGrantValidationResult.Failed(grant, CapabilityGrantValidationCategory.MissingAcknowledgmentReference, VerificationPolicyAction.RequireAcknowledgment, "capability.acknowledgment-missing")
-            : options.AcknowledgmentId is not null && !string.Equals(options.AcknowledgmentId, grant.AcknowledgmentId, StringComparison.Ordinal)
-            ? CapabilityGrantValidationResult.Failed(grant, CapabilityGrantValidationCategory.AcknowledgmentMismatch, VerificationPolicyAction.Deny, "capability.acknowledgment-mismatch")
-            : options.HandshakeId is not null && !string.Equals(options.HandshakeId, grant.HandshakeId, StringComparison.Ordinal)
-            ? CapabilityGrantValidationResult.Failed(grant, CapabilityGrantValidationCategory.HandshakeMismatch, VerificationPolicyAction.Deny, "capability.handshake-mismatch")
-            : options.GatewayBinding is not null && !string.Equals(options.GatewayBinding, grant.GatewayBinding, StringComparison.Ordinal)
-            ? CapabilityGrantValidationResult.Failed(grant, CapabilityGrantValidationCategory.GatewayMismatch, VerificationPolicyAction.Deny, "capability.gateway-mismatch")
-            : options.ResourceBinding is not null && !string.Equals(options.ResourceBinding, grant.ResourceBinding, StringComparison.Ordinal)
-            ? CapabilityGrantValidationResult.Failed(grant, CapabilityGrantValidationCategory.ResourceMismatch, VerificationPolicyAction.Deny, "capability.resource-mismatch")
+            ? CapabilityGrantValidationResult.Failed(
+                grant,
+                CapabilityGrantValidationCategory.MissingAcknowledgmentReference,
+                VerificationPolicyAction.RequireAcknowledgment,
+                "capability.acknowledgment-missing")
+            : options.AcknowledgmentId is not null
+            && !string.Equals(options.AcknowledgmentId, grant.AcknowledgmentId, StringComparison.Ordinal)
+            ? CapabilityGrantValidationResult.Failed(
+                grant,
+                CapabilityGrantValidationCategory.AcknowledgmentMismatch,
+                VerificationPolicyAction.Deny,
+                "capability.acknowledgment-mismatch")
+            : options.HandshakeId is not null
+            && !string.Equals(options.HandshakeId, grant.HandshakeId, StringComparison.Ordinal)
+            ? CapabilityGrantValidationResult.Failed(
+                grant,
+                CapabilityGrantValidationCategory.HandshakeMismatch,
+                VerificationPolicyAction.Deny,
+                "capability.handshake-mismatch")
+            : options.GatewayBinding is not null
+            && !string.Equals(options.GatewayBinding, grant.GatewayBinding, StringComparison.Ordinal)
+            ? CapabilityGrantValidationResult.Failed(
+                grant,
+                CapabilityGrantValidationCategory.GatewayMismatch,
+                VerificationPolicyAction.Deny,
+                "capability.gateway-mismatch")
+            : options.ResourceBinding is not null
+            && !string.Equals(options.ResourceBinding, grant.ResourceBinding, StringComparison.Ordinal)
+            ? CapabilityGrantValidationResult.Failed(
+                grant,
+                CapabilityGrantValidationCategory.ResourceMismatch,
+                VerificationPolicyAction.Deny,
+                "capability.resource-mismatch")
             : null;
     }
 
