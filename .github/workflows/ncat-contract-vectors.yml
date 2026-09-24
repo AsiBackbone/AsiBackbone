@@ -32,8 +32,11 @@ jobs:
         with:
           persist-credentials: false
 
+      # The NCAT raw file and contents listing are public, so the script works unauthenticated. The token only
+      # raises the API rate limit, and is withheld from pull requests because they run contributor-controlled
+      # copies of the script and this workflow.
       - name: Compare vendored vectors with NCAT
         env:
-          GH_TOKEN: ${{ github.token }}
+          GH_TOKEN: ${{ github.event_name != 'pull_request' && github.token || '' }}
         shell: pwsh
         run: ./scripts/Test-NcatContractVectorPin.ps1

@@ -192,7 +192,7 @@ Valid vectors are replayed from an explicit allowlist in `NcatContractVectorTest
 
 ### Drift reporting
 
-The `NCAT Contract Vectors` workflow runs weekly, on demand, and on pull requests that change the vendored vectors. `scripts/Test-NcatContractVectorPin.ps1` confirms that the vendored bytes still match the pinned NCAT revision. It then compares them with NCAT `main` and fails with a summary when NCAT publishes different vectors, removes them, or adds a newer contract major version. The weekly failure is the signal that the pin needs review; it does not block unrelated pull requests.
+The `NCAT Contract Vectors` workflow runs weekly, on demand, and on pull requests that change the vendored vectors. `scripts/Test-NcatContractVectorPin.ps1` confirms that the vendored bytes still match the pinned NCAT revision. It then compares them with NCAT `main` and fails with a summary when NCAT publishes different vectors, removes them, or adds a newer contract major version. The weekly failure is the signal that the pin needs review; it does not block unrelated pull requests. Pull request runs execute the contributor's copy of the script, so they call the public NCAT endpoints without a GitHub token; only scheduled and manual runs, which maintainers trigger, pass one, to raise the API rate limit.
 
 ### Updating the pinned vectors
 
