@@ -137,7 +137,6 @@ The explicit profiles were introduced additively and do not silently change the 
 - Existing calls to `CapabilityGrantValidationOptions.Create(...)` continue to honor their current arguments and defaults.
 - Existing calls to `ValidateAsync(signedGrant)` continue to use the legacy default options where proof, acknowledgment-reference, and bounded-use checks are disabled.
 - New operational-gateway and consequential-execution code should use `CreateBoundExecutionBoundary(...)`.
-  calls must add this required argument. Include the requested operation when the issuer restricted the grant to an operation.
 - Replace existing `CreateExecutionBoundary(...)` calls with `CreateBoundExecutionBoundary(...)` and pass
   `CapabilityGrantBindingExpectations` built from the authenticated current subject as the required first argument.
   Include the requested operation when the issuer restricted the grant to an operation.
