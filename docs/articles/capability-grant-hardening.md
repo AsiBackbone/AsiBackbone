@@ -137,8 +137,10 @@ The explicit profiles were introduced additively and do not silently change the 
 - Existing calls to `CapabilityGrantValidationOptions.Create(...)` continue to honor their current arguments and defaults.
 - Existing calls to `ValidateAsync(signedGrant)` continue to use the legacy default options where proof, acknowledgment-reference, and bounded-use checks are disabled.
 - New operational-gateway and consequential-execution code should use `CreateBoundExecutionBoundary(...)`.
-- Supply `CapabilityGrantBindingExpectations` built from the authenticated current subject; existing execution-boundary
   calls must add this required argument. Include the requested operation when the issuer restricted the grant to an operation.
+- Replace existing `CreateExecutionBoundary(...)` calls with `CreateBoundExecutionBoundary(...)` and pass
+  `CapabilityGrantBindingExpectations` built from the authenticated current subject as the required first argument.
+  Include the requested operation when the issuer restricted the grant to an operation.
 - Code that intentionally performs only structural or temporal validation should prefer `CreateMetadataValidation(...)` so the reduced validation contract is visible in code review.
 - Hosts migrating an existing execution boundary should supply both an `IGovernanceSignatureVerificationService` and, when the profile keeps its default bounded-use requirement, an `ICapabilityGrantUseStore`.
 
@@ -154,7 +156,8 @@ The retained method is marked obsolete with warning diagnostic `ASIB901`. The wa
 `7.x`: changing it to `error: true` would turn previously compilable source into a build failure within the same stable
 major line. The method is planned for removal in `8.0`, where removal is permitted as a major-version API break.
 
-Migrate by adding `CapabilityGrantBindingExpectations` as the required first argument:
+Migrate by replacing `CreateExecutionBoundary(...)` with `CreateBoundExecutionBoundary(...)` and passing
+`CapabilityGrantBindingExpectations` as the required first argument:
 
 ```csharp
 // Legacy: compiles with ASIB901 in 7.x, then fails closed if executed.
