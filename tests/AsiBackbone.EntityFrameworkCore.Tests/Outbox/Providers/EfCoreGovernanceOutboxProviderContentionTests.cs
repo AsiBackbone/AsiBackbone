@@ -97,7 +97,7 @@ public sealed class EfCoreGovernanceOutboxProviderContentionTests
         await using (GovernanceOutboxTestDbContext context = database.CreateContext())
         {
             var store = new EfCoreGovernanceOutboxStore(context);
-            GovernanceEmissionError error = GovernanceEmissionError.Create(
+            var error = GovernanceEmissionError.Create(
                 "provider.transient",
                 "Simulated transient provider failure.",
                 isRetryable: true);

@@ -239,24 +239,14 @@ internal sealed class ProviderOutboxDatabase(
         bool postgreSql = Provider is OutboxContentionProvider.PostgreSql;
 
         // Each branch assigns a constant so the command text never carries caller-supplied input.
-        switch (query)
+        command.CommandText = query switch
         {
-            case ProbeQuery.LockWaiters when postgreSql:
-                command.CommandText = PostgreSqlLockWaitersSql;
-                break;
-            case ProbeQuery.LockWaiters:
-                command.CommandText = SqlServerBlockedRequestsSql;
-                break;
-            case ProbeQuery.ReadCommittedSnapshot:
-                command.CommandText = SqlServerReadCommittedSnapshotSql;
-                break;
-            case ProbeQuery.Isolation:
-                command.CommandText = PostgreSqlIsolationSql;
-                break;
-            default:
-                throw new ArgumentOutOfRangeException(nameof(query), query, "Unsupported probe query.");
-        }
-
+            ProbeQuery.LockWaiters when postgreSql => PostgreSqlLockWaitersSql,
+            ProbeQuery.LockWaiters => SqlServerBlockedRequestsSql,
+            ProbeQuery.ReadCommittedSnapshot => SqlServerReadCommittedSnapshotSql,
+            ProbeQuery.Isolation => PostgreSqlIsolationSql,
+            _ => throw new ArgumentOutOfRangeException(nameof(query), query, "Unsupported probe query."),
+        };
         return await command.ExecuteScalarAsync(cancellationToken);
     }
 
