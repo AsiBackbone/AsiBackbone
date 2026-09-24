@@ -47,7 +47,7 @@ See [EF Core Outbox Concurrency Validation](../quality/ef-core-outbox-concurrenc
 | `IGovernanceOutboxStore.FindRetryReadyAsync` | Returns retry-ready entries ordered for delivery. | Selection only. It does not prevent another worker from selecting the same entry. |
 | `IGovernanceOutboxClaimStore` | Adds explicit `ClaimPendingAsync`, `ClaimRetryReadyAsync`, claim completion, save, and release operations. | Cooperating workers emit only after acquiring a claim lease. Completion verifies claim owner/token before final state transition. |
 | `GovernanceOutboxDrain` | Uses the existing candidate path by default. When `UseClaimLeases = true`, it requires a claim-capable store and emits only after claim acquisition. | Hosts choose the behavior explicitly. Claim leasing reduces duplicate selection risk but does not create exactly-once provider delivery. |
-| `EfCoreGovernanceOutboxStore` | Uses EF Core persistence and configured concurrency tokens for state updates. It also implements the claim-capable store contract with claim owner, token, claimed time, expiration, and attempt count fields. | Hosts must apply schema/migration changes before enabling claim leases. The baseline EF implementation is portable and optimistic-concurrency based; provider-specific SQL may be stronger for high throughput. |
+| `EfCoreGovernanceOutboxStore` | Uses EF Core persistence and configured concurrency tokens for state updates. It also implements the claim-capable store contract with claim owner, token, claimed time, expiration, and attempt count fields, and claims a batch in one set-based update that rechecks eligibility on every row it writes. | Hosts must apply schema/migration changes before enabling claim leases. Claim acquisition is provider-neutral LINQ; see [EF Core claim guarantees by provider](#ef-core-claim-guarantees-by-provider) for what is verified on SQL Server, PostgreSQL, and SQLite. |
 | `InMemoryGovernanceOutboxStore` | Intended for tests, samples, and local validation. Same-entry status transitions and claim updates use single-process compare-and-swap updates. | Useful for local validation and tests only. It is not durable and does not model cross-replica infrastructure behavior. |
 | Hosted drain worker | Runs wherever it is registered and enabled. | In scaled deployments, each replica may run a worker unless the host disables, partitions, or claim-coordinates it. |
 
@@ -137,9 +137,29 @@ Use stable identifiers where available:
 
 Provider idempotency is especially important for retry, recovery, replay, lease expiration, and manual re-drain operations.
 
+## EF Core claim guarantees by provider
+
+`EfCoreGovernanceOutboxStore` claims a batch with one set-based `UPDATE`. A subquery chooses and orders the candidate rows, and the update restates the eligibility conditions (status, retry time, and no active lease) against each row it writes.
+
+The restated conditions are what make overlapping claims safe. A claim statement chooses its candidates before it can lock them, so two workers starting together can choose the same rows. The second worker waits on the first worker's row locks and resumes after the first commits. At that point the database checks the update's own conditions against the row as it now stands, sees an active lease, and skips it. Without the restated conditions, the second worker could resume with candidates it read before the first claim was visible, overwrite the first worker's claim token, and leave both workers holding the same entries. Issue #823 records this hazard and its verification.
+
+| Provider | Claim acquisition | Evidence |
+| --- | --- | --- |
+| SQL Server, `READ_COMMITTED_SNAPSHOT OFF` | Cooperating workers do not receive the same active claim. A worker that loses rows while waiting receives a smaller or empty batch. | Opt-in provider contention tests, run in CI by the `EF Core provider contention` job. |
+| SQL Server, `READ_COMMITTED_SNAPSHOT ON` (the Azure SQL Database default) | Same as above. | Same tests, run against a database with the snapshot setting enabled. |
+| PostgreSQL, read committed | Same as above. | Same tests. |
+| SQLite | The database serializes writers, so claim statements cannot overlap. | The SQLite claim tests in the EF Core test project. |
+| Other EF Core relational providers | Not verified. The claim relies on the database rechecking an update's own conditions after waiting on a row lock, which a provider may not do. | None. Run a single active worker or partition workers until the host has verified the provider with the same kind of contention test. |
+
+These guarantees cover claim acquisition only. Workers do not skip locked rows, so under heavy contention a worker can wait for another worker's claim statement to finish and then find fewer rows than it asked for. Delivery remains at-least-once: a lease can expire while its worker is still emitting, and a reclaimed entry can be emitted again.
+
+On SQL Server, two claim statements that lock rows in different orders can occasionally deadlock. SQL Server rolls back one of them, and that claim call fails with a deadlock error and claims nothing. Neither worker receives an overlapping claim, and the entries stay eligible for the next pass.
+
+See [EF Core Outbox Concurrency Validation](../quality/ef-core-outbox-concurrency-validation.md#real-provider-claim-contention-issue-823) for the test scenarios and how to run them locally.
+
 ## Provider-specific SQL patterns
 
-The baseline EF Core claim implementation is provider-neutral and optimistic-concurrency based. Provider-specific locking and skip-locked semantics may still be stronger for high-throughput deployments.
+Provider-specific locking and skip-locked semantics may still suit high-throughput deployments better, because they let competing workers take different rows instead of waiting for each other.
 
 Examples that hosts may evaluate in their own infrastructure include:
 
@@ -209,7 +229,7 @@ This keeps the package boundary clear and avoids overstating delivery guarantees
 
 Claim/lease support is now an implemented baseline rather than only a future design item, but some questions remain host- or provider-specific:
 
-- whether the baseline EF Core optimistic-concurrency claim path is sufficient for a given production workload;
+- whether the provider-neutral EF Core claim path, which waits rather than skipping locked rows, is sufficient for a given production workload;
 - how to avoid breaking existing host-owned migrations and deployed schemas;
 - how provider idempotency keys should flow into downstream emitters;
 - how tests should model real database concurrency beyond in-memory concurrency;

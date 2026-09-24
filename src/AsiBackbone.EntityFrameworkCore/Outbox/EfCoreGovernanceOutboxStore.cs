@@ -1,4 +1,5 @@
 using System.Collections.ObjectModel;
+using System.Linq.Expressions;
 using System.Text.Json;
 using AsiBackbone.Core.Emissions;
 using AsiBackbone.Core.Entities;
@@ -155,14 +156,18 @@ public sealed class EfCoreGovernanceOutboxStore : IGovernanceOutboxClaimStore
         ArgumentNullException.ThrowIfNull(request);
         cancellationToken.ThrowIfCancellationRequested();
 
+        Expression<Func<GovernanceOutboxEntryEntity, bool>> isEligible = outboxEntry =>
+            outboxEntry.Status == GovernanceEmissionStatus.Pending
+            && (outboxEntry.ClaimToken == null || outboxEntry.ClaimExpiresUtc == null || outboxEntry.ClaimExpiresUtc <= request.UtcNow);
+
         IQueryable<GovernanceOutboxEntryEntity> candidates = OutboxEntries()
-            .Where(outboxEntry => outboxEntry.Status == GovernanceEmissionStatus.Pending)
-            .Where(outboxEntry => outboxEntry.ClaimToken == null || outboxEntry.ClaimExpiresUtc == null || outboxEntry.ClaimExpiresUtc <= request.UtcNow)
+            .Where(isEligible)
             .OrderBy(outboxEntry => outboxEntry.CreatedUtc)
             .ThenBy(outboxEntry => outboxEntry.OutboxEntryId)
             .Take(request.MaxCount);
 
         return await ClaimEntriesAsync(
+            isEligible,
             candidates,
             query => query
                 .OrderBy(outboxEntry => outboxEntry.CreatedUtc)
@@ -180,18 +185,21 @@ public sealed class EfCoreGovernanceOutboxStore : IGovernanceOutboxClaimStore
         ArgumentNullException.ThrowIfNull(request);
         cancellationToken.ThrowIfCancellationRequested();
 
-        IQueryable<GovernanceOutboxEntryEntity> candidates = OutboxEntries()
-            .Where(outboxEntry =>
-                outboxEntry.Status == GovernanceEmissionStatus.Deferred ||
+        Expression<Func<GovernanceOutboxEntryEntity, bool>> isEligible = outboxEntry =>
+            (outboxEntry.Status == GovernanceEmissionStatus.Deferred ||
                 outboxEntry.Status == GovernanceEmissionStatus.Failed ||
                 outboxEntry.Status == GovernanceEmissionStatus.RetryableFailure)
-            .Where(outboxEntry => outboxEntry.NextRetryUtc == null || outboxEntry.NextRetryUtc <= request.UtcNow)
-            .Where(outboxEntry => outboxEntry.ClaimToken == null || outboxEntry.ClaimExpiresUtc == null || outboxEntry.ClaimExpiresUtc <= request.UtcNow)
+            && (outboxEntry.NextRetryUtc == null || outboxEntry.NextRetryUtc <= request.UtcNow)
+            && (outboxEntry.ClaimToken == null || outboxEntry.ClaimExpiresUtc == null || outboxEntry.ClaimExpiresUtc <= request.UtcNow);
+
+        IQueryable<GovernanceOutboxEntryEntity> candidates = OutboxEntries()
+            .Where(isEligible)
             .OrderBy(outboxEntry => outboxEntry.NextRetryUtc ?? outboxEntry.UpdatedUtc)
             .ThenBy(outboxEntry => outboxEntry.OutboxEntryId)
             .Take(request.MaxCount);
 
         return await ClaimEntriesAsync(
+            isEligible,
             candidates,
             query => query
                 .OrderBy(outboxEntry => outboxEntry.NextRetryUtc ?? outboxEntry.UpdatedUtc)
@@ -354,7 +362,35 @@ public sealed class EfCoreGovernanceOutboxStore : IGovernanceOutboxClaimStore
         return releasedEntry;
     }
 
+    /// <summary>
+    /// Claims up to one batch of candidate rows in a single set-based update and returns the rows this call won.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <paramref name="isEligible" /> is applied twice: once inside <paramref name="candidates" />, which chooses and
+    /// orders the batch, and again directly to each row the update writes. The second application is what makes the
+    /// claim safe under row-locking concurrency (issue #823).
+    /// </para>
+    /// <para>
+    /// A claim statement chooses its candidate set before it can lock the chosen rows, so two workers starting
+    /// together can choose the same rows. The first worker locks and claims them; the second waits on those row locks
+    /// and resumes after the first commits. If eligibility were checked only inside the candidate query, the second
+    /// worker could resume with a candidate set read before the first claim became visible, overwrite the first
+    /// worker's claim token, and leave both workers believing they hold the same entries. PostgreSQL at read committed
+    /// re-evaluates the update's own predicate against the newly committed row version before writing it, but not the
+    /// already-materialized candidate set. SQL Server evaluates the update target's predicate against the committed
+    /// row after it acquires the update lock. Stating eligibility on the update target therefore makes the waiting
+    /// worker skip rows that another worker claimed while it waited.
+    /// </para>
+    /// <para>
+    /// The consequence is liveness, not correctness: a worker that loses a row to another worker receives a smaller
+    /// batch, possibly an empty one, and claims again on its next pass. The expression is provider-neutral LINQ; no
+    /// lock hints or provider-specific SQL are involved. The behavior is verified against SQL Server and PostgreSQL by
+    /// the opt-in provider contention tests.
+    /// </para>
+    /// </remarks>
     private async ValueTask<IReadOnlyList<GovernanceOutboxClaim>> ClaimEntriesAsync(
+        Expression<Func<GovernanceOutboxEntryEntity, bool>> isEligible,
         IQueryable<GovernanceOutboxEntryEntity> candidates,
         Func<IQueryable<GovernanceOutboxEntryEntity>, IOrderedQueryable<GovernanceOutboxEntryEntity>> orderClaimedEntries,
         GovernanceOutboxClaimRequest request,
@@ -362,8 +398,11 @@ public sealed class EfCoreGovernanceOutboxStore : IGovernanceOutboxClaimStore
     {
         string claimToken = Guid.NewGuid().ToString("N");
         string concurrencyStamp = GovernanceEntity.NewConcurrencyStamp();
+        IQueryable<Guid> candidateIds = candidates.Select(outboxEntry => outboxEntry.Id);
 
-        int claimedCount = await candidates
+        int claimedCount = await OutboxEntries()
+            .Where(isEligible)
+            .Where(outboxEntry => candidateIds.Contains(outboxEntry.Id))
             .ExecuteUpdateAsync(
                 setters => setters
                     .SetProperty(outboxEntry => outboxEntry.ConcurrencyStamp, concurrencyStamp)
