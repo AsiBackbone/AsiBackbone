@@ -96,10 +96,31 @@ public sealed class CapabilityGrantValidationProfileTests
     [Fact]
     public void LegacyCreateExecutionBoundaryOverloadFailsClosed()
     {
+#pragma warning disable ASIB901 // Exercise the retained runtime compatibility behavior intentionally.
         _ = Assert.Throws<InvalidOperationException>(() =>
             CapabilityGrantValidationOptions.CreateExecutionBoundary());
         _ = Assert.Throws<InvalidOperationException>(() =>
             CapabilityGrantValidationOptions.CreateExecutionBoundary(null));
+#pragma warning restore ASIB901
+    }
+
+    /// <summary>
+    /// Verifies that the retained legacy execution-boundary factory surfaces its migration path at compile time.
+    /// </summary>
+    [Fact]
+    public void LegacyCreateExecutionBoundaryOverloadCarriesNonErrorObsoleteDiagnostic()
+    {
+        System.Reflection.MethodInfo method = Assert.Single(typeof(CapabilityGrantValidationOptions)
+                .GetMethods()
+                , candidate => candidate.Name == nameof(CapabilityGrantValidationOptions.CreateExecutionBoundary));
+
+        ObsoleteAttribute obsolete = Assert.IsType<ObsoleteAttribute>(
+            Assert.Single(method.GetCustomAttributes(typeof(ObsoleteAttribute), inherit: false)));
+
+        Assert.False(obsolete.IsError);
+        Assert.Equal("ASIB901", obsolete.DiagnosticId);
+        Assert.Contains(nameof(CapabilityGrantValidationOptions.CreateBoundExecutionBoundary), obsolete.Message, StringComparison.Ordinal);
+        Assert.Contains(nameof(CapabilityGrantBindingExpectations), obsolete.Message, StringComparison.Ordinal);
     }
 
     /// <summary>
