@@ -109,6 +109,12 @@ public static class NcatAuditCompletionContract
             return false;
         }
 
+        if (!IsSha256Hex(message.MutationManifestHash))
+        {
+            reasonCode = "invalid-manifest-hash";
+            return false;
+        }
+
         if (!TryReadManifestHeader(canonicalManifestUtf8, out ManifestHeader? header))
         {
             reasonCode = "manifest-malformed";
@@ -157,9 +163,10 @@ public static class NcatAuditCompletionContract
             : null;
     }
 
+    // Version 1 of the contract encodes digests as uppercase hex, so lowercase a-f is not a v1 digest.
     private static bool IsSha256Hex(string? value)
     {
-        return value is { Length: Sha256HexLength } && value.All(char.IsAsciiHexDigit);
+        return value is { Length: Sha256HexLength } && value.All(char.IsAsciiHexDigitUpper);
     }
 
     private static bool IsValidDestination(string? destination)

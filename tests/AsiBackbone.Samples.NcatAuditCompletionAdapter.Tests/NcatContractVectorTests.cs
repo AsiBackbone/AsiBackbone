@@ -243,6 +243,29 @@ public sealed class NcatContractVectorTests
     }
 
     /// <summary>
+    /// Verifies a lowercase manifest digest is rejected, because the contract encodes digests as uppercase hex.
+    /// </summary>
+    [Theory]
+    [MemberData(nameof(VectorNames))]
+    public void LowercaseManifestDigestIsRejected(string vectorName)
+    {
+        ContractVector vector = GetSupportedVector(vectorName);
+        byte[] manifestBytes = new UTF8Encoding(false).GetBytes(vector.CanonicalManifestJson);
+        NcatAuditCompletionMessage message = vector.Message with
+        {
+            MutationManifestHash = vector.ExpectedDigest.ToLowerInvariant()
+        };
+
+        // Guards the negative case: the digest must contain a letter for lowercasing to change it.
+        Assert.NotEqual(vector.ExpectedDigest, message.MutationManifestHash);
+
+        Assert.False(NcatAuditCompletionContract.TryCreateHandoff(message, deliveryAttempt: 1, out _, out string? handoffReason));
+        Assert.Equal("invalid-manifest-hash", handoffReason);
+        Assert.False(NcatAuditCompletionContract.TryVerifyCanonicalManifest(message, manifestBytes, out string? verifyReason));
+        Assert.Equal("invalid-manifest-hash", verifyReason);
+    }
+
+    /// <summary>
     /// Verifies a retained manifest followed by another JSON value is rejected even when the digest covers the
     /// combined bytes.
     /// </summary>

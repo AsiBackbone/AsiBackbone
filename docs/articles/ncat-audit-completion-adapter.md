@@ -186,6 +186,7 @@ The vectors are vendored from a pinned NCAT commit:
 - each valid vector's canonical manifest bytes reproduce its expected digest and its idempotency key is recomputed from the destination and the trimmed mutation batch ID;
 - each valid vector's receipt and message agree, pass `TryCreateHandoff`, and deliver with the operation, attempt, decision, correlation, trace, batch, count, algorithm, digest, and timestamp preserved. Vectors without an operation or decision identifier are rejected with the adapter's documented reason codes;
 - each published invalid message is rejected with a specific reason code;
+- a lowercase manifest digest is rejected by both `TryCreateHandoff` and `TryVerifyCanonicalManifest` with `invalid-manifest-hash`, because the contract encodes digests as uppercase hex;
 - the no-mutation, failed, and rolled-back scenarios cannot carry committed batch evidence.
 
 Valid vectors are replayed from an explicit allowlist in `NcatContractVectorTests`, not discovered from the fixture. A test fails with review guidance when NCAT publishes or removes a vector name, or publishes an outcome or contract major version the adapter does not recognize.
