@@ -18,6 +18,11 @@ This project follows the spirit of [Keep a Changelog](https://keepachangelog.com
 
 ### Documentation
 
+* Corrected [Outbox Multi-Worker Concurrency Guidance](docs/articles/outbox-multi-worker-concurrency.md) so the
+  `GovernanceOutboxDrain` path, EF Core migration guidance, deployment recommendations, and wording boundary all
+  reflect the current `GovernanceOutboxOptions.UseClaimLeases = true` default. The non-claiming candidate path is now
+  documented as an explicit opt-out that can permit duplicate provider emission in multi-worker deployments, and the
+  article links the runtime default to its existing core unit-test assertion (#824).
 * Expanded [Canonical JSON v1 Format](docs/articles/canonical-json-v1.md) into the normative specification for
   `asibackbone.canonical-json.v1`. It now covers envelope descriptor trimming, property ordering, the full string
   escaping table, integer handling, an exact double formatting algorithm with a locked table of boundary values, array order and string-set normalization, timestamp formatting,
