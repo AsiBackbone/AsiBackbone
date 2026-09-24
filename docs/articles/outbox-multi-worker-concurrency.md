@@ -8,9 +8,11 @@ The goal is to help hosts avoid accidental duplicate emissions when an ASP.NET C
 
 Claim leasing is enabled by default. `GovernanceOutboxOptions.UseClaimLeases` defaults to `true`, and `ClaimWorkerId` defaults to the machine name and process identifier so replicas of the same deployment do not share a claim owner. The previous default left two replicas free to select and emit the same envelope, which is not a safe default for a durable outbox.
 
-Enabling claim leases requires a store implementing `IGovernanceOutboxClaimStore`. Both shipped stores do. A host supplying its own store that does not implement it must set `UseClaimLeases` to `false`; the drain throws rather than silently falling back, because falling back would restore the duplicate-emission behavior the default exists to prevent.
+The default claim-lease path requires a store implementing `IGovernanceOutboxClaimStore`. Both shipped stores do. A host supplying its own store that does not implement it must set `UseClaimLeases` to `false`; the drain throws rather than silently falling back, because falling back would restore the duplicate-emission behavior the default exists to prevent.
 
 Hosts that opt out keep the previous behavior: `FindPendingAsync` and `FindRetryReadyAsync` return candidate rows and do not claim, lease, lock, or hide rows from another worker. That path is safe for a single active worker and for local or test validation, and it requires partitioning, a single worker role, or provider-side idempotency when scaled.
+
+Source-of-truth check: the runtime default is defined by [`GovernanceOutboxOptions.UseClaimLeases`](https://github.com/AsiBackbone/AsiBackbone/blob/main/src/AsiBackbone.Core/Outbox/GovernanceOutboxOptions.cs), and [`ValidateAcceptsDefaultOptions`](https://github.com/AsiBackbone/AsiBackbone/blob/main/tests/AsiBackbone.Core.Tests/Outbox/AsiBackboneGovernanceOutboxOptionsTests.cs) asserts that a newly constructed options instance has claim leases enabled. Keep this article aligned with those sources if the default changes.
 
 Claim leasing reduces duplicate selection between cooperating workers. Downstream provider delivery remains at-least-once unless the provider and host enforce idempotency.
 
@@ -46,8 +48,8 @@ See [EF Core Outbox Concurrency Validation](../quality/ef-core-outbox-concurrenc
 | `IGovernanceOutboxStore.FindPendingAsync` | Returns pending entries ordered for delivery. | Selection only. It does not claim, lease, lock, or hide rows from another worker. |
 | `IGovernanceOutboxStore.FindRetryReadyAsync` | Returns retry-ready entries ordered for delivery. | Selection only. It does not prevent another worker from selecting the same entry. |
 | `IGovernanceOutboxClaimStore` | Adds explicit `ClaimPendingAsync`, `ClaimRetryReadyAsync`, claim completion, save, and release operations. | Cooperating workers emit only after acquiring a claim lease. Completion verifies claim owner/token before final state transition. |
-| `GovernanceOutboxDrain` | Uses the existing candidate path by default. When `UseClaimLeases = true`, it requires a claim-capable store and emits only after claim acquisition. | Hosts choose the behavior explicitly. Claim leasing reduces duplicate selection risk but does not create exactly-once provider delivery. |
-| `EfCoreGovernanceOutboxStore` | Uses EF Core persistence and configured concurrency tokens for state updates. It also implements the claim-capable store contract with claim owner, token, claimed time, expiration, and attempt count fields, and claims a batch in one set-based update that rechecks eligibility on every row it writes. | Hosts must apply schema/migration changes before enabling claim leases. Claim acquisition is provider-neutral LINQ; see [EF Core claim guarantees by provider](#ef-core-claim-guarantees-by-provider) for what is verified on SQL Server, PostgreSQL, and SQLite. |
+| `GovernanceOutboxDrain` | Uses the claim-capable path by default because `UseClaimLeases = true`. It requires a claim-capable store and emits only after claim acquisition. The existing candidate path is used only when a host explicitly sets `UseClaimLeases = false`. | Explicitly opting out restores a path where multiple workers can select and emit the same entry before final state is saved. Claim leasing reduces duplicate selection risk but does not create exactly-once provider delivery. |
+| `EfCoreGovernanceOutboxStore` | Uses EF Core persistence and configured concurrency tokens for state updates. It also implements the claim-capable store contract with claim owner, token, claimed time, expiration, and attempt count fields, and claims a batch in one set-based update that rechecks eligibility on every row it writes. | Hosts must apply the claim schema/migration changes before running the default claim-lease path against a durable EF Core outbox in production. A host that explicitly disables claim leases accepts the non-claiming duplicate-emission risk. Claim acquisition is provider-neutral LINQ; see [EF Core claim guarantees by provider](#ef-core-claim-guarantees-by-provider) for what is verified on SQL Server, PostgreSQL, and SQLite. |
 | `InMemoryGovernanceOutboxStore` | Intended for tests, samples, and local validation. Same-entry status transitions and claim updates use single-process compare-and-swap updates. | Useful for local validation and tests only. It is not durable and does not model cross-replica infrastructure behavior. |
 | Hosted drain worker | Runs wherever it is registered and enabled. | In scaled deployments, each replica may run a worker unless the host disables, partitions, or claim-coordinates it. |
 
@@ -100,9 +102,11 @@ Multiple workers can be safe when each worker owns a disjoint outbox partition. 
 
 Partitioning must be enforced in the durable selection query or storage adapter. Merely giving workers different names is not enough if they still read the same pending rows.
 
-### 3. Opt-in package claim leases before provider emission
+### 3. Default package claim leases before provider emission
 
-A multi-worker durable store can claim work before calling the provider when the configured store implements `IGovernanceOutboxClaimStore`.
+The drain claims work before calling the provider by default when the configured store implements `IGovernanceOutboxClaimStore`. Both shipped stores implement that contract. Setting `UseClaimLeases = false` is an explicit compatibility opt-out and should be used only when the host has another coordination or idempotency strategy appropriate to its deployment.
+
+The default already sets `UseClaimLeases` to `true`; the following configuration makes that posture explicit while assigning a host-controlled worker identifier and lease duration:
 
 ```csharp
 builder.Services.Configure<GovernanceOutboxOptions>(options =>
@@ -121,7 +125,7 @@ When claim leases are enabled, the drain:
 - completes delivered, deferred, failed, retryable, or dead-letter transitions only when the claim token still matches;
 - allows expired claims to be reclaimed by another worker.
 
-Hosts using EF Core must add the claim columns and indexes to their host-owned migration before enabling this option in production.
+Hosts using EF Core must add the claim columns and indexes to their host-owned migration before running the default claim-lease path in production. A host that cannot deploy that schema must explicitly set `UseClaimLeases = false` and accept the duplicate-emission risk of the non-claiming path.
 
 ### 4. Provider-side idempotency
 
@@ -221,7 +225,7 @@ Do not describe the provider-neutral outbox drain as exactly-once delivery.
 
 A safer description is:
 
-> AsiBackbone provides durable local outbox records, provider-neutral drain primitives, and opt-in claim/lease coordination for cooperating workers. Hosts must still use partitioning, host-owned migrations, and provider-side idempotency appropriate to their deployment to avoid or collapse duplicate emissions.
+> AsiBackbone provides durable local outbox records, provider-neutral drain primitives, and claim/lease coordination enabled by default for cooperating workers. Hosts that explicitly opt out of claim leases must provide another coordination or idempotency strategy appropriate to their deployment. Delivery remains at-least-once, so provider-side idempotency is still required where duplicates are consequential.
 
 This keeps the package boundary clear and avoids overstating delivery guarantees.
 
@@ -235,4 +239,4 @@ Claim/lease support is now an implemented baseline rather than only a future des
 - how tests should model real database concurrency beyond in-memory concurrency;
 - whether later operational evidence justifies provider-specific claim packages or a new provider-neutral `Claimed` or `InProgress` status.
 
-Production multi-replica hosts should choose one active worker, partitioned workers, or the opt-in claim/lease behavior with provider-side idempotency.
+Production multi-replica hosts should use the default claim/lease behavior with provider-side idempotency unless they deliberately choose one active worker, partitioned workers, or another coordination strategy and explicitly opt out of claim leases.
