@@ -189,11 +189,11 @@ The vectors are vendored from a pinned NCAT commit:
 - a lowercase manifest digest is rejected by both `TryCreateHandoff` and `TryVerifyCanonicalManifest` with `invalid-manifest-hash`, because the contract encodes digests as uppercase hex;
 - the no-mutation, failed, and rolled-back scenarios cannot carry committed batch evidence.
 
-Valid vectors are replayed from an explicit allowlist in `NcatContractVectorTests`, not discovered from the fixture. A test fails with review guidance when NCAT publishes or removes a vector name, or publishes an outcome or contract major version the adapter does not recognize.
+Valid vectors, invalid messages, and no-message scenarios are replayed from the reviewed names in `NcatContractVectorTests`, not discovered from the fixture. A test fails with review guidance when NCAT publishes or removes any of these names, or publishes an outcome or contract major version the adapter does not recognize.
 
 ### Drift reporting
 
-The `NCAT Contract Vectors` workflow runs weekly, on demand, and on pull requests that change the vendored vectors. `scripts/Test-NcatContractVectorPin.ps1` confirms that the vendored bytes still match the pinned NCAT revision. It then compares them with NCAT `main` and fails with a summary when NCAT publishes different vectors, removes them, or adds a newer contract major version. The weekly failure is the signal that the pin needs review; it does not block unrelated pull requests. Pull request runs execute the contributor's copy of the script, so they call the public NCAT endpoints without a GitHub token; only scheduled and manual runs, which maintainers trigger, pass one, to raise the API rate limit.
+The `NCAT Contract Vectors` workflow runs weekly, on demand, and on pull requests that change the vendored vectors. `scripts/Test-NcatContractVectorPin.ps1` confirms that the vendored bytes still match the pinned NCAT revision. It then compares them with NCAT `main` and fails with a summary when NCAT publishes different vectors, removes them, or adds a newer contract major version. If it cannot list NCAT's contract versions, it reports that as a finding rather than passing on an incomplete check. The weekly failure is the signal that the pin needs review; it does not block unrelated pull requests. Pull request runs execute the contributor's copy of the script, so they call the public NCAT endpoints without a GitHub token; only scheduled and manual runs, which maintainers trigger, pass one, to raise the API rate limit.
 
 ### Updating the pinned vectors
 

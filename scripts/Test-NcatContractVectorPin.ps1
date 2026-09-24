@@ -102,17 +102,31 @@ else {
 $pinnedMajor = [int](($pin.sourcePath -split '/') | Where-Object { $_ -match '^v\d+$' } | Select-Object -First 1).TrimStart('v')
 $contractDirectory = ($pin.sourcePath -split '/v\d+/')[0]
 $listingUri = "https://api.github.com/repos/$($pin.repository)/contents/$contractDirectory`?ref=$UpstreamRef"
+
+# The newer-major check is part of the drift result, so an unreadable or implausible listing is a finding,
+# never a clean pass.
+$listed = $false
 try {
     $entries = Invoke-RestMethod -Uri $listingUri -Headers (Get-RequestHeaders)
-    $newerMajors = @($entries |
-        Where-Object { $_.type -eq 'dir' -and $_.name -match '^v(\d+)$' -and [int]$Matches[1] -gt $pinnedMajor } |
+    $listed = $true
+}
+catch {
+    $findings.Add("Unable to list NCAT contract versions at ``$listingUri``, so newer contract major versions were not checked: $($_.Exception.Message)")
+}
+
+if ($listed) {
+    $versionDirectories = @($entries |
+        Where-Object { $_.type -eq 'dir' -and $_.name -match '^v\d+$' } |
         Select-Object -ExpandProperty name)
+
+    if ($versionDirectories -notcontains "v$pinnedMajor") {
+        $findings.Add("The NCAT contract listing at ``$listingUri`` does not include the pinned ``v$pinnedMajor`` directory, so newer contract major versions could not be checked reliably.")
+    }
+
+    $newerMajors = @($versionDirectories | Where-Object { [int]$_.TrimStart('v') -gt $pinnedMajor })
     if ($newerMajors.Count -gt 0) {
         $findings.Add("NCAT ``$UpstreamRef`` publishes newer contract major version(s): $($newerMajors -join ', ').")
     }
-}
-catch {
-    Write-Warning "Unable to list NCAT contract versions at '$listingUri': $($_.Exception.Message)"
 }
 
 if ($findings.Count -eq 0) {

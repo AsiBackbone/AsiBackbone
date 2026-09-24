@@ -67,11 +67,19 @@ public sealed class NcatContractVectorTests
     /// </remarks>
     public static TheoryData<string> VectorNames => [.. SupportedVectorNames.Order(StringComparer.Ordinal)];
 
-    /// <summary>Gets the names of the invalid NCAT messages.</summary>
-    public static TheoryData<string> InvalidMessageNames => [.. Fixture.Value.InvalidMessages.Keys];
+    /// <summary>Gets the names of the invalid NCAT messages this adapter has reviewed.</summary>
+    /// <remarks>
+    /// Drawn from the reviewed reason map rather than the fixture, so a removed invalid message fails
+    /// <see cref="FixtureInvalidMessageNamesMatchReviewedReasons" /> instead of silently dropping coverage.
+    /// </remarks>
+    public static TheoryData<string> InvalidMessageNames => [.. ExpectedInvalidReasons.Keys.Order(StringComparer.Ordinal)];
 
-    /// <summary>Gets the NCAT scenarios that produce no completion message.</summary>
-    public static TheoryData<string> WithoutReceiptScenarios => [.. Fixture.Value.WithoutReceiptScenarios];
+    /// <summary>Gets the NCAT scenarios that produce no completion message this adapter has reviewed.</summary>
+    /// <remarks>
+    /// Drawn from the reviewed outcome map rather than the fixture, so a removed scenario fails
+    /// <see cref="FixtureWithoutReceiptScenariosMatchReviewedOutcomes" /> instead of silently dropping coverage.
+    /// </remarks>
+    public static TheoryData<string> WithoutReceiptScenarios => [.. WithoutReceiptOutcomes.Keys.Order(StringComparer.Ordinal)];
 
     /// <summary>
     /// Verifies the vendored vectors are the exact bytes recorded in the pin file.
@@ -124,20 +132,35 @@ public sealed class NcatContractVectorTests
     [Fact]
     public void FixtureVectorNamesMatchSupportedAllowlist()
     {
-        IReadOnlyDictionary<string, ContractVector> vectors = Fixture.Value.Vectors;
-        string[] unrecognized = [.. vectors.Keys
-            .Where(name => !SupportedVectorNames.Contains(name))
-            .Order(StringComparer.Ordinal)];
-        string[] missing = [.. SupportedVectorNames
-            .Where(name => !vectors.ContainsKey(name))
+        AssertReviewedNamesMatch("vectors", Fixture.Value.Vectors.Keys, SupportedVectorNames);
+    }
+
+    /// <summary>
+    /// Verifies the pinned fixture publishes exactly the invalid messages this adapter has reviewed.
+    /// </summary>
+    [Fact]
+    public void FixtureInvalidMessageNamesMatchReviewedReasons()
+    {
+        AssertReviewedNamesMatch("invalid messages", Fixture.Value.InvalidMessages.Keys, ExpectedInvalidReasons.Keys);
+    }
+
+    /// <summary>
+    /// Verifies the pinned fixture publishes exactly the no-message scenarios this adapter has reviewed.
+    /// </summary>
+    [Fact]
+    public void FixtureWithoutReceiptScenariosMatchReviewedOutcomes()
+    {
+        IReadOnlyList<string> scenarios = Fixture.Value.WithoutReceiptScenarios;
+        string[] duplicates = [.. scenarios
+            .GroupBy(scenario => scenario, StringComparer.Ordinal)
+            .Where(group => group.Count() > 1)
+            .Select(group => group.Key)
             .Order(StringComparer.Ordinal)];
 
         Assert.True(
-            unrecognized.Length == 0,
-            $"NCAT publishes unrecognized vectors [{string.Join(", ", unrecognized)}]. {ReviewGuidance}");
-        Assert.True(
-            missing.Length == 0,
-            $"NCAT no longer publishes vectors [{string.Join(", ", missing)}]. {ReviewGuidance}");
+            duplicates.Length == 0,
+            $"NCAT publishes duplicate no-message scenarios [{string.Join(", ", duplicates)}]. {ReviewGuidance}");
+        AssertReviewedNamesMatch("no-message scenarios", scenarios, WithoutReceiptOutcomes.Keys);
     }
 
     /// <summary>
@@ -294,8 +317,8 @@ public sealed class NcatContractVectorTests
     [MemberData(nameof(InvalidMessageNames))]
     public void InvalidMessageIsRejected(string invalidName)
     {
-        Assert.True(ExpectedInvalidReasons.TryGetValue(invalidName, out string? expectedReason), $"'{invalidName}': {ReviewGuidance}");
-        NcatAuditCompletionMessage message = Fixture.Value.InvalidMessages[invalidName];
+        string expectedReason = ExpectedInvalidReasons[invalidName];
+        NcatAuditCompletionMessage message = GetPublished(Fixture.Value.InvalidMessages, "invalid message", invalidName);
 
         if (NcatAuditCompletionContract.TryCreateHandoff(message, deliveryAttempt: 1, out _, out string? actualReason))
         {
@@ -319,7 +342,8 @@ public sealed class NcatContractVectorTests
     [MemberData(nameof(WithoutReceiptScenarios))]
     public async Task OutcomesWithoutReceiptCannotClaimCommittedEvidence(string scenario)
     {
-        Assert.True(WithoutReceiptOutcomes.TryGetValue(scenario, out GovernedOperationPersistenceOutcome expectedOutcome), $"'{scenario}': {ReviewGuidance}");
+        Assert.Contains(scenario, Fixture.Value.WithoutReceiptScenarios);
+        GovernedOperationPersistenceOutcome expectedOutcome = WithoutReceiptOutcomes[scenario];
         NcatAuditCompletionMessage committed = Fixture.Value.Vectors.Values
             .Select(vector => vector.Message)
             .First(message => message.OperationExecutionId is not null && message.DecisionAuditRecordId is not null);
@@ -360,12 +384,36 @@ public sealed class NcatContractVectorTests
 
     private static ContractVector GetSupportedVector(string vectorName)
     {
-        if (!Fixture.Value.Vectors.TryGetValue(vectorName, out ContractVector? vector))
+        return GetPublished(Fixture.Value.Vectors, "supported vector", vectorName);
+    }
+
+    private static T GetPublished<T>(IReadOnlyDictionary<string, T> published, string kind, string name)
+        where T : class
+    {
+        if (!published.TryGetValue(name, out T? value))
         {
-            Assert.Fail($"NCAT no longer publishes supported vector '{vectorName}'. {ReviewGuidance}");
+            Assert.Fail($"NCAT no longer publishes {kind} '{name}'. {ReviewGuidance}");
         }
 
-        return vector;
+        return value;
+    }
+
+    private static void AssertReviewedNamesMatch(
+        string kind,
+        IEnumerable<string> fixtureNames,
+        IEnumerable<string> reviewedNames)
+    {
+        HashSet<string> published = new(fixtureNames, StringComparer.Ordinal);
+        HashSet<string> reviewed = new(reviewedNames, StringComparer.Ordinal);
+        string[] unrecognized = [.. published.Except(reviewed).Order(StringComparer.Ordinal)];
+        string[] missing = [.. reviewed.Except(published).Order(StringComparer.Ordinal)];
+
+        Assert.True(
+            unrecognized.Length == 0,
+            $"NCAT publishes unrecognized {kind} [{string.Join(", ", unrecognized)}]. {ReviewGuidance}");
+        Assert.True(
+            missing.Length == 0,
+            $"NCAT no longer publishes {kind} [{string.Join(", ", missing)}]. {ReviewGuidance}");
     }
 
     private static void AssertTerminal(NcatAuditCompletionDeliveryResult result, string reasonCode)
