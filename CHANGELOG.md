@@ -18,6 +18,7 @@ This project follows the spirit of [Keep a Changelog](https://keepachangelog.com
 
 ### Changed
 
+* Updated the repository-pinned DocFX tool from 2.78.5 to 2.81.0.
 * Refactored `CapabilityGrantValidator.ValidateMetadata` into explicit ordered guard clauses while preserving the
   existing first-failure precedence, validation categories, policy actions, failure codes, messages, and success
   behavior. Focused tests now lock precedence when multiple metadata fields are invalid (#827).
