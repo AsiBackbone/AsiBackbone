@@ -4,10 +4,13 @@ Release date: 2026-09-26
 
 ## Summary
 
-`7.0.0` is a major release for the AsiBackbone package family. It carries two
-security corrections that change stable contracts, completes the 6.0 naming work
-by renaming the compatibility names that 6.0 retained, and renames five Entity
-Framework Core columns and one JSON property name to match.
+`7.0.0` is a major release for the AsiBackbone package family. It strengthens
+acknowledgment actor binding, capability-grant execution binding, typed-artifact
+verification, and DLP fail-safe defaults. Two of those corrections change
+stable contracts: response-actor binding and the DLP enum value changes. The
+release also completes the 6.0 naming work by renaming the compatibility names
+that 6.0 retained, and renames five Entity Framework Core columns and one JSON
+property name to match.
 
 Package IDs and the `net10.0` target remain unchanged. Four namespaces and the
 retained `AuditResidue*`, `LiabilityHandshake*`, `Handshake*`, and

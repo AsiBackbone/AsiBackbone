@@ -119,15 +119,17 @@ This project follows the spirit of [Keep a Changelog](https://keepachangelog.com
 
 ### Release summary
 
-`7.0.0` is a major release for the AsiBackbone package family. It carries two
-security corrections that change stable contracts, completes the 6.0 naming
-work by renaming the compatibility names that 6.0 retained, and renames five
-Entity Framework Core columns to match.
+`7.0.0` is a major release for the AsiBackbone package family. It strengthens
+acknowledgment actor binding, capability-grant execution binding, typed-artifact
+verification, and DLP fail-safe defaults. Two of those corrections change
+stable contracts: response-actor binding and the DLP enum value changes. The
+release also completes the 6.0 naming work by renaming the compatibility names
+that 6.0 retained, and renames five Entity Framework Core columns to match.
 
-The first security correction binds acknowledgment responses to the actor the
-challenge was issued to. The second moves the DLP classification enums off their
-permissive zero values, which changes the numeric value of every existing member
-of `DlpFailureBehavior` and `DlpIntentRiskLevel`. Under the repository's
+The first contract-changing correction binds acknowledgment responses to the
+actor the challenge was issued to. The second moves the DLP classification enums
+off their permissive zero values, which changes the numeric value of every
+existing member of `DlpFailureBehavior` and `DlpIntentRiskLevel`. Under the repository's
 [API compatibility and SemVer contract](docs/articles/api-compatibility-and-semver.md),
 an enum value change affects a stable package contract and cannot ship on the
 `6.x` line, where `AssemblyVersion` stays pinned at `6.0.0.0` and a consumer
