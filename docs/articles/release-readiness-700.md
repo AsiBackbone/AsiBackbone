@@ -88,8 +88,8 @@ commit.
 - [x] Package SBOM generation succeeds for all 11 packages and produces the
   SBOM manifest.
 - [x] Template, external-consumer, and stable-package smoke tests succeed.
-- [ ] CodeQL and dependency review report no blocking findings.
-- [ ] Required actionlint/Zizmor, workflow-security, OWASP Dependency-Check,
+- [x] CodeQL and dependency review report no blocking findings.
+- [x] Required actionlint/Zizmor, workflow-security, OWASP Dependency-Check,
   and related repository checks have no unexplained blocking findings.
 - [x] No package-author-signing claim is made for unsigned project packages.
 
