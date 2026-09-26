@@ -3,13 +3,14 @@
 Version 7.0 is a major release with five groups of breaking changes:
 
 * **Security corrections that change stable contracts.** It binds acknowledgment responses to the actor the challenge was issued to, binds capability grants to the expected subject and operation, and moves `DlpFailureBehavior` and `DlpIntentRiskLevel` off their permissive zero values, which changes the numeric value of every existing member of both enums.
-* **Completion of the 6.0 naming work.** The compatibility names that 6.0 retained (`AuditResidue*`, `LiabilityHandshake*`, `Handshake*`, and `CapabilityToken*`) are renamed to the current vocabulary: decision receipt, acknowledgment, and capability grant. Two namespaces change with them. No `[Obsolete]` forwarding aliases are provided.
+* **Completion of the 6.0 naming work.** The compatibility names that 6.0 retained (`AuditResidue*`, `LiabilityHandshake*`, `Handshake*`, and `CapabilityToken*`) are renamed to the current vocabulary: decision receipt, acknowledgment, and capability grant. Four namespaces change with them. No `[Obsolete]` forwarding aliases are provided.
 * **An EF Core schema change.** Five columns are renamed to match the new property names. Hosts that use `AsiBackbone.EntityFrameworkCore` must add and review a migration before deploying 7.0.
 * **A JSON property name change.** Types serialized with `System.Text.Json` now emit the renamed property names, so `auditResidueId` becomes `decisionReceiptId`. Consumers that parse or store this JSON must update. See [Decision receipt JSON uses `decisionReceiptId`](#decision-receipt-json-uses-decisionreceiptid).
+* **Constructor signature changes.** `GovernanceOutboxDrain` and `GovernanceOutboxDrainHostedService` each gain an optional trailing `TimeProvider` parameter, so assemblies compiled against 6.x must be rebuilt against 7.0.
 
 Signed and telemetry contracts are not renamed. Canonical artifact tags, signed payload bytes, OpenTelemetry event and attribute names, EF Core table names, reason codes, diagnostic IDs, and the `AddAsiBackbone*` registration methods keep their 6.x values, so artifacts signed by 6.x verify under 7.0 and existing dashboards keep working. See [What does not change](#what-does-not-change).
 
-Two public constructors were also replaced: `GovernanceOutboxDrain` and `GovernanceOutboxDrainHostedService` each gained an optional trailing `TimeProvider` parameter. All assemblies compiled against 6.x must be rebuilt against 7.0, and most consumers will need source changes for the renames. [Other changes that affect hosts](#other-changes-that-affect-hosts) covers the remaining adjustments.
+The constructor signature changes require all assemblies compiled against 6.x to be rebuilt against 7.0, and most consumers will need source changes for the renames. [Other changes that affect hosts](#other-changes-that-affect-hosts) covers the remaining adjustments.
 
 ## Why these changes required a major release
 

@@ -144,9 +144,10 @@ Stable `7.x` package family. The current release is `7.0.0`.
 
 `7.0.0` binds acknowledgment responses to the challenged actor and makes
 unconfigured DLP failure behavior and risk levels fail explicitly instead of
-inheriting a permissive zero value. Package IDs, public namespaces, and the
-`net10.0` target remain unchanged; the binary assembly identity advances to
-`7.0.0.0`.
+inheriting a permissive zero value. Package IDs and the `net10.0` target remain
+unchanged. Four public namespaces move from the `Handshakes` and
+`CapabilityTokens` vocabulary to `Acknowledgments` and `CapabilityGrants`; the
+binary assembly identity advances to `7.0.0.0`.
 
 Consumers upgrading from `6.x` must follow the [6.x to 7.0 upgrade guide](https://github.com/AsiBackbone/AsiBackbone/blob/main/docs/articles/upgrade-600-to-700.md). Hosts must preserve actor identity across both acknowledgment-challenge legs and remap persisted numeric DLP enum values.
 
