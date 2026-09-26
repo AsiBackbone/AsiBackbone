@@ -26,9 +26,9 @@ Major releases should be rare. They should be reserved for identity, namespace, 
 
 ## Current `7.x` stabilization posture
 
-`7.x` is the stable package line maintained on `main`. The latest published stable release is `6.0.0`; `7.0.0` is the prepared next release and is not yet tagged or published.
+`7.x` is the stable package line maintained on `main`. The current stable release is `7.0.0`.
 
-The `7.0.0` release preserves the package IDs, namespaces, and `net10.0` target while advancing the binary identity to `7.0.0.0`. It binds acknowledgment responses to the challenged actor and removes permissive zero defaults from the DLP failure-behavior and intent-risk enums.
+The `7.0.0` release preserves the package IDs and `net10.0` target while advancing the binary identity to `7.0.0.0`. It renames the `Handshakes` and `CapabilityTokens` namespaces, binds acknowledgment responses to the challenged actor, binds capability grants to the expected subject and operation, and removes permissive zero defaults from the DLP failure-behavior and intent-risk enums.
 
 `7.0.0` is a young major line. Future `7.x` releases should prioritize compatibility, documentation clarity, patch-level release correction, and carefully scoped additive improvements. Additional breaking changes should be avoided unless strongly justified by consumer safety, correctness, maintainability, or a documented architectural boundary that cannot be preserved compatibly.
 

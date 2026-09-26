@@ -11,17 +11,14 @@ General architectural education belongs in [ASI Backbone Learning](https://asiba
 
 ## Current stable package posture
 
-Stable `7.x` package family. The latest published stable release is `6.0.0`.
-Repository `main` targets `7.0.0`, the prepared next release, which is not yet
-tagged or published. NuGet consumers remain on `6.0.0` until the release
-readiness checklist completes, `v7.0.0` is tagged, and its packages are
-published.
+Stable `7.x` package family. The current release is `7.0.0`.
 
 `7.0.0` binds acknowledgment responses to the challenged actor and makes
 unconfigured DLP failure behavior and risk levels fail explicitly instead of
-inheriting a permissive zero value. Package IDs, public namespaces, and the
-`net10.0` target remain unchanged; the binary assembly identity advances to
-`7.0.0.0`.
+inheriting a permissive zero value. Package IDs and the `net10.0` target remain
+unchanged. Four public namespaces move from the `Handshakes` and
+`CapabilityTokens` vocabulary to `Acknowledgments` and `CapabilityGrants`; the
+binary assembly identity advances to `7.0.0.0`.
 
 Released stable package surfaces include Core, DependencyInjection,
 Storage.InMemory, EntityFrameworkCore, AspNetCore, Testing, Templates,
@@ -39,7 +36,7 @@ packages remain design-only, strategy-only, sample-only, host-owned, or
 future-provider work unless a later stable release explicitly ships them.
 
 The release process includes explicit [Release Cadence and Readiness](release-cadence-and-readiness.md) guidance for patch, minor, and major release selection, package metadata, Source Link, SBOM/provenance, documentation links, and future package identity or namespace changes.
-The most recently published verification evidence remains the [6.0.0 Consumer Verification Guide](consumer-verification-600.md) while the `7.0.0` release checklist is still being finalized.
+The current verification evidence is the [7.0.0 Consumer Verification Guide](consumer-verification-700.md).
 Consumers moving from the previous stable line must also follow the [Upgrade from 6.x to 7.0](upgrade-600-to-700.md) guide.
 
 ## Search and navigation

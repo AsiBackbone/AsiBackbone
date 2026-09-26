@@ -33,17 +33,14 @@ The DocFX header search is available for package names, API concepts, and articl
 
 ## Current stable package family
 
-Stable `7.x` package family. The latest published stable release is `6.0.0`.
-Repository `main` targets `7.0.0`, the prepared next release, which is not yet
-tagged or published. NuGet consumers remain on `6.0.0` until the release
-readiness checklist completes, `v7.0.0` is tagged, and its packages are
-published.
+Stable `7.x` package family. The current release is `7.0.0`.
 
 `7.0.0` binds acknowledgment responses to the challenged actor and makes
 unconfigured DLP failure behavior and intent risk levels fail explicitly instead of
-inheriting a permissive zero value. Package IDs, public namespaces, and the
-`net10.0` target remain unchanged; the binary assembly identity advances to
-`7.0.0.0`.
+inheriting a permissive zero value. Package IDs and the `net10.0` target remain
+unchanged. Four public namespaces move from the `Handshakes` and
+`CapabilityTokens` vocabulary to `Acknowledgments` and `CapabilityGrants`; the
+binary assembly identity advances to `7.0.0.0`.
 
 ```text
 AsiBackbone.Core

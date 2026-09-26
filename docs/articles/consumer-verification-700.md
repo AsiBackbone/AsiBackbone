@@ -49,6 +49,13 @@ as applicable.
   same `ActorId` and `ActorType` as the actor that received it. Confirm actor
   resolution is stable across both request legs and handle
   `acknowledgment.challenge.actor_mismatch`.
+- **Known actor binding:** confirm challenge creation and response handling
+  reject unknown, unauthenticated, `Unknown`-typed, and shared `"unknown"`
+  actors as `acknowledgment.challenge.actor_unbound`.
+- **Capability-grant binding:** construct execution-boundary validation with
+  `CreateBoundExecutionBoundary` and host-owned
+  `CapabilityGrantBindingExpectations`. Confirm a grant issued for another
+  subject or operation fails closed.
 - **DLP enum values:** `DlpFailureBehavior` and `DlpIntentRiskLevel` now use
   `Unspecified = 0`, shifting every former numeric value by one. Remap stored,
   serialized, transmitted, or numerically configured values; name-based values
@@ -70,6 +77,13 @@ as applicable.
 - **Unchanged signed contracts:** confirm that an artifact signed by a `6.x`
   host verifies under `7.0.0`, and that artifact tags and OpenTelemetry names
   seen by existing dashboards are unchanged.
+- **Typed artifact verification:** when the application consumes the typed
+  `Artifact` after verification, use `GovernanceArtifactVerifier.VerifyTypedAsync`
+  with the matching canonical-payload builder and signing options.
+- **NCAT adapter contract:** if the optional NCAT audit-completion adapter is
+  used, run `NcatContractVectorTests` and
+  `./scripts/Test-NcatContractVectorPin.ps1` to verify the vendored versioned
+  vectors against NCAT.
 
 ## Verify Source Link repository metadata
 
