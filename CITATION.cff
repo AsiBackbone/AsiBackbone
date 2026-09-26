@@ -2,7 +2,7 @@ cff-version: 1.2.0
 message: "If you use this software, please cite it using the metadata below."
 title: "ASI Backbone"
 version: "7.0.0"
-date-released: "2026-09-20"
+date-released: "2026-09-26"
 repository-code: "https://github.com/AsiBackbone/AsiBackbone"
 url: "https://asibackbone.github.io/AsiBackbone/"
 type: software
@@ -15,7 +15,7 @@ authors:
   - family-names: "Cavell"
     given-names: "Christopher D."
     orcid: "https://orcid.org/0009-0002-2113-0245"
-abstract: "AsiBackbone 7.0.0 is a major release of the Accountable Systems Infrastructure package family for .NET. It binds liability-handshake acknowledgment responses to the actor that received the challenge and adds explicit Unspecified zero values to the DLP failure-behavior and intent-risk enums so incomplete policy cannot silently inherit permissive defaults. Package IDs, public namespaces, and the net10.0 target remain unchanged; AssemblyVersion advances to 7.0.0.0."
+abstract: "AsiBackbone 7.0.0 is a major release of the Accountable Systems Infrastructure package family for .NET. It binds acknowledgment responses to the actor that received the challenge, binds capability grants to the expected subject and operation, and adds explicit Unspecified zero values to the DLP failure-behavior and intent-risk enums so incomplete policy cannot silently inherit permissive defaults. Package IDs and the net10.0 target remain unchanged; the Handshakes and CapabilityTokens namespaces are renamed to Acknowledgments and CapabilityGrants, and AssemblyVersion advances to 7.0.0.0."
 keywords:
   - asi-backbone
   - dotnet

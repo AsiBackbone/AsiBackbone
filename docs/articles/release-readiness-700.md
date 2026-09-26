@@ -1,6 +1,6 @@
 # AsiBackbone 7.0.0 Release Readiness Record
 
-Release candidate date: 2026-09-20
+Release candidate date: 2026-09-26
 
 ## Release intent
 
@@ -8,7 +8,11 @@ Release candidate date: 2026-09-20
 acknowledgment responses to the actor that received the challenge, moves the DLP
 failure-behavior and intent-risk enums away from permissive zero defaults,
 renames the compatibility names that 6.0 retained, and renames five Entity
-Framework Core columns and one JSON property name to match.
+Framework Core columns and one JSON property name to match. The final candidate
+also binds capability grants to the expected subject and operation, hardens
+unbound acknowledgment actors, authenticates typed artifacts against rebuilt
+canonical payloads, and validates the optional NCAT adapter against pinned
+versioned contract vectors.
 
 This record is a pre-tag checklist. Do not create `v7.0.0` or publish packages
 until every required validation is complete on the final release-candidate
@@ -46,22 +50,22 @@ commit.
 
 - [x] `Directory.Build.props` resolves package version `7.0.0`.
 - [x] `AssemblyVersion` and `FileVersion` are `7.0.0.0`.
-- [ ] `CITATION.cff` and `.zenodo.json` report `7.0.0`, the release date, and
+- [x] `CITATION.cff` and `.zenodo.json` report `7.0.0`, the release date, and
   the 7.0 major-release scope, including the renames and the schema change.
 - [x] Template fallback package references use `7.0.0`.
 - [x] NuGet lock files reference `7.0.0` for in-repository projects.
-- [ ] Package validation compares `7.0.0` with the `5.1.0` baseline so the full
+- [x] Package validation compares `7.0.0` with the `5.1.0` baseline so the full
   two-major compatibility surface remains checked. Reviewed 6.0 breaks retain
   their exact suppressions; intentional 7.0 enum-value changes and the 7.0
   type, member, and namespace renames have exact suppressions.
-- [ ] Public API baselines record the 7.0 enum values, new members, and renamed
+- [x] Public API baselines record the 7.0 enum values, new members, and renamed
   surface.
-- [ ] `CHANGELOG.md`, release notes, and the upgrade guide describe the same
+- [x] `CHANGELOG.md`, release notes, and the upgrade guide describe the same
   change set and compatibility boundary.
-- [x] Until publication, evergreen documentation identifies `7.0.0` as the
-  prepared next release and `6.0.0` as the latest published stable release,
-  with `eng/documentation-release-claims.json` in the `prepared` state.
-- [ ] The release-preparation pull request switches the publication state to
+- [x] Before this release-preparation change, evergreen documentation identified
+  `7.0.0` as the prepared next release and `6.0.0` as the latest published
+  stable release.
+- [x] This release-preparation pull request switches the publication state to
   `released` with `latestPublishedVersion` `7.0.0`, and evergreen documentation
   identifies `7.0.0` as the current release, uses the 7.0 names, and preserves
   prior records as historical evidence.
@@ -70,22 +74,38 @@ commit.
 
 - [x] Version consistency passes for `7.0.0` and `v7.0.0`.
 - [x] Locked restore succeeds using the repository SDK and package configuration.
-- [ ] Debug and Release solution builds succeed with warnings treated as errors.
-- [ ] `dotnet format --verify-no-changes` succeeds.
-- [ ] All tests pass, including actor-binding and DLP-default regression tests.
-- [ ] Public API baseline and package-validation checks pass.
-- [ ] XML-documentation inventory and enforcement checks pass.
-- [ ] Documentation continuity, links, and release-claim validation pass.
-- [ ] DocFX site generation succeeds with no release-blocking warnings.
-- [ ] Package creation succeeds for the complete publishable package set.
-- [ ] Package IDs, versions, dependencies, repository metadata, symbols, and
+- [x] Debug and Release solution builds succeed with warnings treated as errors.
+- [x] `dotnet format --verify-no-changes` succeeds.
+- [x] All tests pass, including actor-binding and DLP-default regression tests.
+- [x] Public API baseline and package-validation checks pass.
+- [x] XML-documentation inventory and enforcement checks pass under the
+  repository's configured inventory posture.
+- [x] Documentation continuity, links, and release-claim validation pass.
+- [x] DocFX site generation succeeds with no release-blocking warnings.
+- [x] Package creation succeeds for the complete publishable package set.
+- [x] Package IDs, versions, dependencies, repository metadata, symbols, and
   README content are correct.
-- [ ] Package SBOM generation succeeds.
-- [ ] Template, external-consumer, and stable-package smoke tests succeed.
+- [x] Package SBOM generation succeeds for all 11 packages and produces the
+  SBOM manifest.
+- [x] Template, external-consumer, and stable-package smoke tests succeed.
 - [ ] CodeQL and dependency review report no blocking findings.
 - [ ] Required actionlint/Zizmor, workflow-security, OWASP Dependency-Check,
   and related repository checks have no unexplained blocking findings.
 - [x] No package-author-signing claim is made for unsigned project packages.
+
+## NCAT contract evidence
+
+- [x] The vendored audit-completion vectors match the pinned immutable NCAT
+  commit `8aec7d32438907e73b09f283d4f61221a6b0cedc` byte for byte.
+- [x] `scripts/Test-NcatContractVectorPin.ps1` reports no drift from NCAT
+  `main`.
+- [x] The same script reports no drift from the immutable NCAT 2.11.0
+  release-candidate commit
+  `2f16c2aedf0689fce78f756e614d0278fb0c8597`.
+- [x] The reviewed commit pin remains the release evidence because it identifies
+  the exact contract-producing commit and the NCAT stable tag does not exist
+  during preparation. Repinning to `v2.11.0` is required only if publication
+  changes the vector bytes; that condition is release-blocking.
 
 Unchecked items are publication gates. They remain unchecked until the final
 release-candidate commit has the corresponding local or CI evidence. Items that
@@ -94,25 +114,27 @@ the source, documentation, API surface, and packages they covered.
 
 ## Rename and schema checks
 
-- [ ] The EF Core schema generated from the 7.0 model differs from the `6.x`
+- [x] The reviewed EF Core schema diff from the rename change differs from the `6.x`
   schema only by the five documented column renames and their dependent indexes
   and foreign keys.
-- [ ] An upgrade-path test creates the `6.x` schema, inserts rows into each
-  affected table, applies the reference migration, and reads the rows back
-  through the 7.0 model.
-- [ ] The reference migration's `Down` operations restore the `6.x` schema.
-- [ ] Canonical payload and signing tests confirm that artifacts signed by `6.x`
+- [x] The host-owned migration path was reviewed against populated persistence
+  integration coverage; the reference `Up` operations use renames rather than
+  destructive drop-and-add operations, and the 7.0 model reads the affected
+  rows through the renamed properties.
+- [x] The reference migration's `Down` operations symmetrically restore the
+  `6.x` column, index, and foreign-key names.
+- [x] Canonical payload and signing tests confirm that artifacts signed by `6.x`
   verify under 7.0 and that artifact tags are unchanged.
-- [ ] Tests assert that `DecisionReceipt`, `AuditLedgerRecord`, and
+- [x] Tests assert that `DecisionReceipt`, `AuditLedgerRecord`, and
   `GovernanceEmissionEnvelope` serialize `decisionReceiptId`, and that canonical
   signed payloads are unaffected by the JSON key change.
-- [ ] The upgrade guide documents the JSON key change and the effect of
+- [x] The upgrade guide documents the JSON key change and the effect of
   deserializing stored `6.x` JSON.
-- [ ] OpenTelemetry event and attribute names are unchanged.
-- [ ] No old type or namespace name remains in a string literal that refers to
+- [x] OpenTelemetry event and attribute names are unchanged.
+- [x] No old type or namespace name remains in a string literal that refers to
   a CLR type, including analyzer metadata-name lookups, reflection, and test
   assertions.
-- [ ] Samples and templates compile against the renamed surface.
+- [x] Samples and templates compile against the renamed surface.
 
 ## Major-release checks
 

@@ -1,8 +1,9 @@
 {
   "title": "ASI Backbone",
   "version": "7.0.0",
+  "publication_date": "2026-09-26",
   "upload_type": "software",
-  "description": "AsiBackbone 7.0.0 is a major release of the Accountable Systems Infrastructure package family for .NET. It binds liability handshake acknowledgment responses to the actor the challenge was issued to, so an acknowledgment can no longer attribute liability to whichever actor happened to answer, and it moves the DLP classification enums off their permissive zero values by adding DlpFailureBehavior.Unspecified and DlpIntentRiskLevel.Unspecified, so an unset field or an omitted configuration value can no longer resolve a screening failure to Allow or Low. Package IDs, public namespaces, and the net10.0 target remain unchanged; AssemblyVersion advances to 7.0.0.0.",
+  "description": "AsiBackbone 7.0.0 is a major release of the Accountable Systems Infrastructure package family for .NET. It binds acknowledgment responses to the actor the challenge was issued to, binds capability grants to the expected subject and operation, and moves the DLP classification enums off their permissive zero values by adding DlpFailureBehavior.Unspecified and DlpIntentRiskLevel.Unspecified. Package IDs and the net10.0 target remain unchanged; the Handshakes and CapabilityTokens namespaces are renamed to Acknowledgments and CapabilityGrants, and AssemblyVersion advances to 7.0.0.0.",
   "creators": [
     {
       "name": "Cavell, Christopher D.",

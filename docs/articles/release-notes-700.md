@@ -1,6 +1,6 @@
 # AsiBackbone 7.0.0 Release Notes
 
-Release date: 2026-09-20
+Release date: 2026-09-26
 
 ## Summary
 
@@ -172,6 +172,28 @@ migrated or translated when read. See
 [Decision receipt JSON uses `decisionReceiptId`](upgrade-600-to-700.md#decision-receipt-json-uses-decisionreceiptid).
 
 ## Additional changes
+
+- **Security:** capability-grant execution-boundary validation now compares the
+  signed grant's subject and operation with normalized host expectations.
+  `CreateBoundExecutionBoundary` requires
+  `CapabilityGrantBindingExpectations`; mismatches fail closed with stable
+  subject- or operation-mismatch results. The retained
+  `CreateExecutionBoundary` factory is obsolete and continues to fail closed.
+- **Security:** challenge creation and response handling reject unknown,
+  unauthenticated, `Unknown`-typed, and shared `"unknown"` actors with
+  `acknowledgment.challenge.actor_unbound`.
+- **Security:** `GovernanceArtifactVerifier.VerifyTypedAsync` authenticates a
+  typed artifact by rebuilding its canonical payload before signature
+  verification, closing the gap between an authentic retained payload and an
+  unrelated supplied object.
+- **Interoperability:** canonical JSON v1 is now documented as the normative
+  `asibackbone.canonical-json.v1` format and has expanded golden vectors. The
+  NCAT audit-completion adapter replays NCAT's pinned versioned contract vectors
+  without adding a packaged or compile-time dependency between repositories.
+- **Fixed:** EF Core claim acquisition restates eligibility in the update so a
+  waiting SQL Server or PostgreSQL worker cannot overwrite another worker's
+  newly acquired claim.
+- **Tooling:** the repository-pinned DocFX tool is updated to 2.81.0.
 
 - **Fixed:** `EfCoreGovernanceOutboxStore` claim transitions no longer silently
   do nothing when the entry was enqueued through the same `DbContext`. Previously

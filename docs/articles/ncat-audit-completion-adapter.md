@@ -179,6 +179,15 @@ The vectors are vendored from a pinned NCAT commit:
 | `tests/AsiBackbone.Samples.NcatAuditCompletionAdapter.Tests/ContractVectors/ncat/v1/audit-completion-vectors.json` | Exact bytes of NCAT's `contracts/audit-completion/v1/audit-completion-vectors.json` at the pinned revision |
 | `tests/AsiBackbone.Samples.NcatAuditCompletionAdapter.Tests/ContractVectors/ncat/ncat-contract-pin.json` | NCAT repository, pinned commit SHA, source path, and SHA-256 of the vendored file |
 
+For the AsiBackbone 7.0.0 release candidate, the reviewed commit pin
+`8aec7d32438907e73b09f283d4f61221a6b0cedc` remains the immutable release
+evidence. The vendored bytes match both NCAT `main` and the NCAT 2.11.0
+release-candidate commit `2f16c2aedf0689fce78f756e614d0278fb0c8597`.
+Keeping the contract-producing commit, rather than replacing it with a tag that
+does not yet exist during release preparation, preserves exact provenance. A
+later metadata-only repin to `v2.11.0` is unnecessary unless the published tag
+contains different vector bytes, which the drift check would reject.
+
 `NcatContractVectorTests` checks that:
 
 - the vendored file matches the pinned SHA-256;

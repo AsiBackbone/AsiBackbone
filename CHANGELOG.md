@@ -6,6 +6,8 @@ This project follows the spirit of [Keep a Changelog](https://keepachangelog.com
 
 ## [Unreleased]
 
+## [7.0.0] - 2026-09-26
+
 ### Added
 
 * The NCAT audit-completion adapter sample now validates NCAT completion messages against NCAT's versioned,
@@ -114,8 +116,6 @@ This project follows the spirit of [Keep a Changelog](https://keepachangelog.com
   Validation, and package-publishing workflows pass the tag on tag refs; package publication now requires a tag ref, so
   branch dispatches are pack-only. The release process switches the state in the release-preparation pull request
   (#812).
-
-## [7.0.0] - 2026-09-20
 
 ### Release summary
 

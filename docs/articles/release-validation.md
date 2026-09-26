@@ -1,17 +1,16 @@
 # Stable Release Validation
 
-This article documents the reusable release-blocking validation path for stable release lines. The stable package family maintained on `main` is `7.x`. The latest published stable release is `6.0.0`; `7.0.0` is the prepared next release and is not yet tagged or published.
+This article documents the reusable release-blocking validation path for stable release lines. The stable package family maintained on `main` is `7.x`, and the current stable release is `7.0.0`.
 
 The binary assembly identity for the `7.x` line is `7.0.0.0`.
 
 Release validation should confirm that the package family remains practical governance infrastructure and that implementation claims stay within the documented software boundary. See [Release Cadence and Readiness](release-cadence-and-readiness.md) for the release-stream and stabilization guidance that complements this checklist.
 
-The [6.0.0 Release Readiness Record](release-readiness-600.md) and the
-[6.0.0 Consumer Verification Guide](consumer-verification-600.md) remain
-the most recently completed release-control sheets while the `7.0.0`
-release evidence is still being finalized.
-The [7.0.0 Release Notes](release-notes-700.md) record the planned `7.x`
-release boundary.
+The [7.0.0 Release Readiness Record](release-readiness-700.md) and the
+[7.0.0 Consumer Verification Guide](consumer-verification-700.md) record the
+current release-control evidence.
+The [7.0.0 Release Notes](release-notes-700.md) record the `7.x` release
+boundary.
 The [Upgrade from 6.x to 7.0](upgrade-600-to-700.md) guide is
 authoritative for consumers moving from the previous stable line.
 Earlier readiness records are retained for traceability.

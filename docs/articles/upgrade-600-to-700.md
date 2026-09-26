@@ -1,8 +1,8 @@
 # Upgrade from 6.x to 7.0
 
-Version 7.0 is a major release with three groups of breaking changes:
+Version 7.0 is a major release with five groups of breaking changes:
 
-* **Two security corrections that change stable contracts.** It binds acknowledgment responses to the actor the challenge was issued to, and it moves `DlpFailureBehavior` and `DlpIntentRiskLevel` off their permissive zero values, which changes the numeric value of every existing member of both enums.
+* **Security corrections that change stable contracts.** It binds acknowledgment responses to the actor the challenge was issued to, binds capability grants to the expected subject and operation, and moves `DlpFailureBehavior` and `DlpIntentRiskLevel` off their permissive zero values, which changes the numeric value of every existing member of both enums.
 * **Completion of the 6.0 naming work.** The compatibility names that 6.0 retained (`AuditResidue*`, `LiabilityHandshake*`, `Handshake*`, and `CapabilityToken*`) are renamed to the current vocabulary: decision receipt, acknowledgment, and capability grant. Two namespaces change with them. No `[Obsolete]` forwarding aliases are provided.
 * **An EF Core schema change.** Five columns are renamed to match the new property names. Hosts that use `AsiBackbone.EntityFrameworkCore` must add and review a migration before deploying 7.0.
 * **A JSON property name change.** Types serialized with `System.Text.Json` now emit the renamed property names, so `auditResidueId` becomes `decisionReceiptId`. Consumers that parse or store this JSON must update. See [Decision receipt JSON uses `decisionReceiptId`](#decision-receipt-json-uses-decisionreceiptid).
@@ -75,6 +75,26 @@ it does not establish challenge lifetime or consume a challenge. `Acknowledgment
 nothing consumes a challenge when it is used, so a stored response payload remains replayable. Bounded-lifetime
 challenge state, revalidating authorization, and revalidating current policy before the consequential operation all
 remain host responsibilities. See [ASP.NET Core Integration Boundary](aspnetcore-integration-boundary.md).
+
+## Capability grants are bound to the expected subject and operation
+
+`CapabilityGrantValidator` now compares the signed grant's normalized
+`SubjectId` and `OperationName` with host-supplied expectations. A mismatch
+fails closed as `capability.subject-mismatch` or
+`capability.operation-mismatch` rather than allowing a valid grant issued for a
+different subject or operation to authorize execution.
+
+Use `CapabilityGrantValidationOptions.CreateBoundExecutionBoundary` and supply
+`CapabilityGrantBindingExpectations` from authenticated host context. The
+subject expectation is required; provide the requested operation whenever the
+grant is operation-bound. Do not derive either value from the grant itself.
+
+The retained `CreateExecutionBoundary` factory is marked obsolete with warning
+`ASIB901` and throws instead of constructing an unbound execution profile. It
+remains only for binary compatibility and is scheduled for removal at the next
+permitted major version. Reduced validation paths created with `Create` or
+`CreateMetadataValidation` may opt into the same checks with
+`WithExpectedBindings`.
 
 ## DLP classification enums no longer default to a permissive value
 
