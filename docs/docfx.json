@@ -42,6 +42,10 @@
       }
     ],
     "dest": "_site",
+    "sitemap": {
+      "baseUrl": "https://asibackbone.github.io/AsiBackbone/",
+      "changefreq": "weekly"
+    },
     "template": [
       "default",
       "modern"
