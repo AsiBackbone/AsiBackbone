@@ -13,7 +13,7 @@ Security review and vulnerability handling focus on the current stable `7.x` rel
 | Version line | Support posture |
 | --- | --- |
 | `7.x` | Supported stable line. Please prefer the latest available `7.x` patch when validating or reporting a concern. |
-| `6.x` | Previous stable line. Supported only for migration-sensitive reports that also affect or inform the current `7.x` package family. |
+| `6.x` | Previous stable line. High and Critical vulnerability fixes through 2027-03-26, six months after the `7.0.0` release. When a fix cannot be backported compatibly, a security advisory with host-side mitigation guidance is published instead. Other reports are handled only when they also affect or inform the `7.x` package family. |
 | `5.x`, `4.x`, `3.x` | Historical stable lines. Supported only for migration-sensitive reports that also affect or inform the current `7.x` package family. |
 | `2.x`, `1.x` | Historical stable lines. Supported only for migration-sensitive reports that also affect or inform the current `7.x` package family. |
 | `0.x`, alpha, beta, preview, or historical package lines | Not supported except when a maintainer explicitly asks for comparison or reproduction details. |

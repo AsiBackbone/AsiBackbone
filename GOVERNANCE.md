@@ -263,6 +263,15 @@ Any proposal that would create another package identity, namespace, or public AP
 break should explain why the change cannot wait, why a compatibility shim is not
 sufficient, and what consumer migration support will be provided.
 
+Breaking changes are governed by the
+[deprecation and major-release policy](docs/articles/api-compatibility-and-semver.md#deprecation-and-major-release-policy):
+an `[Obsolete]` warning with a shipped replacement before removal, a minimum
+deprecation window of 90 days and one subsequent minor release, at most one
+major release in any rolling six-month period, a 30-day public announcement
+before each major release, and six months of High and Critical vulnerability
+fixes for the preceding major line. A documented security exception may
+override these timelines.
+
 ### Stabilization window after major releases
 
 After a major release, maintainers should favor a stabilization window before
