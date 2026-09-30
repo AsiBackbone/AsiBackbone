@@ -7,9 +7,9 @@ It complements the historical stable API review tracked in [issue #13](https://g
 > [!NOTE]
 > Additive public API or package surface should use a minor version bump even when the change is backward-compatible. Patch releases should be reserved for fixes, documentation, packaging, tests, and implementation hardening that do not expand the stable public surface.
 
-## Compatibility promise for the stable `5.x` line
+## Compatibility promise within a stable major line
 
-Starting with `5.0.0`, packages identified as stable are expected to preserve their documented public API surface for consumers within the same major version. The same promise applied within the `4.x` line.
+Starting with `5.0.0`, packages identified as stable are expected to preserve their documented public API surface for consumers within the same major version. The same promise applied within the `4.x` line and applies within the `7.x` stable line maintained on `main`.
 
 The compatibility promise applies to:
 
@@ -114,6 +114,50 @@ AsiBackbone follows Semantic Versioning expectations after stabilization:
 
 For future releases, additive public API or package changes should be grouped into a minor release even when they are opt-in and backward-compatible.
 
+## Deprecation and major-release policy
+
+This policy applies to changes made after `7.0.0`. Releases `4.0.0` through `7.0.0` shipped within a short period, and some renamed or removed members in that span had no forwarding window. The rules below make the stable contract predictable for consumers who persist governance evidence or build long-lived integrations.
+
+### Deprecation before removal
+
+A stable public type, member, namespace, option, extension point, or documented default may be removed or renamed only in a major release, and only after it has been deprecated in a published release of the preceding major line.
+
+A deprecation is complete only when all of the following are true:
+
+- the member carries `[Obsolete]` as a compiler **warning**, not an error, with a stable `ASIB9xx` diagnostic ID and a message that names the replacement;
+- the replacement API ships in the same release as the deprecation, so consumers can migrate before the removal release exists;
+- a rename is delivered as an additive replacement plus an obsolete forwarding member, not as a removal-only change;
+- the changelog, release notes, and an `ASIB9xx` migration article describe the replacement and the earliest major version in which removal may occur.
+
+### Minimum deprecation window
+
+A deprecated member remains available for at least **90 days** after the first published release that deprecates it **and** through at least one subsequent published minor release of the same major line. Both conditions must be met before the removal release is tagged.
+
+Durable contracts follow the same window. Changes to persisted column names, serialized property names, canonical wire values, and enum numeric values require a published migration path, and where practical a compatible reader, before the release that removes the old shape.
+
+### Major-release spacing
+
+- At most one major release may be published in any rolling six-month period.
+- Following `7.0.0` (published 2026-09-26), the next major release will not be tagged before **2027-03-26**.
+- A planned major release is announced in GitHub Discussions at least **30 days** before it is tagged. The announcement lists every intended breaking change and links the deprecations already published for it.
+
+### Preceding major line after a new major release
+
+When a new major release is published, the preceding major line receives fixes for vulnerabilities rated **High** or **Critical** for **six months** after the new major release date. When a fix cannot be backported compatibly, the project publishes a security advisory with host-side mitigation guidance instead. Other reports against the preceding line are handled on a best-effort basis.
+
+### Security exception
+
+When an existing behavior is itself a High or Critical vulnerability and cannot be corrected compatibly, a breaking fix may ship before the deprecation window or the major-release spacing would otherwise allow. The release must identify the security justification and the related advisory, and must still include migration guidance and a host-side mitigation for consumers who cannot upgrade immediately. Fail-closed default changes made for security reasons fall under this exception; naming and ergonomic changes do not.
+
+### Checking a proposed break
+
+Before a breaking change is merged for a future major release, confirm that:
+
+- the replacement and the `[Obsolete]` deprecation are already published in the current major line;
+- the minimum deprecation window will have elapsed by the planned tag date;
+- the major-release spacing and the 30-day announcement requirement are satisfied, or the security exception is documented;
+- the migration article and changelog entry exist.
+
 ## Assembly version policy
 
 For the stable `7.x` package line, AsiBackbone keeps `AssemblyVersion` fixed at `7.0.0.0` for compatible minor and patch releases. NuGet package `Version`, `FileVersion`, and `InformationalVersion` continue to move with each package release.
@@ -160,7 +204,7 @@ Additive artifact fields are normally acceptable in a compatible minor release w
 
 ## Provider and future package guidance
 
-Released provider packages have their own stable contract within the compatible `5.x` line once they are published as stable packages. Documentation should state whether each package is stable, preview, experimental, design-only, strategy-only, sample-only, or host-owned integration guidance.
+Released provider packages have their own stable contract within the compatible `7.x` line once they are published as stable packages. Documentation should state whether each package is stable, preview, experimental, design-only, strategy-only, sample-only, or host-owned integration guidance.
 
 ## Release readiness checklist reference
 

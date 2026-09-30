@@ -45,13 +45,23 @@ Users should not expect:
 | Version line | Support expectation |
 |:---|:---|
 | `7.x` | Current stable line. Supported for reproducible defects, security fixes, compatible package corrections, and documentation fixes. Consumers should use the latest available `7.x` patch. |
-| `6.x` | Previous stable line. Best effort for migration-sensitive reports that also affect or inform the current stable line. |
+| `6.x` | Previous stable line. Fixes for High or Critical vulnerabilities through 2027-03-26, six months after the `7.0.0` release; a security advisory with mitigation guidance is published when a fix cannot be backported compatibly. Other reports are best effort. |
 | `5.x` | Historical stable line. Best effort for migration-sensitive reports that also affect or inform the current stable line. |
 | Earlier stable lines | Best effort for migration-sensitive reports that also affect or inform the current stable line. Historical releases do not receive routine backports. |
 | Alpha, beta, preview, and other prerelease builds | Evaluation only unless a maintainer explicitly requests testing or reproduction details. |
 | Unreleased `main` branch | Development line only. Behavior may change before release. |
 
 The security-specific lifecycle and private reporting process are authoritative in [SECURITY.md](SECURITY.md).
+
+## Deprecation and Breaking-Change Commitments
+
+The authoritative policy is [Deprecation and major-release policy](docs/articles/api-compatibility-and-semver.md#deprecation-and-major-release-policy). In summary:
+
+- Stable public APIs are removed or renamed only in a major release, after an `[Obsolete]` warning with an `ASIB9xx` diagnostic ID and a shipped replacement.
+- A deprecation stays available for at least 90 days and at least one subsequent minor release before removal.
+- At most one major release is published in any rolling six-month period, and each is announced in GitHub Discussions at least 30 days before tagging. The next major release after `7.0.0` will not be tagged before 2027-03-26.
+- After a new major release, the preceding line receives High and Critical vulnerability fixes for six months.
+- A High or Critical vulnerability that cannot be fixed compatibly may override these timelines; the release documents the justification and provides migration and mitigation guidance.
 
 ## Issue Triage
 

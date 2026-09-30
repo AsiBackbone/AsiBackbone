@@ -24,6 +24,8 @@ Minor releases should be paced enough to let additive surfaces be reviewed, docu
 
 Major releases should be rare. They should be reserved for identity, namespace, public API, durable artifact, binary identity, or package-boundary breaks that are strongly justified and documented in advance.
 
+The measurable rules for deprecation windows, major-release spacing, advance announcement, and preceding-line security fixes are defined in [Deprecation and major-release policy](api-compatibility-and-semver.md#deprecation-and-major-release-policy).
+
 ## Current `7.x` stabilization posture
 
 `7.x` is the stable package line maintained on `main`. The current stable release is `7.0.0`.
