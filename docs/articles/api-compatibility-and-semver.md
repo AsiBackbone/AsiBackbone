@@ -2,14 +2,14 @@
 
 This article defines the public API compatibility promise for the stable AsiBackbone package family and documents how semantic versioning applies after stabilization.
 
-It complements the historical stable API review tracked in [issue #13](https://github.com/AsiBackbone/AsiBackbone/issues/13). The `2.0.0` release moved public package IDs and namespaces from `CDCavell.AsiBackbone.*` to `AsiBackbone.*`. The `3.0.0` release established the prior binary assembly identity, `4.0.0` started the previous stable line, and `5.0.0` starts the current stable line while preserving the existing package IDs and namespaces.
+It complements the historical stable API review tracked in [issue #13](https://github.com/AsiBackbone/AsiBackbone/issues/13). The `2.0.0` release moved public package IDs and namespaces from `CDCavell.AsiBackbone.*` to `AsiBackbone.*`. The `3.0.0` release established the prior binary assembly identity, `4.0.0`, `5.0.0`, and `6.0.0` each started a previous stable line while preserving the existing package IDs and namespaces, and `7.0.0` starts the current `7.x` stable line maintained on `main`.
 
 > [!NOTE]
 > Additive public API or package surface should use a minor version bump even when the change is backward-compatible. Patch releases should be reserved for fixes, documentation, packaging, tests, and implementation hardening that do not expand the stable public surface.
 
 ## Compatibility promise within a stable major line
 
-Starting with `5.0.0`, packages identified as stable are expected to preserve their documented public API surface for consumers within the same major version. The same promise applied within the `4.x` line and applies within the `7.x` stable line maintained on `main`.
+Packages identified as stable are expected to preserve their documented public API surface for consumers within the same major version. This promise applies within the current `7.x` stable line maintained on `main`, and it applied in the same way within the earlier `4.x`, `5.x`, and `6.x` stable lines.
 
 The compatibility promise applies to:
 

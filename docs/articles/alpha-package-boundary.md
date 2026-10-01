@@ -3,7 +3,9 @@
 This article is a historical stable-era reference for the original intended `0.1.0-alpha.1` boundary for `AsiBackbone.Core`.
 
 > [!NOTE]
-> This page is preserved for project history and early package-boundary rationale. It describes the alpha planning posture before the stable `1.x` package family. Current stable package guidance is documented in [1.2.1 Release Notes](release-notes-121.md), [API Compatibility and Semantic Versioning](api-compatibility-and-semver.md), and [Historical Stable API Review](stable-api-review.md).
+> This page is preserved for project history and early package-boundary rationale. It describes the alpha planning posture before the stable `1.x` package family. Current stable package guidance is documented in [API Compatibility and Semantic Versioning](api-compatibility-and-semver.md) and [Releases & Compatibility](../releases/index.md).
+>
+> For the early stable-era record, see [1.2.1 Release Notes](release-notes-121.md) and [Historical Stable API Review](stable-api-review.md).
 
 
 At the alpha stage, `0.1.0-alpha.1` was intended to establish the first shared language for the package family. It was not intended to deliver persistence, web integration, signing infrastructure, robotics integration, or AI model functionality.
@@ -31,7 +33,7 @@ The alpha documentation and package metadata were expected to preserve these bou
 * Core had no robotics or physical execution dependency.
 * Core remained framework-neutral and host-neutral.
 
-These boundaries later informed the stable `1.x` package-family direction. Current stable package boundaries are documented in [API Compatibility and Semantic Versioning](api-compatibility-and-semver.md) and [1.2.1 Release Notes](release-notes-121.md).
+These boundaries later informed the stable `1.x` package-family direction. Current stable package boundaries are documented in [API Compatibility and Semantic Versioning](api-compatibility-and-semver.md) and [Releases & Compatibility](../releases/index.md).
 
 ## Initial package responsibility
 
@@ -94,7 +96,7 @@ The first alpha was not intended to include:
 * external system gateway SDKs
 * AI inference or training APIs
 
-Those areas were expected to become later package responsibilities after the Core language stabilized. In the stable `1.x` line, several of those areas are now represented as explicit package boundaries or host-owned integration seams and are carried forward into the current `1.2.x` package family, while AI inference, robotics control, production tamper-evidence, and compliance guarantees remain outside the default package claim.
+Those areas were expected to become later package responsibilities after the Core language stabilized. In the stable `1.x` line, several of those areas became explicit package boundaries or host-owned integration seams and were carried forward into the `1.2.x` package family, while AI inference, robotics control, production tamper-evidence, and compliance guarantees remained outside the default package claim.
 
 ## Historical implementation sequence
 
@@ -113,7 +115,7 @@ The early practical implementation sequence was:
 11. Gateway examples
 12. Robotics or high-risk external execution examples
 
-This sequence is retained as planning history. Current package status should be read from [1.2.1 Release Notes](release-notes-121.md) and the current package documentation.
+This sequence is retained as planning history. Current package status should be read from [Releases & Compatibility](../releases/index.md) and the current package documentation.
 
 ## Historical alpha acceptance checklist
 

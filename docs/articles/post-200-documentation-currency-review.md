@@ -2,6 +2,9 @@
 
 This record captures the post-release documentation currency review for issue #347.
 
+> [!NOTE]
+> This page is a historical record of the documentation currency review performed after the `2.0.0` release. Statements about the "current" stable package family describe the posture at the time of that review, not the current release line. For current stable package guidance, see [API Compatibility and Semantic Versioning](api-compatibility-and-semver.md) and [Releases & Compatibility](../releases/index.md).
+
 The review goal is to confirm that the public documentation still matches the stable `2.0.x` package family after the `2.0.0` release and continues to describe AsiBackbone as practical Accountable Systems Infrastructure: a governance spine for policy-controlled decision flow, not an intelligence engine or completed ASI implementation.
 
 ## Review scope
@@ -18,9 +21,9 @@ The review covered the public documentation surfaces most likely to shape first 
 - project-boundary and production-wording guidance;
 - package names, namespace wording, and stable-provider boundaries.
 
-## Current stable package family
+## Stable package family at the time of review
 
-The current stable documentation posture is `2.0.x`, with `2.0.0` as the current major release boundary for the simplified package and namespace identity:
+At the time of this review, the stable documentation posture was `2.0.x`, with `2.0.0` as the major release boundary for the simplified package and namespace identity:
 
 ```text
 AsiBackbone.Core

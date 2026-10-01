@@ -98,6 +98,7 @@ Assert-FixturePasses 'released-valid'
 Assert-FixturePasses 'released-valid' @('-ReleaseTag', 'v3.0.0')
 Assert-FixturePasses 'prepared-prerelease'
 Assert-FixturePasses 'prepared-prerelease' @('-ReleaseTag', 'v3.0.0-rc.1')
+Assert-FixturePasses 'historical-pointer-valid'
 
 Assert-FixtureFails 'prepared-current-claim' @(
     'README.md:1',
@@ -113,6 +114,12 @@ Assert-FixtureFails 'released-stale-wording' @(
     "published-release claim '2.0.0'",
     'README.md:3',
     "prepared-release claim '3.0.0'")
+
+Assert-FixtureFails 'historical-pointer-stale' @(
+    'docs/articles/history-review.md:3',
+    "links to version-specific page 'release-notes-100.md'",
+    'docs/articles/history-review.md:8',
+    "links to version-specific page 'upgrade-100-to-200.md'")
 
 Assert-FixtureFails 'prepared-valid' @("Release tag 'v3.0.0' requires publication.state 'released'") @('-ReleaseTag', 'v3.0.0')
 Assert-FixtureFails 'released-valid' @("Release tag 'v3.0.1' does not match Directory.Build.props version '3.0.0'") @('-ReleaseTag', 'v3.0.1')
