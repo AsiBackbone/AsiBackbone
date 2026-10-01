@@ -6,6 +6,14 @@ This project follows the spirit of [Keep a Changelog](https://keepachangelog.com
 
 ## [Unreleased]
 
+### Changed
+
+* Marked the pre-6.0 signature compatibility methods `GovernanceSignatureInput.CreateLegacy(...)` and
+  `VerificationPolicyContext.WithLegacySignatureInputAllowed()` obsolete with warning diagnostic `ASIB902`. The
+  methods remain available in the `7.x` line for historical artifact review and migration, while current signing and
+  verification should use the version 1 signature input path. Removal is deferred to the next permitted major version
+  (`8.0`). See the [ASIB902 migration guide](docs/articles/asib902-legacy-signature-input.md).
+
 ### Documentation
 
 * The published documentation site now includes an XML sitemap at

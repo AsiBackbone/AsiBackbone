@@ -84,6 +84,10 @@ public static class GovernanceSignatureInput
     /// </remarks>
     /// <param name="signingHash">The canonical payload hash value.</param>
     /// <returns>The UTF-8 bytes of the trimmed signing hash.</returns>
+    [Obsolete(
+        "CreateLegacy produces the pre-6.0 hash-only signature input and is retained only for migration compatibility. Use CreateV1(CanonicalPayloadHash, IReadOnlyDictionary<string, string>?) for new signing and verification. Planned removal in 8.0.",
+        DiagnosticId = "ASIB902",
+        UrlFormat = "https://asibackbone.github.io/AsiBackbone/articles/asib902-legacy-signature-input.html")]
     public static ReadOnlyMemory<byte> CreateLegacy(string signingHash)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(signingHash);

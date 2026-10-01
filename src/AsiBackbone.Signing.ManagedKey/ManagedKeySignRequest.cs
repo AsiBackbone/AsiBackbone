@@ -87,7 +87,9 @@ public sealed class ManagedKeySignRequest
     /// </remarks>
     public ReadOnlyMemory<byte> SignatureInput
     {
+#pragma warning disable ASIB902 // Retained internal fallback for pre-6.0 provider-request compatibility.
         get => signatureInput ?? GovernanceSignatureInput.CreateLegacy(SigningHash);
+#pragma warning restore ASIB902
         init => signatureInput = value.IsEmpty ? null : [.. value.Span];
     }
 

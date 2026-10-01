@@ -83,10 +83,31 @@ public sealed class GovernanceSignatureInputTests
     {
         CanonicalPayloadHash hash = CreateHash();
 
+#pragma warning disable ASIB902 // Exercise the retained pre-6.0 compatibility input intentionally.
         ReadOnlyMemory<byte> legacyInput = GovernanceSignatureInput.CreateLegacy(" 0123abcd ");
+#pragma warning restore ASIB902
 
         Assert.Equal("0123abcd", Encoding.UTF8.GetString(legacyInput.Span));
         Assert.False(legacyInput.Span.SequenceEqual(GovernanceSignatureInput.CreateV1(hash).Span));
+    }
+
+    /// <summary>
+    /// Verifies that the pre-6.0 input factory surfaces the ASIB902 migration warning without making it an error.
+    /// </summary>
+    [Fact]
+    public void CreateLegacyCarriesNonErrorObsoleteDiagnostic()
+    {
+        System.Reflection.MethodInfo method = Assert.Single(
+            typeof(GovernanceSignatureInput).GetMethods(),
+            candidate => candidate.Name == nameof(GovernanceSignatureInput.CreateLegacy));
+
+        ObsoleteAttribute obsolete = Assert.IsType<ObsoleteAttribute>(
+            Assert.Single(method.GetCustomAttributes(typeof(ObsoleteAttribute), inherit: false)));
+
+        Assert.False(obsolete.IsError);
+        Assert.Equal("ASIB902", obsolete.DiagnosticId);
+        Assert.Contains(nameof(GovernanceSignatureInput.CreateV1), obsolete.Message, StringComparison.Ordinal);
+        Assert.Contains("8.0", obsolete.Message, StringComparison.Ordinal);
     }
 
     /// <summary>
