@@ -75,8 +75,12 @@
       href: upgrade-500-to-600.md
     - name: API Compatibility and SemVer
       href: api-compatibility-and-semver.md
+    - name: "ASIB903: Outbox Drain Retry Clock"
+      href: asib903-outbox-retry-clock.md
     - name: "ASIB902: Legacy Signature Input Compatibility"
       href: asib902-legacy-signature-input.md
+    - name: "ASIB901: Legacy CreateExecutionBoundary"
+      href: asib901-create-execution-boundary.md
     - name: "ASIB900: Obsolete Policy Evaluator Constructors"
       href: asib900-policy-evaluator-constructors.md
 

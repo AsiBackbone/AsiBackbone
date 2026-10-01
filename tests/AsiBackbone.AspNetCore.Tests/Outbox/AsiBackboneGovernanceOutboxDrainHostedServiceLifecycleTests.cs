@@ -1,3 +1,4 @@
+#pragma warning disable ASIB903 // These tests cover the obsolete RetryClock compatibility path.
 using AsiBackbone.AspNetCore.Outbox;
 using AsiBackbone.Core.Emissions;
 using AsiBackbone.Core.Outbox;

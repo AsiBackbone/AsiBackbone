@@ -1,3 +1,4 @@
+#pragma warning disable ASIB903 // These tests pin drain time through the obsolete RetryClock compatibility path.
 using System.Collections.Concurrent;
 using AsiBackbone.AspNetCore.DependencyInjection;
 using AsiBackbone.AspNetCore.Outbox;

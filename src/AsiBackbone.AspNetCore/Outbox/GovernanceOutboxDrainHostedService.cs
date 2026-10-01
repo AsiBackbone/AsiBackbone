@@ -241,15 +241,17 @@ public sealed class GovernanceOutboxDrainHostedService(
     /// Resolves the drain timestamp for one drain cycle.
     /// </summary>
     /// <remarks>
-    /// A custom <see cref="GovernanceOutboxDrainWorkerOptions.RetryClock" /> is honored for compatibility. While it keeps
+    /// A custom <see cref="GovernanceOutboxDrainWorkerOptions.RetryClock" /> (obsolete, <c>ASIB903</c>) is honored for compatibility. While it keeps
     /// its default value, the registered <see cref="TimeProvider" /> supplies the time, so the worker, the drain, and the
     /// signing providers read one clock.
     /// </remarks>
     private DateTimeOffset ResolveDrainUtc(GovernanceOutboxDrainWorkerOptions options)
     {
+#pragma warning disable ASIB903 // A custom delegate is still honored for compatibility during the 7.x deprecation window.
         DateTimeOffset utcNow = ReferenceEquals(options.RetryClock, GovernanceOutboxDrainWorkerOptions.DefaultRetryClock)
             ? timeProvider.GetUtcNow()
             : options.RetryClock();
+#pragma warning restore ASIB903
 
         return utcNow.ToUniversalTime();
     }

@@ -49,13 +49,19 @@ public sealed class GovernanceOutboxDrainWorkerOptions
     internal static readonly Func<DateTimeOffset> DefaultRetryClock = static () => DateTimeOffset.UtcNow;
 
     /// <summary>
-    /// Gets or sets the retry clock used when finding retry-ready entries.
+    /// Obsolete. Gets or sets the retry clock used when finding retry-ready entries.
     /// </summary>
     /// <remarks>
-    /// Prefer registering a <see cref="TimeProvider" /> instead. While this property keeps its default value, the worker
-    /// reads the time from the registered <see cref="TimeProvider" />, which is the same clock the drain and the
-    /// signing providers use. Assigning a custom delegate overrides that clock for this worker only.
+    /// Register a <see cref="TimeProvider" /> instead. While this property keeps its default value, the worker reads the
+    /// time from the registered <see cref="TimeProvider" />, which is the same clock the drain and the signing providers
+    /// use. Assigning a custom delegate overrides that clock for this worker only, so retry-ready lookups can disagree
+    /// with drain claim leases and signing timestamps. The warning remains non-error in the 7.x line; removal is planned
+    /// for the next permitted major version.
     /// </remarks>
+    [Obsolete(
+        "RetryClock is a second clock for retry-ready lookups that can diverge from the drain and signing clocks. Register a TimeProvider instead; the worker, the drain, and the signing providers all read it. Planned removal in 8.0.",
+        DiagnosticId = "ASIB903",
+        UrlFormat = "https://asibackbone.github.io/AsiBackbone/articles/asib903-outbox-retry-clock.html")]
     public Func<DateTimeOffset> RetryClock { get; set; } = DefaultRetryClock;
 
     /// <summary>
@@ -98,9 +104,11 @@ public sealed class GovernanceOutboxDrainWorkerOptions
             throw new InvalidOperationException("Governance outbox drain shutdown timeout must be greater than zero.");
         }
 
+#pragma warning disable ASIB903 // Validation keeps rejecting a null delegate while the obsolete property exists.
         if (RetryClock is null)
         {
             throw new InvalidOperationException("Governance outbox drain retry clock must be configured.");
         }
+#pragma warning restore ASIB903
     }
 }

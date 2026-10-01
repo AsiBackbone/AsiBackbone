@@ -101,12 +101,14 @@ public sealed class VerificationPolicyContext
     /// <remarks>
     /// Use this only for reviewing or migrating artifacts signed before 6.0. Signing metadata labels on such artifacts,
     /// including the policy version and policy hash, are not covered by the signature.
+    /// <para>
+    /// This opt-in is a supported verification path, not a deprecated one. Governance evidence signed before 6.0 must
+    /// stay verifiable for its audit-retention period, and removing this method would leave no way to verify it.
+    /// Producing new hash-only signatures is deprecated separately through
+    /// <see cref="GovernanceSignatureInput.CreateLegacy" /> (<c>ASIB902</c>).
+    /// </para>
     /// </remarks>
     /// <returns>A context identical to this one with <see cref="AllowLegacySignatureInput" /> set.</returns>
-    [Obsolete(
-        "WithLegacySignatureInputAllowed permits pre-6.0 hash-only signature verification and is retained only for migration compatibility. Use VerificationPolicyContext.Default or VerificationPolicyContext.Create(...) without legacy fallback for current artifacts. Planned removal in 8.0.",
-        DiagnosticId = "ASIB902",
-        UrlFormat = "https://asibackbone.github.io/AsiBackbone/articles/asib902-legacy-signature-input.html")]
     public VerificationPolicyContext WithLegacySignatureInputAllowed()
     {
         return new VerificationPolicyContext(
