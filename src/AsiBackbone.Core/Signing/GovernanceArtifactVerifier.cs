@@ -143,6 +143,7 @@ public static class GovernanceArtifactVerifier
         SignatureVerificationResult versionOneResult,
         CancellationToken cancellationToken)
     {
+#pragma warning disable ASIB902 // Explicit legacy-verification path requested by the host.
         SignatureVerificationResult legacyResult = await verificationService
             .VerifyAsync(
                 CreateVerificationRequest(
@@ -151,6 +152,7 @@ public static class GovernanceArtifactVerifier
                     GovernanceSignatureInput.CreateLegacy(artifact.SigningHash)),
                 cancellationToken)
             .ConfigureAwait(false);
+#pragma warning restore ASIB902
 
         return !legacyResult.IsValid
             ? versionOneResult

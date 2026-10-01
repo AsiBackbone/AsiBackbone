@@ -136,11 +136,13 @@ public sealed class SignatureInputBindingTests
             service,
             cancellationToken: TestContext.Current.CancellationToken);
 
+#pragma warning disable ASIB902 // Exercise explicit pre-6.0 verification compatibility intentionally.
         VerificationPolicyOutcome outcome = await GovernanceArtifactVerifier.VerifyAsync(
             artifact,
             service,
             context: VerificationPolicyContext.Default.WithLegacySignatureInputAllowed(),
             cancellationToken: TestContext.Current.CancellationToken);
+#pragma warning restore ASIB902
 
         Assert.True(outcome.ShouldAllow);
         Assert.Equal(2, service.VerificationCount);
@@ -156,11 +158,13 @@ public sealed class SignatureInputBindingTests
         var service = new HmacSignatureService(signLegacyInput: true);
         SignedGovernanceArtifact<AuditLedgerRecord> artifact = await SignWithPolicyContextAsync(service);
 
+#pragma warning disable ASIB902 // Exercise explicit pre-6.0 verification compatibility intentionally.
         VerificationPolicyOutcome outcome = await GovernanceArtifactVerifier.VerifyAsync(
             artifact,
             service,
             context: VerificationPolicyContext.Create(expectedPolicyVersion: "policy-v1").WithLegacySignatureInputAllowed(),
             cancellationToken: TestContext.Current.CancellationToken);
+#pragma warning restore ASIB902
 
         Assert.False(outcome.ShouldAllow);
         Assert.Equal(SignatureVerificationCategory.UntrustedSigningContext, outcome.Category);
@@ -184,7 +188,9 @@ public sealed class SignatureInputBindingTests
             requiredHashAlgorithm: "SHA-256",
             metadata: new Dictionary<string, string>(StringComparer.Ordinal) { ["k"] = "v" });
 
+#pragma warning disable ASIB902 // Exercise explicit pre-6.0 verification compatibility intentionally.
         VerificationPolicyContext legacyContext = context.WithLegacySignatureInputAllowed();
+#pragma warning restore ASIB902
 
         Assert.False(context.AllowLegacySignatureInput);
         Assert.False(VerificationPolicyContext.Default.AllowLegacySignatureInput);
@@ -197,6 +203,26 @@ public sealed class SignatureInputBindingTests
         Assert.Equal(context.RequiredProvider, legacyContext.RequiredProvider);
         Assert.Equal(context.RequiredHashAlgorithm, legacyContext.RequiredHashAlgorithm);
         Assert.Equal("v", legacyContext.Metadata["k"]);
+    }
+
+    /// <summary>
+    /// Verifies that opting into pre-6.0 signature verification carries the same ASIB902 migration diagnostic.
+    /// </summary>
+    [Fact]
+    public void WithLegacySignatureInputAllowedCarriesNonErrorObsoleteDiagnostic()
+    {
+        System.Reflection.MethodInfo method = Assert.Single(
+            typeof(VerificationPolicyContext).GetMethods(),
+            candidate => candidate.Name == nameof(VerificationPolicyContext.WithLegacySignatureInputAllowed));
+
+        ObsoleteAttribute obsolete = Assert.IsType<ObsoleteAttribute>(
+            Assert.Single(method.GetCustomAttributes(typeof(ObsoleteAttribute), inherit: false)));
+
+        Assert.False(obsolete.IsError);
+        Assert.Equal("ASIB902", obsolete.DiagnosticId);
+        Assert.Contains("VerificationPolicyContext.Default", obsolete.Message, StringComparison.Ordinal);
+        Assert.Contains("VerificationPolicyContext.Create", obsolete.Message, StringComparison.Ordinal);
+        Assert.Contains("8.0", obsolete.Message, StringComparison.Ordinal);
     }
 
     private static ValueTask<SignedGovernanceArtifact<AuditLedgerRecord>> SignWithPolicyContextAsync(
@@ -279,9 +305,11 @@ public sealed class SignatureInputBindingTests
             ArgumentNullException.ThrowIfNull(request);
             cancellationToken.ThrowIfCancellationRequested();
 
+#pragma warning disable ASIB902 // Test double deliberately emits the pre-6.0 signature form.
             ReadOnlyMemory<byte> input = signLegacyInput
                 ? GovernanceSignatureInput.CreateLegacy(request.SigningHash)
                 : request.SignatureInput;
+#pragma warning restore ASIB902
             Dictionary<string, string> metadata = new(request.Metadata, StringComparer.Ordinal);
 
             if (returnedPolicyVersionOverride is not null)
