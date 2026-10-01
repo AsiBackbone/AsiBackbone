@@ -52,7 +52,7 @@ builder.Services.Configure<GovernanceOutboxOptions>(options =>
     options.DeferredDelay = TimeSpan.FromMinutes(5);
 });
 
-// The worker, the drain, and the signing providers read one registered clock.
+// The worker and drain use the registered clock; other TimeProvider-aware services can share it.
 builder.Services.AddSingleton(TimeProvider.System);
 
 builder.Services.AddAsiBackboneGovernanceOutboxDrainWorker(options =>
@@ -75,7 +75,7 @@ High-throughput production hosts should load-test the selected `BatchSize`, `Pol
 | `BatchSize` | `100` | Maximum number of pending/retry-ready entries attempted per drain pass. |
 | `PollingInterval` | `30s` | Delay between normal drain passes and the fallback check interval while disabled when the options source does not raise change notifications. |
 | `FailureDelay` | `30s` | Delay after runtime worker-level failures such as storage exceptions. Missing drain dependencies fail startup. Provider failures returned through the emitter are still persisted by the Core drain. |
-| `RetryClock` | Registered `TimeProvider` | Obsolete (`ASIB903`). A custom delegate overrides the registered clock for retry-ready lookups only. Register a `TimeProvider` instead, including a fake one in tests; see the [ASIB903 migration guide](asib903-outbox-retry-clock.md). |
+| `RetryClock` | Registered `TimeProvider` | Obsolete (`ASIB903`). A custom delegate supplies the explicit timestamp for the entire hosted drain cycle, including retry-ready checks, claim timing, and persisted drain transitions. Register a `TimeProvider` instead, including a fake one in tests; see the [ASIB903 migration guide](asib903-outbox-retry-clock.md). |
 | `DrainOnShutdown` | `false` | Optionally attempts one final drain pass after the background loop has stopped. Do not enable this on many replicas unless duplicate drain behavior is understood. |
 | `ShutdownDrainTimeout` | `5s` | Time budget for the optional shutdown drain. |
 

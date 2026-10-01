@@ -120,11 +120,53 @@ public sealed class SignatureInputRequestAnalyzer : DiagnosticAnalyzer
     {
         operation = Unwrap(operation);
 
-        return operation is IDefaultValueOperation || (operation is IPropertyReferenceOperation propertyReference
+        if (operation is IDefaultValueOperation)
+        {
+            return true;
+        }
+
+        if (operation is IPropertyReferenceOperation propertyReference
             && propertyReference.Property.Name.Equals("Empty", StringComparison.Ordinal)
-            && IsReadOnlyMemory(propertyReference.Property.ContainingType)) || (operation is IObjectCreationOperation objectCreation
+            && IsReadOnlyMemory(propertyReference.Property.ContainingType))
+        {
+            return true;
+        }
+
+        if (operation is IObjectCreationOperation objectCreation
             && objectCreation.Arguments.Length == 0
-            && IsReadOnlyMemory(objectCreation.Type));
+            && IsReadOnlyMemory(objectCreation.Type))
+        {
+            return true;
+        }
+
+        return IsArrayEmptyInvocation(operation) || IsStaticallyEmptyByteArray(operation);
+    }
+
+    private static bool IsArrayEmptyInvocation(IOperation operation)
+    {
+        return operation is IInvocationOperation invocation
+            && invocation.TargetMethod.Name.Equals("Empty", StringComparison.Ordinal)
+            && invocation.TargetMethod.ContainingType.SpecialType == SpecialType.System_Array
+            && invocation.TargetMethod.TypeArguments.Length == 1
+            && invocation.TargetMethod.TypeArguments[0].SpecialType == SpecialType.System_Byte;
+    }
+
+    private static bool IsStaticallyEmptyByteArray(IOperation operation)
+    {
+        if (operation is not IArrayCreationOperation arrayCreation
+            || arrayCreation.Type is not IArrayTypeSymbol arrayType
+            || arrayType.ElementType.SpecialType != SpecialType.System_Byte)
+        {
+            return false;
+        }
+
+        if (arrayCreation.Initializer is { ElementValues.Length: 0 })
+        {
+            return true;
+        }
+
+        return arrayCreation.DimensionSizes.Length == 1
+            && arrayCreation.DimensionSizes[0].ConstantValue is { HasValue: true, Value: 0 };
     }
 
     private static bool IsReadOnlyMemory(ITypeSymbol? type)

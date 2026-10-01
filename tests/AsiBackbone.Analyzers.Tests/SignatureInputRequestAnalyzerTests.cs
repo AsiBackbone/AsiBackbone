@@ -106,6 +106,38 @@ public sealed class SignatureInputRequestAnalyzerTests
     }
 
     /// <summary>
+    /// Tests that assigning <c>Array.Empty&lt;byte&gt;()</c> still reports the ASIB004 diagnostic.
+    /// </summary>
+    /// <returns>A task representing the asynchronous operation.</returns>
+    [Fact]
+    public async Task SigningRequestWithArrayEmptySignatureInputReportsASIB004()
+    {
+        string source = SourceWithBody(
+            "_ = new SigningRequest(\"hash\") { SignatureInput = Array.Empty<byte>() };");
+
+        ImmutableArray<Diagnostic> diagnostics = await GetAnalyzerDiagnosticsAsync(source);
+
+        Diagnostic diagnostic = Assert.Single(diagnostics);
+        Assert.Equal(SignatureInputRequestAnalyzer.DiagnosticId, diagnostic.Id);
+    }
+
+    /// <summary>
+    /// Tests that assigning a zero-length byte array still reports the ASIB004 diagnostic.
+    /// </summary>
+    /// <returns>A task representing the asynchronous operation.</returns>
+    [Fact]
+    public async Task SigningRequestWithZeroLengthArraySignatureInputReportsASIB004()
+    {
+        string source = SourceWithBody(
+            "_ = new SigningRequest(\"hash\") { SignatureInput = new byte[0] };");
+
+        ImmutableArray<Diagnostic> diagnostics = await GetAnalyzerDiagnosticsAsync(source);
+
+        Diagnostic diagnostic = Assert.Single(diagnostics);
+        Assert.Equal(SignatureInputRequestAnalyzer.DiagnosticId, diagnostic.Id);
+    }
+
+    /// <summary>
     /// Tests that a verification request created without a signature input reports the ASIB004 diagnostic.
     /// </summary>
     /// <returns>A task representing the asynchronous operation.</returns>

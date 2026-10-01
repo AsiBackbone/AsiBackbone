@@ -6,9 +6,9 @@ The property remains available in the `7.x` line, and a custom delegate is still
 
 ## Why the property is deprecated
 
-Since 7.0, the hosted outbox worker, `GovernanceOutboxDrain`, and the signing providers read the time from the registered `TimeProvider`. `RetryClock` predates that change. While it keeps its default value, the worker ignores it and reads the registered `TimeProvider`.
+Since 7.0, the hosted outbox worker and `GovernanceOutboxDrain` use the registered `TimeProvider` when the worker option keeps its default value. Other components that consume the registered clock, such as `LocalDevelopmentSigningService`, can share that same time source. `RetryClock` predates that arrangement.
 
-Assigning a custom delegate gives the worker a second clock. Retry-ready lookups then use that delegate, while drain claim leases and signing timestamps use the registered `TimeProvider`. If the two disagree, an entry can be treated as retry-ready at a different time than its lease or its recorded timestamps imply.
+Assigning a custom delegate bypasses the registered `TimeProvider` for the entire hosted drain cycle. The worker resolves the delegate once and passes that value as the explicit `utcNow` argument to `GovernanceOutboxDrain.DrainAsync(...)`. The drain then reuses that caller-supplied timestamp for retry-ready checks, claim-page and lease timing, and the persisted transition timestamps produced during that cycle. Other `TimeProvider` consumers continue to use the registered provider, so the custom delegate can make drain time disagree with them.
 
 ## Migrate
 
@@ -21,7 +21,7 @@ builder.Services.AddAsiBackboneGovernanceOutboxDrainWorker(options =>
     options.RetryClock = () => DateTimeOffset.UtcNow;
 });
 
-// After: one clock for the worker, the drain, and the signing providers.
+// After: one registered clock for the worker, the drain, and other TimeProvider-aware services.
 builder.Services.AddSingleton(TimeProvider.System);
 builder.Services.AddAsiBackboneGovernanceOutboxDrainWorker(options =>
 {

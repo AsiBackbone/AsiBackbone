@@ -23,9 +23,11 @@ This project follows the spirit of [Keep a Changelog](https://keepachangelog.com
   before 6.0 remains a supported opt-in with no planned removal, so governance evidence stays verifiable for its
   retention period.
 * Marked `GovernanceOutboxDrainWorkerOptions.RetryClock` obsolete with warning diagnostic `ASIB903`. A custom delegate
-  gave the hosted worker a second clock for retry-ready lookups that could disagree with the registered `TimeProvider`
-  used by the drain and the signing providers. Register a `TimeProvider` instead. A custom delegate is still honored in
-  the `7.x` line, and removal is deferred to `8.0`. See the
+  bypasses the registered `TimeProvider` for the hosted drain cycle by supplying the explicit timestamp passed to
+  `GovernanceOutboxDrain.DrainAsync(...)`; that timestamp is then used for retry-ready checks, claim timing, and persisted
+  drain transitions. It can therefore disagree with other `TimeProvider` consumers, such as local-development signing.
+  Register a `TimeProvider` instead. A custom delegate is still honored in the `7.x` line, and removal is deferred to
+  `8.0`. See the
   [ASIB903 migration guide](docs/articles/asib903-outbox-retry-clock.md).
 
 ### Documentation
