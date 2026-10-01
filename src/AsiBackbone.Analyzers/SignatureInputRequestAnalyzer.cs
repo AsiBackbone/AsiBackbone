@@ -122,9 +122,9 @@ public sealed class SignatureInputRequestAnalyzer : DiagnosticAnalyzer
 
         return operation is IDefaultValueOperation || (operation is IPropertyReferenceOperation propertyReference
             && propertyReference.Property.Name.Equals("Empty", StringComparison.Ordinal)
-            && IsReadOnlyMemory(propertyReference.Property.ContainingType)) || (operation is IObjectCreationOperation objectCreation
+            && IsMemoryLike(propertyReference.Property.ContainingType)) || (operation is IObjectCreationOperation objectCreation
             && objectCreation.Arguments.Length == 0
-            && IsReadOnlyMemory(objectCreation.Type)) || IsArrayEmptyInvocation(operation) || IsStaticallyEmptyByteArray(operation);
+            && IsMemoryLike(objectCreation.Type)) || IsArrayEmptyInvocation(operation) || IsStaticallyEmptyByteArray(operation);
     }
 
     private static bool IsArrayEmptyInvocation(IOperation operation)
@@ -144,11 +144,12 @@ public sealed class SignatureInputRequestAnalyzer : DiagnosticAnalyzer
             && arrayCreation.DimensionSizes[0].ConstantValue is { HasValue: true, Value: 0 }));
     }
 
-    private static bool IsReadOnlyMemory(ITypeSymbol? type)
+    private static bool IsMemoryLike(ITypeSymbol? type)
     {
         return type is INamedTypeSymbol namedType
-            && namedType.Name.Equals("ReadOnlyMemory", StringComparison.Ordinal)
             && namedType.Arity == 1
+            && (namedType.Name.Equals("Memory", StringComparison.Ordinal)
+                || namedType.Name.Equals("ReadOnlyMemory", StringComparison.Ordinal))
             && namedType.ContainingNamespace?.ToDisplayString().Equals("System", StringComparison.Ordinal) == true;
     }
 

@@ -106,6 +106,38 @@ public sealed class SignatureInputRequestAnalyzerTests
     }
 
     /// <summary>
+    /// Tests that assigning <see cref="Memory{T}.Empty"/> still reports the ASIB004 diagnostic.
+    /// </summary>
+    /// <returns>A task representing the asynchronous operation.</returns>
+    [Fact]
+    public async Task SigningRequestWithEmptyMemorySignatureInputReportsASIB004()
+    {
+        string source = SourceWithBody(
+            "_ = new SigningRequest(\"hash\") { SignatureInput = Memory<byte>.Empty };");
+
+        ImmutableArray<Diagnostic> diagnostics = await GetAnalyzerDiagnosticsAsync(source);
+
+        Diagnostic diagnostic = Assert.Single(diagnostics);
+        Assert.Equal(SignatureInputRequestAnalyzer.DiagnosticId, diagnostic.Id);
+    }
+
+    /// <summary>
+    /// Tests that constructing an empty <see cref="Memory{T}"/> still reports the ASIB004 diagnostic.
+    /// </summary>
+    /// <returns>A task representing the asynchronous operation.</returns>
+    [Fact]
+    public async Task SigningRequestWithConstructedEmptyMemorySignatureInputReportsASIB004()
+    {
+        string source = SourceWithBody(
+            "_ = new SigningRequest(\"hash\") { SignatureInput = new Memory<byte>() };");
+
+        ImmutableArray<Diagnostic> diagnostics = await GetAnalyzerDiagnosticsAsync(source);
+
+        Diagnostic diagnostic = Assert.Single(diagnostics);
+        Assert.Equal(SignatureInputRequestAnalyzer.DiagnosticId, diagnostic.Id);
+    }
+
+    /// <summary>
     /// Tests that assigning <c>Array.Empty&lt;byte&gt;()</c> still reports the ASIB004 diagnostic.
     /// </summary>
     /// <returns>A task representing the asynchronous operation.</returns>
