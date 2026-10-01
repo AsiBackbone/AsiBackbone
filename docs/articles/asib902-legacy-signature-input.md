@@ -5,7 +5,7 @@
 - `GovernanceSignatureInput.CreateLegacy(string)`
 - `VerificationPolicyContext.WithLegacySignatureInputAllowed()`
 
-Both methods remain callable in the `7.x` line. The warning is not an error. Their purpose is limited to reviewing or migrating artifacts produced before 6.0, when providers signed only the UTF-8 text of the canonical payload hash.
+Both methods remain callable in the `7.x` line. `ASIB902` is emitted as a compiler warning, but projects that enable `TreatWarningsAsErrors` (or otherwise promote warnings to errors) will fail to build until the affected call sites are migrated or the diagnostic is narrowly suppressed. AsiBackbone itself enables `TreatWarningsAsErrors`, so consumers using the same policy should treat this warning as an upgrade-blocking migration item. Their purpose is limited to reviewing or migrating artifacts produced before 6.0, when providers signed only the UTF-8 text of the canonical payload hash.
 
 ## Why these methods are deprecated
 
