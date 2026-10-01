@@ -5,11 +5,21 @@ using Microsoft.CodeAnalysis.Operations;
 
 namespace AsiBackbone.Analyzers;
 
+/// <summary>
+/// Reports signing and verification request construction that omits an explicit signature input.
+/// </summary>
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
 public sealed class SignatureInputRequestAnalyzer : DiagnosticAnalyzer
 {
+    /// <summary>
+    /// Gets the diagnostic identifier reported when a supported request omits
+    /// an explicit signature input.
+    /// </summary>
     public const string DiagnosticId = "ASIB004";
 
+    /// <summary>
+    /// Gets the name of the property that must be set to avoid falling back to the pre-6.0 hash-only signature input.
+    /// </summary>
     private const string SignatureInputPropertyName = "SignatureInput";
 
     /// <remarks>
@@ -32,8 +42,15 @@ public sealed class SignatureInputRequestAnalyzer : DiagnosticAnalyzer
         isEnabledByDefault: true,
         description: "A signing or verification request without an explicit SignatureInput signs or verifies the UTF-8 text of the signing hash alone. That pre-6.0 input does not authenticate the canonical descriptors or the signing policy version and hash, and a signature produced from it fails default version 1 verification. GovernanceArtifactSigner and GovernanceArtifactVerifier set the input automatically.");
 
+    /// <summary>
+    /// Gets the diagnostics supported by this analyzer.
+    /// </summary>
     public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => [Rule];
 
+    /// <summary>
+    /// Initializes the analyzer and registers operation analysis.
+    /// </summary>
+    /// <param name="context">The analysis context used to register analyzer actions.</param>
     public override void Initialize(AnalysisContext context)
     {
         context.ConfigureGeneratedCodeAnalysis(GeneratedCodeAnalysisFlags.None);
