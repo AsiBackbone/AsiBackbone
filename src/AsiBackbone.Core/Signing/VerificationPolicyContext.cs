@@ -104,7 +104,7 @@ public sealed class VerificationPolicyContext
     /// </remarks>
     /// <returns>A context identical to this one with <see cref="AllowLegacySignatureInput" /> set.</returns>
     [Obsolete(
-        "WithLegacySignatureInputAllowed permits pre-6.0 hash-only signature verification and is retained only for migration compatibility. Use the default version 1 verification path without legacy fallback for current artifacts. Planned removal in 8.0.",
+        "WithLegacySignatureInputAllowed permits pre-6.0 hash-only signature verification and is retained only for migration compatibility. Use VerificationPolicyContext.Default or VerificationPolicyContext.Create(...) without legacy fallback for current artifacts. Planned removal in 8.0.",
         DiagnosticId = "ASIB902",
         UrlFormat = "https://asibackbone.github.io/AsiBackbone/articles/asib902-legacy-signature-input.html")]
     public VerificationPolicyContext WithLegacySignatureInputAllowed()

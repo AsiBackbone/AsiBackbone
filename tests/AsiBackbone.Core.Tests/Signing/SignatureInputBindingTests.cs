@@ -220,7 +220,8 @@ public sealed class SignatureInputBindingTests
 
         Assert.False(obsolete.IsError);
         Assert.Equal("ASIB902", obsolete.DiagnosticId);
-        Assert.Contains("version 1", obsolete.Message, StringComparison.OrdinalIgnoreCase);
+        Assert.Contains("VerificationPolicyContext.Default", obsolete.Message, StringComparison.Ordinal);
+        Assert.Contains("VerificationPolicyContext.Create", obsolete.Message, StringComparison.Ordinal);
         Assert.Contains("8.0", obsolete.Message, StringComparison.Ordinal);
     }
 
