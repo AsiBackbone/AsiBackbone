@@ -33,7 +33,8 @@ This project follows the spirit of [Keep a Changelog](https://keepachangelog.com
   October 19, 2026. Moving to a newer runner image is now an explicit, reviewable change.
 * Project branch-status automation no longer fails issue-branch pushes when the issue is not yet in the project. The
   project App token is limited to organization Projects (#815), so it cannot add items to a project owned by a personal
-  account; the workflow now reports a `Project status not updated` warning instead. Project PR-status automation
+  account; the workflow now reports that `Resource not accessible by integration` error as a `Project status not
+  updated` warning instead. Any other failure to add the issue still fails the job. Project PR-status automation
   reports the same warning when a linked issue is not in the project, rather than skipping it silently. Removed the
   commented-out branch-name parser.
 * The template package smoke test sets `DOTNET_ADD_GLOBAL_TOOLS_TO_PATH=false`, so its isolated `DOTNET_CLI_HOME` no
