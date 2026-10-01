@@ -1,17 +1,17 @@
 # Design-Only: Event Hubs Governance Emission Provider
 
-This article documents a **design-only** future provider strategy for an optional Event Hubs governance emission provider. It is retained as planning guidance after the released `1.1.0 - Observability, Outbox, Signing, and Governance Emission Providers` package-family boundary.
+This article documents a **design-only** future provider strategy for an optional Event Hubs governance emission provider. It originated as planning guidance after the released `1.1.0 - Observability, Outbox, Signing, and Governance Emission Providers` package-family boundary and remains design-only in the current `7.0.0` stable package family.
 
 Issue: #145.
 
 AsiBackbone is a governance spine for consequential software decision flow. It is not a streaming platform, SIEM product, cloud governance platform, signing product, or compliance guarantee by itself.
 
 > [!IMPORTANT]
-> This page does **not** document a released NuGet package. No Event Hubs provider package, Azure Event Hubs SDK adapter, Azure-specific emission package, or Event Hubs publishing implementation is included in the `1.1.0` stable package family.
+> This page does **not** document a released NuGet package. No Event Hubs provider package, Azure Event Hubs SDK adapter, Azure-specific emission package, or Event Hubs publishing implementation is included in the current `7.0.0` stable package family.
 >
-> `AsiBackbone.OpenTelemetry` is the only concrete released governance emission provider package in `1.1.0`. Event Hubs remains a future/design-only provider direction unless a later release separately reviews and ships it.
+> `AsiBackbone.OpenTelemetry` remains the concrete released governance emission provider package in `7.0.0`. Event Hubs remains a future/design-only provider direction unless a later release separately reviews and ships it.
 >
-> See [1.1.0 Release Notes - Accepted deferrals](release-notes-110.md#accepted-deferrals) for the current release boundary.
+> See [1.1.0 Release Notes - Accepted deferrals](release-notes-110.md#accepted-deferrals) for the historical origin of this deferral and the [7.0.0 Release Notes](release-notes-700.md) for the current stable release boundary.
 
 > [!NOTE]
 > Event Hubs is a downstream streaming boundary. It must not replace durable local decision receipt, durable outbox persistence, policy evaluation, acknowledgment, capability-token, or gateway records.
@@ -49,7 +49,7 @@ AsiBackbone.Azure.EventHubs
 AsiBackbone.Observability.EventHubs
 ```
 
-These names are planning candidates only. They are not part of the released `1.1.0` package list.
+These names are planning candidates only. They are not part of the released `7.0.0` package list.
 
 A future package should depend on:
 
@@ -327,7 +327,7 @@ Before implementation begins, confirm:
 | #140 Durable outbox | Event Hubs emission should happen after local durable outbox persistence. |
 | #141 Lifecycle stages | Lifecycle stage and sequence should be present in the envelope and safe message properties. |
 | #142 Decision receipt telemetry | Trace, latency, gateway, outbox, and PII-safe identifiers provide provider mapping fields. |
-| #144 OpenTelemetry provider | OpenTelemetry is the released `1.1.0` governance emission provider; Event Hubs remains a future Azure streaming provider design. |
+| #144 OpenTelemetry provider | OpenTelemetry remains the released governance emission provider in `7.0.0`; Event Hubs remains a future Azure streaming provider design. |
 | #149 Observability architecture | This provider design follows the Core-neutral provider package architecture. |
 | #187 Governance emission contract | The provider implements the neutral `IGovernanceEmitter` seam. |
 | #193 No-op outbox drain | The no-op proof path validates the drain sequence before this real provider is added. |
@@ -349,7 +349,7 @@ Before implementation begins, confirm:
 This design-only provider page does not implement:
 
 * Event Hubs publishing code;
-* an Event Hubs NuGet package in the `1.1.0` stable package family;
+* an Event Hubs NuGet package in the current `7.0.0` stable package family;
 * Event Hubs namespace or event hub provisioning;
 * Azure Monitor direct emission;
 * OpenTelemetry export configuration;

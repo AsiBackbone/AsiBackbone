@@ -170,7 +170,7 @@ Failure results expose only the exception type name. Detailed diagnostics should
 
 ## NCAT contract vectors
 
-The adapter models NCAT independently, so both repositories could drift while their own tests stay green. To prevent that, the sample tests replay NCAT's published, machine-readable [audit-completion contract vectors](https://github.com/AsiBackbone/NetCoreApplicationTemplate/blob/main/contracts/audit-completion/README.md). Neither product takes a compile-time dependency on the other.
+The adapter models NCAT independently, so both repositories could drift while their own tests stay green. To prevent that, the sample tests replay NCAT's published, machine-readable [audit-completion contract vectors](https://github.com/AsiBackbone/NetCoreApplicationTemplate/blob/v2.11.0/contracts/audit-completion/README.md). The published `v2.11.0` tag and `v1` contract path are the stable external compatibility baseline. Neither product takes a compile-time dependency on the other.
 
 The vectors are vendored from a pinned NCAT commit:
 
@@ -179,14 +179,14 @@ The vectors are vendored from a pinned NCAT commit:
 | `tests/AsiBackbone.Samples.NcatAuditCompletionAdapter.Tests/ContractVectors/ncat/v1/audit-completion-vectors.json` | Exact bytes of NCAT's `contracts/audit-completion/v1/audit-completion-vectors.json` at the pinned revision |
 | `tests/AsiBackbone.Samples.NcatAuditCompletionAdapter.Tests/ContractVectors/ncat/ncat-contract-pin.json` | NCAT repository, pinned commit SHA, source path, and SHA-256 of the vendored file |
 
-For the AsiBackbone 7.0.0 release candidate, the reviewed commit pin
+For the published AsiBackbone 7.0.0 release, the reviewed commit pin
 `8aec7d32438907e73b09f283d4f61221a6b0cedc` remains the immutable release
-evidence. The vendored bytes match both NCAT `main` and the NCAT 2.11.0
-release-candidate commit `2f16c2aedf0689fce78f756e614d0278fb0c8597`.
-Keeping the contract-producing commit, rather than replacing it with a tag that
-does not yet exist during release preparation, preserves exact provenance. A
-later metadata-only repin to `v2.11.0` is unnecessary unless the published tag
-contains different vector bytes, which the drift check would reject.
+evidence. The vendored bytes also match the published NCAT `v2.11.0` / `v1`
+contract baseline. Keeping the exact contract-producing commit in
+`ncat-contract-pin.json` preserves byte-level provenance for the AsiBackbone
+release, while external consumers should pin the published `v2.11.0` tag and
+`v1` contract path. NCAT `main` is checked separately for drift and is not the
+stable compatibility baseline.
 
 `NcatContractVectorTests` checks that:
 
@@ -202,7 +202,7 @@ Valid vectors, invalid messages, and no-message scenarios are replayed from the 
 
 ### Drift reporting
 
-The `NCAT Contract Vectors` workflow runs weekly, on demand, and on pull requests that change the vendored vectors. `scripts/Test-NcatContractVectorPin.ps1` confirms that the vendored bytes still match the pinned NCAT revision. It then compares them with NCAT `main` and fails with a summary when NCAT publishes different vectors, removes them, or adds a newer contract major version. If it cannot list NCAT's contract versions, it reports that as a finding rather than passing on an incomplete check. The weekly failure is the signal that the pin needs review; it does not block unrelated pull requests. Pull request runs execute the contributor's copy of the script, so they call the public NCAT endpoints without a GitHub token; only scheduled and manual runs, which maintainers trigger, pass one, to raise the API rate limit.
+The `NCAT Contract Vectors` workflow runs weekly, on demand, and on pull requests that change the vendored vectors. `scripts/Test-NcatContractVectorPin.ps1` confirms that the vendored bytes still match the pinned NCAT revision. It then compares them with NCAT `main` as a change detector and fails with a summary when NCAT publishes different vectors, removes them, or adds a newer contract major version. NCAT `main` is not the stable compatibility baseline; the published `v2.11.0` / `v1` contract is. If the workflow cannot list NCAT's contract versions, it reports that as a finding rather than passing on an incomplete check. The weekly failure is the signal that the pin needs review; it does not block unrelated pull requests. Pull request runs execute the contributor's copy of the script, so they call the public NCAT endpoints without a GitHub token; only scheduled and manual runs, which maintainers trigger, pass one, to raise the API rate limit.
 
 ### Updating the pinned vectors
 
