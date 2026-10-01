@@ -98,6 +98,9 @@ cat > "$work_root/NuGet.config" <<NUGETCONFIG
 NUGETCONFIG
 
 export DOTNET_CLI_HOME="$work_root/.dotnet-home"
+# The isolated CLI home triggers the .NET first-run experience, which on Windows permanently
+# appends "$DOTNET_CLI_HOME/.dotnet/tools" to the user PATH. Keep the smoke run side-effect free.
+export DOTNET_ADD_GLOBAL_TOOLS_TO_PATH=false
 mkdir -p "$DOTNET_CLI_HOME"
 
 dotnet new install "$template_package"

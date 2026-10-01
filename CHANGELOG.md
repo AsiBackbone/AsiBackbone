@@ -29,6 +29,21 @@ This project follows the spirit of [Keep a Changelog](https://keepachangelog.com
   Register a `TimeProvider` instead. A custom delegate is still honored in the `7.x` line, and removal is deferred to
   `8.0`. See the
   [ASIB903 migration guide](docs/articles/asib903-outbox-retry-clock.md).
+* Pinned every workflow job to `ubuntu-24.04` instead of `ubuntu-latest`, which GitHub migrates to Ubuntu 26 beginning
+  October 19, 2026. Moving to a newer runner image is now an explicit, reviewable change.
+* Project branch-status automation no longer fails issue-branch pushes when the issue is not yet in the project. The
+  project App token is limited to organization Projects (#815), so it cannot add items to a project owned by a personal
+  account; the workflow now reports a `Project status not updated` warning instead. Project PR-status automation
+  reports the same warning when a linked issue is not in the project, rather than skipping it silently. Removed the
+  commented-out branch-name parser.
+* The template package smoke test sets `DOTNET_ADD_GLOBAL_TOOLS_TO_PATH=false`, so its isolated `DOTNET_CLI_HOME` no
+  longer adds a temporary `.dotnet/tools` directory to the Windows user `PATH` on every local run.
+* Updated test, sample, and infrastructure dependencies: `FsCheck` 3.4.0, `coverlet.MTP` 10.1.0,
+  `Npgsql.EntityFrameworkCore.PostgreSQL` 10.0.3, `SQLitePCLRaw.bundle_e_sqlite3` 3.0.5, and `Aspire.Hosting.AppHost`
+  13.6.0. Shipped package dependencies are unchanged; `Microsoft.CodeAnalysis.*` stays at 5.6.0 so the analyzer's
+  minimum consumer compiler version does not rise.
+* Dependabot commit messages use the prefix `chore` with the dependency scope, producing `chore(deps): ...` instead of
+  `chore(deps)(deps): ...`.
 
 ### Documentation
 

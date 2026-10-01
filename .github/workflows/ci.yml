@@ -32,7 +32,7 @@ env:
 jobs:
   dependency-review:
     name: Dependency review
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
 
     if: github.event_name == 'pull_request'
 
@@ -54,7 +54,7 @@ jobs:
 
   build-test-pack:
     name: Build, test, and pack
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     permissions:
       contents: read
       id-token: write
@@ -239,7 +239,7 @@ jobs:
 
   efcore-provider-contention:
     name: EF Core provider contention
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 30
 
     permissions:
@@ -303,7 +303,7 @@ jobs:
 
   codeql-analysis:
     name: CodeQL analysis
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
 
     permissions:
       actions: read

@@ -31,7 +31,7 @@ env:
 jobs:
   stable-release-validation:
     name: Restore, build, test, docs, pack, and smoke
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
 
     permissions:
       contents: read
@@ -195,7 +195,7 @@ jobs:
     name: Attest validated package artifacts
     if: github.event_name != 'pull_request'
     needs: stable-release-validation
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
 
     permissions:
       contents: read
