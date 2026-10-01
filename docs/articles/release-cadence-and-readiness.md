@@ -45,7 +45,7 @@ The publication state is declared in `eng/documentation-release-claims.json`:
 ```json
 "publication": {
   "state": "prepared",
-  "latestPublishedVersion": "6.0.0"
+  "latestPublishedVersion": "<latest published stable version>"
 }
 ```
 
