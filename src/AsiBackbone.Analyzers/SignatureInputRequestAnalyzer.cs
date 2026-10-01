@@ -120,26 +120,11 @@ public sealed class SignatureInputRequestAnalyzer : DiagnosticAnalyzer
     {
         operation = Unwrap(operation);
 
-        if (operation is IDefaultValueOperation)
-        {
-            return true;
-        }
-
-        if (operation is IPropertyReferenceOperation propertyReference
+        return operation is IDefaultValueOperation || (operation is IPropertyReferenceOperation propertyReference
             && propertyReference.Property.Name.Equals("Empty", StringComparison.Ordinal)
-            && IsReadOnlyMemory(propertyReference.Property.ContainingType))
-        {
-            return true;
-        }
-
-        if (operation is IObjectCreationOperation objectCreation
+            && IsReadOnlyMemory(propertyReference.Property.ContainingType)) || (operation is IObjectCreationOperation objectCreation
             && objectCreation.Arguments.Length == 0
-            && IsReadOnlyMemory(objectCreation.Type))
-        {
-            return true;
-        }
-
-        return IsArrayEmptyInvocation(operation) || IsStaticallyEmptyByteArray(operation);
+            && IsReadOnlyMemory(objectCreation.Type)) || IsArrayEmptyInvocation(operation) || IsStaticallyEmptyByteArray(operation);
     }
 
     private static bool IsArrayEmptyInvocation(IOperation operation)
