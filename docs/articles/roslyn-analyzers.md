@@ -119,7 +119,9 @@ For production-like environments, use a host-owned managed-key adapter, HSM-back
 
 ## ASIB003 - Guard local-development signing by environment
 
-`ASIB003` warns when a local-development signing type is registered with no environment guard at all. `ASIB002` only sees calls inside an explicit production branch, so an unconditional registration, the shape that actually reaches production, needs its own rule. Put the registration behind an environment check, or set `LocalDevelopmentSigningOptions.AllowInProduction` to state the intent explicitly.
+`ASIB003` warns when a local-development signing type is registered with no environment guard at all. `ASIB002` only sees calls inside an explicit production branch, so an unconditional registration, the shape that actually reaches production, needs its own rule. Put the registration behind an environment check.
+
+`LocalDevelopmentSigningOptions.AllowInProduction` is a runtime opt-in; the analyzer does not inspect that option and setting it does not suppress `ASIB003`. If deliberately unconditional wiring has been separately reviewed, pair the runtime opt-in with `AsiBackboneProductionConfigurationReviewedAttribute` on the containing method or type, or narrowly suppress `ASIB003`.
 
 ```csharp
 builder.Services.AddSingleton<LocalDevelopmentSigningService>(); // ASIB003
@@ -127,7 +129,7 @@ builder.Services.AddSingleton<LocalDevelopmentSigningService>(); // ASIB003
 
 ## ASIB004 - Set SignatureInput on signing and verification requests
 
-`ASIB004` warns when a `SigningRequest`, `SignatureVerificationRequest`, or `ManagedKeySignRequest` is created without setting `SignatureInput`. Such a request falls back to the pre-6.0 hash-only input, which does not authenticate the canonical descriptors or the signing policy version and hash. A signature produced that way fails default version 1 verification. The fallback happens inside the request type, so it never surfaces the `ASIB902` deprecation warning on its own.
+`ASIB004` warns when a `SigningRequest`, `SignatureVerificationRequest`, or `ManagedKeySignRequest` is created without an effective `SignatureInput`. Omitted input and statically empty values such as `default`, `ReadOnlyMemory<byte>.Empty`, or `new ReadOnlyMemory<byte>()` fall back to the pre-6.0 hash-only input, which does not authenticate the canonical descriptors or the signing policy version and hash. A signature produced that way fails default version 1 verification. The fallback happens inside the request type, so it never surfaces the `ASIB902` deprecation warning on its own.
 
 ```csharp
 var request = new SigningRequest(canonicalHash.HashValue, canonicalHash.HashAlgorithm); // ASIB004

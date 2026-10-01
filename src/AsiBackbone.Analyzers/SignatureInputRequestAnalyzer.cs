@@ -103,8 +103,12 @@ public sealed class SignatureInputRequestAnalyzer : DiagnosticAnalyzer
 
         foreach (IOperation memberInitializer in initializer.Initializers)
         {
-            if (memberInitializer is ISimpleAssignmentOperation { Target: IPropertyReferenceOperation propertyReference }
-                && propertyReference.Property.Name.Equals(SignatureInputPropertyName, StringComparison.Ordinal))
+            if (memberInitializer is ISimpleAssignmentOperation
+                {
+                    Target: IPropertyReferenceOperation propertyReference
+                } assignment
+                && propertyReference.Property.Name.Equals(SignatureInputPropertyName, StringComparison.Ordinal)
+                && !IsStaticallyEmptySignatureInput(assignment.Value))
             {
                 return true;
             }
@@ -112,4 +116,43 @@ public sealed class SignatureInputRequestAnalyzer : DiagnosticAnalyzer
 
         return false;
     }
+    private static bool IsStaticallyEmptySignatureInput(IOperation operation)
+    {
+        operation = Unwrap(operation);
+
+        if (operation is IDefaultValueOperation)
+        {
+            return true;
+        }
+
+        if (operation is IPropertyReferenceOperation propertyReference
+            && propertyReference.Property.Name.Equals("Empty", StringComparison.Ordinal)
+            && IsReadOnlyMemory(propertyReference.Property.ContainingType))
+        {
+            return true;
+        }
+
+        return operation is IObjectCreationOperation objectCreation
+            && objectCreation.Arguments.Length == 0
+            && IsReadOnlyMemory(objectCreation.Type);
+    }
+
+    private static bool IsReadOnlyMemory(ITypeSymbol? type)
+    {
+        return type is INamedTypeSymbol namedType
+            && namedType.Name.Equals("ReadOnlyMemory", StringComparison.Ordinal)
+            && namedType.Arity == 1
+            && namedType.ContainingNamespace?.ToDisplayString().Equals("System", StringComparison.Ordinal) == true;
+    }
+
+    private static IOperation Unwrap(IOperation operation)
+    {
+        while (operation is IConversionOperation conversion)
+        {
+            operation = conversion.Operand;
+        }
+
+        return operation;
+    }
+
 }

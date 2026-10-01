@@ -59,6 +59,53 @@ public sealed class SignatureInputRequestAnalyzerTests
     }
 
     /// <summary>
+    /// Tests that assigning the default signature input still reports the ASIB004 diagnostic.
+    /// </summary>
+    /// <returns>A task representing the asynchronous operation.</returns>
+    [Fact]
+    public async Task SigningRequestWithDefaultSignatureInputReportsASIB004()
+    {
+        string source = SourceWithBody("_ = new SigningRequest(\"hash\") { SignatureInput = default };");
+
+        ImmutableArray<Diagnostic> diagnostics = await GetAnalyzerDiagnosticsAsync(source);
+
+        Diagnostic diagnostic = Assert.Single(diagnostics);
+        Assert.Equal(SignatureInputRequestAnalyzer.DiagnosticId, diagnostic.Id);
+    }
+
+    /// <summary>
+    /// Tests that assigning <see cref="ReadOnlyMemory{T}.Empty"/> still reports the ASIB004 diagnostic.
+    /// </summary>
+    /// <returns>A task representing the asynchronous operation.</returns>
+    [Fact]
+    public async Task SigningRequestWithEmptySignatureInputReportsASIB004()
+    {
+        string source = SourceWithBody(
+            "_ = new SigningRequest(\"hash\") { SignatureInput = ReadOnlyMemory<byte>.Empty };");
+
+        ImmutableArray<Diagnostic> diagnostics = await GetAnalyzerDiagnosticsAsync(source);
+
+        Diagnostic diagnostic = Assert.Single(diagnostics);
+        Assert.Equal(SignatureInputRequestAnalyzer.DiagnosticId, diagnostic.Id);
+    }
+
+    /// <summary>
+    /// Tests that constructing an empty <see cref="ReadOnlyMemory{T}"/> still reports the ASIB004 diagnostic.
+    /// </summary>
+    /// <returns>A task representing the asynchronous operation.</returns>
+    [Fact]
+    public async Task SigningRequestWithConstructedEmptySignatureInputReportsASIB004()
+    {
+        string source = SourceWithBody(
+            "_ = new SigningRequest(\"hash\") { SignatureInput = new ReadOnlyMemory<byte>() };");
+
+        ImmutableArray<Diagnostic> diagnostics = await GetAnalyzerDiagnosticsAsync(source);
+
+        Diagnostic diagnostic = Assert.Single(diagnostics);
+        Assert.Equal(SignatureInputRequestAnalyzer.DiagnosticId, diagnostic.Id);
+    }
+
+    /// <summary>
     /// Tests that a verification request created without a signature input reports the ASIB004 diagnostic.
     /// </summary>
     /// <returns>A task representing the asynchronous operation.</returns>
