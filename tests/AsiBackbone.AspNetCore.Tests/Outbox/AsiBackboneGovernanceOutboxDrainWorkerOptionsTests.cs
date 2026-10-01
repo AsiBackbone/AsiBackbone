@@ -1,3 +1,4 @@
+#pragma warning disable ASIB903 // These tests cover validation of the obsolete RetryClock property.
 using AsiBackbone.AspNetCore.Outbox;
 using Xunit;
 
@@ -88,6 +89,24 @@ public sealed class AsiBackboneGovernanceOutboxDrainWorkerOptionsTests
         InvalidOperationException exception = Assert.Throws<InvalidOperationException>(options.Validate);
 
         Assert.Contains("retry clock", exception.Message, StringComparison.Ordinal);
+    }
+
+    /// <summary>
+    /// Verifies that the retry clock surfaces its migration path as a non-error ASIB903 diagnostic.
+    /// </summary>
+    [Fact]
+    public void RetryClockCarriesNonErrorObsoleteDiagnostic()
+    {
+        System.Reflection.PropertyInfo property = typeof(GovernanceOutboxDrainWorkerOptions)
+            .GetProperty(nameof(GovernanceOutboxDrainWorkerOptions.RetryClock))!;
+
+        ObsoleteAttribute obsolete = Assert.IsType<ObsoleteAttribute>(
+            Assert.Single(property.GetCustomAttributes(typeof(ObsoleteAttribute), inherit: false)));
+
+        Assert.False(obsolete.IsError);
+        Assert.Equal("ASIB903", obsolete.DiagnosticId);
+        Assert.Contains(nameof(TimeProvider), obsolete.Message, StringComparison.Ordinal);
+        Assert.Contains("8.0", obsolete.Message, StringComparison.Ordinal);
     }
 
     /// <summary>

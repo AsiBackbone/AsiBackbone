@@ -1,17 +1,16 @@
 # ASIB902: Legacy Signature Input Compatibility
 
-`ASIB902` is reported when source code calls either of the two public methods retained for pre-6.0 hash-only signature compatibility:
+`ASIB902` is reported when source code calls `GovernanceSignatureInput.CreateLegacy(string)`, the public factory for the pre-6.0 hash-only signature input.
 
-- `GovernanceSignatureInput.CreateLegacy(string)`
-- `VerificationPolicyContext.WithLegacySignatureInputAllowed()`
+The method remains callable in the `7.x` line. `ASIB902` is emitted as a compiler warning, but projects that enable `TreatWarningsAsErrors` (or otherwise promote warnings to errors) will fail to build until the affected call sites are migrated or the diagnostic is narrowly suppressed. AsiBackbone itself enables `TreatWarningsAsErrors`, so consumers using the same policy should treat this warning as an upgrade-blocking migration item.
 
-Both methods remain callable in the `7.x` line. `ASIB902` is emitted as a compiler warning, but projects that enable `TreatWarningsAsErrors` (or otherwise promote warnings to errors) will fail to build until the affected call sites are migrated or the diagnostic is narrowly suppressed. AsiBackbone itself enables `TreatWarningsAsErrors`, so consumers using the same policy should treat this warning as an upgrade-blocking migration item. Their purpose is limited to reviewing or migrating artifacts produced before 6.0, when providers signed only the UTF-8 text of the canonical payload hash.
+Verifying historical artifacts is **not** deprecated. `VerificationPolicyContext.WithLegacySignatureInputAllowed()` remains a supported opt-in with no planned removal, because governance evidence signed before 6.0 must stay verifiable for its audit-retention period.
 
-## Why these methods are deprecated
+## Why `CreateLegacy` is deprecated
 
 Since 6.0, AsiBackbone signs a versioned signature input created by `GovernanceSignatureInput.CreateV1(...)`. The version 1 input binds the canonical artifact descriptors, payload hash, and signing policy version/hash into the bytes that are signed. The legacy input authenticates only the payload hash.
 
-Allowing the legacy path for current artifacts would therefore preserve a weaker trust boundary: policy metadata can be carried beside the signature without being authenticated by it.
+Producing hash-only input for new artifacts would therefore preserve a weaker trust boundary: policy metadata can be carried beside the signature without being authenticated by it. Code that verifies historical artifacts does not need `CreateLegacy`; `GovernanceArtifactVerifier` builds the legacy input itself when the verification context opts in.
 
 ## Migrate new signing code
 
@@ -24,9 +23,9 @@ ReadOnlyMemory<byte> signatureInput = GovernanceSignatureInput.CreateV1(
     signingMetadata);
 ```
 
-In normal package use, prefer `GovernanceArtifactSigner`; it supplies the version 1 `SigningRequest.SignatureInput` automatically.
+In normal package use, prefer `GovernanceArtifactSigner`; it supplies the version 1 `SigningRequest.SignatureInput` automatically. When you construct a `SigningRequest` or `SignatureVerificationRequest` yourself, set `SignatureInput`. A request without it falls back to the hash-only input.
 
-## Migrate verification code
+## Verify historical artifacts
 
 Current artifacts should use the ordinary verification context without enabling the legacy retry path:
 
@@ -36,19 +35,17 @@ VerificationPolicyContext context = VerificationPolicyContext.Default;
 
 or create the required key/provider/policy pins with `VerificationPolicyContext.Create(...)` and leave legacy fallback disabled.
 
-Only a deliberate historical-review or migration workflow should temporarily suppress `ASIB902` and call `WithLegacySignatureInputAllowed()`:
+To review or migrate artifacts signed before 6.0, opt in explicitly on the context you pass to `GovernanceArtifactVerifier`. No suppression is needed:
 
 ```csharp
-#pragma warning disable ASIB902 // Required only while reviewing pre-6.0 artifacts.
 VerificationPolicyContext historicalReview =
     VerificationPolicyContext.Default.WithLegacySignatureInputAllowed();
-#pragma warning restore ASIB902
 ```
 
-A legacy signature accepted through that path authenticates the canonical payload hash only. It cannot satisfy `ExpectedPolicyVersion` or `ExpectedPolicyHash`, because those labels were not part of the pre-6.0 signature input.
+A legacy signature accepted through that path authenticates the canonical payload hash only. It cannot satisfy `ExpectedPolicyVersion` or `ExpectedPolicyHash`, because those labels were not part of the pre-6.0 signature input. Use the opt-in for historical review paths, not for new execution decisions.
 
 ## Removal target
 
-The methods are planned for removal in `8.0`, subject to the repository's deprecation and major-release policy. They remain available throughout the required `7.x` deprecation window so consumers can migrate historical-artifact workflows without a source break in the current major line.
+`CreateLegacy` is planned for removal in `8.0`, subject to the repository's deprecation and major-release policy. It remains available throughout the required `7.x` deprecation window. Removing the public factory does not remove legacy verification: `GovernanceArtifactVerifier` keeps building the hash-only input internally for contexts that opt in.
 
-Do not suppress `ASIB902` globally. Keep any suppression scoped to the smallest historical compatibility path and remove it once pre-6.0 artifacts no longer need to be accepted.
+Do not suppress `ASIB902` globally. Keep any suppression scoped to the smallest compatibility path that still needs to produce hash-only input, and remove it once that path is migrated.

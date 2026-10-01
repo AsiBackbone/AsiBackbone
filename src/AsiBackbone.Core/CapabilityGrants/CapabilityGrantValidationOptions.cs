@@ -248,7 +248,7 @@ public sealed class CapabilityGrantValidationOptions
     [Obsolete(
         "CreateExecutionBoundary always fails closed and is retained only for binary compatibility. Use CreateBoundExecutionBoundary(CapabilityGrantBindingExpectations, ...) instead. Planned removal in 8.0.",
         DiagnosticId = "ASIB901",
-        UrlFormat = "https://asibackbone.github.io/AsiBackbone/articles/capability-grant-hardening.html#legacy-createexecutionboundary-deprecation")]
+        UrlFormat = "https://asibackbone.github.io/AsiBackbone/articles/asib901-create-execution-boundary.html")]
     public static CapabilityGrantValidationOptions CreateExecutionBoundary(
         string? issuer = null,
         string? audience = null,

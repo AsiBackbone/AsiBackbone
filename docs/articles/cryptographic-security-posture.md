@@ -216,8 +216,9 @@ Artifacts signed by 5.x providers carry signatures over the hash text only. Vers
 VerificationPolicyContext historicalReview = VerificationPolicyContext.Default.WithLegacySignatureInputAllowed();
 ```
 
-With the opt-in, an invalid-signature result is retried once against the hash-only input. A signature accepted that way authenticates the canonical payload hash only, so it cannot satisfy `ExpectedPolicyVersion` or `ExpectedPolicyHash`; such pins deny with `UntrustedSigningContext` and `signature.policy-context-not-authenticated`. Use the opt-in for historical review paths, not for new execution decisions. Both `CreateLegacy(...)` and
-`WithLegacySignatureInputAllowed()` are deprecated in the `7.x` line with `ASIB902`; see the
+With the opt-in, an invalid-signature result is retried once against the hash-only input. A signature accepted that way authenticates the canonical payload hash only, so it cannot satisfy `ExpectedPolicyVersion` or `ExpectedPolicyHash`; such pins deny with `UntrustedSigningContext` and `signature.policy-context-not-authenticated`. Use the opt-in for historical review paths, not for new execution decisions. The opt-in is supported and is not
+planned for removal, so evidence signed before 6.0 stays verifiable for its retention period. Producing new hash-only
+input with `GovernanceSignatureInput.CreateLegacy(...)` is deprecated in the `7.x` line with `ASIB902`; see the
 [ASIB902 migration guide](asib902-legacy-signature-input.md).
 
 ## Audit chains and anchoring

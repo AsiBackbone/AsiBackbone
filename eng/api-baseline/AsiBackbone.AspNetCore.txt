@@ -171,7 +171,7 @@ MEMBER | AsiBackbone.AspNetCore.Outbox.GovernanceOutboxDrainWorkerOptions.DrainO
 MEMBER | AsiBackbone.AspNetCore.Outbox.GovernanceOutboxDrainWorkerOptions.Enabled | public bool Enabled { get; set; }
 MEMBER | AsiBackbone.AspNetCore.Outbox.GovernanceOutboxDrainWorkerOptions.FailureDelay | public TimeSpan FailureDelay { get; set; }
 MEMBER | AsiBackbone.AspNetCore.Outbox.GovernanceOutboxDrainWorkerOptions.PollingInterval | public TimeSpan PollingInterval { get; set; }
-MEMBER | AsiBackbone.AspNetCore.Outbox.GovernanceOutboxDrainWorkerOptions.RetryClock | public Func<DateTimeOffset> RetryClock { get; set; }
+MEMBER | AsiBackbone.AspNetCore.Outbox.GovernanceOutboxDrainWorkerOptions.RetryClock | [Obsolete("RetryClock bypasses the registered TimeProvider for the entire hosted drain cycle and can diverge from other TimeProvider consumers. Register a TimeProvider instead. Planned removal in 8.0.", DiagnosticId = "ASIB903", UrlFormat = "https://asibackbone.github.io/AsiBackbone/articles/asib903-outbox-retry-clock.html")] public Func<DateTimeOffset> RetryClock { get; set; }
 MEMBER | AsiBackbone.AspNetCore.Outbox.GovernanceOutboxDrainWorkerOptions.ShutdownDrainTimeout | public TimeSpan ShutdownDrainTimeout { get; set; }
 MEMBER | AsiBackbone.AspNetCore.Outbox.GovernanceOutboxDrainWorkerOptions.Validate | public void Validate()
 MEMBER | AsiBackbone.AspNetCore.Results.GovernanceHttpResultMappingExtensions.ToHttpResult(AsiBackbone.Core.Decisions.GovernanceDecision) | public static IResult ToHttpResult(this GovernanceDecision decision)

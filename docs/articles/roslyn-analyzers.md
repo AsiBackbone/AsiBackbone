@@ -16,6 +16,8 @@ The analyzer package helps catch simple, recognizable mistakes at build time. It
 | --- | --- | --- | --- |
 | `ASIB001` | Warning | Advisory safety rail | Governance artifact created or returned and then discarded. |
 | `ASIB002` | Warning | Elevate to error in production CI when local-development signing must be prohibited | Local-development signing is registered, instantiated, or passed through a production branch. |
+| `ASIB003` | Warning | Elevate to error in production CI when local-development signing must be prohibited | Local-development signing is registered with no environment guard. |
+| `ASIB004` | Warning | Advisory safety rail | Signing or verification request created without an explicit `SignatureInput`. |
 
 The package does not make builds fail by default. Hosts that want build-breaking behavior should configure it explicitly:
 
@@ -114,6 +116,33 @@ if (builder.Environment.IsProduction())
 ```
 
 For production-like environments, use a host-owned managed-key adapter, HSM-backed provider, cloud key client, or verification boundary that is reviewed as part of the host application's production security model.
+
+## ASIB003 - Guard local-development signing by environment
+
+`ASIB003` warns when a local-development signing type is registered with no environment guard at all. `ASIB002` only sees calls inside an explicit production branch, so an unconditional registration, the shape that actually reaches production, needs its own rule. Put the registration behind an environment check.
+
+`LocalDevelopmentSigningOptions.AllowInProduction` is a runtime opt-in; the analyzer does not inspect that option and setting it does not suppress `ASIB003`. If deliberately unconditional wiring has been separately reviewed, pair the runtime opt-in with `AsiBackboneProductionConfigurationReviewedAttribute` on the containing method or type, or narrowly suppress `ASIB003`.
+
+```csharp
+builder.Services.AddSingleton<LocalDevelopmentSigningService>(); // ASIB003
+```
+
+## ASIB004 - Set SignatureInput on signing and verification requests
+
+`ASIB004` warns when a `SigningRequest`, `SignatureVerificationRequest`, or `ManagedKeySignRequest` is created without an effective `SignatureInput`. Omitted input and statically empty values such as `default`, `ReadOnlyMemory<byte>.Empty`, or `new ReadOnlyMemory<byte>()` fall back to the pre-6.0 hash-only input, which does not authenticate the canonical descriptors or the signing policy version and hash. A signature produced that way fails default version 1 verification. The fallback happens inside the request type, so it never surfaces the `ASIB902` deprecation warning on its own.
+
+```csharp
+var request = new SigningRequest(canonicalHash.HashValue, canonicalHash.HashAlgorithm); // ASIB004
+```
+
+Prefer `GovernanceArtifactSigner.CreateSigningRequest(...)` and `GovernanceArtifactVerifier`, which set the input automatically. When you construct a request yourself, set the version 1 input:
+
+```csharp
+var request = new SigningRequest(canonicalHash.HashValue, canonicalHash.HashAlgorithm)
+{
+    SignatureInput = GovernanceSignatureInput.CreateV1(canonicalHash, signingMetadata)
+};
+```
 
 ## Suppression and custom host-owned persistence
 

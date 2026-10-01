@@ -38,7 +38,7 @@ public sealed class LocalDevelopmentSigningProductionAnalyzer : DiagnosticAnalyz
         "AsiBackbone.ProductionSafety",
         DiagnosticSeverity.Warning,
         isEnabledByDefault: true,
-        description: "LocalDevelopment signing providers generate an in-process key that is never persisted, so artifacts they sign stop verifying after a restart. Registration should sit behind an environment check, or set LocalDevelopmentSigningOptions.AllowInProduction to state the intent explicitly.");
+        description: "LocalDevelopment signing providers generate an in-process key that is never persisted, so artifacts they sign stop verifying after a restart. Registration should sit behind an environment check. Deliberately unconditional wiring requires separate host review and suppression of this diagnostic.");
 
     public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => [Rule, UnguardedRule];
 

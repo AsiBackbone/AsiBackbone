@@ -155,6 +155,8 @@ The retained method is marked obsolete with warning diagnostic `ASIB901`. The wa
 `7.x`: changing it to `error: true` would turn previously compilable source into a build failure within the same stable
 major line. The method is planned for removal in `8.0`, where removal is permitted as a major-version API break.
 
+See the [ASIB901 migration guide](asib901-create-execution-boundary.md) for the diagnostic reference.
+
 Migrate by replacing `CreateExecutionBoundary(...)` with `CreateBoundExecutionBoundary(...)` and passing
 `CapabilityGrantBindingExpectations` as the required first argument:
 

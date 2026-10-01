@@ -107,6 +107,7 @@ public sealed class GovernanceSignatureInputTests
         Assert.False(obsolete.IsError);
         Assert.Equal("ASIB902", obsolete.DiagnosticId);
         Assert.Contains(nameof(GovernanceSignatureInput.CreateV1), obsolete.Message, StringComparison.Ordinal);
+        Assert.Contains(nameof(VerificationPolicyContext.WithLegacySignatureInputAllowed), obsolete.Message, StringComparison.Ordinal);
         Assert.Contains("8.0", obsolete.Message, StringComparison.Ordinal);
     }
 

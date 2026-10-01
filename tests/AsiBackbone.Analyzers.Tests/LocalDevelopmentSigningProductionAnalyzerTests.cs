@@ -168,6 +168,26 @@ public sealed class LocalDevelopmentSigningProductionAnalyzerTests
         Assert.Empty(diagnostics);
     }
 
+    /// <summary>
+    /// Tests that the <c>AsiBackboneProductionConfigurationReviewedAttribute</c> suppresses the ASIB003 diagnostic.
+    /// </summary>
+    /// <returns>A task representing the asynchronous operation.</returns>
+    [Fact]
+    public async Task ProductionConfigurationReviewedMarkerSuppressesASIB003()
+    {
+        string source = SourceWithBody("""
+            [AsiBackboneProductionConfigurationReviewed]
+            static void Configure(IServiceCollection services, IHostEnvironment environment)
+            {
+                services.AddSingleton<LocalDevelopmentSigningService>();
+            }
+            """, includeConfigureWrapper: false);
+
+        ImmutableArray<Diagnostic> diagnostics = await GetAnalyzerDiagnosticsAsync(source);
+
+        Assert.Empty(diagnostics);
+    }
+
     private static string SourceWithProductionBody(string body)
     {
         return SourceWithBody($$"""
