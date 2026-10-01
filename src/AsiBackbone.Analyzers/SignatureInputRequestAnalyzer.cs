@@ -138,20 +138,10 @@ public sealed class SignatureInputRequestAnalyzer : DiagnosticAnalyzer
 
     private static bool IsStaticallyEmptyByteArray(IOperation operation)
     {
-        if (operation is not IArrayCreationOperation arrayCreation
-            || arrayCreation.Type is not IArrayTypeSymbol arrayType
-            || arrayType.ElementType.SpecialType != SpecialType.System_Byte)
-        {
-            return false;
-        }
-
-        if (arrayCreation.Initializer is { ElementValues.Length: 0 })
-        {
-            return true;
-        }
-
-        return arrayCreation.DimensionSizes.Length == 1
-            && arrayCreation.DimensionSizes[0].ConstantValue is { HasValue: true, Value: 0 };
+        return operation is IArrayCreationOperation arrayCreation
+            && arrayCreation.Type is IArrayTypeSymbol arrayType
+            && arrayType.ElementType.SpecialType == SpecialType.System_Byte && (arrayCreation.Initializer is { ElementValues.Length: 0 } || (arrayCreation.DimensionSizes.Length == 1
+            && arrayCreation.DimensionSizes[0].ConstantValue is { HasValue: true, Value: 0 }));
     }
 
     private static bool IsReadOnlyMemory(ITypeSymbol? type)
