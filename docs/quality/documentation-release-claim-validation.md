@@ -114,7 +114,9 @@ An excluded historical page can still route readers to current guidance, for exa
 ]
 ```
 
-In those pages, a line that mentions current guidance, documentation, status, boundaries, references, package family, or release line is a current-reader pointer. When such a line ends with a colon, the list items that follow it are pointers too. A pointer fails when it links to a version-specific page: a `release-notes-`, `release-readiness-`, `consumer-verification-`, `upgrade-`, or `quickstart-` article whose name contains a version number.
+In those pages, a line that mentions current guidance, documentation, status, boundaries, references, package family, or release line is a current-reader pointer. When such a line ends with a colon, the list items that follow it are pointers too. Blank lines, including blockquote lines that contain only `>`, do not end that list. A pointer fails when it links to a version-specific page: a `release-notes-`, `release-readiness-`, `consumer-verification-`, `upgrade-`, or `quickstart-` article whose name contains a version number.
+
+Fenced code blocks are ignored, including fences inside blockquotes. A fence closes only on the same marker character with at least the opening length, so a triple-backtick example inside a four-backtick fence stays fenced content.
 
 Route current guidance to version-neutral pages such as [Releases & Compatibility](../releases/index.md) and [API Compatibility and Semantic Versioning](../articles/api-compatibility-and-semver.md). Keep links to version-specific records in separately labeled historical text, on a line of their own, so the historical record stays intact without being presented as current guidance. Historical facts and other version references in these pages are not checked.
 
@@ -126,8 +128,8 @@ The deterministic fixtures verify that:
 - a stale current release claim fails;
 - an ordinary historical version mention passes;
 - an explicitly excluded historical file passes;
-- a historical page whose current-reader pointers use version-neutral pages passes, including labeled historical links and fenced examples;
-- a historical pointer page whose current-reader pointer, or a list item under a current-guidance lead-in, links to a version-specific release record fails with the file, line, and linked page;
+- a historical page whose current-reader pointers use version-neutral pages passes, including labeled historical links and fenced examples nested in a longer fence or inside a blockquote;
+- a historical pointer page whose current-reader pointer, or a list item under a current-guidance lead-in, links to a version-specific release record fails with the file, line, and linked page, including a blockquoted list separated from its lead-in by a quote-only line and a pointer that follows a closed nested fence;
 - stale failure output identifies the file, line, stale value, and expected value;
 - prepared-state wording that separates the prepared version from the latest published release passes;
 - a prepared-state claim that the prepared version is the current release fails;

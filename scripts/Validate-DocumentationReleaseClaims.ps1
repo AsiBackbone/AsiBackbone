@@ -507,6 +507,55 @@ $versionSpecificLinkPattern = [regex]::new(
     $regexOptions)
 $listItemPattern = [regex]::new('^\s*(?:>\s*)*(?:[-*+]|\d+[.)])\s+', $regexOptions)
 
+# A line with no content, or only blockquote markers, separates paragraphs
+# without ending a pointer list such as "> For current guidance:" / ">" / "> - ...".
+$blankOrQuoteOnlyLinePattern = [regex]::new('^\s*(?:>\s*)*$', $regexOptions)
+
+# A fence delimiter may sit inside a blockquote. The info string is captured so a
+# closing fence can be told apart from an opening fence that names a language.
+$fenceDelimiterPattern = [regex]::new('^(?:\s*>)*\s*(?<marker>`{3,}|~{3,})(?<info>[^\r\n]*)$')
+
+# Tracks a fenced code block the way Markdown does: a fence closes only on a line
+# that uses the same marker character, is at least as long as the opening fence,
+# and has no info string. A shorter or different fence inside the block, such as
+# a triple-backtick example inside a four-backtick fence, is content. Returns
+# $true when the line opens or closes a fence.
+function Update-CodeFenceState {
+    param(
+        [pscustomobject]$State,
+        [string]$Line
+    )
+
+    $fenceMatch = $fenceDelimiterPattern.Match($Line)
+    if (-not $fenceMatch.Success) {
+        return $false
+    }
+
+    $marker = $fenceMatch.Groups['marker'].Value
+    $info = $fenceMatch.Groups['info'].Value
+
+    if (-not $State.Inside) {
+        # A backtick fence's info string cannot contain a backtick.
+        if ($marker[0] -eq '`' -and $info.Contains('`')) {
+            return $false
+        }
+
+        $State.Inside = $true
+        $State.Character = $marker[0]
+        $State.Length = $marker.Length
+        return $true
+    }
+
+    if ($marker[0] -eq $State.Character -and
+        $marker.Length -ge $State.Length -and
+        [string]::IsNullOrWhiteSpace($info)) {
+        $State.Inside = $false
+        return $true
+    }
+
+    return $false
+}
+
 $failures = [System.Collections.Generic.List[object]]::new()
 $reportedMatches = [System.Collections.Generic.HashSet[string]]::new([System.StringComparer]::Ordinal)
 
@@ -573,19 +622,22 @@ foreach ($documentationFile in @($documentationFiles | Sort-Object FullName)) {
     }
 
     $lines = @(Get-Content -LiteralPath $documentationFile.FullName)
-    $insideCodeFence = $false
+    $fenceState = [pscustomobject]@{
+        Inside = $false
+        Character = [char]0
+        Length = 0
+    }
     $insideCurrentPointerList = $false
 
     for ($lineIndex = 0; $lineIndex -lt $lines.Count; $lineIndex++) {
         $line = [string]$lines[$lineIndex]
 
-        if ($line -match '^\s*(?:```|~~~)') {
-            $insideCodeFence = -not $insideCodeFence
+        if (Update-CodeFenceState $fenceState $line) {
             $insideCurrentPointerList = $false
             continue
         }
 
-        if ($insideCodeFence -or [string]::IsNullOrWhiteSpace($line)) {
+        if ($fenceState.Inside -or $blankOrQuoteOnlyLinePattern.IsMatch($line)) {
             continue
         }
 

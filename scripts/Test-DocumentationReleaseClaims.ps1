@@ -119,7 +119,10 @@ Assert-FixtureFails 'historical-pointer-stale' @(
     'docs/articles/history-review.md:3',
     "links to version-specific page 'release-notes-100.md'",
     'docs/articles/history-review.md:8',
-    "links to version-specific page 'upgrade-100-to-200.md'")
+    "links to version-specific page 'upgrade-100-to-200.md'",
+    'docs/articles/history-review.md:13',
+    'docs/articles/history-review.md:21',
+    "links to version-specific page 'upgrade-090-to-100.md'")
 
 Assert-FixtureFails 'prepared-valid' @("Release tag 'v3.0.0' requires publication.state 'released'") @('-ReleaseTag', 'v3.0.0')
 Assert-FixtureFails 'released-valid' @("Release tag 'v3.0.1' does not match Directory.Build.props version '3.0.0'") @('-ReleaseTag', 'v3.0.1')

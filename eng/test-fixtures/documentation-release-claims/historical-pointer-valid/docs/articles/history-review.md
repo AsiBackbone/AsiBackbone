@@ -20,3 +20,15 @@ The current `1.0.x` release line was the subject of this review.
 ```text
 Current stable guidance at the time: [1.0.0 Release Notes](release-notes-100.md)
 ```
+
+````markdown
+A fenced example inside a longer fence:
+
+```text
+Current stable guidance at the time: [1.0.0 Release Notes](release-notes-100.md)
+```
+````
+
+> ```text
+> Current stable guidance at the time: [1.0.0 Release Notes](release-notes-100.md)
+> ```
