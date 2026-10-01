@@ -3,7 +3,9 @@
 This document preserves the readiness review for `AsiBackbone.Core` before the `0.1.0-alpha.1` milestone was completed.
 
 > [!NOTE]
-> This page is an archived design and readiness record. It is retained to explain early Core package boundary decisions, not to describe the current stable release posture. Current stable package guidance is documented in [1.2.1 Release Notes](release-notes-121.md), [API Compatibility and Semantic Versioning](api-compatibility-and-semver.md), and [Historical Stable API Review](stable-api-review.md).
+> This page is an archived design and readiness record. It is retained to explain early Core package boundary decisions, not to describe the current stable release posture. Current stable package guidance is documented in [API Compatibility and Semantic Versioning](api-compatibility-and-semver.md) and [Releases & Compatibility](../releases/index.md).
+>
+> For the early stable-era record, see [1.2.1 Release Notes](release-notes-121.md) and [Historical Stable API Review](stable-api-review.md).
 
 ## Historical review scope
 
@@ -63,7 +65,7 @@ AsiBackbone.Core.Results
 
 The domain-based namespace model kept Core readable and avoided a broad catch-all abstractions namespace.
 
-Current stable API and namespace guidance is documented in [API Compatibility and Semantic Versioning](api-compatibility-and-semver.md) and [Historical Stable API Review](stable-api-review.md).
+Current stable API and namespace guidance is documented in [API Compatibility and Semantic Versioning](api-compatibility-and-semver.md). [Historical Stable API Review](stable-api-review.md) records the original stable API shape.
 
 ## Implemented foundation primitives reviewed for alpha
 
@@ -168,15 +170,19 @@ Before cutting a stable `1.0.0` release, the release readiness review was expect
 
 Historical review status: Pending stable release review at the time this alpha document was written.
 
-## Current stable-era reference
+## Current and historical references
 
 For current stable documentation, use:
 
+- [Releases & Compatibility](../releases/index.md)
+- [API Compatibility and Semantic Versioning](api-compatibility-and-semver.md)
+- [Schema Versioning](schema-versioning.md)
+- [Core Domain Language](core-domain-language.md)
+
+Historical records related to this review:
+
+- [Historical Stable API Review](stable-api-review.md)
+- [Historical Alpha Package Boundary](alpha-package-boundary.md)
 - [1.2.1 Release Notes](release-notes-121.md)
 - [1.2.0 Release Notes](release-notes-120.md)
 - [1.1.x Release Notes](release-notes-110.md)
-- [API Compatibility and Semantic Versioning](api-compatibility-and-semver.md)
-- [Historical Stable API Review](stable-api-review.md)
-- [Schema Versioning](schema-versioning.md)
-- [Core Domain Language](core-domain-language.md)
-- [Historical Alpha Package Boundary](alpha-package-boundary.md)

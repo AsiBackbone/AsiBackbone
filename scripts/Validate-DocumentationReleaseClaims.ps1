@@ -87,6 +87,7 @@ $latestPublishedVersion = $versionPrefix
 $publicationStateErrors = [System.Collections.Generic.List[string]]::new()
 
 $excludedPathPatterns = @()
+$historicalPointerPathPatterns = @()
 $allowedClaims = @()
 $configurationFilePath = if ([System.IO.Path]::IsPathRooted($ConfigurationPath)) {
     $ConfigurationPath
@@ -108,6 +109,17 @@ if (Test-Path -LiteralPath $configurationFilePath -PathType Leaf) {
             $pattern = [string]$_
             if ([string]::IsNullOrWhiteSpace($pattern)) {
                 throw 'Documentation release-claim excludedPaths entries must not be blank.'
+            }
+
+            $pattern.Replace('\', '/')
+        })
+    }
+
+    if ($null -ne $configuration.PSObject.Properties['historicalPointerPaths']) {
+        $historicalPointerPathPatterns = @($configuration.historicalPointerPaths | ForEach-Object {
+            $pattern = [string]$_
+            if ([string]::IsNullOrWhiteSpace($pattern)) {
+                throw 'Documentation release-claim historicalPointerPaths entries must not be blank.'
             }
 
             $pattern.Replace('\', '/')
@@ -228,6 +240,18 @@ function Test-ExcludedPath {
     param([string]$RelativePath)
 
     foreach ($pattern in $excludedPathPatterns) {
+        if ($RelativePath -like $pattern) {
+            return $true
+        }
+    }
+
+    return $false
+}
+
+function Test-HistoricalPointerPath {
+    param([string]$RelativePath)
+
+    foreach ($pattern in $historicalPointerPathPatterns) {
         if ($RelativePath -like $pattern) {
             return $true
         }
@@ -470,6 +494,68 @@ $historicalContextPattern = [regex]::new(
     '\b(?:historical|original|initial|previous|prior|superseded|final stable patch|releases? expanded|release established)\b',
     $regexOptions)
 
+# Historical pages are excluded from release-claim checks, but a sentence in
+# one that routes readers to current guidance is not historical. Such a pointer
+# must not send current readers to a version-specific release record. A line is
+# a pointer when it mentions current guidance; a pointer line ending in ':' also
+# makes the list items that follow it pointers.
+$currentPointerPattern = [regex]::new(
+    '\bcurrent\b[^\r\n]{0,80}?\b(?:guidance|documentation|status|boundaries|references?|package\s+family|release\s+line|release\s+posture)\b',
+    $regexOptions)
+$versionSpecificLinkPattern = [regex]::new(
+    '\]\(\s*<?(?<target>[^)\s>]*?(?<page>(?:release-notes|release-readiness|consumer-verification|upgrade|quickstart)-[^)\s>/#]*\d[^)\s>/#]*\.md))(?:#[^)\s>]*)?>?\s*\)',
+    $regexOptions)
+$listItemPattern = [regex]::new('^\s*(?:>\s*)*(?:[-*+]|\d+[.)])\s+', $regexOptions)
+
+# A line with no content, or only blockquote markers, separates paragraphs
+# without ending a pointer list such as "> For current guidance:" / ">" / "> - ...".
+$blankOrQuoteOnlyLinePattern = [regex]::new('^\s*(?:>\s*)*$', $regexOptions)
+
+# A fence delimiter may sit inside a blockquote. The info string is captured so a
+# closing fence can be told apart from an opening fence that names a language.
+$fenceDelimiterPattern = [regex]::new('^(?:\s*>)*\s*(?<marker>`{3,}|~{3,})(?<info>[^\r\n]*)$')
+
+# Tracks a fenced code block the way Markdown does: a fence closes only on a line
+# that uses the same marker character, is at least as long as the opening fence,
+# and has no info string. A shorter or different fence inside the block, such as
+# a triple-backtick example inside a four-backtick fence, is content. Returns
+# $true when the line opens or closes a fence.
+function Update-CodeFenceState {
+    param(
+        [pscustomobject]$State,
+        [string]$Line
+    )
+
+    $fenceMatch = $fenceDelimiterPattern.Match($Line)
+    if (-not $fenceMatch.Success) {
+        return $false
+    }
+
+    $marker = $fenceMatch.Groups['marker'].Value
+    $info = $fenceMatch.Groups['info'].Value
+
+    if (-not $State.Inside) {
+        # A backtick fence's info string cannot contain a backtick.
+        if ($marker[0] -eq '`' -and $info.Contains('`')) {
+            return $false
+        }
+
+        $State.Inside = $true
+        $State.Character = $marker[0]
+        $State.Length = $marker.Length
+        return $true
+    }
+
+    if ($marker[0] -eq $State.Character -and
+        $marker.Length -ge $State.Length -and
+        [string]::IsNullOrWhiteSpace($info)) {
+        $State.Inside = $false
+        return $true
+    }
+
+    return $false
+}
+
 $failures = [System.Collections.Generic.List[object]]::new()
 $reportedMatches = [System.Collections.Generic.HashSet[string]]::new([System.StringComparer]::Ordinal)
 
@@ -525,6 +611,63 @@ foreach ($documentationFile in @($documentationFiles | Sort-Object FullName)) {
                     Detail = $detail
                 })
             }
+        }
+    }
+}
+
+foreach ($documentationFile in @($documentationFiles | Sort-Object FullName)) {
+    $relativePath = [System.IO.Path]::GetRelativePath($repoRoot, $documentationFile.FullName).Replace('\', '/')
+    if (-not (Test-HistoricalPointerPath $relativePath)) {
+        continue
+    }
+
+    $lines = @(Get-Content -LiteralPath $documentationFile.FullName)
+    $fenceState = [pscustomobject]@{
+        Inside = $false
+        Character = [char]0
+        Length = 0
+    }
+    $insideCurrentPointerList = $false
+
+    for ($lineIndex = 0; $lineIndex -lt $lines.Count; $lineIndex++) {
+        $line = [string]$lines[$lineIndex]
+
+        if (Update-CodeFenceState $fenceState $line) {
+            $insideCurrentPointerList = $false
+            continue
+        }
+
+        if ($fenceState.Inside -or $blankOrQuoteOnlyLinePattern.IsMatch($line)) {
+            continue
+        }
+
+        $isPointerLine = $false
+        if ($insideCurrentPointerList -and $listItemPattern.IsMatch($line)) {
+            $isPointerLine = $true
+        }
+        else {
+            $insideCurrentPointerList = $false
+            if ($currentPointerPattern.IsMatch($line)) {
+                $isPointerLine = $true
+                $insideCurrentPointerList = $line.TrimEnd().EndsWith(':', [System.StringComparison]::Ordinal)
+            }
+        }
+
+        if (-not $isPointerLine) {
+            continue
+        }
+
+        $displayLine = $line.Trim()
+        if ($displayLine.Length -gt 240) {
+            $displayLine = $displayLine.Substring(0, 237) + '...'
+        }
+
+        foreach ($linkMatch in $versionSpecificLinkPattern.Matches($line)) {
+            $failures.Add([pscustomobject]@{
+                Path = $relativePath
+                LineNumber = $lineIndex + 1
+                Detail = "current-reader pointer in a historical page links to version-specific page '$($linkMatch.Groups['page'].Value)' in '$displayLine'. Route current guidance to a version-neutral page such as docs/releases/index.md, and keep version-specific links in separately labeled historical text."
+            })
         }
     }
 }

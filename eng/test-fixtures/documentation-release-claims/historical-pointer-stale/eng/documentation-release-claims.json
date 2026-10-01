@@ -1,0 +1,10 @@
+{
+  "excludedPaths": [
+    "docs/articles/history-*.md",
+    "docs/articles/release-notes-*.md"
+  ],
+  "historicalPointerPaths": [
+    "docs/articles/history-*.md"
+  ],
+  "allowedClaims": []
+}

@@ -2,7 +2,7 @@
 
 This review records the public API review for the initial stable AsiBackbone package family before the `1.0.0` surface was established. It is retained as a historical API-shape baseline for the original compatible `1.x` line and the `1.1.0` additive package-family expansion.
 
-Current package status is documented in [API Compatibility and Semantic Versioning](api-compatibility-and-semver.md), [3.0.0 Release Notes](release-notes-300.md), and the current release-readiness record. This page is intentionally historical and should not be read as the current stable package-family index.
+Current package status is documented in [API Compatibility and Semantic Versioning](api-compatibility-and-semver.md) and [Releases & Compatibility](../releases/index.md), which links the current release notes and release-readiness record. This page is intentionally historical and should not be read as the current stable package-family index.
 
 This review is limited to implemented .NET package APIs and does not treat AsiBackbone as a legal/compliance guarantee, or robot controller.
 

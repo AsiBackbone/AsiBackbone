@@ -23,6 +23,18 @@ This project follows the spirit of [Keep a Changelog](https://keepachangelog.com
   `GOVERNANCE.md` and the release cadence article link to the policy.
 * The API compatibility article's promise heading and provider-package guidance now refer to the `7.x` line instead
   of the superseded `5.x` line.
+* The API compatibility article's introduction and compatibility promise now describe `4.x`, `5.x`, and `6.x` as
+  previous stable lines and `7.x` as the current line, instead of saying `5.0.0` starts the current stable line
+  (#842).
+* Historical pages no longer route current readers to version-specific release records. The alpha package boundary
+  and Core alpha readiness review pointed current stable guidance at the `1.2.1` release notes, and the historical
+  stable API review pointed current package status at the `3.0.0` release notes. They now link to Releases &
+  Compatibility and the API compatibility article, and keep the older release links as labeled history. The
+  post-`2.0.0` documentation currency review now carries a historical banner and describes its `2.0.x` posture as of
+  the review (#842).
+* Documentation release-claim validation now checks current-reader pointers in the historical pages listed in the new
+  `historicalPointerPaths` setting. A pointer that links current readers to a version-specific release record fails
+  validation, while historical facts in those pages remain unchecked (#842).
 
 ## [7.0.0] - 2026-09-26
 

@@ -13,6 +13,12 @@
     "docs/articles/stable-api-review.md",
     "docs/articles/post-*-documentation-currency-review.md"
   ],
+  "historicalPointerPaths": [
+    "docs/articles/alpha-package-boundary.md",
+    "docs/articles/core-alpha-readiness-review.md",
+    "docs/articles/stable-api-review.md",
+    "docs/articles/post-*-documentation-currency-review.md"
+  ],
   "allowedClaims": [
     {
       "path": "docs/articles/api-compatibility-and-semver.md",
