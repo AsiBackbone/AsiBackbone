@@ -1,4 +1,5 @@
 using System.Collections.Immutable;
+using System.Globalization;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.Diagnostics;
@@ -25,7 +26,7 @@ public sealed class SignatureInputRequestAnalyzerTests
 
         Diagnostic diagnostic = Assert.Single(diagnostics);
         Assert.Equal(SignatureInputRequestAnalyzer.DiagnosticId, diagnostic.Id);
-        Assert.Contains("SigningRequest", diagnostic.GetMessage(), StringComparison.Ordinal);
+        Assert.Contains("SigningRequest", diagnostic.GetMessage(CultureInfo.InvariantCulture), StringComparison.Ordinal);
     }
 
     /// <summary>
@@ -70,7 +71,7 @@ public sealed class SignatureInputRequestAnalyzerTests
 
         Diagnostic diagnostic = Assert.Single(diagnostics);
         Assert.Equal(SignatureInputRequestAnalyzer.DiagnosticId, diagnostic.Id);
-        Assert.Contains("SignatureVerificationRequest", diagnostic.GetMessage(), StringComparison.Ordinal);
+        Assert.Contains("SignatureVerificationRequest", diagnostic.GetMessage(CultureInfo.InvariantCulture), StringComparison.Ordinal);
     }
 
     /// <summary>
