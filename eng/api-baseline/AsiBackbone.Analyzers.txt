@@ -11,5 +11,9 @@ MEMBER | AsiBackbone.Analyzers.LocalDevelopmentSigningProductionAnalyzer.Diagnos
 MEMBER | AsiBackbone.Analyzers.LocalDevelopmentSigningProductionAnalyzer.Initialize(Microsoft.CodeAnalysis.Diagnostics.AnalysisContext) | public override void Initialize(AnalysisContext context)
 MEMBER | AsiBackbone.Analyzers.LocalDevelopmentSigningProductionAnalyzer.SupportedDiagnostics | public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; }
 MEMBER | AsiBackbone.Analyzers.LocalDevelopmentSigningProductionAnalyzer.UnguardedDiagnosticId | public const string UnguardedDiagnosticId = "ASIB003"
+MEMBER | AsiBackbone.Analyzers.SignatureInputRequestAnalyzer.DiagnosticId | public const string DiagnosticId = "ASIB004"
+MEMBER | AsiBackbone.Analyzers.SignatureInputRequestAnalyzer.Initialize(Microsoft.CodeAnalysis.Diagnostics.AnalysisContext) | public override void Initialize(AnalysisContext context)
+MEMBER | AsiBackbone.Analyzers.SignatureInputRequestAnalyzer.SupportedDiagnostics | public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; }
 TYPE | AsiBackbone.Analyzers.GovernanceArtifactPersistenceAnalyzer | [DiagnosticAnalyzer("C#", new string[] { })] public sealed class GovernanceArtifactPersistenceAnalyzer : DiagnosticAnalyzer
 TYPE | AsiBackbone.Analyzers.LocalDevelopmentSigningProductionAnalyzer | [DiagnosticAnalyzer("C#", new string[] { })] public sealed class LocalDevelopmentSigningProductionAnalyzer : DiagnosticAnalyzer
+TYPE | AsiBackbone.Analyzers.SignatureInputRequestAnalyzer | [DiagnosticAnalyzer("C#", new string[] { })] public sealed class SignatureInputRequestAnalyzer : DiagnosticAnalyzer
