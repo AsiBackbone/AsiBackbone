@@ -11,14 +11,11 @@ General architectural education belongs in [ASI Backbone Learning](https://asiba
 
 ## Current stable package posture
 
-Stable `7.x` package family. The current release is `7.0.0`.
+Stable `7.x` package family. The current release is `7.1.0`.
 
-`7.0.0` binds acknowledgment responses to the challenged actor and makes
-unconfigured DLP failure behavior and risk levels fail explicitly instead of
-inheriting a permissive zero value. Package IDs and the `net10.0` target remain
-unchanged. Four public namespaces move from the `Handshakes` and
-`CapabilityTokens` vocabulary to `Acknowledgments` and `CapabilityGrants`; the
-binary assembly identity advances to `7.0.0.0`.
+`7.1.0` adds signing-input analyzer guidance and begins the `ASIB902` and
+`ASIB903` deprecation windows while preserving package IDs, the `net10.0`
+target, and binary assembly identity `7.0.0.0`.
 
 Released stable package surfaces include Core, DependencyInjection,
 Storage.InMemory, EntityFrameworkCore, AspNetCore, Testing, Templates,
@@ -36,7 +33,7 @@ packages remain design-only, strategy-only, sample-only, host-owned, or
 future-provider work unless a later stable release explicitly ships them.
 
 The release process includes explicit [Release Cadence and Readiness](release-cadence-and-readiness.md) guidance for patch, minor, and major release selection, package metadata, Source Link, SBOM/provenance, documentation links, and future package identity or namespace changes.
-The current verification evidence is the [7.0.0 Consumer Verification Guide](consumer-verification-700.md).
+The current verification evidence is the [7.1.0 Consumer Verification Guide](consumer-verification-710.md).
 Consumers moving from the previous stable line must also follow the [Upgrade from 6.x to 7.0](upgrade-600-to-700.md) guide.
 
 ## Search and navigation
@@ -148,6 +145,8 @@ These pages cover production hardening, durable audit/outbox behavior, observabi
 
 Start with the current release and compatibility rules. Older release notes, consumer-verification guides, and upgrade records are preserved under [Releases & Compatibility](../releases/index.md) so they remain easy to find without dominating the implementation navigation.
 
+* [7.1.0 Release Notes](release-notes-710.md)
+* [7.1.0 Consumer Verification Guide](consumer-verification-710.md)
 * [7.0.0 Release Notes](release-notes-700.md)
 * [6.0.0 Release Readiness Record](release-readiness-600.md)
 * [6.0.0 Consumer Verification Guide](consumer-verification-600.md)

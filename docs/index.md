@@ -33,14 +33,11 @@ The DocFX header search is available for package names, API concepts, and articl
 
 ## Current stable package family
 
-Stable `7.x` package family. The current release is `7.0.0`.
+Stable `7.x` package family. The current release is `7.1.0`.
 
-`7.0.0` binds acknowledgment responses to the challenged actor and makes
-unconfigured DLP failure behavior and intent risk levels fail explicitly instead of
-inheriting a permissive zero value. Package IDs and the `net10.0` target remain
-unchanged. Four public namespaces move from the `Handshakes` and
-`CapabilityTokens` vocabulary to `Acknowledgments` and `CapabilityGrants`; the
-binary assembly identity advances to `7.0.0.0`.
+`7.1.0` adds signing-input analyzer guidance and begins the `ASIB902` and
+`ASIB903` deprecation windows while preserving package IDs, the `net10.0`
+target, and binary assembly identity `7.0.0.0`.
 
 ```text
 AsiBackbone.Core
@@ -111,6 +108,8 @@ Package-specific READMEs and release notes define which surfaces are stable, opt
 
 ### Releases and compatibility
 
+* [7.1.0 Release Notes](articles/release-notes-710.md)
+* [7.1.0 Consumer Verification Guide](articles/consumer-verification-710.md)
 * [7.0.0 Release Notes](articles/release-notes-700.md)
 * [6.0.0 Release Readiness Record](articles/release-readiness-600.md)
 * [6.0.0 Consumer Verification Guide](articles/consumer-verification-600.md)

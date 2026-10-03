@@ -2,7 +2,7 @@
 
 ASP.NET Core host adapters for AsiBackbone governance primitives.
 
-Part of the stable `7.x` package family. This README describes version `7.0.0` of this package.
+Part of the stable `7.x` package family. This README describes version `7.1.0` of this package.
 
 This package acts as a thin web-host adapter around `AsiBackbone.Core`.
 
