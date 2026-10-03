@@ -3,6 +3,27 @@
 
 - name: Current Release
   items:
+    - name: 7.1.0 Release Notes
+      href: ../articles/release-notes-710.md
+    - name: 7.1.0 Release Readiness Record
+      href: ../articles/release-readiness-710.md
+    - name: 7.1.0 Consumer Verification Guide
+      href: ../articles/consumer-verification-710.md
+    - name: ASIB901 Migration Guide
+      href: ../articles/asib901-create-execution-boundary.md
+    - name: ASIB902 Migration Guide
+      href: ../articles/asib902-legacy-signature-input.md
+    - name: ASIB903 Migration Guide
+      href: ../articles/asib903-outbox-retry-clock.md
+    - name: API Compatibility and SemVer
+      href: ../articles/api-compatibility-and-semver.md
+    - name: Schema Versioning
+      href: ../articles/schema-versioning.md
+    - name: Target Framework Support
+      href: ../articles/target-framework-support.md
+
+- name: 7.0.0 Archive
+  items:
     - name: 7.0.0 Release Notes
       href: ../articles/release-notes-700.md
     - name: 7.0.0 Release Readiness Record
@@ -11,12 +32,6 @@
       href: ../articles/consumer-verification-700.md
     - name: Upgrade from 6.x to 7.0
       href: ../articles/upgrade-600-to-700.md
-    - name: API Compatibility and SemVer
-      href: ../articles/api-compatibility-and-semver.md
-    - name: Schema Versioning
-      href: ../articles/schema-versioning.md
-    - name: Target Framework Support
-      href: ../articles/target-framework-support.md
 
 - name: Changelog & Upgrade Guidance
   items:

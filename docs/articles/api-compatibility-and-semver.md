@@ -67,7 +67,7 @@ The `2.0.0` release established the simplified `AsiBackbone.*` package and names
 
 ### Current `7.x` stable family
 
-`7.0.0` is the current stable release on `main`. It preserves the `AsiBackbone.*` package IDs and the `net10.0` target, and advances the binary assembly identity to `7.0.0.0`. It renames the retained 6.0 compatibility types, namespaces, and members; the `GovernanceOutboxDrain` and `GovernanceOutboxDrainHostedService` constructors are replaced by source-compatible signatures that add an optional `TimeProvider` parameter. It carries security corrections that change stable contracts: acknowledgment responses are now bound to the challenged actor, capability grants are bound to the expected subject and operation, and the DLP classification enums move off their permissive zero values, which changes the numeric value of every existing member of `DlpFailureBehavior` and `DlpIntentRiskLevel`. The enum change is what requires the major boundary, because an enum value change affects a stable package contract and the `6.x` line pins its assembly identity at `6.0.0.0`. See [Upgrade from 6.x to 7.0](upgrade-600-to-700.md).
+`7.1.0` is the current stable release on `main`. The `7.x` line preserves the `AsiBackbone.*` package IDs, the `net10.0` target, and binary assembly identity `7.0.0.0`. Version 7.1 adds analyzer guidance and deprecates retained compatibility APIs through warnings and documented replacements without removing them or changing their runtime behavior. See [7.1.0 Release Notes](release-notes-710.md) and [Upgrade from 6.x to 7.0](upgrade-600-to-700.md).
 
 | Package | `7.x` stable role |
 | --- | --- |
@@ -191,6 +191,7 @@ Expected stable-line behavior:
 | `5.2.0` | `5.2.0` | `5.0.0.0` | `5.2.0.0` | `5.2.0+...` |
 | `6.0.0` | `6.0.0` | `6.0.0.0` | `6.0.0.0` | `6.0.0+...` |
 | `7.0.0` | `7.0.0` | `7.0.0.0` | `7.0.0.0` | `7.0.0+...` |
+| `7.1.0` | `7.1.0` | `7.0.0.0` | `7.1.0.0` | `7.1.0+...` |
 
 Before cutting stable releases, release validation should verify that `AssemblyVersion`, `FileVersion`, `InformationalVersion`, package metadata, release notes, and repository tags match this policy.
 
@@ -224,6 +225,7 @@ Before cutting a stable release or stable package-family expansion, the release 
 
 - [API Baseline and Architecture Boundary Checks](api-baseline-and-boundary-checks.md)
 - [4.0.0 Release Notes](release-notes-400.md)
+- [7.1.0 Release Notes](release-notes-710.md)
 - [7.0.0 Release Notes](release-notes-700.md)
 - [Upgrade from 6.x to 7.0](upgrade-600-to-700.md)
 - [6.0.0 Release Notes](release-notes-600.md)

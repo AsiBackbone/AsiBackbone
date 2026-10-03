@@ -6,16 +6,27 @@ Current package/runtime behavior is documented in the product articles and gener
 
 ## Current release
 
-Stable package family: `7.x`. Current release: `7.0.0`.
+Stable package family: `7.x`. Current release: `7.1.0`.
+
+- [7.1.0 Release Notes](../articles/release-notes-710.md)
+- [7.1.0 Release Readiness Record](../articles/release-readiness-710.md)
+- [7.1.0 Consumer Verification Guide](../articles/consumer-verification-710.md)
+- [ASIB901 Migration Guide](../articles/asib901-create-execution-boundary.md)
+- [ASIB902 Migration Guide](../articles/asib902-legacy-signature-input.md)
+- [ASIB903 Migration Guide](../articles/asib903-outbox-retry-clock.md)
+- [API Compatibility and Semantic Versioning](../articles/api-compatibility-and-semver.md)
+- [Schema Versioning](../articles/schema-versioning.md)
+- [Target Framework Support](../articles/target-framework-support.md)
+
+## Release archive
+
+### 7.0.0
 
 - [7.0.0 Release Notes](../articles/release-notes-700.md)
 - [7.0.0 Release Readiness Record](../articles/release-readiness-700.md)
 - [7.0.0 Consumer Verification Guide](../articles/consumer-verification-700.md)
 - [Upgrade from 6.x to 7.0](../articles/upgrade-600-to-700.md)
 - [6.0 Public API Naming Convention](../articles/public-api-naming-600.md)
-- [API Compatibility and Semantic Versioning](../articles/api-compatibility-and-semver.md)
-- [Schema Versioning](../articles/schema-versioning.md)
-- [Target Framework Support](../articles/target-framework-support.md)
 
 ## Changelog and upgrade guidance
 
@@ -23,8 +34,6 @@ Stable package family: `7.x`. Current release: `7.0.0`.
 - [Upgrade Guide: 1.0.0 to 1.1.0](../articles/upgrade-100-to-110.md)
 
 The upgrade guide is a historical version-to-version record. Use current compatibility, target-framework, and release notes for present-day package decisions.
-
-## Release archive
 
 ### 6.0.0
 

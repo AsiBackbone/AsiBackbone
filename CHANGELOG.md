@@ -6,6 +6,8 @@ This project follows the spirit of [Keep a Changelog](https://keepachangelog.com
 
 ## [Unreleased]
 
+## [7.1.0] - 2026-10-03
+
 ### Added
 
 * Analyzer rule `ASIB004` warns when a `SigningRequest`, `SignatureVerificationRequest`, or `ManagedKeySignRequest`
@@ -82,6 +84,13 @@ This project follows the spirit of [Keep a Changelog](https://keepachangelog.com
 * Documentation release-claim validation now checks current-reader pointers in the historical pages listed in the new
   `historicalPointerPaths` setting. A pointer that links current readers to a version-specific release record fails
   validation, while historical facts in those pages remain unchecked (#842).
+
+### Compatibility
+
+* `7.1.0` is a backward-compatible minor release for the stable `7.x` package family. It adds analyzer guidance and
+  begins documented deprecation windows without removing the retained APIs or changing their runtime behavior.
+* Package IDs and the `net10.0` target remain unchanged. `AssemblyVersion` remains `7.0.0.0`; package and file versions
+  advance to `7.1.0` and `7.1.0.0` respectively.
 
 ## [7.0.0] - 2026-09-26
 
