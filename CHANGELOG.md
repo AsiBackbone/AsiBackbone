@@ -6,6 +6,10 @@ This project follows the spirit of [Keep a Changelog](https://keepachangelog.com
 
 ## [Unreleased]
 
+### Fixed
+
+* Ensured every published documentation page has page-specific search and social-preview descriptions when authored metadata is absent, and marked generated coverage and mutation reports `noindex` so search engines focus on durable documentation.
+
 ## [7.1.0] - 2026-10-03
 
 ### Added

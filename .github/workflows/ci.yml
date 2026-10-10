@@ -107,6 +107,14 @@ jobs:
       - name: Build DocFX site for public API baseline
         run: dotnet tool run docfx -- docs/docfx.json
 
+      - name: Test published HTML metadata tooling
+        shell: pwsh
+        run: ./scripts/Ensure-PublishedHtmlMetadata.ps1 -SelfTest
+
+      - name: Ensure published HTML metadata
+        shell: pwsh
+        run: ./scripts/Ensure-PublishedHtmlMetadata.ps1 -SiteDirectory ./docs/_site
+
       - name: Validate stable public API baseline
         shell: pwsh
         run: ./scripts/Validate-PublicApiBaseline.ps1
