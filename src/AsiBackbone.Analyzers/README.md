@@ -1,5 +1,8 @@
 # AsiBackbone.Analyzers
 
+[![NuGet](https://img.shields.io/nuget/v/AsiBackbone.Analyzers?label=NuGet)](https://www.nuget.org/packages/AsiBackbone.Analyzers)
+[![NuGet Downloads](https://img.shields.io/nuget/dt/AsiBackbone.Analyzers?label=downloads)](https://www.nuget.org/packages/AsiBackbone.Analyzers)
+
 Roslyn analyzer safety rails for AsiBackbone governance flows.
 
 > **New to AsiBackbone?** Start with the concept, not this package: [Intent to Execution: An Accountability Pattern](https://asibackbone.github.io/AsiBackbone/articles/intent-to-execution-pattern.html) and the [documentation site](https://asibackbone.github.io/AsiBackbone/). This README covers one package in the family.

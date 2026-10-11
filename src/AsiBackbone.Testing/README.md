@@ -1,5 +1,8 @@
 # AsiBackbone.Testing
 
+[![NuGet](https://img.shields.io/nuget/v/AsiBackbone.Testing?label=NuGet)](https://www.nuget.org/packages/AsiBackbone.Testing)
+[![NuGet Downloads](https://img.shields.io/nuget/dt/AsiBackbone.Testing?label=downloads)](https://www.nuget.org/packages/AsiBackbone.Testing)
+
 `AsiBackbone.Testing` provides test harness helpers for exercising AsiBackbone-governed endpoints and services without forcing host applications to wire production persistence, signing, outbox, audit, or capability-grant infrastructure in every automated test.
 
 > [!IMPORTANT]

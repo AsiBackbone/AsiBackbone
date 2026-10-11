@@ -1,5 +1,8 @@
 # AsiBackbone.Templates
 
+[![NuGet](https://img.shields.io/nuget/v/AsiBackbone.Templates?label=NuGet)](https://www.nuget.org/packages/AsiBackbone.Templates)
+[![NuGet Downloads](https://img.shields.io/nuget/dt/AsiBackbone.Templates?label=downloads)](https://www.nuget.org/packages/AsiBackbone.Templates)
+
 `AsiBackbone.Templates` provides `dotnet new` templates for creating governed ASP.NET Core hosts with AsiBackbone.
 
 The package is a developer-experience scaffold. It is not a runtime dependency. It helps generate local adoption starting points, not production authority or operational control.

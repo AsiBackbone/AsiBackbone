@@ -1,5 +1,8 @@
 # AsiBackbone.DependencyInjection
 
+[![NuGet](https://img.shields.io/nuget/v/AsiBackbone.DependencyInjection?label=NuGet)](https://www.nuget.org/packages/AsiBackbone.DependencyInjection)
+[![NuGet Downloads](https://img.shields.io/nuget/dt/AsiBackbone.DependencyInjection?label=downloads)](https://www.nuget.org/packages/AsiBackbone.DependencyInjection)
+
 Explicit `AddAsiBackbone(...)` builder facade for coordinating host-selected AsiBackbone provider registrations.
 
 > **Important:**
