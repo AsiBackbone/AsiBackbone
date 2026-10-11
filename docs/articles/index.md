@@ -55,6 +55,7 @@ Use these pages to establish the product boundary before integrating the package
 
 ## Get started
 
+* [Adoption and Target Use Cases](use-cases.md)
 * [Implementation-First Adoption Path](implementation-first-adoption.md)
 * [First 15 Minutes: Standard API Gating](quickstart-api-gating.md)
 * [AddAsiBackbone Builder Facade](add-asibackbone-builder-facade.md)
