@@ -1,5 +1,8 @@
 # AsiBackbone.OpenTelemetry
 
+[![NuGet](https://img.shields.io/nuget/v/AsiBackbone.OpenTelemetry?label=NuGet)](https://www.nuget.org/packages/AsiBackbone.OpenTelemetry)
+[![NuGet Downloads](https://img.shields.io/nuget/dt/AsiBackbone.OpenTelemetry?label=downloads)](https://www.nuget.org/packages/AsiBackbone.OpenTelemetry)
+
 `AsiBackbone.OpenTelemetry` adapts provider-neutral AsiBackbone governance emission envelopes into OpenTelemetry-friendly .NET diagnostics primitives.
 
 The package implements `IGovernanceEmitter` without making `AsiBackbone.Core` depend on OpenTelemetry exporters, Azure SDKs, SIEM SDKs, Event Hubs, Purview, robotics packages, or cloud-provider dependencies.

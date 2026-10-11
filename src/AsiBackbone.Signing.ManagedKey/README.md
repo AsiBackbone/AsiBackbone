@@ -1,5 +1,8 @@
 # AsiBackbone.Signing.ManagedKey
 
+[![NuGet](https://img.shields.io/nuget/v/AsiBackbone.Signing.ManagedKey?label=NuGet)](https://www.nuget.org/packages/AsiBackbone.Signing.ManagedKey)
+[![NuGet Downloads](https://img.shields.io/nuget/dt/AsiBackbone.Signing.ManagedKey?label=downloads)](https://www.nuget.org/packages/AsiBackbone.Signing.ManagedKey)
+
 Provider-neutral managed-key signing adapter for AsiBackbone governance artifacts.
 
 This package keeps `AsiBackbone.Core` provider-neutral while allowing host applications to connect signing flow to a host-owned managed key system, HSM, cloud KMS, Azure Key Vault / Managed HSM adapter, or organization-owned signing service through the existing adapter boundary.

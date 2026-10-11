@@ -1,5 +1,8 @@
 # AsiBackbone.AspNetCore
 
+[![NuGet](https://img.shields.io/nuget/v/AsiBackbone.AspNetCore?label=NuGet)](https://www.nuget.org/packages/AsiBackbone.AspNetCore)
+[![NuGet Downloads](https://img.shields.io/nuget/dt/AsiBackbone.AspNetCore?label=downloads)](https://www.nuget.org/packages/AsiBackbone.AspNetCore)
+
 ASP.NET Core host adapters for AsiBackbone governance primitives.
 
 Part of the stable `7.x` package family. This README describes version `7.1.0` of this package.

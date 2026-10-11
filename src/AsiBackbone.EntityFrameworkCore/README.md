@@ -1,5 +1,8 @@
 # AsiBackbone.EntityFrameworkCore
 
+[![NuGet](https://img.shields.io/nuget/v/AsiBackbone.EntityFrameworkCore?label=NuGet)](https://www.nuget.org/packages/AsiBackbone.EntityFrameworkCore)
+[![NuGet Downloads](https://img.shields.io/nuget/dt/AsiBackbone.EntityFrameworkCore?label=downloads)](https://www.nuget.org/packages/AsiBackbone.EntityFrameworkCore)
+
 Entity Framework Core model configuration and host-owned persistence helpers for AsiBackbone records.
 
 This package contributes provider-neutral EF Core model configuration, persistence entities, EF Core-backed audit ledger storage, EF Core-backed decision receipt lifecycle storage, and EF Core-backed durable outbox storage while preserving host ownership of the application database.

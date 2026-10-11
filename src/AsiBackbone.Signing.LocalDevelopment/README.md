@@ -1,5 +1,8 @@
 # AsiBackbone.Signing.LocalDevelopment
 
+[![NuGet](https://img.shields.io/nuget/v/AsiBackbone.Signing.LocalDevelopment?label=NuGet)](https://www.nuget.org/packages/AsiBackbone.Signing.LocalDevelopment)
+[![NuGet Downloads](https://img.shields.io/nuget/dt/AsiBackbone.Signing.LocalDevelopment?label=downloads)](https://www.nuget.org/packages/AsiBackbone.Signing.LocalDevelopment)
+
 `AsiBackbone.Signing.LocalDevelopment` provides a local-development RSA signing and verification provider for exercising AsiBackbone signing abstractions without Azure Key Vault, HSM, cloud KMS, certificate-store, or external infrastructure dependencies.
 
 > **New to AsiBackbone?** Start with the concept, not this package: [Intent to Execution: An Accountability Pattern](https://asibackbone.github.io/AsiBackbone/articles/intent-to-execution-pattern.html) and the [documentation site](https://asibackbone.github.io/AsiBackbone/). This README covers one package in the family.

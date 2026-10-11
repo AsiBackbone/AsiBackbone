@@ -1,5 +1,8 @@
 # AsiBackbone.Storage.InMemory
 
+[![NuGet](https://img.shields.io/nuget/v/AsiBackbone.Storage.InMemory?label=NuGet)](https://www.nuget.org/packages/AsiBackbone.Storage.InMemory)
+[![NuGet Downloads](https://img.shields.io/nuget/dt/AsiBackbone.Storage.InMemory?label=downloads)](https://www.nuget.org/packages/AsiBackbone.Storage.InMemory)
+
 Non-durable in-memory storage helpers for AsiBackbone local validation, samples, and tests.
 
 This package provides non-durable storage implementations that make it easy to exercise ASI Backbone governance flows without requiring a database, EF Core provider, or host infrastructure.
