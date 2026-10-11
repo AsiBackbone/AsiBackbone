@@ -42,6 +42,8 @@ Most software can tell you *what* happened. Far less can show that an action was
 
 AsiBackbone is a .NET package family for that decision boundary. It helps a host application build safe policy context, evaluate constraints, return a structured decision, preserve a decision receipt, optionally scope continuation, and then let the host decide whether and how to execute.
 
+**Is it a good fit?** Consider AsiBackbone when a consequential host-owned action needs policy provenance, acknowledgment, scoped continuation authority, or durable decision evidence. Prefer ordinary framework authorization, application services, and logs when the action is low risk and those simpler boundaries already provide the evidence you need. See [Adoption and Target Use Cases](https://asibackbone.github.io/AsiBackbone/articles/use-cases.html) for the detailed product-fit and simpler-design guidance.
+
 ## Implementation-first mental model
 
 A normal API adoption path looks like this:

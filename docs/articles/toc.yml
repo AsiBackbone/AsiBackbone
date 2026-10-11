@@ -22,6 +22,8 @@
 
 - name: Get Started
   items:
+    - name: Adoption and Target Use Cases
+      href: use-cases.md
     - name: Implementation-First Adoption Path
       href: implementation-first-adoption.md
     - name: "First 15 Minutes: Standard API Gating"
