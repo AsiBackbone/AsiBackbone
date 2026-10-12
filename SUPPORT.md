@@ -4,11 +4,13 @@ AsiBackbone is a .NET package family for governance-oriented decision flow. Supp
 
 ## Support Channels
 
-Use [GitHub Discussions](https://github.com/AsiBackbone/AsiBackbone/discussions) for:
+Use [AsiBackbone organization Discussions](https://github.com/orgs/AsiBackbone/discussions) for:
 
 - Setup, adoption, and usage questions.
 - Design or integration guidance that is not a package defect.
 - Community feedback and open-ended ideas that are not yet focused feature requests.
+
+Name `AsiBackbone/AsiBackbone` and the affected package version so project-specific conversations remain easy to find on the shared surface.
 
 Use [GitHub Issues](https://github.com/AsiBackbone/AsiBackbone/issues) for:
 
