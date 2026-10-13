@@ -88,24 +88,53 @@ jobs:
           preserve_root="./artifacts/preserved-pages"
           mkdir -p "$preserve_root"
 
+          # Each Stryker report is one self-contained index.html (html reporter), so only that file is fetched.
+          # A 404 means the report was never published. Any other failure (for example a transient 503 from
+          # Pages) is retried and then fails the job, because deploying without the report would drop it from
+          # the site and every later deploy would carry that gap forward.
+          max_attempts=5
+
           for report in core aspnetcore signing-managedkey opentelemetry; do
-            report_url="${PAGES_BASE_URL%/}/mutation/${report}/"
+            report_url="${PAGES_BASE_URL%/}/mutation/${report}/index.html"
+            report_file="$preserve_root/mutation/${report}/index.html"
+            mkdir -p "$(dirname "$report_file")"
 
             echo "Attempting to preserve deployed mutation report from $report_url"
 
-            if wget \
-              --recursive \
-              --level=2 \
-              --page-requisites \
-              --no-parent \
-              --no-host-directories \
-              --cut-dirs=1 \
-              --directory-prefix "$preserve_root" \
-              "$report_url"; then
-              echo "Preserved deployed mutation report: $report"
-            else
-              echo "No deployed mutation report found for: $report"
-            fi
+            status=""
+            for attempt in $(seq 1 "$max_attempts"); do
+              status="$(curl --silent --show-error --location --output "$report_file" --write-out '%{http_code}' "$report_url" || true)"
+
+              if [ "$status" = "200" ] || [ "$status" = "404" ]; then
+                break
+              fi
+
+              echo "Attempt $attempt of $max_attempts for $report returned HTTP ${status:-no response}."
+              if [ "$attempt" -lt "$max_attempts" ]; then
+                sleep $((attempt * 10))
+              fi
+            done
+
+            case "$status" in
+              200)
+                if [ ! -s "$report_file" ]; then
+                  echo "::error::Deployed mutation report for $report returned an empty body."
+                  exit 1
+                fi
+                echo "Preserved deployed mutation report: $report"
+                ;;
+              404)
+                rm -f "$report_file"
+                rmdir "$(dirname "$report_file")" 2>/dev/null || true
+                echo "::warning::No deployed mutation report found for: $report"
+                ;;
+              *)
+                rm -f "$report_file"
+                rmdir "$(dirname "$report_file")" 2>/dev/null || true
+                echo "::error::Could not preserve deployed mutation report for $report (last HTTP ${status:-no response}). Failing instead of deploying the site without it."
+                exit 1
+                ;;
+            esac
           done
 
           if [ -d "$preserve_root/mutation" ]; then
