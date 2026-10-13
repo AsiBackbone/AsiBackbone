@@ -1,6 +1,3 @@
-- name: Overview
-  href: index.md
-
 - name: Documentation
   items:
     - name: Get Started
@@ -19,11 +16,19 @@
     - name: Historical Records
       href: history/
 
-- name: Resources
+- name: AsiBackbone
   items:
-    - name: Organization Home
+    - name: Organization
       href: https://asibackbone.github.io/
-    - name: Learn the Architecture
+    - name: Learning
       href: https://asibackbone.github.io/Learning/
-    - name: Repository
+    - name: Community
+      href: https://asibackbone.github.io/#community
+    - name: Framework
+      href: index.md
+    - name: Template
+      href: https://asibackbone.github.io/NetCoreApplicationTemplate/
+    - name: GitHub
+      href: https://github.com/AsiBackbone
+    - name: Framework Repository
       href: https://github.com/AsiBackbone/AsiBackbone

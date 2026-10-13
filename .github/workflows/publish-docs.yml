@@ -144,6 +144,14 @@ jobs:
       - name: Build DocFX site
         run: dotnet tool run docfx -- docs/docfx.json
 
+      - name: Test documentation landing-page validator
+        shell: pwsh
+        run: ./scripts/Validate-LandingPage.ps1 -SelfTest
+
+      - name: Validate documentation landing page
+        shell: pwsh
+        run: ./scripts/Validate-LandingPage.ps1 -SiteDirectory ./docs/_site
+
       - name: Validate documentation continuity and cross-repository links
         shell: pwsh
         run: ./scripts/Validate-DocumentationLinks.ps1
