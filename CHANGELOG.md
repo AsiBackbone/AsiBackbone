@@ -6,6 +6,19 @@ This project follows the spirit of [Keep a Changelog](https://keepachangelog.com
 
 ## [Unreleased]
 
+### Changed
+
+* Aligned the documentation homepage with the organization
+  [landing-page standard](https://github.com/AsiBackbone/.github/blob/main/LANDING-PAGE-STANDARD.md) v1.0.0. A
+  problem-first hero states what the framework solves and when to evaluate it and keeps the not-an-intelligence-engine
+  and host-responsibility boundary; six Start here cards cover fit, the 15-minute quick start, adoption, runtime
+  decisions, hardening, and the API reference; an Is AsiBackbone a fit? callout routes to Adoption and Target Use Cases;
+  and Related projects and Design philosophy close the page. Detailed package, release, maintainer, and historical
+  content is unchanged below the first-contact sections. The navbar AsiBackbone menu exposes Organization, Learning,
+  Community, Framework, Template, and GitHub, replacing Resources and the redundant Overview item; the footer adds source,
+  community, license, and archive links; and every page now has a skip link. `scripts/Validate-LandingPage.ps1` checks
+  the homepage, navigation, and footer in CI (AsiBackbone/.github#17).
+
 ### Fixed
 
 * Ensured every published documentation page has page-specific search and social-preview descriptions when authored metadata is absent, and marked generated coverage and mutation reports `noindex` so search engines focus on durable documentation.

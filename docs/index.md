@@ -1,36 +1,85 @@
-# ASI Backbone Documentation
+---
+_disableAffix: true
+_disableBreadcrumb: true
+---
 
-Welcome to the AsiBackbone product documentation.
+# AsiBackbone Documentation
 
-AsiBackbone is a .NET governance and policy-control package family for accountable software execution. It is not an intelligence engine.
+<div class="home-hero">
+  <p class="home-kicker">Governed decisions for .NET applications</p>
+  <p class="home-summary">AsiBackbone is a .NET governance and policy-control package family for accountable software execution: policy context, explicit decision outcomes, decision records, scoped authority, and host-owned execution.</p>
+  <p class="home-why">Most software can tell you what happened. Far less can show that an action was evaluated before it executed, under which policy, and with what evidence. Evaluate AsiBackbone when a consequential host-owned action needs policy provenance, acknowledgment, scoped continuation authority, or durable decision evidence.</p>
+  <div class="home-actions" role="group" aria-label="Start with AsiBackbone">
+    <a class="btn btn-primary" href="articles/implementation-first-adoption.md">Get Started</a>
+    <a class="btn btn-outline-primary" href="articles/use-cases.md">Is It a Fit?</a>
+    <a class="btn btn-outline-primary" href="articles/quickstart-api-gating.md">First 15 Minutes</a>
+  </div>
+  <p class="home-boundary">AsiBackbone is not an intelligence engine. It provides framework-neutral building blocks and host integration seams for governing consequential actions in software systems. Host applications remain responsible for authentication, authorization, execution, persistence, deployment, monitoring, compliance review, and operational controls. See <a href="articles/project-boundaries.md">Project Boundaries and Non-Claims</a> for the canonical boundary reference.</p>
+</div>
 
-> [!IMPORTANT]
-> AsiBackbone provides framework-neutral building blocks and host integration seams for governing consequential actions in software systems. Host applications remain responsible for authentication, authorization, execution, persistence, deployment, monitoring, compliance review, and operational controls. See [Project Boundaries and Non-Claims](articles/project-boundaries.md) for the canonical boundary reference.
+## Start here
+
+<div class="entry-point-grid">
+  <a class="entry-point" href="articles/use-cases.md">
+    <strong>Decide whether it fits</strong>
+    <span>Compare the product's good and poor fits, including when a simpler design is enough.</span>
+  </a>
+  <a class="entry-point" href="articles/quickstart-api-gating.md">
+    <strong>Gate an API in 15 minutes</strong>
+    <span>Run the standard API gating path end to end in a minimal host.</span>
+  </a>
+  <a class="entry-point" href="articles/implementation-first-adoption.md">
+    <strong>Adopt it in a host</strong>
+    <span>Install, register, and configure the package family step by step.</span>
+  </a>
+  <a class="entry-point" href="articles/policy-evaluator-pipeline.md">
+    <strong>Understand runtime decisions</strong>
+    <span>See how the policy evaluator pipeline produces a governance decision.</span>
+  </a>
+  <a class="entry-point" href="articles/production-hardening-evaluator-and-outbox.md">
+    <strong>Harden a deployment</strong>
+    <span>Persist, observe, sign, and verify decisions in production.</span>
+  </a>
+  <a class="entry-point" href="api-reference.md">
+    <strong>Find a package or type</strong>
+    <span>Browse the generated API reference for every shipped package.</span>
+  </a>
+</div>
+
+## Is AsiBackbone a fit?
+
+<div class="fit-grid">
+  <section class="fit-panel" aria-labelledby="fit-use">
+    <h3 id="fit-use">Consider AsiBackbone when</h3>
+    <p>a consequential host-owned action needs policy provenance, acknowledgment, scoped continuation authority, or durable decision evidence.</p>
+    <p>See <a href="articles/use-cases.md#good-product-fit">Good product fit</a> for the capabilities that make it a reasonable candidate.</p>
+  </section>
+  <section class="fit-panel" aria-labelledby="fit-simpler">
+    <h3 id="fit-simpler">Prefer a simpler design when</h3>
+    <p>the action is low risk and ordinary framework authorization, application services, and logs already provide the evidence you need.</p>
+    <p>See <a href="articles/use-cases.md#poor-product-fit">Poor product fit</a>, and the general comparisons <a href="https://asibackbone.github.io/Learning/architecture/when-aspnet-core-authorization-is-enough.html">When ASP.NET Core Authorization Is Enough</a> and <a href="https://asibackbone.github.io/Learning/architecture/when-a-simple-application-service-is-enough.html">When a Simple Application Service Is Enough</a>.</p>
+  </section>
+</div>
 
 ## Product documentation versus architecture education
 
 This site is authoritative for concrete AsiBackbone package, API, configuration, runtime, integration, security, operations, compatibility, release, and maintainer behavior.
 
-For architecture concepts, tutorials, comparisons, tradeoffs, labs, and general governed-execution education, use [ASI Backbone Learning](https://asibackbone.github.io/Learning/). Its [Architecture Glossary](https://asibackbone.github.io/Learning/architecture/glossary.html) is the canonical educational terminology reference, with lineage maintained in [Terminology and Established Architecture Concepts](https://asibackbone.github.io/Learning/architecture/terminology-and-established-concepts.html). Learning does not override product API or runtime truth documented here.
+For architecture concepts, tutorials, comparisons, tradeoffs, labs, and general governed-execution education, use [AsiBackbone Learning](https://asibackbone.github.io/Learning/). Its [Architecture Glossary](https://asibackbone.github.io/Learning/architecture/glossary.html) is the canonical educational terminology reference, with lineage maintained in [Terminology and Established Architecture Concepts](https://asibackbone.github.io/Learning/architecture/terminology-and-established-concepts.html). Learning does not override product API or runtime truth documented here.
 
 See [Documentation Ownership](articles/documentation-ownership.md) for the cross-repository ownership matrix and contribution routing rule.
 
-## Choose a task
+## More tasks
 
 | Goal | Start here |
 | --- | --- |
-| Decide whether AsiBackbone fits the problem | [Adoption and Target Use Cases](articles/use-cases.md), including when to prefer a simpler design |
-| Install and configure AsiBackbone | [Implementation-First Adoption Path](articles/implementation-first-adoption.md) and [First 15 Minutes: Standard API Gating](articles/quickstart-api-gating.md) |
 | Register the package family in a host | [AddAsiBackbone Builder Facade](articles/add-asibackbone-builder-facade.md) and [Getting Started](articles/getting-started.md) |
-| Find a package or public type | [Documentation Articles](articles/index.md) and [API Reference](api-reference.md) |
-| Understand runtime decision behavior | [Policy Evaluator Pipeline](articles/policy-evaluator-pipeline.md) |
-| Persist, observe, sign, verify, or harden a deployment | [Production Hardening: Evaluator and Outbox](articles/production-hardening-evaluator-and-outbox.md) |
+| Find articles by package or topic | [Documentation Articles](articles/index.md) |
 | Run a concrete integration path | [Plain ASP.NET Core Host Sample](articles/plain-aspnetcore-host-sample.md) and [Samples & Scenarios](articles/index.md) |
 | Check compatibility, release changes, or upgrade history | [Releases & Compatibility](releases/index.md) |
 | Review readiness, benchmarks, or quality evidence | [Maintainer & Quality Evidence](maintainers/index.md) |
-| Learn the broader architecture | [ASI Backbone Learning](https://asibackbone.github.io/Learning/) |
 
-The DocFX header search is available for package names, API concepts, and article titles. Source for every page lives under `docs/`, and the site header includes a Repository link for source review or edits.
+The DocFX header search is available for package names, API concepts, and article titles. Source for every page lives under `docs/`, and the site header's AsiBackbone menu includes a Framework Repository link for source review or edits.
 
 ## Current stable package family
 
@@ -131,7 +180,6 @@ Historical release notes and verification records remain available under [Releas
 * [Release Cadence and Readiness](articles/release-cadence-and-readiness.md)
 * [6.0.0 Release Readiness Record](articles/release-readiness-600.md)
 
-
 ### Historical records
 
 * [Historical and Superseded Records](history/index.md)
@@ -140,4 +188,46 @@ Historical and superseded records remain public and searchable for traceability 
 
 ## Learn the architecture
 
-General architecture teaching is maintained in [ASI Backbone Learning](https://asibackbone.github.io/Learning/). Retained conceptual articles in this repository remain available for continuity and historical context, but they are intentionally separated from the main implementation/API navigation.
+General architecture teaching is maintained in [AsiBackbone Learning](https://asibackbone.github.io/Learning/). Retained conceptual articles in this repository remain available for continuity and historical context, but they are intentionally separated from the main implementation/API navigation.
+
+## Related projects
+
+<div class="project-grid">
+  <article class="project-card" aria-current="page">
+    <span class="project-role">Add governed decisions</span>
+    <h3>AsiBackbone <span class="current-site">Current site</span></h3>
+    <p>A .NET governance and policy-control framework for auditable decision flows: policy evaluation, auditable decision records, acknowledgment workflows, capability-based authorization, host-owned execution boundaries, and ASP.NET Core integration.</p>
+    <p class="project-links">
+      <a href="https://github.com/AsiBackbone/AsiBackbone" aria-label="AsiBackbone repository">Repository</a>
+      <a href="https://doi.org/10.5281/zenodo.20546032" aria-label="AsiBackbone archive (DOI)">Archive (DOI)</a>
+    </p>
+  </article>
+  <article class="project-card">
+    <span class="project-role">Learn the patterns</span>
+    <h3><a href="https://asibackbone.github.io/Learning/">AsiBackbone Learning</a></h3>
+    <p>Practical .NET architecture tutorials, labs, runnable samples, and reference patterns for governed execution, secure applications, AI integration, and policy-driven systems, including comparisons that show when these patterns are unnecessary.</p>
+    <p class="project-links">
+      <a href="https://asibackbone.github.io/Learning/" aria-label="AsiBackbone Learning documentation">Documentation</a>
+      <a href="https://github.com/AsiBackbone/Learning" aria-label="AsiBackbone Learning repository">Repository</a>
+      <a href="https://doi.org/10.5281/zenodo.21938556" aria-label="AsiBackbone Learning archive (DOI)">Archive (DOI)</a>
+    </p>
+  </article>
+  <article class="project-card">
+    <span class="project-role">Start a secure application</span>
+    <h3><a href="https://asibackbone.github.io/NetCoreApplicationTemplate/">.NET Core Application Template</a></h3>
+    <p>A secure-by-default ASP.NET Core application template with authentication and authorization, structured logging, security headers, rate limiting, EF Core data access, reverse proxy support, and Problem Details error handling.</p>
+    <p class="project-links">
+      <a href="https://asibackbone.github.io/NetCoreApplicationTemplate/" aria-label=".NET Core Application Template documentation">Documentation</a>
+      <a href="https://github.com/AsiBackbone/NetCoreApplicationTemplate" aria-label=".NET Core Application Template repository">Repository</a>
+      <a href="https://doi.org/10.5281/zenodo.20373042" aria-label=".NET Core Application Template archive (DOI)">Archive (DOI)</a>
+    </p>
+  </article>
+</div>
+
+## Design philosophy
+
+<div class="philosophy-callout">
+  <p class="philosophy-statement">We favor architectures where consequential operations are explicit, constrained, reviewable, and auditable.</p>
+  <p>We also document when these patterns are unnecessary: see <a href="articles/use-cases.md#poor-product-fit">Poor product fit</a>, <a href="https://asibackbone.github.io/Learning/architecture/when-aspnet-core-authorization-is-enough.html">When ASP.NET Core Authorization Is Enough</a>, and <a href="https://asibackbone.github.io/Learning/architecture/when-a-simple-application-service-is-enough.html">When a Simple Application Service Is Enough</a>.</p>
+  <p>The projects focus on practical .NET engineering. They do not claim regulatory certification or automatic compliance. See <a href="articles/project-boundaries.md">Project Boundaries and Non-Claims</a>.</p>
+</div>
