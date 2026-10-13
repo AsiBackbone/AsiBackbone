@@ -19,6 +19,7 @@ See [Documentation Ownership](articles/documentation-ownership.md) for the cross
 
 | Goal | Start here |
 | --- | --- |
+| Decide whether AsiBackbone fits the problem | [Adoption and Target Use Cases](articles/use-cases.md), including when to prefer a simpler design |
 | Install and configure AsiBackbone | [Implementation-First Adoption Path](articles/implementation-first-adoption.md) and [First 15 Minutes: Standard API Gating](articles/quickstart-api-gating.md) |
 | Register the package family in a host | [AddAsiBackbone Builder Facade](articles/add-asibackbone-builder-facade.md) and [Getting Started](articles/getting-started.md) |
 | Find a package or public type | [Documentation Articles](articles/index.md) and [API Reference](api-reference.md) |
@@ -69,6 +70,7 @@ Package-specific READMEs and release notes define which surfaces are stable, opt
 
 ### Get started
 
+* [Adoption and Target Use Cases](articles/use-cases.md)
 * [Implementation-First Adoption Path](articles/implementation-first-adoption.md)
 * [First 15 Minutes: Standard API Gating](articles/quickstart-api-gating.md)
 * [AddAsiBackbone Builder Facade](articles/add-asibackbone-builder-facade.md)
