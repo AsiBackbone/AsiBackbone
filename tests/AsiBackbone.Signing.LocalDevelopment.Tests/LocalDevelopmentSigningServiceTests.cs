@@ -260,6 +260,114 @@ public sealed class LocalDevelopmentSigningServiceTests
         Assert.Equal("localdev.signature.provider-not-trusted", outcome.FailureCode);
     }
 
+    /// <summary>
+    /// Verifies that each signing-metadata field the verifier checks rejects a value this provider did not produce.
+    /// </summary>
+    /// <param name="mutation">The signing-metadata field to alter.</param>
+    /// <param name="expectedFailureCode">The expected verification failure code.</param>
+    /// <returns>A task that represents the asynchronous test.</returns>
+    [Theory]
+    [InlineData("hash-null", "localdev.signature.hash-mismatch")]
+    [InlineData("hash-algorithm", "localdev.signature.hash-algorithm-unsupported")]
+    [InlineData("signature-algorithm", "localdev.signature.algorithm-mismatch")]
+    [InlineData("key-id", "localdev.signature.key-mismatch")]
+    [InlineData("key-version", "localdev.signature.key-mismatch")]
+    [InlineData("malformed-signature", "localdev.signature.malformed")]
+    public async Task VerifyAsyncRejectsAlteredSigningMetadata(string mutation, string expectedFailureCode)
+    {
+        using var service = new LocalDevelopmentSigningService();
+        SigningResult signingResult = await service.SignAsync(
+            new SigningRequest("expected-hash", hashAlgorithm: "sha256"),
+            TestContext.Current.CancellationToken);
+        SigningMetadata original = signingResult.Metadata;
+
+        var altered = SigningMetadata.Create(
+            signingHash: mutation == "hash-null" ? null : original.SigningHash,
+            hashAlgorithm: mutation == "hash-algorithm" ? "SHA-512" : original.HashAlgorithm,
+            signature: mutation == "malformed-signature" ? "not base64!" : original.Signature,
+            signatureAlgorithm: mutation == "signature-algorithm" ? "OTHER-ALGORITHM" : original.SignatureAlgorithm,
+            keyId: mutation == "key-id" ? "other-key" : original.KeyId,
+            keyVersion: mutation == "key-version" ? "other-version" : original.KeyVersion,
+            provider: original.Provider,
+            signedUtc: original.SignedUtc,
+            metadata: original.Metadata);
+
+        SignatureVerificationResult verificationResult = await service.VerifyAsync(
+            new SignatureVerificationRequest("expected-hash", altered),
+            TestContext.Current.CancellationToken);
+
+        Assert.False(verificationResult.IsValid);
+        Assert.Equal(expectedFailureCode, verificationResult.FailureCode);
+    }
+
+    /// <summary>
+    /// Verifies that verification without a signature value reports a missing signature.
+    /// </summary>
+    /// <returns>A task that represents the asynchronous test.</returns>
+    [Fact]
+    public async Task VerifyAsyncReportsMissingSignature()
+    {
+        using var service = new LocalDevelopmentSigningService();
+
+        SignatureVerificationResult verificationResult = await service.VerifyAsync(
+            new SignatureVerificationRequest("expected-hash", SigningMetadata.Create(signingHash: "expected-hash")),
+            TestContext.Current.CancellationToken);
+
+        Assert.False(verificationResult.IsValid);
+        Assert.Equal(SignatureVerificationCategory.MissingSignature, verificationResult.Category);
+    }
+
+    /// <summary>
+    /// Verifies that signing requests naming a different key or key version return unsigned failure metadata.
+    /// </summary>
+    /// <param name="keyId">The requested key identifier.</param>
+    /// <param name="keyVersion">The requested key version.</param>
+    /// <param name="expectedFailureCode">The expected signing failure code.</param>
+    /// <returns>A task that represents the asynchronous test.</returns>
+    [Theory]
+    [InlineData("other-key", null, "localdev.signing.key-mismatch")]
+    [InlineData(null, "other-version", "localdev.signing.key-version-mismatch")]
+    public async Task SignAsyncReturnsUnsignedFailureForMismatchedKeyReference(
+        string? keyId,
+        string? keyVersion,
+        string expectedFailureCode)
+    {
+        using var service = new LocalDevelopmentSigningService();
+
+        SigningResult result = await service.SignAsync(
+            new SigningRequest("abc123", keyId: keyId, keyVersion: keyVersion),
+            TestContext.Current.CancellationToken);
+
+        Assert.False(result.IsSigned);
+        Assert.Equal(expectedFailureCode, result.Metadata.Metadata["failure_code"]);
+    }
+
+    /// <summary>
+    /// Verifies that signing normalizes caller metadata, defaults a missing hash algorithm, and signs with the configured key.
+    /// </summary>
+    /// <returns>A task that represents the asynchronous test.</returns>
+    [Fact]
+    public async Task SignAsyncNormalizesCallerMetadataAndDefaultsHashAlgorithm()
+    {
+        using var service = new LocalDevelopmentSigningService();
+
+        SigningResult result = await service.SignAsync(
+            new SigningRequest(
+                "abc123",
+                metadata: new Dictionary<string, string>
+                {
+                    [" source "] = " test ",
+                    ["empty"] = null!,
+                    [" "] = "ignored"
+                }),
+            TestContext.Current.CancellationToken);
+
+        Assert.True(result.IsSigned);
+        Assert.Equal("SHA-256", result.Metadata.HashAlgorithm);
+        Assert.Equal("test", result.Metadata.Metadata["source"]);
+        Assert.Equal(string.Empty, result.Metadata.Metadata["empty"]);
+    }
+
     private static CanonicalPayloadHash CreateCanonicalHash()
     {
         return CanonicalPayloadHasher.ComputeHash(CanonicalPayloadBuilder.ForAuditLedgerRecord(CreateAuditLedgerRecord()));

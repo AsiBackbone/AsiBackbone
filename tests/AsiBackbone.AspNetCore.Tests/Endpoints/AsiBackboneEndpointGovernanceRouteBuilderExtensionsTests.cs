@@ -189,6 +189,23 @@ public sealed class AsiBackboneEndpointGovernanceRouteBuilderExtensionsTests
         _ = Assert.Single(endpointBuilder.Metadata.OfType<AllowMissingGovernanceMetadataAttribute>());
     }
 
+    /// <summary>
+    /// Tests that endpoint metadata conventions are added through a value-type convention builder.
+    /// </summary>
+    [Fact]
+    public void AllowMissingGovernanceMetadata_SupportsValueTypeConventionBuilder()
+    {
+        var builder = new ValueTypeEndpointConventionBuilder([]);
+
+        ValueTypeEndpointConventionBuilder returned = builder.AllowMissingGovernanceMetadata();
+
+        EndpointBuilder endpointBuilder = CreateEndpointBuilder();
+        Action<EndpointBuilder> convention = Assert.Single(returned.Conventions);
+        convention(endpointBuilder);
+
+        _ = Assert.Single(endpointBuilder.Metadata.OfType<AllowMissingGovernanceMetadataAttribute>());
+    }
+
     private static RouteEndpointBuilder CreateEndpointBuilder()
     {
         return new RouteEndpointBuilder(
@@ -200,6 +217,17 @@ public sealed class AsiBackboneEndpointGovernanceRouteBuilderExtensionsTests
     private sealed class CapturingEndpointConventionBuilder : IEndpointConventionBuilder
     {
         public List<Action<EndpointBuilder>> Conventions { get; } = [];
+
+        public void Add(Action<EndpointBuilder> convention)
+        {
+            ArgumentNullException.ThrowIfNull(convention);
+            Conventions.Add(convention);
+        }
+    }
+
+    private readonly struct ValueTypeEndpointConventionBuilder(List<Action<EndpointBuilder>> conventions) : IEndpointConventionBuilder
+    {
+        public List<Action<EndpointBuilder>> Conventions { get; } = conventions;
 
         public void Add(Action<EndpointBuilder> convention)
         {

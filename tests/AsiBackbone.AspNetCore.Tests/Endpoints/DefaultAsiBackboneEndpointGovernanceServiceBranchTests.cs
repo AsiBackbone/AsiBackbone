@@ -1,6 +1,10 @@
 using System.Security.Claims;
+using AsiBackbone.AspNetCore.Acknowledgments;
+using AsiBackbone.AspNetCore.Actors;
+using AsiBackbone.AspNetCore.Correlation;
 using AsiBackbone.AspNetCore.DependencyInjection;
 using AsiBackbone.AspNetCore.Endpoints;
+using AsiBackbone.AspNetCore.Results;
 using AsiBackbone.Core.Constraints;
 using AsiBackbone.Core.Decisions;
 using AsiBackbone.Core.Evaluation;
@@ -342,6 +346,64 @@ public sealed class DefaultAsiBackboneEndpointGovernanceServiceBranchTests
         Assert.Contains("endpoint.audit_sink.missing", result.Decision.ReasonCodes);
     }
 
+    /// <summary>
+    /// Verifies requested audit emission is allowed when the host opts out of failing closed for a missing sink.
+    /// </summary>
+    [Fact]
+    public async Task EvaluateAsyncAllowsMissingAuditSinkWhenFailOpenIsConfigured()
+    {
+        using ServiceProvider services = CreateServices(
+            configure: static options => options.FailClosedWhenAuditSinkMissing = false);
+        using IServiceScope scope = services.CreateScope();
+        DefaultHttpContext httpContext = CreateHttpContext(scope.ServiceProvider);
+        var descriptor =
+            EndpointGovernanceDescriptor.FromEndpoint(
+                CreateEndpoint("audit.missing.fail-open", new EmitGovernanceAuditAttribute()));
+        IEndpointGovernanceService service = scope.ServiceProvider
+            .GetRequiredService<IEndpointGovernanceService>();
+
+        EndpointGovernanceResult result = await service.EvaluateAsync(
+            httpContext,
+            descriptor,
+            TestContext.Current.CancellationToken);
+
+        Assert.True(result.CanExecute);
+        Assert.Null(result.FailureResult);
+    }
+
+    /// <summary>
+    /// Verifies the service constructor rejects every missing dependency and options value.
+    /// </summary>
+    [Fact]
+    public void ConstructorRejectsMissingDependencies()
+    {
+        using ServiceProvider services = CreateServices();
+        using IServiceScope scope = services.CreateScope();
+        IServiceProvider provider = scope.ServiceProvider;
+        IHttpGovernanceActorContextResolver actorResolver = provider.GetRequiredService<IHttpGovernanceActorContextResolver>();
+        IHttpGovernanceRequestCorrelationResolver correlationResolver = provider.GetRequiredService<IHttpGovernanceRequestCorrelationResolver>();
+        IAcknowledgmentChallengeService acknowledgmentService = provider.GetRequiredService<IAcknowledgmentChallengeService>();
+        IOptions<EndpointGovernanceOptions> endpointOptions = Options.Create(new EndpointGovernanceOptions());
+        IOptions<GovernanceHttpResultMappingOptions> resultOptions = Options.Create(new GovernanceHttpResultMappingOptions());
+
+        Assert.Equal("serviceProvider", Assert.Throws<ArgumentNullException>(() => new DefaultEndpointGovernanceService(
+            null!, actorResolver, correlationResolver, acknowledgmentService, endpointOptions, resultOptions)).ParamName);
+        Assert.Equal("actorContextResolver", Assert.Throws<ArgumentNullException>(() => new DefaultEndpointGovernanceService(
+            provider, null!, correlationResolver, acknowledgmentService, endpointOptions, resultOptions)).ParamName);
+        Assert.Equal("requestCorrelationResolver", Assert.Throws<ArgumentNullException>(() => new DefaultEndpointGovernanceService(
+            provider, actorResolver, null!, acknowledgmentService, endpointOptions, resultOptions)).ParamName);
+        Assert.Equal("acknowledgmentChallengeService", Assert.Throws<ArgumentNullException>(() => new DefaultEndpointGovernanceService(
+            provider, actorResolver, correlationResolver, null!, endpointOptions, resultOptions)).ParamName);
+        Assert.Equal("endpointOptions", Assert.Throws<ArgumentNullException>(() => new DefaultEndpointGovernanceService(
+            provider, actorResolver, correlationResolver, acknowledgmentService, null!, resultOptions)).ParamName);
+        Assert.Equal("endpointOptions", Assert.Throws<ArgumentNullException>(() => new DefaultEndpointGovernanceService(
+            provider, actorResolver, correlationResolver, acknowledgmentService, new NullValueOptions<EndpointGovernanceOptions>(), resultOptions)).ParamName);
+        Assert.Equal("resultOptions", Assert.Throws<ArgumentNullException>(() => new DefaultEndpointGovernanceService(
+            provider, actorResolver, correlationResolver, acknowledgmentService, endpointOptions, null!)).ParamName);
+        Assert.Equal("resultOptions", Assert.Throws<ArgumentNullException>(() => new DefaultEndpointGovernanceService(
+            provider, actorResolver, correlationResolver, acknowledgmentService, endpointOptions, new NullValueOptions<GovernanceHttpResultMappingOptions>())).ParamName);
+    }
+
     private static ServiceProvider CreateServices(
         IGovernancePolicyEvaluator<GovernanceEvaluationContext>? evaluator = null,
         Action<EndpointGovernanceOptions>? configure = null)
@@ -383,6 +445,12 @@ public sealed class DefaultAsiBackboneEndpointGovernanceServiceBranchTests
 
     private sealed class SamplePolicy
     {
+    }
+
+    private sealed class NullValueOptions<TOptions> : IOptions<TOptions>
+        where TOptions : class
+    {
+        public TOptions Value => null!;
     }
 
     private sealed class DelegatePolicyEvaluator(

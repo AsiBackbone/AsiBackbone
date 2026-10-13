@@ -121,6 +121,63 @@ public sealed class OpenTelemetryGovernanceEmitterTests
         Assert.Equal(OpenTelemetryGovernanceInstrumentation.ProviderName, result.ProviderName);
     }
 
+    /// <summary>
+    /// Verifies that a minimal envelope uses the default activity name and omits absent optional attributes.
+    /// </summary>
+    [Fact]
+    public async Task EmitAsyncUsesDefaultActivityNameAndOmitsAbsentOptionalAttributes()
+    {
+        List<Activity> stoppedActivities = [];
+        using ActivityListener listener = new()
+        {
+            ShouldListenTo = static source => source.Name == OpenTelemetryGovernanceInstrumentation.ActivitySourceName,
+            Sample = static (ref _) => ActivitySamplingResult.AllDataAndRecorded,
+            ActivityStopped = stoppedActivities.Add
+        };
+
+        ActivitySource.AddActivityListener(listener);
+
+        var envelope = GovernanceEmissionEnvelope.Create(
+            GovernanceEmissionEventType.Decision,
+            eventId: "event-minimal",
+            occurredUtc: new DateTimeOffset(2026, 6, 15, 12, 0, 0, TimeSpan.Zero),
+            envelopeId: "envelope-minimal");
+        OpenTelemetryGovernanceEmitter emitter = new(new OpenTelemetryGovernanceEmitterOptions
+        {
+            DefaultActivityName = "governance.minimal"
+        });
+
+        GovernanceEmissionResult result = await emitter.EmitAsync(envelope, TestContext.Current.CancellationToken);
+
+        Assert.True(result.IsSuccess);
+        Activity activity = Assert.Single(stoppedActivities, static item => item.OperationName == "governance.minimal");
+        var tags = activity.TagObjects.ToDictionary(static tag => tag.Key, static tag => tag.Value, StringComparer.Ordinal);
+        Assert.Equal("envelope-minimal", tags[OpenTelemetryGovernanceAttributes.EnvelopeId]?.ToString());
+        Assert.False(tags.ContainsKey(OpenTelemetryGovernanceAttributes.LifecycleStage));
+        Assert.False(tags.ContainsKey(OpenTelemetryGovernanceAttributes.OutboxSequence));
+        Assert.False(tags.ContainsKey(OpenTelemetryGovernanceAttributes.PayloadType));
+    }
+
+    /// <summary>
+    /// Verifies that emitter options reject blank provider and default activity names.
+    /// </summary>
+    /// <param name="providerName">The configured provider name.</param>
+    /// <param name="defaultActivityName">The configured default activity name.</param>
+    [Theory]
+    [InlineData(" ", "governance.activity")]
+    [InlineData("provider", " ")]
+    public void OptionsRejectBlankNames(string providerName, string defaultActivityName)
+    {
+        var options = new OpenTelemetryGovernanceEmitterOptions
+        {
+            ProviderName = providerName,
+            DefaultActivityName = defaultActivityName
+        };
+
+        _ = Assert.Throws<InvalidOperationException>(options.Validate);
+        _ = Assert.Throws<InvalidOperationException>(() => new OpenTelemetryGovernanceEmitter(options));
+    }
+
     private static GovernanceEmissionEnvelope CreateEnvelope()
     {
         return GovernanceEmissionEnvelope.Create(

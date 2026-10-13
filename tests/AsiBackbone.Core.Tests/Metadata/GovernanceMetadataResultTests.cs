@@ -328,6 +328,38 @@ public sealed class GovernanceMetadataResultTests
         Assert.Same(budget, result.BudgetValidation);
     }
 
+    /// <summary>
+    /// Verifies that a valid budget result does not throw.
+    /// </summary>
+    [Fact]
+    public void BudgetThrowIfInvalidIsNoOpForValidResult()
+    {
+        CreateValidBudgetValidation().ThrowIfInvalid("governanceMetadata");
+    }
+
+    /// <summary>
+    /// Verifies that invalid budget results compose violations and use the fallback parameter name when none is supplied.
+    /// </summary>
+    /// <param name="parameterName">The optional parameter name supplied to the budget guard.</param>
+    /// <param name="expectedParameterName">The parameter name expected on the thrown exception.</param>
+    [Theory]
+    [InlineData(null, "metadata")]
+    [InlineData("   ", "metadata")]
+    [InlineData("governanceMetadata", "governanceMetadata")]
+    public void BudgetThrowIfInvalidUsesSuppliedOrFallbackParameterName(string? parameterName, string expectedParameterName)
+    {
+        var result = GovernanceMetadataBudgetValidationResult.Create(
+            new Dictionary<string, string>(),
+            ["Too many entries.", "Value too long."],
+            estimatedSerializedBytes: 128);
+
+        ArgumentException exception = Assert.Throws<ArgumentException>(() => result.ThrowIfInvalid(parameterName));
+
+        Assert.False(result.IsValid);
+        Assert.Equal(expectedParameterName, exception.ParamName);
+        Assert.Contains("Too many entries.; Value too long.", exception.Message, StringComparison.Ordinal);
+    }
+
     private static GovernanceMetadataBudgetValidationResult CreateValidBudgetValidation()
     {
         return GovernanceMetadataBudgetValidationResult.Create(

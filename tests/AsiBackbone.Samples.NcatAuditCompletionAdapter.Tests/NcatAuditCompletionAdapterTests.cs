@@ -219,6 +219,133 @@ public sealed class NcatAuditCompletionAdapterTests
         Assert.Equal(expectedReason, result.ReasonCode);
     }
 
+    /// <summary>
+    /// Verifies invalid source outcome, count, and attempt values are rejected before persistence.
+    /// </summary>
+    /// <param name="persistenceOutcome">The source persistence outcome.</param>
+    /// <param name="auditRecordCount">The source audit record count.</param>
+    /// <param name="deliveryAttempt">The source delivery attempt.</param>
+    /// <param name="expectedReason">The expected terminal reason.</param>
+    [Theory]
+    [InlineData(" ", 2, 1, "persistence-outcome-required")]
+    [InlineData("committed", -1, 1, "audit-record-count-invalid")]
+    [InlineData("committed", 2, -1, "delivery-attempt-invalid")]
+    [InlineData("pending", 2, 1, "unsupported-persistence-outcome")]
+    public async Task InvalidSourceValuesAreTerminal(
+        string persistenceOutcome,
+        int auditRecordCount,
+        int deliveryAttempt,
+        string expectedReason)
+    {
+        NcatAuditCompletionAdapter adapter = CreateAdapter(new InMemoryDecisionReceiptLifecycleStore());
+        NcatAuditCompletionHandoff handoff = CreateCommittedHandoff() with
+        {
+            PersistenceOutcome = persistenceOutcome,
+            AuditRecordCount = auditRecordCount,
+            DeliveryAttempt = deliveryAttempt
+        };
+
+        NcatAuditCompletionDeliveryResult result = await adapter.DeliverAsync(
+            handoff,
+            TestContext.Current.CancellationToken);
+
+        Assert.Equal(NcatAuditCompletionDeliveryDisposition.Terminal, result.Disposition);
+        Assert.Equal(expectedReason, result.ReasonCode);
+    }
+
+    /// <summary>
+    /// Verifies mismatched trace identity cannot join unrelated audit trails.
+    /// </summary>
+    [Fact]
+    public async Task TraceMismatchIsTerminal()
+    {
+        NcatAuditCompletionAdapter adapter = CreateAdapter(new InMemoryDecisionReceiptLifecycleStore());
+        NcatAuditCompletionHandoff handoff = CreateCommittedHandoff() with { TraceId = "other-trace" };
+
+        NcatAuditCompletionDeliveryResult result = await adapter.DeliverAsync(
+            handoff,
+            TestContext.Current.CancellationToken);
+
+        Assert.Equal(NcatAuditCompletionDeliveryDisposition.Terminal, result.Disposition);
+        Assert.Equal("trace-id-mismatch", result.ReasonCode);
+    }
+
+    /// <summary>
+    /// Verifies optional correlation and trace identifiers may be omitted by the source.
+    /// </summary>
+    [Fact]
+    public async Task HandoffWithoutCorrelationOrTraceIsDelivered()
+    {
+        NcatAuditCompletionAdapter adapter = CreateAdapter(new InMemoryDecisionReceiptLifecycleStore());
+        NcatAuditCompletionHandoff handoff = CreateCommittedHandoff() with { CorrelationId = null, TraceId = " " };
+
+        NcatAuditCompletionDeliveryResult result = await adapter.DeliverAsync(
+            handoff,
+            TestContext.Current.CancellationToken);
+
+        Assert.Equal(NcatAuditCompletionDeliveryDisposition.Delivered, result.Disposition);
+    }
+
+    /// <summary>
+    /// Verifies a redelivered completion entry with different evidence is an idempotency conflict, not a duplicate.
+    /// </summary>
+    [Fact]
+    public async Task ConflictingRedeliveryIsTerminal()
+    {
+        InMemoryDecisionReceiptLifecycleStore store = new();
+        NcatAuditCompletionAdapter adapter = CreateAdapter(store);
+
+        NcatAuditCompletionDeliveryResult first = await adapter.DeliverAsync(
+            CreateCommittedHandoff(),
+            TestContext.Current.CancellationToken);
+        NcatAuditCompletionDeliveryResult conflict = await adapter.DeliverAsync(
+            CreateCommittedHandoff() with { ExecutionAttemptId = "attempt-2" },
+            TestContext.Current.CancellationToken);
+
+        Assert.Equal(NcatAuditCompletionDeliveryDisposition.Delivered, first.Disposition);
+        Assert.Equal(NcatAuditCompletionDeliveryDisposition.Terminal, conflict.Disposition);
+        Assert.Equal("idempotency-conflict", conflict.ReasonCode);
+        Assert.Equal(first.LifecycleEventId, conflict.LifecycleEventId);
+    }
+
+    /// <summary>
+    /// Verifies persistence failures below the configured dead-letter threshold remain retryable.
+    /// </summary>
+    [Fact]
+    public async Task PersistenceFailureBelowDeadLetterThresholdRemainsRetryable()
+    {
+        NcatAuditCompletionAdapter adapter = CreateAdapter(
+            new ThrowingLifecycleStore(),
+            new NcatAuditCompletionAdapterOptions { DeadLetterAfterAttempts = 3 });
+
+        NcatAuditCompletionDeliveryResult result = await adapter.DeliverAsync(
+            CreateCommittedHandoff() with { DeliveryAttempt = 2 },
+            TestContext.Current.CancellationToken);
+
+        Assert.Equal(NcatAuditCompletionDeliveryDisposition.Retryable, result.Disposition);
+    }
+
+    /// <summary>
+    /// Verifies the adapter rejects missing dependencies and invalid options.
+    /// </summary>
+    [Fact]
+    public void ConstructorRejectsMissingDependenciesAndInvalidOptions()
+    {
+        var store = new InMemoryDecisionReceiptLifecycleStore();
+        var resolver = new StubResolver(new TestDecisionReceipt());
+
+        Assert.Equal("lifecycleStore", Assert.Throws<ArgumentNullException>(() => new NcatAuditCompletionAdapter(null!, resolver)).ParamName);
+        Assert.Equal("decisionReceiptResolver", Assert.Throws<ArgumentNullException>(() => new NcatAuditCompletionAdapter(store, null!)).ParamName);
+        _ = Assert.Throws<ArgumentOutOfRangeException>(() => new NcatAuditCompletionAdapter(
+            store,
+            resolver,
+            new NcatAuditCompletionAdapterOptions { DeadLetterAfterAttempts = 0 }));
+        _ = Assert.ThrowsAny<ArgumentException>(() => new NcatAuditCompletionAdapter(
+            store,
+            resolver,
+            new NcatAuditCompletionAdapterOptions { PersistenceProvider = " " }));
+    }
+
     private static NcatAuditCompletionAdapter CreateAdapter(
         IDecisionReceiptLifecycleStore store,
         NcatAuditCompletionAdapterOptions? options = null)

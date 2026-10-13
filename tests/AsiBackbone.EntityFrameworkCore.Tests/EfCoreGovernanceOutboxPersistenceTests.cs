@@ -298,6 +298,64 @@ public sealed class EfCoreGovernanceOutboxPersistenceTests
         Assert.Equal(["lifecycle-1", "lifecycle-2"], [.. decisionReceiptMatches.Select(match => match.EventId)]);
     }
 
+    /// <summary>
+    /// Verifies lifecycle lookups return no event for an unknown identifier.
+    /// </summary>
+    /// <returns>A task that represents the asynchronous test operation.</returns>
+    [Fact]
+    public async Task LifecycleStoreReturnsNullForUnknownEventId()
+    {
+        await using SqliteConnection connection = await OpenConnectionAsync();
+        DbContextOptions<HostOwnedGovernanceDbContext> options = CreateOptions(connection);
+        await EnsureCreatedAsync(options);
+
+        await using HostOwnedGovernanceDbContext context = new(options);
+        var store = new EfCoreDecisionReceiptLifecycleStore(context);
+
+        Assert.Null(await store.FindByEventIdAsync(" missing-lifecycle ", TestContext.Current.CancellationToken));
+    }
+
+    /// <summary>
+    /// Verifies stored lifecycle metadata that is blank, JSON null, or an empty object reads back as empty metadata.
+    /// </summary>
+    /// <param name="metadataJson">The stored metadata JSON.</param>
+    /// <returns>A task that represents the asynchronous test operation.</returns>
+    [Theory]
+    [InlineData("")]
+    [InlineData(" ")]
+    [InlineData("null")]
+    [InlineData("{}")]
+    public async Task LifecycleStoreReadsBlankOrEmptyStoredMetadataAsEmpty(string metadataJson)
+    {
+        await using SqliteConnection connection = await OpenConnectionAsync();
+        DbContextOptions<HostOwnedGovernanceDbContext> options = CreateOptions(connection);
+        await EnsureCreatedAsync(options);
+
+        await using HostOwnedGovernanceDbContext context = new(options);
+        var store = new EfCoreDecisionReceiptLifecycleStore(context);
+        _ = await store.AppendAsync(
+            CreateLifecycleEvent(
+                "lifecycle-empty-metadata",
+                DecisionReceiptLifecycleStage.ExternalEmissionQueued,
+                "correlation-empty-metadata",
+                "audit-empty-metadata",
+                new DateTimeOffset(2026, 6, 15, 10, 0, 0, TimeSpan.Zero)),
+            TestContext.Current.CancellationToken);
+
+        DecisionReceiptLifecycleEventEntity entity = await context.Set<DecisionReceiptLifecycleEventEntity>()
+            .SingleAsync(TestContext.Current.CancellationToken);
+        entity.MetadataJson = metadataJson;
+        _ = await context.SaveChangesAsync(TestContext.Current.CancellationToken);
+        context.ChangeTracker.Clear();
+
+        DecisionReceiptLifecycleEvent? found = await store.FindByEventIdAsync(
+            "lifecycle-empty-metadata",
+            TestContext.Current.CancellationToken);
+
+        Assert.NotNull(found);
+        Assert.Empty(found.Metadata);
+    }
+
     private static async Task<SqliteConnection> OpenConnectionAsync()
     {
         var connection = new SqliteConnection("Filename=:memory:");

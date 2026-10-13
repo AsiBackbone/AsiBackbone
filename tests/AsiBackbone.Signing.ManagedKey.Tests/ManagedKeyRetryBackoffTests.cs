@@ -144,6 +144,90 @@ public sealed class ManagedKeyRetryBackoffTests
                 cancellationTokenSource.Token));
     }
 
+    /// <summary>
+    /// Verifies invalid delay windows, attempts, jitter samples, and previous delays are rejected.
+    /// </summary>
+    /// <param name="baseDelayMilliseconds">The base delay in milliseconds.</param>
+    /// <param name="maxDelayMilliseconds">The maximum delay in milliseconds.</param>
+    /// <param name="retryAttempt">The retry attempt number.</param>
+    /// <param name="jitterSample">The jitter sample.</param>
+    /// <param name="previousDelayMilliseconds">The previous delay in milliseconds.</param>
+    /// <param name="expectedParameterName">The expected rejected parameter name.</param>
+    [Theory]
+    [InlineData(-1, 500, 1, 0.5d, 0, "baseDelay")]
+    [InlineData(100, -1, 1, 0.5d, 0, "maxDelay")]
+    [InlineData(100, 50, 1, 0.5d, 0, "maxDelay")]
+    [InlineData(100, 500, 0, 0.5d, 0, "retryAttempt")]
+    [InlineData(100, 500, 1, double.NaN, 0, "jitterSample")]
+    [InlineData(100, 500, 1, -0.1d, 0, "jitterSample")]
+    [InlineData(100, 500, 1, 1.1d, 0, "jitterSample")]
+    [InlineData(100, 500, 1, 0.5d, -1, "previousDelay")]
+    [InlineData(100, 500, 1, 0.5d, 501, "previousDelay")]
+    public void CalculateDelayRejectsInvalidArguments(
+        int baseDelayMilliseconds,
+        int maxDelayMilliseconds,
+        int retryAttempt,
+        double jitterSample,
+        int previousDelayMilliseconds,
+        string expectedParameterName)
+    {
+        ArgumentOutOfRangeException exception = Assert.Throws<ArgumentOutOfRangeException>(() => ManagedKeyRetryBackoff.CalculateDelay(
+            TimeSpan.FromMilliseconds(baseDelayMilliseconds),
+            TimeSpan.FromMilliseconds(maxDelayMilliseconds),
+            retryAttempt,
+            jitterSample,
+            TimeSpan.FromMilliseconds(previousDelayMilliseconds)));
+
+        Assert.Equal(expectedParameterName, exception.ParamName);
+    }
+
+    /// <summary>
+    /// Verifies a previous delay already at the window cap keeps the next delay at that cap.
+    /// </summary>
+    [Fact]
+    public void CalculateDelayHoldsAtCapWhenPreviousDelayReachedUpperBound()
+    {
+        TimeSpan result = ManagedKeyRetryBackoff.CalculateDelay(
+            TimeSpan.FromMilliseconds(100),
+            TimeSpan.FromMilliseconds(500),
+            retryAttempt: 1,
+            jitterSample: 0d,
+            previousDelay: TimeSpan.FromMilliseconds(100));
+
+        Assert.Equal(TimeSpan.FromMilliseconds(100), result);
+    }
+
+    /// <summary>
+    /// Verifies the real delay implementation completes immediately for a non-positive delay.
+    /// </summary>
+    /// <returns>A task that represents the asynchronous test.</returns>
+    [Fact]
+    public async Task SystemRetryDelayCompletesImmediatelyForZeroDelay()
+    {
+        ValueTask delay = SystemManagedKeyRetryDelay.Instance.DelayAsync(TimeSpan.Zero, TestContext.Current.CancellationToken);
+
+        Assert.True(delay.IsCompletedSuccessfully);
+        await delay;
+    }
+
+    /// <summary>
+    /// Verifies the signing exception falls back to the failure code when no message is supplied.
+    /// </summary>
+    /// <param name="message">The optional exception message.</param>
+    /// <param name="expectedMessage">The expected exception message.</param>
+    [Theory]
+    [InlineData(null, "managed-key.failed")]
+    [InlineData(" ", "managed-key.failed")]
+    [InlineData("Provider failed.", "Provider failed.")]
+    public void SigningExceptionUsesFailureCodeWhenMessageIsMissing(string? message, string expectedMessage)
+    {
+        var exception = new ManagedKeySigningException(" managed-key.failed ", message, isRetryable: true);
+
+        Assert.Equal(expectedMessage, exception.Message.Trim());
+        Assert.Equal("managed-key.failed", exception.FailureCode);
+        Assert.True(exception.IsRetryable);
+    }
+
     private static ManagedKeySigningOptions CreateOptions(
         int maxRetryAttempts,
         bool returnUnsignedOnFailure = false)

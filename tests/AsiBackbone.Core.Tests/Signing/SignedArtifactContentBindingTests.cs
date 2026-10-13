@@ -107,6 +107,50 @@ public sealed class SignedArtifactContentBindingTests
     }
 
     /// <summary>
+    /// Verifies that signing metadata cannot claim a hash that differs from the canonical payload hash.
+    /// </summary>
+    [Fact]
+    public void FromSigningMetadataRejectsMismatchedSigningHash()
+    {
+        CapabilityGrant grant = CreateGrant();
+        CanonicalPayload payload = CanonicalPayloadBuilder.ForCapabilityGrant(grant);
+        CanonicalPayloadHash hash = CanonicalPayloadHasher.ComputeHash(payload);
+        var signingMetadata = SigningMetadata.Create(signingHash: "not-the-canonical-hash", signature: "fake-signature");
+
+        ArgumentException exception = Assert.Throws<ArgumentException>(() => SignedGovernanceArtifacts.FromSigningMetadata(
+            grant,
+            payload,
+            hash,
+            signingMetadata));
+
+        Assert.Equal("signingMetadata", exception.ParamName);
+    }
+
+    /// <summary>
+    /// Verifies that signing metadata without a hash or hash algorithm inherits both from the canonical payload hash.
+    /// </summary>
+    [Fact]
+    public void FromSigningMetadataFillsMissingHashAndAlgorithmFromCanonicalHash()
+    {
+        CapabilityGrant grant = CreateGrant();
+        CanonicalPayload payload = CanonicalPayloadBuilder.ForCapabilityGrant(grant);
+        CanonicalPayloadHash hash = CanonicalPayloadHasher.ComputeHash(payload);
+        var signingMetadata = SigningMetadata.Create(
+            signature: "fake-signature",
+            metadata: new Dictionary<string, string> { ["host"] = "gateway" });
+
+        SignedGovernanceArtifact<CapabilityGrant> artifact = SignedGovernanceArtifacts.FromSigningMetadata(
+            grant,
+            payload,
+            hash,
+            signingMetadata);
+
+        Assert.Equal(hash.HashValue, artifact.SigningMetadata.SigningHash);
+        Assert.Equal(hash.HashAlgorithm, artifact.SigningMetadata.HashAlgorithm);
+        Assert.Equal("gateway", artifact.SigningMetadata.Metadata["host"]);
+    }
+
+    /// <summary>
     /// Covers the typed binding path with every first-party canonical builder used by the generic signed artifact wrapper.
     /// </summary>
     [Fact]

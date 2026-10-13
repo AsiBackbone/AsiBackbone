@@ -188,6 +188,93 @@ public sealed class LocalDevelopmentSigningProductionAnalyzerTests
         Assert.Empty(diagnostics);
     }
 
+    /// <summary>
+    /// Tests the environment-condition shapes the analyzer recognizes as production, non-production, or unguarded.
+    /// </summary>
+    /// <param name="body">The configuration method body.</param>
+    /// <param name="expectedDiagnosticId">The expected diagnostic ID, or an empty string when nothing should be reported.</param>
+    /// <returns>A task representing the asynchronous operation.</returns>
+    [Theory]
+    [InlineData("if (\"Production\" == environment.EnvironmentName) { services.AddSingleton<LocalDevelopmentSigningService>(); }", LocalDevelopmentSigningProductionAnalyzer.DiagnosticId)]
+    [InlineData("if (environment.EnvironmentName.Equals(\"Production\")) { services.AddSingleton<LocalDevelopmentSigningService>(); }", LocalDevelopmentSigningProductionAnalyzer.DiagnosticId)]
+    [InlineData("if (string.Equals(environment.EnvironmentName, \"production\", StringComparison.OrdinalIgnoreCase)) { services.AddSingleton<LocalDevelopmentSigningService>(); }", LocalDevelopmentSigningProductionAnalyzer.DiagnosticId)]
+    [InlineData("if (HostingEnvironmentExtensions.IsProduction(environment)) { services.AddSingleton<LocalDevelopmentSigningService>(); }", LocalDevelopmentSigningProductionAnalyzer.DiagnosticId)]
+    [InlineData("_ = environment.IsProduction() ? services.AddSingleton<LocalDevelopmentSigningService>() : services;", LocalDevelopmentSigningProductionAnalyzer.DiagnosticId)]
+    [InlineData("if (environment.IsProduction()) { _ = new object(); }", "")]
+    [InlineData("if (environment.EnvironmentName == \"Staging\") { services.AddSingleton<LocalDevelopmentSigningService>(); }", "")]
+    [InlineData("if (environment.EnvironmentName != \"Production\") { services.AddSingleton<LocalDevelopmentSigningService>(); }", "")]
+    [InlineData("if (environment.EnvironmentName.Equals(\"Staging\")) { services.AddSingleton<LocalDevelopmentSigningService>(); }", "")]
+    [InlineData("if (!environment.IsDevelopment()) { services.AddSingleton<LocalDevelopmentSigningService>(); }", "")]
+    [InlineData("if (HostFlags.UseSharedEnvironment) { services.AddSingleton<LocalDevelopmentSigningService>(); }", "")]
+    [InlineData("if (HostFlags.Enabled) { services.AddSingleton<LocalDevelopmentSigningService>(); }", LocalDevelopmentSigningProductionAnalyzer.UnguardedDiagnosticId)]
+    [InlineData("if (environment.Equals(null)) { services.AddSingleton<LocalDevelopmentSigningService>(); }", LocalDevelopmentSigningProductionAnalyzer.UnguardedDiagnosticId)]
+    [InlineData("if (string.IsNullOrEmpty(environment.EnvironmentName)) { services.AddSingleton<LocalDevelopmentSigningService>(); }", LocalDevelopmentSigningProductionAnalyzer.UnguardedDiagnosticId)]
+    [InlineData("if (environment.EnvironmentName.Length > 0) { services.AddSingleton<LocalDevelopmentSigningService>(); }", LocalDevelopmentSigningProductionAnalyzer.UnguardedDiagnosticId)]
+    [InlineData("if (environment.EnvironmentName is \"Staging\") { services.AddSingleton<LocalDevelopmentSigningService>(); }", LocalDevelopmentSigningProductionAnalyzer.UnguardedDiagnosticId)]
+    [InlineData("services.AddSingleton(LocalDevelopmentSigningOptions.Create());", LocalDevelopmentSigningProductionAnalyzer.UnguardedDiagnosticId)]
+    [InlineData("services.AddSingleton<System.Collections.Generic.List<LocalDevelopmentSigningService>>();", LocalDevelopmentSigningProductionAnalyzer.UnguardedDiagnosticId)]
+    [InlineData("_ = SignerFactory.Create();", LocalDevelopmentSigningProductionAnalyzer.UnguardedDiagnosticId)]
+    [InlineData("services.AddSingleton<System.Collections.Generic.List<string>>();", "")]
+    [InlineData("services.AddSingleton(new int[0]);", "")]
+    [InlineData("_ = new LocalDevelopmentSigningService();", "")]
+    public async Task EnvironmentConditionShapesReportExpectedDiagnostic(string body, string expectedDiagnosticId)
+    {
+        string source = SourceWithBody(body) + HostFlagsSource;
+
+        ImmutableArray<Diagnostic> diagnostics = await GetAnalyzerDiagnosticsAsync(source);
+
+        if (expectedDiagnosticId.Length == 0)
+        {
+            Assert.Empty(diagnostics);
+        }
+        else
+        {
+            Diagnostic diagnostic = Assert.Single(diagnostics);
+            Assert.Equal(expectedDiagnosticId, diagnostic.Id);
+        }
+    }
+
+    /// <summary>
+    /// Tests that the review marker on the containing type suppresses diagnostics for its members.
+    /// </summary>
+    /// <returns>A task representing the asynchronous operation.</returns>
+    [Fact]
+    public async Task ProductionConfigurationReviewedMarkerOnContainingTypeSuppressesDiagnostics()
+    {
+        string source = SourceWithBody("""
+            public static void Configure(IServiceCollection services, IHostEnvironment environment)
+            {
+                services.AddSingleton<LocalDevelopmentSigningService>();
+                if (environment.IsProduction())
+                {
+                    _ = new LocalDevelopmentSigningService();
+                }
+            }
+            """, includeConfigureWrapper: false).Replace(
+                "public static class Sample",
+                "[AsiBackboneProductionConfigurationReviewed]\npublic static class Sample",
+                StringComparison.Ordinal);
+
+        ImmutableArray<Diagnostic> diagnostics = await GetAnalyzerDiagnosticsAsync(source);
+
+        Assert.Empty(diagnostics);
+    }
+
+    private const string HostFlagsSource = """
+
+        public static class HostFlags
+        {
+            public static bool Enabled => true;
+
+            public static bool UseSharedEnvironment => false;
+        }
+
+        public static class SignerFactory
+        {
+            public static LocalDevelopmentSigningService Create() => null!;
+        }
+        """;
+
     private static string SourceWithProductionBody(string body)
     {
         return SourceWithBody($$"""
