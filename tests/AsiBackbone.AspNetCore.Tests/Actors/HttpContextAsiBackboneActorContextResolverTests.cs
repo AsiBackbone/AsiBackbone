@@ -175,6 +175,61 @@ public sealed class HttpContextAsiBackboneActorContextResolverTests
     }
 
     [Fact]
+    public void ResolveActorContextAcceptsUnknownAfterExplicitOptIn()
+    {
+        DefaultHttpContext httpContext = CreateHttpContext(
+            new Claim(ClaimTypes.NameIdentifier, "caller-1"),
+            new Claim("actor_type", "Unknown"));
+
+        IGovernanceActorContext actor = CreateResolver(
+            httpContext,
+            options => options.AllowedActorTypesFromClaims = [GovernanceActorType.Unknown]).ResolveActorContext();
+
+        Assert.Same(GovernanceActorContext.Unknown, actor);
+    }
+
+    [Fact]
+    public void ResolveActorContextRepresentsMissingHttpContextAsUnauthenticated()
+    {
+        var resolver = new HttpContextGovernanceActorContextResolver(
+            new HttpContextAccessor(),
+            Options.Create(new HttpGovernanceActorContextOptions()));
+
+        IGovernanceActorContext actor = resolver.ResolveActorContext();
+
+        Assert.Equal(GovernanceActorType.Unknown, actor.ActorType);
+        Assert.False(actor.IsAuthenticated);
+    }
+
+    [Fact]
+    public void ResolveActorContextRepresentsPrincipalWithoutIdentityAsUnauthenticated()
+    {
+        DefaultHttpContext httpContext = new()
+        {
+            User = new ClaimsPrincipal(),
+        };
+
+        IGovernanceActorContext actor = CreateResolver(httpContext).ResolveActorContext();
+
+        Assert.Equal(GovernanceActorType.Unknown, actor.ActorType);
+        Assert.False(actor.IsAuthenticated);
+    }
+
+    [Fact]
+    public void ConstructorRejectsMissingDependencies()
+    {
+        _ = Assert.Throws<ArgumentNullException>(() => new HttpContextGovernanceActorContextResolver(
+            null!,
+            Options.Create(new HttpGovernanceActorContextOptions())));
+        _ = Assert.Throws<ArgumentNullException>(() => new HttpContextGovernanceActorContextResolver(
+            new HttpContextAccessor(),
+            null!));
+        _ = Assert.Throws<ArgumentNullException>(() => new HttpContextGovernanceActorContextResolver(
+            new HttpContextAccessor(),
+            new NullValueOptions()));
+    }
+
+    [Fact]
     public void ActorOptionsRejectNullAllowedActorTypes()
     {
         HttpGovernanceActorContextOptions options = new()
@@ -245,5 +300,10 @@ public sealed class HttpContextAsiBackboneActorContextResolverTests
         return new HttpContextGovernanceActorContextResolver(
             new HttpContextAccessor { HttpContext = httpContext },
             Options.Create(options));
+    }
+
+    private sealed class NullValueOptions : IOptions<HttpGovernanceActorContextOptions>
+    {
+        public HttpGovernanceActorContextOptions Value => null!;
     }
 }

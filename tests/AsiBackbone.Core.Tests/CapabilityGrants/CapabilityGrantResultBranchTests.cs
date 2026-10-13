@@ -176,6 +176,29 @@ public sealed class CapabilityGrantResultBranchTests
             " "));
     }
 
+    /// <summary>
+    /// Tests that the Failed factory method of CapabilityGrantValidationResult rejects undefined category and action values.
+    /// </summary>
+    [Fact]
+    public void ValidationResultFailedRejectsUndefinedCategoryAndAction()
+    {
+        CapabilityGrant grant = CreateGrant();
+
+        ArgumentOutOfRangeException categoryException = Assert.Throws<ArgumentOutOfRangeException>(() => CapabilityGrantValidationResult.Failed(
+            grant,
+            (CapabilityGrantValidationCategory)999,
+            VerificationPolicyAction.Deny,
+            "capability.failed"));
+        ArgumentOutOfRangeException actionException = Assert.Throws<ArgumentOutOfRangeException>(() => CapabilityGrantValidationResult.Failed(
+            grant,
+            CapabilityGrantValidationCategory.Failed,
+            (VerificationPolicyAction)999,
+            "capability.failed"));
+
+        Assert.Equal("category", categoryException.ParamName);
+        Assert.Equal("action", actionException.ParamName);
+    }
+
     private static CapabilityGrant CreateGrant(
         string? acknowledgmentId = "ack-1",
         string? handshakeId = "handshake-1",

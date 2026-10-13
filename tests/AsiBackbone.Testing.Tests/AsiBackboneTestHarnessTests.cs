@@ -1,8 +1,10 @@
 using AsiBackbone.AspNetCore.DependencyInjection;
 using AsiBackbone.AspNetCore.Endpoints;
+using AsiBackbone.Core.Audit;
 using AsiBackbone.Core.Constraints;
 using AsiBackbone.Core.Decisions;
 using AsiBackbone.Core.Evaluation;
+using AsiBackbone.Core.Outbox;
 using AsiBackbone.Core.Signing;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
@@ -219,6 +221,50 @@ public sealed class AsiBackboneTestHarnessTests
             TestContext.Current.CancellationToken);
 
         Assert.False(result.IsSigned);
+    }
+
+    /// <summary>
+    /// Tests that disabling the optional harness registrations leaves the audit sink, outbox store, and signing service unregistered.
+    /// </summary>
+    [Fact]
+    public void AddAsiBackboneTestHarnessSkipsDisabledOptionalRegistrations()
+    {
+        using ServiceProvider services = new ServiceCollection()
+            .AddAsiBackboneTestHarness(harness =>
+            {
+                harness.RegisterInMemoryAuditSink = false;
+                harness.RegisterInMemoryOutboxStore = false;
+                harness.RegisterDeterministicSigningService = false;
+            })
+            .BuildServiceProvider(validateScopes: true);
+
+        Assert.Null(services.GetService<IDecisionReceiptSink>());
+        Assert.Null(services.GetService<IGovernanceOutboxStore>());
+        Assert.Null(services.GetService<IGovernanceSigningService>());
+        Assert.NotNull(services.GetService<IEndpointCapabilityGrantValidator>());
+    }
+
+    /// <summary>
+    /// Tests that a policy marker type without a full name is keyed by its simple name.
+    /// </summary>
+    [Fact]
+    public void SetPolicyResultAcceptsPolicyTypeWithoutFullName()
+    {
+        Type genericParameter = typeof(List<>).GetGenericArguments()[0];
+        Assert.Null(genericParameter.FullName);
+
+        GovernanceTestHarnessOptions options = new();
+
+        Assert.Same(options, options.SetPolicyResult(genericParameter, GovernanceDecision.Allow()));
+    }
+
+    /// <summary>
+    /// Tests that the harness capability-grant validator requires options.
+    /// </summary>
+    [Fact]
+    public void CapabilityGrantValidatorRejectsMissingOptions()
+    {
+        _ = Assert.Throws<ArgumentNullException>(() => new GovernanceTestHarnessEndpointCapabilityGrantValidator(null!));
     }
 
     private static DefaultHttpContext CreateHttpContext(IServiceProvider serviceProvider, string traceIdentifier)

@@ -133,6 +133,68 @@ public sealed class GovernedOperationExecutionReceiptTests
     }
 
     /// <summary>
+    /// Verifies execution-started events normalize caller metadata and bind optional attempt evidence.
+    /// </summary>
+    [Fact]
+    public void ExecutionStartedLifecycleEventNormalizesMetadataAndOptionalIdentifiers()
+    {
+        var residue = new TestDecisionReceipt();
+        var occurredUtc = new DateTimeOffset(2026, 7, 17, 17, 0, 0, TimeSpan.Zero);
+
+        DecisionReceiptLifecycleEvent lifecycleEvent = HostAccountabilityLifecycleEvent.ExecutionStarted(
+            residue,
+            " operation-1 ",
+            executionAttemptId: " attempt-1 ",
+            decisionAuditRecordId: " decision-record-1 ",
+            eventId: "lifecycle-1",
+            occurredUtc: occurredUtc,
+            metadata: new Dictionary<string, string>
+            {
+                [" host "] = " gateway ",
+                ["empty"] = null!,
+                [" "] = "ignored",
+                [HostAccountabilityMetadataKeys.OperationExecutionId] = "caller-supplied"
+            });
+
+        Assert.Equal(DecisionReceiptLifecycleStage.GatewayExecutionStarted, lifecycleEvent.Stage);
+        Assert.Equal("Started", lifecycleEvent.Outcome);
+        Assert.Equal(occurredUtc, lifecycleEvent.OccurredUtc);
+        Assert.Equal("correlation-1", lifecycleEvent.CorrelationId);
+        Assert.Equal("gateway", lifecycleEvent.Metadata["host"]);
+        Assert.Equal(string.Empty, lifecycleEvent.Metadata["empty"]);
+        Assert.False(lifecycleEvent.Metadata.ContainsKey(" "));
+        Assert.Equal("operation-1", lifecycleEvent.Metadata[HostAccountabilityMetadataKeys.OperationExecutionId]);
+        Assert.Equal("attempt-1", lifecycleEvent.Metadata[HostAccountabilityMetadataKeys.ExecutionAttemptId]);
+        Assert.Equal("decision-record-1", lifecycleEvent.Metadata[HostAccountabilityMetadataKeys.DecisionAuditRecordId]);
+    }
+
+    /// <summary>
+    /// Verifies execution-started events omit optional identifiers and metadata that were not supplied.
+    /// </summary>
+    [Fact]
+    public void ExecutionStartedLifecycleEventOmitsMissingOptionalIdentifiers()
+    {
+        DecisionReceiptLifecycleEvent lifecycleEvent = HostAccountabilityLifecycleEvent.ExecutionStarted(
+            new TestDecisionReceipt(),
+            "operation-1",
+            executionAttemptId: " ");
+
+        Assert.Equal("operation-1", lifecycleEvent.Metadata[HostAccountabilityMetadataKeys.OperationExecutionId]);
+        Assert.False(lifecycleEvent.Metadata.ContainsKey(HostAccountabilityMetadataKeys.ExecutionAttemptId));
+        Assert.False(lifecycleEvent.Metadata.ContainsKey(HostAccountabilityMetadataKeys.DecisionAuditRecordId));
+    }
+
+    /// <summary>
+    /// Verifies execution-started events reject missing decision residue and operation identity.
+    /// </summary>
+    [Fact]
+    public void ExecutionStartedLifecycleEventRejectsMissingRequiredInputs()
+    {
+        _ = Assert.Throws<ArgumentNullException>(() => HostAccountabilityLifecycleEvent.ExecutionStarted(null!, "operation-1"));
+        _ = Assert.Throws<ArgumentException>(() => HostAccountabilityLifecycleEvent.ExecutionStarted(new TestDecisionReceipt(), " "));
+    }
+
+    /// <summary>
     /// Verifies receipt canonicalization is deterministic and compatible with the existing payload hasher.
     /// </summary>
     [Fact]

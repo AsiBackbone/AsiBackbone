@@ -308,6 +308,139 @@ public sealed class GovernanceArtifactPersistenceAnalyzerTests
         Assert.Empty(diagnostics);
     }
 
+    /// <summary>
+    /// Tests the producer, wrapper, and persistence-boundary shapes the analyzer distinguishes.
+    /// </summary>
+    /// <param name="body">The method body under analysis.</param>
+    /// <param name="expectDiagnostic">Whether ASIB001 is expected.</param>
+    /// <returns>A task representing the asynchronous operation.</returns>
+    [Theory]
+    [InlineData("_ = flag ? GovernanceDecision.Allow() : GovernanceDecision.Allow();", true)]
+    [InlineData("_ = maybe ?? GovernanceDecision.Allow();", true)]
+    [InlineData("_ = maybe ?? existing;", false)]
+    [InlineData("_ = maybe;", false)]
+    [InlineData("_ = GovernanceDecision.Current;", true)]
+    [InlineData("_ = new GovernanceDecision();", true)]
+    [InlineData("_ = (GovernanceDecision)new DerivedDecision();", true)]
+    [InlineData("store.Save();", false)]
+    [InlineData("concreteStore.Save();", false)]
+    [InlineData("factory.Create();", true)]
+    [InlineData("await Task.FromResult(GovernanceDecision.Allow());", true)]
+    [InlineData("_ = new ValueTask<GovernanceDecision>(GovernanceDecision.Allow());", true)]
+    [InlineData("_ = new Lazy<GovernanceDecision>();", false)]
+    [InlineData("_ = Task.FromResult(1);", false)]
+    [InlineData("int count = 1; _ = count;", false)]
+    [InlineData("Dictionary<int, int> map; map = new Dictionary<int, int>();", false)]
+    [InlineData("List<int> list; list = new List<int>();", false)]
+    [InlineData("Task task; task = Task.CompletedTask;", false)]
+    [InlineData("ValueTask<int> pending; pending = new ValueTask<int>(1);", false)]
+    [InlineData("ValueTask<GovernanceDecision> pending; pending = new ValueTask<GovernanceDecision>(GovernanceDecision.Allow());", true)]
+    public async Task ArtifactProducerShapesReportExpectedDiagnostic(string body, bool expectDiagnostic)
+    {
+        string source = $$"""
+            using System;
+            using System.Collections.Generic;
+            using System.Threading.Tasks;
+            using AsiBackbone.Core.Decisions;
+            using AsiBackbone.Core.Outbox;
+
+            public static class Sample
+            {
+                public static async Task Execute(
+                    bool flag,
+                    GovernanceDecision? maybe,
+                    GovernanceDecision existing,
+                    IGovernanceOutboxStore store,
+                    ConcreteOutboxStore concreteStore,
+                    DecisionFactory factory)
+                {
+                    {{body}}
+                    await Task.CompletedTask;
+                }
+            }
+
+            public sealed class DecisionFactory
+            {
+                public GovernanceDecision Create() => new();
+            }
+
+            public sealed class DerivedDecision : GovernanceDecision;
+
+            public sealed class ConcreteOutboxStore : IGovernanceOutboxStore
+            {
+                public GovernanceDecision Save() => new();
+            }
+
+            namespace AsiBackbone.Core.Decisions
+            {
+                public class GovernanceDecision
+                {
+                    public static GovernanceDecision Current { get; } = new();
+
+                    public static GovernanceDecision Allow() => new();
+                }
+            }
+
+            namespace AsiBackbone.Core.Outbox
+            {
+                public interface IGovernanceOutboxStore
+                {
+                    AsiBackbone.Core.Decisions.GovernanceDecision Save();
+                }
+            }
+            """;
+
+        ImmutableArray<Diagnostic> diagnostics = await GetAnalyzerDiagnosticsAsync(source);
+
+        if (expectDiagnostic)
+        {
+            Diagnostic diagnostic = Assert.Single(diagnostics);
+            Assert.Equal(GovernanceArtifactPersistenceAnalyzer.DiagnosticId, diagnostic.Id);
+        }
+        else
+        {
+            Assert.Empty(diagnostics);
+        }
+    }
+
+    /// <summary>
+    /// Tests that a type-level marker attribute declared without the Attribute suffix suppresses the ASIB001 diagnostic.
+    /// </summary>
+    /// <returns>A task representing the asynchronous operation.</returns>
+    [Fact]
+    public async Task TypeLevelHostMarkerWithoutAttributeSuffixSuppressesASIB001()
+    {
+        string source = """
+            using System;
+            using AsiBackbone.Core.Decisions;
+
+            [AttributeUsage(AttributeTargets.Method | AttributeTargets.Class)]
+            internal sealed class AsiBackbonePersistenceHandled : Attribute;
+
+            [AsiBackbonePersistenceHandled]
+            public static class Sample
+            {
+                public static void Execute()
+                {
+                    GovernanceDecision.Allow();
+                    _ = GovernanceDecision.Allow();
+                }
+            }
+
+            namespace AsiBackbone.Core.Decisions
+            {
+                public sealed class GovernanceDecision
+                {
+                    public static GovernanceDecision Allow() => new();
+                }
+            }
+            """;
+
+        ImmutableArray<Diagnostic> diagnostics = await GetAnalyzerDiagnosticsAsync(source);
+
+        Assert.Empty(diagnostics);
+    }
+
     private static string SourceWithBody(string body)
     {
         return $$"""

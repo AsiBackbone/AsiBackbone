@@ -252,6 +252,98 @@ public sealed class EfCoreGovernanceOutboxClaimOutcomeTests
         Assert.Equal(GovernanceEmissionStatus.Pending, transition.Entry.Status);
     }
 
+    /// <summary>
+    /// Verifies a caller-owned save of the claimed entry reports an applied outcome.
+    /// </summary>
+    [Fact]
+    public async Task TrySaveClaimReportsAppliedForMatchingEntry()
+    {
+        CancellationToken cancellationToken = TestContext.Current.CancellationToken;
+        await using SqliteConnection connection = await EfCoreGovernanceOutboxTestHost.OpenConnectionAsync(cancellationToken);
+        DbContextOptions<GovernanceOutboxTestDbContext> options = EfCoreGovernanceOutboxTestHost.CreateOptions(connection);
+        await EfCoreGovernanceOutboxTestHost.EnsureCreatedAsync(options, cancellationToken);
+
+        await using GovernanceOutboxTestDbContext context = new(options);
+        var store = new EfCoreGovernanceOutboxOutcomeStore(context);
+        GovernanceOutboxClaim claim = await SaveAndClaimAsync(
+            context,
+            store,
+            "claim-outcome-save",
+            cancellationToken);
+        context.ChangeTracker.Clear();
+
+        GovernanceOutboxClaimTransitionResult transition = await store.TrySaveClaimAsync(
+            claim,
+            claim.Entry.MarkDelivered(GovernanceEmissionResult.Delivered("provider-save", "record-save")),
+            cancellationToken);
+
+        Assert.Equal(GovernanceOutboxClaimTransitionOutcome.Applied, transition.Outcome);
+        Assert.True(transition.Entry.IsDelivered);
+    }
+
+    /// <summary>
+    /// Verifies a caller-owned save rejects an entry that does not belong to the claim.
+    /// </summary>
+    [Fact]
+    public async Task TrySaveClaimRejectsEntryForDifferentClaim()
+    {
+        CancellationToken cancellationToken = TestContext.Current.CancellationToken;
+        await using SqliteConnection connection = await EfCoreGovernanceOutboxTestHost.OpenConnectionAsync(cancellationToken);
+        DbContextOptions<GovernanceOutboxTestDbContext> options = EfCoreGovernanceOutboxTestHost.CreateOptions(connection);
+        await EfCoreGovernanceOutboxTestHost.EnsureCreatedAsync(options, cancellationToken);
+
+        await using GovernanceOutboxTestDbContext context = new(options);
+        var store = new EfCoreGovernanceOutboxOutcomeStore(context);
+        GovernanceOutboxClaim claim = await SaveAndClaimAsync(
+            context,
+            store,
+            "claim-outcome-save-mismatch",
+            cancellationToken);
+        var otherEntry = GovernanceOutboxEntry.Create(
+            EfCoreGovernanceOutboxTestHost.CreateEnvelope("event-other"),
+            "other-outbox-entry");
+
+        ArgumentException exception = await Assert.ThrowsAsync<ArgumentException>(async () => await store.TrySaveClaimAsync(
+            claim,
+            otherEntry,
+            cancellationToken));
+
+        Assert.Equal("entry", exception.ParamName);
+    }
+
+    /// <summary>
+    /// Verifies a claimed transition reports a missing outcome when the entry no longer exists before the update starts.
+    /// </summary>
+    [Fact]
+    public async Task TryMarkClaimFailedReportsMissingWhenEntryIsAbsent()
+    {
+        CancellationToken cancellationToken = TestContext.Current.CancellationToken;
+        await using SqliteConnection connection = await EfCoreGovernanceOutboxTestHost.OpenConnectionAsync(cancellationToken);
+        DbContextOptions<GovernanceOutboxTestDbContext> options = EfCoreGovernanceOutboxTestHost.CreateOptions(connection);
+        await EfCoreGovernanceOutboxTestHost.EnsureCreatedAsync(options, cancellationToken);
+
+        await using GovernanceOutboxTestDbContext context = new(options);
+        var store = new EfCoreGovernanceOutboxOutcomeStore(context);
+        GovernanceOutboxClaim claim = await SaveAndClaimAsync(
+            context,
+            store,
+            "claim-outcome-absent",
+            cancellationToken);
+        GovernanceOutboxEntryEntity entity = await context.GovernanceOutboxEntries
+            .SingleAsync(item => item.OutboxEntryId == claim.OutboxEntryId, cancellationToken);
+        _ = context.GovernanceOutboxEntries.Remove(entity);
+        _ = await context.SaveChangesAsync(cancellationToken);
+        context.ChangeTracker.Clear();
+
+        GovernanceOutboxClaimTransitionResult transition = await store.TryMarkClaimFailedAsync(
+            claim,
+            GovernanceEmissionError.Create("provider.unavailable", "Provider unavailable."),
+            cancellationToken: cancellationToken);
+
+        Assert.Equal(GovernanceOutboxClaimTransitionOutcome.Missing, transition.Outcome);
+        Assert.Same(claim.Entry, transition.Entry);
+    }
+
     private static async Task<GovernanceOutboxClaim> SaveAndClaimAsync(
         GovernanceOutboxTestDbContext context,
         EfCoreGovernanceOutboxOutcomeStore store,

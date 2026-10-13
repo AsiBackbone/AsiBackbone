@@ -311,6 +311,67 @@ public sealed class NcatContractVectorTests
     }
 
     /// <summary>
+    /// Verifies a manifest header that is not the expected object shape is rejected as malformed.
+    /// </summary>
+    /// <param name="manifestJson">The retained manifest text.</param>
+    [Theory]
+    [InlineData("[]")]
+    [InlineData("not-json")]
+    [InlineData(/*lang=json,strict*/ "{\"mutationBatchId\":\"batch\",\"auditRecordCount\":1}")]
+    [InlineData(/*lang=json,strict*/ "{\"schemaVersion\":1,\"mutationBatchId\":\"batch\",\"auditRecordCount\":1}")]
+    [InlineData(/*lang=json,strict*/ "{\"schemaVersion\":\"1.0\",\"auditRecordCount\":1}")]
+    [InlineData(/*lang=json,strict*/ "{\"schemaVersion\":\"1.0\",\"mutationBatchId\":7,\"auditRecordCount\":1}")]
+    [InlineData(/*lang=json,strict*/ "{\"schemaVersion\":\"1.0\",\"mutationBatchId\":\"batch\"}")]
+    [InlineData(/*lang=json,strict*/ "{\"schemaVersion\":\"1.0\",\"mutationBatchId\":\"batch\",\"auditRecordCount\":1.5}")]
+    public void ManifestWithMalformedHeaderIsRejected(string manifestJson)
+    {
+        ContractVector vector = GetSupportedVector("committed-single-record-all-identifiers");
+        byte[] manifestBytes = new UTF8Encoding(false).GetBytes(manifestJson);
+
+        Assert.False(NcatAuditCompletionContract.TryVerifyCanonicalManifest(vector.Message, manifestBytes, out string? reason));
+        Assert.Equal("manifest-malformed", reason);
+    }
+
+    /// <summary>
+    /// Verifies a well-formed manifest whose header disagrees with the message is rejected with the specific mismatch.
+    /// </summary>
+    /// <param name="mismatch">The header field that disagrees with the message.</param>
+    /// <param name="expectedReason">The expected rejection reason.</param>
+    [Theory]
+    [InlineData("schema", "manifest-schema-version-mismatch")]
+    [InlineData("batch", "manifest-batch-id-mismatch")]
+    [InlineData("count", "manifest-record-count-mismatch")]
+    public void ManifestHeaderMismatchIsRejected(string mismatch, string expectedReason)
+    {
+        ContractVector vector = GetSupportedVector("committed-single-record-all-identifiers");
+        NcatAuditCompletionMessage message = vector.Message;
+        string manifestJson = JsonSerializer.Serialize(new Dictionary<string, object?>
+        {
+            ["schemaVersion"] = mismatch == "schema" ? "other-schema" : message.MutationManifestSchemaVersion,
+            ["mutationBatchId"] = mismatch == "batch" ? "other-batch" : message.MutationBatchId,
+            ["auditRecordCount"] = mismatch == "count" ? message.AuditRecordCount + 1 : message.AuditRecordCount
+        });
+        byte[] manifestBytes = new UTF8Encoding(false).GetBytes(manifestJson);
+
+        Assert.False(NcatAuditCompletionContract.TryVerifyCanonicalManifest(message, manifestBytes, out string? reason));
+        Assert.Equal(expectedReason, reason);
+    }
+
+    /// <summary>
+    /// Verifies manifest verification rejects an unsupported manifest algorithm before reading the manifest.
+    /// </summary>
+    [Fact]
+    public void ManifestWithUnsupportedAlgorithmIsRejected()
+    {
+        ContractVector vector = GetSupportedVector("committed-single-record-all-identifiers");
+        byte[] manifestBytes = new UTF8Encoding(false).GetBytes(vector.CanonicalManifestJson);
+        NcatAuditCompletionMessage message = vector.Message with { MutationManifestAlgorithm = "SHA-512" };
+
+        Assert.False(NcatAuditCompletionContract.TryVerifyCanonicalManifest(message, manifestBytes, out string? reason));
+        Assert.Equal("unsupported-manifest-algorithm", reason);
+    }
+
+    /// <summary>
     /// Verifies every published invalid message is rejected with the expected reason.
     /// </summary>
     [Theory]
