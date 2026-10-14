@@ -1,6 +1,9 @@
 ---
+title: "Governed Decisions for .NET Applications"
+description: AsiBackbone is a .NET governance and policy-control package family for accountable software execution, explicit decisions, and decision records.
 _disableAffix: true
 _disableBreadcrumb: true
+_disableToc: true
 ---
 
 # AsiBackbone Documentation
