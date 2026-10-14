@@ -1,6 +1,6 @@
 # Intent to Execution: Product Mapping
 
-The stack-neutral accountability pattern is canonical in [ASI Backbone Learning](https://asibackbone.github.io/Learning/architecture/intent-to-execution-accountability-pattern.html).
+The stack-neutral accountability pattern is canonical in [AsiBackbone Learning](https://asibackbone.github.io/Learning/architecture/intent-to-execution-accountability-pattern.html).
 
 This URL is retained for continuity and maps that pattern to current AsiBackbone implementation surfaces.
 

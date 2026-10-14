@@ -1,12 +1,12 @@
 ---
-description: Implementation/API glossary mapping ASI Backbone Learning terminology to concrete AsiBackbone packages, types, runtime semantics, and host responsibilities.
+description: Implementation/API glossary mapping AsiBackbone Learning terminology to concrete AsiBackbone packages, types, runtime semantics, and host responsibilities.
 ---
 
 # AsiBackbone API Glossary
 
-This page is the **implementation-side glossary** for the AsiBackbone package family. It maps the architecture vocabulary taught in ASI Backbone Learning to concrete `AsiBackbone.*` APIs and product behavior.
+This page is the **implementation-side glossary** for the AsiBackbone package family. It maps the architecture vocabulary taught in AsiBackbone Learning to concrete `AsiBackbone.*` APIs and product behavior.
 
-For canonical educational definitions, terminology lineage, and comparisons with established architecture concepts, use the [ASI Backbone Learning Architecture Glossary](https://asibackbone.github.io/Learning/architecture/glossary.html) and [Terminology and Established Architecture Concepts](https://asibackbone.github.io/Learning/architecture/terminology-and-established-concepts.html).
+For canonical educational definitions, terminology lineage, and comparisons with established architecture concepts, use the [AsiBackbone Learning Architecture Glossary](https://asibackbone.github.io/Learning/architecture/glossary.html) and [Terminology and Established Architecture Concepts](https://asibackbone.github.io/Learning/architecture/terminology-and-established-concepts.html).
 
 > [!IMPORTANT]
 > Learning owns the teaching definition of the architecture concepts. This repository owns exact type names, namespaces, API contracts, package-specific semantics, implementation invariants, and released runtime behavior. Learning does not override the product contract documented here or in the generated API reference.

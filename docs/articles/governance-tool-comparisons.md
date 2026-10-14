@@ -1,6 +1,6 @@
 # Governance Tool Comparisons: Product Note
 
-General governance-tool selection and composition guidance is canonical in [ASI Backbone Learning](https://asibackbone.github.io/Learning/architecture/governance-tool-selection-and-composition.html).
+General governance-tool selection and composition guidance is canonical in [AsiBackbone Learning](https://asibackbone.github.io/Learning/architecture/governance-tool-selection-and-composition.html).
 
 This URL is retained for continuity.
 

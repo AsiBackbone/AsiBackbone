@@ -1,12 +1,12 @@
 ---
-description: Map canonical ASI Backbone Learning concepts to concrete AsiBackbone packages, public APIs, and implementation-specific semantics.
+description: Map canonical AsiBackbone Learning concepts to concrete AsiBackbone packages, public APIs, and implementation-specific semantics.
 ---
 
 # AsiBackbone API Terminology Map
 
-This page maps the terminology taught in ASI Backbone Learning to the concrete `AsiBackbone.*` product surface.
+This page maps the terminology taught in AsiBackbone Learning to the concrete `AsiBackbone.*` product surface.
 
-For **canonical educational definitions**, use the [ASI Backbone Learning Architecture Glossary](https://asibackbone.github.io/Learning/architecture/glossary.html). For terminology lineage and comparisons with ABAC, least privilege, authorization, provenance, workflow, reference-monitor patterns, and AI tool calling, use [Terminology and Established Architecture Concepts](https://asibackbone.github.io/Learning/architecture/terminology-and-established-concepts.html).
+For **canonical educational definitions**, use the [AsiBackbone Learning Architecture Glossary](https://asibackbone.github.io/Learning/architecture/glossary.html). For terminology lineage and comparisons with ABAC, least privilege, authorization, provenance, workflow, reference-monitor patterns, and AI tool calling, use [Terminology and Established Architecture Concepts](https://asibackbone.github.io/Learning/architecture/terminology-and-established-concepts.html).
 
 This repository does not maintain a second organization-level teaching glossary.
 
@@ -17,8 +17,8 @@ This repository does not maintain a second organization-level teaching glossary.
 
 | Question | Canonical source |
 | --- | --- |
-| What does this architecture term mean for teaching and comparison? | ASI Backbone Learning |
-| Which established concept is it related to? | ASI Backbone Learning |
+| What does this architecture term mean for teaching and comparison? | AsiBackbone Learning |
+| Which established concept is it related to? | AsiBackbone Learning |
 | Which package or type implements it today? | AsiBackbone product documentation and API reference |
 | What exact outcomes, fields, defaults, or runtime invariants exist? | AsiBackbone product documentation and source |
 | Does a Learning sample redefine a released API contract? | No |

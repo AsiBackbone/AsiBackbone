@@ -1,6 +1,6 @@
 # Adoption and Target Use Cases
 
-General governed-execution scenario teaching and role-based learning belong in [ASI Backbone Learning](https://asibackbone.github.io/Learning/). This page stays product-focused: where the current AsiBackbone packages fit, and where they do not.
+General governed-execution scenario teaching and role-based learning belong in [AsiBackbone Learning](https://asibackbone.github.io/Learning/). This page stays product-focused: where the current AsiBackbone packages fit, and where they do not.
 
 > [!IMPORTANT]
 > AsiBackbone does not execute AI, robotics, infrastructure, physical-control, or external-system commands by itself. The host remains responsible for authentication, authorization, execution, persistence, operational safeguards, and compliance review.
@@ -68,4 +68,4 @@ The host remains responsible for:
 
 ## Learn the broader scenarios
 
-Use [ASI Backbone Learning](https://asibackbone.github.io/Learning/) for architecture tutorials, case studies, labs, comparisons, and adoption personas.
+Use [AsiBackbone Learning](https://asibackbone.github.io/Learning/) for architecture tutorials, case studies, labs, comparisons, and adoption personas.

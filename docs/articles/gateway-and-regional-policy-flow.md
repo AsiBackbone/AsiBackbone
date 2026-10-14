@@ -1,6 +1,6 @@
 # Gateway and Regional Policy Flow: Product Integration Note
 
-The general regional-policy and operational-gateway architecture is canonical in [ASI Backbone Learning](https://asibackbone.github.io/Learning/advanced/regional-policy-and-operational-gateways.html).
+The general regional-policy and operational-gateway architecture is canonical in [AsiBackbone Learning](https://asibackbone.github.io/Learning/advanced/regional-policy-and-operational-gateways.html).
 
 This page documents how current AsiBackbone primitives fit that pattern.
 

@@ -74,7 +74,7 @@ An AsiBackbone implementation sample should identify:
 
 Preferred cross-link language:
 
-> Want to understand the architectural pattern and alternatives before using this API? See [ASI Backbone Learning](https://asibackbone.github.io/Learning/).
+> Want to understand the architectural pattern and alternatives before using this API? See [AsiBackbone Learning](https://asibackbone.github.io/Learning/).
 
 ## Authority when examples differ
 

@@ -33,4 +33,4 @@ The API pages are produced by DocFX from the current public .NET surface. Use th
 - [Capability Grant Hardening](articles/capability-grant-hardening.md)
 - [Host-Owned Execution Enforcement](articles/host-owned-execution-enforcement.md)
 
-For architecture education and stack-neutral teaching, use [ASI Backbone Learning](https://asibackbone.github.io/Learning/).
+For architecture education and stack-neutral teaching, use [AsiBackbone Learning](https://asibackbone.github.io/Learning/).

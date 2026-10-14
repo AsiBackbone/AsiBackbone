@@ -30,7 +30,7 @@ AsiBackbone is the implementation package family for Accountable Systems Infrast
 
 `AsiBackbone/AsiBackbone` is the source of truth for the concrete product: package installation and configuration, public APIs and type behavior, runtime semantics, integration boundaries, security posture, operations, compatibility, releases, and maintainer evidence.
 
-For organization-level concepts, architecture education, terminology lineage, tutorials, comparisons, tradeoffs, labs, and general governed-execution teaching, use [ASI Backbone Learning](https://asibackbone.github.io/Learning/) and its [source repository](https://github.com/AsiBackbone/Learning) as the canonical educational source. Learning does not define or override released AsiBackbone package, API, configuration, or runtime behavior.
+For organization-level concepts, architecture education, terminology lineage, tutorials, comparisons, tradeoffs, labs, and general governed-execution teaching, use [AsiBackbone Learning](https://asibackbone.github.io/Learning/) and its [source repository](https://github.com/AsiBackbone/Learning) as the canonical educational source. Learning does not define or override released AsiBackbone package, API, configuration, or runtime behavior.
 
 See the [cross-repository documentation ownership contract](docs/articles/documentation-ownership.md) for the full routing matrix.
 
@@ -182,7 +182,7 @@ If meaningful external consumer demand appears, additional TFM support can be re
 
 Use the organization as one connected path; each repository has a distinct job:
 
-1. **Learn the pattern:** start with [ASI Backbone Learning](https://asibackbone.github.io/Learning/)
+1. **Learn the pattern:** start with [AsiBackbone Learning](https://asibackbone.github.io/Learning/)
    for concepts, tutorials, labs, comparisons, and adoption personas.
 2. **Try a complete host:** use
    [NetCoreApplicationTemplate](https://github.com/AsiBackbone/NetCoreApplicationTemplate)

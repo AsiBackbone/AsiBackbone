@@ -1,6 +1,6 @@
 # Why AsiBackbone? Product Fit
 
-The general rationale for governed execution is canonical in [ASI Backbone Learning](https://asibackbone.github.io/Learning/architecture/accountable-systems-infrastructure-and-governed-execution.html).
+The general rationale for governed execution is canonical in [AsiBackbone Learning](https://asibackbone.github.io/Learning/architecture/accountable-systems-infrastructure-and-governed-execution.html).
 
 This URL is retained for continuity. For product adoption, the question is narrower: **does a .NET host need an explicit, auditable decision boundary before consequential execution?**
 

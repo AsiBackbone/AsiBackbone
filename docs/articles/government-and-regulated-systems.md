@@ -1,6 +1,6 @@
 # Government and Regulated Systems: Product Guidance
 
-General regulated-system architecture teaching is canonical in [ASI Backbone Learning](https://asibackbone.github.io/Learning/advanced/governed-execution-in-regulated-systems.html).
+General regulated-system architecture teaching is canonical in [AsiBackbone Learning](https://asibackbone.github.io/Learning/advanced/governed-execution-in-regulated-systems.html).
 
 This product page documents only how current AsiBackbone primitives can contribute application-level decision evidence.
 

@@ -1,7 +1,7 @@
 # Plain ASP.NET Core Host Sample
 
 > [!NOTE]
-> This is a compile-ready package integration sample. For vendor-neutral architecture teaching and standalone executable exercises, use [ASI Backbone Learning](https://asibackbone.github.io/Learning/) and its [Executable Samples](https://asibackbone.github.io/Learning/samples/).
+> This is a compile-ready package integration sample. For vendor-neutral architecture teaching and standalone executable exercises, use [AsiBackbone Learning](https://asibackbone.github.io/Learning/) and its [Executable Samples](https://asibackbone.github.io/Learning/samples/).
 
 The plain ASP.NET Core host sample is the canonical in-repository validation path for AsiBackbone.
 
