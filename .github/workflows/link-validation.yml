@@ -84,6 +84,11 @@ jobs:
       # pages, and blob/tree links to this repository, are remapped to the build
       # and checkout under test, so a pull request that adds a page or file is
       # checked against itself rather than against the published site or main.
+      # DocFX writes its "View Source" and edit links for the checked-out ref:
+      # blob/<number>/merge/<path>/#L<line> on pull requests (a ref that does not
+      # exist on GitHub) and blob/main/<path>/#L<line> on main. Both forms are
+      # remapped to the checked-out file, dropping the line anchor, so every
+      # source link must name a file that exists in the revision under test.
       # Coverage and mutation reports are published only by the deployment
       # workflows, so links to them are checked live against the published site.
       #
@@ -99,6 +104,8 @@ jobs:
             --root-dir "${{ github.workspace }}"
             --remap "^https://asibackbone\.github\.io/AsiBackbone/$ file://${{ github.workspace }}/docs/_site/index.html"
             --remap "^https://asibackbone\.github\.io/AsiBackbone/((articles|api|releases|maintainers|history|quality|images)/.*)$ file://${{ github.workspace }}/docs/_site/\$1"
+            --remap "^https://github\.com/AsiBackbone/AsiBackbone/blob/(?:[0-9]+/merge|main)/(.*)/#L[0-9]+$ file://${{ github.workspace }}/\$1"
+            --remap "^https://github\.com/AsiBackbone/AsiBackbone/blob/[0-9]+/merge file://${{ github.workspace }}"
             --remap "^https://github\.com/AsiBackbone/AsiBackbone/blob/main file://${{ github.workspace }}"
             --remap "^https://github\.com/AsiBackbone/AsiBackbone/tree/main file://${{ github.workspace }}"
             ${{ (github.event_name == 'pull_request' || github.event_name == 'push') && '--accept 200..=399,503' || '' }}
