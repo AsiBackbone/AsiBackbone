@@ -1,6 +1,6 @@
 # Equations and Toy Models: Product Boundary
 
-The conceptual equation material that inspired parts of the architecture is now canonical in [ASI Backbone Learning](https://asibackbone.github.io/Learning/architecture/constraint-conditioned-decision-model.html).
+The conceptual equation material that inspired parts of the architecture is now canonical in [AsiBackbone Learning](https://asibackbone.github.io/Learning/architecture/constraint-conditioned-decision-model.html).
 
 This URL is retained for continuity.
 

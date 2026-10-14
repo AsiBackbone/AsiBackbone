@@ -1,6 +1,6 @@
 # Enterprise Adoption Personas: Product Entry Points
 
-The general role-based learning guide is canonical in [ASI Backbone Learning](https://asibackbone.github.io/Learning/getting-started/adoption-personas-and-entry-points.html).
+The general role-based learning guide is canonical in [AsiBackbone Learning](https://asibackbone.github.io/Learning/getting-started/adoption-personas-and-entry-points.html).
 
 This URL is retained for continuity. Product consumers can use the following implementation-oriented entry points.
 

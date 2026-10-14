@@ -7,7 +7,7 @@ AsiBackbone is a .NET governance package family for accountable software decisio
 
 This repository is authoritative for concrete AsiBackbone package, API, configuration, runtime, integration, security, operations, compatibility, release, and maintainer behavior. See [Documentation Ownership](documentation-ownership.md) for the cross-repository ownership matrix.
 
-General architectural education belongs in [ASI Backbone Learning](https://asibackbone.github.io/Learning/) ([source](https://github.com/AsiBackbone/Learning)). Former conceptual URLs in this repository are retained as short product-mapping stubs for bookmark and inbound-link continuity; the left navigation now points directly to the canonical Learning treatments.
+General architectural education belongs in [AsiBackbone Learning](https://asibackbone.github.io/Learning/) ([source](https://github.com/AsiBackbone/Learning)). Former conceptual URLs in this repository are retained as short product-mapping stubs for bookmark and inbound-link continuity; the left navigation now points directly to the canonical Learning treatments.
 
 ## Current stable package posture
 
@@ -167,7 +167,7 @@ Superseded design proposals, alpha-era package/readiness records, and historical
 
 ## Learn the architecture
 
-For general architecture concepts, tutorials, comparisons, tradeoffs, labs, and broader governed-execution education, use [ASI Backbone Learning](https://asibackbone.github.io/Learning/).
+For general architecture concepts, tutorials, comparisons, tradeoffs, labs, and broader governed-execution education, use [AsiBackbone Learning](https://asibackbone.github.io/Learning/).
 
 Former conceptual URLs remain searchable as short continuity stubs, but canonical educational navigation points directly to Learning. Product-specific implementation, API, security, operations, compatibility, and release content remains authoritative here.
 

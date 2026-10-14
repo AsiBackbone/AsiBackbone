@@ -35,6 +35,10 @@ This project follows the spirit of [Keep a Changelog](https://keepachangelog.com
   new `scripts/Validate-DocFxStrictBuild.ps1` runs in CI and fails if any workflow DocFX build drops the flag or if one
   of those five workflows stops building DocFX, and contributor and release documentation use the same strict command
   (AsiBackbone/.github#20). Package contents and runtime behavior are unchanged.
+* Removed the `styles/**` and `examples/**` DocFX resource globs, which pointed at directories that do not exist, and
+  replaced the legacy name "ASI Backbone Learning" with "AsiBackbone Learning" in the README, contributor guidance,
+  API reference, documentation articles, and cross-repository link manifest. The 3.2.3 release notes keep the name
+  they were published with (#868).
 
 ### Fixed
 

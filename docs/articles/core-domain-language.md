@@ -6,7 +6,7 @@ description: Concrete AsiBackbone.Core API domain model, type mappings, outcome 
 
 This article documents the concrete domain model of `AsiBackbone.Core` and the host-neutral API boundary that the rest of the package family builds on.
 
-For canonical architecture definitions, use the [ASI Backbone Learning Architecture Glossary](https://asibackbone.github.io/Learning/architecture/glossary.html). This page owns the **product mapping**: exact Core types, current outcome semantics, package boundaries, and implementation invariants.
+For canonical architecture definitions, use the [AsiBackbone Learning Architecture Glossary](https://asibackbone.github.io/Learning/architecture/glossary.html). This page owns the **product mapping**: exact Core types, current outcome semantics, package boundaries, and implementation invariants.
 
 > [!IMPORTANT]
 > Learning terminology explains the architecture. The released `AsiBackbone.Core` API defines how this package implements that architecture. If a teaching example is intentionally smaller than the product surface, the product API and runtime documentation remain authoritative for implementation behavior.
