@@ -32,5 +32,21 @@ exclude = [
 
   # The canonical DOI remains the published citation target, but Zenodo's
   # resolver can repeatedly redirect or time out for automated link checks.
-  '^https://doi\.org/10\.5281/zenodo\.20546032$'
+  '^https://doi\.org/10\.5281/zenodo\.20546032$',
+
+  # ISO's standards catalog and this HHS guidance page answer automated clients
+  # with HTTP 403 whether or not the page exists, so a live check cannot
+  # distinguish a valid link from a broken one. Review these links manually
+  # when the external framework and standards mapping is updated.
+  '^https://www\.iso\.org/standard/[0-9]+(\.html)?$',
+  '^https://www\.hhs\.gov/hipaa/for-professionals/security/index\.html$'
 ]
+
+# Per-host settings are TOML tables, so they must stay at the end of this file.
+# DocFX links every referenced .NET type to Microsoft Learn, so the generated
+# API reference sends hundreds of requests to one host, which then answers
+# HTTP 429. Pace that host instead of excluding it: one request at a time and
+# at least one second apart, on top of Lychee's adaptive back-off.
+[hosts."learn.microsoft.com"]
+concurrency = 1
+request_interval = "1s"
