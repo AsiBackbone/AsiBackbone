@@ -18,6 +18,11 @@ This project follows the spirit of [Keep a Changelog](https://keepachangelog.com
   Community, Framework, Template, and GitHub, replacing Resources and the redundant Overview item; the footer adds source,
   community, license, and archive links; and every page now has a skip link. `scripts/Validate-LandingPage.ps1` checks
   the homepage, navigation, and footer in CI (AsiBackbone/.github#17).
+* Every DocFX build in CI, documentation and quality-report publishing, package publishing, and release validation now
+  runs with `--warningsAsErrors`, so a DocFX warning fails the workflow instead of publishing a site with warnings. The
+  new `scripts/Validate-DocFxStrictBuild.ps1` runs in CI and fails if any workflow DocFX build drops the flag or if one
+  of those five workflows stops building DocFX, and contributor and release documentation use the same strict command
+  (AsiBackbone/.github#20). Package contents and runtime behavior are unchanged.
 
 ### Fixed
 

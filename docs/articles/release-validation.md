@@ -73,7 +73,7 @@ The stable managed public API baseline is validated from DocFX output:
 
 ```powershell
 dotnet tool restore
-dotnet tool run docfx -- docs/docfx.json
+dotnet tool run docfx -- docs/docfx.json --warningsAsErrors
 ./scripts/Validate-PublicApiBaseline.ps1
 ```
 

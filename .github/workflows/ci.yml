@@ -104,8 +104,16 @@ jobs:
       - name: Restore .NET tools
         run: dotnet tool restore
 
+      - name: Test strict DocFX build validator
+        shell: pwsh
+        run: ./scripts/Validate-DocFxStrictBuild.ps1 -SelfTest
+
+      - name: Validate DocFX builds fail on warnings
+        shell: pwsh
+        run: ./scripts/Validate-DocFxStrictBuild.ps1
+
       - name: Build DocFX site for public API baseline
-        run: dotnet tool run docfx -- docs/docfx.json
+        run: dotnet tool run docfx -- docs/docfx.json --warningsAsErrors
 
       - name: Test documentation landing-page validator
         shell: pwsh

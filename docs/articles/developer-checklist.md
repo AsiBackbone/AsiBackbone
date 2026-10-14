@@ -52,7 +52,7 @@ For documentation changes, preview the DocFX site locally:
 
 ```bash
 dotnet tool restore
-dotnet tool run docfx docs/docfx.json --serve
+dotnet tool run docfx docs/docfx.json --warningsAsErrors --serve
 ```
 
 ## Package boundary checklist

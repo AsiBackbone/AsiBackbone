@@ -90,7 +90,7 @@ The documentation site uses DocFX.
 
 ```bash
 dotnet tool restore
-dotnet tool run docfx docs/docfx.json --serve
+dotnet tool run docfx docs/docfx.json --warningsAsErrors --serve
 ```
 
 DocFX will build the documentation and serve it locally. Use the local URL printed in the terminal to preview changes before opening a pull request.

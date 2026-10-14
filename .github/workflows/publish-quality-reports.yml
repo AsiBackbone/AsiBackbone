@@ -133,7 +133,7 @@ jobs:
           dotnet tool run dotnet-stryker -- --config-file stryker-config.json --output "../../artifacts/mutation-report/opentelemetry"
 
       - name: Build DocFX site
-        run: dotnet tool run docfx -- docs/docfx.json
+        run: dotnet tool run docfx -- docs/docfx.json --warningsAsErrors
 
       - name: Copy coverage report to DocFX output
         shell: pwsh

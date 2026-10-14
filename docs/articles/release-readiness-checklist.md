@@ -55,7 +55,7 @@ dotnet build AsiBackbone.slnx --configuration Release
 dotnet test AsiBackbone.slnx --configuration Release --no-build --no-restore
 dotnet format AsiBackbone.slnx --verify-no-changes --verbosity minimal
 dotnet tool restore
-dotnet tool run docfx -- docs/docfx.json
+dotnet tool run docfx -- docs/docfx.json --warningsAsErrors
 ```
 
 Pack local release artifacts for inspection:
