@@ -1,0 +1,125 @@
+name: Documentation Link Validation
+
+on:
+  workflow_dispatch:
+
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'docs/**'
+      - 'scripts/Ensure-PublishedHtmlMetadata.ps1'
+      - 'lychee.toml'
+      - '.config/dotnet-tools.json'
+      - '.github/workflows/link-validation.yml'
+
+  push:
+    branches:
+      - main
+    paths:
+      - 'docs/**'
+      - 'scripts/Ensure-PublishedHtmlMetadata.ps1'
+      - 'lychee.toml'
+      - '.config/dotnet-tools.json'
+      - '.github/workflows/link-validation.yml'
+
+  # Detect external link rot even when the documentation has not recently changed.
+  schedule:
+    - cron: '29 13 * * 0'
+
+# Deny all GitHub token permissions by default.
+permissions: {}
+
+concurrency:
+  group: documentation-link-validation-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  DOTNET_NOLOGO: true
+  DOTNET_SKIP_FIRST_TIME_EXPERIENCE: true
+  SOLUTION_FILE: './AsiBackbone.slnx'
+  CONFIGURATION: Release
+
+jobs:
+  validate-links:
+    name: Validate documentation links
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@a98b56852c35b8e3190ac28c8c2271da59106c68 # v6.0.0
+        with:
+          global-json-file: global.json
+
+      - name: Restore
+        run: dotnet restore ${{ env.SOLUTION_FILE }} --locked-mode
+
+      - name: Build
+        run: dotnet build ${{ env.SOLUTION_FILE }} --configuration ${{ env.CONFIGURATION }} --no-restore /p:ContinuousIntegrationBuild=true
+
+      - name: Restore .NET tools
+        run: dotnet tool restore
+
+      - name: Build DocFX site
+        run: dotnet tool run docfx -- docs/docfx.json --warningsAsErrors
+
+      - name: Ensure published HTML metadata
+        shell: pwsh
+        run: |
+          ./scripts/Ensure-PublishedHtmlMetadata.ps1 `
+            -SiteDirectory "./docs/_site" `
+            -NoIndexPathPrefix @("coverage", "mutation")
+
+      # Lychee checks every link in the generated site: internal links between
+      # pages and external HTTP(S) links. Absolute links to this site's own
+      # pages, and blob/tree links to this repository, are remapped to the build
+      # and checkout under test, so a pull request that adds a page or file is
+      # checked against itself rather than against the published site or main.
+      # DocFX writes its "View Source" and edit links for the checked-out ref:
+      # blob/<number>/merge/<path>/#L<line> on pull requests (a ref that does not
+      # exist on GitHub) and blob/main/<path>/#L<line> on main. Both forms are
+      # remapped to the checked-out file, dropping the line anchor, so every
+      # source link must name a file that exists in the revision under test.
+      # Coverage and mutation reports are published only by the deployment
+      # workflows, so links to them are checked live against the published site.
+      #
+      # Pull request and push runs also accept HTTP 503, which third-party hosts
+      # return transiently and which says nothing about the change under review.
+      # Scheduled and manual runs keep the strict lychee.toml accept list, so a
+      # link that stays unavailable is reported as link rot. HTTP 429 is never
+      # accepted.
+      - name: Validate generated site and external links
+        uses: lycheeverse/lychee-action@e7477775783ea5526144ba13e8db5eec57747ce8 # v2.9.0
+        with:
+          args: >-
+            --root-dir "${{ github.workspace }}"
+            --remap "^https://asibackbone\.github\.io/AsiBackbone/$ file://${{ github.workspace }}/docs/_site/index.html"
+            --remap "^https://asibackbone\.github\.io/AsiBackbone/((articles|api|releases|maintainers|history|quality|images)/.*)$ file://${{ github.workspace }}/docs/_site/\$1"
+            --remap "^https://github\.com/AsiBackbone/AsiBackbone/blob/(?:[0-9]+/merge|main)/(.*)/#L[0-9]+$ file://${{ github.workspace }}/\$1"
+            --remap "^https://github\.com/AsiBackbone/AsiBackbone/blob/[0-9]+/merge file://${{ github.workspace }}"
+            --remap "^https://github\.com/AsiBackbone/AsiBackbone/blob/main file://${{ github.workspace }}"
+            --remap "^https://github\.com/AsiBackbone/AsiBackbone/tree/main file://${{ github.workspace }}"
+            ${{ (github.event_name == 'pull_request' || github.event_name == 'push') && '--accept 200..=399,503' || '' }}
+            './docs/_site/**/*.html'
+          # The pinned action exports this input as GITHUB_TOKEN, which Lychee
+          # uses for authenticated GitHub requests and a higher rate limit.
+          token: ${{ github.token }}
+          fail: true
+          jobSummary: true
+
+      - name: Explain persistent rate limiting
+        if: failure()
+        shell: bash
+        run: |
+          if [[ -f lychee/out.md ]] && grep -Eqi '(^|[^0-9])429([^0-9]|$)|too many requests' lychee/out.md; then
+            echo "::error::A host still returned HTTP 429 after retries. Treat this as a retryable validation failure; rerun the job rather than accepting 429 as success."
+          fi

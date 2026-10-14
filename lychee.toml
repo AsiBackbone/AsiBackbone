@@ -1,15 +1,19 @@
 verbose = "info"
 no_progress = true
 
-max_retries = 2
+max_retries = 4
 timeout = 20
-retry_wait_time = 2
+retry_wait_time = 5
 
 max_concurrency = 8
 host_concurrency = 2
 
-# Treat rate limiting as inconclusive rather than a broken link.
-accept = ["200..=399", "429"]
+# A response must resolve successfully after retries. In particular, HTTP 429
+# remains a retryable failure instead of being mistaken for a valid target.
+# Pull request and push runs widen this to accept HTTP 503 on the command line
+# (see .github/workflows/link-validation.yml); scheduled and manual runs keep
+# this list, so a link that stays unavailable is reported as link rot.
+accept = ["200..=399"]
 
 # Do not attempt to validate localhost/private addresses used in
 # local-development documentation.
@@ -18,11 +22,31 @@ exclude_all_private = true
 # Email-address validation is outside the scope of documentation links.
 include_mail = false
 
+# Exclusions suppress link rot rather than reporting it, so each one needs a
+# reason that is specific to the URL and not merely "this is sometimes slow".
+# Transient slowness and throttling are handled by bounded retries.
 exclude = [
   # Private vulnerability reporting may intentionally return 404 to
   # unauthenticated link checkers.
-  '^https://github\\.com/AsiBackbone/AsiBackbone/security/advisories/new$',
+  '^https://github\.com/AsiBackbone/AsiBackbone/security/advisories/new$',
 
-  # Zenodo DOI occasionally times out for automated link validation.
-  '^https://doi\.org/10\.5281/zenodo\.20546032$'
+  # The canonical DOI remains the published citation target, but Zenodo's
+  # resolver can repeatedly redirect or time out for automated link checks.
+  '^https://doi\.org/10\.5281/zenodo\.20546032$',
+
+  # ISO's standards catalog and this HHS guidance page answer automated clients
+  # with HTTP 403 whether or not the page exists, so a live check cannot
+  # distinguish a valid link from a broken one. Review these links manually
+  # when the external framework and standards mapping is updated.
+  '^https://www\.iso\.org/standard/[0-9]+(\.html)?$',
+  '^https://www\.hhs\.gov/hipaa/for-professionals/security/index\.html$'
 ]
+
+# Per-host settings are TOML tables, so they must stay at the end of this file.
+# DocFX links every referenced .NET type to Microsoft Learn, so the generated
+# API reference sends hundreds of requests to one host, which then answers
+# HTTP 429. Pace that host instead of excluding it: one request at a time and
+# at least one second apart, on top of Lychee's adaptive back-off.
+[hosts."learn.microsoft.com"]
+concurrency = 1
+request_interval = "1s"

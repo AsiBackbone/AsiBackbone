@@ -6,6 +6,18 @@ This project follows the spirit of [Keep a Changelog](https://keepachangelog.com
 
 ## [Unreleased]
 
+### Added
+
+* Added the `Documentation Link Validation` workflow, which builds the DocFX site, applies the published-HTML metadata
+  step, and runs Lychee over every generated page on documentation pull requests and pushes and weekly, checking links
+  between pages and external HTTP(S) links. Absolute links to the site and to this repository resolve against the build
+  under test. `lychee.toml` now retries transient failures and no longer accepts HTTP 429 as success; pull-request and
+  push runs also tolerate HTTP 503, while scheduled runs stay strict. Requests to Microsoft Learn, which DocFX links
+  for every referenced .NET type, are paced to one at a time and one second apart instead of being excluded, and the
+  ISO standards catalog and HHS guidance links, which return HTTP 403 to automated clients, are excluded with that
+  reason recorded. The private vulnerability reporting exclusion now matches its URL; it previously never matched. `scripts/Validate-DocumentationLinks.ps1` keeps its focused checks, and
+  the contributor and release-validation guidance describe the crawl (#867).
+
 ### Changed
 
 * Aligned the documentation homepage with the organization
@@ -26,6 +38,9 @@ This project follows the spirit of [Keep a Changelog](https://keepachangelog.com
 
 ### Fixed
 
+* Corrected the `IAcknowledgmentChallengeService` source link in the AI agent gateway scenario, which still pointed at
+  the former `Handshakes` folder instead of `src/AsiBackbone.AspNetCore/Acknowledgments/`. The new documentation link
+  validation found it (#867).
 * Fixed the published-HTML metadata script inserting a literal `\n` instead of a line break before `</head>` when the
   document's line endings differ from the platform's (LF DocFX output processed on Windows). Browsers treated that text
   as body content, so the injected description meta tags moved into `<body>` and `\n` appeared at the top of the page in
