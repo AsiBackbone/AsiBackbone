@@ -6,6 +6,16 @@ This project follows the spirit of [Keep a Changelog](https://keepachangelog.com
 
 ## [Unreleased]
 
+### Added
+
+* Added the `Documentation Link Validation` workflow, which builds the DocFX site, applies the published-HTML metadata
+  step, and runs Lychee over every generated page on documentation pull requests and pushes and weekly, checking links
+  between pages and external HTTP(S) links. Absolute links to the site and to this repository resolve against the build
+  under test. `lychee.toml` now retries transient failures and no longer accepts HTTP 429 as success; pull-request and
+  push runs also tolerate HTTP 503, while scheduled runs stay strict. The private vulnerability reporting exclusion now
+  matches its URL; it previously never matched. `scripts/Validate-DocumentationLinks.ps1` keeps its focused checks, and
+  the contributor and release-validation guidance describe the crawl (#867).
+
 ### Changed
 
 * Aligned the documentation homepage with the organization
