@@ -265,7 +265,7 @@
 
 - name: Learn the Architecture
   items:
-    - name: ASI Backbone Learning Site
+    - name: AsiBackbone Learning Site
       href: https://asibackbone.github.io/Learning/
     - name: Accountable Systems Infrastructure
       href: https://asibackbone.github.io/Learning/architecture/accountable-systems-infrastructure-and-governed-execution.html
