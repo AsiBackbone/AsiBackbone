@@ -142,7 +142,7 @@ jobs:
           fi
 
       - name: Build DocFX site
-        run: dotnet tool run docfx -- docs/docfx.json
+        run: dotnet tool run docfx -- docs/docfx.json --warningsAsErrors
 
       - name: Test documentation landing-page validator
         shell: pwsh

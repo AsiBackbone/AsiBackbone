@@ -39,7 +39,7 @@ baseline:
 
 ```powershell
 dotnet tool restore
-dotnet tool run docfx -- docs/docfx.json
+dotnet tool run docfx -- docs/docfx.json --warningsAsErrors
 ./scripts/Validate-PublicApiBaseline.ps1
 ```
 

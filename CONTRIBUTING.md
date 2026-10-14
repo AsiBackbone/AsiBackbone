@@ -97,8 +97,10 @@ Build the documentation site locally when documentation changes or public behavi
 
 ```bash
 dotnet tool restore
-dotnet tool run docfx docs/docfx.json --serve
+dotnet tool run docfx docs/docfx.json --warningsAsErrors --serve
 ```
+
+CI and publishing build DocFX with `--warningsAsErrors`, so any DocFX warning fails the build. `scripts/Validate-DocFxStrictBuild.ps1` keeps every workflow build strict.
 
 Documentation should clearly separate:
 
