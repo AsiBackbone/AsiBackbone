@@ -185,7 +185,7 @@ public sealed class GovernedOperationExecutionReceiptTests
     }
 
     /// <summary>
-    /// Verifies execution-started events reject missing decision residue and operation identity.
+    /// Verifies execution-started events reject a missing decision receipt and operation identity.
     /// </summary>
     [Fact]
     public void ExecutionStartedLifecycleEventRejectsMissingRequiredInputs()

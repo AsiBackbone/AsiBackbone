@@ -17,7 +17,7 @@ public interface IDecisionReceipt
     /// Gets the stable decision receipt identifier when available.
     /// </summary>
     /// <remarks>
-    /// Existing residue implementations may use <see cref="EventId" /> as the residue identifier.
+    /// Existing receipt implementations may use <see cref="EventId" /> as the decision receipt identifier.
     /// </remarks>
     string? DecisionReceiptId => EventId;
 

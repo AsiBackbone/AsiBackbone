@@ -357,15 +357,15 @@ public sealed class GovernanceTestDecisionReceiptSink : IDecisionReceiptSink
 
     /// <inheritdoc />
     public ValueTask WriteAsync(
-        IDecisionReceipt residue,
+        IDecisionReceipt receipt,
         CancellationToken cancellationToken = default)
     {
-        ArgumentNullException.ThrowIfNull(residue);
+        ArgumentNullException.ThrowIfNull(receipt);
         cancellationToken.ThrowIfCancellationRequested();
 
         lock (gate)
         {
-            entries.Add(residue);
+            entries.Add(receipt);
         }
 
         return ValueTask.CompletedTask;

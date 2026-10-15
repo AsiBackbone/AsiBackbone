@@ -473,7 +473,7 @@ public sealed class AsiBackboneContractCoverageTests
     private sealed class ThrowingAuditSink : IDecisionReceiptSink
     {
         public ValueTask WriteAsync(
-            IDecisionReceipt residue,
+            IDecisionReceipt receipt,
             CancellationToken cancellationToken = default)
         {
             throw new InvalidOperationException("Audit sink failed.");

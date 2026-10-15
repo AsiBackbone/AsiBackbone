@@ -6,6 +6,34 @@ This project follows the spirit of [Keep a Changelog](https://keepachangelog.com
 
 ## [Unreleased]
 
+### Changed
+
+* Renamed the `IDecisionReceipt` parameter of `IDecisionReceiptSink.WriteAsync(...)`,
+  `InMemoryAuditLedger.WriteAsync(...)`, and `GovernanceTestDecisionReceiptSink.WriteAsync(...)` from `residue` to
+  `receipt`, completing the 6.0 terminology change that renamed the same parameter on the decision-receipt factories
+  and signing helpers. The interface and implementation documentation now describe recording a receipt. The member
+  signatures, binary compatibility, and runtime behavior are unchanged, so compiled consumers and existing
+  `IDecisionReceiptSink` implementations keep working without changes. Callers that pass the argument by name must
+  update `residue:` to `receipt:`. Implementations may keep their own parameter name, but matching the interface avoids
+  analyzer rule CA1725 where it is enabled. The serialized `audit_residue` and `audit-residue` wire values are
+  unchanged.
+* Renamed the parameters of `HostAccountabilityLifecycleEvent.ExecutionStarted(...)` and
+  `HostAccountabilityLifecycleEvent.FromExecutionReceipt(...)` so each names the receipt it takes. The
+  `IDecisionReceipt` parameter is now `decisionReceipt` (previously `residue`) on both methods, and the
+  `GovernedOperationExecutionReceipt` parameter of `FromExecutionReceipt(...)` is now `executionReceipt` (previously
+  `receipt`), which removes the ambiguity of two receipt types in one call. The host mutation accountability article's
+  example now passes `decisionReceipt` and `executionReceipt`. As with the sink rename, signatures, binary
+  compatibility, and behavior are unchanged; callers that pass these arguments by name must update `residue:` to
+  `decisionReceipt:` and, for `FromExecutionReceipt(...)`, `receipt:` to `executionReceipt:`.
+* Replaced the remaining "residue" wording in the `IDecisionReceipt`, `DecisionReceiptBuilder`, and
+  `DecisionReceiptLifecycleEvent` XML documentation, and in local variable names in the ASP.NET Core endpoint
+  governance service, the EF Core audit ledger store, and the `asibackbone-webapi` template, with "receipt". The
+  `GovernanceArtifactPersistenceAnalyzer` message now asks hosts to persist "the decision receipt or outbox entry"
+  instead of "audit/outbox residue", and its description says "acknowledgment outcomes" instead of "handshake
+  outcomes". The diagnostic ID, severity, and trigger conditions are unchanged. Persisted column names, JSON property
+  names, canonical payload keys, wire constants, enum wire names, and the `{AuditResidueId}` structured-log placeholder
+  are unchanged.
+
 ## [7.1.1] - 2026-10-15
 
 ### Added

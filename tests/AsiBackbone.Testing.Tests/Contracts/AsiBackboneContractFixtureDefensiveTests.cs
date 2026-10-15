@@ -633,7 +633,7 @@ public sealed class AsiBackboneContractFixtureDefensiveTests
 
     private sealed class AcceptingAuditSink : IDecisionReceiptSink
     {
-        public ValueTask WriteAsync(IDecisionReceipt residue, CancellationToken cancellationToken = default)
+        public ValueTask WriteAsync(IDecisionReceipt receipt, CancellationToken cancellationToken = default)
         {
             return ValueTask.CompletedTask;
         }
@@ -641,7 +641,7 @@ public sealed class AsiBackboneContractFixtureDefensiveTests
 
     private sealed class CancelingAuditSink : IDecisionReceiptSink
     {
-        public ValueTask WriteAsync(IDecisionReceipt residue, CancellationToken cancellationToken = default)
+        public ValueTask WriteAsync(IDecisionReceipt receipt, CancellationToken cancellationToken = default)
         {
             return ValueTask.FromException(new OperationCanceledException());
         }
@@ -649,7 +649,7 @@ public sealed class AsiBackboneContractFixtureDefensiveTests
 
     private sealed class ContractViolatingAuditSink(GovernanceContractViolationException exception) : IDecisionReceiptSink
     {
-        public ValueTask WriteAsync(IDecisionReceipt residue, CancellationToken cancellationToken = default)
+        public ValueTask WriteAsync(IDecisionReceipt receipt, CancellationToken cancellationToken = default)
         {
             return ValueTask.FromException(exception);
         }

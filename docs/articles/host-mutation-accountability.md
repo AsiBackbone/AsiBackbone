@@ -33,7 +33,7 @@ Each record remains authoritative for a separate question:
 The logical `OperationExecutionId` remains stable across retries. `ExecutionAttemptId` distinguishes individual attempts.
 
 ```csharp
-GovernedOperationExecutionReceipt receipt =
+GovernedOperationExecutionReceipt executionReceipt =
     GovernedOperationExecutionReceipt.Create(
         operationExecutionId: operationExecutionId,
         persistenceOutcome: GovernedOperationPersistenceOutcome.Committed,
@@ -47,8 +47,8 @@ GovernedOperationExecutionReceipt receipt =
 
 DecisionReceiptLifecycleEvent completed =
     HostAccountabilityLifecycleEvent.FromExecutionReceipt(
-        receipt,
-        receipt);
+        decisionReceipt,
+        executionReceipt);
 
 await lifecycleStore.AppendAsync(completed, cancellationToken);
 ```

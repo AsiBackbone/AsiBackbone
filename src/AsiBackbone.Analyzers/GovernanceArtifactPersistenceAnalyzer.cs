@@ -13,11 +13,11 @@ public sealed class GovernanceArtifactPersistenceAnalyzer : DiagnosticAnalyzer
     private static readonly DiagnosticDescriptor Rule = new(
         DiagnosticId,
         "Persist or continue AsiBackbone governance artifact",
-        "AsiBackbone governance artifact '{0}' is created or returned and then discarded; persist audit/outbox residue or pass it to a safe continuation before execution",
+        "AsiBackbone governance artifact '{0}' is created or returned and then discarded; persist the decision receipt or outbox entry, or pass it to a safe continuation before execution",
         "AsiBackbone.GovernanceSafety",
         DiagnosticSeverity.Warning,
         isEnabledByDefault: true,
-        description: "Governance decisions, decision receipt, capability grants, handshake outcomes, and outbox artifacts should not be created and discarded without persistence, outbox emission, audit recording, or a deliberate host-owned continuation path.");
+        description: "Governance decisions, decision receipts, capability grants, acknowledgment outcomes, and outbox artifacts should not be created and discarded without persistence, outbox emission, audit recording, or a deliberate host-owned continuation path.");
 
     private static readonly ImmutableHashSet<string> GovernanceArtifactTypeNames = ImmutableHashSet.Create(
         StringComparer.Ordinal,

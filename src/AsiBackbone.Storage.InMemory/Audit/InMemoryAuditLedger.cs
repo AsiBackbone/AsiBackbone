@@ -30,17 +30,17 @@ public sealed class InMemoryAuditLedger : IDecisionReceiptSink
 
     /// <inheritdoc />
     public ValueTask WriteAsync(
-        IDecisionReceipt residue,
+        IDecisionReceipt receipt,
         CancellationToken cancellationToken = default)
     {
-        return WriteCore(residue, cancellationToken);
+        return WriteCore(receipt, cancellationToken);
     }
 
     ValueTask IDecisionReceiptSink.WriteAsync(
-        IDecisionReceipt residue,
+        IDecisionReceipt receipt,
         CancellationToken cancellationToken)
     {
-        return WriteCore(residue, cancellationToken);
+        return WriteCore(receipt, cancellationToken);
     }
 
     /// <summary>
@@ -86,15 +86,15 @@ public sealed class InMemoryAuditLedger : IDecisionReceiptSink
     }
 
     private ValueTask WriteCore(
-        IDecisionReceipt residue,
+        IDecisionReceipt receipt,
         CancellationToken cancellationToken)
     {
-        ArgumentNullException.ThrowIfNull(residue);
+        ArgumentNullException.ThrowIfNull(receipt);
         cancellationToken.ThrowIfCancellationRequested();
 
         lock (syncRoot)
         {
-            records.Add(residue);
+            records.Add(receipt);
         }
 
         return ValueTask.CompletedTask;

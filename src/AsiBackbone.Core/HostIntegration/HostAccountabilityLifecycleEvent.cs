@@ -13,7 +13,7 @@ public static class HostAccountabilityLifecycleEvent
     /// Creates a gateway-execution-started lifecycle event for one logical operation and attempt.
     /// </summary>
     public static DecisionReceiptLifecycleEvent ExecutionStarted(
-        IDecisionReceipt residue,
+        IDecisionReceipt decisionReceipt,
         string operationExecutionId,
         string? executionAttemptId = null,
         string? decisionAuditRecordId = null,
@@ -21,7 +21,7 @@ public static class HostAccountabilityLifecycleEvent
         DateTimeOffset? occurredUtc = null,
         IReadOnlyDictionary<string, string>? metadata = null)
     {
-        ArgumentNullException.ThrowIfNull(residue);
+        ArgumentNullException.ThrowIfNull(decisionReceipt);
         ArgumentException.ThrowIfNullOrWhiteSpace(operationExecutionId);
 
         SortedDictionary<string, string> lifecycleMetadata = new(StringComparer.Ordinal);
@@ -32,7 +32,7 @@ public static class HostAccountabilityLifecycleEvent
 
         return DecisionReceiptLifecycleEvent.FromDecisionReceipt(
             DecisionReceiptLifecycleStage.GatewayExecutionStarted,
-            residue,
+            decisionReceipt,
             eventId: eventId,
             occurredUtc: occurredUtc,
             outcome: "Started",
@@ -48,21 +48,21 @@ public static class HostAccountabilityLifecycleEvent
     /// expanding the lifecycle-stage enum.
     /// </remarks>
     public static DecisionReceiptLifecycleEvent FromExecutionReceipt(
-        IDecisionReceipt residue,
-        GovernedOperationExecutionReceipt receipt,
+        IDecisionReceipt decisionReceipt,
+        GovernedOperationExecutionReceipt executionReceipt,
         string? eventId = null,
         IReadOnlyDictionary<string, string>? metadata = null)
     {
-        ArgumentNullException.ThrowIfNull(residue);
-        ArgumentNullException.ThrowIfNull(receipt);
+        ArgumentNullException.ThrowIfNull(decisionReceipt);
+        ArgumentNullException.ThrowIfNull(executionReceipt);
 
         return DecisionReceiptLifecycleEvent.FromDecisionReceipt(
             DecisionReceiptLifecycleStage.GatewayExecutionCompleted,
-            residue,
+            decisionReceipt,
             eventId: eventId,
-            occurredUtc: receipt.CompletedUtc,
-            outcome: CanonicalEnumWireNames.ForPersistenceOutcome(receipt.PersistenceOutcome),
-            metadata: receipt.ToLifecycleMetadata(metadata));
+            occurredUtc: executionReceipt.CompletedUtc,
+            outcome: CanonicalEnumWireNames.ForPersistenceOutcome(executionReceipt.PersistenceOutcome),
+            metadata: executionReceipt.ToLifecycleMetadata(metadata));
     }
 
     private static void AddMetadata(SortedDictionary<string, string> destination, IReadOnlyDictionary<string, string>? metadata)

@@ -10,7 +10,7 @@ namespace AsiBackbone.Core.Audit;
 /// </summary>
 /// <remarks>
 /// The builder is intended for ergonomic object creation in host code, samples, and tests. It preserves the immutable
-/// <see cref="DecisionReceipt" /> value model by producing a new residue when <see cref="Build" /> is called.
+/// <see cref="DecisionReceipt" /> value model by producing a new receipt when <see cref="Build" /> is called.
 /// </remarks>
 public sealed class DecisionReceiptBuilder
 {

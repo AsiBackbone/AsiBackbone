@@ -291,7 +291,7 @@ public sealed class EfCoreAuditLedgerStore : IGovernanceAuditLedgerStore
         string[] reasonCodes = DeserializeReasonCodes(entity.ReasonCodesJson);
         ReadOnlyDictionary<string, string> metadata = DeserializeMetadata(entity.MetadataJson);
 
-        var residue = new EntityDecisionReceipt(
+        var receipt = new EntityDecisionReceipt(
             entity.EventId,
             entity.DecisionReceiptId,
             entity.SchemaVersion,
@@ -323,7 +323,7 @@ public sealed class EfCoreAuditLedgerStore : IGovernanceAuditLedgerStore
             metadata);
 
         return AuditLedgerRecord.FromDecisionReceipt(
-            residue,
+            receipt,
             entity.RecordId,
             entity.RecordedUtc,
             entity.HandshakeId,
