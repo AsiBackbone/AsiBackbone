@@ -67,7 +67,7 @@ The `2.0.0` release established the simplified `AsiBackbone.*` package and names
 
 ### Current `7.x` stable family
 
-`7.1.0` is the current stable release on `main`. The `7.x` line preserves the `AsiBackbone.*` package IDs, the `net10.0` target, and binary assembly identity `7.0.0.0`. Version 7.1 adds analyzer guidance and deprecates retained compatibility APIs through warnings and documented replacements without removing them or changing their runtime behavior. See [7.1.0 Release Notes](release-notes-710.md) and [Upgrade from 6.x to 7.0](upgrade-600-to-700.md).
+`7.1.1` is the current stable release on `main`. The `7.x` line preserves the `AsiBackbone.*` package IDs, the `net10.0` target, and binary assembly identity `7.0.0.0`. Version 7.1 adds analyzer guidance and deprecates retained compatibility APIs through warnings and documented replacements without removing them or changing their runtime behavior; version 7.1.1 is a patch release with no public API change. See [7.1.1 Release Notes](release-notes-711.md), [7.1.0 Release Notes](release-notes-710.md), and [Upgrade from 6.x to 7.0](upgrade-600-to-700.md).
 
 | Package | `7.x` stable role |
 | --- | --- |
@@ -192,6 +192,7 @@ Expected stable-line behavior:
 | `6.0.0` | `6.0.0` | `6.0.0.0` | `6.0.0.0` | `6.0.0+...` |
 | `7.0.0` | `7.0.0` | `7.0.0.0` | `7.0.0.0` | `7.0.0+...` |
 | `7.1.0` | `7.1.0` | `7.0.0.0` | `7.1.0.0` | `7.1.0+...` |
+| `7.1.1` | `7.1.1` | `7.0.0.0` | `7.1.1.0` | `7.1.1+...` |
 
 Before cutting stable releases, release validation should verify that `AssemblyVersion`, `FileVersion`, `InformationalVersion`, package metadata, release notes, and repository tags match this policy.
 
@@ -225,6 +226,7 @@ Before cutting a stable release or stable package-family expansion, the release 
 
 - [API Baseline and Architecture Boundary Checks](api-baseline-and-boundary-checks.md)
 - [4.0.0 Release Notes](release-notes-400.md)
+- [7.1.1 Release Notes](release-notes-711.md)
 - [7.1.0 Release Notes](release-notes-710.md)
 - [7.0.0 Release Notes](release-notes-700.md)
 - [Upgrade from 6.x to 7.0](upgrade-600-to-700.md)
