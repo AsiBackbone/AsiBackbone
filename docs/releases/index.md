@@ -6,11 +6,12 @@ Current package/runtime behavior is documented in the product articles and gener
 
 ## Current release
 
-Stable package family: `7.x`. Current release: `7.1.0`.
+Stable package family: `7.x`. Current release: `7.1.1`.
 
-- [7.1.0 Release Notes](../articles/release-notes-710.md)
-- [7.1.0 Release Readiness Record](../articles/release-readiness-710.md)
-- [7.1.0 Consumer Verification Guide](../articles/consumer-verification-710.md)
+- [7.1.1 Release Notes](../articles/release-notes-711.md)
+- [7.1.1 Release Readiness Record](../articles/release-readiness-711.md)
+- [7.1.1 Consumer Verification Guide](../articles/consumer-verification-711.md)
+- [7.1.0 Release Notes](../articles/release-notes-710.md) (analyzer and deprecation changes in the `7.1` line)
 - [ASIB901 Migration Guide](../articles/asib901-create-execution-boundary.md)
 - [ASIB902 Migration Guide](../articles/asib902-legacy-signature-input.md)
 - [ASIB903 Migration Guide](../articles/asib903-outbox-retry-clock.md)
@@ -19,6 +20,12 @@ Stable package family: `7.x`. Current release: `7.1.0`.
 - [Target Framework Support](../articles/target-framework-support.md)
 
 ## Release archive
+
+### 7.1.0
+
+- [7.1.0 Release Notes](../articles/release-notes-710.md)
+- [7.1.0 Release Readiness Record](../articles/release-readiness-710.md)
+- [7.1.0 Consumer Verification Guide](../articles/consumer-verification-710.md)
 
 ### 7.0.0
 

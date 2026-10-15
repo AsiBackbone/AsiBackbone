@@ -86,11 +86,13 @@ The DocFX header search is available for package names, API concepts, and articl
 
 ## Current stable package family
 
-Stable `7.x` package family. The current release is `7.1.0`.
+Stable `7.x` package family. The current release is `7.1.1`.
 
-`7.1.0` adds signing-input analyzer guidance and begins the `ASIB902` and
-`ASIB903` deprecation windows while preserving package IDs, the `net10.0`
-target, and binary assembly identity `7.0.0.0`.
+`7.1.1` is a maintenance patch over `7.1.0` with no public API, runtime
+behavior, or package dependency changes. The `7.1` minor release added
+signing-input analyzer guidance and began the `ASIB902` and `ASIB903`
+deprecation windows while preserving package IDs, the `net10.0` target, and
+binary assembly identity `7.0.0.0`.
 
 ```text
 AsiBackbone.Core
@@ -162,6 +164,8 @@ Package-specific READMEs and release notes define which surfaces are stable, opt
 
 ### Releases and compatibility
 
+* [7.1.1 Release Notes](articles/release-notes-711.md)
+* [7.1.1 Consumer Verification Guide](articles/consumer-verification-711.md)
 * [7.1.0 Release Notes](articles/release-notes-710.md)
 * [7.1.0 Consumer Verification Guide](articles/consumer-verification-710.md)
 * [7.0.0 Release Notes](articles/release-notes-700.md)

@@ -6,6 +6,8 @@ This project follows the spirit of [Keep a Changelog](https://keepachangelog.com
 
 ## [Unreleased]
 
+## [7.1.1] - 2026-10-15
+
 ### Added
 
 * Added the `Documentation Link Validation` workflow, which builds the DocFX site, applies the published-HTML metadata
@@ -17,6 +19,11 @@ This project follows the spirit of [Keep a Changelog](https://keepachangelog.com
   ISO standards catalog and HHS guidance links, which return HTTP 403 to automated clients, are excluded with that
   reason recorded. The private vulnerability reporting exclusion now matches its URL; it previously never matched. `scripts/Validate-DocumentationLinks.ps1` keeps its focused checks, and
   the contributor and release-validation guidance describe the crawl (#867).
+* Added NuGet version and download badges to the README header, the README package-family table, and every
+  packaged component README, so the README shown on each package's NuGet page links to that package (#855).
+* Added branch tests for the 26 classes below 80% branch coverage in the published coverage report. Every class is now
+  at or above 80%; overall branch coverage rises from 87.6% to 92.3% and line coverage from 97.4% to 98.4%. The change
+  is test-only and modifies no library code (#862).
 
 ### Changed
 
@@ -39,6 +46,14 @@ This project follows the spirit of [Keep a Changelog](https://keepachangelog.com
   replaced the legacy name "ASI Backbone Learning" with "AsiBackbone Learning" in the README, contributor guidance,
   API reference, documentation articles, and cross-repository link manifest. The 3.2.3 release notes keep the name
   they were published with (#868).
+* Restored concise product-fit and simpler-design guidance near the README's practical-problem introduction, and
+  exposed the existing Adoption and Target Use Cases page from the documentation task picker and Get Started
+  navigation (#860).
+* Routed package support questions to the
+  [AsiBackbone organization Discussions](https://github.com/orgs/AsiBackbone/discussions) in the support policy and the
+  issue-form contact link, and asked project-specific posts to name the repository and package version (#861).
+* Added the top-level `doi` field for the Zenodo concept DOI to `CITATION.cff`, alongside the existing DOI identifier
+  (#857).
 
 ### Fixed
 
@@ -52,14 +67,27 @@ This project follows the spirit of [Keep a Changelog](https://keepachangelog.com
   and its self-test covers LF and CRLF documents and rejects any literal `\n`. The script is again identical to the
   copies in Learning and NetCoreApplicationTemplate.
 * Ensured every published documentation page has page-specific search and social-preview descriptions when authored metadata is absent, and marked generated coverage and mutation reports `noindex` so search engines focus on durable documentation.
+* Publish Documentation no longer drops a deployed mutation report when fetching it from GitHub Pages fails
+  transiently. Each report's `index.html` is fetched directly, non-404 failures are retried with backoff, and only an
+  HTTP 404 is treated as a report that was never published (#863).
 
 ### Security
 
 * Pinned the transitive `System.Security.Cryptography.Pkcs` dependency, which `Microsoft.Data.SqlClient` resolved to
   9.0.11, to the patched 10.0.13 release for the .NET denial-of-service advisories CVE-2026-70162
   ([GHSA-2fmv-rv2c-59x7](https://github.com/advisories/GHSA-2fmv-rv2c-59x7)) and CVE-2026-84008
-  ([GHSA-846f-f764-76mx](https://github.com/advisories/GHSA-846f-f764-76mx)). The pin is in the packaged
-  `Directory.Packages.props`, so generated applications restore the patched version and no longer fail NuGet audit.
+  ([GHSA-846f-f764-76mx](https://github.com/advisories/GHSA-846f-f764-76mx)). The pin is an explicit reference in
+  `AsiBackbone.EntityFrameworkCore.Tests`, the only project whose restore graph includes `Microsoft.Data.SqlClient`, so
+  repository builds no longer fail NuGet audit. No shipped package or `AsiBackbone.Templates` scaffold depends on
+  `Microsoft.Data.SqlClient`, so package consumers are unaffected and need no action (#870).
+
+### Compatibility
+
+* `7.1.1` is a backward-compatible patch release for the stable `7.x` package family. Apart from version metadata,
+  package contents change only in their README files; public APIs, runtime behavior, package dependencies, schemas,
+  and canonical wire values are unchanged from `7.1.0`.
+* Package IDs and the `net10.0` target remain unchanged. `AssemblyVersion` remains `7.0.0.0`; package and file versions
+  advance to `7.1.1` and `7.1.1.0` respectively.
 
 ## [7.1.0] - 2026-10-03
 
