@@ -70,13 +70,13 @@ app.MapGet("/sample/decision", async (
         .EvaluateAsync(context, cancellationToken)
         .ConfigureAwait(false);
 
-    var residue = DecisionReceipt.FromDecision(
+    var receipt = DecisionReceipt.FromDecision(
         GovernanceActorContext.Human("template-user", "Template User"),
         operationName: "template.sample.decision",
         decision,
         metadata: context.Metadata);
 
-    await auditSink.WriteAsync(residue, cancellationToken).ConfigureAwait(false);
+    await auditSink.WriteAsync(receipt, cancellationToken).ConfigureAwait(false);
 
     return Results.Ok(new
     {
@@ -87,7 +87,7 @@ app.MapGet("/sample/decision", async (
         decision.CorrelationId,
         decision.PolicyVersion,
         decision.PolicyHash,
-        auditEventId = residue.EventId,
+        auditEventId = receipt.EventId,
         hostStyle = builder.Configuration["AsiBackbone:HostStyle"] ?? "plain",
         next = new[]
         {

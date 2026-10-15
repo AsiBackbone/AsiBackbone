@@ -272,14 +272,14 @@ public sealed class DefaultEndpointGovernanceService : IEndpointGovernanceServic
         }
 
         IGovernanceActorContext actor = actorContextResolver.ResolveActorContext();
-        var residue = DecisionReceipt.FromDecision(
+        var receipt = DecisionReceipt.FromDecision(
             actor,
             descriptor.OperationName,
             decision,
             metadata: endpointMetadata,
             decisionStage: "aspnetcore.endpoint.governance");
 
-        await auditSink.WriteAsync(residue, cancellationToken).ConfigureAwait(false);
+        await auditSink.WriteAsync(receipt, cancellationToken).ConfigureAwait(false);
         return new AuditStageResult(actor, TerminalResult: null);
     }
 

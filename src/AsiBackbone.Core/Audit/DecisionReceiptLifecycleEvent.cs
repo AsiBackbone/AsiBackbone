@@ -75,12 +75,12 @@ public sealed class DecisionReceiptLifecycleEvent
     public string? DecisionReceiptId { get; }
 
     /// <summary>
-    /// Gets the trace identifier associated with the lifecycle event, when supplied by the host or original residue.
+    /// Gets the trace identifier associated with the lifecycle event, when supplied by the host or original decision receipt.
     /// </summary>
     public string? TraceId { get; }
 
     /// <summary>
-    /// Gets the operation name associated with the lifecycle event, when supplied by the host or original residue.
+    /// Gets the operation name associated with the lifecycle event, when supplied by the host or original decision receipt.
     /// </summary>
     public string? OperationName { get; }
 

@@ -139,7 +139,7 @@ Examples:
 - `audit-ledger:tenant:{tenantHash}`;
 - `audit-ledger:tenant:{tenantHash}:date:2026-06-16`;
 - `outbox:{providerName}:date:2026-06-16`;
-- `lifecycle:{auditResidueId}`.
+- `lifecycle:{auditReceiptId}`.
 
 Shorter chains are easier to verify and repair operationally. Longer chains provide stronger continuity but require careful retention and tip management.
 

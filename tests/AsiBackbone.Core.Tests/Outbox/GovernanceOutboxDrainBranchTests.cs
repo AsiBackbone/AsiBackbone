@@ -162,7 +162,7 @@ public sealed class GovernanceOutboxDrainBranchTests
         Assert.Equal("test-sink", Assert.IsType<string>(logEntry["EmitterProvider"]));
         Assert.Equal(DrainUtc.AddMinutes(1), Assert.IsType<DateTimeOffset>(logEntry["NextRetryUtc"]));
         Assert.Equal("correlation-event-1", Assert.IsType<string>(logEntry["CorrelationId"]));
-        Assert.Equal("residue-event-1", Assert.IsType<string>(logEntry["AuditResidueId"]));
+        Assert.Equal("receipt-event-1", Assert.IsType<string>(logEntry["AuditReceiptId"]));
     }
 
     /// <summary>
@@ -287,7 +287,7 @@ public sealed class GovernanceOutboxDrainBranchTests
             occurredUtc: CreatedUtc,
             envelopeId: $"envelope-{eventId}",
             correlationId: $"correlation-{eventId}",
-            decisionReceiptId: $"residue-{eventId}",
+            decisionReceiptId: $"receipt-{eventId}",
             lifecycleStage: DecisionReceiptLifecycleStage.ExternalEmissionQueued,
             policyVersion: "v1",
             policyHash: "hash",
