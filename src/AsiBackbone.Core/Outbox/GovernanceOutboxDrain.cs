@@ -29,7 +29,7 @@ public sealed class GovernanceOutboxDrain(
     private static readonly Action<ILogger, string, int, string, DateTimeOffset, string?, string?, Exception?> LogGovernanceEmissionException = LoggerMessage.Define<string, int, string, DateTimeOffset, string?, string?>(
         LogLevel.Warning,
         new EventId(19701, nameof(LogGovernanceEmissionException)),
-        "Governance outbox emission threw an exception for outbox entry {OutboxEntryId} on attempt {AttemptCount}. Emitter provider: {EmitterProvider}. Next retry UTC: {NextRetryUtc}. Correlation ID: {CorrelationId}. Decision receipt ID: {AuditResidueId}.");
+        "Governance outbox emission threw an exception for outbox entry {OutboxEntryId} on attempt {AttemptCount}. Emitter provider: {EmitterProvider}. Next retry UTC: {NextRetryUtc}. Correlation ID: {CorrelationId}. Decision receipt ID: {AuditReceiptId}.");
 
     private static readonly Action<ILogger, string, int, int, string?, Exception?> LogGovernanceClaimAttemptsExceeded = LoggerMessage.Define<string, int, int, string?>(
         LogLevel.Warning,

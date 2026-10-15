@@ -31,8 +31,7 @@ This project follows the spirit of [Keep a Changelog](https://keepachangelog.com
   `GovernanceArtifactPersistenceAnalyzer` message now asks hosts to persist "the decision receipt or outbox entry"
   instead of "audit/outbox residue", and its description says "acknowledgment outcomes" instead of "handshake
   outcomes". The diagnostic ID, severity, and trigger conditions are unchanged. Persisted column names, JSON property
-  names, canonical payload keys, wire constants, enum wire names, and the `{AuditResidueId}` structured-log placeholder
-  are unchanged.
+  names, canonical payload keys, wire constants, and the enum wire names are unchanged.
 
 ## [7.1.1] - 2026-10-15
 
