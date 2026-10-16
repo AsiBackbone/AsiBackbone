@@ -1,14 +1,15 @@
 # Documentation Ownership
 
-This page defines the documentation ownership contract between `AsiBackbone/AsiBackbone` and `AsiBackbone/Learning`. The goal is to keep one canonical educational source and one canonical product-implementation source without allowing the two to drift into competing authorities.
+This page defines the documentation ownership contract across `AsiBackbone/AsiBackbone`, `AsiBackbone/Learning`, and the downstream `AsiBackbone/ReferenceApplication`. The goal is to keep one canonical educational source, one canonical product-implementation source, and one concrete integration record without allowing them to drift into competing authorities.
 
 > [!IMPORTANT]
-> `AsiBackbone/AsiBackbone` remains authoritative for the released product. `AsiBackbone/Learning` is authoritative for organization-level education and architecture teaching. Learning does not define or override package APIs, configuration defaults, runtime semantics, compatibility, security posture, or release behavior.
+> `AsiBackbone/AsiBackbone` remains authoritative for the released product. `AsiBackbone/Learning` is authoritative for organization-level education and architecture teaching. `AsiBackbone/ReferenceApplication` is authoritative only for its own host-specific code, generated API reference, and ordered NCAT-to-AsiBackbone integration walkthrough. The Reference Application does not define or override package APIs, NCAT behavior, general architecture guidance, compatibility, security posture, or release behavior.
 
 ## Canonical sources
 
 - Product implementation and API documentation: [AsiBackbone documentation](https://asibackbone.github.io/AsiBackbone/) and [AsiBackbone repository](https://github.com/AsiBackbone/AsiBackbone).
 - Architecture education and general teaching: [AsiBackbone Learning](https://asibackbone.github.io/Learning/) and [AsiBackbone/Learning repository](https://github.com/AsiBackbone/Learning).
+- Concrete NCAT-to-AsiBackbone integration walkthrough and host-specific API reference: [Reference Application documentation](https://asibackbone.github.io/ReferenceApplication/) and [AsiBackbone/ReferenceApplication repository](https://github.com/AsiBackbone/ReferenceApplication).
 - Canonical educational terminology: [Learning Architecture Glossary](https://asibackbone.github.io/Learning/architecture/glossary.html) and [Terminology and Established Architecture Concepts](https://asibackbone.github.io/Learning/architecture/terminology-and-established-concepts.html).
 - Product/API terminology mappings: [AsiBackbone API Glossary](glossary.md), [AsiBackbone API Terminology Map](terminology-map.md), and [Core API Domain Model](core-domain-language.md).
 
@@ -31,6 +32,8 @@ This page defines the documentation ownership contract between `AsiBackbone/AsiB
 | Provider/package operational guidance | AsiBackbone |
 | Release notes, compatibility, migration, consumer verification | AsiBackbone |
 | Quality, benchmark, release-readiness, maintainer evidence | AsiBackbone |
+| Ordered NCAT-to-AsiBackbone integration walkthrough | ReferenceApplication |
+| ReferenceApplication host-specific API and implementation record | ReferenceApplication |
 
 ## Sample and tutorial boundary
 
@@ -44,7 +47,7 @@ Use this test before creating or expanding a page:
 
 > If the page primarily teaches a general architectural idea, comparison, tradeoff, pattern, or exercise that remains useful without the AsiBackbone packages, it belongs in Learning. If it primarily documents what a concrete AsiBackbone package, API, configuration surface, runtime path, provider, or release actually does, it belongs in AsiBackbone.
 
-For mixed topics, keep the exact implementation contract and compile-ready product usage in AsiBackbone, then link to Learning for the broader explanation, alternatives, or teaching material. Do not maintain two independent canonical explanations of the same general concept.
+For mixed topics, keep the exact implementation contract and compile-ready product usage in AsiBackbone, link to Learning for the broader explanation, alternatives, or teaching material, and use ReferenceApplication when the purpose is to show the ordered integration of NCAT and AsiBackbone in that concrete host. Do not maintain independent canonical explanations of the same product or general concept.
 
 ## URL continuity and cross-repository link contract
 
