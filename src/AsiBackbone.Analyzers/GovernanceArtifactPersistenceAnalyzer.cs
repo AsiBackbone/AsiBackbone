@@ -5,9 +5,20 @@ using Microsoft.CodeAnalysis.Operations;
 
 namespace AsiBackbone.Analyzers;
 
+/// <summary>
+/// Reports governance artifacts, such as decisions, decision receipts, capability grant results, and outbox entries,
+/// that are created or returned and then discarded without persistence, emission, or a host-owned continuation.
+/// </summary>
+/// <remarks>
+/// Members annotated with an <c>AsiBackbonePersistenceHandled</c> attribute are treated as deliberate host-owned
+/// continuation paths and are not reported.
+/// </remarks>
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
 public sealed class GovernanceArtifactPersistenceAnalyzer : DiagnosticAnalyzer
 {
+    /// <summary>
+    /// Gets the diagnostic identifier reported when a governance artifact is created or returned and then discarded.
+    /// </summary>
     public const string DiagnosticId = "ASIB001";
 
     private static readonly DiagnosticDescriptor Rule = new(
@@ -40,8 +51,16 @@ public sealed class GovernanceArtifactPersistenceAnalyzer : DiagnosticAnalyzer
         "AsiBackbone.Core.CapabilityTokens.ICapabilityGrantUseStore",
         "AsiBackbone.Core.Outbox.IGovernanceOutboxStore");
 
+    /// <summary>
+    /// Gets the diagnostics supported by this analyzer.
+    /// </summary>
     public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => [Rule];
 
+    /// <summary>
+    /// Initializes the analyzer and registers operation analysis for discarded expression statements and discard
+    /// assignments.
+    /// </summary>
+    /// <param name="context">The analysis context used to register analyzer actions.</param>
     public override void Initialize(AnalysisContext context)
     {
         context.ConfigureGeneratedCodeAnalysis(GeneratedCodeAnalysisFlags.None);
