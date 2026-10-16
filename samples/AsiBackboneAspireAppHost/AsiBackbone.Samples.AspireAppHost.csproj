@@ -10,8 +10,16 @@
     <IsPackable>false</IsPackable>
     <UserSecretsId>asibackbone-samples-aspire-apphost</UserSecretsId>
 
-    <!-- Aspire adds host-specific Dashboard and Orchestration packages. -->
-    <NuGetLockFilePath>packages.$(NETCoreSdkRuntimeIdentifier).lock.json</NuGetLockFilePath>
+    <RestorePackagesWithLockFile>true</RestorePackagesWithLockFile>
+
+    <NuGetLockFilePath Condition="'$(RuntimeIdentifier)' != ''">
+      packages.$(RuntimeIdentifier).lock.json
+    </NuGetLockFilePath>
+
+    <NuGetLockFilePath Condition="'$(RuntimeIdentifier)' == ''">
+      packages.$(NETCoreSdkRuntimeIdentifier).lock.json
+    </NuGetLockFilePath>
+
     <!-- The sample builds and runs without the Aspire CLI bundle; see ASPIRE010. -->
     <NoWarn>$(NoWarn);ASPIRE010</NoWarn>
   </PropertyGroup>
