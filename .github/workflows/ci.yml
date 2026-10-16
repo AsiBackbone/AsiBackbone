@@ -218,28 +218,28 @@ jobs:
           subject-path: ${{ env.SBOM_OUTPUT }}/*.json
 
       - name: Upload package artifact
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: asi-backbone-packages
           path: ${{ env.PACKAGE_OUTPUT }}/*.nupkg
           if-no-files-found: error
 
       - name: Upload package SBOM artifact
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: asi-backbone-package-sboms
           path: ${{ env.SBOM_OUTPUT }}/*.json
           if-no-files-found: error
 
       - name: Upload coverage artifact
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: asi-backbone-coverage
           path: ${{ env.COVERAGE_OUTPUT }}/coverage.cobertura.xml
           if-no-files-found: error
 
       - name: Upload Core branch coverage artifact
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: asi-backbone-core-branch-coverage
           path: ${{ env.CORE_COVERAGE_OUTPUT }}/coverage.cobertura.xml
@@ -247,7 +247,7 @@ jobs:
 
       - name: Upload adapter and provider package coverage artifacts
         if: always()
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: asi-backbone-package-coverage-baselines
           path: ${{ env.PACKAGE_COVERAGE_OUTPUT }}/**
@@ -255,7 +255,7 @@ jobs:
 
       - name: Upload XML documentation inventory artifact
         if: always()
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: asi-backbone-cs1591-inventory
           path: ${{ env.XML_DOCS_OUTPUT }}/cs1591-inventory.md
@@ -359,7 +359,7 @@ jobs:
           global-json-file: global.json
 
       - name: Initialize CodeQL
-        uses: github/codeql-action/init@2892aa5e19bbd11bc0cff5427e3b750a04d9e3c2 # v4.38.2
+        uses: github/codeql-action/init@24c54180a607b1449ed407dd24f251e4e9147c8d # v4.38.3
         with:
           languages: ${{ matrix.language }}
           build-mode: ${{ matrix.build-mode }}
@@ -373,6 +373,6 @@ jobs:
         run: dotnet build ${{ env.SOLUTION_PATH }} --configuration ${{ env.CONFIGURATION }} --no-restore /p:ContinuousIntegrationBuild=true
 
       - name: Perform CodeQL analysis
-        uses: github/codeql-action/analyze@2892aa5e19bbd11bc0cff5427e3b750a04d9e3c2 # v4.38.2
+        uses: github/codeql-action/analyze@24c54180a607b1449ed407dd24f251e4e9147c8d # v4.38.3
         with:
           category: "/language:${{ matrix.language }}"
