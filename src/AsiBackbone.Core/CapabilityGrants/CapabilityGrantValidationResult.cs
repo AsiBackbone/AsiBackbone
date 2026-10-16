@@ -3,6 +3,13 @@ using AsiBackbone.Core.Signing;
 
 namespace AsiBackbone.Core.CapabilityGrants;
 
+/// <summary>
+/// Represents the outcome of validating a capability grant, including the policy action the host should take.
+/// </summary>
+/// <remarks>
+/// Hosts should gate execution on <see cref="ShouldAllow" /> rather than <see cref="IsValid" /> alone, and act on
+/// <see cref="Action" /> for failed results, because some failures defer or require acknowledgment instead of denying.
+/// </remarks>
 public sealed class CapabilityGrantValidationResult
 {
     private static readonly IReadOnlyDictionary<string, string> EmptyMetadata =
@@ -41,24 +48,58 @@ public sealed class CapabilityGrantValidationResult
         SafeMetadata = safeMetadata;
     }
 
+    /// <summary>
+    /// Gets a value indicating whether the grant satisfied every configured validation check.
+    /// </summary>
     public bool IsValid { get; }
 
+    /// <summary>
+    /// Gets the validation category that describes why the grant passed or failed.
+    /// </summary>
     public CapabilityGrantValidationCategory Category { get; }
 
+    /// <summary>
+    /// Gets the policy action the host should take for this result.
+    /// </summary>
     public VerificationPolicyAction Action { get; }
 
+    /// <summary>
+    /// Gets a value indicating whether the host may proceed with the governed operation.
+    /// </summary>
     public bool ShouldAllow => Action is VerificationPolicyAction.Allow;
 
+    /// <summary>
+    /// Gets the result status, either <c>Valid</c> or <c>Failed</c>.
+    /// </summary>
     public string Status { get; }
 
+    /// <summary>
+    /// Gets the machine-readable failure code, such as <c>capability.expired</c>, when validation failed.
+    /// </summary>
     public string? FailureCode { get; }
 
+    /// <summary>
+    /// Gets the human-readable failure message, when one was supplied.
+    /// </summary>
     public string? FailureMessage { get; }
 
+    /// <summary>
+    /// Gets the token identifier of the validated grant.
+    /// </summary>
     public string TokenId { get; }
 
+    /// <summary>
+    /// Gets non-secret grant and outcome metadata, such as issuer, audience, policy action, and failure code, that is
+    /// safe to log or attach to audit records.
+    /// </summary>
     public IReadOnlyDictionary<string, string> SafeMetadata { get; }
 
+    /// <summary>
+    /// Creates a successful result that allows the governed operation.
+    /// </summary>
+    /// <param name="grant">The grant that passed validation.</param>
+    /// <returns>A valid result with <see cref="VerificationPolicyAction.Allow" />.</returns>
+    /// <exception cref="ArgumentNullException"><paramref name="grant" /> is <see langword="null" />.</exception>
     public static CapabilityGrantValidationResult Valid(CapabilityGrant grant)
     {
         ArgumentNullException.ThrowIfNull(grant);
@@ -74,6 +115,18 @@ public sealed class CapabilityGrantValidationResult
             BuildSafeMetadata(grant, CapabilityGrantValidationCategory.Valid, VerificationPolicyAction.Allow, null));
     }
 
+    /// <summary>
+    /// Creates a failed result with the category and policy action the host should apply.
+    /// </summary>
+    /// <param name="grant">The grant that failed validation.</param>
+    /// <param name="category">The validation category that describes the failure.</param>
+    /// <param name="action">The policy action the host should take, such as deny, defer, or require acknowledgment.</param>
+    /// <param name="failureCode">The machine-readable failure code.</param>
+    /// <param name="failureMessage">An optional human-readable failure message.</param>
+    /// <returns>A failed result.</returns>
+    /// <exception cref="ArgumentNullException"><paramref name="grant" /> or <paramref name="failureCode" /> is <see langword="null" />.</exception>
+    /// <exception cref="ArgumentException"><paramref name="failureCode" /> is empty or whitespace.</exception>
+    /// <exception cref="ArgumentOutOfRangeException"><paramref name="category" /> or <paramref name="action" /> is not a defined value.</exception>
     public static CapabilityGrantValidationResult Failed(
         CapabilityGrant grant,
         CapabilityGrantValidationCategory category,

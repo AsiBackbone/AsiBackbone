@@ -5,9 +5,20 @@ using Microsoft.CodeAnalysis.Operations;
 
 namespace AsiBackbone.Analyzers;
 
+/// <summary>
+/// Reports local-development signing providers that are wired inside a production environment branch, or wired
+/// without any environment guard.
+/// </summary>
+/// <remarks>
+/// Local-development signing generates an in-process key that is never persisted, so it is suitable only for tests,
+/// samples, and local proof paths. Production hosts should use a host-owned key provider instead.
+/// </remarks>
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
 public sealed class LocalDevelopmentSigningProductionAnalyzer : DiagnosticAnalyzer
 {
+    /// <summary>
+    /// Reports local-development signing used inside a production environment branch.
+    /// </summary>
     public const string DiagnosticId = "ASIB002";
 
     /// <summary>
@@ -40,8 +51,16 @@ public sealed class LocalDevelopmentSigningProductionAnalyzer : DiagnosticAnalyz
         isEnabledByDefault: true,
         description: "LocalDevelopment signing providers generate an in-process key that is never persisted, so artifacts they sign stop verifying after a restart. Registration should sit behind an environment check. Deliberately unconditional wiring requires separate host review and suppression of this diagnostic.");
 
+    /// <summary>
+    /// Gets the diagnostics supported by this analyzer.
+    /// </summary>
     public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => [Rule, UnguardedRule];
 
+    /// <summary>
+    /// Initializes the analyzer and registers operation analysis for invocations and object creations that reference
+    /// local-development signing types.
+    /// </summary>
+    /// <param name="context">The analysis context used to register analyzer actions.</param>
     public override void Initialize(AnalysisContext context)
     {
         context.ConfigureGeneratedCodeAnalysis(GeneratedCodeAnalysisFlags.None);

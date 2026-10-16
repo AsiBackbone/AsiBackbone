@@ -2,8 +2,41 @@ using AsiBackbone.Core.Signing;
 
 namespace AsiBackbone.Core.CapabilityGrants;
 
+/// <summary>
+/// Validates signed capability grants against host-supplied expectations before a governed operation executes.
+/// </summary>
 public static class CapabilityGrantValidator
 {
+    /// <summary>
+    /// Validates a signed capability grant against the supplied options.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// Validation runs in a fixed order and returns the first failure: proof binding and signature verification when
+    /// <see cref="CapabilityGrantValidationOptions.RequireProof" /> is set; then issuer, audience, subject, operation,
+    /// validity window, scope, policy, acknowledgment, handshake, gateway, and resource expectations; and finally use
+    /// consumption when <see cref="CapabilityGrantValidationOptions.RequireUseCheck" /> is set.
+    /// </para>
+    /// <para>
+    /// Validation fails closed. Omitted options, a missing verifier when proof is required, or a missing use store
+    /// when a use check is required each produce a failed result rather than a permissive one. Use consumption runs
+    /// last so a grant that fails any other check does not consume a use.
+    /// </para>
+    /// </remarks>
+    /// <param name="signedGrant">The signed capability grant to validate.</param>
+    /// <param name="options">
+    /// The expectations the grant is validated against. Validation fails when <see langword="null" />; use
+    /// <see cref="CapabilityGrantValidationOptions.CreateBoundExecutionBoundary" /> at an execution boundary.
+    /// </param>
+    /// <param name="verificationService">The signature verification service, required when proof is required.</param>
+    /// <param name="useStore">The use store that consumes grant uses, required when a use check is required.</param>
+    /// <param name="cancellationToken">A token used to observe cancellation.</param>
+    /// <returns>
+    /// A result whose <see cref="CapabilityGrantValidationResult.Action" /> states whether the host should allow,
+    /// deny, defer, escalate, or require acknowledgment.
+    /// </returns>
+    /// <exception cref="ArgumentNullException"><paramref name="signedGrant" /> is <see langword="null" />.</exception>
+    /// <exception cref="OperationCanceledException"><paramref name="cancellationToken" /> is cancelled.</exception>
     public static async ValueTask<CapabilityGrantValidationResult> ValidateAsync(
         SignedGovernanceArtifact<CapabilityGrant> signedGrant,
         CapabilityGrantValidationOptions? options = null,

@@ -1,7 +1,7 @@
 Project,MaxCS1591,Notes
-src/AsiBackbone.Analyzers/AsiBackbone.Analyzers.csproj,8,Calibrated to observed inventory; lower as analyzer public API documentation is completed.
+src/AsiBackbone.Analyzers/AsiBackbone.Analyzers.csproj,0,Public API documentation completed in #879; candidate for staged enforcement.
 src/AsiBackbone.AspNetCore/AsiBackbone.AspNetCore.csproj,0,Calibrated to observed inventory; candidate for staged enforcement.
-src/AsiBackbone.Core/AsiBackbone.Core.csproj,92,Calibrated to observed inventory; Core remains the first candidate for staged enforcement once cleaned.
+src/AsiBackbone.Core/AsiBackbone.Core.csproj,0,Public API documentation completed in #879; Core remains the first candidate for staged enforcement.
 src/AsiBackbone.DependencyInjection/AsiBackbone.DependencyInjection.csproj,0,Calibrated to observed inventory; candidate for staged enforcement.
 src/AsiBackbone.EntityFrameworkCore/AsiBackbone.EntityFrameworkCore.csproj,0,Calibrated to observed inventory; candidate for staged enforcement.
 src/AsiBackbone.OpenTelemetry/AsiBackbone.OpenTelemetry.csproj,0,Calibrated to observed inventory; candidate for staged enforcement.
