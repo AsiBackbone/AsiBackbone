@@ -28,6 +28,8 @@
       href: index.md
     - name: Template
       href: https://asibackbone.github.io/NetCoreApplicationTemplate/
+    - name: Reference
+      href: https://asibackbone.github.io/ReferenceApplication/
     - name: GitHub
       href: https://github.com/AsiBackbone
     - name: Framework Repository
