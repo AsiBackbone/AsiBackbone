@@ -1,8 +1,8 @@
 cff-version: 1.2.0
 message: "If you use this software, please cite it using the metadata below."
 title: "ASI Backbone"
-version: "7.1.1"
-date-released: "2026-10-15"
+version: "7.2.0"
+date-released: "2026-10-17"
 repository-code: "https://github.com/AsiBackbone/AsiBackbone"
 url: "https://asibackbone.github.io/AsiBackbone/"
 type: software
@@ -16,7 +16,7 @@ authors:
   - family-names: "Cavell"
     given-names: "Christopher D."
     orcid: "https://orcid.org/0009-0002-2113-0245"
-abstract: "AsiBackbone 7.1.1 is a backward-compatible patch release of the Accountable Systems Infrastructure package family for .NET. It republishes the 7.1.0 package surface with refreshed package README content and carries documentation, validation, and test maintenance completed since 7.1.0, without public API, runtime behavior, or package dependency changes. Package IDs, the net10.0 target, and AssemblyVersion 7.0.0.0 remain unchanged."
+abstract: "AsiBackbone 7.2.0 is a backward-compatible minor release of the Accountable Systems Infrastructure package family for .NET. It completes the public residue-to-receipt terminology transition by renaming receipt-related parameters; named-argument callers must update while binary compatibility, positional calls, and runtime behavior remain unchanged. It also services dependencies, automation, tests, and documentation. Package IDs, the net10.0 target, and AssemblyVersion 7.0.0.0 remain unchanged."
 keywords:
   - asi-backbone
   - dotnet

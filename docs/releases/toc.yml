@@ -3,12 +3,12 @@
 
 - name: Current Release
   items:
-    - name: 7.1.1 Release Notes
-      href: ../articles/release-notes-711.md
-    - name: 7.1.1 Release Readiness Record
-      href: ../articles/release-readiness-711.md
-    - name: 7.1.1 Consumer Verification Guide
-      href: ../articles/consumer-verification-711.md
+    - name: 7.2.0 Release Notes
+      href: ../articles/release-notes-720.md
+    - name: 7.2.0 Release Readiness Record
+      href: ../articles/release-readiness-720.md
+    - name: 7.2.0 Consumer Verification Guide
+      href: ../articles/consumer-verification-720.md
     - name: ASIB901 Migration Guide
       href: ../articles/asib901-create-execution-boundary.md
     - name: ASIB902 Migration Guide
@@ -21,6 +21,15 @@
       href: ../articles/schema-versioning.md
     - name: Target Framework Support
       href: ../articles/target-framework-support.md
+
+- name: 7.1.1 Archive
+  items:
+    - name: 7.1.1 Release Notes
+      href: ../articles/release-notes-711.md
+    - name: 7.1.1 Release Readiness Record
+      href: ../articles/release-readiness-711.md
+    - name: 7.1.1 Consumer Verification Guide
+      href: ../articles/consumer-verification-711.md
 
 - name: 7.1.0 Archive
   items:
