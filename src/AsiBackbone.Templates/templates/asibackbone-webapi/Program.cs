@@ -46,6 +46,13 @@ app.UseAsiBackboneEndpointGovernance();
 
 app.MapGet("/", () => Results.Redirect("/sample/decision"));
 
+string[] sampleNextSteps =
+[
+    "POST /sample/minimal/execute",
+    "POST /sample/controller/execute",
+    "GET /sample/audit/{correlationId}"
+];
+
 app.MapGet("/sample/decision", async (
     HttpContext httpContext,
     IGovernancePolicyEvaluator<GovernanceEvaluationContext> evaluator,
@@ -89,12 +96,7 @@ app.MapGet("/sample/decision", async (
         decision.PolicyHash,
         auditEventId = receipt.EventId,
         hostStyle = builder.Configuration["AsiBackbone:HostStyle"] ?? "plain",
-        next = new[]
-        {
-            "POST /sample/minimal/execute",
-            "POST /sample/controller/execute",
-            "GET /sample/audit/{correlationId}"
-        }
+        next = sampleNextSteps
     });
 })
 .WithDisplayName("template.sample.decision")

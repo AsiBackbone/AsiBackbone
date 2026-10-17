@@ -3,8 +3,8 @@
 
 - name: Current Release Evidence
   items:
-    - name: 7.1.1 Release Readiness Record
-      href: ../articles/release-readiness-711.md
+    - name: 7.2.0 Release Readiness Record
+      href: ../articles/release-readiness-720.md
     - name: Release Cadence and Readiness
       href: ../articles/release-cadence-and-readiness.md
     - name: Stable Release Validation

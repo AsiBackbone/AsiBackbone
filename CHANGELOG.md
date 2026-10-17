@@ -4,7 +4,7 @@ All notable changes to this project are documented in this file.
 
 This project follows the spirit of [Keep a Changelog](https://keepachangelog.com/) and adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [7.2.0] - 2026-10-17
 
 ### Changed
 
@@ -32,6 +32,24 @@ This project follows the spirit of [Keep a Changelog](https://keepachangelog.com
   instead of "audit/outbox residue", and its description says "acknowledgment outcomes" instead of "handshake
   outcomes". The diagnostic ID, severity, and trigger conditions are unchanged. Persisted column names, JSON property
   names, canonical payload keys, wire constants, and the enum wire names are unchanged.
+* Updated centrally managed dependencies and refreshed the affected lock files. Final release versions include
+  MessagePack 3.1.12, Microsoft.CodeAnalysis.Analyzers and Microsoft.CodeAnalysis.CSharp 5.9.0, EF Core and selected
+  Microsoft.Extensions packages 10.0.13, Microsoft.NET.Test.Sdk 18.11.0, and xUnit.net 4.0.2 with
+  xunit.runner.visualstudio 4.0.1. The Aspire AppHost sample uses Aspire.Hosting.AppHost 13.6.1.
+* Updated pinned GitHub Actions used by repository automation, including CodeQL 4.39.0 and the latest pinned artifact
+  upload and download maintenance releases.
+* Added the ReferenceApplication integration walkthrough to the documentation ownership contract, global navigation,
+  and Related projects section without changing AsiBackbone's authority over its package APIs and runtime behavior.
+* Added XML documentation for the 99 previously inventoried public API documentation gaps and lowered the CS1591
+  baseline ceilings to zero for `AsiBackbone.Analyzers` and `AsiBackbone.Core`. Public signatures and behavior are
+  unchanged by the documentation work.
+
+### Compatibility
+
+* `7.2.0` retains the `AsiBackbone.*` package IDs, `net10.0` target, durable schemas, canonical wire values, runtime
+  behavior, positional-call compatibility, and binary assembly identity `7.0.0.0`.
+* Callers that use named arguments for the renamed receipt parameters must update those argument names. Existing
+  compiled consumers, positional callers, and `IDecisionReceiptSink` implementations remain compatible.
 
 ## [7.1.1] - 2026-10-15
 

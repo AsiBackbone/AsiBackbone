@@ -28,9 +28,9 @@ The measurable rules for deprecation windows, major-release spacing, advance ann
 
 ## Current `7.x` stabilization posture
 
-`7.x` is the stable package line maintained on `main`. The current stable release is `7.1.1`.
+`7.x` is the stable package line maintained on `main`. The current stable release is `7.2.0`.
 
-The `7.1.0` release preserves the package IDs, `net10.0` target, runtime contracts, and binary identity `7.0.0.0`. It adds signing-input analyzer guidance and begins documented deprecation windows for legacy signature-input creation and the outbox `RetryClock` override. The `7.1.1` patch release republishes that surface with refreshed package README content and documentation, validation, and test maintenance, without public API, runtime behavior, or package dependency changes.
+The `7.2.0` release preserves the package IDs, `net10.0` target, runtime contracts, and binary identity `7.0.0.0`. It aligns public parameter names with decision-receipt terminology while preserving compiled and positional-call compatibility, and refreshes supported dependencies. Named-argument callers must use the new names when rebuilding.
 
 `7.x` is a young major line. Future releases should prioritize compatibility, documentation clarity, patch-level release correction, and carefully scoped additive improvements. Additional breaking changes should be avoided unless strongly justified by consumer safety, correctness, maintainability, or a documented architectural boundary that cannot be preserved compatibly.
 
@@ -56,7 +56,7 @@ The publication state is declared in `eng/documentation-release-claims.json`:
 
 Switching from `prepared` to `released` is an explicit step in the release-preparation pull request, made on the final release-candidate commit before the release tag is created. The switch belongs in that pull request rather than after publication because the tagged commit's README files are packed into the published packages: a tagged commit that still described its own version as prepared would ship that wording to NuGet. The Version Consistency, Stable Release Validation, and package-publishing workflows run the documentation release-claim validator with the release tag, and the validator rejects a stable tag whose commit is still in the `prepared` state. Packages are published only from a tag ref.
 
-Prerelease tags such as `v7.1.1-rc.1` are the exception: they publish prerelease packages only, so the stable version is still unpublished and the tagged commit stays in the `prepared` state.
+Prerelease tags such as `v7.2.0-rc.1` are the exception: they publish prerelease packages only, so the stable version is still unpublished and the tagged commit stays in the `prepared` state.
 
 When the next version begins on `main`, the pull request that advances `Directory.Build.props` switches the state back to `prepared` and sets `latestPublishedVersion` to the release that was just published.
 
@@ -141,9 +141,9 @@ Avoid:
 
 - [Governance](https://github.com/AsiBackbone/AsiBackbone/blob/main/GOVERNANCE.md)
 - [Release Validation](release-validation.md)
-- [7.1.1 Release Readiness Record](release-readiness-711.md)
-- [7.1.1 Release Notes](release-notes-711.md)
-- [7.1.1 Consumer Verification Guide](consumer-verification-711.md)
+- [7.2.0 Release Readiness Record](release-readiness-720.md)
+- [7.2.0 Release Notes](release-notes-720.md)
+- [7.2.0 Consumer Verification Guide](consumer-verification-720.md)
 - [7.1.0 Release Readiness Record](release-readiness-710.md)
 - [7.0.0 Release Readiness Record](release-readiness-700.md)
 - [5.2.0 Release Readiness Record](release-readiness-520.md)
