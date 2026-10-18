@@ -11,13 +11,11 @@ General architectural education belongs in [AsiBackbone Learning](https://asibac
 
 ## Current stable package posture
 
-Stable `7.x` package family. The current release is `7.2.0`.
+Stable `7.x` package family. The current release is `7.2.1`.
 
-`7.2.0` aligns public parameter names with decision-receipt terminology and
-refreshes supported dependencies. Existing compiled consumers, positional
-callers, persisted data, and runtime behavior remain compatible; named-argument
-callers must use the new names when rebuilding. Package IDs, the `net10.0`
-target, and binary assembly identity `7.0.0.0` are unchanged.
+`7.2.1` corrects endpoint-governance capability enforcement without changing
+public APIs, package dependencies, durable schemas, canonical wire values,
+package IDs, the `net10.0` target, or binary assembly identity `7.0.0.0`.
 
 Released stable package surfaces include Core, DependencyInjection,
 Storage.InMemory, EntityFrameworkCore, AspNetCore, Testing, Templates,
@@ -35,7 +33,7 @@ packages remain design-only, strategy-only, sample-only, host-owned, or
 future-provider work unless a later stable release explicitly ships them.
 
 The release process includes explicit [Release Cadence and Readiness](release-cadence-and-readiness.md) guidance for patch, minor, and major release selection, package metadata, Source Link, SBOM/provenance, documentation links, and future package identity or namespace changes.
-The current verification evidence is the [7.2.0 Consumer Verification Guide](consumer-verification-720.md).
+The current verification evidence is the [7.2.1 Consumer Verification Guide](consumer-verification-721.md).
 Consumers moving from the previous stable line must also follow the [Upgrade from 6.x to 7.0](upgrade-600-to-700.md) guide.
 
 ## Search and navigation
@@ -148,6 +146,8 @@ These pages cover production hardening, durable audit/outbox behavior, observabi
 
 Start with the current release and compatibility rules. Older release notes, consumer-verification guides, and upgrade records are preserved under [Releases & Compatibility](../releases/index.md) so they remain easy to find without dominating the implementation navigation.
 
+* [7.2.1 Release Notes](release-notes-721.md)
+* [7.2.1 Consumer Verification Guide](consumer-verification-721.md)
 * [7.2.0 Release Notes](release-notes-720.md)
 * [7.2.0 Consumer Verification Guide](consumer-verification-720.md)
 * [7.1.1 Release Notes](release-notes-711.md)

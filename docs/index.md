@@ -86,13 +86,11 @@ The DocFX header search is available for package names, API concepts, and articl
 
 ## Current stable package family
 
-Stable `7.x` package family. The current release is `7.2.0`.
+Stable `7.x` package family. The current release is `7.2.1`.
 
-`7.2.0` aligns public parameter names with decision-receipt terminology and
-refreshes supported dependencies. Existing compiled consumers, positional
-callers, persisted data, and runtime behavior remain compatible; named-argument
-callers must use the new names when rebuilding. Package IDs, the `net10.0`
-target, and binary assembly identity `7.0.0.0` are unchanged.
+`7.2.1` corrects endpoint-governance capability enforcement without changing
+public APIs, package dependencies, durable schemas, canonical wire values,
+package IDs, the `net10.0` target, or binary assembly identity `7.0.0.0`.
 
 ```text
 AsiBackbone.Core
@@ -164,6 +162,8 @@ Package-specific READMEs and release notes define which surfaces are stable, opt
 
 ### Releases and compatibility
 
+* [7.2.1 Release Notes](articles/release-notes-721.md)
+* [7.2.1 Consumer Verification Guide](articles/consumer-verification-721.md)
 * [7.2.0 Release Notes](articles/release-notes-720.md)
 * [7.2.0 Consumer Verification Guide](articles/consumer-verification-720.md)
 * [7.1.1 Release Notes](articles/release-notes-711.md)

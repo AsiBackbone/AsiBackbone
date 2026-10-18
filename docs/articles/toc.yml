@@ -227,6 +227,12 @@
 
 - name: Releases & Compatibility
   items:
+    - name: 7.2.1 Release Notes
+      href: release-notes-721.md
+    - name: 7.2.1 Release Readiness Record
+      href: release-readiness-721.md
+    - name: 7.2.1 Consumer Verification Guide
+      href: consumer-verification-721.md
     - name: 7.2.0 Release Notes
       href: release-notes-720.md
     - name: 7.2.0 Release Readiness Record
