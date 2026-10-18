@@ -6,6 +6,12 @@ This project follows the spirit of [Keep a Changelog](https://keepachangelog.com
 
 ## [Unreleased]
 
+## [7.2.1] - 2026-10-18
+
+`7.2.1` is a backward-compatible patch release for the stable `7.x` package family. It corrects endpoint-governance
+capability enforcement without changing public APIs, package dependencies, durable schemas, canonical wire values,
+or the binary assembly identity.
+
 ### Fixed
 
 * ASP.NET Core endpoint governance no longer skips capability-grant validation for decisions that cannot proceed
