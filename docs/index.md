@@ -202,15 +202,6 @@ General architecture teaching is maintained in [AsiBackbone Learning](https://as
 ## Related projects
 
 <div class="project-grid">
-  <article class="project-card" aria-current="page">
-    <span class="project-role">Add governed decisions</span>
-    <h3>AsiBackbone <span class="current-site">Current site</span></h3>
-    <p>A .NET governance and policy-control framework for auditable decision flows: policy evaluation, auditable decision records, acknowledgment workflows, capability-based authorization, host-owned execution boundaries, and ASP.NET Core integration.</p>
-    <p class="project-links">
-      <a href="https://github.com/AsiBackbone/AsiBackbone" aria-label="AsiBackbone repository">Repository</a>
-      <a href="https://doi.org/10.5281/zenodo.20546032" aria-label="AsiBackbone archive (DOI)">Archive (DOI)</a>
-    </p>
-  </article>
   <article class="project-card">
     <span class="project-role">Learn the patterns</span>
     <h3><a href="https://asibackbone.github.io/Learning/">AsiBackbone Learning</a></h3>
@@ -219,6 +210,15 @@ General architecture teaching is maintained in [AsiBackbone Learning](https://as
       <a href="https://asibackbone.github.io/Learning/" aria-label="AsiBackbone Learning documentation">Documentation</a>
       <a href="https://github.com/AsiBackbone/Learning" aria-label="AsiBackbone Learning repository">Repository</a>
       <a href="https://doi.org/10.5281/zenodo.21938556" aria-label="AsiBackbone Learning archive (DOI)">Archive (DOI)</a>
+    </p>
+  </article>
+  <article class="project-card" aria-current="page">
+    <span class="project-role">Add governed decisions</span>
+    <h3>AsiBackbone <span class="current-site">Current site</span></h3>
+    <p>A .NET governance and policy-control framework for auditable decision flows: policy evaluation, auditable decision records, acknowledgment workflows, capability-based authorization, host-owned execution boundaries, and ASP.NET Core integration.</p>
+    <p class="project-links">
+      <a href="https://github.com/AsiBackbone/AsiBackbone" aria-label="AsiBackbone repository">Repository</a>
+      <a href="https://doi.org/10.5281/zenodo.20546032" aria-label="AsiBackbone archive (DOI)">Archive (DOI)</a>
     </p>
   </article>
   <article class="project-card">
