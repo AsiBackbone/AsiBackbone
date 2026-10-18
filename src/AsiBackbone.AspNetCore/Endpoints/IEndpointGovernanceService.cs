@@ -33,6 +33,13 @@ public interface IEndpointCapabilityGrantValidator
     /// <summary>
     /// Validates endpoint capability requirements before endpoint execution continues.
     /// </summary>
+    /// <remarks>
+    /// The validator is called for every decision that is not already denied, so <paramref name="currentDecision" />
+    /// may allow the request, carry a warning, require acknowledgment, be deferred, or recommend escalation. A validator
+    /// that does not find every required grant should return a denied decision instead of preserving any of those
+    /// outcomes. A valid grant may preserve the current decision so the host can continue its acknowledgment, deferral,
+    /// or escalation flow.
+    /// </remarks>
     /// <param name="httpContext">The current HTTP context.</param>
     /// <param name="descriptor">The endpoint governance descriptor.</param>
     /// <param name="currentDecision">The current governance decision.</param>

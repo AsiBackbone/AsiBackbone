@@ -166,6 +166,226 @@ public sealed class DefaultAsiBackboneEndpointGovernanceServiceBranchTests
     }
 
     /// <summary>
+    /// Verifies a missing capability grant denies an acknowledgment-required decision before a challenge is created.
+    /// </summary>
+    [Fact]
+    public async Task EvaluateAsyncCapabilityDenialTakesPrecedenceOverAcknowledgmentChallenge()
+    {
+        var evaluator = new DelegatePolicyEvaluator(static (context, _) =>
+            ValueTask.FromResult(GovernanceDecision.RequireAcknowledgment(
+                "acknowledgment.required",
+                "The operation requires acknowledgment.",
+                correlationId: context.CorrelationId)));
+        var capabilityValidator = new DelegateCapabilityGrantValidator(static (_, _, currentDecision, _) =>
+            ValueTask.FromResult(GovernanceDecision.Deny(
+                "capability.missing",
+                "The required capability grant is missing.",
+                correlationId: currentDecision.CorrelationId)));
+        using ServiceProvider services = CreateServices(evaluator, capabilityValidator);
+        using IServiceScope scope = services.CreateScope();
+        DefaultHttpContext httpContext = CreateAuthenticatedHttpContext(scope.ServiceProvider);
+        var descriptor = EndpointGovernanceDescriptor.FromEndpoint(CreateEndpoint(
+            "policy.acknowledgment.capability-denied",
+            new GovernancePolicyAttribute(typeof(SamplePolicy)),
+            new RequireCapabilityGrantAttribute("robotics.execute"),
+            new RequireAcknowledgmentAttribute()));
+        IEndpointGovernanceService service = scope.ServiceProvider
+            .GetRequiredService<IEndpointGovernanceService>();
+
+        EndpointGovernanceResult result = await service.EvaluateAsync(
+            httpContext,
+            descriptor,
+            TestContext.Current.CancellationToken);
+
+        Assert.False(result.CanExecute);
+        Assert.NotNull(result.Decision);
+        Assert.True(result.Decision.IsDenied);
+        Assert.Contains("capability.missing", result.Decision.ReasonCodes);
+        Assert.Null(result.AcknowledgmentChallenge);
+        Assert.Equal(1, capabilityValidator.CallCount);
+        Assert.True(capabilityValidator.CurrentDecision?.RequiresAcknowledgment);
+    }
+
+    /// <summary>
+    /// Verifies a held capability preserves the acknowledgment-required decision and produces a challenge.
+    /// </summary>
+    [Fact]
+    public async Task EvaluateAsyncHeldCapabilityAllowsAcknowledgmentChallenge()
+    {
+        var evaluator = new DelegatePolicyEvaluator(static (context, _) =>
+            ValueTask.FromResult(GovernanceDecision.RequireAcknowledgment(
+                "acknowledgment.required",
+                "The operation requires acknowledgment.",
+                correlationId: context.CorrelationId)));
+        var capabilityValidator = new DelegateCapabilityGrantValidator(
+            static (_, _, currentDecision, _) => ValueTask.FromResult(currentDecision));
+        using ServiceProvider services = CreateServices(evaluator, capabilityValidator);
+        using IServiceScope scope = services.CreateScope();
+        DefaultHttpContext httpContext = CreateAuthenticatedHttpContext(scope.ServiceProvider);
+        var descriptor = EndpointGovernanceDescriptor.FromEndpoint(CreateEndpoint(
+            "policy.acknowledgment.capability-held",
+            new GovernancePolicyAttribute(typeof(SamplePolicy)),
+            new RequireCapabilityGrantAttribute("robotics.execute"),
+            new RequireAcknowledgmentAttribute()));
+        IEndpointGovernanceService service = scope.ServiceProvider
+            .GetRequiredService<IEndpointGovernanceService>();
+
+        EndpointGovernanceResult result = await service.EvaluateAsync(
+            httpContext,
+            descriptor,
+            TestContext.Current.CancellationToken);
+
+        Assert.False(result.CanExecute);
+        Assert.NotNull(result.Decision);
+        Assert.True(result.Decision.RequiresAcknowledgment);
+        Assert.NotNull(result.AcknowledgmentChallenge);
+        Assert.Equal(1, capabilityValidator.CallCount);
+        Assert.True(capabilityValidator.CurrentDecision?.RequiresAcknowledgment);
+    }
+
+    /// <summary>
+    /// Verifies the fail-closed missing-validator path also takes precedence over an acknowledgment challenge.
+    /// </summary>
+    [Fact]
+    public async Task EvaluateAsyncAcknowledgmentRequiredFailsClosedWhenCapabilityValidatorIsMissing()
+    {
+        var evaluator = new DelegatePolicyEvaluator(static (context, _) =>
+            ValueTask.FromResult(GovernanceDecision.RequireAcknowledgment(
+                "acknowledgment.required",
+                "The operation requires acknowledgment.",
+                correlationId: context.CorrelationId)));
+        using ServiceProvider services = CreateServices(evaluator);
+        using IServiceScope scope = services.CreateScope();
+        DefaultHttpContext httpContext = CreateAuthenticatedHttpContext(scope.ServiceProvider);
+        var descriptor = EndpointGovernanceDescriptor.FromEndpoint(CreateEndpoint(
+            "policy.acknowledgment.capability-validator-missing",
+            new GovernancePolicyAttribute(typeof(SamplePolicy)),
+            new RequireCapabilityGrantAttribute("robotics.execute"),
+            new RequireAcknowledgmentAttribute()));
+        IEndpointGovernanceService service = scope.ServiceProvider
+            .GetRequiredService<IEndpointGovernanceService>();
+
+        EndpointGovernanceResult result = await service.EvaluateAsync(
+            httpContext,
+            descriptor,
+            TestContext.Current.CancellationToken);
+
+        Assert.False(result.CanExecute);
+        Assert.NotNull(result.Decision);
+        Assert.True(result.Decision.IsDenied);
+        Assert.Contains("endpoint.capability_validator.missing", result.Decision.ReasonCodes);
+        Assert.Null(result.AcknowledgmentChallenge);
+        Assert.NotNull(result.FailureResult);
+    }
+
+    /// <summary>
+    /// Verifies opting out of the missing-validator failure preserves, rather than bypasses, an acknowledgment
+    /// challenge.
+    /// </summary>
+    [Fact]
+    public async Task EvaluateAsyncAcknowledgmentRequiredPreservesChallengeWhenMissingCapabilityValidatorFailsOpen()
+    {
+        var evaluator = new DelegatePolicyEvaluator(static (context, _) =>
+            ValueTask.FromResult(GovernanceDecision.RequireAcknowledgment(
+                "acknowledgment.required",
+                "The operation requires acknowledgment.",
+                correlationId: context.CorrelationId)));
+        using ServiceProvider services = CreateServices(
+            evaluator,
+            configure: static options => options.FailClosedWhenCapabilityValidatorMissing = false);
+        using IServiceScope scope = services.CreateScope();
+        DefaultHttpContext httpContext = CreateAuthenticatedHttpContext(scope.ServiceProvider);
+        var descriptor = EndpointGovernanceDescriptor.FromEndpoint(CreateEndpoint(
+            "policy.acknowledgment.capability-validator-missing.fail-open",
+            new GovernancePolicyAttribute(typeof(SamplePolicy)),
+            new RequireCapabilityGrantAttribute("robotics.execute"),
+            new RequireAcknowledgmentAttribute()));
+        IEndpointGovernanceService service = scope.ServiceProvider
+            .GetRequiredService<IEndpointGovernanceService>();
+
+        EndpointGovernanceResult result = await service.EvaluateAsync(
+            httpContext,
+            descriptor,
+            TestContext.Current.CancellationToken);
+
+        Assert.False(result.CanExecute);
+        Assert.NotNull(result.Decision);
+        Assert.True(result.Decision.RequiresAcknowledgment);
+        Assert.NotNull(result.AcknowledgmentChallenge);
+        Assert.NotNull(result.FailureResult);
+    }
+
+    /// <summary>
+    /// Verifies the capability validator runs for every non-denied outcome, and that a missing grant replaces each of
+    /// them with a denial, so no later deferral, escalation, or warning flow can proceed without the grant.
+    /// </summary>
+    /// <param name="outcome">The policy outcome returned before capability validation.</param>
+    [Theory]
+    [InlineData(GovernanceDecisionOutcome.Warning)]
+    [InlineData(GovernanceDecisionOutcome.Deferred)]
+    [InlineData(GovernanceDecisionOutcome.EscalationRecommended)]
+    public async Task EvaluateAsyncCapabilityDenialTakesPrecedenceOverNonDeniedOutcome(GovernanceDecisionOutcome outcome)
+    {
+        var evaluator = new DelegatePolicyEvaluator((context, _) =>
+            ValueTask.FromResult(CreateDecision(outcome, context.CorrelationId)));
+        var capabilityValidator = new DelegateCapabilityGrantValidator(static (_, _, currentDecision, _) =>
+            ValueTask.FromResult(GovernanceDecision.Deny(
+                "capability.missing",
+                "The required capability grant is missing.",
+                correlationId: currentDecision.CorrelationId)));
+        using ServiceProvider services = CreateServices(evaluator, capabilityValidator);
+        using IServiceScope scope = services.CreateScope();
+        DefaultHttpContext httpContext = CreateAuthenticatedHttpContext(scope.ServiceProvider);
+        var descriptor = EndpointGovernanceDescriptor.FromEndpoint(CreateEndpoint(
+            $"policy.{outcome}.capability-denied",
+            new GovernancePolicyAttribute(typeof(SamplePolicy)),
+            new RequireCapabilityGrantAttribute("robotics.execute")));
+        IEndpointGovernanceService service = scope.ServiceProvider
+            .GetRequiredService<IEndpointGovernanceService>();
+
+        EndpointGovernanceResult result = await service.EvaluateAsync(
+            httpContext,
+            descriptor,
+            TestContext.Current.CancellationToken);
+
+        Assert.False(result.CanExecute);
+        Assert.NotNull(result.Decision);
+        Assert.True(result.Decision.IsDenied);
+        Assert.Contains("capability.missing", result.Decision.ReasonCodes);
+        Assert.Equal(1, capabilityValidator.CallCount);
+        Assert.Equal(outcome, capabilityValidator.CurrentDecision?.Outcome);
+    }
+
+    /// <summary>
+    /// Verifies that opting out of the missing-validator failure skips only the capability check: a requested audit is
+    /// still enforced, so a missing decision receipt sink still fails closed.
+    /// </summary>
+    [Fact]
+    public async Task EvaluateAsyncMissingCapabilityValidatorFailOpenStillEnforcesAudit()
+    {
+        using ServiceProvider services = CreateServices(
+            configure: static options => options.FailClosedWhenCapabilityValidatorMissing = false);
+        using IServiceScope scope = services.CreateScope();
+        DefaultHttpContext httpContext = CreateHttpContext(scope.ServiceProvider);
+        var descriptor = EndpointGovernanceDescriptor.FromEndpoint(CreateEndpoint(
+            "capability.validator-missing.fail-open.audit",
+            new RequireCapabilityGrantAttribute("robotics.execute"),
+            new EmitGovernanceAuditAttribute()));
+        IEndpointGovernanceService service = scope.ServiceProvider
+            .GetRequiredService<IEndpointGovernanceService>();
+
+        EndpointGovernanceResult result = await service.EvaluateAsync(
+            httpContext,
+            descriptor,
+            TestContext.Current.CancellationToken);
+
+        Assert.False(result.CanExecute);
+        Assert.NotNull(result.Decision);
+        Assert.NotNull(result.FailureResult);
+        Assert.Contains("endpoint.audit_sink.missing", result.Decision.ReasonCodes);
+    }
+
+    /// <summary>
     /// Verifies an acknowledgment-required endpoint fails closed with a stable code when the request is anonymous.
     /// </summary>
     [Fact]
@@ -406,6 +626,7 @@ public sealed class DefaultAsiBackboneEndpointGovernanceServiceBranchTests
 
     private static ServiceProvider CreateServices(
         IGovernancePolicyEvaluator<GovernanceEvaluationContext>? evaluator = null,
+        IEndpointCapabilityGrantValidator? capabilityValidator = null,
         Action<EndpointGovernanceOptions>? configure = null)
     {
         ServiceCollection services = new();
@@ -420,6 +641,11 @@ public sealed class DefaultAsiBackboneEndpointGovernanceServiceBranchTests
             _ = services.AddSingleton(evaluator);
         }
 
+        if (capabilityValidator is not null)
+        {
+            _ = services.AddSingleton(capabilityValidator);
+        }
+
         return services.BuildServiceProvider(validateScopes: true);
     }
 
@@ -432,6 +658,37 @@ public sealed class DefaultAsiBackboneEndpointGovernanceServiceBranchTests
         };
         httpContext.Response.Body = new MemoryStream();
         requestServices.GetRequiredService<IHttpContextAccessor>().HttpContext = httpContext;
+        return httpContext;
+    }
+
+    private static GovernanceDecision CreateDecision(GovernanceDecisionOutcome outcome, string? correlationId)
+    {
+        return outcome switch
+        {
+            GovernanceDecisionOutcome.Warning => GovernanceDecision.Warning(
+                "policy.warning",
+                "The operation carries a warning.",
+                correlationId: correlationId),
+            GovernanceDecisionOutcome.Deferred => GovernanceDecision.Defer(
+                "policy.deferred",
+                "The operation is deferred for later review.",
+                correlationId: correlationId),
+            GovernanceDecisionOutcome.EscalationRecommended => GovernanceDecision.Escalate(
+                "policy.escalation",
+                "The operation should be escalated.",
+                correlationId: correlationId),
+            GovernanceDecisionOutcome.Allowed or GovernanceDecisionOutcome.Denied or GovernanceDecisionOutcome.AcknowledgmentRequired =>
+                throw new ArgumentOutOfRangeException(nameof(outcome), outcome, "Covered by dedicated tests."),
+            _ => throw new ArgumentOutOfRangeException(nameof(outcome), outcome, "Unsupported test outcome.")
+        };
+    }
+
+    private static DefaultHttpContext CreateAuthenticatedHttpContext(IServiceProvider requestServices)
+    {
+        DefaultHttpContext httpContext = CreateHttpContext(requestServices);
+        httpContext.User = new ClaimsPrincipal(new ClaimsIdentity(
+            [new Claim(ClaimTypes.NameIdentifier, "user-123")],
+            authenticationType: "test"));
         return httpContext;
     }
 
@@ -465,6 +722,26 @@ public sealed class DefaultAsiBackboneEndpointGovernanceServiceBranchTests
         {
             CallCount++;
             return evaluate(context, cancellationToken);
+        }
+    }
+
+    private sealed class DelegateCapabilityGrantValidator(
+        Func<HttpContext, EndpointGovernanceDescriptor, GovernanceDecision, CancellationToken, ValueTask<GovernanceDecision>>
+            validate) : IEndpointCapabilityGrantValidator
+    {
+        public int CallCount { get; private set; }
+
+        public GovernanceDecision? CurrentDecision { get; private set; }
+
+        public ValueTask<GovernanceDecision> ValidateAsync(
+            HttpContext httpContext,
+            EndpointGovernanceDescriptor descriptor,
+            GovernanceDecision currentDecision,
+            CancellationToken cancellationToken = default)
+        {
+            CallCount++;
+            CurrentDecision = currentDecision;
+            return validate(httpContext, descriptor, currentDecision, cancellationToken);
         }
     }
 }

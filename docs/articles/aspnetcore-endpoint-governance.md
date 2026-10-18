@@ -141,6 +141,18 @@ When endpoint governance metadata is present, the middleware can:
 6. Return an acknowledgment challenge when the governance decision requires acknowledgment and the endpoint requested liability-handshake support.
 7. Block execution with a safe HTTP result when policy, capability, or configuration checks fail closed.
 
+Capability requirements are enforced before acknowledgment, deferral, or escalation handling. The capability validator
+receives every decision that is not already denied (allowed, warning, acknowledgment-required, deferred, and
+escalation-recommended) and should replace any of them with a denial when the required grant is absent. Only an
+already-denied decision skips capability validation. An actor without a required grant is therefore denied before the
+host creates an acknowledgment challenge or starts a deferral or escalation flow, while a valid grant preserves the
+current decision and lets the corresponding host flow continue.
+
+When `FailClosedWhenCapabilityValidatorMissing` is `false`, a missing validator skips only the capability check. The
+current decision still proceeds through audit, acknowledgment, escalation, and final result handling. Opting out of the
+configuration failure does not turn an acknowledgment-required decision into an allowed one, and it does not bypass a
+requested audit or the `FailClosedWhenAuditSinkMissing` check.
+
 ## Host-owned boundaries
 
 The ergonomic endpoint layer deliberately does not own persistence. Durable audit storage, outbox persistence, transactional consistency, signing, key management, and replay protection remain host responsibilities.
