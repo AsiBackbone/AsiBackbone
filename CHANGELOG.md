@@ -4,6 +4,31 @@ All notable changes to this project are documented in this file.
 
 This project follows the spirit of [Keep a Changelog](https://keepachangelog.com/) and adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Fixed
+
+* ASP.NET Core endpoint governance no longer skips capability-grant validation for decisions that cannot proceed
+  immediately. `DefaultEndpointGovernanceService` previously called the host's `IEndpointCapabilityGrantValidator`
+  only for allowed and warning decisions, so an endpoint marked with both `[RequireCapabilityGrant]` and
+  `[RequireAcknowledgment]` issued an acknowledgment challenge to an actor who lacked the required grant. The validator
+  now runs for every decision that is not already denied, including acknowledgment-required, deferred, and
+  escalation-recommended decisions, so a missing grant is denied before any challenge, deferral, or escalation flow
+  begins ([#887](https://github.com/AsiBackbone/AsiBackbone/issues/887)). The fail-closed "capability validator
+  missing" check applies to the same decisions.
+* With `FailClosedWhenCapabilityValidatorMissing` set to `false`, a missing capability validator now skips only the
+  capability check. Previously it ended evaluation with an allowed result, which bypassed the audit stage, so an
+  endpoint that requested governance audit could run without a decision receipt sink even when
+  `FailClosedWhenAuditSinkMissing` was `true`. The current decision now continues through audit, acknowledgment, and
+  final result handling.
+
+### Compatibility
+
+* Hosts whose `IEndpointCapabilityGrantValidator` assumed it only received allowed or warning decisions should confirm
+  it denies a missing grant, and otherwise preserves the current decision, for acknowledgment-required, deferred, and
+  escalation-recommended decisions. Validators that return a denial for a missing grant and the current decision
+  otherwise need no change.
+
 ## [7.2.0] - 2026-10-17
 
 ### Changed

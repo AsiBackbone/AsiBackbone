@@ -211,7 +211,10 @@ public sealed class DefaultEndpointGovernanceService : IEndpointGovernanceServic
         GovernanceDecision decision,
         CancellationToken cancellationToken)
     {
-        if (!decision.CanProceed || descriptor.CapabilityScopes.Count == 0)
+        // Capability requirements apply to every decision that is not already denied, including warning,
+        // acknowledgment-required, deferred, and escalation-recommended outcomes. A missing grant must take precedence
+        // over any later host flow that could otherwise approve the request without re-checking the grant.
+        if (decision.IsDenied || descriptor.CapabilityScopes.Count == 0)
         {
             return new DecisionStageResult(decision, TerminalResult: null);
         }
@@ -220,7 +223,7 @@ public sealed class DefaultEndpointGovernanceService : IEndpointGovernanceServic
             optionalServices.GetCapabilityValidator();
         if (capabilityValidator is null)
         {
-            EndpointGovernanceResult terminalResult = endpointOptions.FailClosedWhenCapabilityValidatorMissing
+            EndpointGovernanceResult? terminalResult = endpointOptions.FailClosedWhenCapabilityValidatorMissing
                 ? CreateCapabilityFailure(
                     httpContext,
                     descriptor,
@@ -229,7 +232,7 @@ public sealed class DefaultEndpointGovernanceService : IEndpointGovernanceServic
                     "Endpoint capability metadata was present, but no host-owned endpoint capability validator was registered.",
                     decision,
                     "aspnetcore.endpoint.governance.capability.configuration")
-                : EndpointGovernanceResult.Allow(decision);
+                : null;
 
             return new DecisionStageResult(decision, terminalResult);
         }
