@@ -26,7 +26,11 @@ public interface IEndpointGovernanceService
 /// </summary>
 /// <remarks>
 /// The ASP.NET Core package does not infer grant storage, proof verification, or replay semantics. Hosts that attach
-/// capability metadata should register an implementation that validates the request against their grant source.
+/// capability metadata should register an implementation that validates the request against their grant source, or opt
+/// in to <see cref="CapabilityGrants.SignedCapabilityGrantEndpointValidator" /> through
+/// <see cref="DependencyInjection.AsiBackboneSignedCapabilityGrantServiceCollectionExtensions.AddAsiBackboneSignedCapabilityGrants" />
+/// for signed, request-bound grants. An implementation that accepts a grant can record it in
+/// <see cref="IEndpointCapabilityGrantFeature" /> so the decision receipt names it.
 /// </remarks>
 public interface IEndpointCapabilityGrantValidator
 {

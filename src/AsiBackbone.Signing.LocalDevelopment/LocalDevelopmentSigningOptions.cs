@@ -68,6 +68,30 @@ public sealed class LocalDevelopmentSigningOptions
     public int KeySizeBits { get; set; } = DefaultKeySizeBits;
 
     /// <summary>
+    /// Gets or sets a PEM-encoded RSA key to use instead of generating one per process.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// When null or blank, the provider generates a <see cref="KeySizeBits" /> key in each process, so signatures stop
+    /// verifying after a restart and cannot be verified by another process. Supplying a key gives every process
+    /// configured with it the same signing identity, which lets a capability grant issued by one process, or before a
+    /// restart, verify in another.
+    /// </para>
+    /// <para>
+    /// A private key (<c>RSA PRIVATE KEY</c> or <c>PRIVATE KEY</c>) supports signing and verification. A public key
+    /// (<c>PUBLIC KEY</c> or <c>RSA PUBLIC KEY</c>) supports verification only; signing with it fails. The key must be at
+    /// least <see cref="MinimumKeySizeBits" /> bits, and <see cref="KeySizeBits" /> is ignored. Encrypted PEM is not
+    /// supported.
+    /// </para>
+    /// <para>
+    /// This remains a local-development provider: the key is held in process memory with no custody, rotation, or
+    /// revocation story. Load it from a development secret store rather than source control, and use a managed key
+    /// provider in production.
+    /// </para>
+    /// </remarks>
+    public string? RsaKeyPem { get; set; }
+
+    /// <summary>
     /// Gets or sets a value indicating whether signing failures should return unsigned metadata with explicit failure details instead of throwing during normal signing flow.
     /// </summary>
     public bool ReturnUnsignedOnFailure { get; set; } = true;
@@ -124,6 +148,7 @@ public sealed class LocalDevelopmentSigningOptions
             KeyVersion = KeyVersion,
             SignatureAlgorithm = SignatureAlgorithm,
             KeySizeBits = KeySizeBits,
+            RsaKeyPem = RsaKeyPem,
             ReturnUnsignedOnFailure = ReturnUnsignedOnFailure,
             AllowInProduction = AllowInProduction,
             EnvironmentName = EnvironmentName

@@ -153,6 +153,11 @@ current decision still proceeds through audit, acknowledgment, escalation, and f
 configuration failure does not turn an acknowledgment-required decision into an allowed one, and it does not bypass a
 requested audit or the `FailClosedWhenAuditSinkMissing` check.
 
+Hosts that carry request-bound, signed grants instead of claims can opt in to `SignedCapabilityGrantEndpointValidator`
+with `AddAsiBackboneSignedCapabilityGrants(...)`. It denies every grant validation failure, including those the core
+validator would defer, escalate, or answer with an acknowledgment requirement, and records the accepted grant identifier
+in the decision receipt. See [Signed Capability Grants at Endpoints](signed-capability-grants.md).
+
 ## Host-owned boundaries
 
 The ergonomic endpoint layer deliberately does not own persistence. Durable audit storage, outbox persistence, transactional consistency, signing, key management, and replay protection remain host responsibilities.
@@ -161,7 +166,7 @@ The ergonomic endpoint layer deliberately does not own persistence. Durable audi
 | --- | --- |
 | Endpoint metadata and middleware orchestration | `AsiBackbone.AspNetCore` |
 | Policy constraints and decision policy | Host/Core evaluator registration |
-| Capability-grant source, proof validation, and replay handling | Host-owned `IEndpointCapabilityGrantValidator` |
+| Capability-grant source, proof validation, and replay handling | Host-owned `IEndpointCapabilityGrantValidator`, or the opt-in `SignedCapabilityGrantEndpointValidator` with a host-supplied verifier, use store, and request-binding provider |
 | Decision receipt sink, ledger store, outbox store, and transactions | Host-owned storage/integration layer |
 | Legal/compliance interpretation | Host governance process |
 

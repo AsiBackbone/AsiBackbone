@@ -142,6 +142,16 @@ public interface IDecisionReceipt
     string? DecisionStage => null;
 
     /// <summary>
+    /// Gets the identifier of the capability grant that authorized the audited operation, when one was validated.
+    /// </summary>
+    /// <remarks>
+    /// <see cref="AuditLedgerRecord.FromDecisionReceipt" /> copies this value into
+    /// <see cref="AuditLedgerRecord.CapabilityTokenId" /> when no explicit identifier is supplied. The canonical decision
+    /// receipt payload includes it only when present, so receipts without a grant hash exactly as before.
+    /// </remarks>
+    string? CapabilityGrantId => null;
+
+    /// <summary>
     /// Gets the policy version associated with the event, when supplied by the host.
     /// </summary>
     string? PolicyVersion { get; }

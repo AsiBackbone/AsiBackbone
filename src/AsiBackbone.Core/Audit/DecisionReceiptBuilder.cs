@@ -42,6 +42,7 @@ public sealed class DecisionReceiptBuilder
     private string? gatewayExecutionId;
     private string? decisionStage;
     private string? schemaVersion;
+    private string? capabilityGrantId;
 
     private DecisionReceiptBuilder(
         IGovernanceActorContext actor,
@@ -356,11 +357,20 @@ public sealed class DecisionReceiptBuilder
     }
 
     /// <summary>
+    /// Sets the identifier of the capability grant that authorized the operation.
+    /// </summary>
+    public DecisionReceiptBuilder WithCapabilityGrantId(string? value)
+    {
+        capabilityGrantId = value;
+        return this;
+    }
+
+    /// <summary>
     /// Builds an immutable decision receipt value.
     /// </summary>
     public DecisionReceipt Build()
     {
-        return DecisionReceipt.Create(
+        var receipt = DecisionReceipt.Create(
             actor,
             operationName,
             outcome,
@@ -388,5 +398,9 @@ public sealed class DecisionReceiptBuilder
             gatewayExecutionId,
             decisionStage,
             schemaVersion);
+
+        return string.IsNullOrWhiteSpace(capabilityGrantId)
+            ? receipt
+            : receipt.WithCapabilityGrantId(capabilityGrantId);
     }
 }

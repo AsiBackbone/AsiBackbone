@@ -48,7 +48,8 @@ public sealed class DecisionReceipt : IDecisionReceipt
         string? decisionStage,
         string? policyVersion,
         string? policyHash,
-        IReadOnlyDictionary<string, string> metadata)
+        IReadOnlyDictionary<string, string> metadata,
+        string? capabilityGrantId)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(eventId);
         ArgumentException.ThrowIfNullOrWhiteSpace(decisionReceiptId);
@@ -85,6 +86,7 @@ public sealed class DecisionReceipt : IDecisionReceipt
         PolicyVersion = NormalizeOptional(policyVersion);
         PolicyHash = NormalizeOptional(policyHash);
         Metadata = metadata;
+        CapabilityGrantId = NormalizeOptional(capabilityGrantId);
     }
 
     /// <inheritdoc />
@@ -174,6 +176,9 @@ public sealed class DecisionReceipt : IDecisionReceipt
     /// <inheritdoc />
     public IReadOnlyDictionary<string, string> Metadata { get; }
 
+    /// <inheritdoc />
+    public string? CapabilityGrantId { get; }
+
     /// <summary>
     /// Gets a value indicating whether this decision receipt contains reason codes.
     /// </summary>
@@ -183,6 +188,50 @@ public sealed class DecisionReceipt : IDecisionReceipt
     /// Gets a value indicating whether this decision receipt contains metadata.
     /// </summary>
     public bool HasMetadata => Metadata.Count > 0;
+
+    /// <summary>
+    /// Creates a copy of this receipt that records the identifier of the capability grant that authorized the operation.
+    /// </summary>
+    /// <remarks>
+    /// Every other value, including <see cref="EventId" /> and <see cref="OccurredUtc" />, is preserved. A blank
+    /// <paramref name="capabilityGrantId" /> clears the identifier.
+    /// </remarks>
+    /// <param name="capabilityGrantId">The validated capability grant identifier.</param>
+    /// <returns>A receipt carrying the supplied capability grant identifier.</returns>
+    public DecisionReceipt WithCapabilityGrantId(string? capabilityGrantId)
+    {
+        return new DecisionReceipt(
+            EventId,
+            DecisionReceiptId,
+            SchemaVersion,
+            OccurredUtc,
+            ActorId,
+            ActorType,
+            ActorDisplayName,
+            OperationName,
+            Outcome,
+            ReasonCodes,
+            CorrelationId,
+            TraceId,
+            SpanId,
+            ParentSpanId,
+            DecisionLatencyMs,
+            ConstraintSetHash,
+            ConstraintCount,
+            RiskScore,
+            PolicyScope,
+            TenantHash,
+            OrganizationHash,
+            EmitterStatus,
+            EmitterProvider,
+            OutboxSequence,
+            GatewayExecutionId,
+            DecisionStage,
+            PolicyVersion,
+            PolicyHash,
+            Metadata,
+            capabilityGrantId);
+    }
 
     /// <summary>
     /// Creates decision receipt from a host-defined operation outcome.
@@ -508,7 +557,8 @@ public sealed class DecisionReceipt : IDecisionReceipt
             decisionStage,
             policyVersion,
             policyHash,
-            NormalizeMetadata(metadata));
+            NormalizeMetadata(metadata),
+            capabilityGrantId: null);
     }
 
     private static string NormalizeIdentifier(string? identifier)

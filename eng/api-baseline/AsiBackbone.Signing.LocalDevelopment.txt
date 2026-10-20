@@ -20,6 +20,7 @@ MEMBER | AsiBackbone.Signing.LocalDevelopment.LocalDevelopmentSigningOptions.Key
 MEMBER | AsiBackbone.Signing.LocalDevelopment.LocalDevelopmentSigningOptions.MinimumKeySizeBits | public const int MinimumKeySizeBits = 2048
 MEMBER | AsiBackbone.Signing.LocalDevelopment.LocalDevelopmentSigningOptions.ProviderName | public string ProviderName { get; set; }
 MEMBER | AsiBackbone.Signing.LocalDevelopment.LocalDevelopmentSigningOptions.ReturnUnsignedOnFailure | public bool ReturnUnsignedOnFailure { get; set; }
+MEMBER | AsiBackbone.Signing.LocalDevelopment.LocalDevelopmentSigningOptions.RsaKeyPem | public string? RsaKeyPem { get; set; }
 MEMBER | AsiBackbone.Signing.LocalDevelopment.LocalDevelopmentSigningOptions.SignatureAlgorithm | public string SignatureAlgorithm { get; set; }
 MEMBER | AsiBackbone.Signing.LocalDevelopment.LocalDevelopmentSigningOptions.Validate | public void Validate()
 MEMBER | AsiBackbone.Signing.LocalDevelopment.LocalDevelopmentSigningService.#ctor | public LocalDevelopmentSigningService()

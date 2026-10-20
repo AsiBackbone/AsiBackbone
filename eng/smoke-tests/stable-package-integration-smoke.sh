@@ -146,7 +146,11 @@ popd > /dev/null
 
 cat > "$smoke_project_dir/StablePackageIntegrationSmokeTests.cs" <<'CSHARP'
 using System.Net.Http.Json;
+using System.Security.Claims;
+using System.Security.Cryptography;
 using AsiBackbone.AspNetCore.Actors;
+using AsiBackbone.AspNetCore.CapabilityGrants;
+using AsiBackbone.AspNetCore.Endpoints;
 using AsiBackbone.AspNetCore.Correlation;
 using AsiBackbone.AspNetCore.DependencyInjection;
 using AsiBackbone.AspNetCore.Acknowledgments;
@@ -162,12 +166,14 @@ using AsiBackbone.EntityFrameworkCore;
 using AsiBackbone.EntityFrameworkCore.Audit;
 using AsiBackbone.Storage.InMemory.Audit;
 using AsiBackbone.Storage.InMemory.CapabilityGrants;
+using AsiBackbone.Signing.LocalDevelopment;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Primitives;
 using Xunit;
 
 namespace StablePackageIntegrationSmoke.Tests;
@@ -254,6 +260,104 @@ public sealed class StablePackageIntegrationSmokeTests
         Assert.Equal(VerificationPolicyAction.Deny, second.Action);
         Assert.Equal("capability.use-limit-exceeded", second.FailureCode);
         Assert.Equal(1, useStore.GetUseCount(signedGrant.Artifact.TokenId));
+    }
+
+    [Fact]
+    public async Task SignedCapabilityGrantRoundTripsThroughPackagedEndpointValidator()
+    {
+        // Two providers configured with the same key stand in for an issuing process and a separate relying process.
+        using RSA rsa = RSA.Create(LocalDevelopmentSigningOptions.MinimumKeySizeBits);
+        string keyPem = rsa.ExportPkcs8PrivateKeyPem();
+        using var issuerSigning = new LocalDevelopmentSigningService(CreateConfiguredKeyOptions(keyPem));
+        using var relyingVerification = new LocalDevelopmentSigningService(CreateConfiguredKeyOptions(keyPem));
+
+        Dictionary<string, StringValues> fields = new(StringComparer.Ordinal)
+        {
+            ["orderId"] = "stable-order-1",
+            ["amount"] = "42.00"
+        };
+        DateTimeOffset now = DateTimeOffset.UtcNow;
+        CapabilityGrant grant = CapabilityGrant.Create(
+            tokenId: $"stable-signed-grant-{Guid.NewGuid():N}",
+            issuer: "stable-issuer",
+            audience: "stable-orders",
+            scopes: ["stable.orders.approve"],
+            issuedUtc: now.AddMinutes(-1),
+            expiresUtc: now.AddMinutes(5),
+            subjectId: "stable-user",
+            operationName: "stable.orders.approve",
+            resourceBinding: FormFieldCapabilityGrantRequestBindingProvider.CreateBinding(fields),
+            maxUseCount: 1);
+
+        SignedGovernanceArtifact<CapabilityGrant> signed = await GovernanceArtifactSigner.SignCapabilityGrantAsync(
+            grant,
+            issuerSigning,
+            cancellationToken: TestContext.Current.CancellationToken);
+        string token = CapabilityGrantToken.Encode(signed);
+
+        var sink = new CapturingReceiptSink();
+        ServiceCollection services = new();
+        services.AddAsiBackboneAspNetCore();
+        services.AddAsiBackboneSignedCapabilityGrants(options =>
+        {
+            options.Issuer = "stable-issuer";
+            options.Audience = "stable-orders";
+            options.AllowedClockSkew = TimeSpan.FromSeconds(30);
+        });
+        services.AddAsiBackboneFormFieldCapabilityGrantBinding();
+        services.AddSingleton<IGovernanceSignatureVerificationService>(relyingVerification);
+        services.AddSingleton<ICapabilityGrantUseStore>(new InMemoryCapabilityGrantUseStore());
+        services.AddSingleton<IDecisionReceiptSink>(sink);
+        await using ServiceProvider provider = services.BuildServiceProvider(validateScopes: true);
+
+        var endpoint = new Endpoint(
+            static _ => Task.CompletedTask,
+            new EndpointMetadataCollection(
+                new RequireCapabilityGrantAttribute("stable.orders.approve"),
+                new EmitGovernanceAuditAttribute()),
+            "stable.orders.approve");
+
+        EndpointGovernanceResult first = await EvaluateSignedGrantRequestAsync(provider, endpoint, token, fields);
+        EndpointGovernanceResult replay = await EvaluateSignedGrantRequestAsync(provider, endpoint, token, fields);
+
+        Assert.True(first.CanExecute);
+        Assert.False(replay.CanExecute);
+        Assert.Contains(SignedCapabilityGrantReasonCodes.UseLimitExceeded, replay.Decision!.ReasonCodes);
+
+        IDecisionReceipt allowedReceipt = sink.Records[0];
+        Assert.Equal(grant.TokenId, allowedReceipt.CapabilityGrantId);
+        Assert.Equal(grant.TokenId, AuditLedgerRecord.FromDecisionReceipt(allowedReceipt).CapabilityTokenId);
+        Assert.Null(sink.Records[1].CapabilityGrantId);
+    }
+
+    private static LocalDevelopmentSigningOptions CreateConfiguredKeyOptions(string keyPem)
+    {
+        LocalDevelopmentSigningOptions options = LocalDevelopmentSigningOptions.Create(keyId: "stable-configured-key", keyVersion: "v1");
+        options.RsaKeyPem = keyPem;
+        return options;
+    }
+
+    private static async Task<EndpointGovernanceResult> EvaluateSignedGrantRequestAsync(
+        ServiceProvider provider,
+        Endpoint endpoint,
+        string token,
+        Dictionary<string, StringValues> fields)
+    {
+        await using AsyncServiceScope scope = provider.CreateAsyncScope();
+        var httpContext = new DefaultHttpContext { RequestServices = scope.ServiceProvider };
+        httpContext.Request.Method = HttpMethods.Post;
+        httpContext.Request.ContentType = "application/x-www-form-urlencoded";
+        httpContext.Request.Form = new FormCollection(new Dictionary<string, StringValues>(fields, StringComparer.OrdinalIgnoreCase));
+        httpContext.Request.Headers[SignedCapabilityGrantOptions.DefaultTokenHeaderName] = token;
+        httpContext.User = new ClaimsPrincipal(new ClaimsIdentity(
+            [new Claim(ClaimTypes.NameIdentifier, "stable-user")],
+            authenticationType: "stable-smoke"));
+        httpContext.SetEndpoint(endpoint);
+        scope.ServiceProvider.GetRequiredService<IHttpContextAccessor>().HttpContext = httpContext;
+
+        return await scope.ServiceProvider
+            .GetRequiredService<IEndpointGovernanceService>()
+            .EvaluateAsync(httpContext, EndpointGovernanceDescriptor.FromEndpoint(endpoint), TestContext.Current.CancellationToken);
     }
 
     [Fact]

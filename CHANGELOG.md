@@ -6,6 +6,54 @@ This project follows the spirit of [Keep a Changelog](https://keepachangelog.com
 
 ## [Unreleased]
 
+### Added
+
+* An opt-in signed capability grant endpoint validator in `AsiBackbone.AspNetCore`
+  ([#890](https://github.com/AsiBackbone/AsiBackbone/issues/890)). `AddAsiBackboneSignedCapabilityGrants(...)`, or
+  `UseSignedCapabilityGrants(...)` on the builder facade, registers `SignedCapabilityGrantEndpointValidator`, which reads a
+  `CapabilityGrantToken` from the request, binds the authenticated actor, endpoint operation and scopes, current policy
+  version and hash, and request binding, and validates through `CapabilityGrantValidationOptions.CreateBoundExecutionBoundary`
+  with proof and use consumption required. Every result other than `Valid` is denied, including the categories the core
+  validator answers with `Defer`, `Escalate`, or `RequireAcknowledgment`. A valid grant preserves the current decision, so it
+  never bypasses an acknowledgment challenge, and an existing denial is preserved without consuming the grant. An
+  acknowledgment-required request is fully validated but consumes no use, so a single-use grant survives the challenge
+  and is consumed by the acknowledged retry. Denials
+  carry a stable reason code from `SignedCapabilityGrantReasonCodes`, one per `CapabilityGrantValidationCategory`. The host
+  supplies the verification service, use store, issuer, audience, clock skew, and request-binding provider.
+* `ICapabilityGrantRequestBindingProvider`, `CapabilityGrantRequestBinding`, and the built-in
+  `FormFieldCapabilityGrantRequestBindingProvider` (`AddAsiBackboneFormFieldCapabilityGrantBinding(...)`), which binds the
+  form fields excluding the antiforgery and token fields, and refuses forms with files and non-form bodies.
+  `FormFieldCapabilityGrantRequestBindingProvider.CreateBinding(...)` computes the same value for issuers.
+* `IEndpointCapabilityGrantFeature`. `DefaultEndpointGovernanceService` clears it before calling the capability
+  validator and copies an accepted grant identifier into the decision receipt when the final decision is not denied.
+* `IDecisionReceipt.CapabilityGrantId` (default `null`), `DecisionReceipt.CapabilityGrantId`,
+  `DecisionReceipt.WithCapabilityGrantId(...)`, and `DecisionReceiptBuilder.WithCapabilityGrantId(...)`.
+  `AuditLedgerRecord.FromDecisionReceipt(...)` uses the receipt's grant identifier for `CapabilityTokenId` when no explicit
+  identifier is supplied.
+* `GovernanceArtifactSigner.SignCapabilityGrantAsync(...)`, `CreateUnsignedCapabilityGrant(...)`, and
+  `CreateSigningReadyCapabilityGrant(...)`. They sign under schema `2.0.0` by default so `MaxUseCount` is covered by the
+  signature, and refuse to sign a use-limited grant under schema `1.0.0`.
+* `CapabilityGrantToken`, a versioned (`asibcg1.`, format version `1`), size-limited transport encoding for
+  `SignedGovernanceArtifact<CapabilityGrant>`. Decoding is strict, never throws for token content, and rebuilds the
+  canonical payload and hash from the grant fields, so editing any field after signing fails verification.
+* `LocalDevelopmentSigningOptions.RsaKeyPem`, a configured-key mode for `AsiBackbone.Signing.LocalDevelopment`, so
+  processes configured with the same key verify each other's signatures and signatures survive a restart. A public key
+  configures a verify-only provider.
+* The [Signed Capability Grants at Endpoints](docs/articles/signed-capability-grants.md) article covers when to use
+  signed grants or claims, issuance, the token format, reason codes, key rotation, and multi-replica replay storage.
+
+### Compatibility
+
+* All additions are opt-in and additive. Hosts that do not call the new registration extensions see no registration or
+  behavior change, and hosts with a claim-backed `IEndpointCapabilityGrantValidator` are unaffected.
+  `AddAsiBackboneSignedCapabilityGrants(...)` refuses to register when another `IEndpointCapabilityGrantValidator` is
+  already registered.
+* The canonical decision receipt payload includes `capabilityGrantId` only when a receipt carries a grant identifier.
+  Receipts without one, including every receipt created before this release, hash exactly as before. Audit ledger record
+  payloads are unchanged; they already bound `capabilityGrantId`.
+* The capability grant token is a new serialized format. Its format version is independent of the grant's canonical
+  payload schema version, and a decoder rejects any format version it does not know.
+
 ## [7.2.1] - 2026-10-18
 
 `7.2.1` is a backward-compatible patch release for the stable `7.x` package family. It corrects endpoint-governance

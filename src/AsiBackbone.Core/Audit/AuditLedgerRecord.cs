@@ -294,6 +294,9 @@ public sealed class AuditLedgerRecord : IDecisionReceipt
     /// </summary>
     public string? CapabilityTokenId { get; }
 
+    /// <inheritdoc />
+    string? IDecisionReceipt.CapabilityGrantId => CapabilityTokenId;
+
     /// <summary>
     /// Gets the hash of the preceding ledger record, when the host chains records for tamper evidence.
     /// </summary>
@@ -369,7 +372,10 @@ public sealed class AuditLedgerRecord : IDecisionReceipt
     /// <param name="recordedUtc">The capture timestamp; defaults to the current UTC time.</param>
     /// <param name="handshakeId">The optional liability handshake identifier to link.</param>
     /// <param name="acknowledgmentId">The optional handshake acknowledgment identifier to link.</param>
-    /// <param name="capabilityTokenId">The optional capability token or grant identifier to link.</param>
+    /// <param name="capabilityTokenId">
+    /// The optional capability token or grant identifier to link. When omitted or blank, the receipt's
+    /// <see cref="IDecisionReceipt.CapabilityGrantId" /> is used.
+    /// </param>
     /// <param name="previousRecordHash">The optional hash of the preceding ledger record.</param>
     /// <param name="recordHash">The optional hash of this ledger record.</param>
     /// <param name="signatureKeyId">The optional identifier of the signing key.</param>
@@ -439,7 +445,7 @@ public sealed class AuditLedgerRecord : IDecisionReceipt
             receipt.PolicyHash,
             handshakeId,
             acknowledgmentId,
-            capabilityTokenId,
+            string.IsNullOrWhiteSpace(capabilityTokenId) ? receipt.CapabilityGrantId : capabilityTokenId,
             previousRecordHash,
             recordHash,
             signatureKeyId,

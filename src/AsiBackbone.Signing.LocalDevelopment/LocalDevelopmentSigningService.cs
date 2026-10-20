@@ -8,7 +8,8 @@ namespace AsiBackbone.Signing.LocalDevelopment;
 /// Provides local-development RSA signing and verification for AsiBackbone signing abstractions.
 /// </summary>
 /// <remarks>
-/// This service generates an in-process RSA key for samples and tests. It is not a production managed-key provider.
+/// This service generates an in-process RSA key for samples and tests, or uses the key configured through
+/// <see cref="LocalDevelopmentSigningOptions.RsaKeyPem" /> when one is supplied. It is not a production managed-key provider.
 /// </remarks>
 public sealed class LocalDevelopmentSigningService : IGovernanceSigningService, IGovernanceSignatureVerificationService, IDisposable
 {
@@ -62,7 +63,9 @@ public sealed class LocalDevelopmentSigningService : IGovernanceSigningService, 
 
         this.options = snapshot;
         this.timeProvider = timeProvider;
-        rsa = CreateRsa(snapshot.KeySizeBits);
+        rsa = string.IsNullOrWhiteSpace(snapshot.RsaKeyPem)
+            ? CreateRsa(snapshot.KeySizeBits)
+            : ImportRsa(snapshot.RsaKeyPem);
         keySizeBits = rsa.KeySize;
     }
 
@@ -267,6 +270,46 @@ public sealed class LocalDevelopmentSigningService : IGovernanceSigningService, 
         }
 
         return created;
+    }
+
+    /// <summary>
+    /// Imports the configured PEM-encoded RSA key.
+    /// </summary>
+    /// <remarks>
+    /// Failure messages never include the key text, so a malformed key does not reach logs through the exception.
+    /// </remarks>
+    /// <param name="rsaKeyPem">The configured PEM-encoded RSA key.</param>
+    /// <returns>An RSA instance holding the configured key.</returns>
+    /// <exception cref="InvalidOperationException">
+    /// Thrown when the key cannot be imported or is smaller than <see cref="LocalDevelopmentSigningOptions.MinimumKeySizeBits" />.
+    /// </exception>
+    private static RSA ImportRsa(string rsaKeyPem)
+    {
+        var imported = RSA.Create();
+
+        try
+        {
+            imported.ImportFromPem(rsaKeyPem);
+        }
+        catch (Exception exception) when (exception is ArgumentException or CryptographicException)
+        {
+            imported.Dispose();
+
+            throw new InvalidOperationException(
+                "The configured local-development RSA key could not be imported. Supply an unencrypted PEM-encoded RSA private or public key.",
+                exception is CryptographicException ? exception : null);
+        }
+
+        if (imported.KeySize < LocalDevelopmentSigningOptions.MinimumKeySizeBits)
+        {
+            int importedKeySizeBits = imported.KeySize;
+            imported.Dispose();
+
+            throw new InvalidOperationException(
+                $"The configured local-development RSA key is {importedKeySizeBits} bits; at least {LocalDevelopmentSigningOptions.MinimumKeySizeBits} bits are required.");
+        }
+
+        return imported;
     }
 
     private static string NormalizeRequired(string? value, string fallback)
