@@ -206,7 +206,7 @@ public static class CanonicalPayloadBuilder
         CanonicalPayloadOptions options,
         string decisionReceiptId)
     {
-        return new SortedDictionary<string, object?>(StringComparer.Ordinal)
+        SortedDictionary<string, object?> content = new(StringComparer.Ordinal)
         {
             ["actorDisplayName"] = receipt.ActorDisplayName,
             ["actorId"] = receipt.ActorId,
@@ -238,6 +238,17 @@ public static class CanonicalPayloadBuilder
             ["tenantHash"] = receipt.TenantHash,
             ["traceId"] = receipt.TraceId
         };
+
+        // The grant identifier is bound only when present, so receipts that carry none keep the exact payload, and hash,
+        // they had before the field existed. A receipt that names a grant cannot have that name removed or replaced
+        // without changing its hash.
+        string? capabilityGrantId = receipt.CapabilityGrantId;
+        if (!string.IsNullOrWhiteSpace(capabilityGrantId))
+        {
+            content["capabilityGrantId"] = capabilityGrantId.Trim();
+        }
+
+        return content;
     }
 
     private static SortedDictionary<string, object?> BuildGovernanceEmissionEnvelopeContent(GovernanceEmissionEnvelope envelope, CanonicalPayloadOptions options)

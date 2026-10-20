@@ -145,6 +145,8 @@
       href: capability-grant-hardening.md
     - name: Capability Proof Trust Pinning
       href: capability-proof-trust-pinning.md
+    - name: Signed Capability Grants at Endpoints
+      href: signed-capability-grants.md
     - name: Durable Audit and Outbox Persistence
       href: durable-audit-outbox-persistence.md
     - name: Governance Outbox Delivery Semantics

@@ -237,6 +237,10 @@ public sealed class DefaultEndpointGovernanceService : IEndpointGovernanceServic
             return new DecisionStageResult(decision, terminalResult);
         }
 
+        // The feature reports the grant accepted by this evaluation only. Clearing it first keeps an identifier left by
+        // earlier request processing from reaching the receipt when the validator accepts nothing.
+        httpContext.Features.Set<IEndpointCapabilityGrantFeature>(null);
+
         GovernanceDecision validatedDecision = await capabilityValidator
             .ValidateAsync(httpContext, descriptor, decision, cancellationToken)
             .ConfigureAwait(false);
@@ -281,6 +285,17 @@ public sealed class DefaultEndpointGovernanceService : IEndpointGovernanceServic
             decision,
             metadata: endpointMetadata,
             decisionStage: "aspnetcore.endpoint.governance");
+
+        // Only a grant accepted for a decision that was not then denied is recorded, so a receipt never names a grant as
+        // the authority for an operation that did not go ahead on it.
+        string? capabilityGrantId = descriptor.CapabilityScopes.Count > 0 && !decision.IsDenied
+            ? httpContext.Features.Get<IEndpointCapabilityGrantFeature>()?.GrantId
+            : null;
+
+        if (!string.IsNullOrWhiteSpace(capabilityGrantId))
+        {
+            receipt = receipt.WithCapabilityGrantId(capabilityGrantId);
+        }
 
         await auditSink.WriteAsync(receipt, cancellationToken).ConfigureAwait(false);
         return new AuditStageResult(actor, TerminalResult: null);

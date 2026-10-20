@@ -31,6 +31,37 @@ public static class AsiBackboneAspNetCoreBuilderExtensions
     }
 
     /// <summary>
+    /// Opts in to signed capability grant endpoint validation through the AsiBackbone builder facade.
+    /// </summary>
+    /// <remarks>
+    /// See <see cref="AsiBackboneSignedCapabilityGrantServiceCollectionExtensions.AddAsiBackboneSignedCapabilityGrants" />
+    /// for the services the host must also supply.
+    /// </remarks>
+    public static IAsiBackboneBuilder UseSignedCapabilityGrants(
+        this IAsiBackboneBuilder builder,
+        Action<CapabilityGrants.SignedCapabilityGrantOptions> configure)
+    {
+        ArgumentNullException.ThrowIfNull(builder);
+        ArgumentNullException.ThrowIfNull(configure);
+
+        _ = builder.Services.AddAsiBackboneSignedCapabilityGrants(configure);
+        return builder;
+    }
+
+    /// <summary>
+    /// Adds the form-field capability grant request-binding provider through the AsiBackbone builder facade.
+    /// </summary>
+    public static IAsiBackboneBuilder UseFormFieldCapabilityGrantBinding(
+        this IAsiBackboneBuilder builder,
+        Action<CapabilityGrants.FormFieldCapabilityGrantBindingOptions>? configure = null)
+    {
+        ArgumentNullException.ThrowIfNull(builder);
+
+        _ = builder.Services.AddAsiBackboneFormFieldCapabilityGrantBinding(configure);
+        return builder;
+    }
+
+    /// <summary>
     /// Adds the host-owned outbox drain worker through the AsiBackbone builder facade using default options.
     /// </summary>
     public static IAsiBackboneBuilder UseGovernanceOutboxDrain(this IAsiBackboneBuilder builder)

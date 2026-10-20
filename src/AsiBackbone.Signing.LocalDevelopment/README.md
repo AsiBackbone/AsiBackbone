@@ -62,6 +62,22 @@ builder.Services.AddSingleton<IGovernanceSigningService>(localSigningService);
 builder.Services.AddSingleton<IGovernanceSignatureVerificationService>(localSigningService);
 ```
 
+## Configured key
+
+By default the provider generates a new RSA key in each process, so artifacts it signs stop verifying after a restart and
+cannot be verified by another process. Set `RsaKeyPem` to an unencrypted PEM-encoded RSA key to give every process
+configured with it the same signing identity, for example so a capability grant token issued by one process verifies in
+another:
+
+```csharp
+var localSigningOptions = LocalDevelopmentSigningOptions.Create(keyId: "dev-shared-key", keyVersion: "dev");
+localSigningOptions.RsaKeyPem = builder.Configuration["Signing:LocalDevelopmentKeyPem"];
+```
+
+A private key signs and verifies. A public key only verifies. The key must be at least 2048 bits, and `KeySizeBits` is
+ignored. Load the key from a development secret store rather than source control. This is still a local-development
+provider: the key has no custody, rotation, or revocation story, and production registration remains guarded.
+
 The builder facade validates configuration during registration:
 
 ```csharp

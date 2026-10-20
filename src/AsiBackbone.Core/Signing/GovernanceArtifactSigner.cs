@@ -1,6 +1,8 @@
 using AsiBackbone.Core.Audit;
+using AsiBackbone.Core.CapabilityGrants;
 using AsiBackbone.Core.Emissions;
 using AsiBackbone.Core.Outbox;
+using AsiBackbone.Core.Serialization;
 
 namespace AsiBackbone.Core.Signing;
 
@@ -259,6 +261,100 @@ public static class GovernanceArtifactSigner
     }
 
     /// <summary>
+    /// Creates an unsigned wrapper for a capability grant.
+    /// </summary>
+    /// <remarks>
+    /// The grant is wrapped under <paramref name="schemaVersion" />, which defaults to
+    /// <see cref="GovernanceSchemaVersions.StableArtifactsV2" /> so <see cref="CapabilityGrant.MaxUseCount" /> is part of
+    /// the canonical payload. The returned <see cref="SignedGovernanceArtifact{TArtifact}.Artifact" /> carries that schema
+    /// version and is the grant to transport.
+    /// </remarks>
+    /// <exception cref="ArgumentException">
+    /// <paramref name="schemaVersion" /> is <see cref="GovernanceSchemaVersions.StableArtifactsV1" /> and the grant carries a
+    /// use limit that the version 1 payload cannot bind.
+    /// </exception>
+    public static SignedGovernanceArtifact<CapabilityGrant> CreateUnsignedCapabilityGrant(
+        CapabilityGrant grant,
+        CanonicalPayloadOptions? options = null,
+        string? hashAlgorithm = null,
+        string? schemaVersion = null)
+    {
+        CapabilityGrant versionedGrant = ApplyCapabilityGrantSchemaVersion(grant, schemaVersion);
+        return CreateUnsigned(versionedGrant, CanonicalPayloadBuilder.ForCapabilityGrant(versionedGrant, options), hashAlgorithm);
+    }
+
+    /// <summary>
+    /// Creates signing-ready metadata for a capability grant without invoking a signing provider.
+    /// </summary>
+    /// <remarks>
+    /// The grant schema version is applied as described for <see cref="CreateUnsignedCapabilityGrant" />.
+    /// </remarks>
+    /// <exception cref="ArgumentException">
+    /// <paramref name="schemaVersion" /> is <see cref="GovernanceSchemaVersions.StableArtifactsV1" /> and the grant carries a
+    /// use limit that the version 1 payload cannot bind.
+    /// </exception>
+    public static SignedGovernanceArtifact<CapabilityGrant> CreateSigningReadyCapabilityGrant(
+        CapabilityGrant grant,
+        CanonicalPayloadOptions? options = null,
+        string? hashAlgorithm = null,
+        IReadOnlyDictionary<string, string>? metadata = null,
+        string? schemaVersion = null)
+    {
+        CapabilityGrant versionedGrant = ApplyCapabilityGrantSchemaVersion(grant, schemaVersion);
+        return CreateSigningReady(versionedGrant, CanonicalPayloadBuilder.ForCapabilityGrant(versionedGrant, options), hashAlgorithm, metadata);
+    }
+
+    /// <summary>
+    /// Signs a capability grant after canonical payload hashing.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// The grant is signed under <paramref name="schemaVersion" />, which defaults to
+    /// <see cref="GovernanceSchemaVersions.StableArtifactsV2" /> so the issuer-bound
+    /// <see cref="CapabilityGrant.MaxUseCount" /> is covered by the signature. A grant created with another schema version
+    /// is re-created under the requested one, and the returned
+    /// <see cref="SignedGovernanceArtifact{TArtifact}.Artifact" /> is the grant that was signed.
+    /// </para>
+    /// <para>
+    /// Verifiers rebuild the payload with <see cref="CapabilityGrantValidationOptions.ProofPayloadOptions" />, so
+    /// <paramref name="options" /> must match what the relying party configures. Use
+    /// <see cref="CapabilityGrantToken" /> to carry the result to a relying party.
+    /// </para>
+    /// </remarks>
+    /// <exception cref="ArgumentException">
+    /// <paramref name="schemaVersion" /> is <see cref="GovernanceSchemaVersions.StableArtifactsV1" /> and the grant carries a
+    /// use limit that the version 1 payload cannot bind.
+    /// </exception>
+    /// <exception cref="InvalidOperationException">
+    /// <paramref name="requireSignature" /> is <see langword="true" /> and the signing provider returned no signature.
+    /// </exception>
+    public static ValueTask<SignedGovernanceArtifact<CapabilityGrant>> SignCapabilityGrantAsync(
+        CapabilityGrant grant,
+        IGovernanceSigningService signingService,
+        CanonicalPayloadOptions? options = null,
+        string? hashAlgorithm = null,
+        string? keyId = null,
+        string? keyVersion = null,
+        IReadOnlyDictionary<string, string>? metadata = null,
+        bool requireSignature = true,
+        string? schemaVersion = null,
+        CancellationToken cancellationToken = default)
+    {
+        CapabilityGrant versionedGrant = ApplyCapabilityGrantSchemaVersion(grant, schemaVersion);
+
+        return SignAsync(
+            versionedGrant,
+            CanonicalPayloadBuilder.ForCapabilityGrant(versionedGrant, options),
+            signingService,
+            hashAlgorithm,
+            keyId,
+            keyVersion,
+            metadata,
+            requireSignature,
+            cancellationToken);
+    }
+
+    /// <summary>
     /// Creates a signing request from canonical payload hash metadata.
     /// </summary>
     public static SigningRequest CreateSigningRequest(
@@ -281,6 +377,25 @@ public static class GovernanceArtifactSigner
         {
             SignatureInput = GovernanceSignatureInput.CreateV1(canonicalHash, signingReadyMetadata.Metadata)
         };
+    }
+
+    private static CapabilityGrant ApplyCapabilityGrantSchemaVersion(CapabilityGrant grant, string? schemaVersion)
+    {
+        ArgumentNullException.ThrowIfNull(grant);
+
+        string effectiveSchemaVersion = string.IsNullOrWhiteSpace(schemaVersion)
+            ? GovernanceSchemaVersions.StableArtifactsV2
+            : schemaVersion.Trim();
+
+        // The version 1 payload omits the use limit, so signing a limited grant under it would leave the limit outside the
+        // proof while the validator still enforces it. Refuse rather than produce a grant whose limit a relying party
+        // could not trust.
+        return string.Equals(effectiveSchemaVersion, GovernanceSchemaVersions.StableArtifactsV1, StringComparison.Ordinal)
+            && grant.MaxUseCount.HasValue
+            ? throw new ArgumentException(
+                $"A capability grant with a use limit cannot be signed under schema version {GovernanceSchemaVersions.StableArtifactsV1}, whose canonical payload does not bind the limit. Use {GovernanceSchemaVersions.StableArtifactsV2}.",
+                nameof(schemaVersion))
+            : grant.WithSchemaVersion(effectiveSchemaVersion);
     }
 
     private static SignedGovernanceArtifact<TArtifact> CreateUnsigned<TArtifact>(

@@ -8,7 +8,8 @@ namespace AsiBackbone.Core.CapabilityGrants;
 /// </summary>
 /// <remarks>
 /// The grant is a metadata model, not a bearer-token format. Hosts decide how this grant is serialized,
-/// transported, protected, and bound to their authentication and authorization systems.
+/// transported, protected, and bound to their authentication and authorization systems. A signed grant can be carried
+/// with <see cref="CapabilityGrantToken" />, which is one versioned transport form rather than a requirement.
 /// </remarks>
 public sealed class CapabilityGrant
 {
@@ -237,6 +238,35 @@ public sealed class CapabilityGrant
             NormalizeMetadata(metadata),
             maxUseCount,
             schemaVersion);
+    }
+
+    /// <summary>
+    /// Returns this grant when it already records <paramref name="schemaVersion" />, or an otherwise identical grant
+    /// that records it.
+    /// </summary>
+    internal CapabilityGrant WithSchemaVersion(string schemaVersion)
+    {
+        return string.Equals(SchemaVersion, GovernanceSchemaVersions.Normalize(schemaVersion), StringComparison.Ordinal)
+            ? this
+            : new CapabilityGrant(
+                TokenId,
+                Issuer,
+                Audience,
+                Scopes,
+                IssuedUtc,
+                NotBeforeUtc,
+                ExpiresUtc,
+                SubjectId,
+                OperationName,
+                PolicyVersion,
+                PolicyHash,
+                AcknowledgmentId,
+                HandshakeId,
+                GatewayBinding,
+                ResourceBinding,
+                Metadata,
+                MaxUseCount,
+                schemaVersion);
     }
 
     private static ReadOnlyCollection<string> NormalizeScopes(IEnumerable<string> scopes)

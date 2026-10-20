@@ -69,7 +69,7 @@ public IActionResult ExecuteHighRiskAction()
 }
 ```
 
-The metadata layer is optional and ergonomic. It does not replace full manual wire-up. Hosts that attach policy metadata should register an `IGovernancePolicyEvaluator<GovernanceEvaluationContext>`. Hosts that attach capability metadata should register an `IEndpointCapabilityGrantValidator`. Hosts that request audit emission should register a host-owned `IDecisionReceiptSink`.
+The metadata layer is optional and ergonomic. It does not replace full manual wire-up. Hosts that attach policy metadata should register an `IGovernancePolicyEvaluator<GovernanceEvaluationContext>`. Hosts that attach capability metadata should register an `IEndpointCapabilityGrantValidator`, or opt in to the signed, request-bound grant validator with `AddAsiBackboneSignedCapabilityGrants(...)` plus a host-supplied verification service, use store, and request-binding provider such as `AddAsiBackboneFormFieldCapabilityGrantBinding()`. Hosts that request audit emission should register a host-owned `IDecisionReceiptSink`.
 
 ## Hosted outbox drain
 

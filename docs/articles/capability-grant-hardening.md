@@ -26,7 +26,7 @@ AsiBackbone can model short-lived, scoped grants for governed execution, but it 
 | Acknowledgment/handshake reference | Binds follow-on execution to the approval or acknowledgment flow that authorized it. |
 | Gateway/resource binding | Limits the grant to a specific gateway or target resource when supplied. |
 
-The grant model is not a wire format. Hosts decide whether they serialize it as JSON, wrap it in a signed envelope, store it server-side, or project it into another provider-owned format.
+The grant model is not a wire format. Hosts decide whether they serialize it as JSON, wrap it in a signed envelope, store it server-side, or project it into another provider-owned format. Hosts that carry a signed grant on a request can use the versioned `CapabilityGrantToken` encoding, which rebuilds the canonical payload on decode; see [Signed Capability Grants at Endpoints](signed-capability-grants.md).
 
 ## Canonical payload for a signed grant
 
