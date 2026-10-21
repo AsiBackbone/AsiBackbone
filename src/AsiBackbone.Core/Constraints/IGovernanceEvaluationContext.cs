@@ -11,6 +11,14 @@ public interface IGovernanceEvaluationContext
     string? CorrelationId { get; }
 
     /// <summary>
+    /// Gets the trace identifier associated with the evaluation, when supplied by the host.
+    /// </summary>
+    /// <remarks>
+    /// The default implementation preserves source and binary compatibility for existing host-defined contexts.
+    /// </remarks>
+    string? TraceId => null;
+
+    /// <summary>
     /// Gets the policy version associated with the evaluation, when supplied by the host.
     /// </summary>
     string? PolicyVersion { get; }

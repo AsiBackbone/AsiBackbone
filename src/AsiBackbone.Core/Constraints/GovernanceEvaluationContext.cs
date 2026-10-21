@@ -26,6 +26,9 @@ public sealed class GovernanceEvaluationContext(
     public string? CorrelationId { get; } = NormalizeOptional(correlationId);
 
     /// <inheritdoc />
+    public string? TraceId { get; }
+
+    /// <inheritdoc />
     public string? PolicyVersion { get; } = NormalizeOptional(policyVersion);
 
     /// <inheritdoc />
@@ -38,6 +41,25 @@ public sealed class GovernanceEvaluationContext(
     /// Gets a value indicating whether this context contains metadata.
     /// </summary>
     public bool HasMetadata => Metadata.Count > 0;
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="GovernanceEvaluationContext"/> class with a trace identifier.
+    /// </summary>
+    /// <param name="correlationId">Optional correlation identifier.</param>
+    /// <param name="policyVersion">Optional policy version.</param>
+    /// <param name="policyHash">Optional policy hash.</param>
+    /// <param name="metadata">Optional host-provided metadata.</param>
+    /// <param name="traceId">Optional trace identifier.</param>
+    public GovernanceEvaluationContext(
+        string? correlationId,
+        string? policyVersion,
+        string? policyHash,
+        IReadOnlyDictionary<string, string>? metadata,
+        string? traceId)
+        : this(correlationId, policyVersion, policyHash, metadata)
+    {
+        TraceId = NormalizeOptional(traceId);
+    }
 
     private static string? NormalizeOptional(string? value)
     {

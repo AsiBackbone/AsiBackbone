@@ -6,6 +6,12 @@ This project follows the spirit of [Keep a Changelog](https://keepachangelog.com
 
 ## [Unreleased]
 
+### Fixed
+
+* Policy-evaluated ASP.NET Core endpoint decisions now carry the request trace identifier into decision receipts,
+  including decisions returned by custom policy and capability evaluators that omit it. Evaluator-supplied trace
+  identifiers remain authoritative. ([#897](https://github.com/AsiBackbone/AsiBackbone/issues/897))
+
 ## [7.4.0] - 2026-10-21
 
 `7.4.0` is a backward-compatible minor release for the stable `7.x` package family. It adds production-oriented

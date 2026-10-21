@@ -63,4 +63,30 @@ public sealed class GovernanceDecisionTelemetryIdentifierTests
         Assert.Equal(expectedCorrelationId, decision.CorrelationId);
         Assert.Equal(expectedTraceId, decision.TraceId);
     }
+
+    /// <summary>
+    /// Verifies replacing a trace identifier preserves all decision semantics and normalizes the new identifier.
+    /// </summary>
+    [Fact]
+    public void WithTraceIdPreservesDecisionAndNormalizesTraceIdentifier()
+    {
+        var decision = GovernanceDecision.RequireAcknowledgment(
+            "acknowledgment.required",
+            "Approval is required.",
+            correlationId: "correlation-123",
+            traceId: "original-trace",
+            policyVersion: "v1",
+            policyHash: "hash-123");
+
+        GovernanceDecision tracedDecision = decision.WithTraceId(" replacement-trace ");
+
+        Assert.NotSame(decision, tracedDecision);
+        Assert.Equal(decision.Outcome, tracedDecision.Outcome);
+        Assert.Equal(decision.Reasons, tracedDecision.Reasons);
+        Assert.Equal(decision.ReasonCodes, tracedDecision.ReasonCodes);
+        Assert.Equal(decision.CorrelationId, tracedDecision.CorrelationId);
+        Assert.Equal("replacement-trace", tracedDecision.TraceId);
+        Assert.Equal(decision.PolicyVersion, tracedDecision.PolicyVersion);
+        Assert.Equal(decision.PolicyHash, tracedDecision.PolicyHash);
+    }
 }

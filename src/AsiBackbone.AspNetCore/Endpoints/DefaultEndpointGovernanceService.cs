@@ -200,6 +200,8 @@ public sealed class DefaultEndpointGovernanceService : IEndpointGovernanceServic
             .EvaluateAsync(evaluationContext, cancellationToken)
             .ConfigureAwait(false);
 
+        decision = BackfillTraceId(decision, correlation.TraceId);
+
         return new DecisionStageResult(decision, TerminalResult: null);
     }
 
@@ -244,6 +246,8 @@ public sealed class DefaultEndpointGovernanceService : IEndpointGovernanceServic
         GovernanceDecision validatedDecision = await capabilityValidator
             .ValidateAsync(httpContext, descriptor, decision, cancellationToken)
             .ConfigureAwait(false);
+
+        validatedDecision = BackfillTraceId(validatedDecision, decision.TraceId);
 
         return new DecisionStageResult(validatedDecision, TerminalResult: null);
     }
@@ -375,6 +379,13 @@ public sealed class DefaultEndpointGovernanceService : IEndpointGovernanceServic
             traceId: traceId,
             policyVersion: evaluationContext.PolicyVersion,
             policyHash: evaluationContext.PolicyHash);
+    }
+
+    private static GovernanceDecision BackfillTraceId(GovernanceDecision decision, string? traceId)
+    {
+        return decision.TraceId is null && traceId is not null
+            ? decision.WithTraceId(traceId)
+            : decision;
     }
 
     private readonly record struct MetadataStageResult(

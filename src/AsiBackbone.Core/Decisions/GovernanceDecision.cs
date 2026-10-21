@@ -387,6 +387,22 @@ public sealed class GovernanceDecision
             policyHash);
     }
 
+    /// <summary>
+    /// Creates a copy of this decision with the supplied trace identifier.
+    /// </summary>
+    /// <param name="traceId">Optional trace identifier.</param>
+    /// <returns>A decision preserving the outcome, reasons, correlation identifier, and policy identifiers.</returns>
+    public GovernanceDecision WithTraceId(string? traceId)
+    {
+        return new GovernanceDecision(
+            Outcome,
+            Reasons,
+            CorrelationId,
+            traceId,
+            PolicyVersion,
+            PolicyHash);
+    }
+
     private static string? NormalizeOptional(string? value)
     {
         return string.IsNullOrWhiteSpace(value)
