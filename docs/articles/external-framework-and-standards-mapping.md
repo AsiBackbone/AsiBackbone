@@ -99,7 +99,7 @@ AsiBackbone does not classify an organization as a provider, deployer, importer,
 
 Official sources:
 
-- [European Commission AI regulatory framework](https://digital-strategy.ec.europa.eu/en/policies/regulatory-framework-ai)
+- [EU Artificial Intelligence Act (Regulation (EU) 2024/1689)](https://eur-lex.europa.eu/eli/reg/2024/1689/oj/eng)
 - [Regulation (EU) 2024/1689](https://eur-lex.europa.eu/eli/reg/2024/1689/oj)
 
 ## HIPAA Security Rule
