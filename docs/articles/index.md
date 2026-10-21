@@ -11,11 +11,12 @@ General architectural education belongs in [AsiBackbone Learning](https://asibac
 
 ## Current stable package posture
 
-Stable `7.x` package family. The current release is `7.3.0`.
+Stable `7.x` package family. The current release is `7.4.0`.
 
-`7.3.0` adds opt-in, request-bound signed capability grants for ASP.NET Core
-endpoints without changing existing host behavior, package IDs, the `net10.0`
-target, or binary assembly identity `7.0.0.0`.
+`7.4.0` adds opt-in public-key signature verification in Signing.ManagedKey and
+durable, atomic EF Core capability-grant replay storage for multi-replica hosts
+without changing existing host behavior, package IDs, the `net10.0` target, or
+binary assembly identity `7.0.0.0`.
 
 Released stable package surfaces include Core, DependencyInjection,
 Storage.InMemory, EntityFrameworkCore, AspNetCore, Testing, Templates,

@@ -6,6 +6,12 @@ This project follows the spirit of [Keep a Changelog](https://keepachangelog.com
 
 ## [Unreleased]
 
+## [7.4.0] - 2026-10-21
+
+`7.4.0` is a backward-compatible minor release for the stable `7.x` package family. It adds production-oriented
+public-key signature verification and durable, atomic EF Core capability-grant replay storage for multi-replica hosts.
+Existing hosts are unchanged unless they opt in, and binary assembly identity remains `7.0.0.0`.
+
 ### Added
 
 * `AsiBackbone.Signing.ManagedKey` now includes opt-in public-key signature verification with trusted key-version

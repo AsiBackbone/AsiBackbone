@@ -2,9 +2,9 @@
 
 # AsiBackbone
 
-> `7.3.0` is the current stable release on `main`.
+> `7.4.0` is the current stable release on `main`.
 >
-> `7.3.0` adds opt-in, request-bound signed capability grants for ASP.NET Core endpoints without changing existing host behavior. See the [7.3.0 release notes](docs/articles/release-notes-730.md); consumers moving from `6.x` must still follow the [6.x to 7.0 upgrade guide](docs/articles/upgrade-600-to-700.md).
+> `7.4.0` adds production-oriented public-key signature verification and durable EF Core capability-grant replay storage for multi-replica hosts. See the [7.4.0 release notes](docs/articles/release-notes-740.md); consumers moving from `6.x` must still follow the [6.x to 7.0 upgrade guide](docs/articles/upgrade-600-to-700.md).
 
 [![CI](https://github.com/AsiBackbone/AsiBackbone/actions/workflows/ci.yml/badge.svg)](https://github.com/AsiBackbone/AsiBackbone/actions/workflows/ci.yml)
 [![Line Coverage Gate](https://img.shields.io/badge/line%20coverage%20gate-75%25-brightgreen)](https://asibackbone.github.io/AsiBackbone/coverage/index.html)
