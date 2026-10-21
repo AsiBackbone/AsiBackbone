@@ -34,7 +34,7 @@ packages remain design-only, strategy-only, sample-only, host-owned, or
 future-provider work unless a later stable release explicitly ships them.
 
 The release process includes explicit [Release Cadence and Readiness](release-cadence-and-readiness.md) guidance for patch, minor, and major release selection, package metadata, Source Link, SBOM/provenance, documentation links, and future package identity or namespace changes.
-The current verification evidence is the [7.3.0 Consumer Verification Guide](consumer-verification-730.md).
+The current verification evidence is the [7.4.0 Consumer Verification Guide](consumer-verification-740.md).
 Consumers moving from the previous stable line must also follow the [Upgrade from 6.x to 7.0](upgrade-600-to-700.md) guide.
 
 ## Search and navigation

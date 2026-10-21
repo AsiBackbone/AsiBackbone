@@ -144,18 +144,19 @@ For production-style hosts, add durable audit/outbox persistence, signing or ver
 
 ## Package family
 
-Stable `7.x` package family. The current release is `7.3.0`.
+Stable `7.x` package family. The current release is `7.4.0`.
 
-`7.3.0` adds opt-in, request-bound signed capability grants for ASP.NET Core
-endpoints, with signing, transport, replay protection, request binding, and
-audit correlation. Existing hosts are unchanged unless they opt in. The `7.2`
-minor release aligned public parameter names
-with decision-receipt terminology and refreshed supported dependencies. The
-`7.1` minor release added analyzer rule `ASIB004` for signing requests that omit
-`SignatureInput` and begins the `ASIB902` and `ASIB903` deprecation windows for
-legacy signature-input creation and the outbox `RetryClock` override. Historical
-signature verification remains supported through its explicit opt-in. Package
-IDs, the `net10.0` target, and binary assembly identity `7.0.0.0` are unchanged.
+`7.4.0` adds opt-in public-key signature verification for managed-key integrations
+and durable EF Core-backed capability-grant replay protection, building on the
+request-bound signed capability grant support introduced in `7.3.0`. Existing
+hosts are unchanged unless they opt in. The `7.2` minor release aligned public
+parameter names with decision-receipt terminology and refreshed supported
+dependencies. The `7.1` minor release added analyzer rule `ASIB004` for signing
+requests that omit `SignatureInput` and begins the `ASIB902` and `ASIB903`
+deprecation windows for legacy signature-input creation and the outbox
+`RetryClock` override. Historical signature verification remains supported
+through its explicit opt-in. Package IDs, the `net10.0` target, and binary
+assembly identity `7.0.0.0` are unchanged.
 
 Consumers upgrading from `6.x` must follow the [6.x to 7.0 upgrade guide](https://github.com/AsiBackbone/AsiBackbone/blob/main/docs/articles/upgrade-600-to-700.md). Hosts must preserve actor identity across both acknowledgment-challenge legs and remap persisted numeric DLP enum values.
 
@@ -231,13 +232,13 @@ The full, categorized documentation set lives at the [documentation site](https:
 
 ## Current status
 
-The current stable release is `7.3.0`. It adds opt-in, request-bound signed capability grants for ASP.NET Core endpoints while preserving existing host behavior, package IDs, the `net10.0` target, and existing durable contracts.
+The current stable release is `7.4.0`. It adds opt-in public-key signature verification for managed-key integrations and durable EF Core-backed capability-grant replay protection, building on the request-bound signed capability grant support introduced in `7.3.0`. Existing hosts are unchanged unless they opt in. The `7.2` minor release aligned public parameter names with decision-receipt terminology and refreshed supported dependencies. The `7.1` minor release added analyzer rule `ASIB004` for signing requests that omit `SignatureInput` and begins the `ASIB902` and `ASIB903` deprecation windows for legacy signature-input creation and the outbox `RetryClock` override. Historical signature verification remains supported through its explicit opt-in. Package IDs, the `net10.0` target, and binary assembly identity `7.0.0.0` are unchanged.
 
 Managed assemblies retain binary identity `7.0.0.0` throughout the compatible `7.x` line.
 
 The stable API contract is documented in [API Compatibility and SemVer](https://github.com/AsiBackbone/AsiBackbone/blob/main/docs/articles/api-compatibility-and-semver.md).
-The release is described in [7.3.0 Release Notes](https://github.com/AsiBackbone/AsiBackbone/blob/main/docs/articles/release-notes-730.md); the preceding endpoint-governance correction is described in [7.2.1 Release Notes](https://github.com/AsiBackbone/AsiBackbone/blob/main/docs/articles/release-notes-721.md).
-Consumer verification evidence is recorded in the [7.3.0 Consumer Verification Guide](https://github.com/AsiBackbone/AsiBackbone/blob/main/docs/articles/consumer-verification-730.md).
+The release is described in [7.4.0 Release Notes](https://github.com/AsiBackbone/AsiBackbone/blob/main/docs/articles/release-notes-740.md); the preceding endpoint-governance correction is described in [7.2.1 Release Notes](https://github.com/AsiBackbone/AsiBackbone/blob/main/docs/articles/release-notes-721.md).
+Consumer verification evidence is recorded in the [7.4.0 Consumer Verification Guide](https://github.com/AsiBackbone/AsiBackbone/blob/main/docs/articles/consumer-verification-740.md).
 Consumers moving from the previous stable line must follow the [6.x to 7.0 upgrade guide](https://github.com/AsiBackbone/AsiBackbone/blob/main/docs/articles/upgrade-600-to-700.md).
 Earlier release records remain available for historical traceability.
 

@@ -196,6 +196,7 @@ Expected stable-line behavior:
 | `7.2.0` | `7.2.0` | `7.0.0.0` | `7.2.0.0` | `7.2.0+...` |
 | `7.2.1` | `7.2.1` | `7.0.0.0` | `7.2.1.0` | `7.2.1+...` |
 | `7.3.0` | `7.3.0` | `7.0.0.0` | `7.3.0.0` | `7.3.0+...` |
+| `7.4.0` | `7.4.0` | `7.0.0.0` | `7.4.0.0` | `7.4.0+...` |
 
 Before cutting stable releases, release validation should verify that `AssemblyVersion`, `FileVersion`, `InformationalVersion`, package metadata, release notes, and repository tags match this policy.
 

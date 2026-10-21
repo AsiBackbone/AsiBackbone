@@ -163,6 +163,8 @@ Package-specific READMEs and release notes define which surfaces are stable, opt
 
 ### Releases and compatibility
 
+* [7.4.0 Release Notes](articles/release-notes-730.md)
+* [7.4.0 Consumer Verification Guide](articles/consumer-verification-730.md)
 * [7.3.0 Release Notes](articles/release-notes-730.md)
 * [7.3.0 Consumer Verification Guide](articles/consumer-verification-730.md)
 * [7.2.1 Release Notes](articles/release-notes-721.md)

@@ -10,7 +10,7 @@ The [7.4.0 Release Readiness Record](release-readiness-740.md) and the
 [7.4.0 Consumer Verification Guide](consumer-verification-740.md) record the
 current release-control evidence.
 The [7.4.0 Release Notes](release-notes-740.md) record the current `7.x`
-minor release, and the [7.3.0 Release Notes](release-notes-730.md) record the
+minor release, and the [7.4.0 Release Notes](release-notes-740.md) record the
 preceding endpoint-governance correction.
 The [Upgrade from 6.x to 7.0](upgrade-600-to-700.md) guide is
 authoritative for consumers moving from the previous stable line.
