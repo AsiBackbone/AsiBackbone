@@ -24,7 +24,7 @@
 
 > AI may provide the intellect. AsiBackbone provides the accountable spine.
 
-AsiBackbone is the implementation package family for Accountable Systems Infrastructure (stable `7.3.x`).
+AsiBackbone is the implementation package family for Accountable Systems Infrastructure (stable `7.4.x`).
 
 ## Documentation ownership
 
@@ -266,7 +266,7 @@ A consumer should be able to use AsiBackbone in an application generated from Ne
 
 AsiBackbone is a governance framework, not an intelligence engine. It implements software primitives for accountable decision flow and keeps execution authority with the host application. See [Project Boundaries and Non-Claims](https://asibackbone.github.io/AsiBackbone/articles/project-boundaries.html) for the full scope statement and safe wording guidance.
 
-> **Current NuGet packages are intentionally published without package signing.** The dated [NuGet Package Signing Decision Record](https://asibackbone.github.io/AsiBackbone/articles/nuget-package-signing-decision.html) records the accepted risk, compensating controls, mandatory review date, and early re-evaluation criteria. The project publishes durable release-attached SBOMs, package/SBOM provenance, Source Link metadata, and package hashes as distinct trust signals; none is presented as a signed-package guarantee. For verification guidance, see the [7.3.0 Consumer Verification Guide](https://asibackbone.github.io/AsiBackbone/articles/consumer-verification-730.html) and [**7.3.0 Release Notes**](https://asibackbone.github.io/AsiBackbone/articles/release-notes-730.html).
+> **Current NuGet packages are intentionally published without package signing.** The dated [NuGet Package Signing Decision Record](https://asibackbone.github.io/AsiBackbone/articles/nuget-package-signing-decision.html) records the accepted risk, compensating controls, mandatory review date, and early re-evaluation criteria. The project publishes durable release-attached SBOMs, package/SBOM provenance, Source Link metadata, and package hashes as distinct trust signals; none is presented as a signed-package guarantee. For verification guidance, see the [7.4.0 Consumer Verification Guide](https://asibackbone.github.io/AsiBackbone/articles/consumer-verification-740.html) and [**7.4.0 Release Notes**](https://asibackbone.github.io/AsiBackbone/articles/release-notes-740.html).
 
 ## Design principles
 
