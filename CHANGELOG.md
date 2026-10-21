@@ -4,6 +4,13 @@ All notable changes to this project are documented in this file.
 
 This project follows the spirit of [Keep a Changelog](https://keepachangelog.com/) and adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Changed
+
+* Updated `Aspire.Hosting.AppHost` from `13.6.1` to `13.6.2` and `FsCheck` from `3.4.0` to `3.5.0`, and refreshed
+  the affected package lock files.
+
 ## [7.3.0] - 2026-10-20
 
 `7.3.0` is a backward-compatible minor release for the stable `7.x` package family. It adds opt-in, request-bound

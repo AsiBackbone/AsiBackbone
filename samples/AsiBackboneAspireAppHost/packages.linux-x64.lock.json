@@ -4,25 +4,25 @@
     "net10.0": {
       "Aspire.Dashboard.Sdk.linux-x64": {
         "type": "Direct",
-        "requested": "[13.6.1, )",
-        "resolved": "13.6.1",
-        "contentHash": "7SleuF3C/vACKF1eN++e31c+LhkbQ9pTbHtlMbHIoN/rNoVaMuyKWT1yhuDBdof+Y8zi5+c2gYtm9tjABBbAcQ=="
+        "requested": "[13.6.2, )",
+        "resolved": "13.6.2",
+        "contentHash": "tyYTWqcF5ICR0SilzjiUsvi41iKoP1MOos6NkVlsrwfMBeNuZvHiJvYN5iX+b+KIIyXfsb29OOwVR/zOcONpCg=="
       },
       "Aspire.Hosting.AppHost": {
         "type": "Direct",
-        "requested": "[13.6.1, )",
-        "resolved": "13.6.1",
-        "contentHash": "1qfHjEFIwPErKUdvlwySgSbUgZtuvKTq1x8WRhl7hAOYvr/WouiSeA5DhVST0Ig6ZFPiTOEG2AJqJjmS6ZEMzw==",
+        "requested": "[13.6.2, )",
+        "resolved": "13.6.2",
+        "contentHash": "iCpFLP7pLlE7+JN12Rk27qmKHmiidni8/SxumGNs1lS2CPAqvX+gBwpSOfiJFzZBcecNoIXzQ3y5C87rN7FMLA==",
         "dependencies": {
           "AspNetCore.HealthChecks.Uris": "9.0.0",
-          "Aspire.Hosting": "13.6.1",
+          "Aspire.Hosting": "13.6.2",
           "Google.Protobuf": "3.36.1",
           "Grpc.AspNetCore": "2.83.0",
           "Grpc.Net.ClientFactory": "2.83.0",
           "Grpc.Tools": "2.83.0",
           "Hex1b": "0.168.0",
           "KubernetesClient": "19.0.2",
-          "MessagePack": "2.5.302",
+          "MessagePack": "2.5.307",
           "Microsoft.Extensions.Configuration.Abstractions": "10.0.12",
           "Microsoft.Extensions.Configuration.Binder": "10.0.12",
           "Microsoft.Extensions.Configuration.EnvironmentVariables": "10.0.12",
@@ -49,9 +49,9 @@
       },
       "Aspire.Hosting.Orchestration.linux-x64": {
         "type": "Direct",
-        "requested": "[13.6.1, )",
-        "resolved": "13.6.1",
-        "contentHash": "3egUoP8xlZngXNOb7FdPNDD5K+0d6NfS7YUo8D77/rnZTAMBosBNmNiBorG9XR5n4D49Rep70r8yqXkI2PEgng=="
+        "requested": "[13.6.2, )",
+        "resolved": "13.6.2",
+        "contentHash": "YcRxButPdm4WQEgvmg+6LeJLt0JCsMdFuIUWgswcGtCZ0gjmrCRJr6/9yy18uwsZRaAKFALSiy6WddHynW6I7g=="
       },
       "MessagePack": {
         "type": "Direct",
@@ -66,8 +66,8 @@
       },
       "Aspire.Hosting": {
         "type": "Transitive",
-        "resolved": "13.6.1",
-        "contentHash": "gIcP7+rPSBPWLlEpFGCWGKdjoXvyn0rZRCbjxUHTMnw8Y+a6Esp915o8MOROpYI++MQN3Fo55Yu0XuBJ6MqEIw==",
+        "resolved": "13.6.2",
+        "contentHash": "eMnytcYrRtfksutqu5vgnCCcWVnYXFq4O0i5/ABskIV3rzAKR88dr8z0aDuZJPKSyf8hhDL1gBVZPN+rr6qJxw==",
         "dependencies": {
           "AspNetCore.HealthChecks.Uris": "9.0.0",
           "Google.Protobuf": "3.36.1",
@@ -76,7 +76,7 @@
           "Grpc.Tools": "2.83.0",
           "Hex1b": "0.168.0",
           "KubernetesClient": "19.0.2",
-          "MessagePack": "2.5.302",
+          "MessagePack": "2.5.307",
           "Microsoft.Extensions.Configuration.Abstractions": "10.0.12",
           "Microsoft.Extensions.Configuration.Binder": "10.0.12",
           "Microsoft.Extensions.Configuration.EnvironmentVariables": "10.0.12",
