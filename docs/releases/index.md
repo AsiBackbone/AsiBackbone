@@ -6,8 +6,11 @@ Current package/runtime behavior is documented in the product articles and gener
 
 ## Current release
 
-Stable package family: `7.x`. Current release: `7.4.0`.
+Stable package family: `7.x`. Current release: `7.5.0`.
 
+- [7.5.0 Release Notes](../articles/release-notes-750.md)
+- [7.5.0 Release Readiness Record](../articles/release-readiness-750.md)
+- [7.5.0 Consumer Verification Guide](../articles/consumer-verification-750.md)
 - [7.4.0 Release Notes](../articles/release-notes-740.md)
 - [7.4.0 Release Readiness Record](../articles/release-readiness-740.md)
 - [7.4.0 Consumer Verification Guide](../articles/consumer-verification-740.md)

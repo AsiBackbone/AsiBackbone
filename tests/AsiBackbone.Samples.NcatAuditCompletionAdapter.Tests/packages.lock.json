@@ -278,14 +278,14 @@
       "asibackbone.samples.ncatauditcompletionadapter": {
         "type": "Project",
         "dependencies": {
-          "AsiBackbone.Core": "[7.4.0, )"
+          "AsiBackbone.Core": "[7.5.0, )"
         }
       },
       "asibackbone.storage.inmemory": {
         "type": "Project",
         "dependencies": {
-          "AsiBackbone.Core": "[7.4.0, )",
-          "AsiBackbone.DependencyInjection": "[7.4.0, )"
+          "AsiBackbone.Core": "[7.5.0, )",
+          "AsiBackbone.DependencyInjection": "[7.5.0, )"
         }
       },
       "Microsoft.Extensions.DependencyInjection": {

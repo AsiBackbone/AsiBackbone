@@ -28,9 +28,11 @@ The measurable rules for deprecation windows, major-release spacing, advance ann
 
 ## Current `7.x` stabilization posture
 
-`7.x` is the stable package line maintained on `main`. The current stable release is `7.4.0`.
+`7.x` is the stable package line maintained on `main`. The current stable release is `7.5.0`.
 
-The `7.4.0` release preserves the package IDs, `net10.0` target, existing durable contracts, and binary identity `7.0.0.0`. It adds an opt-in signed capability grant path for ASP.NET Core endpoints, together with additive signing, token, request-binding, replay-protection, and audit-correlation surfaces. Existing hosts are unchanged unless they opt in.
+The `7.5.0` release preserves the package IDs, `net10.0` target, existing durable contracts, and canonical wire values. It adds trace-aware Core evaluation context and decision-copy surfaces while restoring request trace correlation for policy-evaluated ASP.NET Core decisions and receipts. Existing custom contexts remain compatible.
+
+Managed assemblies retain binary identity `7.0.0.0` throughout the compatible `7.x` line.
 
 `7.x` is a young major line. Future releases should prioritize compatibility, documentation clarity, patch-level release correction, and carefully scoped additive improvements. Additional breaking changes should be avoided unless strongly justified by consumer safety, correctness, maintainability, or a documented architectural boundary that cannot be preserved compatibly.
 
@@ -56,7 +58,7 @@ The publication state is declared in `eng/documentation-release-claims.json`:
 
 Switching from `prepared` to `released` is an explicit step in the release-preparation pull request, made on the final release-candidate commit before the release tag is created. The switch belongs in that pull request rather than after publication because the tagged commit's README files are packed into the published packages: a tagged commit that still described its own version as prepared would ship that wording to NuGet. The Version Consistency, Stable Release Validation, and package-publishing workflows run the documentation release-claim validator with the release tag, and the validator rejects a stable tag whose commit is still in the `prepared` state. Packages are published only from a tag ref.
 
-Prerelease tags such as `v7.4.0-rc.1` are the exception: they publish prerelease packages only, so the stable version is still unpublished and the tagged commit stays in the `prepared` state.
+Prerelease tags such as `v7.5.0-rc.1` are the exception: they publish prerelease packages only, so the stable version is still unpublished and the tagged commit stays in the `prepared` state.
 
 When the next version begins on `main`, the pull request that advances `Directory.Build.props` switches the state back to `prepared` and sets `latestPublishedVersion` to the release that was just published.
 
