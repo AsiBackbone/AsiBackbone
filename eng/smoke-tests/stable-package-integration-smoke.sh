@@ -164,9 +164,10 @@ using AsiBackbone.Core.Results;
 using AsiBackbone.Core.Signing;
 using AsiBackbone.EntityFrameworkCore;
 using AsiBackbone.EntityFrameworkCore.Audit;
+using AsiBackbone.EntityFrameworkCore.CapabilityGrants;
+using AsiBackbone.Signing.ManagedKey;
 using AsiBackbone.Storage.InMemory.Audit;
 using AsiBackbone.Storage.InMemory.CapabilityGrants;
-using AsiBackbone.Signing.LocalDevelopment;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -263,13 +264,68 @@ public sealed class StablePackageIntegrationSmokeTests
     }
 
     [Fact]
+    public async Task ManagedKeySignedGrantVerifiesAndEfCoreStoreDeniesReplay()
+    {
+        using RSA rsa = RSA.Create(2048);
+        var signingService = new ManagedKeySigningService(
+            ManagedKeySigningOptions.Create("stable-managed-key", "v1"),
+            new StableManagedKeyClient(rsa));
+        ServiceProvider verificationProvider = new ServiceCollection()
+            .AddAsiBackboneKeySignatureVerification(options => options.AddPemKey(
+                "stable-managed-key",
+                "v1",
+                ManagedKeySignatureAlgorithms.RsaPssSha256,
+                rsa.ExportSubjectPublicKeyInfoPem()))
+            .BuildServiceProvider();
+        IGovernanceSignatureVerificationService verifier = verificationProvider
+            .GetRequiredService<IGovernanceSignatureVerificationService>();
+        CapabilityGrant grant = CapabilityGrant.Create(
+            tokenId: $"stable-managed-grant-{Guid.NewGuid():N}",
+            issuer: "stable-managed-issuer",
+            audience: "stable-managed-audience",
+            scopes: ["stable.execute"],
+            issuedUtc: CapabilityGrantNow.AddMinutes(-1),
+            expiresUtc: CapabilityGrantNow.AddMinutes(5));
+        SignedGovernanceArtifact<CapabilityGrant> signed = await GovernanceArtifactSigner.SignCapabilityGrantAsync(
+            grant, signingService, cancellationToken: TestContext.Current.CancellationToken);
+
+        await using var connection = new Microsoft.Data.Sqlite.SqliteConnection("Data Source=:memory:");
+        await connection.OpenAsync(TestContext.Current.CancellationToken);
+        DbContextOptions<StableSmokeDbContext> dbOptions = new DbContextOptionsBuilder<StableSmokeDbContext>()
+            .UseSqlite(connection)
+            .Options;
+        await using var dbContext = new StableSmokeDbContext(dbOptions);
+        _ = await dbContext.Database.EnsureCreatedAsync(TestContext.Current.CancellationToken);
+        var useStore = new EfCoreCapabilityGrantUseStore(
+            dbContext,
+            new EfCoreCapabilityGrantUseStoreOptions { RetentionGracePeriod = TimeSpan.FromSeconds(30) });
+        CapabilityGrantValidationOptions validation = CapabilityGrantValidationOptions.Create(
+            issuer: "stable-managed-issuer",
+            audience: "stable-managed-audience",
+            scopes: ["stable.execute"],
+            validationUtc: CapabilityGrantNow,
+            requireProof: true,
+            requireUseCheck: true,
+            maxUseCount: 1);
+
+        CapabilityGrantValidationResult first = await CapabilityGrantValidator.ValidateAsync(
+            signed, validation, verifier, useStore, TestContext.Current.CancellationToken);
+        CapabilityGrantValidationResult replay = await CapabilityGrantValidator.ValidateAsync(
+            signed, validation, verifier, useStore, TestContext.Current.CancellationToken);
+
+        Assert.True(first.IsValid);
+        Assert.Equal(CapabilityGrantValidationCategory.ReuseLimitExceeded, replay.Category);
+    }
+
+    [Fact]
     public async Task SignedCapabilityGrantRoundTripsThroughPackagedEndpointValidator()
     {
-        // Two providers configured with the same key stand in for an issuing process and a separate relying process.
-        using RSA rsa = RSA.Create(LocalDevelopmentSigningOptions.MinimumKeySizeBits);
-        string keyPem = rsa.ExportPkcs8PrivateKeyPem();
-        using var issuerSigning = new LocalDevelopmentSigningService(CreateConfiguredKeyOptions(keyPem));
-        using var relyingVerification = new LocalDevelopmentSigningService(CreateConfiguredKeyOptions(keyPem));
+        using RSA rsa = RSA.Create(2048);
+        var issuerSigning = new ManagedKeySigningService(
+            ManagedKeySigningOptions.Create("stable-configured-key", "v1"),
+            new StableManagedKeyClient(rsa));
+        await using var replayConnection = new Microsoft.Data.Sqlite.SqliteConnection("Data Source=:memory:");
+        await replayConnection.OpenAsync(TestContext.Current.CancellationToken);
 
         Dictionary<string, StringValues> fields = new(StringComparer.Ordinal)
         {
@@ -305,10 +361,21 @@ public sealed class StablePackageIntegrationSmokeTests
             options.AllowedClockSkew = TimeSpan.FromSeconds(30);
         });
         services.AddAsiBackboneFormFieldCapabilityGrantBinding();
-        services.AddSingleton<IGovernanceSignatureVerificationService>(relyingVerification);
-        services.AddSingleton<ICapabilityGrantUseStore>(new InMemoryCapabilityGrantUseStore());
+        services.AddAsiBackboneKeySignatureVerification(options => options.AddPemKey(
+            "stable-configured-key",
+            "v1",
+            ManagedKeySignatureAlgorithms.RsaPssSha256,
+            rsa.ExportSubjectPublicKeyInfoPem()));
+        services.AddDbContext<StableSmokeDbContext>(options => options.UseSqlite(replayConnection));
+        services.AddAsiBackboneEfCoreCapabilityGrantUseStore<StableSmokeDbContext>(options =>
+            options.RetentionGracePeriod = TimeSpan.FromSeconds(30));
         services.AddSingleton<IDecisionReceiptSink>(sink);
         await using ServiceProvider provider = services.BuildServiceProvider(validateScopes: true);
+        await using (AsyncServiceScope setupScope = provider.CreateAsyncScope())
+        {
+            _ = await setupScope.ServiceProvider.GetRequiredService<StableSmokeDbContext>()
+                .Database.EnsureCreatedAsync(TestContext.Current.CancellationToken);
+        }
 
         var endpoint = new Endpoint(
             static _ => Task.CompletedTask,
@@ -328,13 +395,6 @@ public sealed class StablePackageIntegrationSmokeTests
         Assert.Equal(grant.TokenId, allowedReceipt.CapabilityGrantId);
         Assert.Equal(grant.TokenId, AuditLedgerRecord.FromDecisionReceipt(allowedReceipt).CapabilityTokenId);
         Assert.Null(sink.Records[1].CapabilityGrantId);
-    }
-
-    private static LocalDevelopmentSigningOptions CreateConfiguredKeyOptions(string keyPem)
-    {
-        LocalDevelopmentSigningOptions options = LocalDevelopmentSigningOptions.Create(keyId: "stable-configured-key", keyVersion: "v1");
-        options.RsaKeyPem = keyPem;
-        return options;
     }
 
     private static async Task<EndpointGovernanceResult> EvaluateSignedGrantRequestAsync(
@@ -451,6 +511,26 @@ public sealed class StablePackageIntegrationSmokeTests
             signedUtc: CapabilityGrantNow);
 
         return SignedGovernanceArtifacts.FromSigningMetadata(grant, payload, hash, signingMetadata);
+    }
+}
+
+internal sealed class StableManagedKeyClient(RSA rsa) : IManagedKeySigningClient
+{
+    public ValueTask<ManagedKeySignResult> SignAsync(
+        ManagedKeySignRequest request,
+        CancellationToken cancellationToken = default)
+    {
+        cancellationToken.ThrowIfCancellationRequested();
+        string signature = Convert.ToBase64String(rsa.SignData(
+            request.SignatureInput.Span,
+            HashAlgorithmName.SHA256,
+            RSASignaturePadding.Pss));
+        return ValueTask.FromResult(ManagedKeySignResult.Create(
+            signature,
+            request.SignatureAlgorithm,
+            request.KeyId,
+            request.KeyVersion,
+            DateTimeOffset.UtcNow));
     }
 }
 

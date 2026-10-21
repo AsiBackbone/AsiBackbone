@@ -5,7 +5,7 @@ This article documents the released `AsiBackbone.Signing.ManagedKey` provider pa
 AsiBackbone provides provider-neutral signing, verification, and audit metadata seams. It does not provide immutable storage, external anchoring, blockchain, legal evidence guarantees, compliance certification, production key management, or tamper-evidence by itself.
 
 > [!IMPORTANT]
-> The managed-key package is a stable provider adapter and client boundary. It does not include a live Azure Key Vault, Managed HSM, AWS KMS, GCP Cloud KMS, certificate store, cloud KMS, or HSM implementation by default. Host applications supply the actual managed-key client, credentials, verification path, monitoring, and operational policy.
+> The managed-key package is a stable provider adapter and client boundary. It does not include a live Azure Key Vault, Managed HSM, AWS KMS, GCP Cloud KMS, certificate store, cloud KMS, or HSM implementation by default. Host applications supply the actual managed-key client, credentials, trusted public keys or key resolver, monitoring, and operational policy.
 >
 > Production runtime signing remains provider-neutral. AsiBackbone does not ship or maintain first-party production signing providers or production-style signing sample hosts. See the [Production Managed-Key Integration Guide](production-managed-key-integration.md).
 
@@ -34,7 +34,7 @@ Core remains provider-neutral. Provider packages reference Core, not the reverse
 | Managed-key adapter package | Released stable package. | Provides options, DI registration, signing service, and client abstraction. |
 | `IManagedKeySigningClient` | Host-owned implementation boundary. | The host implementation may call Azure Key Vault, Managed HSM, AWS KMS, GCP Cloud KMS, an HSM appliance, or an organization-owned signing service. |
 | Concrete cloud/HSM/KMS client | Not shipped by default and not planned as a first-party production signing provider. | Host-owned implementation behind the managed-key boundary. |
-| Verification service | Separate host/provider responsibility. | Signed metadata is preserved for later verification, but hosts must provide a matching verification path when trust is required. |
+| Public-key verification service | Released opt-in package surface. | Verifies RSA-PSS SHA-256 or ECDSA P-256 SHA-256 signatures with configured PEM/JWK public keys or a host key resolver. Trust selection, key refresh, and operational policy remain host-owned. |
 | Production tamper-evidence | Not provided by default. | Requires signing, verification, protected key management, durable storage controls, retention, monitoring, and operational procedures. |
 
 ## Key boundary
@@ -69,6 +69,15 @@ The default managed-key signature descriptor is `RSASSA-PSS-SHA256-MANAGED-KEY`.
 This value is provider-neutral metadata. AsiBackbone passes it to the host-owned `IManagedKeySigningClient`, and the host-owned client maps it to the concrete algorithm identifier required by Azure Key Vault, Managed HSM, AWS KMS, GCP Cloud KMS, a cloud KMS, an HSM appliance, or an organization-owned signing service.
 
 Migration note: earlier examples used `RSASSA-PKCS1-v1_5-SHA256-MANAGED-KEY`. Hosts that still require PKCS#1 v1.5 for an existing managed-key backend can override `ManagedKeySigningOptions.SignatureAlgorithm` explicitly, but new integrations should prefer RSA-PSS when the key provider supports it. Verification services must use the same algorithm family recorded in the signing metadata.
+
+## Public-key verification
+
+Use `AddAsiBackboneKeySignatureVerification(...)` to register the package verifier with trusted public-key versions.
+The built-in allow-list accepts `ManagedKeySignatureAlgorithms.RsaPssSha256` and
+`ManagedKeySignatureAlgorithms.EcdsaP256Sha256`. Configuration accepts SPKI PEM or public JWK material and rejects
+private or weak key material. Keep the preceding public-key version available through the longest artifact lifetime plus
+clock skew, or mark a compromised version revoked. For JWKS or an external key catalog, implement
+`IGovernanceVerificationKeyResolver`; the host owns refresh, caching, and trust policy.
 
 ## Dependency injection
 

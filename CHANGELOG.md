@@ -6,6 +6,15 @@ This project follows the spirit of [Keep a Changelog](https://keepachangelog.com
 
 ## [Unreleased]
 
+### Added
+
+* `AsiBackbone.Signing.ManagedKey` now includes opt-in public-key signature verification with trusted key-version
+  rotation, revocation, explicit RSA-PSS SHA-256 and ECDSA P-256 SHA-256 descriptors, PEM and JWK public-key parsing,
+  stable failure codes, and `AddAsiBackboneKeySignatureVerification(...)` registration.
+* `AsiBackbone.EntityFrameworkCore` now includes `EfCoreCapabilityGrantUseStore`, its host-owned model configuration,
+  atomic cross-replica consumption, stopped and cancelled states, expiry-plus-skew retention and purging, and
+  `AddAsiBackboneEfCoreCapabilityGrantUseStore<TDbContext>(...)` registration.
+
 ### Changed
 
 * Updated `Aspire.Hosting.AppHost` from `13.6.1` to `13.6.2` and `FsCheck` from `3.4.0` to `3.5.0`, and refreshed

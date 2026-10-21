@@ -76,9 +76,18 @@ builder.Services.AddAsiBackboneSignedCapabilityGrants(options =>
 // Defines what a grant's ResourceBinding covers for this host.
 builder.Services.AddAsiBackboneFormFieldCapabilityGrantBinding();
 
-// Host-supplied: verification key material and replay storage.
-builder.Services.AddSingleton<IGovernanceSignatureVerificationService>(verificationService);
-builder.Services.AddSingleton<ICapabilityGrantUseStore, SharedCapabilityGrantUseStore>();
+// Production verification with current and previous public-key versions.
+builder.Services.AddAsiBackboneKeySignatureVerification(options =>
+{
+    options.AddPemKey("capability-key", "v2", ManagedKeySignatureAlgorithms.RsaPssSha256, currentPublicPem);
+    options.AddPemKey("capability-key", "v1", ManagedKeySignatureAlgorithms.RsaPssSha256, previousPublicPem);
+});
+
+// Shared, atomic replay storage through the host-owned application database.
+builder.Services.AddAsiBackboneEfCoreCapabilityGrantUseStore<ApplicationDbContext>(options =>
+{
+    options.RetentionGracePeriod = TimeSpan.FromSeconds(30);
+});
 ```
 
 The builder facade offers the same registration through `UseSignedCapabilityGrants(...)` and
@@ -240,6 +249,11 @@ The validator accepts any key the registered `IGovernanceSignatureVerificationSe
 3. keep trusting the old key for at least the longest grant lifetime plus the allowed clock skew; then
 4. retire the old key.
 
+`AsiBackbone.Signing.ManagedKey` implements this model through `PublicKeySignatureVerificationService`. Configured PEM
+or JWK keys are selected by the exact `SigningMetadata.KeyId` and `KeyVersion`; a host can instead implement
+`IGovernanceVerificationKeyResolver` for a cached key service or JWKS adapter. Mark a configured version revoked to
+return `signature.key-revoked` immediately. Private material and undersized keys are rejected at configuration time.
+
 Do not pin `ExpectedProofKeyVersion` across a rotation, because grants signed under the previous version would be denied
 as `proof_invalid` until they expire. Pin a key identifier only when every issuer uses it. See
 [Key Rotation and Retired-Key Verification](key-rotation-and-retired-key-verification.md) for the provider-side guidance.
@@ -247,10 +261,12 @@ as `proof_invalid` until they expire. Pin a key identifier only when every issue
 ## Multi-replica replay storage
 
 Replay protection is only as wide as the `ICapabilityGrantUseStore`. `InMemoryCapabilityGrantUseStore` is process-local:
-behind a load balancer, a single-use grant can be accepted once by each replica. Hosts with more than one replica need a
-shared store whose consume operation is atomic across replicas, for example a database row with a unique key on the
-token identifier and an update guarded by the use count. The store must also retain a consumed grant at least until the
-grant expires plus the allowed clock skew, following the retention rule in
+behind a load balancer, a single-use grant can be accepted once by each replica. Migrate scaled hosts to
+`EfCoreCapabilityGrantUseStore`, register it against a host-owned `DbContext`, call
+`ApplyAsiBackboneConfigurations()`, and generate a host-owned migration. Its unique issuer/token key and conditional
+increment make consumption atomic across cooperating replicas. Set `RetentionGracePeriod` to at least the largest
+validator clock skew and schedule `PurgeExpiredAsync(...)`; the store retains records until expiry plus that period.
+The retention rule is described in
 [Capability Grant Hardening](capability-grant-hardening.md#retention-horizon-and-clock-skew). A store that cannot
 answer returns `Unavailable`, which the validator denies.
 

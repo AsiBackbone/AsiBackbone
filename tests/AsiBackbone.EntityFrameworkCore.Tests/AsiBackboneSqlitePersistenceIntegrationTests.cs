@@ -30,6 +30,7 @@ public sealed class AsiBackboneSqlitePersistenceIntegrationTests
         Assert.NotNull(context.Model.FindEntityType(typeof(AcknowledgmentRequestMetadataEntity)));
         Assert.NotNull(context.Model.FindEntityType(typeof(AcknowledgmentResponseEntity)));
         Assert.NotNull(context.Model.FindEntityType(typeof(AcknowledgmentResponseMetadataEntity)));
+        Assert.NotNull(context.Model.FindEntityType(typeof(CapabilityGrantUseEntity)));
         Assert.Empty(context.Database.GetMigrations());
 
         string[] tableNames = await context.Database
@@ -43,6 +44,7 @@ public sealed class AsiBackboneSqlitePersistenceIntegrationTests
         Assert.Contains("AsiBackboneHandshakeRequestMetadata", tableNames);
         Assert.Contains("AsiBackboneHandshakeAcknowledgments", tableNames);
         Assert.Contains("AsiBackboneHandshakeAcknowledgmentMetadata", tableNames);
+        Assert.Contains("AsiBackboneCapabilityGrantUses", tableNames);
     }
 
     /// <summary>

@@ -10,7 +10,7 @@ This package keeps `AsiBackbone.Core` provider-neutral while allowing host appli
 > **New to AsiBackbone?** Start with the concept, not this package: [Intent to Execution: An Accountability Pattern](https://asibackbone.github.io/AsiBackbone/articles/intent-to-execution-pattern.html) and the [documentation site](https://asibackbone.github.io/AsiBackbone/). This README covers one package in the family.
 
 > **Important:**
-> This package does not include a live Azure Key Vault, AWS KMS, GCP Cloud KMS, HSM, certificate store, or blockchain implementation by default. Host applications provide the concrete client, credentials, verification path, monitoring, and operational policy; private keys, tokens, secrets, and raw key material must not be returned to AsiBackbone.
+> This package does not include a live Azure Key Vault, AWS KMS, GCP Cloud KMS, HSM, certificate store, or blockchain implementation by default. Host applications provide the concrete signing client, credentials, trusted public keys, monitoring, and operational policy; private keys, tokens, secrets, and raw private-key material must not be returned to AsiBackbone.
 >
 > For production guidance, see the [Production Managed-Key Integration Guide](https://asibackbone.github.io/AsiBackbone/articles/production-managed-key-integration.html). AsiBackbone remains provider-neutral and does not ship first-party production signing providers or production-style signing sample hosts.
 
@@ -67,7 +67,38 @@ services.AddAsiBackboneManagedKeySigningForLocalValidation(
     serviceProvider => new HostOwnedManagedKeySigningClient());
 ```
 
-The registration wires `ManagedKeySigningService` as `IGovernanceSigningService`. Verification remains a separate provider or host responsibility.
+The registration wires `ManagedKeySigningService` as `IGovernanceSigningService`.
+
+## Public-key verification
+
+`AddAsiBackboneKeySignatureVerification(...)` registers `PublicKeySignatureVerificationService` as
+`IGovernanceSignatureVerificationService`. The verifier selects an exact key ID and version, permits current and
+previous versions during rotation, rejects revoked versions, and verifies the version 1 signature input in process with
+public material only. The stable descriptors are `RSASSA-PSS-SHA256-MANAGED-KEY` and
+`ECDSA-P256-SHA256-MANAGED-KEY`.
+
+```csharp
+services.AddAsiBackboneKeySignatureVerification(options =>
+{
+    options.AddPemKey(
+        "capability-signing-key",
+        "2026-10",
+        ManagedKeySignatureAlgorithms.RsaPssSha256,
+        configuration["CapabilitySigning:PublicKeyPem"]!);
+
+    // Keep the preceding public-key version until every grant it signed has expired plus clock skew.
+    options.AddJwkKey(
+        "capability-signing-key",
+        "2026-09",
+        ManagedKeySignatureAlgorithms.RsaPssSha256,
+        configuration["CapabilitySigning:PreviousPublicJwk"]!);
+});
+```
+
+PEM input must contain SubjectPublicKeyInfo public material. JWK input supports RSA public `n`/`e` and EC P-256
+public `x`/`y` parameters. Private members are rejected, RSA keys default to a 2,048-bit minimum, and algorithms must
+be present in `AllowedAlgorithms`. For JWKS or a key service, implement `IGovernanceVerificationKeyResolver` and use
+the generic registration; the host owns refresh and caching.
 
 ## Failure behavior
 
