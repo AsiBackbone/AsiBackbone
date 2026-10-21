@@ -2,6 +2,7 @@ using AsiBackbone.Core.Audit;
 using AsiBackbone.Core.Outbox;
 using AsiBackbone.DependencyInjection;
 using AsiBackbone.EntityFrameworkCore.Audit;
+using AsiBackbone.EntityFrameworkCore.CapabilityGrants;
 using AsiBackbone.EntityFrameworkCore.Outbox;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
@@ -18,6 +19,17 @@ namespace AsiBackbone.EntityFrameworkCore;
 /// </remarks>
 public static class AsiBackboneEntityFrameworkCoreBuilderExtensions
 {
+    /// <summary>Adds durable EF Core capability-grant replay protection through the builder facade.</summary>
+    public static IAsiBackboneBuilder UseEfCoreCapabilityGrantUseStore<TDbContext>(
+        this IAsiBackboneBuilder builder,
+        Action<EfCoreCapabilityGrantUseStoreOptions>? configure = null)
+        where TDbContext : DbContext
+    {
+        ArgumentNullException.ThrowIfNull(builder);
+        _ = builder.Services.AddAsiBackboneEfCoreCapabilityGrantUseStore<TDbContext>(configure);
+        return builder;
+    }
+
     /// <summary>
     /// Adds EF Core audit ledger storage through the AsiBackbone builder facade.
     /// </summary>

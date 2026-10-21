@@ -5,7 +5,7 @@
 
 Entity Framework Core model configuration and host-owned persistence helpers for AsiBackbone records.
 
-This package contributes provider-neutral EF Core model configuration, persistence entities, EF Core-backed audit ledger storage, EF Core-backed decision receipt lifecycle storage, and EF Core-backed durable outbox storage while preserving host ownership of the application database.
+This package contributes provider-neutral EF Core model configuration, persistence entities, EF Core-backed audit ledger storage, EF Core-backed decision receipt lifecycle storage, durable outbox storage, and shared capability-grant replay protection while preserving host ownership of the application database.
 
 > **New to AsiBackbone?** Start with the concept, not this package: [Intent to Execution: An Accountability Pattern](https://asibackbone.github.io/AsiBackbone/articles/intent-to-execution-pattern.html) and the [documentation site](https://asibackbone.github.io/AsiBackbone/). This README covers one package in the family.
 
@@ -19,6 +19,7 @@ This package contributes provider-neutral EF Core model configuration, persisten
 - `EfCoreAuditLedgerStore`, an append-oriented audit ledger implementation that uses a host-owned `DbContext`.
 - `EfCoreDecisionReceiptLifecycleStore`, an append-oriented lifecycle event implementation for durable progress records.
 - `EfCoreGovernanceOutboxStore`, a durable local outbox implementation for provider-neutral governance emission envelopes.
+- `EfCoreCapabilityGrantUseStore`, an atomic issuer-and-token scoped use store for multi-replica signed grants.
 - Provider-neutral configuration where practical.
 
 ## Minimal host-owned DbContext setup
@@ -67,6 +68,24 @@ dotnet ef database update \
 ```
 
 The project paths are examples only. The host application decides the provider, migration assembly, schema names, deployment workflow, retention policy, backup strategy, and environment-specific configuration.
+
+## Capability-grant replay protection
+
+Register the store against the same host-owned context whose model calls `ApplyAsiBackboneConfigurations()`:
+
+```csharp
+builder.Services.AddAsiBackboneEfCoreCapabilityGrantUseStore<ApplicationDbContext>(options =>
+{
+    options.RetentionGracePeriod = TimeSpan.FromSeconds(30);
+});
+```
+
+`TryConsumeAsync(...)` uses a conditional set-based increment and a unique issuer/token index, so cooperating replicas
+accept a single-use grant exactly once. Records remain until grant expiry plus `RetentionGracePeriod`; set that period
+to at least the largest validator clock skew. Schedule `PurgeExpiredAsync(...)` after that horizon. Database failures
+return `Unavailable`, while cancellation still propagates. `SetStoppedAsync(...)` and `SetCancelledAsync(...)` persist
+administrative denial state. Existing hosts must generate and review a host-owned migration for
+`AsiBackboneCapabilityGrantUses`; the package never applies migrations itself.
 
 ## Audit ledger signing metadata persistence
 
