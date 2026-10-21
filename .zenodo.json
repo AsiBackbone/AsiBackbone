@@ -1,9 +1,9 @@
 {
   "title": "ASI Backbone",
-  "version": "7.2.1",
-  "publication_date": "2026-10-18",
+  "version": "7.3.0",
+  "publication_date": "2026-10-20",
   "upload_type": "software",
-  "description": "AsiBackbone 7.2.1 is a backward-compatible patch release of the Accountable Systems Infrastructure package family for .NET. It restores capability-grant validation for every endpoint-governance decision that is not already denied and keeps fail-open validator handling in the remaining audit and challenge pipeline. Public APIs, package dependencies, durable schemas, canonical wire values, package IDs, the net10.0 target, and AssemblyVersion 7.0.0.0 remain unchanged.",
+  "description": "AsiBackbone 7.3.0 is a backward-compatible minor release of the Accountable Systems Infrastructure package family for .NET. It adds opt-in, request-bound signed capability grants for ASP.NET Core endpoints, including token encoding, signing helpers, replay-aware validation, audit correlation, and configured development keys. Existing hosts are unchanged unless they opt in; package IDs, the net10.0 target, and AssemblyVersion 7.0.0.0 remain unchanged.",
   "creators": [
     {
       "name": "Cavell, Christopher D.",
