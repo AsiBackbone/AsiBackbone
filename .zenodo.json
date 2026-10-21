@@ -1,9 +1,9 @@
 {
   "title": "ASI Backbone",
-  "version": "7.4.0",
+  "version": "7.5.0",
   "publication_date": "2026-10-21",
   "upload_type": "software",
-  "description": "AsiBackbone 7.4.0 is a backward-compatible minor release of the Accountable Systems Infrastructure package family for .NET. It adds production-oriented public-key signature verification in Signing.ManagedKey and durable, atomic EF Core capability-grant replay storage for multi-replica hosts. Existing hosts are unchanged unless they opt in; package IDs, the net10.0 target, and AssemblyVersion 7.0.0.0 remain unchanged.",
+  "description": "AsiBackbone 7.5.0 is a backward-compatible minor release of the Accountable Systems Infrastructure package family for .NET. It preserves request trace identifiers across policy and capability evaluation so governed endpoint decisions, receipts, logs, and spans remain joinable. Package IDs, the net10.0 target, canonical wire values, and AssemblyVersion 7.0.0.0 remain unchanged.",
   "creators": [
     {
       "name": "Cavell, Christopher D.",

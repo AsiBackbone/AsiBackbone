@@ -6,11 +6,33 @@ This project follows the spirit of [Keep a Changelog](https://keepachangelog.com
 
 ## [Unreleased]
 
+## [7.5.0] - 2026-10-21
+
+`7.5.0` is a backward-compatible minor release for the stable `7.x` package family. It restores end-to-end request
+trace correlation for policy-evaluated ASP.NET Core endpoints and adds additive Core APIs for trace-aware evaluation
+contexts and immutable decision copying. Package IDs, target framework, canonical wire values, and binary assembly
+identity remain unchanged.
+
+### Added
+
+* `GovernanceEvaluationContext.TraceId` and a trace-aware constructor overload carry host trace correlation into Core
+  policy evaluation. `IGovernanceEvaluationContext.TraceId` has a default `null` implementation so existing custom
+  context implementations remain compatible.
+* `GovernanceDecision.WithTraceId(...)` creates a decision copy with a normalized trace identifier while preserving
+  outcome, reasons, correlation identifier, policy version, and policy hash.
+
 ### Fixed
 
 * Policy-evaluated ASP.NET Core endpoint decisions now carry the request trace identifier into decision receipts,
   including decisions returned by custom policy and capability evaluators that omit it. Evaluator-supplied trace
   identifiers remain authoritative. ([#897](https://github.com/AsiBackbone/AsiBackbone/issues/897))
+
+### Compatibility
+
+* The existing four-argument `GovernanceEvaluationContext` constructor remains available, and existing custom
+  `IGovernanceEvaluationContext` implementations compile unchanged.
+* The default evaluator now stamps every decision it creates with the context trace identifier. The ASP.NET Core
+  endpoint service backfills only a missing trace identifier, so a value supplied by a host evaluator is preserved.
 
 ## [7.4.0] - 2026-10-21
 

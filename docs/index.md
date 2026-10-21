@@ -86,12 +86,14 @@ The DocFX header search is available for package names, API concepts, and articl
 
 ## Current stable package family
 
-Stable `7.x` package family. The current release is `7.4.0`.
+Stable `7.x` package family. The current release is `7.5.0`.
 
-`7.4.0` adds opt-in public-key signature verification in Signing.ManagedKey and
-durable, atomic EF Core capability-grant replay storage for multi-replica hosts
-without changing existing host behavior, package IDs, the `net10.0` target, or
-binary assembly identity `7.0.0.0`.
+`7.5.0` carries request trace identifiers through endpoint policy and capability
+evaluation so decisions and receipts remain correlated with request logs and
+spans. Existing custom contexts remain compatible, and package IDs, the
+`net10.0` target, and canonical wire values are unchanged.
+
+Managed assemblies retain binary identity `7.0.0.0` throughout the compatible `7.x` line.
 
 ```text
 AsiBackbone.Core
@@ -163,8 +165,10 @@ Package-specific READMEs and release notes define which surfaces are stable, opt
 
 ### Releases and compatibility
 
-* [7.4.0 Release Notes](articles/release-notes-730.md)
-* [7.4.0 Consumer Verification Guide](articles/consumer-verification-730.md)
+* [7.5.0 Release Notes](articles/release-notes-750.md)
+* [7.5.0 Consumer Verification Guide](articles/consumer-verification-750.md)
+* [7.4.0 Release Notes](articles/release-notes-740.md)
+* [7.4.0 Consumer Verification Guide](articles/consumer-verification-740.md)
 * [7.3.0 Release Notes](articles/release-notes-730.md)
 * [7.3.0 Consumer Verification Guide](articles/consumer-verification-730.md)
 * [7.2.1 Release Notes](articles/release-notes-721.md)

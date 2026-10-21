@@ -2,9 +2,9 @@
 
 # AsiBackbone
 
-> `7.4.0` is the current stable release on `main`.
+> `7.5.0` is the current stable release on `main`.
 >
-> `7.4.0` adds production-oriented public-key signature verification and durable EF Core capability-grant replay storage for multi-replica hosts. See the [7.4.0 release notes](docs/articles/release-notes-740.md); consumers moving from `6.x` must still follow the [6.x to 7.0 upgrade guide](docs/articles/upgrade-600-to-700.md).
+> `7.5.0` preserves request trace identifiers across endpoint policy and capability evaluation so decisions, receipts, logs, and spans remain joinable. See the [7.5.0 release notes](docs/articles/release-notes-750.md); consumers moving from `6.x` must still follow the [6.x to 7.0 upgrade guide](docs/articles/upgrade-600-to-700.md).
 
 [![CI](https://github.com/AsiBackbone/AsiBackbone/actions/workflows/ci.yml/badge.svg)](https://github.com/AsiBackbone/AsiBackbone/actions/workflows/ci.yml)
 [![Line Coverage Gate](https://img.shields.io/badge/line%20coverage%20gate-75%25-brightgreen)](https://asibackbone.github.io/AsiBackbone/coverage/index.html)
@@ -24,7 +24,7 @@
 
 > AI may provide the intellect. AsiBackbone provides the accountable spine.
 
-AsiBackbone is the implementation package family for Accountable Systems Infrastructure (stable `7.4.x`).
+AsiBackbone is the implementation package family for Accountable Systems Infrastructure (stable `7.5.x`).
 
 ## Documentation ownership
 
@@ -144,19 +144,16 @@ For production-style hosts, add durable audit/outbox persistence, signing or ver
 
 ## Package family
 
-Stable `7.x` package family. The current release is `7.4.0`.
+Stable `7.x` package family. The current release is `7.5.0`.
 
-`7.4.0` adds opt-in public-key signature verification for managed-key integrations
-and durable EF Core-backed capability-grant replay protection, building on the
-request-bound signed capability grant support introduced in `7.3.0`. Existing
-hosts are unchanged unless they opt in. The `7.2` minor release aligned public
-parameter names with decision-receipt terminology and refreshed supported
-dependencies. The `7.1` minor release added analyzer rule `ASIB004` for signing
-requests that omit `SignatureInput` and begins the `ASIB902` and `ASIB903`
-deprecation windows for legacy signature-input creation and the outbox
-`RetryClock` override. Historical signature verification remains supported
-through its explicit opt-in. Package IDs, the `net10.0` target, and binary
-assembly identity `7.0.0.0` are unchanged.
+`7.5.0` carries request trace identifiers through policy and capability
+evaluation so governed endpoint decisions and receipts remain correlated with
+request logs and spans. It adds compatible Core context and decision-copy APIs,
+while preserving existing custom context implementations. The `7.4` minor
+release added production public-key signature verification and durable EF Core
+capability-grant replay protection, building on the signed capability grants
+introduced in `7.3`. Package IDs, the `net10.0` target, canonical wire values,
+and binary assembly identity `7.0.0.0` are unchanged.
 
 Consumers upgrading from `6.x` must follow the [6.x to 7.0 upgrade guide](https://github.com/AsiBackbone/AsiBackbone/blob/main/docs/articles/upgrade-600-to-700.md). Hosts must preserve actor identity across both acknowledgment-challenge legs and remap persisted numeric DLP enum values.
 
@@ -232,13 +229,13 @@ The full, categorized documentation set lives at the [documentation site](https:
 
 ## Current status
 
-The current stable release is `7.4.0`. It adds opt-in public-key signature verification for managed-key integrations and durable EF Core-backed capability-grant replay protection, building on the request-bound signed capability grant support introduced in `7.3.0`. Existing hosts are unchanged unless they opt in. The `7.2` minor release aligned public parameter names with decision-receipt terminology and refreshed supported dependencies. The `7.1` minor release added analyzer rule `ASIB004` for signing requests that omit `SignatureInput` and begins the `ASIB902` and `ASIB903` deprecation windows for legacy signature-input creation and the outbox `RetryClock` override. Historical signature verification remains supported through its explicit opt-in. Package IDs, the `net10.0` target, and binary assembly identity `7.0.0.0` are unchanged.
+The current stable release is `7.5.0`. It preserves request trace identifiers across endpoint policy and capability evaluation so decisions and persisted receipts remain joinable to request logs and spans. The release adds compatible Core context and immutable decision-copy APIs while preserving existing custom context implementations, package IDs, the `net10.0` target, and canonical wire values.
 
 Managed assemblies retain binary identity `7.0.0.0` throughout the compatible `7.x` line.
 
 The stable API contract is documented in [API Compatibility and SemVer](https://github.com/AsiBackbone/AsiBackbone/blob/main/docs/articles/api-compatibility-and-semver.md).
-The release is described in [7.4.0 Release Notes](https://github.com/AsiBackbone/AsiBackbone/blob/main/docs/articles/release-notes-740.md); the preceding endpoint-governance correction is described in [7.2.1 Release Notes](https://github.com/AsiBackbone/AsiBackbone/blob/main/docs/articles/release-notes-721.md).
-Consumer verification evidence is recorded in the [7.4.0 Consumer Verification Guide](https://github.com/AsiBackbone/AsiBackbone/blob/main/docs/articles/consumer-verification-740.md).
+The release is described in [7.5.0 Release Notes](https://github.com/AsiBackbone/AsiBackbone/blob/main/docs/articles/release-notes-750.md); the preceding production verification and replay-storage additions are described in [7.4.0 Release Notes](https://github.com/AsiBackbone/AsiBackbone/blob/main/docs/articles/release-notes-740.md).
+Consumer verification evidence is recorded in the [7.5.0 Consumer Verification Guide](https://github.com/AsiBackbone/AsiBackbone/blob/main/docs/articles/consumer-verification-750.md).
 Consumers moving from the previous stable line must follow the [6.x to 7.0 upgrade guide](https://github.com/AsiBackbone/AsiBackbone/blob/main/docs/articles/upgrade-600-to-700.md).
 Earlier release records remain available for historical traceability.
 
@@ -266,7 +263,7 @@ A consumer should be able to use AsiBackbone in an application generated from Ne
 
 AsiBackbone is a governance framework, not an intelligence engine. It implements software primitives for accountable decision flow and keeps execution authority with the host application. See [Project Boundaries and Non-Claims](https://asibackbone.github.io/AsiBackbone/articles/project-boundaries.html) for the full scope statement and safe wording guidance.
 
-> **Current NuGet packages are intentionally published without package signing.** The dated [NuGet Package Signing Decision Record](https://asibackbone.github.io/AsiBackbone/articles/nuget-package-signing-decision.html) records the accepted risk, compensating controls, mandatory review date, and early re-evaluation criteria. The project publishes durable release-attached SBOMs, package/SBOM provenance, Source Link metadata, and package hashes as distinct trust signals; none is presented as a signed-package guarantee. For verification guidance, see the [7.4.0 Consumer Verification Guide](https://asibackbone.github.io/AsiBackbone/articles/consumer-verification-740.html) and [**7.4.0 Release Notes**](https://asibackbone.github.io/AsiBackbone/articles/release-notes-740.html).
+> **Current NuGet packages are intentionally published without package signing.** The dated [NuGet Package Signing Decision Record](https://asibackbone.github.io/AsiBackbone/articles/nuget-package-signing-decision.html) records the accepted risk, compensating controls, mandatory review date, and early re-evaluation criteria. The project publishes durable release-attached SBOMs, package/SBOM provenance, Source Link metadata, and package hashes as distinct trust signals; none is presented as a signed-package guarantee. For verification guidance, see the [7.5.0 Consumer Verification Guide](https://asibackbone.github.io/AsiBackbone/articles/consumer-verification-750.html) and [**7.5.0 Release Notes**](https://asibackbone.github.io/AsiBackbone/articles/release-notes-750.html).
 
 ## Design principles
 
