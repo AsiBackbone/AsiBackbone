@@ -4,7 +4,12 @@ All notable changes to this project are documented in this file.
 
 This project follows the spirit of [Keep a Changelog](https://keepachangelog.com/) and adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [7.3.0] - 2026-10-20
+
+`7.3.0` is a backward-compatible minor release for the stable `7.x` package family. It adds opt-in, request-bound
+signed capability grants for ASP.NET Core endpoints, with signing, transport, replay protection, request binding, and
+audit-correlation support. Existing hosts are unchanged unless they opt in, and binary assembly identity remains
+`7.0.0.0`.
 
 ### Added
 

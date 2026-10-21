@@ -86,11 +86,11 @@ The DocFX header search is available for package names, API concepts, and articl
 
 ## Current stable package family
 
-Stable `7.x` package family. The current release is `7.2.1`.
+Stable `7.x` package family. The current release is `7.3.0`.
 
-`7.2.1` corrects endpoint-governance capability enforcement without changing
-public APIs, package dependencies, durable schemas, canonical wire values,
-package IDs, the `net10.0` target, or binary assembly identity `7.0.0.0`.
+`7.3.0` adds opt-in, request-bound signed capability grants for ASP.NET Core
+endpoints without changing existing host behavior, package IDs, the `net10.0`
+target, or binary assembly identity `7.0.0.0`.
 
 ```text
 AsiBackbone.Core
@@ -162,6 +162,8 @@ Package-specific READMEs and release notes define which surfaces are stable, opt
 
 ### Releases and compatibility
 
+* [7.3.0 Release Notes](articles/release-notes-730.md)
+* [7.3.0 Consumer Verification Guide](articles/consumer-verification-730.md)
 * [7.2.1 Release Notes](articles/release-notes-721.md)
 * [7.2.1 Consumer Verification Guide](articles/consumer-verification-721.md)
 * [7.2.0 Release Notes](articles/release-notes-720.md)

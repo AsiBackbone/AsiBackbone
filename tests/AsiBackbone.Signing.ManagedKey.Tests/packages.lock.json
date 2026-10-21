@@ -273,8 +273,8 @@
       "asibackbone.signing.managedkey": {
         "type": "Project",
         "dependencies": {
-          "AsiBackbone.Core": "[7.2.1, )",
-          "AsiBackbone.DependencyInjection": "[7.2.1, )",
+          "AsiBackbone.Core": "[7.3.0, )",
+          "AsiBackbone.DependencyInjection": "[7.3.0, )",
           "Microsoft.Extensions.DependencyInjection": "[10.0.13, )"
         }
       },
