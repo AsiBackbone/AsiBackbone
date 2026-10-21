@@ -67,21 +67,21 @@ The `2.0.0` release established the simplified `AsiBackbone.*` package and names
 
 ### Current `7.x` stable family
 
-`7.3.0` is the current stable release on `main`. The `7.x` line preserves the `AsiBackbone.*` package IDs, the `net10.0` target, and binary assembly identity `7.0.0.0`. Version 7.3 adds opt-in, request-bound signed capability grants for ASP.NET Core endpoints and additive Core signing, token, replay-protection, and audit-correlation surfaces. Existing hosts are unchanged unless they opt in. See [7.3.0 Release Notes](release-notes-730.md), [7.2.1 Release Notes](release-notes-721.md), and [Upgrade from 6.x to 7.0](upgrade-600-to-700.md).
+`7.4.0` is the current stable release on `main`. The `7.x` line preserves the `AsiBackbone.*` package IDs, the `net10.0` target, and binary assembly identity `7.0.0.0`. Version 7.4 adds opt-in public-key signature verification in `AsiBackbone.Signing.ManagedKey` and durable, atomic EF Core capability-grant replay storage for multi-replica hosts. Existing hosts are unchanged unless they opt in. See [7.4.0 Release Notes](release-notes-740.md), [7.3.0 Release Notes](release-notes-730.md), and [Upgrade from 6.x to 7.0](upgrade-600-to-700.md).
 
 | Package | `7.x` stable role |
 | --- | --- |
 | `AsiBackbone.Core` | Framework-neutral governance primitives and durable artifact contracts for the current `7.x` line, including policy evaluation, governance decisions, threat-model contributor hooks, metadata budget validation helpers, constraint-exception denial behavior, governed execution-to-mutation accountability receipts, capability-proof trust pinning, explicit capability-grant validation profiles, and canonical capability-grant payload construction. |
 | `AsiBackbone.DependencyInjection` | Explicit builder facade and host-selected provider registration composition path. |
 | `AsiBackbone.Storage.InMemory` | Non-durable storage helpers for tests, samples, local validation, lifecycle events, and outbox proof paths. |
-| `AsiBackbone.EntityFrameworkCore` | EF Core host-owned persistence helpers for audit, acknowledgment, lifecycle, JSON metadata storage guidance, and outbox records. |
+| `AsiBackbone.EntityFrameworkCore` | EF Core host-owned persistence helpers for audit, acknowledgment, lifecycle, JSON metadata storage guidance, outbox records, and durable capability-grant replay protection. |
 | `AsiBackbone.AspNetCore` | ASP.NET Core host adapters, endpoint governance, endpoint-governance metadata mode, strict-governance profile helpers, development diagnostics, endpoint fast-abort metadata, conservative actor-type claim trust controls, startup/configured-options validation, and hosted outbox drain integration. |
 | `AsiBackbone.Testing` | Test-only harness helpers for deterministic governance and package-wiring tests. |
 | `AsiBackbone.Templates` | Developer-experience `dotnet new` templates for governed ASP.NET Core host scaffolding. |
 | `AsiBackbone.Analyzers` | Build-time analyzer safety rails, including production-signing configuration guidance. |
 | `AsiBackbone.OpenTelemetry` | Released OpenTelemetry governance emission provider. |
 | `AsiBackbone.Signing.LocalDevelopment` | Local-development signing and verification for tests, samples, and wiring proof paths only. |
-| `AsiBackbone.Signing.ManagedKey` | Managed-key signing adapter boundary where the host supplies the actual managed-key client and operational controls. Production-oriented registration fails closed by default when signing cannot complete. |
+| `AsiBackbone.Signing.ManagedKey` | Managed-key signing adapter boundary plus opt-in public-key verification; the host supplies the actual managed-key client, trusted keys or resolver, and operational controls. Production-oriented signing registration fails closed by default when signing cannot complete. |
 
 Stable package status does not imply that every future provider idea is stable. Event Hubs, Purview, Azure-specific SDK adapters, Aspire runtime packages, robotics, immutable storage, and additional provider packages remain outside the stable contract unless separately reviewed and released as stable packages.
 
@@ -196,6 +196,7 @@ Expected stable-line behavior:
 | `7.2.0` | `7.2.0` | `7.0.0.0` | `7.2.0.0` | `7.2.0+...` |
 | `7.2.1` | `7.2.1` | `7.0.0.0` | `7.2.1.0` | `7.2.1+...` |
 | `7.3.0` | `7.3.0` | `7.0.0.0` | `7.3.0.0` | `7.3.0+...` |
+| `7.4.0` | `7.4.0` | `7.0.0.0` | `7.4.0.0` | `7.4.0+...` |
 
 Before cutting stable releases, release validation should verify that `AssemblyVersion`, `FileVersion`, `InformationalVersion`, package metadata, release notes, and repository tags match this policy.
 
