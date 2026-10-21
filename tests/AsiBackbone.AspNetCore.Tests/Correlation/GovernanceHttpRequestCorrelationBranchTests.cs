@@ -88,4 +88,19 @@ public sealed class GovernanceHttpRequestCorrelationBranchTests
         Assert.Equal("tenant-1", supplied.Metadata["tenant"]);
         Assert.False(supplied.Metadata.ContainsKey("route"));
     }
+
+    /// <summary>
+    /// Verifies the resolved request trace identifier is carried into the framework-neutral evaluation context.
+    /// </summary>
+    [Fact]
+    public void ToEvaluationContextCarriesTraceIdentifier()
+    {
+        var correlation = new GovernanceHttpRequestCorrelation(
+            correlationId: "correlation-1",
+            traceId: " trace-1 ");
+
+        GovernanceEvaluationContext context = correlation.ToEvaluationContext();
+
+        Assert.Equal("trace-1", context.TraceId);
+    }
 }

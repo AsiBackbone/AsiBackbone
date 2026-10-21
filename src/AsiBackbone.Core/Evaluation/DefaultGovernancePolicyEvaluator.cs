@@ -245,6 +245,7 @@ public sealed class DefaultGovernancePolicyEvaluator<TContext> : IGovernancePoli
                 ? GovernanceDecision.Deny(
                     warnings.ConcatAsArray(denials),
                     correlationId: context.CorrelationId,
+                    traceId: context.TraceId,
                     policyVersion: context.PolicyVersion,
                     policyHash: context.PolicyHash)
                 : CreateDeniedDecision(context, denials)
@@ -252,6 +253,7 @@ public sealed class DefaultGovernancePolicyEvaluator<TContext> : IGovernancePoli
             ? CreateWarningDecision(context, warnings)
             : GovernanceDecision.Allow(
             correlationId: context.CorrelationId,
+            traceId: context.TraceId,
             policyVersion: context.PolicyVersion,
             policyHash: context.PolicyHash);
     }
@@ -264,10 +266,12 @@ public sealed class DefaultGovernancePolicyEvaluator<TContext> : IGovernancePoli
             ? GovernanceDecision.Warning(
                 threatWarningReasons,
                 correlationId: context.CorrelationId,
+                traceId: context.TraceId,
                 policyVersion: context.PolicyVersion,
                 policyHash: context.PolicyHash)
             : GovernanceDecision.Allow(
             correlationId: context.CorrelationId,
+            traceId: context.TraceId,
             policyVersion: context.PolicyVersion,
             policyHash: context.PolicyHash);
     }
@@ -283,6 +287,7 @@ public sealed class DefaultGovernancePolicyEvaluator<TContext> : IGovernancePoli
             options.NoConstraintsReasonCode,
             options.NoConstraintsReasonMessage,
             correlationId: context.CorrelationId,
+            traceId: context.TraceId,
             policyVersion: context.PolicyVersion,
             policyHash: context.PolicyHash);
     }
@@ -295,11 +300,13 @@ public sealed class DefaultGovernancePolicyEvaluator<TContext> : IGovernancePoli
             ? GovernanceDecision.Deny(
                 denials.FirstReason!,
                 correlationId: context.CorrelationId,
+                traceId: context.TraceId,
                 policyVersion: context.PolicyVersion,
                 policyHash: context.PolicyHash)
             : GovernanceDecision.Deny(
                 denials.AsReadOnlyList(),
                 correlationId: context.CorrelationId,
+                traceId: context.TraceId,
                 policyVersion: context.PolicyVersion,
                 policyHash: context.PolicyHash);
     }
@@ -312,11 +319,13 @@ public sealed class DefaultGovernancePolicyEvaluator<TContext> : IGovernancePoli
             ? GovernanceDecision.Warning(
                 warnings.FirstReason!,
                 correlationId: context.CorrelationId,
+                traceId: context.TraceId,
                 policyVersion: context.PolicyVersion,
                 policyHash: context.PolicyHash)
             : GovernanceDecision.Warning(
                 warnings.AsReadOnlyList(),
                 correlationId: context.CorrelationId,
+                traceId: context.TraceId,
                 policyVersion: context.PolicyVersion,
                 policyHash: context.PolicyHash);
     }
@@ -338,6 +347,7 @@ public sealed class DefaultGovernancePolicyEvaluator<TContext> : IGovernancePoli
             ? GovernanceDecision.Warning(
                 threatWarningReasons,
                 correlationId: context.CorrelationId,
+                traceId: context.TraceId,
                 policyVersion: context.PolicyVersion,
                 policyHash: context.PolicyHash)
             : null;
@@ -439,6 +449,7 @@ public sealed class DefaultGovernancePolicyEvaluator<TContext> : IGovernancePoli
         var decision = GovernanceDecision.Deny(
             reason,
             correlationId: context.CorrelationId,
+            traceId: context.TraceId,
             policyVersion: context.PolicyVersion,
             policyHash: context.PolicyHash);
 
@@ -457,6 +468,7 @@ public sealed class DefaultGovernancePolicyEvaluator<TContext> : IGovernancePoli
                 GovernanceDecision.Deny(
                     reasons,
                     correlationId: context.CorrelationId,
+                    traceId: context.TraceId,
                     policyVersion: context.PolicyVersion,
                     policyHash: context.PolicyHash)),
             GovernanceDecisionOutcome.Deferred => ThreatEvaluationResult.ForBlockingDecision(
@@ -464,6 +476,7 @@ public sealed class DefaultGovernancePolicyEvaluator<TContext> : IGovernancePoli
                     selectedReason.Code,
                     selectedReason.Message,
                     correlationId: context.CorrelationId,
+                    traceId: context.TraceId,
                     policyVersion: context.PolicyVersion,
                     policyHash: context.PolicyHash)),
             GovernanceDecisionOutcome.AcknowledgmentRequired => ThreatEvaluationResult.ForBlockingDecision(
@@ -471,6 +484,7 @@ public sealed class DefaultGovernancePolicyEvaluator<TContext> : IGovernancePoli
                     selectedReason.Code,
                     selectedReason.Message,
                     correlationId: context.CorrelationId,
+                    traceId: context.TraceId,
                     policyVersion: context.PolicyVersion,
                     policyHash: context.PolicyHash)),
             GovernanceDecisionOutcome.EscalationRecommended => ThreatEvaluationResult.ForBlockingDecision(
@@ -478,6 +492,7 @@ public sealed class DefaultGovernancePolicyEvaluator<TContext> : IGovernancePoli
                     selectedReason.Code,
                     selectedReason.Message,
                     correlationId: context.CorrelationId,
+                    traceId: context.TraceId,
                     policyVersion: context.PolicyVersion,
                     policyHash: context.PolicyHash)),
             GovernanceDecisionOutcome.Warning => ThreatEvaluationResult.ForWarningReasons(reasons),
@@ -547,6 +562,7 @@ public sealed class DefaultGovernancePolicyEvaluator<TContext> : IGovernancePoli
         var exceptionDecision = GovernanceDecision.Deny(
             exceptionResult.Reasons,
             correlationId: context.CorrelationId,
+            traceId: context.TraceId,
             policyVersion: context.PolicyVersion,
             policyHash: context.PolicyHash);
 

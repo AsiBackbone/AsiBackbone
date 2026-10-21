@@ -17,6 +17,7 @@ public sealed class AsiBackboneConstraintEvaluationContextTests
         var context = new GovernanceEvaluationContext();
 
         Assert.Null(context.CorrelationId);
+        Assert.Null(context.TraceId);
         Assert.Null(context.PolicyVersion);
         Assert.Null(context.PolicyHash);
         Assert.False(context.HasMetadata);
@@ -32,9 +33,12 @@ public sealed class AsiBackboneConstraintEvaluationContextTests
         var context = new GovernanceEvaluationContext(
             correlationId: " correlation-123 ",
             policyVersion: " v1 ",
-            policyHash: " hash-abc ");
+            policyHash: " hash-abc ",
+            metadata: null,
+            traceId: " trace-456 ");
 
         Assert.Equal("correlation-123", context.CorrelationId);
+        Assert.Equal("trace-456", context.TraceId);
         Assert.Equal("v1", context.PolicyVersion);
         Assert.Equal("hash-abc", context.PolicyHash);
     }
@@ -48,9 +52,12 @@ public sealed class AsiBackboneConstraintEvaluationContextTests
         var context = new GovernanceEvaluationContext(
             correlationId: " ",
             policyVersion: "",
-            policyHash: null);
+            policyHash: null,
+            metadata: null,
+            traceId: "\t");
 
         Assert.Null(context.CorrelationId);
+        Assert.Null(context.TraceId);
         Assert.Null(context.PolicyVersion);
         Assert.Null(context.PolicyHash);
     }
@@ -204,5 +211,28 @@ public sealed class AsiBackboneConstraintEvaluationContextTests
 
         Assert.False(context.HasMetadata);
         Assert.Empty(context.Metadata);
+    }
+
+    /// <summary>
+    /// Verifies existing host contexts that do not implement trace correlation retain the default null value.
+    /// </summary>
+    [Fact]
+    public void InterfaceDefaultsTraceIdForExistingImplementations()
+    {
+        IGovernanceEvaluationContext context = new ExistingHostContext();
+
+        Assert.Null(context.TraceId);
+    }
+
+    private sealed class ExistingHostContext : IGovernanceEvaluationContext
+    {
+        public string? CorrelationId => null;
+
+        public string? PolicyVersion => null;
+
+        public string? PolicyHash => null;
+
+        public IReadOnlyDictionary<string, string> Metadata { get; } =
+            new Dictionary<string, string>(StringComparer.Ordinal);
     }
 }

@@ -70,7 +70,8 @@ public sealed class GovernanceHttpRequestCorrelation(
             CorrelationId,
             policyVersion,
             policyHash,
-            mergeRequestMetadata ? MergeMetadata(metadata) : NormalizeSuppliedMetadata(metadata));
+            mergeRequestMetadata ? MergeMetadata(metadata) : NormalizeSuppliedMetadata(metadata),
+            TraceId);
     }
 
     /// <summary>

@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using System.Security.Claims;
 using AsiBackbone.AspNetCore.Acknowledgments;
 using AsiBackbone.AspNetCore.Actors;
@@ -5,6 +6,7 @@ using AsiBackbone.AspNetCore.Correlation;
 using AsiBackbone.AspNetCore.DependencyInjection;
 using AsiBackbone.AspNetCore.Endpoints;
 using AsiBackbone.AspNetCore.Results;
+using AsiBackbone.Core.Audit;
 using AsiBackbone.Core.Constraints;
 using AsiBackbone.Core.Decisions;
 using AsiBackbone.Core.Evaluation;
@@ -82,6 +84,103 @@ public sealed class DefaultAsiBackboneEndpointGovernanceServiceBranchTests
     }
 
     /// <summary>
+    /// Verifies a custom policy evaluator that omits trace correlation still produces a receipt linked to the active
+    /// request activity.
+    /// </summary>
+    [Fact]
+    public async Task EvaluateAsyncBackfillsActivityTraceIdIntoCustomPolicyDecisionReceipt()
+    {
+        using Activity activity = new("governed-request");
+        activity.SetIdFormat(ActivityIdFormat.W3C);
+        _ = activity.Start();
+        Assert.NotNull(activity.Id);
+
+        var evaluator = new DelegatePolicyEvaluator(static (_, _) =>
+            ValueTask.FromResult(GovernanceDecision.Allow()));
+        var auditSink = new CapturingReceiptSink();
+        using ServiceProvider services = CreateServices(evaluator, auditSink: auditSink);
+        using IServiceScope scope = services.CreateScope();
+        DefaultHttpContext httpContext = CreateHttpContext(scope.ServiceProvider);
+        var descriptor = EndpointGovernanceDescriptor.FromEndpoint(CreateEndpoint(
+            "policy.trace.activity",
+            new GovernancePolicyAttribute(typeof(SamplePolicy)),
+            new EmitGovernanceAuditAttribute()));
+        IEndpointGovernanceService service = scope.ServiceProvider
+            .GetRequiredService<IEndpointGovernanceService>();
+
+        EndpointGovernanceResult result = await service.EvaluateAsync(
+            httpContext,
+            descriptor,
+            TestContext.Current.CancellationToken);
+
+        Assert.Equal(activity.Id, result.Decision?.TraceId);
+        Assert.Equal(activity.Id, Assert.Single(auditSink.Receipts).TraceId);
+    }
+
+    /// <summary>
+    /// Verifies the server trace identifier is used when no activity exists and an evaluator omits trace correlation.
+    /// </summary>
+    [Fact]
+    public async Task EvaluateAsyncBackfillsHttpContextTraceIdWhenActivityIsMissing()
+    {
+        Activity? previousActivity = Activity.Current;
+        Activity.Current = null;
+
+        try
+        {
+            var evaluator = new DelegatePolicyEvaluator(static (_, _) =>
+                ValueTask.FromResult(GovernanceDecision.Allow()));
+            var auditSink = new CapturingReceiptSink();
+            using ServiceProvider services = CreateServices(evaluator, auditSink: auditSink);
+            using IServiceScope scope = services.CreateScope();
+            DefaultHttpContext httpContext = CreateHttpContext(scope.ServiceProvider);
+            var descriptor = EndpointGovernanceDescriptor.FromEndpoint(CreateEndpoint(
+                "policy.trace.fallback",
+                new GovernancePolicyAttribute(typeof(SamplePolicy)),
+                new EmitGovernanceAuditAttribute()));
+            IEndpointGovernanceService service = scope.ServiceProvider
+                .GetRequiredService<IEndpointGovernanceService>();
+
+            EndpointGovernanceResult result = await service.EvaluateAsync(
+                httpContext,
+                descriptor,
+                TestContext.Current.CancellationToken);
+
+            Assert.Equal(httpContext.TraceIdentifier, result.Decision?.TraceId);
+            Assert.Equal(httpContext.TraceIdentifier, Assert.Single(auditSink.Receipts).TraceId);
+        }
+        finally
+        {
+            Activity.Current = previousActivity;
+        }
+    }
+
+    /// <summary>
+    /// Verifies a trace identifier supplied by the policy evaluator remains authoritative.
+    /// </summary>
+    [Fact]
+    public async Task EvaluateAsyncPreservesEvaluatorTraceId()
+    {
+        var evaluator = new DelegatePolicyEvaluator(static (_, _) =>
+            ValueTask.FromResult(GovernanceDecision.Allow(traceId: "evaluator-trace")));
+        using ServiceProvider services = CreateServices(evaluator);
+        using IServiceScope scope = services.CreateScope();
+        DefaultHttpContext httpContext = CreateHttpContext(scope.ServiceProvider);
+        var descriptor = EndpointGovernanceDescriptor.FromEndpoint(CreateEndpoint(
+            "policy.trace.preserved",
+            new GovernancePolicyAttribute(typeof(SamplePolicy))));
+        IEndpointGovernanceService service = scope.ServiceProvider
+            .GetRequiredService<IEndpointGovernanceService>();
+
+        EndpointGovernanceResult result = await service.EvaluateAsync(
+            httpContext,
+            descriptor,
+            TestContext.Current.CancellationToken);
+
+        Assert.Equal("evaluator-trace", result.Decision?.TraceId);
+    }
+
+    /// <summary>
     /// Verifies a denied policy decision remains a bodyless default 403 response through middleware.
     /// </summary>
     [Fact]
@@ -155,6 +254,7 @@ public sealed class DefaultAsiBackboneEndpointGovernanceServiceBranchTests
         Assert.False(result.CanExecute);
         Assert.NotNull(result.Decision);
         Assert.True(result.Decision.RequiresAcknowledgment);
+        Assert.Equal(httpContext.TraceIdentifier, result.Decision.TraceId);
         Assert.NotNull(result.AcknowledgmentChallenge);
         Assert.NotNull(result.FailureResult);
 
@@ -201,6 +301,7 @@ public sealed class DefaultAsiBackboneEndpointGovernanceServiceBranchTests
         Assert.NotNull(result.Decision);
         Assert.True(result.Decision.IsDenied);
         Assert.Contains("capability.missing", result.Decision.ReasonCodes);
+        Assert.Equal(httpContext.TraceIdentifier, result.Decision.TraceId);
         Assert.Null(result.AcknowledgmentChallenge);
         Assert.Equal(1, capabilityValidator.CallCount);
         Assert.True(capabilityValidator.CurrentDecision?.RequiresAcknowledgment);
@@ -627,7 +728,8 @@ public sealed class DefaultAsiBackboneEndpointGovernanceServiceBranchTests
     private static ServiceProvider CreateServices(
         IGovernancePolicyEvaluator<GovernanceEvaluationContext>? evaluator = null,
         IEndpointCapabilityGrantValidator? capabilityValidator = null,
-        Action<EndpointGovernanceOptions>? configure = null)
+        Action<EndpointGovernanceOptions>? configure = null,
+        IDecisionReceiptSink? auditSink = null)
     {
         ServiceCollection services = new();
         if (configure is not null)
@@ -644,6 +746,11 @@ public sealed class DefaultAsiBackboneEndpointGovernanceServiceBranchTests
         if (capabilityValidator is not null)
         {
             _ = services.AddSingleton(capabilityValidator);
+        }
+
+        if (auditSink is not null)
+        {
+            _ = services.AddSingleton(auditSink);
         }
 
         return services.BuildServiceProvider(validateScopes: true);
@@ -742,6 +849,19 @@ public sealed class DefaultAsiBackboneEndpointGovernanceServiceBranchTests
             CallCount++;
             CurrentDecision = currentDecision;
             return validate(httpContext, descriptor, currentDecision, cancellationToken);
+        }
+    }
+
+    private sealed class CapturingReceiptSink : IDecisionReceiptSink
+    {
+        public List<IDecisionReceipt> Receipts { get; } = [];
+
+        public ValueTask WriteAsync(
+            IDecisionReceipt receipt,
+            CancellationToken cancellationToken = default)
+        {
+            Receipts.Add(receipt);
+            return ValueTask.CompletedTask;
         }
     }
 }

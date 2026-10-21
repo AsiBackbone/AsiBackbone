@@ -53,6 +53,7 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorTests
             GovernancePolicyOptions.DefaultNoConstraintsReasonCode,
             Assert.Single(decision.ReasonCodes));
         Assert.Equal(context.CorrelationId, decision.CorrelationId);
+        Assert.Equal(context.TraceId, decision.TraceId);
         Assert.Equal(context.PolicyVersion, decision.PolicyVersion);
         Assert.Equal(context.PolicyHash, decision.PolicyHash);
     }
@@ -792,6 +793,7 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorTests
         return new TestPolicyContext
         {
             CorrelationId = "corr-branch-123",
+            TraceId = "trace-branch-123",
             PolicyVersion = "v-branch",
             PolicyHash = "hash-branch"
         };
@@ -809,6 +811,8 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorTests
     private sealed class TestPolicyContext : IGovernanceEvaluationContext
     {
         public string? CorrelationId { get; init; }
+
+        public string? TraceId { get; init; }
 
         public string? PolicyVersion { get; init; }
 
