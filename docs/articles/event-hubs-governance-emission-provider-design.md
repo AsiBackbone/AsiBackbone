@@ -1,6 +1,6 @@
 # Design-Only: Event Hubs Governance Emission Provider
 
-This article documents a **design-only** future provider strategy for an optional Event Hubs governance emission provider. It originated as planning guidance after the released `1.1.0 - Observability, Outbox, Signing, and Governance Emission Providers` package-family boundary and remains design-only in the current `7.3.0` stable package family.
+This article documents a **design-only** future provider strategy for an optional Event Hubs governance emission provider. It originated as planning guidance after the released `1.1.0 - Observability, Outbox, Signing, and Governance Emission Providers` package-family boundary and remains design-only in the current `7.4.0` stable package family.
 
 Issue: #145.
 

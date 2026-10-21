@@ -1,6 +1,6 @@
 # Strategy-Only: Purview Governance and Lineage Enrichment
 
-This article documents a **strategy-only** future Microsoft Purview governance and lineage enrichment direction. It originated as planning guidance after the released `1.1.0 - Observability, Outbox, Signing, and Governance Emission Providers` package-family boundary and remains strategy-only in the current `7.3.0` stable package family.
+This article documents a **strategy-only** future Microsoft Purview governance and lineage enrichment direction. It originated as planning guidance after the released `1.1.0 - Observability, Outbox, Signing, and Governance Emission Providers` package-family boundary and remains strategy-only in the current `7.4.0` stable package family.
 
 Issue: #146.
 
