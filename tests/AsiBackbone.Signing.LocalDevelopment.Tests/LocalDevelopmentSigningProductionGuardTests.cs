@@ -25,7 +25,9 @@ public sealed class LocalDevelopmentSigningProductionGuardTests
             () => CreateBuilder().UseLocalDevelopmentSigning(
                 LocalDevelopmentSigningOptions.Create(environmentName: "Production")));
 
-        Assert.Contains("Production", exception.Message, StringComparison.Ordinal);
+        Assert.Contains("not a production key-custody control", exception.Message, StringComparison.Ordinal);
+        Assert.Contains("AsiBackbone.Signing.ManagedKey", exception.Message, StringComparison.Ordinal);
+        Assert.Contains("signing-provider-package-boundary.html", exception.Message, StringComparison.Ordinal);
     }
 
     /// <summary>
@@ -63,6 +65,31 @@ public sealed class LocalDevelopmentSigningProductionGuardTests
             LocalDevelopmentSigningOptions.Create(environmentName: environmentName));
 
         Assert.NotNull(builder);
+    }
+
+    /// <summary>
+    /// Verifies that registration remains usable when no hosted environment is present.
+    /// </summary>
+    [Fact]
+    public void UseLocalDevelopmentSigningAllowsNonHostedRegistration()
+    {
+        string? originalDotnetEnvironment = Environment.GetEnvironmentVariable("DOTNET_ENVIRONMENT");
+        string? originalAspNetCoreEnvironment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
+
+        try
+        {
+            Environment.SetEnvironmentVariable("DOTNET_ENVIRONMENT", null);
+            Environment.SetEnvironmentVariable("ASPNETCORE_ENVIRONMENT", null);
+
+            IAsiBackboneBuilder builder = CreateBuilder().UseLocalDevelopmentSigning();
+
+            Assert.NotNull(builder);
+        }
+        finally
+        {
+            Environment.SetEnvironmentVariable("DOTNET_ENVIRONMENT", originalDotnetEnvironment);
+            Environment.SetEnvironmentVariable("ASPNETCORE_ENVIRONMENT", originalAspNetCoreEnvironment);
+        }
     }
 
     /// <summary>
