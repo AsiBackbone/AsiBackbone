@@ -1,6 +1,9 @@
 - name: Releases & Compatibility
   href: index.md
 
+- name: Major Version History and Upgrade Cost
+  href: ../articles/major-version-history.md
+
 - name: Current Release
   items:
     - name: 7.5.0 Release Notes

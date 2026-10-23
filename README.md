@@ -237,6 +237,7 @@ The stable API contract is documented in [API Compatibility and SemVer](https://
 The release is described in [7.5.0 Release Notes](https://github.com/AsiBackbone/AsiBackbone/blob/main/docs/articles/release-notes-750.md); the preceding production verification and replay-storage additions are described in [7.4.0 Release Notes](https://github.com/AsiBackbone/AsiBackbone/blob/main/docs/articles/release-notes-740.md).
 Consumer verification evidence is recorded in the [7.5.0 Consumer Verification Guide](https://github.com/AsiBackbone/AsiBackbone/blob/main/docs/articles/consumer-verification-750.md).
 Consumers moving from the previous stable line must follow the [6.x to 7.0 upgrade guide](https://github.com/AsiBackbone/AsiBackbone/blob/main/docs/articles/upgrade-600-to-700.md).
+[Major Version History and Upgrade Cost](https://github.com/AsiBackbone/AsiBackbone/blob/main/docs/articles/major-version-history.md) explains why each major version since `1.x` was necessary and what each upgrade costs.
 Earlier release records remain available for historical traceability.
 
 ## Support and project stewardship

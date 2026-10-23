@@ -116,7 +116,7 @@ For future releases, additive public API or package changes should be grouped in
 
 ## Deprecation and major-release policy
 
-This policy applies to changes made after `7.0.0`. Releases `4.0.0` through `7.0.0` shipped within a short period, and some renamed or removed members in that span had no forwarding window. The rules below make the stable contract predictable for consumers who persist governance evidence or build long-lived integrations.
+This policy applies to changes made after `7.0.0`. Releases `4.0.0` through `7.0.0` shipped within a short period, and some renamed or removed members in that span had no forwarding window. [Major Version History and Upgrade Cost](major-version-history.md) records why each major version was taken and what it costs to upgrade. The rules below make the stable contract predictable for consumers who persist governance evidence or build long-lived integrations.
 
 ### Deprecation before removal
 
@@ -230,6 +230,7 @@ Before cutting a stable release or stable package-family expansion, the release 
 ## Related documentation
 
 - [API Baseline and Architecture Boundary Checks](api-baseline-and-boundary-checks.md)
+- [Major Version History and Upgrade Cost](major-version-history.md)
 - [4.0.0 Release Notes](release-notes-400.md)
 - [7.3.0 Release Notes](release-notes-730.md)
 - [7.2.1 Release Notes](release-notes-721.md)
