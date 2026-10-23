@@ -100,9 +100,11 @@ public sealed class LocalDevelopmentSigningOptions
     /// Gets or sets a value indicating whether this provider may be registered while the host reports a production environment.
     /// </summary>
     /// <remarks>
-    /// The signing key is generated per process and never persisted, so signatures produced by this provider stop
-    /// verifying after a restart and carry no key custody story. Registration therefore fails in production unless a host
-    /// states this intent explicitly.
+    /// Registration fails in Production by default. This provider is not a production key-custody control, even when a
+    /// configured PEM is supplied. Setting this property to <see langword="true" /> is an explicit escape hatch for
+    /// exceptional test/demo scenarios only; it does not make LocalDevelopment signing suitable for normal production
+    /// use. Production hosts should use <c>AsiBackbone.Signing.ManagedKey</c> with a reviewed host-owned managed-key
+    /// implementation. See the signing-provider package-boundary guidance in the AsiBackbone documentation.
     /// </remarks>
     public bool AllowInProduction { get; set; }
 
@@ -111,7 +113,8 @@ public sealed class LocalDevelopmentSigningOptions
     /// </summary>
     /// <remarks>
     /// When null, the guard reads <c>DOTNET_ENVIRONMENT</c> and then <c>ASPNETCORE_ENVIRONMENT</c>. This package does not
-    /// depend on the hosting abstractions, so a host that determines its environment another way supplies the name here.
+    /// depend on the hosting abstractions, so non-hosted/unit-test scenarios remain usable without fabricating a host
+    /// environment. A host that determines its environment another way supplies the name here.
     /// </remarks>
     public string? EnvironmentName { get; set; }
 

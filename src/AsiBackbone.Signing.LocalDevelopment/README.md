@@ -62,6 +62,24 @@ builder.Services.AddSingleton<IGovernanceSigningService>(localSigningService);
 builder.Services.AddSingleton<IGovernanceSignatureVerificationService>(localSigningService);
 ```
 
+## Production guard
+
+`UseLocalDevelopmentSigning(...)` fails registration when its effective environment is `Production`. The guard uses
+`LocalDevelopmentSigningOptions.EnvironmentName` when supplied; otherwise it checks `DOTNET_ENVIRONMENT` and then
+`ASPNETCORE_ENVIRONMENT`. When none of those values is present, registration remains available for non-hosted unit-test
+and local scenarios.
+
+Production hosts should use `AsiBackbone.Signing.ManagedKey` with a reviewed host-owned managed-key implementation. See
+[Signing provider package boundary](../../docs/articles/signing-provider-package-boundary.md) for the supported boundary
+and key-custody responsibilities.
+
+`LocalDevelopmentSigningOptions.AllowInProduction = true` is an explicit escape hatch for exceptional test/demo needs.
+It is **not suitable for normal production use** and does not turn this package into a production key-custody control.
+Code that requires the override should be treated as an exceptional configuration and reviewed accordingly.
+
+The companion analyzer also reports local-development signing wired directly in a production branch (`ASIB002`) or
+without an environment guard (`ASIB003`). These diagnostics complement the runtime guard; they do not replace it.
+
 ## Configured key
 
 By default the provider generates a new RSA key in each process, so artifacts it signs stop verifying after a restart and

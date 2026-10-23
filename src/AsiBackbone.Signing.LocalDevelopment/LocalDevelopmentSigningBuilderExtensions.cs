@@ -76,7 +76,7 @@ public static class LocalDevelopmentSigningBuilderExtensions
         if (string.Equals(environmentName, "Production", StringComparison.OrdinalIgnoreCase))
         {
             throw new InvalidOperationException(
-                "Local-development signing cannot be registered in the Production environment. Its key is generated per process and is never persisted, so signatures stop verifying after a restart. Register a managed key provider instead, or set LocalDevelopmentSigningOptions.AllowInProduction when this is deliberate.");
+                "Local-development signing cannot be registered in the Production environment. It is not a production key-custody control. Use AsiBackbone.Signing.ManagedKey with a reviewed host-owned managed-key implementation instead. See https://asibackbone.github.io/AsiBackbone/articles/signing-provider-package-boundary.html. LocalDevelopmentSigningOptions.AllowInProduction is an explicit escape hatch for exceptional test/demo scenarios only and is not suitable for normal production use.");
         }
     }
 }
