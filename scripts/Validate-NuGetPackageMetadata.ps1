@@ -112,6 +112,83 @@ function Get-NuspecElement {
     return $Metadata.SelectSingleNode("./*[local-name()='$ElementName']")
 }
 
+function Get-CentralPackageVersions {
+    param([string]$Path)
+
+    $versions = @{}
+    if (-not (Test-Path -LiteralPath $Path -PathType Leaf)) {
+        Add-Failure "Central package version file was not found: $Path"
+        return $versions
+    }
+
+    [xml]$document = Get-Content -LiteralPath $Path -Raw
+    foreach ($node in $document.SelectNodes('//*[local-name()=''PackageVersion'']')) {
+        $versions[$node.GetAttribute('Include')] = $node.GetAttribute('Version')
+    }
+
+    return $versions
+}
+
+function Get-NuspecDescendantAttributeValues {
+    param(
+        [System.Xml.XmlElement]$Metadata,
+        [string]$ElementName,
+        [string]$AttributeName
+    )
+
+    $values = foreach ($node in $Metadata.SelectNodes(".//*[local-name()='$ElementName']")) {
+        $node.GetAttribute($AttributeName)
+    }
+
+    return @($values)
+}
+
+# Checks the consumer-visible dependency surface of a generated package against the reviewed list. Package versions
+# come from Directory.Packages.props and AsiBackbone project references from the package version, so routine version
+# updates pass while an added, removed, or promoted dependency fails. See the Central Transitive Pinning Decision Record.
+function Assert-PackageDependencies {
+    param(
+        [System.Xml.XmlElement]$Metadata,
+        [pscustomobject]$ExpectedPackage,
+        [string]$PackageName
+    )
+
+    $dependencyIds = [System.Collections.Generic.SortedSet[string]]::new([System.StringComparer]::OrdinalIgnoreCase)
+    foreach ($dependency in $Metadata.SelectNodes(".//*[local-name()='dependency']")) {
+        $id = $dependency.GetAttribute('id')
+        [void]$dependencyIds.Add($id)
+
+        if ($ExpectedPackage.Dependencies -notcontains $id) {
+            continue
+        }
+
+        $expectedDependencyVersion = if ($id.StartsWith('AsiBackbone.', [System.StringComparison]::Ordinal)) {
+            $ExpectedVersion
+        }
+        else {
+            $centralPackageVersions[$id]
+        }
+
+        Assert-Equal $dependency.GetAttribute('version') $expectedDependencyVersion "$PackageName dependency '$id' version"
+    }
+
+    foreach ($expectedDependency in $ExpectedPackage.Dependencies) {
+        if (-not $dependencyIds.Contains($expectedDependency)) {
+            Add-Failure "$PackageName is missing the reviewed package dependency '$expectedDependency'."
+        }
+    }
+
+    foreach ($dependencyId in $dependencyIds) {
+        if ($ExpectedPackage.Dependencies -notcontains $dependencyId) {
+            Add-Failure "$PackageName declares unreviewed package dependency '$dependencyId'. Review the consumer impact and record it in this script's expected dependencies, or remove it."
+        }
+    }
+
+    $frameworkReferences = @(Get-NuspecDescendantAttributeValues $Metadata 'frameworkReference' 'name' | Sort-Object -Unique)
+    $expectedFrameworkReferences = @($ExpectedPackage.FrameworkReferences | Sort-Object -Unique)
+    Assert-Equal ($frameworkReferences -join ', ') ($expectedFrameworkReferences -join ', ') "$PackageName framework references"
+}
+
 $directoryBuildPropsPath = Resolve-RepositoryPath 'Directory.Build.props'
 $directoryVersionPrefix = Get-ProjectProperty $directoryBuildPropsPath 'VersionPrefix'
 $directoryVersionSuffix = Get-ProjectProperty $directoryBuildPropsPath 'VersionSuffix' $false
@@ -119,6 +196,16 @@ $directoryVersionSuffix = if ($null -eq $directoryVersionSuffix) { '' } else { $
 
 if ([string]::IsNullOrWhiteSpace($ExpectedVersion)) {
     $ExpectedVersion = Resolve-Version $directoryVersionPrefix $directoryVersionSuffix
+}
+
+$directoryPackagesPropsPath = Resolve-RepositoryPath 'Directory.Packages.props'
+$centralPackageVersions = Get-CentralPackageVersions $directoryPackagesPropsPath
+
+# Transitive pinning would promote pinned transitive packages to explicit dependencies of every package that packs
+# them. The Central Transitive Pinning Decision Record keeps it disabled for this package family.
+$transitivePinning = Get-ProjectProperty $directoryPackagesPropsPath 'CentralPackageTransitivePinningEnabled' $false
+if ($transitivePinning -ne 'false') {
+    Add-Failure "Directory.Packages.props must set CentralPackageTransitivePinningEnabled to false, as the Central Transitive Pinning Decision Record (docs/articles/central-transitive-pinning-decision.md) requires; found '$transitivePinning'."
 }
 
 $expectedProjectUrl = 'https://asibackbone.github.io/AsiBackbone/'
@@ -137,66 +224,88 @@ $expectedPackages = @(
         Description = 'Framework-neutral Accountable Systems Infrastructure governance primitives for consequential .NET decision flow.'
         Tags = @('accountable-systems-infrastructure', 'asi-backbone', 'dotnet', 'governance', 'decision-flow', 'constraint-evaluation', 'audit', 'acknowledgment', 'capability-token')
         ReadmeMustContain = @('Accountable Systems Infrastructure', $expectedStablePackageFamily)
+        Dependencies = @('Microsoft.Extensions.Logging.Abstractions', 'Microsoft.Extensions.Options')
+        FrameworkReferences = @()
     },
     [pscustomobject]@{
         Id = 'AsiBackbone.DependencyInjection'
         Description = 'Explicit AddAsiBackbone builder facade for coordinating host-selected AsiBackbone provider registrations.'
         Tags = @('accountable-systems-infrastructure', 'asi-backbone', 'dotnet', 'governance', 'dependency-injection', 'builder', 'configuration', 'provider-coordination')
         ReadmeMustContain = @('Explicit `AddAsiBackbone(...)` builder facade', 'does not register persistence')
+        Dependencies = @('Microsoft.Extensions.DependencyInjection')
+        FrameworkReferences = @()
     },
     [pscustomobject]@{
         Id = 'AsiBackbone.Analyzers'
         Description = 'Roslyn analyzer safety rails for Accountable Systems Infrastructure governance persistence and continuation flows.'
         Tags = @('accountable-systems-infrastructure', 'asi-backbone', 'dotnet', 'governance', 'roslyn', 'analyzer', 'safety-rails', 'audit', 'outbox')
         ReadmeMustContain = @('Roslyn analyzer safety rails', 'ASIB001')
+        Dependencies = @()
+        FrameworkReferences = @()
     },
     [pscustomobject]@{
         Id = 'AsiBackbone.AspNetCore'
         Description = 'ASP.NET Core host adapters for Accountable Systems Infrastructure actor context, request correlation, HTTP result mapping, and acknowledgment challenge flows.'
         Tags = @('accountable-systems-infrastructure', 'asi-backbone', 'dotnet', 'governance', 'aspnetcore', 'web', 'host-integration', 'http', 'acknowledgment')
         ReadmeMustContain = @('host adapters only', 'do not enforce decisions automatically')
+        Dependencies = @('AsiBackbone.Core', 'AsiBackbone.DependencyInjection')
+        FrameworkReferences = @('Microsoft.AspNetCore.App')
     },
     [pscustomobject]@{
         Id = 'AsiBackbone.Storage.InMemory'
         Description = 'Non-durable in-memory storage helpers for Accountable Systems Infrastructure local validation, tests, and samples.'
         Tags = @('accountable-systems-infrastructure', 'asi-backbone', 'dotnet', 'governance', 'in-memory', 'non-durable', 'storage', 'local-validation', 'testing')
         ReadmeMustContain = @('not durable storage', 'local validation')
+        Dependencies = @('AsiBackbone.Core', 'AsiBackbone.DependencyInjection')
+        FrameworkReferences = @()
     },
     [pscustomobject]@{
         Id = 'AsiBackbone.Testing'
         Description = 'Test harness helpers for Accountable Systems Infrastructure endpoint governance, deterministic policy decisions, and in-memory inspection.'
         Tags = @('accountable-systems-infrastructure', 'asi-backbone', 'dotnet', 'governance', 'testing', 'test-harness', 'aspnetcore', 'policy-evaluation', 'audit')
         ReadmeMustContain = @('test harness helpers', 'not a production enforcement provider')
+        Dependencies = @('AsiBackbone.AspNetCore', 'AsiBackbone.Core', 'AsiBackbone.Storage.InMemory')
+        FrameworkReferences = @('Microsoft.AspNetCore.App')
     },
     [pscustomobject]@{
         Id = 'AsiBackbone.Templates'
         Description = 'dotnet new templates for Accountable Systems Infrastructure governed ASP.NET Core hosts.'
         Tags = @('accountable-systems-infrastructure', 'asi-backbone', 'dotnet', 'governance', 'templates', 'dotnet-new', 'aspnetcore', 'webapi', 'endpoint-governance')
         ReadmeMustContain = @('dotnet new asibackbone-webapi', 'not a runtime dependency')
+        Dependencies = @()
+        FrameworkReferences = @()
     },
     [pscustomobject]@{
         Id = 'AsiBackbone.EntityFrameworkCore'
         Description = 'Entity Framework Core model configuration and host-owned persistence helpers for Accountable Systems Infrastructure audit and acknowledgment records.'
         Tags = @('accountable-systems-infrastructure', 'asi-backbone', 'dotnet', 'governance', 'entity-framework-core', 'efcore', 'host-owned-persistence', 'audit-ledger')
         ReadmeMustContain = @('host-owned', 'does not provide or require a package-owned')
+        Dependencies = @('AsiBackbone.Core', 'AsiBackbone.DependencyInjection', 'Microsoft.EntityFrameworkCore', 'Microsoft.EntityFrameworkCore.Relational', 'Microsoft.Extensions.Logging.Abstractions')
+        FrameworkReferences = @()
     },
     [pscustomobject]@{
         Id = 'AsiBackbone.OpenTelemetry'
         Description = 'OpenTelemetry-friendly Accountable Systems Infrastructure governance emission provider for AsiBackbone decision-flow telemetry.'
         Tags = @('accountable-systems-infrastructure', 'asi-backbone', 'dotnet', 'governance', 'opentelemetry', 'observability', 'audit', 'outbox')
         ReadmeMustContain = @('provider-neutral', 'OpenTelemetry')
+        Dependencies = @('AsiBackbone.Core', 'AsiBackbone.DependencyInjection')
+        FrameworkReferences = @()
     },
     [pscustomobject]@{
         Id = 'AsiBackbone.Signing.LocalDevelopment'
         Description = 'Local-development RSA signing and verification provider for exercising AsiBackbone signing abstractions without cloud key-management dependencies.'
         Tags = @('accountable-systems-infrastructure', 'asi-backbone', 'dotnet', 'governance', 'signing', 'local-development', 'testing', 'audit')
         ReadmeMustContain = @('local development, samples, and tests', 'not a production managed-key provider')
+        Dependencies = @('AsiBackbone.Core', 'AsiBackbone.DependencyInjection')
+        FrameworkReferences = @()
     },
     [pscustomobject]@{
         Id = 'AsiBackbone.Signing.ManagedKey'
         Description = 'Provider-neutral managed-key signing adapter for Accountable Systems Infrastructure governance artifacts without loading raw private keys into Core.'
         Tags = @('accountable-systems-infrastructure', 'asi-backbone', 'dotnet', 'governance', 'signing', 'managed-key', 'key-management', 'audit')
         ReadmeMustContain = @('Provider-neutral managed-key signing adapter', 'raw key material must not be returned')
+        Dependencies = @('AsiBackbone.Core', 'AsiBackbone.DependencyInjection', 'Microsoft.Extensions.DependencyInjection')
+        FrameworkReferences = @()
     }
 )
 
@@ -249,6 +358,7 @@ else {
             Assert-Equal (Get-NuspecElementValue $metadata 'description') $expectedPackage.Description "$($package.Name) description"
             Assert-Equal (Get-NuspecElementValue $metadata 'projectUrl') $expectedProjectUrl "$($package.Name) project URL"
             Assert-Equal (Get-NuspecElementValue $metadata 'readme') 'README.md' "$($package.Name) README metadata"
+            Assert-PackageDependencies $metadata $expectedPackage $package.Name
 
             $licenseNode = Get-NuspecElement $metadata 'license'
             if ($null -eq $licenseNode) {

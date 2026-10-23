@@ -1,6 +1,18 @@
 <Project>
   <PropertyGroup>
     <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
+
+    <!--
+      Deliberately disabled for this reusable package family. Transitive pinning
+      would promote pinned transitive packages to explicit dependencies of the
+      packages that pack them, turning implementation details into consumer
+      constraints. Committed lock files and locked-mode restores provide
+      repository reproducibility; lift a vulnerable transitive with an explicit
+      PackageReference in the affected project only. See
+      docs/articles/central-transitive-pinning-decision.md. The value is
+      checked by scripts/Validate-NuGetPackageMetadata.ps1.
+    -->
+    <CentralPackageTransitivePinningEnabled>false</CentralPackageTransitivePinningEnabled>
   </PropertyGroup>
   <ItemGroup>
     <PackageVersion Include="Aspire.Hosting.AppHost" Version="13.6.2" />

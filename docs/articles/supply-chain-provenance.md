@@ -124,6 +124,7 @@ For released NuGet packages, Source Link metadata validation remains a separate 
 - [7.0.0 Consumer Verification Guide](consumer-verification-700.md)
 - [Stable Release Validation](release-validation.md)
 - [NuGet Package Signing Decision Record](nuget-package-signing-decision.md)
+- [Central Transitive Pinning Decision Record](central-transitive-pinning-decision.md)
 - [API Compatibility and SemVer](api-compatibility-and-semver.md)
 - [Production Wording and Stable Signing Boundaries](production-wording-and-alpha-limitations.md)
 - [Signing-Ready Receipts and Key Handling](signing-ready-receipts-and-key-handling.md)

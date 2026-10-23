@@ -34,7 +34,7 @@ Before cutting a stable release tag, confirm the following checks have passed on
 | Dependency vulnerability analysis | dependency review, OWASP Dependency-Check | Blocks newly introduced dependencies at moderate severity or higher and fails OWASP scans for findings with CVSS 7 or higher unless a reviewed suppression applies. |
 | Package creation | CI, stable release validation, package publish | Confirms every package project under `src`, excluding template-content projects, can be packed. |
 | Package version validation | stable release validation, package publish | Confirms generated package versions and tag identity align with repository version metadata. |
-| NuGet metadata validation | stable release validation, package publish | Confirms generated `.nupkg` metadata, README files, IDs, descriptions, tags, license metadata, project URL, repository URL, and repository commit metadata align before publication. |
+| NuGet metadata validation | stable release validation, package publish | Confirms generated `.nupkg` metadata, README files, IDs, descriptions, tags, license metadata, project URL, repository URL, repository commit metadata, declared package dependencies, and framework references align before publication, and that central transitive pinning remains disabled. |
 | Package metadata asset checklist | release readiness record, generated package inspection | Confirms package icons, packaged README rendering, NuGet metadata, Source Link metadata, SBOM/provenance artifacts, and documentation links are reviewed. |
 | Package SBOM generation | CI, stable release validation, package publish | Generates SPDX JSON SBOM files and an SBOM manifest for generated `.nupkg` artifacts. |
 | Package provenance attestation | CI on non-PR events, stable release validation on non-PR events, package publish | Attests generated package and SBOM artifacts where supported. |
@@ -110,6 +110,8 @@ The package publish workflow performs release-critical validation before publish
 ## NuGet metadata validation
 
 `Validate-NuGetPackageMetadata.ps1` inspects generated `.nupkg` files rather than only project files. It validates package ID casing, package version, package descriptions, package tags, license metadata, project URL, repository URL metadata, repository commit metadata when available, README metadata, packaged README presence, package icon metadata, packaged icon presence, and package-specific README wording anchors.
+
+It also checks each package's consumer-visible dependencies. The package and AsiBackbone dependency IDs and the framework references in each generated `.nuspec` must match the reviewed list in the script, package dependency versions must match `Directory.Packages.props`, and AsiBackbone dependency versions must match the package version. The script fails unless `Directory.Packages.props` sets `CentralPackageTransitivePinningEnabled` to `false`, as the [Central Transitive Pinning Decision Record](central-transitive-pinning-decision.md) requires. An added, removed, or promoted dependency therefore fails validation until it is reviewed as a consumer-facing change.
 
 This check catches release-blocking NuGet metadata mistakes before package publication because NuGet package metadata for a published version cannot be overwritten.
 

@@ -139,6 +139,8 @@
       href: supply-chain-provenance.md
     - name: NuGet Package Signing Decision Record
       href: nuget-package-signing-decision.md
+    - name: Central Transitive Pinning Decision Record
+      href: central-transitive-pinning-decision.md
     - name: Governance Metadata Sanitization
       href: governance-metadata-sanitization.md
     - name: Capability Grant Hardening
