@@ -6,6 +6,26 @@ This project follows the spirit of [Keep a Changelog](https://keepachangelog.com
 
 ## [Unreleased]
 
+### Changed
+
+* Recorded the decision to keep NuGet central transitive pinning disabled for the package family in the
+  [Central Transitive Pinning Decision Record](docs/articles/central-transitive-pinning-decision.md)
+  ([#902](https://github.com/AsiBackbone/AsiBackbone/issues/902)). Pinning would promote pinned transitive packages to
+  explicit dependencies of the packages that pack them, turning repository implementation details into consumer
+  constraints, while committed lock files and locked-mode restores already make repository builds reproducible.
+  `Directory.Packages.props` now sets `CentralPackageTransitivePinningEnabled` to `false` explicitly.
+* `Validate-NuGetPackageMetadata.ps1` now checks each generated package's dependency IDs and framework references
+  against a reviewed list, package dependency versions against `Directory.Packages.props`, and AsiBackbone dependency
+  versions against the package version, and fails unless transitive pinning is disabled. It runs in stable release
+  validation on every pull request and in package publish.
+* Contributor guidance now covers dependency changes: central versions, lock-file refresh, project-scoped lifts for
+  vulnerable transitive packages, and review of shipped packages' declared dependencies.
+
+### Compatibility
+
+* No package dependency, public API, or runtime behavior changes. Setting the default value explicitly does not change
+  the restore graph or the committed lock files.
+
 ## [7.5.0] - 2026-10-21
 
 `7.5.0` is a backward-compatible minor release for the stable `7.x` package family. It restores end-to-end request

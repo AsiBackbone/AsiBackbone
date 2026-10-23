@@ -61,7 +61,7 @@ This project commits two lock files instead of one:
 
 The Aspire AppHost SDK adds host-specific `Aspire.Dashboard.Sdk.<rid>` and `Aspire.Hosting.Orchestration.<rid>` packages, so the restore graph differs by operating system. The project selects its lock file with `NuGetLockFilePath` set to `packages.$(NETCoreSdkRuntimeIdentifier).lock.json`. Windows development uses the `win-x64` file, and the Linux CI runners use the `linux-x64` file under `--locked-mode`.
 
-Refresh both files whenever this project's restore graph changes. Common causes are an `Aspire.AppHost.Sdk` version change in the project file, a `PackageVersion` change in `Directory.Packages.props` for any package this project restores (including centrally pinned transitive packages such as `MessagePack`), or a project reference change. Updating only the file for your own platform passes locally but fails CI with `NU1004`.
+Refresh both files whenever this project's restore graph changes. Common causes are an `Aspire.AppHost.Sdk` version change in the project file, a `PackageVersion` change in `Directory.Packages.props` for any package this project restores (including `MessagePack`, which this project references explicitly), or a project reference change. Updating only the file for your own platform passes locally but fails CI with `NU1004`.
 
 From the repository root on any platform, restore the AppHost project once per runtime identifier. Overriding `NETCoreSdkRuntimeIdentifier` makes the SDK resolve that platform's packages and write that platform's lock file:
 

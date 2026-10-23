@@ -87,6 +87,15 @@ bash ./eng/smoke-tests/stable-package-integration-smoke.sh
 
 The smoke scripts pack local package artifacts, create temporary external consumer projects, install packages from the local NuGet output, and validate that package consumers can wire the implemented package family without repository project references.
 
+## Dependency changes
+
+Package versions are managed centrally in `Directory.Packages.props`, and every project commits a `packages.lock.json`. Central transitive pinning is deliberately disabled for this package family; the [Central Transitive Pinning Decision Record](docs/articles/central-transitive-pinning-decision.md) explains why. When you change dependencies:
+
+- Add or change versions in `Directory.Packages.props`, never in project files, then run `dotnet restore AsiBackbone.slnx --force-evaluate` and commit every changed lock file with the change. The Aspire AppHost sample keeps one lock file per platform; follow its README.
+- Add a `PackageVersion` only for a package that some project references directly. A `PackageVersion` for a package no project references does nothing while pinning is disabled.
+- To lift a vulnerable or outdated transitive package in a test, sample, benchmark, or tool, add an explicit `PackageReference` in the affected project only.
+- A shipped package's declared dependencies are a consumer-facing contract. Adding, removing, or promoting a dependency of a project under `src` must update that package's reviewed dependencies in `scripts/Validate-NuGetPackageMetadata.ps1` and be described in the changelog's compatibility notes. Prefer raising an existing direct dependency over adding a new one to fix a transitive package.
+
 ## Testing expectations
 
 Major new functionality and changes to existing behavior must include automated
