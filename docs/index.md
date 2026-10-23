@@ -183,6 +183,7 @@ Package-specific READMEs and release notes define which surfaces are stable, opt
 * [6.0.0 Release Readiness Record](articles/release-readiness-600.md)
 * [6.0.0 Consumer Verification Guide](articles/consumer-verification-600.md)
 * [Upgrade from 6.x to 7.0](articles/upgrade-600-to-700.md)
+* [Major Version History and Upgrade Cost](articles/major-version-history.md)
 * [API Compatibility and SemVer](articles/api-compatibility-and-semver.md)
 * [Schema Versioning](articles/schema-versioning.md)
 * [Release Validation](articles/release-validation.md)

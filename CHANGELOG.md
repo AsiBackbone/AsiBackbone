@@ -21,6 +21,17 @@ This project follows the spirit of [Keep a Changelog](https://keepachangelog.com
 * Contributor guidance now covers dependency changes: central versions, lock-file refresh, project-scoped lifts for
   vulnerable transitive packages, and review of shipped packages' declared dependencies.
 
+### Documentation
+
+* Added [Major Version History and Upgrade Cost](docs/articles/major-version-history.md)
+  ([#903](https://github.com/AsiBackbone/AsiBackbone/issues/903)). For each major transition from `1.x` to `7.0` it
+  records why the major boundary was taken, which surfaces broke, the migration work by category (package references,
+  namespaces, other source changes, defaults, persisted data, signed artifacts, and custom extension code), whether
+  the break was a security or correctness fix or a naming and identity cleanup, and the authoritative migration guide
+  and release notes. It states the current stable line and support status of each prior line, and links the
+  major-release spacing policy. The documentation home, Releases & Compatibility, API Compatibility and SemVer, and the
+  README link to it.
+
 ### Compatibility
 
 * No package dependency, public API, or runtime behavior changes. Setting the default value explicitly does not change

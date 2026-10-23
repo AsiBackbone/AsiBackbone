@@ -75,6 +75,8 @@
       href: upgrade-600-to-700.md
     - name: Upgrade from 5.x to 6.0
       href: upgrade-500-to-600.md
+    - name: Major Version History and Upgrade Cost
+      href: major-version-history.md
     - name: API Compatibility and SemVer
       href: api-compatibility-and-semver.md
     - name: "ASIB903: Outbox Drain Retry Clock"
