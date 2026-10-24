@@ -6,6 +6,11 @@ This project follows the spirit of [Keep a Changelog](https://keepachangelog.com
 
 ## [Unreleased]
 
+### Changed
+
+* Updated `Aspire.Hosting.AppHost` from `13.6.2` to `13.6.4` and `FsCheck` from `3.5.0` to `3.6.0`, and refreshed
+  the affected package lock files.
+
 ## [7.5.1] - 2026-10-24
 
 `7.5.1` is a backward-compatible patch release for the stable `7.x` package family. It strengthens production-signing
