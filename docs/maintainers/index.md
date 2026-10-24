@@ -6,7 +6,7 @@ These records are public for traceability, but they are not part of the normal c
 
 ## Current release evidence
 
-- [7.5.0 Release Readiness Record](../articles/release-readiness-750.md)
+- [7.5.1 Release Readiness Record](../articles/release-readiness-751.md)
 - [Release Cadence and Readiness](../articles/release-cadence-and-readiness.md)
 - [Stable Release Validation](../articles/release-validation.md)
 - [Quality Reports](../quality/index.md)
