@@ -11,7 +11,7 @@ without the work described below, but no transition on this page is a drop-in up
 
 ## Current status
 
-The stable package family is `7.x`, and the current release is `7.5.0`.
+The stable package family is `7.x`, and the current release is `7.5.1`.
 
 | Line | Support status |
 | --- | --- |

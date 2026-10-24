@@ -67,7 +67,7 @@ The `2.0.0` release established the simplified `AsiBackbone.*` package and names
 
 ### Current `7.x` stable family
 
-`7.5.0` is the current stable release on `main`. The `7.x` line preserves the `AsiBackbone.*` package IDs, the `net10.0` target, and binary assembly identity `7.0.0.0`. Version 7.5 adds trace-aware evaluation context and decision-copy APIs while restoring request trace correlation for policy-evaluated endpoint decisions and receipts. Existing custom evaluation contexts remain compatible through a default interface member and the retained four-argument constructor. See [7.5.0 Release Notes](release-notes-750.md), [7.4.0 Release Notes](release-notes-740.md), and [Upgrade from 6.x to 7.0](upgrade-600-to-700.md).
+`7.5.1` is the current stable release on `main`. The `7.x` line preserves the `AsiBackbone.*` package IDs, the `net10.0` target, and binary assembly identity `7.0.0.0`. Version 7.5 added trace-aware evaluation context and decision-copy APIs while restoring request trace correlation for policy-evaluated endpoint decisions and receipts. Patch 7.5.1 strengthens production-signing guidance, host-enforcement conformance evidence, and package dependency validation without changing the stable public or runtime contract. See [7.5.1 Release Notes](release-notes-751.md), [7.5.0 Release Notes](release-notes-750.md), and [Upgrade from 6.x to 7.0](upgrade-600-to-700.md).
 
 | Package | `7.x` stable role |
 | --- | --- |
@@ -198,6 +198,7 @@ Expected stable-line behavior:
 | `7.3.0` | `7.3.0` | `7.0.0.0` | `7.3.0.0` | `7.3.0+...` |
 | `7.4.0` | `7.4.0` | `7.0.0.0` | `7.4.0.0` | `7.4.0+...` |
 | `7.5.0` | `7.5.0` | `7.0.0.0` | `7.5.0.0` | `7.5.0+...` |
+| `7.5.1` | `7.5.1` | `7.0.0.0` | `7.5.1.0` | `7.5.1+...` |
 
 Before cutting stable releases, release validation should verify that `AssemblyVersion`, `FileVersion`, `InformationalVersion`, package metadata, release notes, and repository tags match this policy.
 

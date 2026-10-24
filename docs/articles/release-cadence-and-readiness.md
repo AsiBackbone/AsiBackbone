@@ -28,9 +28,9 @@ The measurable rules for deprecation windows, major-release spacing, advance ann
 
 ## Current `7.x` stabilization posture
 
-`7.x` is the stable package line maintained on `main`. The current stable release is `7.5.0`.
+`7.x` is the stable package line maintained on `main`. The current stable release is `7.5.1`.
 
-The `7.5.0` release preserves the package IDs, `net10.0` target, existing durable contracts, and canonical wire values. It adds trace-aware Core evaluation context and decision-copy surfaces while restoring request trace correlation for policy-evaluated ASP.NET Core decisions and receipts. Existing custom contexts remain compatible.
+The `7.5.1` release preserves the package IDs, `net10.0` target, public APIs, package dependencies, durable contracts, canonical wire values, documented defaults, and runtime decision behavior. It strengthens production-signing guidance, host-enforcement conformance evidence, and generated-package dependency validation.
 
 Managed assemblies retain binary identity `7.0.0.0` throughout the compatible `7.x` line.
 
@@ -58,7 +58,7 @@ The publication state is declared in `eng/documentation-release-claims.json`:
 
 Switching from `prepared` to `released` is an explicit step in the release-preparation pull request, made on the final release-candidate commit before the release tag is created. The switch belongs in that pull request rather than after publication because the tagged commit's README files are packed into the published packages: a tagged commit that still described its own version as prepared would ship that wording to NuGet. The Version Consistency, Stable Release Validation, and package-publishing workflows run the documentation release-claim validator with the release tag, and the validator rejects a stable tag whose commit is still in the `prepared` state. Packages are published only from a tag ref.
 
-Prerelease tags such as `v7.5.0-rc.1` are the exception: they publish prerelease packages only, so the stable version is still unpublished and the tagged commit stays in the `prepared` state.
+Prerelease tags such as `v7.5.1-rc.1` are the exception: they publish prerelease packages only, so the stable version is still unpublished and the tagged commit stays in the `prepared` state.
 
 When the next version begins on `main`, the pull request that advances `Directory.Build.props` switches the state back to `prepared` and sets `latestPublishedVersion` to the release that was just published.
 

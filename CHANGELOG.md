@@ -6,6 +6,12 @@ This project follows the spirit of [Keep a Changelog](https://keepachangelog.com
 
 ## [Unreleased]
 
+## [7.5.1] - 2026-10-24
+
+`7.5.1` is a backward-compatible patch release for the stable `7.x` package family. It strengthens production-signing
+guidance, host-enforcement conformance evidence, and package dependency validation without changing public APIs,
+package dependencies, durable schemas, canonical wire values, target framework, or binary assembly identity.
+
 ### Changed
 
 * Recorded the decision to keep NuGet central transitive pinning disabled for the package family in the
