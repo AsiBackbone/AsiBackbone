@@ -11,11 +11,12 @@ General architectural education belongs in [AsiBackbone Learning](https://asibac
 
 ## Current stable package posture
 
-Stable `7.x` package family. The current release is `7.5.1`.
+Stable `7.x` package family. The current release is `7.5.2`.
 
-`7.5.1` strengthens production-signing guidance, host-enforcement conformance
-evidence, and package dependency validation without changing public APIs,
-package dependencies, durable contracts, or runtime decision behavior.
+`7.5.2` updates Microsoft dependency versions, Aspire sample hosting, and
+FsCheck test tooling without changing public APIs, durable contracts, or
+runtime decision behavior. Consumer-visible Microsoft dependency minimums
+advance to `10.0.14` where declared by the adopted package.
 
 Managed assemblies retain binary identity `7.0.0.0` throughout the compatible `7.x` line.
 
@@ -35,7 +36,7 @@ packages remain design-only, strategy-only, sample-only, host-owned, or
 future-provider work unless a later stable release explicitly ships them.
 
 The release process includes explicit [Release Cadence and Readiness](release-cadence-and-readiness.md) guidance for patch, minor, and major release selection, package metadata, Source Link, SBOM/provenance, documentation links, and future package identity or namespace changes.
-The current verification evidence is the [7.5.1 Consumer Verification Guide](consumer-verification-751.md).
+The current verification evidence is the [7.5.2 Consumer Verification Guide](consumer-verification-752.md).
 Consumers moving from the previous stable line must also follow the [Upgrade from 6.x to 7.0](upgrade-600-to-700.md) guide.
 
 ## Search and navigation
@@ -149,9 +150,9 @@ These pages cover production hardening, durable audit/outbox behavior, observabi
 
 Start with the current release and compatibility rules. Older release notes, consumer-verification guides, and upgrade records are preserved under [Releases & Compatibility](../releases/index.md) so they remain easy to find without dominating the implementation navigation.
 
-* [7.5.1 Release Notes](release-notes-751.md)
-* [7.5.1 Release Readiness Record](release-readiness-751.md)
-* [7.5.1 Consumer Verification Guide](consumer-verification-751.md)
+* [7.5.2 Release Notes](release-notes-752.md)
+* [7.5.2 Release Readiness Record](release-readiness-752.md)
+* [7.5.2 Consumer Verification Guide](consumer-verification-752.md)
 * [7.5.0 Release Notes](release-notes-750.md)
 * [7.5.0 Release Readiness Record](release-readiness-750.md)
 * [7.5.0 Consumer Verification Guide](consumer-verification-750.md)

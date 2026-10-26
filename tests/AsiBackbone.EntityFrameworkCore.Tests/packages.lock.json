@@ -599,8 +599,8 @@
       "asibackbone.entityframeworkcore": {
         "type": "Project",
         "dependencies": {
-          "AsiBackbone.Core": "[7.5.1, )",
-          "AsiBackbone.DependencyInjection": "[7.5.1, )",
+          "AsiBackbone.Core": "[7.5.2, )",
+          "AsiBackbone.DependencyInjection": "[7.5.2, )",
           "Microsoft.EntityFrameworkCore": "[10.0.14, )",
           "Microsoft.EntityFrameworkCore.Relational": "[10.0.14, )",
           "Microsoft.Extensions.Logging.Abstractions": "[10.0.14, )"

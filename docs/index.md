@@ -86,11 +86,12 @@ The DocFX header search is available for package names, API concepts, and articl
 
 ## Current stable package family
 
-Stable `7.x` package family. The current release is `7.5.1`.
+Stable `7.x` package family. The current release is `7.5.2`.
 
-`7.5.1` strengthens production-signing guidance, host-enforcement conformance
-evidence, and package dependency validation without changing public APIs,
-package dependencies, durable contracts, or runtime decision behavior.
+`7.5.2` updates Microsoft dependency versions, Aspire sample hosting, and
+FsCheck test tooling without changing public APIs, durable contracts, or
+runtime decision behavior. Consumer-visible Microsoft dependency minimums
+advance to `10.0.14` where declared by the adopted package.
 
 Managed assemblies retain binary identity `7.0.0.0` throughout the compatible `7.x` line.
 
@@ -164,8 +165,8 @@ Package-specific READMEs and release notes define which surfaces are stable, opt
 
 ### Releases and compatibility
 
-* [7.5.1 Release Notes](articles/release-notes-751.md)
-* [7.5.1 Consumer Verification Guide](articles/consumer-verification-751.md)
+* [7.5.2 Release Notes](articles/release-notes-752.md)
+* [7.5.2 Consumer Verification Guide](articles/consumer-verification-752.md)
 * [7.5.0 Release Notes](articles/release-notes-750.md)
 * [7.5.0 Consumer Verification Guide](articles/consumer-verification-750.md)
 * [7.4.0 Release Notes](articles/release-notes-740.md)
