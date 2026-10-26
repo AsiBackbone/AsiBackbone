@@ -2,9 +2,9 @@
 
 # AsiBackbone
 
-> `7.5.1` is the current stable release on `main`.
+> `7.5.2` is the current stable release on `main`.
 >
-> `7.5.1` strengthens production-signing guidance, host-enforcement conformance evidence, and package dependency validation without changing public APIs or durable contracts. See the [7.5.1 release notes](docs/articles/release-notes-751.md); consumers moving from `6.x` must still follow the [6.x to 7.0 upgrade guide](docs/articles/upgrade-600-to-700.md).
+> `7.5.2` updates Microsoft dependency versions, Aspire sample hosting, and FsCheck test tooling while preserving public APIs and durable contracts. See the [7.5.2 release notes](docs/articles/release-notes-752.md); consumers moving from `6.x` must still follow the [6.x to 7.0 upgrade guide](docs/articles/upgrade-600-to-700.md).
 
 [![CI](https://github.com/AsiBackbone/AsiBackbone/actions/workflows/ci.yml/badge.svg)](https://github.com/AsiBackbone/AsiBackbone/actions/workflows/ci.yml)
 [![Line Coverage Gate](https://img.shields.io/badge/line%20coverage%20gate-75%25-brightgreen)](https://asibackbone.github.io/AsiBackbone/coverage/index.html)
@@ -144,11 +144,12 @@ For production-style hosts, add durable audit/outbox persistence, signing or ver
 
 ## Package family
 
-Stable `7.x` package family. The current release is `7.5.1`.
+Stable `7.x` package family. The current release is `7.5.2`.
 
-`7.5.1` strengthens production-signing guidance, host-enforcement conformance
-evidence, and package dependency validation without changing public APIs,
-package dependencies, durable contracts, or runtime decision behavior. The
+`7.5.2` updates Microsoft dependency versions, Aspire sample hosting, and
+FsCheck test tooling without changing public APIs, durable contracts, or
+runtime decision behavior. Consumer-visible Microsoft dependency minimums
+advance to `10.0.14` where declared by the adopted package. The
 `7.5.0` release added compatible Core context and decision-copy APIs for request
 trace correlation. The `7.4` minor
 release added production public-key signature verification and durable EF Core
@@ -230,13 +231,13 @@ The full, categorized documentation set lives at the [documentation site](https:
 
 ## Current status
 
-The current stable release is `7.5.1`. It strengthens production-signing guidance, host-enforcement conformance evidence, and package dependency validation while preserving public APIs, package dependencies, durable schemas, canonical wire values, package IDs, the `net10.0` target, and runtime decision behavior.
+The current stable release is `7.5.2`. It updates Microsoft dependency versions, Aspire sample hosting, and FsCheck test tooling while preserving public APIs, durable schemas, canonical wire values, package IDs, the `net10.0` target, and runtime decision behavior. Declared Microsoft dependency minimums advance to `10.0.14`.
 
 Managed assemblies retain binary identity `7.0.0.0` throughout the compatible `7.x` line.
 
 The stable API contract is documented in [API Compatibility and SemVer](https://github.com/AsiBackbone/AsiBackbone/blob/main/docs/articles/api-compatibility-and-semver.md).
-The release is described in [7.5.1 Release Notes](https://github.com/AsiBackbone/AsiBackbone/blob/main/docs/articles/release-notes-751.md); the preceding trace-correlation additions are described in [7.5.0 Release Notes](https://github.com/AsiBackbone/AsiBackbone/blob/main/docs/articles/release-notes-750.md).
-Consumer verification evidence is recorded in the [7.5.1 Consumer Verification Guide](https://github.com/AsiBackbone/AsiBackbone/blob/main/docs/articles/consumer-verification-751.md).
+The release is described in [7.5.2 Release Notes](https://github.com/AsiBackbone/AsiBackbone/blob/main/docs/articles/release-notes-752.md); the preceding trace-correlation additions are described in [7.5.0 Release Notes](https://github.com/AsiBackbone/AsiBackbone/blob/main/docs/articles/release-notes-750.md).
+Consumer verification evidence is recorded in the [7.5.2 Consumer Verification Guide](https://github.com/AsiBackbone/AsiBackbone/blob/main/docs/articles/consumer-verification-752.md).
 Consumers moving from the previous stable line must follow the [6.x to 7.0 upgrade guide](https://github.com/AsiBackbone/AsiBackbone/blob/main/docs/articles/upgrade-600-to-700.md).
 [Major Version History and Upgrade Cost](https://github.com/AsiBackbone/AsiBackbone/blob/main/docs/articles/major-version-history.md) explains why each major version since `1.x` was necessary and what each upgrade costs.
 Earlier release records remain available for historical traceability.
@@ -265,7 +266,7 @@ A consumer should be able to use AsiBackbone in an application generated from Ne
 
 AsiBackbone is a governance framework, not an intelligence engine. It implements software primitives for accountable decision flow and keeps execution authority with the host application. See [Project Boundaries and Non-Claims](https://asibackbone.github.io/AsiBackbone/articles/project-boundaries.html) for the full scope statement and safe wording guidance.
 
-> **Current NuGet packages are intentionally published without package signing.** The dated [NuGet Package Signing Decision Record](https://asibackbone.github.io/AsiBackbone/articles/nuget-package-signing-decision.html) records the accepted risk, compensating controls, mandatory review date, and early re-evaluation criteria. The project publishes durable release-attached SBOMs, package/SBOM provenance, Source Link metadata, and package hashes as distinct trust signals; none is presented as a signed-package guarantee. For verification guidance, see the [7.5.1 Consumer Verification Guide](https://asibackbone.github.io/AsiBackbone/articles/consumer-verification-751.html) and [**7.5.1 Release Notes**](https://asibackbone.github.io/AsiBackbone/articles/release-notes-751.html).
+> **Current NuGet packages are intentionally published without package signing.** The dated [NuGet Package Signing Decision Record](https://asibackbone.github.io/AsiBackbone/articles/nuget-package-signing-decision.html) records the accepted risk, compensating controls, mandatory review date, and early re-evaluation criteria. The project publishes durable release-attached SBOMs, package/SBOM provenance, Source Link metadata, and package hashes as distinct trust signals; none is presented as a signed-package guarantee. For verification guidance, see the [7.5.2 Consumer Verification Guide](https://asibackbone.github.io/AsiBackbone/articles/consumer-verification-752.html) and [**7.5.2 Release Notes**](https://asibackbone.github.io/AsiBackbone/articles/release-notes-752.html).
 
 ## Design principles
 

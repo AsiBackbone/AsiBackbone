@@ -6,18 +6,24 @@ This project follows the spirit of [Keep a Changelog](https://keepachangelog.com
 
 ## [Unreleased]
 
+## [7.5.2] - 2026-10-25
+
+`7.5.2` is a backward-compatible dependency maintenance patch for the stable `7.x` package family.
+Public APIs, durable schemas, canonical wire values, package IDs, target framework, documented defaults,
+and binary assembly identity remain unchanged. Declared Microsoft package dependency minimums advance to `10.0.14`.
+
 ### Changed
 
 * Updated dependencies from `10.0.13` to `10.0.14`, and refreshed the affected package lock files.
-  * Updated `Microsoft.EntityFrameworkCore` 
-  * Updated `Microsoft.EntityFrameworkCore.InMemory` 
-  * Updated `Microsoft.EntityFrameworkCore.Relational` 
-  * Updated `Microsoft.EntityFrameworkCore.Sqlite` 
-  * Updated `Microsoft.EntityFrameworkCore.SqlServer` 
-  * Updated `Microsoft.Extensions.DependencyInjection` 
-  * Updated `Microsoft.Extensions.Logging.Abstractions` 
-  * Updated `Microsoft.Extensions.Options` 
-  * Updated `Security.Cryptography.Pkcs` 
+  * Updated `Microsoft.EntityFrameworkCore`
+  * Updated `Microsoft.EntityFrameworkCore.InMemory`
+  * Updated `Microsoft.EntityFrameworkCore.Relational`
+  * Updated `Microsoft.EntityFrameworkCore.Sqlite`
+  * Updated `Microsoft.EntityFrameworkCore.SqlServer`
+  * Updated `Microsoft.Extensions.DependencyInjection`
+  * Updated `Microsoft.Extensions.Logging.Abstractions`
+  * Updated `Microsoft.Extensions.Options`
+  * Updated `System.Security.Cryptography.Pkcs`
 * Updated `Aspire.Hosting.AppHost` from `13.6.2` to `13.6.4` and `FsCheck` from `3.5.0` to `3.6.0`, and refreshed
   the affected package lock files.
 
