@@ -94,7 +94,7 @@ Before tagging a stable release, the release PR or release-readiness record shou
 
 | Area | Confirmation |
 | --- | --- |
-| Version metadata | `Directory.Build.props`, package filenames, release notes, changelog, citation metadata, Zenodo metadata, and tag expectations align. |
+| Version metadata | `Directory.Build.props`, package filenames, release notes, changelog, citation metadata, Zenodo metadata, and tag expectations align, and `CITATION.cff` and `.zenodo.json` both use the canonical title `AsiBackbone`. |
 | Package identity | Package IDs, namespaces, stable package list, descriptions, tags, license metadata, project URL, repository URL, and repository commit metadata are current. |
 | Package assets | Package icon is regenerated when needed, included in generated packages, and inspected at package-list/detail sizes; packaged README files are present and render acceptably. |
 | Documentation links | README links, DocFX navigation, article index, release notes, migration notes, and GitHub Pages links point to current pages. |
@@ -104,6 +104,12 @@ Before tagging a stable release, the release PR or release-readiness record shou
 | Migration | Breaking changes include migration guidance, old/new package IDs, old/new namespaces, representative `PackageReference` and `using` updates, and previous-line support/deprecation posture. |
 | Deferred checks | Any intentionally deferred release-critical check records the reason, accepted risk, follow-up issue, and whether release notes need to mention it. |
 | Publication wording | The release-preparation pull request switches `eng/documentation-release-claims.json` from `prepared` to `released`, sets `latestPublishedVersion` to the release version, and replaces prepared-release wording so the documentation release-claim validator passes with the release tag. |
+
+## Zenodo archive metadata
+
+Zenodo creates an archive record for each GitHub release and copies its title, version, creators, description, keywords, and related identifiers from `.zenodo.json`. `CITATION.cff` carries the same title and version for citation tools. Both files use the canonical product name `AsiBackbone`; "ASI Backbone" (with a space) is a legacy spelling. `scripts/Validate-VersionConsistency.ps1` fails when either title differs from `AsiBackbone` or when the two titles disagree.
+
+Changing these files affects only records created by later releases. To correct the metadata of a record that is already published, edit that record in place on Zenodo while signed in with the account that owns it, then publish the edit. Zenodo allows metadata such as the title to be edited at any time after publication, and editing does not create a new version. Change only the affected metadata fields. Do not change the archived files, version, creators, related identifiers, or DOI relationships, even while Zenodo still allows file changes during a record's first 30 days, so the archive continues to match the tagged release.
 
 ## Package identity and namespace changes
 
