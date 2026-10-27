@@ -54,6 +54,14 @@ jobs:
         shell: pwsh
         run: ./scripts/Test-DocumentationLinks.ps1
 
+      - name: Test current terminology validator
+        shell: pwsh
+        run: ./scripts/Test-CurrentTerminology.ps1
+
+      - name: Validate current terminology
+        shell: pwsh
+        run: ./scripts/Validate-CurrentTerminology.ps1
+
       - name: Validate documentation release claims
         shell: pwsh
         run: |

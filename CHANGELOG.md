@@ -22,6 +22,17 @@ This project follows the spirit of [Keep a Changelog](https://keepachangelog.com
   when either title differs from `AsiBackbone`, including by letter case, or when the two titles disagree. The release
   readiness guide documents how to correct the metadata of an already published Zenodo record without changing its
   archived files, version, creators, or DOI relationships.
+* Aligned current-facing summaries with the 7.0 vocabulary
+  ([#915](https://github.com/AsiBackbone/AsiBackbone/issues/915)). The README's `AsiBackbone.Core` package summary now
+  describes capability grants and their signed capability grant token transport encoding instead of capability-token
+  abstractions, the Analyzers and Entity Framework Core package READMEs describe acknowledgment requests and responses
+  (noting the retained `AsiBackboneHandshake*` table names), and the `AsiBackbone.Core` package adds the
+  `capability-grant` NuGet tag alongside `capability-token`. The new `scripts/Validate-CurrentTerminology.ps1` checks
+  the README, documentation homepage, package READMEs, package metadata, and citation metadata for legacy capability
+  token, audit residue, and handshake wording against `eng/docs/current-terminology.json`, which lists each retained use
+  with its reason. Historical, compatibility, and generated documentation is not scanned.
+  `scripts/Test-CurrentTerminology.ps1` exercises the check against fixtures, and both run in the version consistency
+  workflow.
 
 ## [7.5.2] - 2026-10-25
 
