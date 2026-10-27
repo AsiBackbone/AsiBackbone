@@ -50,6 +50,10 @@ jobs:
         shell: pwsh
         run: ./scripts/Test-DocumentationReleaseClaims.ps1
 
+      - name: Test documentation link validator
+        shell: pwsh
+        run: ./scripts/Test-DocumentationLinks.ps1
+
       - name: Validate documentation release claims
         shell: pwsh
         run: |

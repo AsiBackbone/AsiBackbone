@@ -65,7 +65,10 @@ The curated continuity contract is stored in `eng/docs/cross-repository-links.js
 
 - preserved transition-page paths and their canonical Learning destinations;
 - critical published Learning and AsiBackbone destinations;
+- the current release-notes and consumer-verification pages, declared once among the local DocFX outputs and once among the published destinations with `currentReleaseDocument` set to `release-notes` or `consumer-verification`;
 - selected reciprocal Learning-to-AsiBackbone links that must remain present.
+
+Any other entry that targets a version-specific release-notes or consumer-verification page must declare `"historical": true`, so an undeclared versioned page cannot silently stand in for the current release.
 
 After building the DocFX site, run:
 
@@ -73,7 +76,7 @@ After building the DocFX site, run:
 ./scripts/Validate-DocumentationLinks.ps1
 ```
 
-The validator confirms that transition source files still name the canonical Learning target, the old DocFX output paths still exist, critical published destinations resolve, and selected reciprocal links remain present. Stable release validation and the documentation publishing workflow run the same guardrail.
+The validator confirms that transition source files still name the canonical Learning target, the old DocFX output paths still exist, critical published destinations resolve, and selected reciprocal links remain present. It also reads `publication.latestPublishedVersion` from `eng/documentation-release-claims.json` and fails when a current release destination's path, URL, or label names any other version, or when the local and published current destinations disagree. A current published destination that does not resolve yet is reported as a warning rather than a failure only when this DocFX build contains the matching page, which covers the window between merging a release-preparation change and deploying the site that publishes it. Stable release validation and the documentation publishing workflow run the same guardrail, and `./scripts/Test-DocumentationLinks.ps1` exercises the current-release rules against fixtures.
 
 ## Authority when content overlaps
 

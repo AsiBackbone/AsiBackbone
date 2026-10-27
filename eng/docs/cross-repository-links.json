@@ -50,12 +50,14 @@
       "url": "https://asibackbone.github.io/AsiBackbone/api/AsiBackbone.Core.Decisions.GovernanceDecision.html"
     },
     {
-      "name": "Latest published release notes (7.5.1)",
-      "url": "https://asibackbone.github.io/AsiBackbone/articles/release-notes-751.html"
+      "name": "Latest published release notes (7.5.2)",
+      "url": "https://asibackbone.github.io/AsiBackbone/articles/release-notes-752.html",
+      "currentReleaseDocument": "release-notes"
     },
     {
-      "name": "Latest published consumer verification guide (7.5.1)",
-      "url": "https://asibackbone.github.io/AsiBackbone/articles/consumer-verification-751.html"
+      "name": "Latest published consumer verification guide (7.5.2)",
+      "url": "https://asibackbone.github.io/AsiBackbone/articles/consumer-verification-752.html",
+      "currentReleaseDocument": "consumer-verification"
     },
     {
       "name": "Product standards mapping",
@@ -81,11 +83,13 @@
     },
     {
       "name": "Current release notes",
-      "path": "articles/release-notes-752.html"
+      "path": "articles/release-notes-752.html",
+      "currentReleaseDocument": "release-notes"
     },
     {
       "name": "Current consumer verification guide",
-      "path": "articles/consumer-verification-752.html"
+      "path": "articles/consumer-verification-752.html",
+      "currentReleaseDocument": "consumer-verification"
     }
   ]
 }
