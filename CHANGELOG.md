@@ -6,6 +6,17 @@ This project follows the spirit of [Keep a Changelog](https://keepachangelog.com
 
 ## [Unreleased]
 
+### Fixed
+
+* Advanced the current published release-notes and consumer-verification destinations in
+  `eng/docs/cross-repository-links.json` from the superseded `7.5.1` pages to the `7.5.2` pages, matching the local
+  current release destinations ([#913](https://github.com/AsiBackbone/AsiBackbone/issues/913)).
+  `scripts/Validate-DocumentationLinks.ps1` now reads `publication.latestPublishedVersion` from
+  `eng/documentation-release-claims.json` and fails when an entry marked with `currentReleaseDocument` targets or
+  labels any other version, when the local and published current destinations disagree, or when another entry
+  targets a version-specific release page without declaring `"historical": true`.
+  `scripts/Test-DocumentationLinks.ps1` exercises these rules against fixtures in the version consistency workflow.
+
 ## [7.5.2] - 2026-10-25
 
 `7.5.2` is a backward-compatible dependency maintenance patch for the stable `7.x` package family.

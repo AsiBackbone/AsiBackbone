@@ -1,0 +1,27 @@
+{
+  "transitionPages": [],
+  "publishedDestinations": [
+    {
+      "name": "Latest published release notes (3.0.1)",
+      "url": "https://asibackbone.github.io/AsiBackbone/articles/release-notes-301.html"
+    },
+    {
+      "name": "Latest published consumer verification guide (3.0.1)",
+      "url": "https://asibackbone.github.io/AsiBackbone/articles/consumer-verification-301.html",
+      "currentReleaseDocument": "consumer-verification"
+    }
+  ],
+  "reciprocalLinks": [],
+  "localPublishedPaths": [
+    {
+      "name": "Current release notes",
+      "path": "articles/release-notes-301.html",
+      "currentReleaseDocument": "release-notes"
+    },
+    {
+      "name": "Current consumer verification guide",
+      "path": "articles/consumer-verification-301.html",
+      "currentReleaseDocument": "consumer-verification"
+    }
+  ]
+}
