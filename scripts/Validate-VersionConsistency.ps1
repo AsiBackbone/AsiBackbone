@@ -92,6 +92,19 @@ function Assert-Equal {
     }
 }
 
+function Assert-OrdinalEqual {
+    param(
+        [string]$Actual,
+        [string]$Expected,
+        [string]$Description
+    )
+
+    # Names are case-sensitive, unlike PowerShell's -eq/-ne comparison.
+    if (-not [string]::Equals($Actual, $Expected, [System.StringComparison]::Ordinal)) {
+        Add-Failure "$Description expected '$Expected' but found '$Actual'."
+    }
+}
+
 function Get-RegexGroupValue {
     param(
         [string]$Text,
@@ -171,12 +184,28 @@ foreach ($projectFile in $projectFiles) {
     }
 }
 
+# Citation and archive titles use the canonical product name. "ASI Backbone"
+# (with a space) is a legacy spelling under the AsiBackbone/.github
+# LANDING-PAGE-STANDARD.md naming rules, and Zenodo copies the .zenodo.json
+# title into each new archived release record.
+$canonicalMetadataTitle = 'AsiBackbone'
+$citationTitle = $null
+$zenodoTitle = $null
+
 $citationPath = Resolve-RepositoryPath 'CITATION.cff'
 if (Test-Path -LiteralPath $citationPath -PathType Leaf) {
     $citation = Get-Content -LiteralPath $citationPath -Raw
     $citationVersion = Get-RegexGroupValue $citation '(?m)^version:\s*["'']?(?<version>[^"''\r\n]+)["'']?\s*$' 'version' 'CITATION.cff version metadata' $false
     if (-not [string]::IsNullOrWhiteSpace($citationVersion)) {
         Assert-Equal $citationVersion $ExpectedVersion 'CITATION.cff version metadata'
+    }
+
+    $citationTitle = Get-RegexGroupValue $citation '(?m)^title:\s*["'']?(?<title>[^"''\r\n]+?)["'']?\s*$' 'title' 'CITATION.cff title metadata' $false
+    if ([string]::IsNullOrWhiteSpace($citationTitle)) {
+        Add-Failure 'CITATION.cff title metadata was not found.'
+    }
+    else {
+        Assert-OrdinalEqual $citationTitle $canonicalMetadataTitle 'CITATION.cff title metadata'
     }
 }
 
@@ -192,10 +221,25 @@ if (Test-Path -LiteralPath $zenodoPath -PathType Leaf) {
         else {
             Assert-Equal $zenodoVersion $ExpectedVersion '.zenodo.json version metadata'
         }
+
+        $zenodoTitleProperty = $zenodo.PSObject.Properties['title']
+        $zenodoTitle = if ($null -ne $zenodoTitleProperty) { [string]$zenodoTitleProperty.Value } else { $null }
+        if ([string]::IsNullOrWhiteSpace($zenodoTitle)) {
+            Add-Failure '.zenodo.json title metadata was not found.'
+        }
+        else {
+            Assert-OrdinalEqual $zenodoTitle $canonicalMetadataTitle '.zenodo.json title metadata'
+        }
     }
     catch {
         Add-Failure ".zenodo.json could not be parsed as JSON. $($_.Exception.Message)"
     }
+}
+
+if (-not [string]::IsNullOrWhiteSpace($citationTitle) -and
+    -not [string]::IsNullOrWhiteSpace($zenodoTitle) -and
+    -not [string]::Equals($citationTitle, $zenodoTitle, [System.StringComparison]::Ordinal)) {
+    Add-Failure "CITATION.cff title '$citationTitle' and .zenodo.json title '$zenodoTitle' must match."
 }
 
 if (-not [string]::IsNullOrWhiteSpace($TagName)) {

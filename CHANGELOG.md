@@ -16,6 +16,12 @@ This project follows the spirit of [Keep a Changelog](https://keepachangelog.com
   labels any other version, when the local and published current destinations disagree, or when another entry
   targets a version-specific release page without declaring `"historical": true`.
   `scripts/Test-DocumentationLinks.ps1` exercises these rules against fixtures in the version consistency workflow.
+* Changed the `CITATION.cff` and `.zenodo.json` title from the legacy spelling "ASI Backbone" to the canonical product
+  name `AsiBackbone`, so Zenodo records for future releases use the canonical name
+  ([#914](https://github.com/AsiBackbone/AsiBackbone/issues/914)). `scripts/Validate-VersionConsistency.ps1` now fails
+  when either title differs from `AsiBackbone`, including by letter case, or when the two titles disagree. The release
+  readiness guide documents how to correct the metadata of an already published Zenodo record without changing its
+  archived files, version, creators, or DOI relationships.
 
 ## [7.5.2] - 2026-10-25
 
