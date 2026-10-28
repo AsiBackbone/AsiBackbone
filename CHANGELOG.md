@@ -6,6 +6,12 @@ This project follows the spirit of [Keep a Changelog](https://keepachangelog.com
 
 ## [Unreleased]
 
+### Changed
+
+* Replaced the documentation logo, icon sizes, favicon, NuGet package icon, and README/social preview with the
+  governance-spine glyph from the AsiBackbone glyph family. File names and image dimensions are unchanged; the
+  superseded `docs/images/asibackbone-icon.svg` source is removed.
+
 ### Fixed
 
 * Advanced the current published release-notes and consumer-verification destinations in
