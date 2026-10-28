@@ -15,7 +15,7 @@ This package contributes provider-neutral EF Core model configuration, persisten
 ## What this package provides
 
 - `ApplyAsiBackboneConfigurations(this ModelBuilder modelBuilder)` for applying ASI Backbone persistence mappings from a host-owned `DbContext`.
-- Persistence entities for audit ledger records, audit reason codes, audit metadata, handshake requests, handshake acknowledgments, outbox entries, decision receipt lifecycle events, and related metadata rows.
+- Persistence entities for audit ledger records, audit reason codes, audit metadata, acknowledgment requests and responses (stored in the retained `AsiBackboneHandshake*` tables), outbox entries, decision receipt lifecycle events, and related metadata rows.
 - `EfCoreAuditLedgerStore`, an append-oriented audit ledger implementation that uses a host-owned `DbContext`.
 - `EfCoreDecisionReceiptLifecycleStore`, an append-oriented lifecycle event implementation for durable progress records.
 - `EfCoreGovernanceOutboxStore`, a durable local outbox implementation for provider-neutral governance emission envelopes.

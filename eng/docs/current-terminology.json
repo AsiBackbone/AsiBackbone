@@ -1,0 +1,63 @@
+{
+  "scope": "Current-facing summary surfaces only: the repository README, the documentation homepage, package READMEs, package project metadata, and citation/archive metadata. Release notes, upgrade and migration guides, compatibility records, readiness reviews, generated API reference output, and other documentation articles are not scanned, so historical and compatibility evidence is never flagged. Identifiers such as CapabilityTokenId, LiabilityHandshake*, AsiBackboneHandshake* tables, and capability.token-* failure codes contain no word boundary or separator before the legacy word, so they do not match.",
+  "surfaces": [
+    "README.md",
+    "docs/index.md",
+    "src/*/README.md",
+    "src/*/*.csproj",
+    ".zenodo.json",
+    "CITATION.cff"
+  ],
+  "terms": [
+    {
+      "name": "capability token",
+      "pattern": "\\bcapability[ -]tokens?\\b",
+      "use": "capability grant",
+      "reason": "Capability grant is the 7.x public vocabulary. Name the token only for the signed capability grant token transport encoding (CapabilityGrantToken)."
+    },
+    {
+      "name": "audit residue",
+      "pattern": "\\baudit[ -]residue\\b",
+      "use": "decision receipt",
+      "reason": "Decision receipt replaced audit residue in current prose and public type names in 6.0."
+    },
+    {
+      "name": "handshake",
+      "pattern": "\\bhandshakes?\\b",
+      "use": "acknowledgment",
+      "reason": "Acknowledgment names the behavior. Handshake is reserved for the multi-step protocol and retained identifiers, which belong in articles rather than summaries."
+    }
+  ],
+  "allowances": [
+    {
+      "path": "README.md",
+      "term": "handshake",
+      "linePattern": "\\[Acknowledgment Workflow\\]\\(https://asibackbone\\.github\\.io/AsiBackbone/articles/dynamic-liability-handshake\\.html\\)",
+      "reason": "Retained published URL of the Acknowledgment Workflow article. The link text uses the current term; changing the path would break existing links."
+    },
+    {
+      "path": "docs/index.md",
+      "term": "handshake",
+      "linePattern": "\\[Acknowledgment Workflow\\]\\(articles/dynamic-liability-handshake\\.md\\)",
+      "reason": "Retained source path of the Acknowledgment Workflow article, published at the URL above. The link text uses the current term."
+    },
+    {
+      "path": "src/AsiBackbone.Core/AsiBackbone.Core.csproj",
+      "term": "capability token",
+      "linePattern": "<PackageTags>.*;capability-grant;capability-token</PackageTags>",
+      "reason": "NuGet discovery tag for the signed capability grant token transport encoding (CapabilityGrantToken), listed after the current capability-grant tag."
+    },
+    {
+      "path": ".zenodo.json",
+      "term": "audit residue",
+      "linePattern": "^\\s*\"audit-residue\",?\\s*$",
+      "reason": "Archive discovery keyword for the pre-6.0 AuditResidue lineage, listed alongside decision-receipt. Archive descriptions use the current term."
+    },
+    {
+      "path": "CITATION.cff",
+      "term": "audit residue",
+      "linePattern": "^\\s*-\\s*audit-residue\\s*$",
+      "reason": "Citation keyword kept identical to .zenodo.json keywords; see the .zenodo.json allowance."
+    }
+  ]
+}

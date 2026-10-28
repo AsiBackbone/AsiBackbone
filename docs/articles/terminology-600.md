@@ -39,6 +39,14 @@ The 6.0 API naming review selected `DecisionReceipt` and related receipt type na
 
 The [public API naming convention](public-api-naming-600.md) records the coordinated type-name decisions. The [terminology map](terminology-map.md) maps educational concepts to concrete product APIs without creating a second organization-level glossary.
 
+## Current-facing summaries
+
+The 7.0 vocabulary is **decision receipt**, **acknowledgment**, and **capability grant**. A capability grant token is the signed, size-limited transport encoding of a grant (`CapabilityGrantToken`); name the token only when that encoding is meant.
+
+`scripts/Validate-CurrentTerminology.ps1` checks the surfaces most readers see first for legacy wording: the repository README, the documentation homepage, package READMEs, package project metadata, and citation and archive metadata. It flags "capability token", "audit residue", and "handshake" in those surfaces. Release notes, upgrade and migration guides, compatibility records, generated API reference output, and other articles are outside its scope, so historical and compatibility evidence is not rewritten. Identifiers that contain these words, such as `CapabilityTokenId`, `LiabilityHandshake*` types, or `AsiBackboneHandshake*` tables, do not match.
+
+Every retained use in a scanned surface is listed in `eng/docs/current-terminology.json` with its reason, for example the published `dynamic-liability-handshake` article URL and the `capability-token` NuGet discovery tag for the token encoding. An allowance that stops matching fails the check, so retained exceptions are reviewed rather than accumulated. The repository description and topics are GitHub settings rather than files, so the check cannot cover them; review them against this vocabulary when they change.
+
 ## Writing examples
 
 Prefer:

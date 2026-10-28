@@ -10,7 +10,7 @@
     <Authors>Christopher D. Cavell</Authors>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageReadmeFile>README.md</PackageReadmeFile>
-    <PackageTags>accountable-systems-infrastructure;asi-backbone;dotnet;governance;decision-flow;constraint-evaluation;audit;acknowledgment;capability-token</PackageTags>
+    <PackageTags>accountable-systems-infrastructure;asi-backbone;dotnet;governance;decision-flow;constraint-evaluation;audit;acknowledgment;capability-grant;capability-token</PackageTags>
     <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
     <AsiBackboneSuppressMissingXmlDocs>true</AsiBackboneSuppressMissingXmlDocs>
   </PropertyGroup>

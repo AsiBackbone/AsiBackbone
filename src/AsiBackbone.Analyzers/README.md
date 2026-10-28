@@ -25,7 +25,7 @@ Analyzer warnings are advisory by default. Hosts can keep exploratory rules as w
 
 `ASIB001` warns when an AsiBackbone governance artifact is created or returned and then discarded.
 
-Examples include discarded governance decisions, decision receipt, outbox entries, capability grants, handshake acknowledgments, and governance emission results.
+Examples include discarded governance decisions, decision receipt, outbox entries, capability grants, acknowledgment responses, and governance emission results.
 
 ```csharp
 GovernanceDecision.Allow(); // ASIB001

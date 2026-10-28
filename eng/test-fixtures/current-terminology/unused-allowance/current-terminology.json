@@ -1,0 +1,29 @@
+{
+  "scope": "Fixture surfaces.",
+  "surfaces": [
+    "README.md",
+    "src/*/README.md"
+  ],
+  "terms": [
+    {
+      "name": "capability token",
+      "pattern": "\\bcapability[ -]tokens?\\b",
+      "use": "capability grant",
+      "reason": "Fixture term."
+    },
+    {
+      "name": "handshake",
+      "pattern": "\\bhandshakes?\\b",
+      "use": "acknowledgment",
+      "reason": "Fixture term."
+    }
+  ],
+  "allowances": [
+    {
+      "path": "README.md",
+      "term": "handshake",
+      "linePattern": "articles/dynamic-liability-handshake\\.html",
+      "reason": "Retained published URL."
+    }
+  ]
+}
