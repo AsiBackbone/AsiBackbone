@@ -1,0 +1,39 @@
+{
+  "description": "Current-facing summary surfaces that must use the 7.0 public vocabulary. Only the listed paths are scanned; everything else is out of scope by construction.",
+  "scannedPaths": [
+    "README.md",
+    "CITATION.cff",
+    "docs/index.md",
+    "src/*/*.csproj"
+  ],
+  "legacyTerms": [
+    {
+      "pattern": "(?i)\\bcapability[- ]tokens?\\b",
+      "replacement": "capability grant",
+      "reason": "The 7.0 terminology migration made capability grant the current public vocabulary."
+    }
+  ],
+  "allowedLines": [],
+  "notScanned": [
+    {
+      "path": "CHANGELOG.md, docs/articles/release-notes-*.md, docs/articles/upgrade-*.md, docs/articles/quickstart-*.md",
+      "reason": "Historical release, migration, compatibility, and upgrade evidence is preserved as written."
+    },
+    {
+      "path": "docs/articles/alpha-package-boundary.md, docs/articles/stable-api-review.md, docs/articles/cryptographic-security-hardening-roadmap.md",
+      "reason": "Historical review and roadmap lineage that records the terminology in use at the time."
+    },
+    {
+      "path": "docs/api/**, docs/_site/**, eng/api-baseline/**",
+      "reason": "Generated API material and baselines mirror source identifiers and XML documentation."
+    },
+    {
+      "path": "src/**/*.cs, tests/**",
+      "reason": "Retained protocol and storage identifiers such as CapabilityTokenId and the asibackbone.capability-token-grant artifact type are compatibility contracts, not prose."
+    },
+    {
+      "path": "ReferenceApplication CapabilityTokens host features",
+      "reason": "Host-specific signed transport artifacts live in another repository and are reviewed there before any rename."
+    }
+  ]
+}

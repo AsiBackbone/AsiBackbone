@@ -222,7 +222,7 @@ $expectedPackages = @(
     [pscustomobject]@{
         Id = 'AsiBackbone.Core'
         Description = 'Framework-neutral Accountable Systems Infrastructure governance primitives for consequential .NET decision flow.'
-        Tags = @('accountable-systems-infrastructure', 'asi-backbone', 'dotnet', 'governance', 'decision-flow', 'constraint-evaluation', 'audit', 'acknowledgment', 'capability-token')
+        Tags = @('accountable-systems-infrastructure', 'asi-backbone', 'dotnet', 'governance', 'decision-flow', 'constraint-evaluation', 'audit', 'acknowledgment', 'capability-grant')
         ReadmeMustContain = @('Accountable Systems Infrastructure', $expectedStablePackageFamily)
         Dependencies = @('Microsoft.Extensions.Logging.Abstractions', 'Microsoft.Extensions.Options')
         FrameworkReferences = @()

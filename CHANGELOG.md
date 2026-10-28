@@ -22,6 +22,14 @@ This project follows the spirit of [Keep a Changelog](https://keepachangelog.com
   when either title differs from `AsiBackbone`, including by letter case, or when the two titles disagree. The release
   readiness guide documents how to correct the metadata of an already published Zenodo record without changing its
   archived files, version, creators, or DOI relationships.
+* Aligned current-facing capability terminology with the 7.0 vocabulary
+  ([#915](https://github.com/AsiBackbone/AsiBackbone/issues/915)). The `AsiBackbone.Core` summary in `README.md` now
+  describes capability-grant abstractions, and the `AsiBackbone.Core` NuGet tag changes from `capability-token` to
+  `capability-grant`. Historical release, upgrade, and compatibility documentation, generated API material, and
+  retained identifiers such as `CapabilityTokenId` and `asibackbone.capability-token-grant` are unchanged.
+  `scripts/Validate-CurrentTerminology.ps1` now fails CI when the README, homepage, citation metadata, or package
+  project metadata use legacy capability-token wording; its scanned paths, reviewed line allowances, and documented
+  exclusions live in `eng/docs/current-terminology.json`.
 
 ## [7.5.2] - 2026-10-25
 

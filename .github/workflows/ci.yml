@@ -123,6 +123,14 @@ jobs:
         shell: pwsh
         run: ./scripts/Validate-LandingPage.ps1 -SiteDirectory ./docs/_site
 
+      - name: Test current terminology validator
+        shell: pwsh
+        run: ./scripts/Validate-CurrentTerminology.ps1 -SelfTest
+
+      - name: Validate current terminology
+        shell: pwsh
+        run: ./scripts/Validate-CurrentTerminology.ps1
+
       - name: Test published HTML metadata tooling
         shell: pwsh
         run: ./scripts/Ensure-PublishedHtmlMetadata.ps1 -SelfTest
