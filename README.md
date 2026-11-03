@@ -44,6 +44,36 @@ AsiBackbone is a .NET package family for that decision boundary. It helps a host
 
 **Is it a good fit?** Consider AsiBackbone when a consequential host-owned action needs policy provenance, acknowledgment, scoped continuation authority, or durable decision evidence. Prefer ordinary framework authorization, application services, and logs when the action is low risk and those simpler boundaries already provide the evidence you need. See [Adoption and Target Use Cases](https://asibackbone.github.io/AsiBackbone/articles/use-cases.html) for the detailed product-fit and simpler-design guidance.
 
+## Five-minute evaluator path
+
+Want to see one policy-as-code decision allow an operation and block another before you read about the package family? With .NET SDK 10.0.400 or a later 10.0.4xx patch installed (pinned in `global.json`):
+
+```bash
+git clone https://github.com/AsiBackbone/AsiBackbone.git
+cd AsiBackbone
+dotnet run samples/FiveMinuteEvaluator/evaluate.cs
+```
+
+The single-file app restores the published `AsiBackbone.Core` package, registers one host-owned rule, and evaluates the same `orders.approve` request for two regions. The output looks like this (receipt IDs omitted):
+
+```text
+orders.approve in US-LA
+  Outcome:        Allowed
+  Reasons:        (none)
+  Host executed:  yes
+
+orders.approve in EU-DE
+  Outcome:        Denied
+  Reasons:        orders.region.not-allowed
+  Host executed:  no
+
+Host executions: 1 of 2. The blocked request never reached host code.
+```
+
+Look for one thing: AsiBackbone returns a decision and a decision receipt, and the host's own code runs only when `decision.CanProceed` is true. The evaluator uses one package and no web host, database, or signing. It is a way to evaluate the approach, not a starting point for adoption. When you're ready to adopt, use [First 15 Minutes: Standard API Gating](https://asibackbone.github.io/AsiBackbone/articles/quickstart-api-gating.html).
+
+If something in this path was unclear or failed, ask in [Q&A](https://github.com/orgs/AsiBackbone/discussions/categories/q-a).
+
 ## Implementation-first mental model
 
 A normal API adoption path looks like this:
@@ -187,15 +217,12 @@ If meaningful external consumer demand appears, additional TFM support can be re
 
 Use the organization as one connected path; each repository has a distinct job:
 
-1. **Learn the pattern:** start with [AsiBackbone Learning](https://asibackbone.github.io/Learning/)
-   for concepts, tutorials, labs, comparisons, and adoption personas.
-2. **Try a complete host:** use
-   [NetCoreApplicationTemplate](https://github.com/AsiBackbone/NetCoreApplicationTemplate)
-   when you want a production-oriented ASP.NET Core baseline to evaluate or adapt.
-3. **Adopt the packages:** return here for the
-   [implementation-first path](https://asibackbone.github.io/AsiBackbone/articles/implementation-first-adoption.html),
-   install only the `AsiBackbone.*` packages your host needs, and validate one
-   low-risk governed operation before expanding.
+| If you want to... | Use | Role |
+| --- | --- | --- |
+| Learn the pattern | [AsiBackbone Learning](https://asibackbone.github.io/Learning/) | Concepts, tutorials, labs, comparisons, and tradeoffs, including when the pattern is unnecessary. Needs no AsiBackbone package. |
+| Start a secure application | [NetCoreApplicationTemplate](https://github.com/AsiBackbone/NetCoreApplicationTemplate) | A secure-by-default ASP.NET Core application baseline to evaluate or adapt, with or without AsiBackbone. |
+| See the pieces running together | [ReferenceApplication](https://github.com/AsiBackbone/ReferenceApplication) | A runnable integration specimen that builds on NetCoreApplicationTemplate and adds AsiBackbone governance (currently pre-release). |
+| Adopt the packages | This repository | Package behavior, APIs, compatibility, and the [implementation-first path](https://asibackbone.github.io/AsiBackbone/articles/implementation-first-adoption.html). Install only the `AsiBackbone.*` packages your host needs, and validate one low-risk governed operation before expanding. |
 
 Already evaluating or using the project? See the public [adopter registry](ADOPTERS.md)
 and use its report form to share permission-based adoption evidence or feedback.
@@ -241,6 +268,20 @@ Consumer verification evidence is recorded in the [7.5.2 Consumer Verification G
 Consumers moving from the previous stable line must follow the [6.x to 7.0 upgrade guide](https://github.com/AsiBackbone/AsiBackbone/blob/main/docs/articles/upgrade-600-to-700.md).
 [Major Version History and Upgrade Cost](https://github.com/AsiBackbone/AsiBackbone/blob/main/docs/articles/major-version-history.md) explains why each major version since `1.x` was necessary and what each upgrade costs.
 Earlier release records remain available for historical traceability.
+
+## Feedback that helps most now
+
+AsiBackbone is a stable `7.5.x` package family targeting `net10.0`. It returns governance decisions and receipts; the host keeps execution ownership. It does not certify compliance or make an application secure on its own, and ordinary framework authorization is often the simpler design (see [Project Boundaries and Non-Claims](https://asibackbone.github.io/AsiBackbone/articles/project-boundaries.html)).
+
+At this stage, the most useful feedback is from people evaluating the package family for the first time: steps that were unclear or failed, packages or examples that would make evaluation easier, and applications where the approach does not fit.
+
+| Discussion category | Question to answer |
+| --- | --- |
+| [Q&A](https://github.com/orgs/AsiBackbone/discussions/categories/q-a) | What is unclear or fails in the five-minute evaluator path or the First 15 Minutes walkthrough? |
+| [Ideas](https://github.com/orgs/AsiBackbone/discussions/categories/ideas) | Which package or example would make evaluation easier? |
+| [Architecture & Integration](https://github.com/orgs/AsiBackbone/discussions/categories/architecture-integration) | Where would this policy-as-code and host-owned-execution approach not fit your application? |
+
+Name `AsiBackbone/AsiBackbone` in the discussion when it is specific to this repository. For a reproducible bug, a focused feature request, or a documentation change, use the [issue forms](https://github.com/AsiBackbone/AsiBackbone/issues/new/choose) instead. Report vulnerabilities privately through the [Security Policy](SECURITY.md).
 
 ## Support and project stewardship
 

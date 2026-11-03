@@ -18,6 +18,7 @@ These records are public for traceability, but they are not part of the normal c
 - [Policy Evaluator Allocation Review](../articles/policy-evaluator-allocation-review.md)
 - [EF Core Outbox Bulk-Claim Performance Evaluation](../articles/efcore-outbox-bulk-claim-evaluation.md)
 - [API Baseline and Boundary Checks](../articles/api-baseline-and-boundary-checks.md)
+- [Package Discovery Metadata Review](../articles/package-discovery-metadata-review.md)
 - [Public API XML Documentation](../articles/public-api-xml-documentation.md)
 - [Production Placeholder Exception Guardrails](../articles/production-placeholder-exception-guardrails.md)
 - [Post-2.0.0 Documentation Currency Review](../articles/post-200-documentation-currency-review.md)

@@ -94,8 +94,8 @@ Before tagging a stable release, the release PR or release-readiness record shou
 
 | Area | Confirmation |
 | --- | --- |
-| Version metadata | `Directory.Build.props`, package filenames, release notes, changelog, citation metadata, Zenodo metadata, and tag expectations align, and `CITATION.cff` and `.zenodo.json` both use the canonical title `AsiBackbone`. |
-| Package identity | Package IDs, namespaces, stable package list, descriptions, tags, license metadata, project URL, repository URL, and repository commit metadata are current. |
+| Version metadata | `Directory.Build.props`, package filenames, release notes, changelog, citation metadata, Zenodo metadata, the `AsiBackbone.Core` pin in `samples/FiveMinuteEvaluator/evaluate.cs`, and tag expectations align, and `CITATION.cff` and `.zenodo.json` both use the canonical title `AsiBackbone`. |
+| Package identity | Package IDs, namespaces, stable package list, descriptions, tags (including the required discovery vocabulary in the [Package Discovery Metadata Review](package-discovery-metadata-review.md)), license metadata, project URL, repository URL, and repository commit metadata are current. |
 | Package assets | Package icon is regenerated when needed, included in generated packages, and inspected at package-list/detail sizes; packaged README files are present and render acceptably. |
 | Documentation links | README links, DocFX navigation, article index, release notes, migration notes, and GitHub Pages links point to current pages. |
 | Source Link | Source Link repository commit metadata is generated, and any required post-publish NuGet validation command is documented. |
