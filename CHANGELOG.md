@@ -8,6 +8,19 @@ This project follows the spirit of [Keep a Changelog](https://keepachangelog.com
 
 ### Changed
 
+* Added a five-minute evaluator path to the README. `samples/FiveMinuteEvaluator/evaluate.cs` is a single-file app on
+  the published `AsiBackbone.Core` package in which one host-owned constraint allows one request and blocks another,
+  and only the allowed request reaches host code. The First 15 Minutes walkthrough remains the adoption route. The
+  version-consistency validator enforces the evaluator's package pin, and the external consumer smoke test runs it
+  against locally packed packages.
+* The README's "Choose your path" now gives Learning, NetCoreApplicationTemplate, ReferenceApplication, and this
+  repository distinct roles. A new "Feedback that helps most now" section links the Q&A, Ideas, and Architecture &
+  Integration discussion categories with concrete questions, next to the support and non-certification boundaries.
+* Reviewed repository and NuGet package metadata as one discovery surface and recorded the result in the
+  [Package Discovery Metadata Review](docs/articles/package-discovery-metadata-review.md). `AsiBackbone.Core` adds
+  the `policy-as-code` tag and names policy evaluation, decision receipts, and capability grants in its description,
+  starting with the next packed release. `Validate-NuGetPackageMetadata.ps1` now requires the reviewed discovery
+  vocabulary so release work cannot silently drop it.
 * Replaced the documentation logo, icon sizes, favicon, NuGet package icon, and README/social preview with the
   governance-spine glyph from the AsiBackbone glyph family. File names and image dimensions are unchanged; the
   superseded `docs/images/asibackbone-icon.svg` source is removed.

@@ -12,6 +12,7 @@ A project belongs in this directory when its primary purpose is to demonstrate c
 
 | Project | Product behavior demonstrated | Documentation |
 | --- | --- | --- |
+| `FiveMinuteEvaluator` | Single-file evaluation slice: one `AsiBackbone.Core` constraint allows one request and blocks another, and only the allowed one reaches host code. | [Five-Minute Evaluator](FiveMinuteEvaluator/README.md) |
 | `PlainAspNetCoreHost` | Standard ASP.NET Core registration, governance evaluation, endpoint integration, audit behavior, and host-owned execution boundaries. | [Plain ASP.NET Core Host Sample](../docs/articles/plain-aspnetcore-host-sample.md) |
 | `AsiBackboneAspireAppHost` | Optional .NET Aspire orchestration around AsiBackbone sample services without making Aspire a package-family dependency. | [Aspire AppHost Sample](../docs/articles/aspire-apphost-sample.md) |
 | `NcatAuditCompletionAdapter` | Concrete adapter behavior around AsiBackbone audit-completion/lifecycle integration. | [NCAT Audit Completion Adapter](../docs/articles/ncat-audit-completion-adapter.md) |

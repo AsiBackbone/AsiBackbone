@@ -447,4 +447,33 @@ CSHARP
 
 dotnet test --project "$smoke_project" --configuration "$configuration" --verbosity normal
 
+# The README's five-minute evaluator is a file-based app pinned to the release version. Copying it outside the
+# repository uses the smoke NuGet.config above, so AsiBackbone.Core restores from the locally packed packages.
+evaluator_dir="$work_root/FiveMinuteEvaluator"
+mkdir -p "$evaluator_dir"
+cp "$repo_root/samples/FiveMinuteEvaluator/evaluate.cs" "$evaluator_dir/evaluate.cs"
+
+evaluator_pin="$(sed -nE 's/^#:package AsiBackbone\.Core@([^[:space:]]+).*/\1/p' "$evaluator_dir/evaluate.cs" | head -n 1)"
+if [ "$evaluator_pin" != "$package_version" ]; then
+  echo "samples/FiveMinuteEvaluator/evaluate.cs pins AsiBackbone.Core@$evaluator_pin, but the packed version is $package_version."
+  exit 1
+fi
+
+pushd "$evaluator_dir" > /dev/null
+evaluator_output="$(dotnet run evaluate.cs)"
+popd > /dev/null
+
+printf '%s\n' "$evaluator_output"
+
+for expected in \
+  "Outcome:        Allowed" \
+  "Outcome:        Denied" \
+  "orders.region.not-allowed" \
+  "Host executions: 1 of 2."; do
+  if ! grep -qF "$expected" <<< "$evaluator_output"; then
+    echo "Five-minute evaluator output did not contain: $expected"
+    exit 1
+  fi
+done
+
 echo "External consumer smoke test completed successfully."

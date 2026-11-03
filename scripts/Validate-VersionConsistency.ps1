@@ -236,6 +236,23 @@ if (Test-Path -LiteralPath $zenodoPath -PathType Leaf) {
     }
 }
 
+# The README's five-minute evaluator restores the published AsiBackbone.Core package by an explicit file-based app pin,
+# so a release that moves the repository version must move the pin with it.
+$evaluatorPath = Resolve-RepositoryPath 'samples/FiveMinuteEvaluator/evaluate.cs'
+if (-not (Test-Path -LiteralPath $evaluatorPath -PathType Leaf)) {
+    Add-Failure 'samples/FiveMinuteEvaluator/evaluate.cs was not found.'
+}
+else {
+    $evaluator = Get-Content -LiteralPath $evaluatorPath -Raw
+    $evaluatorVersion = Get-RegexGroupValue $evaluator '(?m)^#:package\s+AsiBackbone\.Core@(?<version>\S+)\s*$' 'version' 'samples/FiveMinuteEvaluator/evaluate.cs AsiBackbone.Core package pin' $false
+    if ([string]::IsNullOrWhiteSpace($evaluatorVersion)) {
+        Add-Failure 'samples/FiveMinuteEvaluator/evaluate.cs must pin AsiBackbone.Core with a "#:package AsiBackbone.Core@<version>" directive.'
+    }
+    else {
+        Assert-Equal $evaluatorVersion $ExpectedVersion 'samples/FiveMinuteEvaluator/evaluate.cs AsiBackbone.Core package pin'
+    }
+}
+
 if (-not [string]::IsNullOrWhiteSpace($citationTitle) -and
     -not [string]::IsNullOrWhiteSpace($zenodoTitle) -and
     -not [string]::Equals($citationTitle, $zenodoTitle, [System.StringComparison]::Ordinal)) {

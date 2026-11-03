@@ -26,6 +26,8 @@
       href: ../articles/efcore-outbox-bulk-claim-evaluation.md
     - name: API Baseline and Boundary Checks
       href: ../articles/api-baseline-and-boundary-checks.md
+    - name: Package Discovery Metadata Review
+      href: ../articles/package-discovery-metadata-review.md
     - name: Public API XML Documentation
       href: ../articles/public-api-xml-documentation.md
     - name: Production Placeholder Exception Guardrails

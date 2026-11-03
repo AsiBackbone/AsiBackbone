@@ -6,11 +6,11 @@
     <Nullable>enable</Nullable>
     <PackageId>AsiBackbone.Core</PackageId>
     <Title>AsiBackbone Core</Title>
-    <Description>Framework-neutral Accountable Systems Infrastructure governance primitives for consequential .NET decision flow.</Description>
+    <Description>Framework-neutral Accountable Systems Infrastructure governance primitives for policy evaluation, decision receipts, and capability grants in consequential .NET decision flow.</Description>
     <Authors>Christopher D. Cavell</Authors>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageReadmeFile>README.md</PackageReadmeFile>
-    <PackageTags>accountable-systems-infrastructure;asi-backbone;dotnet;governance;decision-flow;constraint-evaluation;audit;acknowledgment;capability-grant;capability-token</PackageTags>
+    <PackageTags>accountable-systems-infrastructure;asi-backbone;dotnet;governance;policy-as-code;decision-flow;constraint-evaluation;audit;acknowledgment;capability-grant;capability-token</PackageTags>
     <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
     <AsiBackboneSuppressMissingXmlDocs>true</AsiBackboneSuppressMissingXmlDocs>
   </PropertyGroup>

@@ -221,8 +221,8 @@ else {
 $expectedPackages = @(
     [pscustomobject]@{
         Id = 'AsiBackbone.Core'
-        Description = 'Framework-neutral Accountable Systems Infrastructure governance primitives for consequential .NET decision flow.'
-        Tags = @('accountable-systems-infrastructure', 'asi-backbone', 'dotnet', 'governance', 'decision-flow', 'constraint-evaluation', 'audit', 'acknowledgment', 'capability-grant', 'capability-token')
+        Description = 'Framework-neutral Accountable Systems Infrastructure governance primitives for policy evaluation, decision receipts, and capability grants in consequential .NET decision flow.'
+        Tags = @('accountable-systems-infrastructure', 'asi-backbone', 'dotnet', 'governance', 'policy-as-code', 'decision-flow','constraint-evaluation', 'audit', 'acknowledgment', 'capability-grant', 'capability-token')
         ReadmeMustContain = @('Accountable Systems Infrastructure', $expectedStablePackageFamily)
         Dependencies = @('Microsoft.Extensions.Logging.Abstractions', 'Microsoft.Extensions.Options')
         FrameworkReferences = @()
@@ -308,6 +308,58 @@ $expectedPackages = @(
         FrameworkReferences = @()
     }
 )
+
+# External search vocabulary reviewed in docs/articles/package-discovery-metadata-review.md. The exact Description and
+# Tags above can change during release work; these terms guard against silently dropping the words evaluators search
+# for. Removing one requires updating that review record and this list together.
+$discoveryReviewPath = 'docs/articles/package-discovery-metadata-review.md'
+$requiredDiscoveryTags = [ordered]@{
+    'governance' = @($expectedPackages | ForEach-Object { $_.Id })
+    'policy-as-code' = @('AsiBackbone.Core')
+    'audit' = @('AsiBackbone.Core')
+    'capability-grant' = @('AsiBackbone.Core')
+    'aspnetcore' = @('AsiBackbone.AspNetCore', 'AsiBackbone.Testing', 'AsiBackbone.Templates')
+    'entity-framework-core' = @('AsiBackbone.EntityFrameworkCore')
+    'efcore' = @('AsiBackbone.EntityFrameworkCore')
+    'opentelemetry' = @('AsiBackbone.OpenTelemetry')
+    'roslyn' = @('AsiBackbone.Analyzers')
+    'analyzer' = @('AsiBackbone.Analyzers')
+    'policy-evaluation' = @('AsiBackbone.Testing')
+}
+$requiredDiscoveryDescriptionTerms = [ordered]@{
+    'AsiBackbone.Core' = @('policy evaluation', 'decision receipts', 'capability grants', '.NET')
+    'AsiBackbone.AspNetCore' = @('ASP.NET Core')
+    'AsiBackbone.EntityFrameworkCore' = @('Entity Framework Core')
+    'AsiBackbone.OpenTelemetry' = @('OpenTelemetry')
+    'AsiBackbone.Analyzers' = @('Roslyn analyzer')
+    'AsiBackbone.Templates' = @('dotnet new', 'ASP.NET Core')
+}
+
+foreach ($tag in $requiredDiscoveryTags.Keys) {
+    foreach ($packageId in $requiredDiscoveryTags[$tag]) {
+        $expectedPackage = $expectedPackages | Where-Object { $_.Id -eq $packageId } | Select-Object -First 1
+        if ($null -eq $expectedPackage) {
+            Add-Failure "Discovery vocabulary names unknown package '$packageId'. Update $discoveryReviewPath and the vocabulary list together."
+        }
+        elseif ($expectedPackage.Tags -notcontains $tag) {
+            Add-Failure "$packageId must keep the reviewed discovery tag '$tag'. Update $discoveryReviewPath before removing it."
+        }
+    }
+}
+
+foreach ($packageId in $requiredDiscoveryDescriptionTerms.Keys) {
+    $expectedPackage = $expectedPackages | Where-Object { $_.Id -eq $packageId } | Select-Object -First 1
+    if ($null -eq $expectedPackage) {
+        Add-Failure "Discovery vocabulary names unknown package '$packageId'. Update $discoveryReviewPath and the vocabulary list together."
+        continue
+    }
+
+    foreach ($term in $requiredDiscoveryDescriptionTerms[$packageId]) {
+        if ($expectedPackage.Description.IndexOf($term, [System.StringComparison]::Ordinal) -lt 0) {
+            Add-Failure "$packageId description must keep the reviewed discovery term '$term'. Update $discoveryReviewPath before removing it."
+        }
+    }
+}
 
 $packageDirectoryPath = Resolve-RepositoryPath $PackageDirectory
 if (-not (Test-Path -LiteralPath $packageDirectoryPath -PathType Container)) {
