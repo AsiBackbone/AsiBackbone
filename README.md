@@ -221,7 +221,7 @@ Use the organization as one connected path; each repository has a distinct job:
 | --- | --- | --- |
 | Learn the pattern | [AsiBackbone Learning](https://asibackbone.github.io/Learning/) | Concepts, tutorials, labs, comparisons, and tradeoffs, including when the pattern is unnecessary. Needs no AsiBackbone package. |
 | Start a secure application | [NetCoreApplicationTemplate](https://github.com/AsiBackbone/NetCoreApplicationTemplate) | A secure-by-default ASP.NET Core application baseline to evaluate or adapt, with or without AsiBackbone. |
-| See the pieces running together | [ReferenceApplication](https://github.com/AsiBackbone/ReferenceApplication) | A runnable integration specimen that builds on NetCoreApplicationTemplate and adds AsiBackbone governance (currently pre-release). |
+| See the pieces running together | [ReferenceApplication](https://github.com/AsiBackbone/ReferenceApplication) | A runnable integration specimen that builds on NetCoreApplicationTemplate and adds AsiBackbone governance (stable `1.x`). |
 | Adopt the packages | This repository | Package behavior, APIs, compatibility, and the [implementation-first path](https://asibackbone.github.io/AsiBackbone/articles/implementation-first-adoption.html). Install only the `AsiBackbone.*` packages your host needs, and validate one low-risk governed operation before expanding. |
 
 Already evaluating or using the project? See the public [adopter registry](ADOPTERS.md)

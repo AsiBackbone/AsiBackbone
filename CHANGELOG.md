@@ -8,6 +8,8 @@ This project follows the spirit of [Keep a Changelog](https://keepachangelog.com
 
 ### Changed
 
+* The README "Choose your path" table now describes ReferenceApplication as stable `1.x` instead of pre-release,
+  matching its prepared `1.0.0` release.
 * Added a five-minute evaluator path to the README. `samples/FiveMinuteEvaluator/evaluate.cs` is a single-file app on
   the published `AsiBackbone.Core` package in which one host-owned constraint allows one request and blocks another,
   and only the allowed request reaches host code. The First 15 Minutes walkthrough remains the adoption route. The
