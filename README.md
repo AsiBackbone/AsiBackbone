@@ -10,6 +10,7 @@
 [![Line Coverage Gate](https://img.shields.io/badge/line%20coverage%20gate-75%25-brightgreen)](https://asibackbone.github.io/AsiBackbone/coverage/index.html)
 [![Core Branch Coverage Gate](https://img.shields.io/badge/core%20branch%20gate-90%25-brightgreen)](https://asibackbone.github.io/AsiBackbone/coverage/core/index.html)
 [![OpenSSF Best Practices](https://www.bestpractices.dev/projects/13630/badge)](https://www.bestpractices.dev/projects/13630)
+[![OpenSSF Scorecard](https://api.scorecard.dev/projects/github.com/AsiBackbone/AsiBackbone/badge)](https://scorecard.dev/viewer/?uri=github.com/AsiBackbone/AsiBackbone)
 [![Documentation](https://github.com/AsiBackbone/AsiBackbone/actions/workflows/publish-docs.yml/badge.svg)](https://github.com/AsiBackbone/AsiBackbone/actions/workflows/publish-docs.yml)
 [![Docs](https://img.shields.io/badge/docs-GitHub%20Pages-blue)](https://asibackbone.github.io/AsiBackbone/)
 [![.NET](https://img.shields.io/badge/.NET-10.0-purple)](https://dotnet.microsoft.com/)
