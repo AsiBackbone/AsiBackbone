@@ -84,8 +84,9 @@ its evidence exists.
 - [ ] CI, stable release validation, CodeQL, dependency review, dependency
   scanning, provider-contention, template smoke, external-consumer, and
   documentation link validation jobs are green for the release-candidate commit.
-- [ ] The non-publishing package workflow produces the expected package, SBOM,
-  hash, and release-evidence artifacts for maintainer review.
+- [ ] The non-publishing package workflow produces the expected packages,
+  SBOMs, hash manifest, and package and SBOM provenance attestations for
+  maintainer review.
 - [ ] The tag will be created from the validated commit already merged to
   protected `main`, after CI on that merge commit has completed.
 
