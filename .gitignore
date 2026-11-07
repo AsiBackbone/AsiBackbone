@@ -492,3 +492,7 @@ $RECYCLE.BIN/
 /.local-hosts/
 /template-hosts/
 /scratch/
+
+# The file-based evaluator targets a package that is rebuilt from the release
+# tag. A pre-publication lock would bind it to a different package content hash.
+/samples/FiveMinuteEvaluator/packages.lock.json

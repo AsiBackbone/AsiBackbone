@@ -22,7 +22,9 @@ its evidence exists.
   `2026-11-06`, and canonical product title `AsiBackbone`.
 - [x] Template fallback package references and the five-minute evaluator use
   `7.5.3`.
-- [x] NuGet lock files are refreshed for the `7.5.3` in-repository graph.
+- [x] Tracked NuGet lock files are refreshed for the `7.5.3` in-repository
+  graph. The file-based evaluator lock is intentionally untracked because a
+  pre-publication package hash can differ from the tagged release artifact.
 - [x] Documentation publication state identifies `7.5.3` as released and
   current for the stable tag candidate.
 - [x] Public API baselines pass with no stable API change.
@@ -73,6 +75,9 @@ its evidence exists.
 - Both template host styles built with zero warnings and errors. The external
   consumer smoke test passed its HTTP decision flow and five-minute evaluator;
   the stable-package integration suite passed all six tests.
+- Version validation rejects a tracked five-minute evaluator lock file, while
+  the external-consumer smoke test validates the evaluator against packages
+  built from the exact candidate commit.
 
 ## Hosted evidence required before tagging
 
