@@ -28,9 +28,9 @@ The measurable rules for deprecation windows, major-release spacing, advance ann
 
 ## Current `7.x` stabilization posture
 
-`7.x` is the stable package line maintained on `main`. The current stable release is `7.5.2`.
+`7.x` is the stable package line maintained on `main`. The current stable release is `7.5.3`.
 
-The `7.5.2` release preserves the package IDs, `net10.0` target, public APIs, durable contracts, canonical wire values, documented defaults, and runtime decision behavior. It updates Microsoft dependency minimums to `10.0.14`, Aspire sample hosting to `13.6.4`, and FsCheck test tooling to `3.6.0`.
+The `7.5.3` release preserves the package IDs, `net10.0` target, public APIs, durable contracts, canonical wire values, documented defaults, declared runtime dependency minimums, and runtime decision behavior. It improves package discovery metadata, evaluation guidance, terminology and documentation validation, visual identity, and repository tooling.
 
 Managed assemblies retain binary identity `7.0.0.0` throughout the compatible `7.x` line.
 

@@ -1,7 +1,7 @@
 {
   "publication": {
     "state": "released",
-    "latestPublishedVersion": "7.5.2"
+    "latestPublishedVersion": "7.5.3"
   },
   "excludedPaths": [
     "docs/articles/release-notes-*.md",
