@@ -264,8 +264,8 @@
       "asibackbone.signing.localdevelopment": {
         "type": "Project",
         "dependencies": {
-          "AsiBackbone.Core": "[7.5.2, )",
-          "AsiBackbone.DependencyInjection": "[7.5.2, )"
+          "AsiBackbone.Core": "[7.5.3, )",
+          "AsiBackbone.DependencyInjection": "[7.5.3, )"
         }
       },
       "Microsoft.Extensions.DependencyInjection": {

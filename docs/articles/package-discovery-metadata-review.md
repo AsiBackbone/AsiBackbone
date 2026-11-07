@@ -45,14 +45,14 @@ Each package keeps tags that describe its own role. The review did not copy one 
 
 - **Gap:** `policy-as-code` is a repository topic and appears in the repository description, but no package carries it. Core, the package that owns policy evaluation, didn't mention "policy" in its description or tags at all.
 - **NuGet search, 2026-11-03:** a search for `policy-as-code` and a `tags:policy-as-code` search each returned no `AsiBackbone.*` package in the top 20 results. Searches for `policy evaluation` and `capability grant` also returned none.
-- **Published drift:** the published `7.5.2` Core package carries `capability-token` but not `capability-grant`. The source tag was added after `7.5.2` by the 7.0-vocabulary terminology alignment ([#918](https://github.com/AsiBackbone/AsiBackbone/pull/918)), so it first ships with the next release.
+- **Published drift resolved in `7.5.3`:** the published `7.5.2` Core package carries `capability-token` but not `capability-grant`. The source tag was added after `7.5.2` by the 7.0-vocabulary terminology alignment ([#918](https://github.com/AsiBackbone/AsiBackbone/pull/918)) and first ships in `7.5.3`.
 
 **Change:**
 
 - Description, from "Framework-neutral Accountable Systems Infrastructure governance primitives for consequential .NET decision flow." to "Framework-neutral Accountable Systems Infrastructure governance primitives for policy evaluation, decision receipts, and capability grants in consequential .NET decision flow."
 - Tags: add `policy-as-code`.
 
-Both changes take effect when the next release is packed. The published `7.5.2` packages are unchanged.
+Both changes take effect in the `7.5.3` packages. The published `7.5.2` packages remain unchanged.
 
 **Not changed, and why:**
 

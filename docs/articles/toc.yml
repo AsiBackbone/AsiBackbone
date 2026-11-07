@@ -233,6 +233,12 @@
 
 - name: Releases & Compatibility
   items:
+    - name: 7.5.3 Release Notes
+      href: release-notes-753.md
+    - name: 7.5.3 Release Readiness Record
+      href: release-readiness-753.md
+    - name: 7.5.3 Consumer Verification Guide
+      href: consumer-verification-753.md
     - name: 7.5.2 Release Notes
       href: release-notes-752.md
     - name: 7.5.2 Release Readiness Record

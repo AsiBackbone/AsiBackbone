@@ -4,7 +4,12 @@ All notable changes to this project are documented in this file.
 
 This project follows the spirit of [Keep a Changelog](https://keepachangelog.com/) and adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [7.5.3] - 2026-11-06
+
+`7.5.3` is a backward-compatible maintenance patch for the stable `7.x` package family. It improves package
+discovery, evaluation guidance, terminology and documentation validation, visual identity, and repository tooling
+without changing public APIs, durable schemas, canonical wire values, package IDs, target framework, documented
+defaults, runtime decision behavior, or binary assembly identity.
 
 ### Changed
 
