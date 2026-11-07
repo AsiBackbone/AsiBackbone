@@ -258,8 +258,8 @@ else {
 # example, because Source Link records the exact commit). Never commit the
 # evaluator's generated lock file before the published package exists.
 $evaluatorLockRelativePath = 'samples/FiveMinuteEvaluator/packages.lock.json'
-$trackedEvaluatorLock = & git -C $repoRoot ls-files --error-unmatch -- $evaluatorLockRelativePath 2>$null
-if ($LASTEXITCODE -eq 0 -and -not [string]::IsNullOrWhiteSpace(($trackedEvaluatorLock -join ''))) {
+$trackedEvaluatorLock = & git -C $repoRoot ls-files -- $evaluatorLockRelativePath
+if (-not [string]::IsNullOrWhiteSpace(($trackedEvaluatorLock -join ''))) {
     Add-Failure "$evaluatorLockRelativePath must not be tracked because its pre-publication package content hash can differ from the tagged release artifact."
 }
 
