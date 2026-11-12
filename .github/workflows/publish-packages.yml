@@ -28,6 +28,7 @@ env:
   PACKAGE_OUTPUT: ./artifacts/packages
   SBOM_OUTPUT: ./artifacts/package-sbom
   RELEASE_EVIDENCE_OUTPUT: ./artifacts/release-evidence
+  SIGSTORE_BUNDLE_OUTPUT: ./artifacts/package-sigstore
 
 concurrency:
   group: publish-asi-backbone-packages-${{ github.ref }}
@@ -231,6 +232,72 @@ jobs:
           name: asi-backbone-packages
           path: ./artifacts/packages
 
+      # Tag-push releases sign the exact validated build packages that the
+      # release-evidence job attaches to the GitHub release. Signing happens in
+      # this protected-environment job, before NuGet publication, so a signing
+      # or verification failure stops the release. Cosign uses the job's GitHub
+      # Actions OIDC token for a short-lived Fulcio certificate; no long-lived
+      # signing key or secret is involved.
+      - name: Download package SBOM artifacts for signing
+        if: github.event_name == 'push'
+        uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        with:
+          name: asi-backbone-package-sboms
+          path: ${{ env.SBOM_OUTPUT }}
+
+      - name: Install Cosign
+        if: github.event_name == 'push'
+        uses: sigstore/cosign-installer@756fe2d284c7292c4e9b62c8a28f1e5629c59532 # v4.1.3
+
+      - name: Sign release build packages with Sigstore
+        if: github.event_name == 'push'
+        shell: bash
+        run: |
+          set -euo pipefail
+          shopt -s nullglob
+
+          packages=(./artifacts/packages/*.nupkg)
+
+          if [ "${#packages[@]}" -eq 0 ]; then
+            echo "::error::No package artifacts were found to sign."
+            exit 1
+          fi
+
+          mkdir -p "$SIGSTORE_BUNDLE_OUTPUT"
+
+          for package in "${packages[@]}"; do
+            bundle="$SIGSTORE_BUNDLE_OUTPUT/$(basename "$package").sigstore.json"
+            echo "Signing $package"
+            cosign sign-blob --yes --bundle "$bundle" "$package"
+          done
+
+      - name: Verify Sigstore bundles before publication
+        if: github.event_name == 'push'
+        shell: pwsh
+        env:
+          RELEASE_TAG: ${{ github.ref_name }}
+          REPOSITORY: ${{ github.repository }}
+          SOURCE_COMMIT: ${{ github.sha }}
+        run: >
+          ./scripts/Assert-SigstorePackageBundles.ps1
+          -PackageDirectory ./artifacts/packages
+          -BundleDirectory $env:SIGSTORE_BUNDLE_OUTPUT
+          -SbomManifestPath (Join-Path $env:SBOM_OUTPUT 'sbom-manifest.json')
+          -TagName $env:RELEASE_TAG
+          -SourceCommit $env:SOURCE_COMMIT
+          -Repository $env:REPOSITORY
+          -IncludeNegativeChecks
+
+      - name: Upload Sigstore bundle artifacts
+        if: github.event_name == 'push'
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: asi-backbone-package-sigstore-bundles
+          path: ${{ env.SIGSTORE_BUNDLE_OUTPUT }}/*.sigstore.json
+          if-no-files-found: error
+          # A re-run of this job re-signs the same validated packages.
+          overwrite: true
+
       - name: Resolve package source
         id: source
         shell: bash
@@ -318,6 +385,16 @@ jobs:
           name: asi-backbone-packages
           path: ${{ env.PACKAGE_OUTPUT }}
 
+      - name: Download Sigstore bundle artifacts
+        uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        with:
+          name: asi-backbone-package-sigstore-bundles
+          path: ${{ env.SIGSTORE_BUNDLE_OUTPUT }}
+
+      # Verification only: this job holds no id-token permission and cannot sign.
+      - name: Install Cosign
+        uses: sigstore/cosign-installer@756fe2d284c7292c4e9b62c8a28f1e5629c59532 # v4.1.3
+
       - name: Prepare durable release evidence
         shell: pwsh
         env:
@@ -352,6 +429,7 @@ jobs:
           ./scripts/New-ReleaseEvidence.ps1 `
             -PackageDirectory $env:PACKAGE_OUTPUT `
             -SbomDirectory $env:SBOM_OUTPUT `
+            -SigstoreBundleDirectory $env:SIGSTORE_BUNDLE_OUTPUT `
             -ReleaseNotesPath $notesPath `
             -OutputDirectory $env:RELEASE_EVIDENCE_OUTPUT `
             -TagName $env:RELEASE_TAG `
@@ -421,3 +499,62 @@ jobs:
                   throw "Provenance verification failed for released package '$($package.Name)'."
               }
           }
+
+      # Consumers download release assets without credentials and after the
+      # temporary workflow artifacts expire, so this check fetches the published
+      # evidence manifest, packages, and bundles anonymously from the public
+      # release download URLs and verifies them against the exact signer
+      # identity, including tamper, untrusted-identity, and swapped-bundle
+      # cases that must fail.
+      - name: Verify released Sigstore bundles from anonymous download
+        shell: pwsh
+        env:
+          RELEASE_TAG: ${{ github.ref_name }}
+          REPOSITORY: ${{ github.repository }}
+          SOURCE_COMMIT: ${{ github.sha }}
+        run: |
+          $verificationRoot = Join-Path $env:RUNNER_TEMP 'asibackbone-sigstore-verification'
+          $packageDirectory = Join-Path $verificationRoot 'packages'
+          $bundleDirectory = Join-Path $verificationRoot 'bundles'
+          New-Item -ItemType Directory -Path $packageDirectory -Force | Out-Null
+          New-Item -ItemType Directory -Path $bundleDirectory -Force | Out-Null
+
+          function Save-AnonymousReleaseAsset {
+              param([string]$Name, [string]$Destination)
+
+              $uri = 'https://github.com/{0}/releases/download/{1}/{2}' -f $env:REPOSITORY, [uri]::EscapeDataString($env:RELEASE_TAG), [uri]::EscapeDataString($Name)
+
+              for ($attempt = 1; $attempt -le 5; $attempt++) {
+                  try {
+                      # No Authorization header: the asset must be publicly downloadable.
+                      Invoke-WebRequest -Uri $uri -OutFile $Destination -MaximumRedirection 5
+                      return
+                  }
+                  catch {
+                      if ($attempt -eq 5) {
+                          throw "Anonymous download of release asset '$Name' failed: $($_.Exception.Message)"
+                      }
+
+                      Write-Host "Release asset '$Name' is not downloadable yet; retrying ($attempt/5)."
+                      Start-Sleep -Seconds 10
+                  }
+              }
+          }
+
+          $manifestPath = Join-Path $verificationRoot 'release-evidence-manifest.json'
+          Save-AnonymousReleaseAsset -Name 'release-evidence-manifest.json' -Destination $manifestPath
+          $manifest = Get-Content -LiteralPath $manifestPath -Raw | ConvertFrom-Json
+
+          foreach ($artifact in @($manifest.packageArtifacts)) {
+              Save-AnonymousReleaseAsset -Name ([string]$artifact.packageFile) -Destination (Join-Path $packageDirectory ([string]$artifact.packageFile))
+              Save-AnonymousReleaseAsset -Name ([string]$artifact.sigstoreBundleFile) -Destination (Join-Path $bundleDirectory ([string]$artifact.sigstoreBundleFile))
+          }
+
+          ./scripts/Assert-SigstorePackageBundles.ps1 `
+            -PackageDirectory $packageDirectory `
+            -BundleDirectory $bundleDirectory `
+            -EvidenceManifestPath $manifestPath `
+            -TagName $env:RELEASE_TAG `
+            -SourceCommit $env:SOURCE_COMMIT `
+            -Repository $env:REPOSITORY `
+            -IncludeNegativeChecks

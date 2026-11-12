@@ -4,6 +4,24 @@ All notable changes to this project are documented in this file.
 
 This project follows the spirit of [Keep a Changelog](https://keepachangelog.com/) and adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Added
+
+* Added Sigstore keyless signatures for released NuGet build packages
+  ([#933](https://github.com/AsiBackbone/AsiBackbone/issues/933)). On a tag push, the protected `package-publish`
+  job signs every validated `.nupkg` with `cosign sign-blob` through GitHub Actions OIDC before NuGet publication, and
+  the release-evidence job attaches one `<package-file>.sigstore.json` bundle per package to the GitHub release.
+  `scripts/Assert-SigstorePackageBundles.ps1` verifies every bundle against the exact `publish-packages.yml`
+  release-tag identity, GitHub Actions OIDC issuer, repository, ref, commit, and trigger, and requires tampered,
+  untrusted-identity, and swapped-bundle cases to fail. It runs before publication and again on packages and bundles
+  downloaded anonymously from the published release. `scripts/New-ReleaseEvidence.ps1` now requires a bundle for every
+  package and writes `release-evidence-manifest.json` schema version 2 with bundle digests and the signer identity.
+  `scripts/Test-SigstorePackageBundles.ps1` exercises the verification rules in CI. The supply-chain, security,
+  release-validation, and signing-decision documentation distinguish Sigstore release-artifact signatures, GitHub
+  build provenance, NuGet.org repository signatures, and the still-deferred NuGet author signing. Public APIs, runtime
+  signing, and `AsiBackbone.Signing.ManagedKey` are unchanged.
+
 ## [7.5.3] - 2026-11-06
 
 `7.5.3` is a backward-compatible maintenance patch for the stable `7.x` package family. It improves package

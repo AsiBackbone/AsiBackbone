@@ -257,8 +257,9 @@ For AsiBackbone packages, consumers should:
 - validate Source Link repository commit metadata after publication;
 - review package SBOMs, `sbom-manifest.json`, recorded hashes, and provenance attestations when produced;
 - ensure package, SBOM, manifest, and provenance evidence belong to the same release workflow or event;
+- for releases that carry `<package-file>.sigstore.json` bundles, verify each GitHub release build package with `cosign verify-blob` against the exact `publish-packages.yml` release-tag identity and GitHub Actions OIDC issuer, remembering that the bundle does not cover the repository-signed bytes served by NuGet.org;
 - perform organization-specific dependency, vulnerability, source, cache, and approval checks;
-- understand that NuGet package signing is currently deferred unless a later release explicitly changes that posture.
+- understand that NuGet package signing is currently deferred unless a later release explicitly changes that posture; Sigstore release-artifact signatures are not NuGet author signatures.
 
 These checks establish package-source and release evidence. They do not verify signatures on runtime audit records.
 
@@ -313,7 +314,7 @@ Avoid wording such as:
 - "Signing makes the ledger immutable."
 - "The database is tamper-proof because records carry signatures."
 - "A valid signature proves the complete event history."
-- "The package is signed" when NuGet package signing remains deferred.
+- "The package is signed" when NuGet package signing remains deferred, including when only a Sigstore bundle for the GitHub release build package exists.
 - "AsiBackbone provides legal non-repudiation or regulatory certification."
 - "WORM storage guarantees admissibility in every jurisdiction."
 

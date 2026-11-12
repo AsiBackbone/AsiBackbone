@@ -143,6 +143,10 @@ jobs:
         shell: pwsh
         run: ./scripts/Test-ReleaseEvidence.ps1
 
+      - name: Test Sigstore package bundle verification
+        shell: pwsh
+        run: ./scripts/Test-SigstorePackageBundles.ps1
+
       - name: Test with coverage gate
         shell: pwsh
         run: >

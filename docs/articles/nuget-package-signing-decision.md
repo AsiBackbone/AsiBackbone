@@ -58,10 +58,35 @@ Until signing is adopted, the release process maintains distinct trust signals:
 - Source Link repository URL and commit metadata;
 - one SPDX SBOM per package plus package and SBOM SHA-256 mappings;
 - durable SBOM and release-evidence assets on each GitHub release;
-- GitHub build-provenance attestations for package and SBOM subjects; and
+- GitHub build-provenance attestations for package and SBOM subjects;
+- Sigstore keyless blob signatures, attached as `<package-file>.sigstore.json`
+  bundles, over each GitHub release build package for releases after `7.5.3`;
+  and
 - consumer-retained package hashes and independent vulnerability review.
 
 None of these controls is described as equivalent to NuGet package signing.
+
+## Relationship to Sigstore release-artifact signatures
+
+Sigstore keyless signatures were added to the release workflow under
+[#933](https://github.com/AsiBackbone/AsiBackbone/issues/933) as a compensating
+control. They do not adopt NuGet package signing and do not change this
+decision:
+
+| Signal | Status | Assurance |
+| --- | --- | --- |
+| Sigstore keyless blob signature | Adopted for releases after `7.5.3` | Binds the exact GitHub release build package to the protected `publish-packages.yml` workflow identity for the release tag through a short-lived Fulcio certificate and a Rekor transparency-log entry. |
+| GitHub build-provenance attestation | Adopted | Binds package and SBOM digests to the building workflow run. |
+| NuGet.org repository signature | Applied by NuGet.org | Identifies the bytes NuGet.org serves; not an AsiBackbone signature. |
+| Native NuGet author signing | Deferred by this record | Would bind package bytes to an AsiBackbone-controlled certificate identity. |
+
+The Sigstore bundle is a detached signature over the GitHub release build
+package. NuGet.org repository-signs packages during ingestion, so it does not
+verify a NuGet.org download, and NuGet tooling does not evaluate it during
+restore. A consumer whose policy requires signed NuGet packages is therefore not
+satisfied by the Sigstore bundle alone. The signer identity, verification
+commands, and failure behavior are documented in
+[Supply-Chain Provenance and Package SBOMs](supply-chain-provenance.md#sigstore-keyless-signatures-for-release-build-packages).
 
 ## Mandatory early re-evaluation criteria
 

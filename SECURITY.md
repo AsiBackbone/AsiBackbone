@@ -140,7 +140,9 @@ This is a deliberate governance decision while the project is independently main
 
 Consumers should validate package identity through the official NuGet package source, package version, repository metadata, Source Link information, GitHub release tags, and available integrity metadata provided by NuGet tooling.
 
-Package signing remains deferred under the dated [NuGet Package Signing Decision Record](docs/articles/nuget-package-signing-decision.md). That record requires review by 2027-03-31 or before the first `8.0.0` release candidate, whichever occurs first, and defines earlier re-evaluation triggers for maintainer capacity, consumer or regulatory requirements, suitable signing infrastructure, and supply-chain incidents. Until package signing is formally adopted and documented, AsiBackbone should not be described as providing signed release artifacts, repository-signed packages, or Authenticode-signed packages.
+Package signing remains deferred under the dated [NuGet Package Signing Decision Record](docs/articles/nuget-package-signing-decision.md). That record requires review by 2027-03-31 or before the first `8.0.0` release candidate, whichever occurs first, and defines earlier re-evaluation triggers for maintainer capacity, consumer or regulatory requirements, suitable signing infrastructure, and supply-chain incidents. Until NuGet package signing is formally adopted and documented, AsiBackbone should not be described as providing author-signed NuGet packages, AsiBackbone repository-signed packages, or Authenticode-signed packages.
+
+Releases after `7.5.3` also attach a Sigstore keyless signature bundle (`<package-file>.sigstore.json`) for every GitHub release build package. The bundle is signed by the protected `publish-packages.yml` workflow for the release tag through GitHub Actions OIDC, with no long-lived signing key. It verifies only the exact build package attached to the GitHub release, not the repository-signed package served by NuGet.org, and it is neither NuGet author signing nor evidence about runtime governance outcomes. See [Sigstore keyless signatures for release build packages](docs/articles/supply-chain-provenance.md#sigstore-keyless-signatures-for-release-build-packages) for the trusted signer identity and verification commands.
 
 ### Current trust model
 
@@ -152,6 +154,7 @@ Current package trust is established through:
 - Source Link integration
 - Durable release-attached Software Bills of Materials (SBOMs)
 - Package and SBOM provenance attestations
+- Sigstore keyless signatures over GitHub release build packages, for releases after `7.5.3`
 - Release evidence and package SHA-256 mappings
 
 These mechanisms provide transparency and traceability while package signing remains deferred.
@@ -164,9 +167,20 @@ gh release download v7.0.0 --repo AsiBackbone/AsiBackbone --pattern 'AsiBackbone
 gh attestation verify ./AsiBackbone.Core.7.0.0.nupkg --repo AsiBackbone/AsiBackbone
 ```
 
+For releases that carry Sigstore bundles, also verify the build package against
+its bundle and the exact signer identity:
+
+```powershell
+cosign verify-blob ./AsiBackbone.Core.<version>.nupkg `
+  --bundle ./AsiBackbone.Core.<version>.nupkg.sigstore.json `
+  --certificate-identity 'https://github.com/AsiBackbone/AsiBackbone/.github/workflows/publish-packages.yml@refs/tags/v<version>' `
+  --certificate-oidc-issuer https://token.actions.githubusercontent.com
+```
+
 NuGet.org repository-signs packages during ingestion, so a package downloaded
-from NuGet.org has a different digest from the attested build package. Verify
-that distribution separately with `dotnet nuget verify --all <package-path>`.
+from NuGet.org has a different digest from the attested and Sigstore-signed
+build package. Verify that distribution separately with
+`dotnet nuget verify --all <package-path>`.
 
 ## Scope examples
 

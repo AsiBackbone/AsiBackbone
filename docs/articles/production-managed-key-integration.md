@@ -19,17 +19,18 @@ AsiBackbone does **not** provide first-party production provider packages for Az
 
 This keeps the package family focused on governance flow and avoids expanding the project into consumer key-management maintenance.
 
-## Three different signing/provenance concerns
+## Distinct signing/provenance concerns
 
 Do not collapse these concerns into one claim:
 
 | Concern | What it means | AsiBackbone posture |
 | --- | --- | --- |
-| NuGet package signing | Whether published `.nupkg` files are signed release artifacts. | Deferred unless a reviewed package-signing process is adopted. See the consumer verification guide. |
+| NuGet package signing | Whether published `.nupkg` files carry a NuGet author signature from an AsiBackbone-controlled certificate. | Deferred unless a reviewed package-signing process is adopted. See the consumer verification guide. |
+| Sigstore release-artifact signatures | Whether the exact `.nupkg` build packages attached to a GitHub release carry a Sigstore keyless signature from the protected release workflow. | Adopted for releases after `7.5.3`. Verifies GitHub release build packages, not NuGet.org downloads; not NuGet author signing and not runtime audit signing. See [Supply-Chain Provenance and Package SBOMs](supply-chain-provenance.md#sigstore-keyless-signatures-for-release-build-packages). |
 | GitHub provenance and SBOM | Source Link, repository metadata, package SBOMs, and workflow provenance where available. | Useful supply-chain evidence, but not package signing and not runtime audit signing. |
 | Runtime decision-receipt signing | A host signs decision receipts, audit ledger records, or outbox records through configured signing infrastructure. | Supported through provider-neutral abstractions and the managed-key adapter boundary; production key custody remains host-owned. |
 
-A package can have Source Link and SBOM provenance without being maintainer-signed. A governance record can be signed at runtime without proving legal non-repudiation. A signed governance record still requires verification, durable storage controls, key-retention policy, monitoring, and incident response before a host should make stronger integrity claims.
+A package can have Source Link, SBOM provenance, and a Sigstore release-artifact signature without being author-signed. Sigstore release-artifact signing does not change `AsiBackbone.Signing.ManagedKey`, its key-version or revocation semantics, or the provider-neutral runtime signing abstractions. A governance record can be signed at runtime without proving legal non-repudiation. A signed governance record still requires verification, durable storage controls, key-retention policy, monitoring, and incident response before a host should make stronger integrity claims.
 
 ## Runtime boundary
 
