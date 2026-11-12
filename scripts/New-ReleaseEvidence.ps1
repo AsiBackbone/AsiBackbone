@@ -6,6 +6,11 @@ param(
     [Parameter(Mandatory = $true)]
     [string]$SbomDirectory,
 
+    # Directory containing one <package-file>.sigstore.json Cosign keyless
+    # bundle for every .nupkg. Release evidence is not produced without them.
+    [Parameter(Mandatory = $true)]
+    [string]$SigstoreBundleDirectory,
+
     [Parameter(Mandatory = $true)]
     [string]$ReleaseNotesPath,
 
@@ -19,7 +24,11 @@ param(
     [ValidatePattern('^[0-9a-fA-F]{40}$')]
     [string]$SourceCommit,
 
-    [string]$Repository = 'AsiBackbone/AsiBackbone'
+    [string]$Repository = 'AsiBackbone/AsiBackbone',
+
+    [string]$SignerWorkflowPath = '.github/workflows/publish-packages.yml',
+
+    [string]$SignerWorkflowTrigger = 'push'
 )
 
 Set-StrictMode -Version Latest
@@ -46,6 +55,7 @@ if ($Repository -notmatch '^[^/]+/[^/]+$') {
 
 $resolvedPackageDirectory = (Resolve-Path -LiteralPath $PackageDirectory).Path
 $resolvedSbomDirectory = (Resolve-Path -LiteralPath $SbomDirectory).Path
+$resolvedSigstoreBundleDirectory = (Resolve-Path -LiteralPath $SigstoreBundleDirectory).Path
 $resolvedReleaseNotesPath = (Resolve-Path -LiteralPath $ReleaseNotesPath).Path
 
 if (-not (Test-Path -LiteralPath $resolvedReleaseNotesPath -PathType Leaf)) {
@@ -86,6 +96,50 @@ if ($packageDifference.Count -ne 0) {
 if ($sbomDifference.Count -ne 0) {
     $details = $sbomDifference | ForEach-Object { "$($_.SideIndicator) $($_.InputObject)" }
     throw "SBOM files do not match sbom-manifest.json:`n$($details -join "`n")"
+}
+
+if ($SignerWorkflowPath -notmatch '^\.github/workflows/[A-Za-z0-9_.-]+\.ya?ml$') {
+    throw "Signer workflow path '$SignerWorkflowPath' must name a workflow file under .github/workflows."
+}
+
+$sigstoreBundleSuffix = '.sigstore.json'
+$actualBundleFiles = @(Get-ChildItem -LiteralPath $resolvedSigstoreBundleDirectory -File |
+    Where-Object { $_.Name.EndsWith($sigstoreBundleSuffix, [System.StringComparison]::Ordinal) } |
+    Sort-Object Name)
+$expectedBundleNames = @($actualPackageNames | ForEach-Object { $_ + $sigstoreBundleSuffix })
+$actualBundleNames = @($actualBundleFiles | ForEach-Object { $_.Name })
+$missingBundleNames = @($expectedBundleNames | Where-Object { $_ -cnotin $actualBundleNames })
+$orphanBundleNames = @($actualBundleNames | Where-Object { $_ -cnotin $expectedBundleNames })
+
+if ($missingBundleNames.Count -ne 0) {
+    throw "Sigstore bundle missing for package subject(s): $($missingBundleNames -join ', ')"
+}
+
+if ($orphanBundleNames.Count -ne 0) {
+    throw "Sigstore bundle(s) without a matching package subject: $($orphanBundleNames -join ', ')"
+}
+
+$bundleMediaTypes = @{}
+
+foreach ($bundleFile in $actualBundleFiles) {
+    if ($bundleFile.Length -eq 0) {
+        throw "Sigstore bundle '$($bundleFile.Name)' is empty."
+    }
+
+    try {
+        $bundleDocument = Get-Content -LiteralPath $bundleFile.FullName -Raw | ConvertFrom-Json
+    }
+    catch {
+        throw "Sigstore bundle '$($bundleFile.Name)' is not valid JSON: $($_.Exception.Message)"
+    }
+
+    $mediaTypeProperty = $bundleDocument.PSObject.Properties['mediaType']
+
+    if ($null -eq $mediaTypeProperty -or -not ([string]$mediaTypeProperty.Value).StartsWith('application/vnd.dev.sigstore.bundle', [System.StringComparison]::Ordinal)) {
+        throw "Sigstore bundle '$($bundleFile.Name)' does not declare a Sigstore protobuf bundle media type."
+    }
+
+    $bundleMediaTypes[$bundleFile.Name] = [string]$mediaTypeProperty.Value
 }
 
 foreach ($entry in $packageEntries) {
@@ -138,6 +192,21 @@ foreach ($sbomFile in $actualSbomFiles) {
     })
 }
 
+$bundleHashes = @{}
+
+foreach ($bundleFile in $actualBundleFiles) {
+    $destination = Join-Path $resolvedOutputDirectory $bundleFile.Name
+    Copy-Item -LiteralPath $bundleFile.FullName -Destination $destination
+    $bundleHash = Get-Sha256Hex -Path $destination
+    $bundleHashes[$bundleFile.Name] = $bundleHash
+    $assetRecords.Add([ordered]@{
+        fileName = $bundleFile.Name
+        sha256 = $bundleHash
+        mediaType = $bundleMediaTypes[$bundleFile.Name]
+        purpose = 'package-sigstore-bundle'
+    })
+}
+
 $copiedSbomManifestPath = Join-Path $resolvedOutputDirectory 'sbom-manifest.json'
 Copy-Item -LiteralPath $sbomManifestPath -Destination $copiedSbomManifestPath
 $assetRecords.Add([ordered]@{
@@ -157,8 +226,20 @@ $assetRecords.Add([ordered]@{
     purpose = 'release-notes'
 })
 
+$signerWorkflowRef = "refs/tags/$TagName"
+$signerIdentity = "https://github.com/$Repository/$($SignerWorkflowPath)@$signerWorkflowRef"
+$verificationCommand = (
+    'cosign verify-blob --bundle <package-file>.sigstore.json' +
+    " --certificate-identity $signerIdentity" +
+    ' --certificate-oidc-issuer https://token.actions.githubusercontent.com' +
+    " --certificate-github-workflow-repository $Repository" +
+    " --certificate-github-workflow-ref $signerWorkflowRef" +
+    " --certificate-github-workflow-sha $($SourceCommit.ToLowerInvariant())" +
+    " --certificate-github-workflow-trigger $SignerWorkflowTrigger" +
+    ' <package-file>')
+
 $evidenceManifest = [ordered]@{
-    schemaVersion = 1
+    schemaVersion = 2
     repository = $Repository
     releaseTag = $TagName
     releaseVersion = $version
@@ -173,11 +254,30 @@ $evidenceManifest = [ordered]@{
             packageSha256 = ([string]$_.packageSha256).ToLowerInvariant()
             sbomFile = [string]$_.sbomFile
             sbomSha256 = ([string]$_.sbomSha256).ToLowerInvariant()
+            sigstoreBundleFile = [string]$_.packageFile + $sigstoreBundleSuffix
+            sigstoreBundleSha256 = $bundleHashes[[string]$_.packageFile + $sigstoreBundleSuffix]
         }
     })
     attestationVerification = [ordered]@{
         repository = $Repository
         command = "gh attestation verify <downloaded-file> --repo $Repository"
+    }
+    sigstoreSignatures = [ordered]@{
+        signatureType = 'Sigstore Cosign keyless blob signature (Sigstore protobuf bundle)'
+        subject = 'The exact .nupkg build package attached to this GitHub release'
+        certificateIdentity = $signerIdentity
+        certificateOidcIssuer = 'https://token.actions.githubusercontent.com'
+        workflowRepository = $Repository
+        workflowRef = $signerWorkflowRef
+        workflowSha = $SourceCommit.ToLowerInvariant()
+        workflowTrigger = $SignerWorkflowTrigger
+        trustRoot = 'Sigstore public-good instance (Fulcio certificate authority, Rekor transparency log, TUF-distributed trusted root)'
+        verificationCommand = $verificationCommand
+        boundaries = @(
+            'Binds only to the GitHub release build package bytes; NuGet.org repository-signs packages on ingestion, so a NuGet.org download has a different digest and is verified with dotnet nuget verify --all instead.',
+            'Is not NuGet author signing, NuGet repository signing, or Authenticode signing.',
+            'Does not replace GitHub build-provenance attestations and does not attest runtime governance decisions, receipts, or signing-provider outcomes.'
+        )
     }
 }
 
