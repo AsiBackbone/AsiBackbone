@@ -130,6 +130,13 @@ if [ -z "$ef_sqlite_version" ] || [ -z "$sqlitepclraw_version" ]; then
   exit 1
 fi
 
+testhost_version="$(get_central_package_version "Microsoft.AspNetCore.TestHost")"
+
+if [ -z "$testhost_version" ]; then
+  echo "Unable to resolve Microsoft.AspNetCore.TestHost version."
+  exit 1
+fi
+
 dotnet add "$smoke_project" package AsiBackbone.Core --version "$package_version"
 dotnet add "$smoke_project" package AsiBackbone.AspNetCore --version "$package_version"
 dotnet add "$smoke_project" package AsiBackbone.EntityFrameworkCore --version "$package_version"
@@ -138,7 +145,7 @@ dotnet add "$smoke_project" package AsiBackbone.Analyzers --version "$package_ve
 dotnet add "$smoke_project" package AsiBackbone.OpenTelemetry --version "$package_version"
 dotnet add "$smoke_project" package AsiBackbone.Signing.LocalDevelopment --version "$package_version"
 dotnet add "$smoke_project" package AsiBackbone.Signing.ManagedKey --version "$package_version"
-dotnet add "$smoke_project" package Microsoft.AspNetCore.TestHost
+dotnet add "$smoke_project" package Microsoft.AspNetCore.TestHost  --version "$testhost_version"
 dotnet add "$smoke_project" package Microsoft.EntityFrameworkCore.Sqlite --version "$ef_sqlite_version"
 dotnet add "$smoke_project" package SQLitePCLRaw.bundle_e_sqlite3 --version "$sqlitepclraw_version"
 
