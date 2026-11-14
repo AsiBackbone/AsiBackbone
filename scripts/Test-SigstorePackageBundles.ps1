@@ -233,6 +233,10 @@ try {
     $valid = New-Fixture -Name 'valid'
     Invoke-Assert -Fixture $valid -Verifier $stubPath -UseManifests
 
+    if ($LASTEXITCODE -ne 0) {
+        throw "Successful Sigstore bundle validation left native exit code '$LASTEXITCODE'."
+    }
+
     $missing = New-Fixture -Name 'missing-bundle'
     Remove-Item -LiteralPath (Join-Path $missing.Bundles 'AsiBackbone.Testing.9.8.7.nupkg.sigstore.json')
     Assert-Rejected -Description 'Missing Sigstore bundle' -ExpectedMessagePattern 'Sigstore bundle missing*' -Action {
