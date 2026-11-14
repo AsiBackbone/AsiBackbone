@@ -86,11 +86,11 @@ The DocFX header search is available for package names, API concepts, and articl
 
 ## Current stable package family
 
-Stable `7.x` package family. The current release is `7.5.3`.
+Stable `7.x` package family. The current release is `7.5.4`.
 
-`7.5.3` improves package discovery metadata, adds a five-minute evaluator,
-aligns current terminology and release documentation, and refreshes visual
-identity and repository tooling without changing public APIs, durable
+`7.5.4` adds Sigstore keyless signatures for GitHub release build packages,
+advances Aspire sample hosting, refreshes GitHub Actions, and strengthens
+package compatibility validation without changing public APIs, durable
 contracts, declared runtime dependency minimums, or runtime decision behavior.
 
 Managed assemblies retain binary identity `7.0.0.0` throughout the compatible `7.x` line.
@@ -165,6 +165,8 @@ Package-specific READMEs and release notes define which surfaces are stable, opt
 
 ### Releases and compatibility
 
+* [7.5.4 Release Notes](articles/release-notes-754.md)
+* [7.5.4 Consumer Verification Guide](articles/consumer-verification-754.md)
 * [7.5.3 Release Notes](articles/release-notes-753.md)
 * [7.5.3 Consumer Verification Guide](articles/consumer-verification-753.md)
 * [7.5.2 Release Notes](articles/release-notes-752.md)

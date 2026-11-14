@@ -4,7 +4,13 @@ All notable changes to this project are documented in this file.
 
 This project follows the spirit of [Keep a Changelog](https://keepachangelog.com/) and adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [7.5.4] - 2026-11-14
+
+`7.5.4` is a backward-compatible supply-chain and validation maintenance patch for the stable `7.x` package family.
+It adds Sigstore keyless signatures for GitHub release build packages, advances Aspire sample hosting, refreshes
+GitHub Actions, and strengthens package compatibility validation without changing public APIs, durable schemas,
+canonical wire values, package IDs, target framework, documented defaults, runtime decision behavior, declared
+runtime dependency minimums, or binary assembly identity.
 
 ### Added
 
@@ -21,6 +27,16 @@ This project follows the spirit of [Keep a Changelog](https://keepachangelog.com
   release-validation, and signing-decision documentation distinguish Sigstore release-artifact signatures, GitHub
   build provenance, NuGet.org repository signatures, and the still-deferred NuGet author signing. Public APIs, runtime
   signing, and `AsiBackbone.Signing.ManagedKey` are unchanged.
+
+### Changed
+
+* Updated `Aspire.Hosting.AppHost` from `13.6.4` to `13.6.5` and refreshed both platform-specific AppHost lock files.
+  This is sample-host tooling and does not change the dependencies declared by the shipped `AsiBackbone.*` packages.
+* Refreshed pinned GitHub Actions used by CI, release validation, documentation publication, dependency scanning,
+  Scorecard analysis, and quality-report publication.
+* Moved package compatibility validation from the historical `5.1.0` baseline to the published `7.5.3` packages and
+  removed the suppressions that recorded intentional 5.x-to-7.x breaks. Package validation now directly protects the
+  complete stable 7.x surface while the DocFX API baseline continues to guard public signatures.
 
 ## [7.5.3] - 2026-11-06
 
