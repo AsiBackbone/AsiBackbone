@@ -28,9 +28,9 @@ The measurable rules for deprecation windows, major-release spacing, advance ann
 
 ## Current `7.x` stabilization posture
 
-`7.x` is the stable package line maintained on `main`. The current stable release is `7.5.3`.
+`7.x` is the stable package line maintained on `main`. The current stable release is `7.5.4`.
 
-The `7.5.3` release preserves the package IDs, `net10.0` target, public APIs, durable contracts, canonical wire values, documented defaults, declared runtime dependency minimums, and runtime decision behavior. It improves package discovery metadata, evaluation guidance, terminology and documentation validation, visual identity, and repository tooling.
+The `7.5.4` release preserves the package IDs, `net10.0` target, public APIs, durable contracts, canonical wire values, documented defaults, declared runtime dependency minimums, and runtime decision behavior. It adds Sigstore keyless signatures for GitHub release build packages, advances Aspire sample hosting, refreshes GitHub Actions, and strengthens package compatibility validation.
 
 Managed assemblies retain binary identity `7.0.0.0` throughout the compatible `7.x` line.
 

@@ -6,6 +6,12 @@
 
 - name: Current Release
   items:
+    - name: 7.5.4 Release Notes
+      href: ../articles/release-notes-754.md
+    - name: 7.5.4 Release Readiness Record
+      href: ../articles/release-readiness-754.md
+    - name: 7.5.4 Consumer Verification Guide
+      href: ../articles/consumer-verification-754.md
     - name: 7.5.3 Release Notes
       href: ../articles/release-notes-753.md
     - name: 7.5.3 Release Readiness Record

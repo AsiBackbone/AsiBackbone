@@ -3,6 +3,8 @@
 
 - name: Current Release Evidence
   items:
+    - name: 7.5.4 Release Readiness Record
+      href: ../articles/release-readiness-754.md
     - name: 7.5.3 Release Readiness Record
       href: ../articles/release-readiness-753.md
     - name: Release Cadence and Readiness

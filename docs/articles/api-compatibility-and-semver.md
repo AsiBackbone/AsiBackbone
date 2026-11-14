@@ -67,7 +67,7 @@ The `2.0.0` release established the simplified `AsiBackbone.*` package and names
 
 ### Current `7.x` stable family
 
-`7.5.3` is the current stable release on `main`. The `7.x` line preserves the `AsiBackbone.*` package IDs, the `net10.0` target, and binary assembly identity `7.0.0.0`. Version 7.5 added trace-aware evaluation context and decision-copy APIs while restoring request trace correlation for policy-evaluated endpoint decisions and receipts. Patch 7.5.1 strengthens production-signing guidance, host-enforcement conformance evidence, and package dependency validation without changing the stable public or runtime contract. Patch 7.5.2 updates Microsoft dependency minimums to `10.0.14`. Patch 7.5.3 improves package discovery metadata, evaluation guidance, terminology and documentation validation, visual identity, and repository tooling without changing public APIs or durable contracts. See [7.5.3 Release Notes](release-notes-753.md), [7.5.2 Release Notes](release-notes-752.md), [7.5.1 Release Notes](release-notes-751.md), [7.5.0 Release Notes](release-notes-750.md), and [Upgrade from 6.x to 7.0](upgrade-600-to-700.md).
+`7.5.4` is the current stable release on `main`. The `7.x` line preserves the `AsiBackbone.*` package IDs, the `net10.0` target, and binary assembly identity `7.0.0.0`. Version 7.5 added trace-aware evaluation context and decision-copy APIs while restoring request trace correlation for policy-evaluated endpoint decisions and receipts. Patch 7.5.1 strengthens production-signing guidance, host-enforcement conformance evidence, and package dependency validation without changing the stable public or runtime contract. Patch 7.5.2 updates Microsoft dependency minimums to `10.0.14`. Patch 7.5.3 improves package discovery metadata, evaluation guidance, terminology and documentation validation, visual identity, and repository tooling. Patch 7.5.4 adds Sigstore keyless signatures for GitHub release build packages and strengthens dependency, workflow, and package compatibility validation without changing public APIs or durable contracts. See [7.5.4 Release Notes](release-notes-754.md), [7.5.3 Release Notes](release-notes-753.md), [7.5.2 Release Notes](release-notes-752.md), [7.5.1 Release Notes](release-notes-751.md), [7.5.0 Release Notes](release-notes-750.md), and [Upgrade from 6.x to 7.0](upgrade-600-to-700.md).
 
 | Package | `7.x` stable role |
 | --- | --- |
@@ -201,6 +201,7 @@ Expected stable-line behavior:
 | `7.5.1` | `7.5.1` | `7.0.0.0` | `7.5.1.0` | `7.5.1+...` |
 | `7.5.2` | `7.5.2` | `7.0.0.0` | `7.5.2.0` | `7.5.2+...` |
 | `7.5.3` | `7.5.3` | `7.0.0.0` | `7.5.3.0` | `7.5.3+...` |
+| `7.5.4` | `7.5.4` | `7.0.0.0` | `7.5.4.0` | `7.5.4+...` |
 
 Before cutting stable releases, release validation should verify that `AssemblyVersion`, `FileVersion`, `InformationalVersion`, package metadata, release notes, and repository tags match this policy.
 
