@@ -15,12 +15,16 @@
 
     <!--
       AssemblyVersion is the stable binary identity for the current major line.
-      Keep it fixed at 7.0.0.0 for compatible 7.x releases; move NuGet Version,
-      FileVersion, and InformationalVersion with each package release.
+      Keep it fixed at 7.0.0.0 for compatible 7.x releases; move NuGet Version
+      and FileVersion with each package release.
+
+      InformationalVersion follows Version automatically: it is left to the SDK
+      default, "<version>+<commit>", and Source Link records the repository. Do
+      not set it here; a value that references a property defined later in this
+      file, such as RepositoryUrl, evaluates that property as empty.
     -->
     <AssemblyVersion>7.0.0.0</AssemblyVersion>
     <FileVersion>7.5.4.0</FileVersion>
-    <InformationalVersion>$(Version)+$(RepositoryUrl)</InformationalVersion>
 
     <ContinuousIntegrationBuild Condition="'$(GITHUB_ACTIONS)' == 'true'">true</ContinuousIntegrationBuild>
     <EnableSourceLink Condition="'$(EnableSourceLink)' == '' and '$(GITHUB_ACTIONS)' == 'true'">true</EnableSourceLink>
