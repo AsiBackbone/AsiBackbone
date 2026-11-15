@@ -160,7 +160,7 @@ Before a breaking change is merged for a future major release, confirm that:
 
 ## Assembly version policy
 
-For the stable `7.x` package line, AsiBackbone keeps `AssemblyVersion` fixed at `7.0.0.0` for compatible minor and patch releases. NuGet package `Version`, `FileVersion`, and `InformationalVersion` continue to move with each package release.
+For the stable `7.x` package line, AsiBackbone keeps `AssemblyVersion` fixed at `7.0.0.0` for compatible minor and patch releases. NuGet package `Version`, `FileVersion`, and `InformationalVersion` continue to move with each package release. `InformationalVersion` is the .NET SDK default, `<version>+<commit>`, where `<commit>` is the full source commit SHA; `Directory.Build.props` does not set it.
 
 Expected stable-line behavior:
 

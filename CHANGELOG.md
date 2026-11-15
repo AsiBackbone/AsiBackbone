@@ -6,6 +6,13 @@ This project follows the spirit of [Keep a Changelog](https://keepachangelog.com
 
 ## [Unreleased]
 
+### Fixed
+
+- Package assemblies now report `InformationalVersion` as `<version>+<commit>`. `Directory.Build.props` set it to
+  `$(Version)+$(RepositoryUrl)` before `RepositoryUrl` was defined, so assemblies reported `<version>+.<commit>`.
+  The property is now left to the SDK default; Source Link still records the repository. Repository tests guard the
+  property and the built value (#938).
+
 ### Changed
 
 - `CODE_OF_CONDUCT.md` is now identical to the AsiBackbone organization Code of Conduct (Contributor Covenant 2.1),
