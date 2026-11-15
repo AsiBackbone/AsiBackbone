@@ -4,6 +4,14 @@ All notable changes to this project are documented in this file.
 
 This project follows the spirit of [Keep a Changelog](https://keepachangelog.com/) and adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Changed
+
+- `CODE_OF_CONDUCT.md` is now identical to the AsiBackbone organization Code of Conduct (Contributor Covenant 2.1),
+  so every AsiBackbone repository carries the same text and reporting contact. The statement that AsiBackbone also
+  adheres to the .NET Foundation Code of Conduct moved to `GOVERNANCE.md`.
+
 ## [7.5.4] - 2026-11-14
 
 `7.5.4` is a backward-compatible supply-chain and validation maintenance patch for the stable `7.x` package family.

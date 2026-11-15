@@ -52,7 +52,12 @@ and reduce maintainer bottleneck.
 
 Anyone who opens an issue, submits a pull request, improves documentation, or
 participates in discussion is a Contributor. No formal application is required.
-All contributions are subject to the [Code of Conduct](CODE_OF_CONDUCT.md).
+All contributions are subject to the [Code of Conduct](CODE_OF_CONDUCT.md), which
+is identical to the
+[AsiBackbone organization Code of Conduct](https://github.com/AsiBackbone/.github/blob/main/CODE_OF_CONDUCT.md).
+AsiBackbone also adheres to the
+[.NET Foundation Code of Conduct](https://dotnetfoundation.org/code-of-conduct) as
+an additional community standard.
 
 See [Contributing to AsiBackbone](CONTRIBUTING.md) for information on contributing.
 
