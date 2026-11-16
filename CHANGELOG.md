@@ -6,6 +6,13 @@ This project follows the spirit of [Keep a Changelog](https://keepachangelog.com
 
 ## [Unreleased]
 
+### Security
+
+- Release jobs in `publish-packages.yml` and `release-validation.yml` now start with
+  `step-security/harden-runner` in egress audit mode, following the organization's release runner-hardening policy
+  (AsiBackbone/.github#46). It records each release run's network connections, processes, and file changes; it does
+  not block them (#942).
+
 ### Fixed
 
 - Package assemblies now report `InformationalVersion` as `<version>+<commit>`. `Directory.Build.props` set it to
