@@ -22,6 +22,10 @@ This project follows the spirit of [Keep a Changelog](https://keepachangelog.com
 
 ### Changed
 
+- Link validation no longer sends Zenodo archive DOIs through Lychee. Zenodo intermittently times out or returns 
+  HTTP 500 to automated requests, which failed the push for #86 on DOI links it did not change. A dedicated step 
+  resolves every Zenodo DOI in the Markdown with bounded retries: it fails scheduled and manual runs, so an archive 
+  that stops resolving is still reported, and only warns on pull request and push runs.
 - Current documentation was reviewed page by page against the published release, the public API baselines, and the
   implementation (#945). Capability Grant Hardening no longer describes the omitted-options
   `CapabilityGrantValidator.ValidateAsync` path as permissive: it has denied with
