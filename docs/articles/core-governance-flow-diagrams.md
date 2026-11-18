@@ -78,7 +78,7 @@ flowchart LR
 
 ## Capability grant scoping and expiration
 
-Capability-token primitives can help model a narrow grant after a governance decision, but the host or provider implementation must still enforce scope, expiry, replay handling, custody, and downstream authorization.
+Capability-grant primitives can help model a narrow grant after a governance decision, but the host or provider implementation must still enforce scope, expiry, replay handling, custody, and downstream authorization.
 
 ```mermaid
 flowchart LR

@@ -268,7 +268,7 @@ The completed migration uses these continuity rules:
 1. Existing AsiBackbone article URLs remain published.
 2. Learning links identify the canonical educational destination.
 3. Current product pages identify exact package/API/runtime ownership.
-4. Release, maintainer, and historical navigation separate evidence from the current 5.x consumer path.
+4. Release, maintainer, and historical navigation separate evidence from the current consumer path.
 5. DocFX and cross-repository link validation enforce continuity.
 
 ## Reconciliation outcome

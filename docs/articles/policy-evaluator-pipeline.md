@@ -51,7 +51,7 @@ When an optional `ILogger<DefaultGovernancePolicyEvaluator<TContext>>` is suppli
 
 ## Evaluator construction
 
-In 6.0, use the evaluator builder for manual construction or the single constructor accepting constraints, threat contributors, decision policy, options, and logger. Pass null for optional dependencies that the host does not supply. Preserve configured options and diagnostics when wiring dependency injection. See [Upgrade from 5.x to 6.0](upgrade-500-to-600.md) for removed overloads.
+Use the evaluator builder for manual construction or the single constructor accepting constraints, threat contributors, decision policy, options, and logger. Pass null for optional dependencies that the host does not supply. Preserve configured options and diagnostics when wiring dependency injection. The other constructor overloads were removed in `6.0`; see [Upgrade from 5.x to 6.0](upgrade-500-to-600.md).
 
 A DI registration that preserves the configured profile and operational diagnostics should resolve options and logger from the service provider:
 

@@ -357,10 +357,10 @@ $claimPatterns = @(
         '[`*_~]*v?(?<version>' + $versionPattern + ')[`*_~]*[^\r\n]{0,80}?\b(?:is|remains|represents|defines|establishes)\s+(?:the\s+)?(?:current|active|canonical)\b',
         $regexOptions),
     [regex]::new(
-        '\bstable\b[^\r\n]{0,50}?[`*_~]*v?(?<version>' + $versionPattern + ')[`*_~]*[^\r\n]{0,50}?\b(?:package\s+family|package\s+lineup|release\s+line|stable\s+line|major\s+release)\b',
+        '\bstable\b[^\r\n]{0,50}?[`*_~]*v?(?<version>' + $versionPattern + ')[`*_~]*[^\r\n]{0,50}?\b(?:package\s+family|package\s+lineup|package\s+line|release\s+line|stable\s+line|major\s+release)\b',
         $regexOptions),
     [regex]::new(
-        '[`*_~]*v?(?<version>\d+\.[xX])[`*_~]*\s+(?:stable\s+)?(?:package\s+family|default)\b',
+        '[`*_~]*v?(?<version>\d+\.[xX])[`*_~]*\s+(?:stable\s+)?(?:package\s+family|package\s+line|default)\b',
         $regexOptions)
 )
 

@@ -82,7 +82,7 @@ Hosts that intentionally need fail-fast propagation can set `TreatConstraintExce
 
 Threat-model contributor failures are also configured to fail closed. When a registered contributor fails with an eligible ordinary exception, the evaluator produces a denied decision with a stable reason code rather than silently continuing to execution.
 
-This is especially important when a contributor screens replay indicators, capability-token mismatch, region-policy mismatch, prompt-injection-like tool requests, or unsafe external commands.
+This is especially important when a contributor screens replay indicators, capability-grant mismatch, region-policy mismatch, prompt-injection-like tool requests, or unsafe external commands.
 
 ## Endpoint metadata behavior
 

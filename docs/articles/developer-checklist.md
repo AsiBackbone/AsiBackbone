@@ -62,7 +62,7 @@ dotnet tool run docfx docs/docfx.json --warningsAsErrors --serve
 - EF Core integration remains host-owned.
 - In-memory storage remains non-durable and local-validation focused.
 - Samples and smoke tests do not become hidden requirements for consumers.
-- Provider-specific behavior is not implied to be part of `1.0.0` unless explicitly released as stable.
+- Provider-specific behavior is not implied to be part of a release unless it is explicitly released as stable.
 
 ## Language and namespace posture checklist
 

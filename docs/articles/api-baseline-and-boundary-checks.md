@@ -6,7 +6,7 @@ These checks protect implemented package contracts; they do not turn AsiBackbone
 
 ## Purpose
 
-The stable `5.x` package line uses two complementary automated guardrails:
+The stable package line uses two complementary automated guardrails:
 
 | Guardrail | Purpose | Current posture |
 | --- | --- | --- |
@@ -27,7 +27,7 @@ Each baseline records:
 
 This makes the baseline diff directly reviewable in a pull request while keeping the gate independent of implementation internals. An unreviewed public addition, removal, rename, parameter/return-type change, generic/interface declaration change, or enum-value change changes the generated baseline and fails validation.
 
-The initial `5.x` baseline was generated from the published `v5.0.0` DocFX managed-reference output at commit `54ddd57a4d272e9294ee5638aef723e6d5ae66a8`.
+The initial baseline was generated from the published `v5.0.0` DocFX managed-reference output at commit `54ddd57a4d272e9294ee5638aef723e6d5ae66a8`. Each baseline file's header names the release it was last reviewed against; reviewed major-version changes since then are recorded in `eng/api-baseline/README.md`.
 
 ### Included package assemblies
 
@@ -122,7 +122,7 @@ Architecture boundary checks enforce the corresponding package rule: Core remain
 
 ## Current decision
 
-- Stable managed `5.x` package APIs are protected by committed, reviewable DocFX-derived baselines.
+- Stable managed package APIs are protected by committed, reviewable DocFX-derived baselines.
 - CI and release workflows fail on unreviewed public API drift.
 - Intentional baseline updates require explicit SemVer review and travel with the implementation change.
 - Core dependency-boundary checks remain implemented and unchanged.

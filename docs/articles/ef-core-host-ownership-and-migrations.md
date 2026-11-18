@@ -1,9 +1,9 @@
 # EF Core Host Ownership and Migration Guidance
 
-`AsiBackbone.EntityFrameworkCore` contributes model configuration and persistence helpers for ASI Backbone accountability records. The host application owns the `DbContext`, database provider, connection string, migrations, schema deployment, and operational database lifecycle.
+`AsiBackbone.EntityFrameworkCore` contributes model configuration and persistence helpers for AsiBackbone accountability records. The host application owns the `DbContext`, database provider, connection string, migrations, schema deployment, and operational database lifecycle.
 
 > [!IMPORTANT]
-> ASI Backbone does not take over the host database. The EF Core package adds ASI Backbone persistence shapes to a host-owned EF Core model; it does not provide a required package-owned `AsiBackboneDbContext`, forced provider, forced connection string, or package-owned migration set.
+> AsiBackbone does not take over the host database. The EF Core package adds AsiBackbone persistence shapes to a host-owned EF Core model; it does not provide a required package-owned `AsiBackboneDbContext`, forced provider, forced connection string, or package-owned migration set.
 
 ## Ownership boundary
 
@@ -19,18 +19,18 @@ Host application
   owns schema lifecycle
   owns backup, retention, encryption, and operational policy
 
-ASI Backbone EF Core package
+AsiBackbone EF Core package
   contributes entity configurations
   contributes ModelBuilder extension methods
   contributes persistence entities and helpers
   preserves Core package independence from EF Core
 ```
 
-This allows ASI Backbone accountability records to participate in the application database without forcing the application to adopt a specific infrastructure style.
+This allows AsiBackbone accountability records to participate in the application database without forcing the application to adopt a specific infrastructure style.
 
 ## Minimal host-owned DbContext example
 
-A host application integrates ASI Backbone persistence by applying the EF Core model configuration extension from its own `DbContext`.
+A host application integrates AsiBackbone persistence by applying the EF Core model configuration extension from its own `DbContext`.
 
 ```csharp
 using AsiBackbone.EntityFrameworkCore;
@@ -62,7 +62,7 @@ public sealed class ApplicationDbContext : DbContext
 }
 ```
 
-The host may expose `DbSet<T>` properties for convenience, but the important integration point is the `ApplyAsiBackboneConfigurations()` call. That call adds the ASI Backbone persistence entities and mappings to the host model.
+The host may expose `DbSet<T>` properties for convenience, but the important integration point is the `ApplyAsiBackboneConfigurations()` call. That call adds the AsiBackbone persistence entities and mappings to the host model.
 
 ## Provider selection remains host-owned
 
@@ -77,7 +77,7 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 });
 ```
 
-A different host could choose a different provider without ASI Backbone changing its Core domain model:
+A different host could choose a different provider without AsiBackbone changing its Core domain model:
 
 ```csharp
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
@@ -92,7 +92,7 @@ Provider-specific details, including date/time conversions, schema names, retry 
 
 Migrations belong to the host application.
 
-After applying ASI Backbone configurations in the host `DbContext`, the host creates and manages its own migrations the same way it manages the rest of its application schema.
+After applying AsiBackbone configurations in the host `DbContext`, the host creates and manages its own migrations the same way it manages the rest of its application schema.
 
 ```bash
 dotnet ef migrations add AddAsiBackbonePersistence \
@@ -106,7 +106,7 @@ dotnet ef database update \
 
 Those command paths are examples only. The actual projects, migration assembly, deployment strategy, and database update process belong to the host.
 
-ASI Backbone should not ship required migrations for the host database because doing so would implicitly choose a provider, schema lifecycle, naming convention, deployment model, and operational policy for the host.
+AsiBackbone should not ship required migrations for the host database because doing so would implicitly choose a provider, schema lifecycle, naming convention, deployment model, and operational policy for the host.
 
 ## Audit ledger signing metadata persistence
 
@@ -170,9 +170,9 @@ The EF Core tables should store minimized governance metadata, not raw prompts, 
 
 Hosts should define retention, encryption, archival, deletion, and access-control policies that match their environment. Durable outbox storage improves local accountability, but it is not by itself a compliance guarantee, tamper-evident ledger, signing system, or legal hold process.
 
-## What ASI Backbone adds to the host model
+## What AsiBackbone adds to the host model
 
-The EF Core package contributes provider-neutral mappings for ASI Backbone accountability records, including:
+The EF Core package contributes provider-neutral mappings for AsiBackbone accountability records, including:
 
 - audit ledger records
 - audit ledger reason codes
@@ -202,7 +202,7 @@ The EF Core package does not automatically:
 - replace the host application's existing persistence architecture
 - require NetCoreApplicationTemplate
 
-That separation is intentional. ASI Backbone provides the accountability model and integration hooks; the host owns infrastructure.
+That separation is intentional. AsiBackbone provides the accountability model and integration hooks; the host owns infrastructure.
 
 ## NetCoreApplicationTemplate usage
 
@@ -210,7 +210,7 @@ That separation is intentional. ASI Backbone provides the accountability model a
 
 It is not required.
 
-A consuming application can integrate ASI Backbone EF Core persistence from:
+A consuming application can integrate AsiBackbone EF Core persistence from:
 
 - a plain ASP.NET Core application
 - a worker service
@@ -222,9 +222,9 @@ Documentation and package behavior should avoid assuming NetCoreApplicationTempl
 
 ## Practical checklist for host applications
 
-When integrating ASI Backbone EF Core persistence, the host application should decide:
+When integrating AsiBackbone EF Core persistence, the host application should decide:
 
-1. Which `DbContext` owns the ASI Backbone entities.
+1. Which `DbContext` owns the AsiBackbone entities.
 2. Which EF Core provider is used.
 3. Which connection string and environment-specific configuration are used.
 4. Which migration assembly owns schema changes.
@@ -236,7 +236,7 @@ When integrating ASI Backbone EF Core persistence, the host application should d
 10. How signing metadata is protected, reviewed, verified, and correlated during key rotation or audit-chain investigation.
 11. How sanitized persistence failures are surfaced while detailed EF Core diagnostics remain inside host-owned logging and operational review boundaries.
 
-The ASI Backbone package should remain a clean integration layer inside that host-owned plan.
+The AsiBackbone package should remain a clean integration layer inside that host-owned plan.
 
 ## Related documentation
 

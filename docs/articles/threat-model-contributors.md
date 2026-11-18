@@ -25,7 +25,7 @@ They should not collapse to `Allowed` unless the input is valid, expected, and a
 
 ## Why this exists
 
-Policy evaluation already narrows a request into a governance decision such as allow, deny, defer, acknowledgment required, or escalation recommended. Threat model contributors add an earlier inspection point for signals such as malformed input, replay indicators, capability-token mismatch, regional-policy mismatch, or unsafe external command requests.
+Policy evaluation already narrows a request into a governance decision such as allow, deny, defer, acknowledgment required, or escalation recommended. Threat model contributors add an earlier inspection point for signals such as malformed input, replay indicators, capability-grant mismatch, regional-policy mismatch, or unsafe external command requests.
 
 The intent is practical hardening:
 
@@ -171,7 +171,7 @@ These examples are illustrative. Hosts should define exact thresholds and outcom
 
 Set this option to `false` only when the host intentionally wants contributor exceptions to propagate to its own error boundary.
 
-Fail-closed behavior is especially important when a contributor is responsible for capability-token integrity, regional policy checks, replay detection, or external command screening. A broken check should not silently create a path to execution.
+Fail-closed behavior is especially important when a contributor is responsible for capability-grant integrity, regional policy checks, replay detection, or external command screening. A broken check should not silently create a path to execution.
 
 ### Critical failures still propagate
 

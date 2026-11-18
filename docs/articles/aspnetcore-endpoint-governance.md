@@ -203,7 +203,7 @@ builder.Services.Configure<EndpointGovernanceOptions>(options =>
 });
 ```
 
-Use richer ProblemDetails responses only when the response body is safe for the deployment. Do not include sensitive policy internals, capability-token details, audit identifiers, or reason messages unless the host has explicitly decided those values are safe to expose.
+Use richer ProblemDetails responses only when the response body is safe for the deployment. Do not include sensitive policy internals, capability-grant details, audit identifiers, or reason messages unless the host has explicitly decided those values are safe to expose.
 
 ## Endpoint metadata mode
 

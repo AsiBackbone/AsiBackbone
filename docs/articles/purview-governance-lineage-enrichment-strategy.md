@@ -1,17 +1,17 @@
 # Strategy-Only: Purview Governance and Lineage Enrichment
 
-This article documents a **strategy-only** future Microsoft Purview governance and lineage enrichment direction. It originated as planning guidance after the released `1.1.0 - Observability, Outbox, Signing, and Governance Emission Providers` package-family boundary and remains strategy-only in the current `7.5.4` stable package family.
+This article documents a **strategy-only** future Microsoft Purview governance and lineage enrichment direction. It originated as planning guidance after the released `1.1.0 - Observability, Outbox, Signing, and Governance Emission Providers` package-family boundary and remains strategy-only in the current stable package family.
 
 Issue: #146.
 
 AsiBackbone is a governance spine for consequential software decision flow. It is not a cloud governance platform, Purview catalog provider, SIEM product, signing product, or compliance guarantee by itself.
 
 > [!IMPORTANT]
-> This page does **not** document a released NuGet package. No Purview provider package, Purview SDK adapter, catalog-ingestion implementation, or Azure-specific enrichment package is included in the current `7.5.4` stable package family.
+> This page does **not** document a released NuGet package. No Purview provider package, Purview SDK adapter, catalog-ingestion implementation, or Azure-specific enrichment package is included in the current stable package family.
 >
-> `AsiBackbone.OpenTelemetry` remains the concrete released governance emission provider package in `7.5.4`. Purview remains a future/strategy-only governance enrichment direction unless a later release separately reviews and ships it.
+> `AsiBackbone.OpenTelemetry` remains the concrete released governance emission provider package. Purview remains a future/strategy-only governance enrichment direction unless a later release separately reviews and ships it.
 >
-> See [1.1.0 Release Notes - Accepted deferrals](release-notes-110.md#accepted-deferrals) for the historical origin of this deferral and the [7.5.4 Release Notes](release-notes-754.md) for the current stable release boundary.
+> See [1.1.0 Release Notes - Accepted deferrals](release-notes-110.md#accepted-deferrals) for the historical origin of this deferral and [Releases & Compatibility](../releases/index.md) for the current stable release.
 
 > [!NOTE]
 > Purview enrichment is not durable audit storage. It should add classification, lineage, catalog, and compliance context around selected governance events while the host-owned durable audit and outbox records remain the reliability and accountability baseline.
@@ -92,7 +92,7 @@ Recommended record categories:
 | Record category | Description | Example |
 | --- | --- | --- |
 | Governance decision summary | Summarizes a decision tied to a workflow or asset. | A sensitive export request required acknowledgment and was approved under policy version `2026.06`. |
-| Gateway execution lineage | Links a governed external execution to an asset, process, or workflow. | A deployment gateway executed after policy evaluation and capability-token validation. |
+| Gateway execution lineage | Links a governed external execution to an asset, process, or workflow. | A deployment gateway executed after policy evaluation and capability-grant validation. |
 | Policy-context annotation | Adds policy version/hash, policy scope, and decision boundary metadata to a cataloged workflow. | A finance report export workflow used policy hash `abc123...`. |
 | Compliance checkpoint | Marks that a high-risk action passed a required acknowledgment, escalation, or review checkpoint. | An administrative action required manual acknowledgment before execution. |
 | Classification enrichment status | Records whether the governance event was classified, redacted, summarized, blocked, or quarantined before external enrichment. | A payload was blocked by DLP and no Purview enrichment was emitted. |
@@ -299,7 +299,7 @@ Before implementation begins, confirm:
 | #140 Durable outbox | Purview enrichment should happen after local durable audit/outbox persistence. |
 | #141 Lifecycle stages | Lifecycle stage and sequence can inform process lineage and compliance checkpoint records. |
 | #142 Decision receipt telemetry | Trace, gateway, outbox, and PII-safe identifiers provide safe correlation fields. |
-| #144 OpenTelemetry provider | OpenTelemetry remains the released governance emission provider in `7.5.4`; Purview remains governance/catalog enrichment strategy. |
+| #144 OpenTelemetry provider | OpenTelemetry remains the released governance emission provider; Purview remains governance/catalog enrichment strategy. |
 | #145 Event Hubs provider | Event Hubs can feed downstream processors that selectively summarize and enrich Purview records. |
 | #149 Observability architecture | This strategy follows the Core-neutral provider package architecture. |
 | #187 Governance emission contract | Purview enrichment should consume minimized, versioned governance emission envelopes or summaries. |
@@ -323,7 +323,7 @@ Before implementation begins, confirm:
 This strategy-only provider page does not implement:
 
 * Purview ingestion code;
-* a Purview NuGet package in the current `7.5.4` stable package family;
+* a Purview NuGet package in the current stable package family;
 * Purview catalog asset creation;
 * Purview account, collection, classification, or lineage provisioning;
 * OpenTelemetry, Azure Monitor, Log Analytics, or Event Hubs emission;

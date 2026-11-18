@@ -1,6 +1,6 @@
 # Governance Emission Contract
 
-This article documents the provider-neutral governance emission contract introduced for the `1.1.0 - Observability, Outbox, and Governance Emission Providers` milestone.
+This article documents the provider-neutral governance emission contract introduced by the `1.1.0` Observability, Outbox, and Governance Emission Providers milestone and carried forward in the current stable package family.
 
 AsiBackbone remains a governance spine for consequential software decision flow. It is not an cloud governance platform, observability backend, SIEM product, streaming system, signing product, or provider SDK wrapper.
 

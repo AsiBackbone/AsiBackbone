@@ -22,6 +22,7 @@ These records are public for traceability, but they are not part of the normal c
 - [Package Discovery Metadata Review](../articles/package-discovery-metadata-review.md)
 - [Public API XML Documentation](../articles/public-api-xml-documentation.md)
 - [Production Placeholder Exception Guardrails](../articles/production-placeholder-exception-guardrails.md)
+- [Post-7.5.4 Documentation Currency Review](../articles/post-754-documentation-currency-review.md)
 - [Post-2.0.0 Documentation Currency Review](../articles/post-200-documentation-currency-review.md)
 - [Implicit Usings Posture](../articles/implicit-usings-posture.md)
 - [Developer Checklist](../articles/developer-checklist.md)

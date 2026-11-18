@@ -22,7 +22,7 @@ Hosts or future package components may provide an explicit schema version when r
 
 ## Capability grant note
 
-The `1.0.0` package does not currently define a package-owned durable capability-token record. Capability-token references are captured as identifiers, such as `CapabilityTokenId`, on schema-stamped audit ledger records when the host supplies them. If a future package adds a durable capability-token artifact, it should carry its own schema discriminator and migration guidance before release.
+A `CapabilityGrant` carries its own `SchemaVersion`, normalized like other governance artifacts, so signed grants can be migrated and verified independently of the records that reference them. Decision receipts reference a grant through `CapabilityGrantId`; audit ledger records retain the `CapabilityTokenId` identifier name from earlier releases. Bounded-use enforcement is persisted separately: `AsiBackbone.EntityFrameworkCore` provides `EfCoreCapabilityGrantUseStore`, which records grant uses in the host-owned `AsiBackboneCapabilityGrantUses` table. These grant and use-record shapes were added after the initial `1.0.0` schema version; see [Signed Capability Grants](signed-capability-grants.md) and [Capability Grant Hardening](capability-grant-hardening.md).
 
 ## Migration expectation
 
@@ -39,4 +39,4 @@ When a future release changes a durable artifact shape, the release should:
 
 Host applications that persist or export governance decisions, receipts, audit records, or acknowledgment records should include a schema/version field in any host-defined durable payloads. If the host wraps AsiBackbone records in a larger envelope, the host envelope may have its own version, but it should preserve the underlying artifact schema version as well.
 
-This keeps decision receipt, decision receipts, and future governance artifacts migratable after `1.0.0` without pulling provider-specific emission work into the core package line.
+This keeps decision receipts and other governance artifacts migratable across releases without pulling provider-specific emission work into the core package line.

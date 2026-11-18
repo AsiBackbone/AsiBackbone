@@ -106,7 +106,7 @@ Typical gateway checks include:
 
 - Command grammar validation.
 - Robot or endpoint identity validation.
-- Capability-token validation.
+- Capability-grant validation.
 - Token scope, expiration, issuer, and audience checks.
 - Geofence validation.
 - Rate limits and cooldown windows.
@@ -215,7 +215,7 @@ A robotics operational gateway helps avoid high-risk integration mistakes:
 
 ## Adoption note
 
-Robotics should remain a later integration package or advanced scenario. A good first validation is a simulated command gateway that never touches hardware. The host should prove policy evaluation, acknowledgment flow, decision receipt, capability-token scope, and fail-closed behavior before connecting the pattern to any external system.
+Robotics should remain a later integration package or advanced scenario. A good first validation is a simulated command gateway that never touches hardware. The host should prove policy evaluation, acknowledgment flow, decision receipt, capability-grant scope, and fail-closed behavior before connecting the pattern to any external system.
 
 ## Related documentation
 

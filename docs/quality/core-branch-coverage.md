@@ -9,7 +9,7 @@ For that reason, Core has a stricter branch-coverage expectation than the reposi
 | Gate | Scope | Coverage type | Threshold | Purpose |
 | --- | --- | --- | --- | --- |
 | Repository-wide coverage gate | Full solution | Line coverage | 75% minimum | Keeps the overall package family from losing broad test coverage across Core, adapters, storage, telemetry, samples, and integration-oriented code. |
-| Core branch coverage gate | `AsiBackbone.Core` through `AsiBackbone.Core.Tests` | Branch coverage | 90% minimum | Protects the framework-neutral governance path where missed branches carry the highest policy, acknowledgment, audit, signing, and capability-token regression risk. |
+| Core branch coverage gate | `AsiBackbone.Core` through `AsiBackbone.Core.Tests` | Branch coverage | 90% minimum | Protects the framework-neutral governance path where missed branches carry the highest policy, acknowledgment, audit, signing, and capability-grant regression risk. |
 
 The Core branch coverage gate does not replace the repository-wide line coverage gate. Both gates should remain active in CI.
 
@@ -39,7 +39,7 @@ Preferred test targets include:
 
 - policy-evaluation allow, deny, warning, acknowledgment, defer, and escalation paths;
 - decision composition and reason-code preservation;
-- capability-token validation, expiry, scope, and failure behavior;
+- capability-grant validation, expiry, scope, and failure behavior;
 - signing verification and tamper-detection boundaries;
 - acknowledgment request and response flows;
 - audit receipt construction, provenance, schema, policy-version, and metadata behavior;

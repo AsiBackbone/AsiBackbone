@@ -48,8 +48,8 @@ evidence pair.
 
 ## Current state
 
-As of the `5.0.0` release line, the repository holds only the two active
-branches. The twenty-nine former `release/*` branches have been removed, and
+When this policy was adopted during the `5.0.0` release line, the repository
+held only the two active branches. The twenty-nine former `release/*` branches have been removed, and
 every one of them is represented by a matching annotated tag with a published
 release — a complete `29` tag to `29` release pairing, verified before removal.
 

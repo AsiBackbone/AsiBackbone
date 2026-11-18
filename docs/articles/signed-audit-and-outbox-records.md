@@ -11,7 +11,7 @@ AsiBackbone provides provider-neutral governance primitives and signing seams. I
 
 ## Released signing context
 
-`1.1.0` includes stable Core signing helpers and stable signing-provider package boundaries:
+The stable package family includes Core signing helpers and signing-provider package boundaries, introduced in `1.1.0`:
 
 | Surface | Status | Limit |
 | --- | --- | --- |
