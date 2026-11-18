@@ -272,7 +272,7 @@ Earlier release records remain available for historical traceability.
 
 ## Feedback that helps most now
 
-AsiBackbone is a stable `7.5.x` package family targeting `net10.0`. It returns governance decisions and receipts; the host keeps execution ownership. It does not certify compliance or make an application secure on its own, and ordinary framework authorization is often the simpler design (see [Project Boundaries and Non-Claims](https://asibackbone.github.io/AsiBackbone/articles/project-boundaries.html)).
+AsiBackbone provides stable packages targeting `net10.0`. It returns governance decisions and receipts; the host keeps execution ownership. It does not certify compliance or make an application secure on its own, and ordinary framework authorization is often the simpler design (see [Project Boundaries and Non-Claims](https://asibackbone.github.io/AsiBackbone/articles/project-boundaries.html)).
 
 At this stage, the most useful feedback is from people evaluating the package family for the first time: steps that were unclear or failed, packages or examples that would make evaluation easier, and applications where the approach does not fit.
 

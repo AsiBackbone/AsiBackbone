@@ -7,7 +7,7 @@ Issue: #216, updated for #253.
 AsiBackbone provides governance infrastructure around consequential software decision flow. It is not a key-management system, immutable ledger, blockchain product, legal evidence system, compliance certification service, or tamper-proof storage system by itself.
 
 > [!IMPORTANT]
-> `1.1.0` includes stable Core signing-ready metadata, canonical payload hashing, signing seams, verification-policy primitives, a local-development signing provider, and a managed-key adapter boundary. Production cryptographic assurance still requires a host-owned or provider-owned implementation that signs canonical artifacts, protects keys, verifies signatures, stores records durably, monitors failures, manages retention, and defines operational response procedures.
+> The released package family includes Core signing-ready metadata, canonical payload hashing, versioned signature inputs, signing and verification seams, a local-development signer, and a managed-key adapter. These are composable primitives, not automatic production signing or verification. The host must supply protected key custody, concrete signing and verification services, durable storage, monitoring, retention, and incident response.
 
 ## Security posture summary
 
@@ -25,7 +25,7 @@ The strongest accurate statement is the narrowest one the deployed system can pr
 
 ## Default package boundary
 
-The stable package family provides governance primitives and metadata surfaces. In `1.1.0`, this includes stable Core signing-ready primitives, the local-development signing provider, and the managed-key signing adapter boundary.
+The released packages provide Core signing-ready primitives, the local-development signing provider, and the managed-key signing adapter boundary. These surfaces were introduced in `1.1.0`; see [Releases & Compatibility](../releases/index.md) for the current stable release and [Signing Provider Package Boundary](signing-provider-package-boundary.md) for available components.
 
 By default the package family does not:
 
@@ -43,7 +43,7 @@ The host application remains responsible for deciding whether a given workflow r
 
 ## Released signing package boundaries
 
-| Surface | `1.1.0` status | Production boundary |
+| Surface | Current package boundary | Production boundary |
 | --- | --- | --- |
 | `AsiBackbone.Core` signing primitives | Stable. | Signing-ready metadata, canonical hashing, signing seams, verification seams, and verification-policy primitives. No production key custody. |
 | `AsiBackbone.Signing.LocalDevelopment` | Stable local-development provider. | Tests, samples, local validation, and wiring proof paths only. Not production signing. |
@@ -440,11 +440,11 @@ Cryptographic posture should reinforce the existing AsiBackbone governance flow 
 | Durable outbox | Outbox records should be preserved locally before external emission, and high-assurance deployments may sign the local artifact or the emission envelope. |
 | Gateway execution | Gateways should validate token scope, expiration, policy binding, and acknowledgment binding before execution. |
 
-## Release-note wording
+## Recommended current wording and historical introduction
 
 Safe release wording:
 
-> AsiBackbone `1.1.0` provides stable Core signing-ready metadata, canonical hashing, provider-neutral signing and verification seams, a local-development signing provider, a managed-key signing adapter boundary, and production guidance for hosts that need signed or verified governance artifacts. Production tamper-evidence, immutability, blockchain anchoring, and non-repudiation are not provided by default and require concrete host or provider configuration.
+> AsiBackbone supplies provider-neutral canonical hashing, versioned signature-input construction, signing and verification contracts, a local-development signing provider, and a managed-key integration adapter. Hosts must configure and operate their own signing keys, verification policy, durability, and incident controls; none of these primitives automatically makes records immutable, tamper-proof, or legally non-repudiable. Signed governance receipts and Sigstore signatures on GitHub Release build packages are separate trust boundaries. See [Supply-Chain Provenance](supply-chain-provenance.md) and [Consumer Verification](../releases/index.md) for release-artifact verification.
 
 Avoid wording such as:
 

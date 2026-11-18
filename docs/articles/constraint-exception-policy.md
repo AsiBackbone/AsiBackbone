@@ -2,11 +2,11 @@
 
 This design note defines the intended behavior when an `IGovernanceConstraint<TContext>` throws during policy evaluation.
 
-AsiBackbone is audit-first governance infrastructure. For the `3.x` stable line, ordinary policy constraint exceptions fail closed by default so a governed attempt can still produce a `GovernanceDecision`, stable reason code, policy metadata, and downstream decision receipt. Hosts can still opt out when they intentionally want exceptions to propagate to an existing host error boundary.
+AsiBackbone is audit-first governance infrastructure. Eligible ordinary policy constraint exceptions fail closed by default so a governed attempt can still produce a `GovernanceDecision`, stable reason code, policy metadata, and downstream decision receipt. Hosts can still opt out when they intentionally want exceptions to propagate to an existing host error boundary.
 
 ## Default behavior: fail closed as a denied decision
 
-The `3.x` stable default is fail-closed conversion for eligible ordinary constraint exceptions.
+The default is fail-closed conversion for eligible ordinary constraint exceptions (introduced in `3.0.0`; see [Major Version History](major-version-history.md)).
 
 When a constraint throws and `GovernancePolicyOptions.TreatConstraintExceptionAsDenial` is `true`, an expected non-cancellation, non-critical exception thrown by a constraint becomes a denied `GovernanceDecision` with reason code:
 

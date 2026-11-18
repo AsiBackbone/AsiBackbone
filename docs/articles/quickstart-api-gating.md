@@ -291,7 +291,7 @@ The important boundary is that AsiBackbone does not perform the order approval. 
 This quickstart makes two evaluator choices explicit:
 
 - `DenyWhenNoConstraints = true` because governed production surfaces should fail closed if expected constraints are missing.
-- `TreatConstraintExceptionAsDenial = true` because the `3.x` stable line defaults eligible ordinary constraint failures into denied governance decisions with the monitored `asibackbone.policy.constraint_exception` reason code.
+- `TreatConstraintExceptionAsDenial = true` because the default converts eligible ordinary constraint failures into denied governance decisions with the monitored `asibackbone.policy.constraint_exception` reason code.
 
 Set `TreatConstraintExceptionAsDenial = false` only when the host has intentionally decided that constraint exceptions should propagate to an existing exception, transaction, retry, telemetry, or incident-response path and the host still records enough audit evidence for governed attempts.
 

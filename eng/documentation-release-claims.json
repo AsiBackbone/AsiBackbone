@@ -8,6 +8,8 @@
     "docs/articles/release-readiness-*.md",
     "docs/articles/quickstart-*.md",
     "docs/articles/upgrade-*.md",
+    "docs/articles/consumer-verification-*.md",
+    "docs/reviews/AsiBackbone_Code_Review_2026-07.md",
     "docs/articles/alpha-package-boundary.md",
     "docs/articles/core-alpha-readiness-review.md",
     "docs/articles/stable-api-review.md",

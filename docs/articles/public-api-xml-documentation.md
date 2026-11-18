@@ -6,7 +6,7 @@ AsiBackbone generates XML documentation for package and DocFX output. Public API
 
 `CS1591` is no longer suppressed at repository scope. Instead, existing package projects opt into a project-scoped compatibility baseline with `AsiBackboneSuppressMissingXmlDocs=true` while the current public API documentation gaps are inventoried.
 
-This is intentionally staged for the `3.x` line:
+This is an intentionally staged approach:
 
 1. Inventory every public package project listed in `eng/xml-docs/public-api-projects.txt`.
 2. Check the inventory against `eng/xml-docs/cs1591-baseline.csv` so selected projects cannot regress above their tracked ceiling.

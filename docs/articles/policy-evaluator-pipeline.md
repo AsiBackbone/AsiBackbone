@@ -39,10 +39,10 @@ Composition rules are intentionally conservative:
 3. Allow is returned when constraints exist and no constraint blocks or warns.
 4. Not-applicable constraint results do not block the request.
 5. An optional `IGovernanceDecisionPolicy<TContext>` can raise the composed decision to deferred, acknowledgment-required, or escalation-recommended.
-6. When the supplied constraint collection is empty and `GovernancePolicyOptions.DenyWhenNoConstraints` remains at its `3.x` default of `true`, the evaluator returns a denied decision with reason code `asibackbone.policy.no_constraints`.
+6. When the supplied constraint collection is empty and `GovernancePolicyOptions.DenyWhenNoConstraints` remains at its default of `true`, the evaluator returns a denied decision with reason code `asibackbone.policy.no_constraints`.
 7. When `GovernancePolicyOptions.ShortCircuitOnFirstDenial` is enabled, the evaluator stops after the first blocked constraint result and preserves reasons produced up to that point.
 8. When full evaluation finds a denial, warning-only reasons are not copied into the final denied decision; the denied decision remains focused on blocking rationale.
-9. When `GovernancePolicyOptions.TreatConstraintExceptionAsDenial` remains at its `3.x` default of `true`, an eligible non-cancellation, non-critical exception thrown by a constraint becomes a denied decision with reason code `asibackbone.policy.constraint_exception`.
+9. When `GovernancePolicyOptions.TreatConstraintExceptionAsDenial` remains at its default of `true`, an eligible non-cancellation, non-critical exception thrown by a constraint becomes a denied decision with reason code `asibackbone.policy.constraint_exception`.
 10. Threat-model contributor exceptions also fail closed by default with reason code `asibackbone.threat.contributor_exception`.
 
 The evaluator propagates correlation, policy version, and policy hash metadata from the evaluation context into the composed governance decision.
@@ -95,7 +95,7 @@ For host-owned orchestration examples, see [Custom Decision Policy Examples](cus
 
 ## Empty-policy behavior
 
-The `3.x` default keeps `GovernancePolicyOptions.DenyWhenNoConstraints` set to `true`. That means an evaluator created with an empty constraint collection produces a denied decision with reason code:
+The default keeps `GovernancePolicyOptions.DenyWhenNoConstraints` set to `true`. That means an evaluator created with an empty constraint collection produces a denied decision with reason code:
 
 ```text
 asibackbone.policy.no_constraints
@@ -139,7 +139,7 @@ Exception-as-denial exists so the evaluator can fail closed when a constraint un
 
 ## Constraint exception behavior
 
-The `3.x` default keeps `GovernancePolicyOptions.TreatConstraintExceptionAsDenial` set to `true`. When enabled, a non-cancellation, non-critical exception thrown by a constraint becomes a denied `GovernanceDecision` with reason code:
+The default keeps `GovernancePolicyOptions.TreatConstraintExceptionAsDenial` set to `true`. When enabled, a non-cancellation, non-critical exception thrown by a constraint becomes a denied `GovernanceDecision` with reason code:
 
 ```text
 asibackbone.policy.constraint_exception

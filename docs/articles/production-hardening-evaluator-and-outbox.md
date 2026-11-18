@@ -14,7 +14,7 @@ A governed production host should start from this posture and then intentionally
 | Area | Recommended posture | Why |
 | --- | --- | --- |
 | Empty policy surface | `DenyWhenNoConstraints = true` for governed production endpoints. | An empty constraint set may indicate dependency-injection, configuration, feature-flag, database, or policy-discovery failure. |
-| Constraint exceptions | Keep the `3.x` default `TreatConstraintExceptionAsDenial = true` for governed production surfaces unless the host explicitly needs fail-fast exception propagation. | Eligible ordinary constraint exceptions produce stable denied decisions, reason codes, and auditable policy metadata instead of unstructured host exceptions. |
+| Constraint exceptions | Keep the default `TreatConstraintExceptionAsDenial = true` for governed production surfaces unless the host explicitly needs fail-fast exception propagation. | Eligible ordinary constraint exceptions produce stable denied decisions, reason codes, and auditable policy metadata instead of unstructured host exceptions. |
 | Exception propagation opt-out | Set `TreatConstraintExceptionAsDenial = false` only when the host has an intentional exception, retry, transaction, telemetry, or incident boundary that must observe the original exception directly. | This preserves fail-fast behavior for hosts that already convert exceptions into reliable audit and operational evidence. |
 | Threat contributor exceptions | Keep `TreatThreatContributorExceptionAsDenial = true` when contributors are registered. | Threat-model extension failures should not quietly continue execution. |
 | Critical failures | Never treat critical host/runtime failures as ordinary policy denials. | Process corruption, cancellation, infrastructure failure, and runtime incidents belong to the host error boundary. |
@@ -30,7 +30,7 @@ var evaluatorOptions = new GovernancePolicyOptions
     // Production governance surfaces should fail closed if expected constraints are missing.
     DenyWhenNoConstraints = true,
 
-    // 3.x defaults eligible ordinary constraint failures to denied governance decisions
+    // By default, eligible ordinary constraint failures produce denied governance decisions
     // with stable reason codes and auditable policy metadata.
     TreatConstraintExceptionAsDenial = true,
 
@@ -72,7 +72,7 @@ Use this distinction when deciding whether to keep the fail-closed default or op
 
 | Failure type | Example | Recommended handling |
 | --- | --- | --- |
-| Policy/constraint failure | A regional rule service returns an unexpected policy value, a host-owned constraint throws during a recoverable policy lookup, or a custom rule cannot evaluate safely. | Keep the `3.x` default exception-as-denial posture when a denied decision artifact is operationally preferred. Opt out only when fail-fast host exception handling is required. |
+| Policy/constraint failure | A regional rule service returns an unexpected policy value, a host-owned constraint throws during a recoverable policy lookup, or a custom rule cannot evaluate safely. | Keep the default exception-as-denial posture when a denied decision artifact is operationally preferred. Opt out only when fail-fast host exception handling is required. |
 | Host/runtime failure | Cancellation, process-corruption-style runtime failure, broken dependency startup, database outage, memory exhaustion, invalid runtime state, or other systemic incident. | Let the host error boundary, health checks, restart policy, and incident handling see the failure. Do not hide it as an ordinary governance denial. |
 
 `OperationCanceledException` remains cancellation and continues to propagate. Critical host/runtime exceptions also continue to propagate instead of becoming denied governance decisions.
@@ -198,7 +198,7 @@ Production hosts should monitor:
 
 | Concern | AsiBackbone package guarantee | Host responsibility |
 | --- | --- | --- |
-| Policy evaluation result | Returns a structured `GovernanceDecision` when evaluation completes normally or eligible exceptions are converted by the `3.x` default policy. | Decide whether to continue execution, return an error response, require acknowledgment, escalate, or retry. |
+| Policy evaluation result | Returns a structured `GovernanceDecision` when evaluation completes normally or eligible exceptions are converted by the default policy. | Decide whether to continue execution, return an error response, require acknowledgment, escalate, or retry. |
 | Exception-as-denial | Converts eligible constraint exceptions into denied decisions by default unless the host explicitly sets `TreatConstraintExceptionAsDenial = false`. | Decide whether conversion is appropriate for each host and monitor both decisions and logs. |
 | Public reason safety | Default exception-as-denial reason text is curated and stable. | Keep custom reason messages safe and prevent sensitive data from entering logs, metadata, or audit payloads. |
 | Local outbox persistence | EF Core adapter persists provider-neutral outbox rows through a host-owned `DbContext`. | Configure the provider, migrations, transactions, credentials, access control, backup, retention, and operational policy. |
