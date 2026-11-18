@@ -30,7 +30,15 @@ Both commands run in the **Version Consistency** workflow. The repository valida
 
 ## Source of truth
 
-The validator parses `<VersionPrefix>` from `Directory.Build.props` as XML. The following is a **synthetic example**, not the current repository version. From a value such as `3.0.0`, it derives:
+The validator parses `<VersionPrefix>` from `Directory.Build.props` as XML.
+
+The following values are a synthetic fixture example, not the current repository version. Given an illustrative input:
+
+```text
+VersionPrefix = 3.0.0
+```
+
+The derived tokens are:
 
 - example exact version: `3.0.0`;
 - example minor line: `3.0.x`;
