@@ -15,7 +15,7 @@ Most new users should start with one of these paths:
 | --- | --- | --- |
 | Understand the absolute Core-only decision shape | This page, [Level 1](#level-1-core-decision-pipeline-only) | `AsiBackbone.Core` |
 | Gate one ASP.NET Core endpoint and inspect decision receipt locally | [First 15 Minutes: Standard API Gating](quickstart-api-gating.md) | `Core`, `AspNetCore`, `Storage.InMemory` |
-| Review the stable package family before broader adoption | [7.5.4 Release Notes](release-notes-754.md) | Install only the packages required by the selected boundary |
+| Review the stable package family before broader adoption | [Releases & Compatibility](../releases/index.md) | Install only the packages required by the selected boundary |
 
 Everything else is an add-on.
 
@@ -36,7 +36,7 @@ Cross-cutting add-ons:
 | --- | --- | --- |
 | Roslyn analyzers | You want build-time safety rails for governance persistence and continuation flows. | Optional; not runtime enforcement. |
 | DLP/classification failure policy | You need risk-sensitive behavior when a host-owned scanner is unavailable, times out, blocks, or classifies content. | AsiBackbone supplies the policy response; the host owns the scanner. |
-| Capability-token hardening | You need short-lived, scoped execution grants after a decision. | Validate at the execution boundary. |
+| Capability-grant hardening | You need short-lived, scoped execution grants after a decision. | Validate at the execution boundary. |
 
 ## Level 1: Core decision pipeline only
 

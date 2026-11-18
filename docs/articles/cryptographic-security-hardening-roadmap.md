@@ -51,7 +51,7 @@ Concrete provider work should live in provider packages, host integrations, samp
 
 ## Child issue plan and status
 
-| Order | Issue | Focus | Status in `1.1.x` documentation/package line |
+| Order | Issue | Focus | Status |
 | --- | --- | --- | --- |
 | 1 | #219 | Canonical payload hashing and deterministic signing payloads. | Released provider-neutral surface and tests exist; not production tamper-evidence by itself. |
 | 2 | #220 | Concrete signing-provider package boundary. | Released package-boundary documentation plus LocalDevelopment and ManagedKey provider surfaces. |
@@ -66,7 +66,7 @@ Concrete provider work should live in provider packages, host integrations, samp
 
 ### Phase 1: Canonical payload foundation
 
-Child issue: #219. Status: released provider-neutral surface in the stable `1.1.x` line.
+Child issue: #219. Status: released in `1.1.0` as a provider-neutral surface; carried forward in the current stable package family.
 
 Define how selected artifacts become deterministic payloads before hashing. Candidate artifacts include audit receipts, audit ledger records, decision receipt lifecycle events, outbox entries, governance emission envelopes, and capability-token grants.
 
@@ -81,7 +81,7 @@ Exit criteria:
 
 ### Phase 2: Signing provider boundary
 
-Child issue: #220. Status: released provider-boundary documentation and provider packages in the stable `1.1.x` line.
+Child issue: #220. Status: released in `1.1.0` as provider-boundary documentation and provider packages; carried forward in the current stable package family.
 
 Define where concrete signing implementations live. Keep Core provider-neutral, treat managed-key providers as separate package work, require key ID and key version to flow with signatures, and never expose private keys, symmetric keys, credentials, connection strings, or managed identity tokens to Core.
 
@@ -93,7 +93,7 @@ Exit criteria:
 
 ### Phase 3: Signed audit and outbox artifacts
 
-Child issue: #221. Status: released signing metadata/canonicalization surfaces for selected governance artifacts in the stable `1.1.x` line.
+Child issue: #221. Status: released in `1.1.0` as signing metadata/canonicalization surfaces for selected governance artifacts; carried forward in the current stable package family.
 
 Decide which artifacts can be signed and where signing occurs in the flow.
 
@@ -119,7 +119,7 @@ Exit criteria:
 
 ### Phase 4: Verification policy
 
-Child issue: #222. Status: released verification-policy and result-handling surfaces in the stable `1.1.x` line.
+Child issue: #222. Status: released in `1.1.0` as verification-policy and result-handling surfaces; carried forward in the current stable package family.
 
 Verification should produce explicit outcomes that can be routed through policy.
 

@@ -60,7 +60,7 @@ The builder covers every field the grant carries, so the hash binds the whole gr
 | `Create(...)` | Optional | Configurable; default is off | Configurable; default is off | Configurable; default is off | Fully configurable validation path |
 
 > [!CAUTION]
-> Calling `CapabilityGrantValidator.ValidateAsync(signedGrant)` without explicit options preserves the existing 3.x behavior. It validates metadata and temporal constraints using `CapabilityGrantValidationOptions.Create()` defaults, but it does **not** verify the signed artifact proof and does **not** perform a bounded-use/replay check. Do not treat the no-options path as execution-boundary validation.
+> Calling `CapabilityGrantValidator.ValidateAsync(signedGrant)` without explicit options does not validate the grant. Since `5.0.0` it fails closed: the result is `Failed` with `VerificationPolicyAction.Deny` and failure code `capability.validation-options-required`. Pass one of the profiles above so the call states what the grant is validated against. Before `5.0.0`, that call built permissive defaults with no proof or bounded-use check; see [Upgrade Guide: 4.0.0 to 5.0.0](upgrade-400-to-500.md#state-what-capability-validation-is-validating-against).
 
 The execution-boundary profile requires `CapabilityGrantBindingExpectations` built from the authenticated current subject
 and always requires proof verification. Include the requested operation whenever the grant is intended for a specific
@@ -130,12 +130,12 @@ CapabilityGrantValidationResult metadataResult = await CapabilityGrantValidator.
 
 A successful metadata-only result means only that the configured structural and temporal checks passed. It does not establish proof authenticity, replay resistance, single-use enforcement, authentication, authorization, or permission to execute an external action.
 
-## 3.x migration guidance
+## Migrating earlier validation calls
 
-The explicit profiles were introduced additively and do not silently change the historical 3.x behavior.
+The explicit profiles were introduced additively in the `3.x` line. The permissive no-options path that `3.x` preserved was closed in `5.0.0`.
 
 - Existing calls to `CapabilityGrantValidationOptions.Create(...)` continue to honor their current arguments and defaults.
-- Existing calls to `ValidateAsync(signedGrant)` continue to use the legacy default options where proof, acknowledgment-reference, and bounded-use checks are disabled.
+- Calls to `ValidateAsync(signedGrant)` without options deny with `capability.validation-options-required`; pass an explicit profile.
 - New operational-gateway and consequential-execution code should use `CreateBoundExecutionBoundary(...)`.
 - Replace existing `CreateExecutionBoundary(...)` calls with `CreateBoundExecutionBoundary(...)` and pass
   `CapabilityGrantBindingExpectations` built from the authenticated current subject as the required first argument.
@@ -143,7 +143,7 @@ The explicit profiles were introduced additively and do not silently change the 
 - Code that intentionally performs only structural or temporal validation should prefer `CreateMetadataValidation(...)` so the reduced validation contract is visible in code review.
 - Hosts migrating an existing execution boundary should supply both an `IGovernanceSignatureVerificationService` and, when the profile keeps its default bounded-use requirement, an `ICapabilityGrantUseStore`.
 
-The ambiguous no-options path remains available for 3.x compatibility. A future major version may tighten or remove that path; such a change would require explicit migration guidance rather than a silent behavioral change.
+The ambiguous no-options path was tightened in `5.0.0` with the migration guidance linked above: it compiles, but it denies rather than validating.
 
 ## Legacy `CreateExecutionBoundary` deprecation
 

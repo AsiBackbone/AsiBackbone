@@ -266,6 +266,9 @@ These managed API changes rename types and update receipt diagnostic wording. Th
 
 ### Planned 6.x deprecations
 
+> [!NOTE]
+> Outcome: no `6.x` minor release shipped. `7.0.0` renamed these compatibility names directly; see [Major Version History](major-version-history.md) and [Upgrade from 6.x to 7.0](upgrade-600-to-700.md). The plan below is kept as the `6.0` record.
+
 The retained `AuditResidue` CLR names are planned for deprecation in a later 6.x
 release. That release would add decision-receipt aliases, mark the current names
 obsolete under an ASIB diagnostic ID, and remove them in 7.0:

@@ -135,7 +135,7 @@ if ($staleResult.ExitCode -eq 0) {
     throw "Fixture 'stale-current' should fail but passed.`n$($staleResult.Output)"
 }
 
-foreach ($expectedText in @('README.md:1', 'docs/quality/current-posture.md:1', "release claim '2.x'", "Expected '3.x'")) {
+foreach ($expectedText in @('README.md:1', 'docs/quality/current-posture.md:1', 'docs/articles/api-guardrails.md:1', "release claim '2.x'", "Expected '3.x'")) {
     if (-not $staleResult.Output.Contains($expectedText, [System.StringComparison]::Ordinal)) {
         throw "Fixture 'stale-current' output did not contain '$expectedText'.`n$($staleResult.Output)"
     }

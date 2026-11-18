@@ -10,8 +10,9 @@ the published `v5.0.0` source at commit
 type/member UID together with the rendered C# declaration. Enum values are also
 recorded with their displayed numeric value.
 
-The committed files now describe the reviewed `7.0.0` public API after the
-intentional major-version changes documented below.
+The committed files describe the reviewed public API of the release named in
+each file's `# Baseline release:` header, after the intentional major-version
+changes documented below.
 
 ## Included stable managed assemblies
 

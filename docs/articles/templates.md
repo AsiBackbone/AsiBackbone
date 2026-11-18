@@ -73,7 +73,7 @@ The template intentionally favors safe local defaults:
 
 | Concern | Template default | Production expectation |
 | --- | --- | --- |
-| Evaluator failure posture | Uses the `3.x` fail-closed evaluator defaults: empty policy denies, eligible ordinary constraint exceptions deny, and threat-contributor exceptions deny. | Keep this posture for governed production paths unless the host has a documented exception-to-audit boundary and intentionally opts out. |
+| Evaluator failure posture | Uses the fail-closed evaluator defaults (introduced in `3.0.0`): empty policy denies, eligible ordinary constraint exceptions deny, and threat-contributor exceptions deny. | Keep this posture for governed production paths unless the host has a documented exception-to-audit boundary and intentionally opts out. |
 | Audit storage | Non-durable in-memory audit ledger | Host-owned durable audit/outbox persistence when records must survive restart. |
 | Capability validation | Sample scope check for `sample.execute` | Host-owned scope, expiry, replay, actor binding, and downstream authorization checks. |
 | Signing | Not configured by default | Add a production signing/key-management provider only when the host has a concrete trust model. |

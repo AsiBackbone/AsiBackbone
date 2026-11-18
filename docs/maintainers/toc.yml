@@ -34,6 +34,8 @@
       href: ../articles/public-api-xml-documentation.md
     - name: Production Placeholder Exception Guardrails
       href: ../articles/production-placeholder-exception-guardrails.md
+    - name: Post-7.5.4 Documentation Currency Review
+      href: ../articles/post-754-documentation-currency-review.md
     - name: Post-2.0.0 Documentation Currency Review
       href: ../articles/post-200-documentation-currency-review.md
     - name: Implicit Usings Posture

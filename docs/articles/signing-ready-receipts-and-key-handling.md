@@ -1,17 +1,16 @@
 # Signing-Ready Receipts and Key Handling
 
-This article documents the stable Core-neutral signing and verification primitives released in the `3.0.0 - Observability, Outbox, Signing, and Governance Emission Providers` package family.
+This article documents the stable Core-neutral signing and verification primitives in `AsiBackbone.Core`. They were introduced by the `1.1.0` Observability, Outbox, Signing, and Governance Emission Providers milestone.
 
 Issues: #147, #219, #253.
 
 AsiBackbone is a governance spine for consequential software decision flow. It is not a signing product, key-management system, immutable ledger, legal certification system, or compliance guarantee by itself.
 
 > [!IMPORTANT]
-> `AsiBackbone.Core` includes stable signing-ready metadata, canonical payload hashing, capability-grant payload construction, signing seams, and verification-policy primitives in `4.0.0`. Those Core primitives make artifacts ready for provider signing and later verification workflows; they do not create production tamper-evidence by themselves. Production tamper evidence requires a concrete signing provider, protected key management, verification policy, durable storage guarantees, retention policy, monitoring, and operational procedures supplied by the host or provider environment.
->
-> These primitives were introduced in the historical `3.0.0` release.
+> `AsiBackbone.Core` includes stable signing-ready metadata, canonical payload hashing, capability-grant payload construction, signing seams, and verification-policy primitives. Those Core primitives make artifacts ready for provider signing and later verification workflows; they do not create production tamper-evidence by themselves. Production tamper evidence requires a concrete signing provider, protected key management, verification policy, durable storage guarantees, retention policy, monitoring, and operational procedures supplied by the host or provider environment.
+> Signature inputs have been versioned since `6.0`; see [What the signature covers](cryptographic-security-posture.md#what-the-signature-covers).
 
-For released provider boundaries, see [Signing Provider Package Boundary](signing-provider-package-boundary.md), [Managed-Key Signing Provider](managed-key-signing-provider.md), and [Signed Audit and Outbox Records](signed-audit-and-outbox-records.md). For production posture, setup guidance, verification-failure behavior, audit-chain wording, capability-token validation, and security non-goals, see [Cryptographic Security Posture and Production Guidance](cryptographic-security-posture.md).
+For released provider boundaries, see [Signing Provider Package Boundary](signing-provider-package-boundary.md), [Managed-Key Signing Provider](managed-key-signing-provider.md), and [Signed Audit and Outbox Records](signed-audit-and-outbox-records.md). For production posture, setup guidance, verification-failure behavior, audit-chain wording, capability-grant validation, and security non-goals, see [Cryptographic Security Posture and Production Guidance](cryptographic-security-posture.md).
 
 ## Purpose
 
@@ -21,7 +20,7 @@ The signing-ready model gives host applications and provider packages a neutral 
 
 ## Released signing boundaries
 
-| Boundary | `3.0.0` status | Wording limit |
+| Boundary | Current status | Wording limit |
 | --- | --- | --- |
 | Core signing-ready primitives | Stable in `AsiBackbone.Core`. | Current behavior. Do not describe it as future-only. |
 | Local-development signer | Stable package: `AsiBackbone.Signing.LocalDevelopment`. | Local/test/sample/wiring proof path only, not production key custody. |

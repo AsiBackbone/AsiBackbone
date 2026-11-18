@@ -19,7 +19,7 @@ It helps hosts model and preserve:
 - structured `GovernanceDecision` outcomes,
 - reason codes and policy metadata,
 - acknowledgment workflows,
-- decision receipt and decision receipts,
+- decision receipts,
 - durable audit/outbox records where configured,
 - optional governance emission,
 - optional signing-ready or provider-signed artifacts,

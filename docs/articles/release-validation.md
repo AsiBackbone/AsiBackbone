@@ -1,6 +1,6 @@
 # Stable Release Validation
 
-This article documents the reusable release-blocking validation path for stable release lines. The stable package family maintained on `main` is `7.x`, and the current stable release is `7.5.4`.
+This article documents the reusable release-blocking validation path for stable release lines. The stable package family maintained on `main` is `7.x`; [Releases & Compatibility](../releases/index.md) lists the current stable release and its notes.
 
 The binary assembly identity for the `7.x` line is `7.0.0.0`.
 
@@ -9,9 +9,8 @@ Release validation should confirm that the package family remains practical gove
 The [7.5.4 Release Readiness Record](release-readiness-754.md) and the
 [7.5.4 Consumer Verification Guide](consumer-verification-754.md) record the
 current release-control evidence.
-The [7.5.4 Release Notes](release-notes-754.md) record the current `7.x`
-patch release, and the [7.5.2 Release Notes](release-notes-752.md) record the
-preceding dependency-maintenance patch.
+Each release's notes, readiness record, and consumer verification guide are
+listed in [Releases & Compatibility](../releases/index.md).
 The [Upgrade from 6.x to 7.0](upgrade-600-to-700.md) guide is
 authoritative for consumers moving from the previous stable line.
 Earlier readiness records are retained for traceability.
@@ -128,7 +127,7 @@ The staged policy is documented in [Public API XML Documentation](public-api-xml
 
 `Validate-PublicApiBaseline.ps1` compares the DocFX-managed reference surface for the stable managed package assemblies with committed baselines under `eng/api-baseline/`. The gate runs in normal CI, Stable Release Validation, and the package-publish validation path.
 
-The `v5.0.0` managed-reference output is the initial `5.x` baseline. `AsiBackbone.Templates` is excluded because it is a content-only `dotnet new` package without a managed consumer assembly; template smoke tests remain its compatibility guard.
+The `v5.0.0` managed-reference output seeded the baselines; each baseline file's header names the release it was last reviewed against. `AsiBackbone.Templates` is excluded because it is a content-only `dotnet new` package without a managed consumer assembly; template smoke tests remain its compatibility guard.
 
 An intentional baseline change must be classified under [API Compatibility and SemVer](api-compatibility-and-semver.md) before the baseline is regenerated. After reviewing the failed diff, maintainers may run `./scripts/Validate-PublicApiBaseline.ps1 -Update`, inspect `git diff -- eng/api-baseline`, and commit that reviewable baseline update in the same pull request as the API change. Baseline regeneration by itself does not authorize an additive change in a patch release or a breaking change in a minor release.
 

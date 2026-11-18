@@ -1,6 +1,6 @@
 # Decision Receipt Observability Schema
 
-This article documents the provider-neutral telemetry, traceability, and operational diagnostics fields added to the decision receipt model for the `1.1.0 - Observability, Outbox, and Governance Emission Providers` milestone.
+This article documents the provider-neutral telemetry, traceability, and operational diagnostics fields added to the decision receipt model introduced by the `1.1.0` Observability, Outbox, and Governance Emission Providers milestone and carried forward in the current stable package family.
 
 These fields support observability and governance emission without making `AsiBackbone.Core` depend on OpenTelemetry, Azure Monitor, Event Hubs, Purview, SIEM products, or any provider-specific package.
 

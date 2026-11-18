@@ -1,6 +1,6 @@
 # OpenTelemetry Governance Emission Provider Design
 
-This article documents the design for an OpenTelemetry-first governance emission provider for the `1.1.0 - Observability, Outbox, and Governance Emission Providers` milestone.
+This article documents the design for an OpenTelemetry-first governance emission provider introduced by the `1.1.0` Observability, Outbox, and Governance Emission Providers milestone and carried forward in the current stable package family.
 
 Issue: #144.
 

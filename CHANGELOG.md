@@ -22,6 +22,15 @@ This project follows the spirit of [Keep a Changelog](https://keepachangelog.com
 
 ### Changed
 
+- Current documentation was reviewed page by page against the published release, the public API baselines, and the
+  implementation (#945). Capability Grant Hardening no longer describes the omitted-options
+  `CapabilityGrantValidator.ValidateAsync` path as permissive: it has denied with
+  `capability.validation-options-required` since 5.0.0. Schema Versioning documents the schema-stamped
+  `CapabilityGrant` and the EF Core use store. Quality Reports no longer lists closed issues as tracked work. Deeper
+  pages stop naming the current release or an earlier major line as current, label introduction versions as history,
+  use the current capability-grant vocabulary and the AsiBackbone spelling, and route release discovery to Releases &
+  Compatibility. The release-claim validator also rejects stale "stable `N.x` package line" prose. The Post-7.5.4
+  Documentation Currency Review records the inventory, findings, retained version references, and follow-up.
 - `CODE_OF_CONDUCT.md` is now identical to the AsiBackbone organization Code of Conduct (Contributor Covenant 2.1),
   so every AsiBackbone repository carries the same text and reporting contact. The statement that AsiBackbone also
   adheres to the .NET Foundation Code of Conduct moved to `GOVERNANCE.md`.

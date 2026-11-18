@@ -1,6 +1,6 @@
 # DLP and Classification Failure Policy
 
-This article documents the provider-neutral DLP, classification, and governance-screening failure behavior model for the `1.1.0 - Observability, Outbox, and Governance Emission Providers` milestone.
+This article documents the provider-neutral DLP, classification, and governance-screening failure behavior model introduced by the `1.1.0` Observability, Outbox, and Governance Emission Providers milestone and carried forward in the current stable package family.
 
 AsiBackbone remains a governance spine for consequential software decision flow. It is not a DLP product, classification engine, Microsoft Purview adapter, cloud governance platform, AI model host, compliance guarantee, or completed ASI implementation.
 
