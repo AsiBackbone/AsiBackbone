@@ -330,9 +330,9 @@ foreach ($topLevelDocument in @('README.md', 'CONTRIBUTING.md', 'GOVERNANCE.md',
 
 Add-DocumentationFile (Join-Path $repoRoot 'docs/index.md')
 
-$articlesRoot = Join-Path $repoRoot 'docs/articles'
-if (Test-Path -LiteralPath $articlesRoot -PathType Container) {
-    Get-ChildItem -LiteralPath $articlesRoot -Recurse -Filter '*.md' -File |
+$docsRoot = Join-Path $repoRoot 'docs'
+if (Test-Path -LiteralPath $docsRoot -PathType Container) {
+    Get-ChildItem -LiteralPath $docsRoot -Recurse -Filter '*.md' -File |
         ForEach-Object { Add-DocumentationFile $_.FullName }
 }
 
@@ -358,6 +358,9 @@ $claimPatterns = @(
         $regexOptions),
     [regex]::new(
         '\bstable\b[^\r\n]{0,50}?[`*_~]*v?(?<version>' + $versionPattern + ')[`*_~]*[^\r\n]{0,50}?\b(?:package\s+family|package\s+lineup|release\s+line|stable\s+line|major\s+release)\b',
+        $regexOptions),
+    [regex]::new(
+        '[`*_~]*v?(?<version>\d+\.[xX])[`*_~]*\s+(?:stable\s+)?(?:package\s+family|default)\b',
         $regexOptions)
 )
 

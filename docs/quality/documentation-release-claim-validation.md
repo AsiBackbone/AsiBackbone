@@ -30,11 +30,11 @@ Both commands run in the **Version Consistency** workflow. The repository valida
 
 ## Source of truth
 
-The validator parses `<VersionPrefix>` from `Directory.Build.props` as XML. From a value such as `3.0.0`, it derives:
+The validator parses `<VersionPrefix>` from `Directory.Build.props` as XML. The following is a **synthetic example**, not the current repository version. From a value such as `3.0.0`, it derives:
 
-- exact current version: `3.0.0`;
-- current minor line: `3.0.x`;
-- current major line: `3.x`.
+- example exact version: `3.0.0`;
+- example minor line: `3.0.x`;
+- example major line: `3.x`.
 
 The script does not duplicate the repository version in its own source or configuration. The configuration declares only the publication state described below.
 
@@ -71,8 +71,7 @@ Status phrases are attributed to the nearest version on the line; a match does n
 The default scan includes:
 
 - `README.md`, `CONTRIBUTING.md`, `GOVERNANCE.md`, and `SECURITY.md`;
-- `docs/index.md`;
-- Markdown articles under `docs/articles/`;
+- Markdown pages recursively under `docs/`, including quality, maintainer, releases, navigation and articles;
 - package README files under `src/`.
 
 Fenced code blocks are ignored because version examples inside commands or sample text are not necessarily release-posture claims.

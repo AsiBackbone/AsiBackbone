@@ -1,6 +1,6 @@
 # Progressive Adoption Ladder
 
-This guide shows the smallest useful way to adopt AsiBackbone first, then how to add stable `3.x` capabilities only when a host actually needs them.
+This guide shows the smallest useful way to adopt AsiBackbone first, then how to add additional capabilities only when a host actually needs them.
 
 AsiBackbone is a governance spine for consequential software decision flow. It is not a compliance product, observability backend, or signing appliance.
 

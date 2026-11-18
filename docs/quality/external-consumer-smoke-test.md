@@ -19,13 +19,13 @@ The generated consumer project validates:
 - the in-memory audit path through `InMemoryAuditLedger` for a minimal non-durable host;
 - allow, deny, and require-acknowledgment decision flows over HTTP.
 
-The stable package integration smoke script also generates focused xUnit tests for the `1.0.0` release path:
+The stable package integration smoke script also generates focused xUnit tests against the packages built from the checked-out repository version:
 
 - Core + `Storage.InMemory` decision/audit composition through public package APIs;
 - a host-defined stub implementation of `IDecisionReceiptSink`;
 - ASP.NET Core + EF Core + SQLite host-owned workflow composition.
 
-These checks intentionally avoid outbox, provider emission, cloud telemetry, or other behavior deferred beyond the initial stable package family.
+These checks cover selected package-composition and host-integration paths; they do not exercise every outbox, provider-emission, cloud-telemetry, or production deployment scenario.
 
 ## Run locally
 

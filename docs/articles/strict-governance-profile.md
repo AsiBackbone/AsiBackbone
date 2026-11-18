@@ -6,7 +6,7 @@ The helper does not register authentication, authorization, host policy rules, a
 
 ## Why this exists
 
-The `3.x` line now defaults the Core evaluator toward fail-closed behavior for empty policy structure, eligible ordinary constraint exceptions, threat-contributor exceptions, and threat-assessment downgrade protection. The strict profile still matters because it applies the same posture explicitly through DI and also configures ASP.NET Core endpoint-governance fail-closed options.
+The Core evaluator defaults toward fail-closed behavior for empty policy structure, eligible ordinary constraint exceptions, threat-contributor exceptions, and threat-assessment downgrade protection. The strict profile still matters because it applies the same posture explicitly through DI and also configures ASP.NET Core endpoint-governance fail-closed options.
 
 Use it when production hosts want a single, discoverable registration call for the complete fail-closed governance posture while keeping final execution authority with the host application.
 
@@ -50,7 +50,7 @@ Configuration order still matters. Later `Configure<TOptions>(...)` calls can in
 
 ## Empty-policy behavior
 
-With the `3.x` defaults or the strict profile applied, empty-policy evaluation returns a denied decision with the default `asibackbone.policy.no_constraints` reason code.
+With the default options or the strict profile applied, empty-policy evaluation returns a denied decision with the default `asibackbone.policy.no_constraints` reason code.
 
 If a host intentionally needs an unconstrained local validation flow, it must opt out explicitly with `DenyWhenNoConstraints = false`. That opt-out should be limited to tests, samples, migration steps, or separately protected local flows.
 
@@ -72,7 +72,7 @@ If a host constructs `DefaultGovernancePolicyEvaluator<TContext>` manually with 
 
 ## Constraint-exception behavior
 
-With the `3.x` defaults or the strict profile applied, eligible ordinary constraint failures are converted into denied governance decisions using the default `asibackbone.policy.constraint_exception` reason code and safe public reason message. Exception details remain in host logging/exception handling paths and are not copied into public decision reasons.
+With the default options or the strict profile applied, eligible ordinary constraint failures are converted into denied governance decisions using the default `asibackbone.policy.constraint_exception` reason code and safe public reason message. Exception details remain in host logging/exception handling paths and are not copied into public decision reasons.
 
 `OperationCanceledException` and critical host/runtime failures continue to propagate. The strict profile is a governance failure policy, not a corrupted-process recovery mechanism.
 
@@ -90,9 +90,9 @@ When `RequireGovernanceMetadata` is enabled, endpoint governance treats unmarked
 
 Use this to distinguish intentional public surface area from accidentally ungoverned execution paths.
 
-## 3.x adoption path
+## Adoption path
 
-Hosts upgrading to or starting with `3.0.0` can use this path:
+Hosts enabling the strict profile can use this path (the fail-closed defaults were introduced in `3.0.0`):
 
 1. Add `AddAsiBackboneStrictGovernance()` in non-production or staging first.
 2. Confirm every governed endpoint has policy, capability, and audit metadata where expected.
