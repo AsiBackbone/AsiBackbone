@@ -1,6 +1,6 @@
 ![AsiBackbone icon](https://raw.githubusercontent.com/AsiBackbone/AsiBackbone/main/docs/images/social-preview.png)
 
-# AsiBackbone
+# AsiBackbone (Accountable Systems Infrastructure)
 
 > `7.5.4` is the current stable release on `main`.
 >
