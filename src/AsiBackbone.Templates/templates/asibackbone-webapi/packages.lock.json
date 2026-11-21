@@ -2,25 +2,42 @@
   "version": 1,
   "dependencies": {
     "net10.0": {
-      "asibackbone.aspnetcore": {
-        "type": "Project",
+      "AsiBackbone.Analyzers": {
+        "type": "Direct",
+        "requested": "[7.5.5, )",
+        "resolved": "7.5.5",
+        "contentHash": "ilFhiYDWa64FZ8/txKmdywa2RTvza7gt6WIuPyIAvsfEevOSRd8S6KkOWiDaW2b7imfH8UkQV7x/inxjYHjBKA=="
+      },
+      "AsiBackbone.AspNetCore": {
+        "type": "Direct",
+        "requested": "[7.5.5, )",
+        "resolved": "7.5.5",
+        "contentHash": "j3hZV2K9d2baZuRV+ZnEmy1IvI/sMS7uqUTZqx1wyjZDuR6u/Oco8Rh2sVbCPHSo/dan5I3KNxfnvpelGBG+Vw==",
         "dependencies": {
-          "AsiBackbone.Core": "[7.1.1, )",
-          "AsiBackbone.DependencyInjection": "[7.1.1, )"
+          "AsiBackbone.Core": "7.5.5",
+          "AsiBackbone.DependencyInjection": "7.5.5"
         }
       },
-      "asibackbone.core": {
-        "type": "Project"
+      "AsiBackbone.Core": {
+        "type": "Direct",
+        "requested": "[7.5.5, )",
+        "resolved": "7.5.5",
+        "contentHash": "pFlpAie99BFBnfBRPP2FQY4GryNyTTUF2Kpsh51rmw0duULjii5fCu+flHJ8Ol1vQTqBBduH8+nQpkjrvxLGnA=="
       },
-      "asibackbone.dependencyinjection": {
-        "type": "Project"
-      },
-      "asibackbone.storage.inmemory": {
-        "type": "Project",
+      "AsiBackbone.Storage.InMemory": {
+        "type": "Direct",
+        "requested": "[7.5.5, )",
+        "resolved": "7.5.5",
+        "contentHash": "msITdJQarTlLLMSMAjIY6Jtp4wxZnLquehIAYVWQgD2YSwH+CpTyu42i/5fpsYvn8ndjB/1MlFmKoPexuCRLxA==",
         "dependencies": {
-          "AsiBackbone.Core": "[7.1.1, )",
-          "AsiBackbone.DependencyInjection": "[7.1.1, )"
+          "AsiBackbone.Core": "7.5.5",
+          "AsiBackbone.DependencyInjection": "7.5.5"
         }
+      },
+      "AsiBackbone.DependencyInjection": {
+        "type": "Transitive",
+        "resolved": "7.5.5",
+        "contentHash": "k1LTQg0ITvmNFYYuovcT3Fu/R2Qq2YVezmDGTbFl3Fp97RSOg3keOHWE99rrOZlm5w7C0ddLc9SOdXLYGtcSpg=="
       }
     }
   }

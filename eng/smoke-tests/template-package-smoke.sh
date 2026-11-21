@@ -135,6 +135,7 @@ for host_style in plain netcoretemplate; do
   fi
 
   dotnet restore "$generated_project" \
+    --locked-mode \
     --configfile "$work_root/NuGet.config"
 
   dotnet build "$generated_project" \
