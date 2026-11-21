@@ -20,6 +20,7 @@
     <PackageReference Include="Aspire.Hosting.AppHost" />
     <PackageReference Include="MessagePack" />
     <PackageReference Include="Microsoft.Extensions.Options" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" />
   </ItemGroup>
 
   <ItemGroup>

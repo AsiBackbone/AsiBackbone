@@ -256,7 +256,7 @@ $expectedPackages = @(
         Description = 'Non-durable in-memory storage helpers for Accountable Systems Infrastructure local validation, tests, and samples.'
         Tags = @('accountable-systems-infrastructure', 'asi-backbone', 'dotnet', 'governance', 'in-memory', 'non-durable', 'storage', 'local-validation', 'testing')
         ReadmeMustContain = @('not durable storage', 'local validation')
-        Dependencies = @('AsiBackbone.Core', 'AsiBackbone.DependencyInjection')
+        Dependencies = @('AsiBackbone.Core', 'AsiBackbone.DependencyInjection', 'Microsoft.Extensions.DependencyInjection')
         FrameworkReferences = @()
     },
     [pscustomobject]@{
