@@ -6,6 +6,14 @@ This project follows the spirit of [Keep a Changelog](https://keepachangelog.com
 
 ## [Unreleased]
 
+## [7.5.5] - 2026-11-21
+
+`7.5.5` is a backward-compatible .NET 10 dependency, documentation, and release-reliability maintenance patch for the
+stable `7.x` package family. It services framework dependencies, corrects assembly informational versions, hardens
+release runners, and strengthens documentation validation without changing public APIs, durable schemas, canonical
+wire values, package IDs, target framework, documented defaults, runtime decision behavior, or binary assembly
+identity.
+
 ### Security
 
 - Release jobs in `publish-packages.yml` and `release-validation.yml` now start with
@@ -38,6 +46,21 @@ This project follows the spirit of [Keep a Changelog](https://keepachangelog.com
 - `CODE_OF_CONDUCT.md` is now identical to the AsiBackbone organization Code of Conduct (Contributor Covenant 2.1),
   so every AsiBackbone repository carries the same text and reporting contact. The statement that AsiBackbone also
   adheres to the .NET Foundation Code of Conduct moved to `GOVERNANCE.md`.
+- Updated Entity Framework Core, Microsoft.Extensions.DependencyInjection,
+  Microsoft.Extensions.Logging.Abstractions, Microsoft.Extensions.Options, and
+  System.Security.Cryptography.Pkcs from 10.0.14 to 10.0.15 while retaining the `net10.0` target. Dependabot now
+  ignores framework-coupled .NET 11 major updates so the supported .NET 10 line continues receiving compatible
+  servicing updates.
+- Kept Microsoft.CodeAnalysis.Analyzers and Microsoft.CodeAnalysis.CSharp on 5.9.0 so the shipped analyzer remains
+  loadable by the compiler included with the .NET 10 SDK.
+- Updated Microsoft.NET.Test.Sdk from 18.11.0 to 18.12.0, xunit.v3 from 4.0.2 to 4.0.3, ReportGenerator from 5.5.12
+  to 5.6.0, and dotnet-stryker from 5.0.0 to 5.1.0.
+
+### Compatibility
+
+- Package IDs, public APIs, durable schemas, canonical wire values, documented defaults, runtime decision behavior,
+  the `net10.0` target, and `AssemblyVersion` `7.0.0.0` remain unchanged. Package and file versions advance to `7.5.5`
+  and `7.5.5.0`.
 
 ## [7.5.4] - 2026-11-14
 

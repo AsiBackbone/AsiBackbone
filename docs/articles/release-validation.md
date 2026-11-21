@@ -6,8 +6,8 @@ The binary assembly identity for the `7.x` line is `7.0.0.0`.
 
 Release validation should confirm that the package family remains practical governance infrastructure and that implementation claims stay within the documented software boundary. See [Release Cadence and Readiness](release-cadence-and-readiness.md) for the release-stream and stabilization guidance that complements this checklist.
 
-The [7.5.4 Release Readiness Record](release-readiness-754.md) and the
-[7.5.4 Consumer Verification Guide](consumer-verification-754.md) record the
+The [7.5.5 Release Readiness Record](release-readiness-755.md) and the
+[7.5.5 Consumer Verification Guide](consumer-verification-755.md) record the
 current release-control evidence.
 Each release's notes, readiness record, and consumer verification guide are
 listed in [Releases & Compatibility](../releases/index.md).

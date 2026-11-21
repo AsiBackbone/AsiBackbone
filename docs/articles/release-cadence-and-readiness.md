@@ -30,7 +30,7 @@ The measurable rules for deprecation windows, major-release spacing, advance ann
 
 `7.x` is the stable package line maintained on `main`. [Releases & Compatibility](../releases/index.md) lists the current stable release.
 
-The `7.5.4` release preserves the package IDs, `net10.0` target, public APIs, durable contracts, canonical wire values, documented defaults, declared runtime dependency minimums, and runtime decision behavior. It adds Sigstore keyless signatures for GitHub release build packages, advances Aspire sample hosting, refreshes GitHub Actions, and strengthens package compatibility validation.
+The `7.5.5` release preserves the package IDs, `net10.0` target, public APIs, durable contracts, canonical wire values, documented defaults, and runtime decision behavior. It services .NET 10 dependencies, corrects assembly informational versions, hardens release runners, and strengthens documentation validation.
 
 Managed assemblies retain binary identity `7.0.0.0` throughout the compatible `7.x` line.
 
