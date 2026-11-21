@@ -6,11 +6,14 @@ Current package/runtime behavior is documented in the product articles and gener
 
 ## Current release
 
-Stable package family: `7.x`. Current release: `7.5.4`.
+Stable package family: `7.x`. Current release: `7.5.5`.
 
 For why each major version since `1.x` was necessary, which contracts it broke, and what upgrading costs, start with
 [Major Version History and Upgrade Cost](../articles/major-version-history.md).
 
+- [7.5.5 Release Notes](../articles/release-notes-755.md)
+- [7.5.5 Release Readiness Record](../articles/release-readiness-755.md)
+- [7.5.5 Consumer Verification Guide](../articles/consumer-verification-755.md)
 - [7.5.4 Release Notes](../articles/release-notes-754.md)
 - [7.5.4 Release Readiness Record](../articles/release-readiness-754.md)
 - [7.5.4 Consumer Verification Guide](../articles/consumer-verification-754.md)

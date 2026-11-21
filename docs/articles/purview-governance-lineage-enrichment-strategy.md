@@ -241,7 +241,7 @@ AsiBackbone.Purview
 AsiBackbone.Lineage.Purview
 ```
 
-These names are planning candidates only. They are not part of the released `7.5.4` package list.
+These names are planning candidates only. They are not part of the released `7.5.5` package list.
 
 A future package should depend on:
 

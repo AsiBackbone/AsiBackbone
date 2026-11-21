@@ -1,9 +1,9 @@
 {
   "title": "AsiBackbone",
-  "version": "7.5.4",
-  "publication_date": "2026-11-14",
+  "version": "7.5.5",
+  "publication_date": "2026-11-21",
   "upload_type": "software",
-  "description": "AsiBackbone 7.5.4 is a backward-compatible supply-chain and validation maintenance patch for the Accountable Systems Infrastructure package family for .NET. It adds Sigstore keyless signatures for GitHub release build packages, advances Aspire sample hosting, refreshes GitHub Actions, and strengthens package compatibility validation while preserving public APIs, durable schemas, canonical wire values, package IDs, the net10.0 target, and AssemblyVersion 7.0.0.0.",
+  "description": "AsiBackbone 7.5.5 is a backward-compatible .NET 10 dependency, documentation, and release-reliability maintenance patch for the Accountable Systems Infrastructure package family for .NET. It services EF Core and Microsoft.Extensions dependencies, corrects assembly informational versions, hardens release runners, strengthens documentation validation, and preserves public APIs, durable schemas, canonical wire values, package IDs, the net10.0 target, and AssemblyVersion 7.0.0.0.",
   "creators": [
     {
       "name": "Cavell, Christopher D.",
