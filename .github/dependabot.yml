@@ -13,6 +13,25 @@ updates:
     commit-message:
       prefix: "chore"
       include: "scope"
+    # Remain on the .NET 10 framework and EF Core package lines until the
+    # repository deliberately schedules and validates a .NET 11 migration.
+    # Patch and minor servicing updates within the current majors remain enabled.
+    ignore:
+      - dependency-name: "Microsoft.AspNetCore.*"
+        update-types:
+          - "version-update:semver-major"
+      - dependency-name: "Microsoft.EntityFrameworkCore*"
+        update-types:
+          - "version-update:semver-major"
+      - dependency-name: "Microsoft.Extensions.*"
+        update-types:
+          - "version-update:semver-major"
+      - dependency-name: "Npgsql.EntityFrameworkCore.PostgreSQL"
+        update-types:
+          - "version-update:semver-major"
+      - dependency-name: "System.Security.Cryptography.Pkcs"
+        update-types:
+          - "version-update:semver-major"
     groups:
       microsoft-entity-framework-core:
         patterns:
