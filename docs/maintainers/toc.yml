@@ -1,6 +1,9 @@
 - name: Maintainer & Quality Evidence
   href: index.md
 
+- name: Repository Assurance Agents
+  href: agent-assurance.md
+
 - name: Current Release Evidence
   items:
     - name: 7.5.5 Release Readiness Record
