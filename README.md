@@ -21,11 +21,46 @@
 [![NuGet Downloads](https://img.shields.io/nuget/dt/AsiBackbone.Core?label=downloads)](https://www.nuget.org/packages/AsiBackbone.Core)
 [![Zenodo DOI](https://img.shields.io/badge/DOI-10.5281%2Fzenodo.20546032-blue)](https://doi.org/10.5281/zenodo.20546032)
 
-**A governance framework for accountable .NET decision flow.**
+**AsiBackbone helps .NET applications check the rules before they act and preserve the reasoning behind the decision.**
 
 > AI may provide the intellect. AsiBackbone provides the accountable spine.
 
 AsiBackbone is the implementation package family for Accountable Systems Infrastructure (stable `7.5.x`).
+
+## What AsiBackbone does
+
+AsiBackbone is a .NET toolkit that helps applications decide whether a consequential action should happen, and keep a record of why.
+
+Think about software that can issue refunds, delete accounts, export customer data, or let an AI assistant use tools. Knowing who is making the request is only part of the problem. The application may also need to ask:
+
+- Is this particular action allowed under the current rules?
+- Does someone need to acknowledge it before it proceeds?
+- If another service performs it later, how narrowly should its permission be limited?
+- What evidence should we keep to explain the decision?
+
+AsiBackbone helps developers put those checks into a consistent flow before the application acts.
+
+### A simple example
+
+An AI support assistant proposes a refund. Instead of letting the assistant call the payment system directly, the application checks its policies: a small refund might proceed, a larger one might require human acknowledgment, and an invalid refund might be denied.
+
+AsiBackbone helps structure that decision and its evidence. The application, not AsiBackbone and not the AI, still performs the payment operation.
+
+### How it fits into an application
+
+| Layer | What it decides |
+| --- | --- |
+| Authentication | Who you are. |
+| Authorization | What you may access or do. |
+| AsiBackbone | Whether a particular consequential action should proceed now, under which conditions, and with what evidence. |
+
+For ASP.NET Core developers, the `AsiBackbone.AspNetCore` integration package lets you declare governance requirements on endpoints while middleware coordinates the checks. See [ASP.NET Core Endpoint Governance](https://asibackbone.github.io/AsiBackbone/articles/aspnetcore-endpoint-governance.html).
+
+AsiBackbone is not a replacement for authentication, a payment processor, an AI model, or an automatic compliance solution. It helps organize the decision boundary around those systems. See [Project Boundaries and Non-Claims](https://asibackbone.github.io/AsiBackbone/articles/project-boundaries.html).
+
+### Why use it
+
+The value is consistency. Rather than scattering approval checks, policy decisions, and audit handling throughout an application, developers get a shared structure for consequential operations.
 
 ## Documentation ownership
 
