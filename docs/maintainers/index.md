@@ -4,6 +4,10 @@ This area contains release-readiness, quality, benchmark, validation, and mainte
 
 These records are public for traceability, but they are not part of the normal consumer implementation path. Current package/API behavior remains authoritative in the product documentation.
 
+## Repository assurance
+
+- [Repository Assurance Agents](agent-assurance.md)
+
 ## Current release evidence
 
 - [7.5.5 Release Readiness Record](../articles/release-readiness-755.md)
