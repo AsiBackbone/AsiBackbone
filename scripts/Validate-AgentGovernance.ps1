@@ -58,11 +58,11 @@ foreach ($profile in $profiles) {
         $errors.Add("$($profile.File) must start with YAML frontmatter.")
     }
     else {
-        $toolLines = [regex]::Matches(
-            $frontmatter.Groups['yaml'].Value,
-            '^tools:\s*.*$',
-            [System.Text.RegularExpressions.RegexOptions]::Multiline)
-        if ($toolLines.Count -ne 1 -or $toolLines[0].Value -ne 'tools: ["read", "search"]') {
+        $toolLines = @(
+            $frontmatter.Groups['yaml'].Value -split '\r?\n' |
+                Where-Object { $_ -match '^tools:' }
+        )
+        if ($toolLines.Count -ne 1 -or $toolLines[0] -cne 'tools: ["read", "search"]') {
             $errors.Add("$($profile.File) must declare exactly tools: [`"read`", `"search`"].")
         }
     }
