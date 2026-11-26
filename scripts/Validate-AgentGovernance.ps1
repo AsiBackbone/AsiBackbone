@@ -14,10 +14,13 @@ $profiles = @(
     @{ File = 'release-assurance.agent.md'; Scope = 'Report readiness evidence and blockers only' }
 )
 
-$requiredProfileText = @(
-    'target: github-copilot',
-    'disable-model-invocation: true',
-    'user-invocable: true',
+$requiredProfileMetadata = @(
+    @{ Key = 'target'; Value = 'github-copilot' },
+    @{ Key = 'disable-model-invocation'; Value = 'true' },
+    @{ Key = 'user-invocable'; Value = 'true' }
+)
+
+$requiredProfileBodyText = @(
     '## Prohibited actions',
     'Do not edit files',
     'execute commands',
@@ -58,6 +61,8 @@ foreach ($profile in $profiles) {
     }
 
     $content = Get-Content -LiteralPath $path -Raw
+    $body = $content
+    $yaml = ''
     $frontmatter = [regex]::Match(
         $content,
         '\A---\r?\n(?<yaml>.*?)\r?\n---\r?\n',
@@ -66,23 +71,42 @@ foreach ($profile in $profiles) {
         $errors.Add("$($profile.File) must start with YAML frontmatter.")
     }
     else {
+        $yaml = $frontmatter.Groups['yaml'].Value
+        $body = $content.Substring($frontmatter.Length)
+
+        foreach ($metadata in $requiredProfileMetadata) {
+            $escapedKey = [regex]::Escape($metadata.Key)
+            $metadataLines = @(
+                $yaml -split '\r?\n' |
+                    Where-Object { $_ -match "^\s*(?:'$escapedKey'|`"$escapedKey`"|$escapedKey)\s*:" }
+            )
+            $expectedPattern = "^\s*(?:'$escapedKey'|`"$escapedKey`"|$escapedKey)\s*:\s*$([regex]::Escape($metadata.Value))\s*(?:#.*)?$"
+            if ($metadataLines.Count -ne 1 -or $metadataLines[0] -cnotmatch $expectedPattern) {
+                $errors.Add("$($profile.File) must declare exactly $($metadata.Key): $($metadata.Value) in YAML frontmatter.")
+            }
+        }
+
         $toolLines = @(
-            $frontmatter.Groups['yaml'].Value -split '\r?\n' |
+            $yaml -split '\r?\n' |
                 Where-Object { $_ -match '^tools:' }
         )
         if ($toolLines.Count -ne 1 -or $toolLines[0] -cne 'tools: ["read", "search"]') {
             $errors.Add("$($profile.File) must declare exactly tools: [`"read`", `"search`"].")
         }
+
+        if ($yaml -match '(?im)^\s*([\x27\x22]?)mcp-servers\1\s*:') {
+            $errors.Add("$($profile.File) contains forbidden tool or MCP configuration: mcp-servers")
+        }
     }
 
-    foreach ($required in $requiredProfileText + $profile.Scope) {
-        if (-not $content.Contains($required, [System.StringComparison]::OrdinalIgnoreCase)) {
+    foreach ($required in $requiredProfileBodyText + $profile.Scope) {
+        if (-not $body.Contains($required, [System.StringComparison]::OrdinalIgnoreCase)) {
             $errors.Add("$($profile.File) is missing required text: $required")
         }
     }
 
-    foreach ($forbidden in @('mcp-servers:', '"edit"', '"execute"', '"web"', '"agent"', 'tools: ["*"]')) {
-        if ($content.Contains($forbidden, [System.StringComparison]::OrdinalIgnoreCase)) {
+    foreach ($forbidden in @('"edit"', '"execute"', '"web"', '"agent"', 'tools: ["*"]')) {
+        if ($yaml.Contains($forbidden, [System.StringComparison]::OrdinalIgnoreCase)) {
             $errors.Add("$($profile.File) contains forbidden tool or MCP configuration: $forbidden")
         }
     }
@@ -200,10 +224,21 @@ function Invoke-AgentGovernanceSelfTest {
             Set-Content -LiteralPath $path -Value $content.Replace('tools: ["read", "search"]', 'tools: ["read", "search", "edit"]')
         }
 
-        Assert-RejectedFixture -ExpectedError 'contains forbidden tool or MCP configuration: mcp-servers:' -Mutation {
+        Assert-RejectedFixture -ExpectedError 'must declare exactly disable-model-invocation: true in YAML frontmatter' -Mutation {
+            param($root)
+            $path = Join-Path $root '.github/agents/security-assurance.agent.md'
+            $content = Get-Content -LiteralPath $path -Raw
+            $content = $content.Replace('disable-model-invocation: true', 'disable-model-invocation: false')
+            Set-Content -LiteralPath $path -Value "$content`n<!-- disable-model-invocation: true -->"
+        }
+
+        Assert-RejectedFixture -ExpectedError 'contains forbidden tool or MCP configuration: mcp-servers' -Mutation {
             param($root)
             $path = Join-Path $root '.github/agents/release-assurance.agent.md'
-            Add-Content -LiteralPath $path -Value "`nmcp-servers:`n  external: enabled"
+            $content = Get-Content -LiteralPath $path -Raw
+            Set-Content -LiteralPath $path -Value $content.Replace(
+                'user-invocable: true',
+                "user-invocable: true`n'mcp-servers' :`n  external: enabled")
         }
 
         Assert-RejectedFixture -ExpectedError 'AGENTS.md is missing required text: governance spine' -Mutation {
