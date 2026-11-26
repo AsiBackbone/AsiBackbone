@@ -68,8 +68,12 @@ dotnet tool run docfx -- docs/docfx.json --warningsAsErrors
 Validate agent governance changes with:
 
 ```powershell
+./scripts/Validate-AgentGovernance.ps1 -SelfTest
 ./scripts/Validate-AgentGovernance.ps1
 ```
+
+The self-test proves weakened fixture configurations fail closed before the
+second command validates the live repository.
 
 Run the additional validators and consumer smoke tests named in
 `CONTRIBUTING.md` when their owned surface changes. Report only checks actually
