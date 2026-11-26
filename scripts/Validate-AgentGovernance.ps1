@@ -231,7 +231,7 @@ function Invoke-AgentGovernanceSelfTest {
 
 if ($SelfTest) {
     Invoke-AgentGovernanceSelfTest
-    exit 0
+    return
 }
 
 $errors = @(Get-AgentGovernanceErrors -Root $repositoryRoot)
