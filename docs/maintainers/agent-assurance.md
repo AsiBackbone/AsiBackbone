@@ -92,10 +92,14 @@ untrusted runtime cannot act outside the declared role.
 Run the structural validation from the repository root:
 
 ```powershell
+./scripts/Validate-AgentGovernance.ps1 -SelfTest
 ./scripts/Validate-AgentGovernance.ps1
 ```
 
-The validator checks that all four profiles are present, manually selected,
+The fixture-based self-test proves the validator rejects missing profiles,
+malformed frontmatter, expanded tools, MCP configuration, missing repository
+guidance, and missing assurance-guide requirements. The live validator checks
+that all four profiles are present, manually selected,
 limited to read/search, free of embedded MCP configuration, explicit about
 prohibited actions, and consistent about evidence-oriented output. It also
 checks the root guidance and representative safe/prohibited review cases. CI
