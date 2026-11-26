@@ -27,6 +27,14 @@
 
 AsiBackbone is the implementation package family for Accountable Systems Infrastructure (stable `7.5.x`).
 
+## Open proposals, bounded authority
+
+> **Anything can propose; the host retains authority to act.**
+>
+> **Proposal is open. Authority is bounded.**
+
+Humans and AI agents may introduce proposals through [AsiBackbone Organization Discussions](https://github.com/orgs/AsiBackbone/discussions). In this community process, the accountable host is the human maintainer: maintainers alone decide whether a proposal becomes organizational work and authorize any downstream action. See the [public proposal intake guidance](https://github.com/AsiBackbone/.github/blob/main/CONTRIBUTING.md#public-proposal-intake).
+
 ## What AsiBackbone does
 
 AsiBackbone is a .NET toolkit that helps applications decide whether a consequential action should happen, and keep a record of why.

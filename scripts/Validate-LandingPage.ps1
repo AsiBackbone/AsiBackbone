@@ -24,6 +24,9 @@ $requiredHomepageSections = @(
 )
 
 $requiredHomepageContent = @(
+    '<strong>Anything can propose; the host retains authority to act.</strong>'
+    '<strong>Proposal is open. Authority is bounded.</strong>'
+    'maintainers alone decide whether a proposal becomes organizational work and authorize any downstream action.'
     'class="btn btn-primary" href="articles/implementation-first-adoption.md"'
     'href="articles/use-cases.md"'
     'href="articles/quickstart-api-gating.md"'
