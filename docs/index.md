@@ -296,8 +296,8 @@ General architecture teaching is maintained in [AsiBackbone Learning](https://as
 
 <div class="philosophy-callout">
   <p class="philosophy-statement">We favor architectures where consequential operations are explicit, constrained, reviewable, and auditable.</p>
-  <p><strong>Anything can propose; the host retains authority to act.</strong><br><strong>Proposal is open. Authority is bounded.</strong></p>
-  <p>Humans and AI agents may introduce proposals through <a href="https://github.com/orgs/AsiBackbone/discussions">AsiBackbone Organization Discussions</a>. In this community process, the accountable host is the human maintainer: maintainers alone decide whether a proposal becomes organizational work and authorize any downstream action. See the <a href="https://github.com/AsiBackbone/.github/blob/main/CONTRIBUTING.md#public-proposal-intake">public proposal intake guidance</a>.</p>
+  <p><strong>Proposal is open. Authority is bounded.</strong></p>
+  <p>Humans and AI agents may introduce proposals through <a href="https://github.com/orgs/AsiBackbone/discussions">AsiBackbone Organization Discussions</a>. In this community process, human maintainers alone decide whether a proposal becomes organizational work and authorize any downstream action. See the <a href="https://github.com/AsiBackbone/.github/blob/main/CONTRIBUTING.md#public-proposal-intake">public proposal intake guidance</a>.</p>
   <p>We also document when these patterns are unnecessary: see <a href="articles/use-cases.md#poor-product-fit">Poor product fit</a>, <a href="https://asibackbone.github.io/Learning/architecture/when-aspnet-core-authorization-is-enough.html">When ASP.NET Core Authorization Is Enough</a>, and <a href="https://asibackbone.github.io/Learning/architecture/when-a-simple-application-service-is-enough.html">When a Simple Application Service Is Enough</a>.</p>
   <p>The projects focus on practical .NET engineering. They do not claim regulatory certification or automatic compliance. See <a href="articles/project-boundaries.md">Project Boundaries and Non-Claims</a>.</p>
 </div>
