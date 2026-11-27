@@ -25,7 +25,13 @@ $requiredHomepageSections = @(
 
 $requiredAuthorityContent = @(
     '<strong>Proposal is open. Authority is bounded.</strong>'
-    'maintainers alone decide whether a proposal becomes organizational work and authorize any downstream action.'
+    'In this community process, human maintainers alone decide whether a proposal becomes organizational work and authorize any downstream action.'
+)
+
+# Retired wording that must not return to the homepage source or built page.
+$retiredAuthorityContent = @(
+    'Anything can propose; the host retains authority to act.'
+    'the accountable host is the human maintainer'
 )
 
 $requiredHomepageContent = $requiredAuthorityContent + @(
@@ -161,6 +167,11 @@ function Test-Homepage {
     foreach ($requiredText in $requiredHomepageContent) {
         if (-not $Content.Contains($requiredText, [StringComparison]::Ordinal)) {
             $Errors.Add("docs/index.md is missing required landing-page content: $requiredText")
+        }
+    }
+    foreach ($retiredText in $retiredAuthorityContent) {
+        if ($Content.Contains($retiredText, [StringComparison]::Ordinal)) {
+            $Errors.Add("docs/index.md must not contain retired authority wording: $retiredText")
         }
     }
 }
@@ -299,7 +310,7 @@ function Test-BuiltHomepage {
         }
     }
 
-    foreach ($forbiddenText in $forbiddenBuiltHomepageContent) {
+    foreach ($forbiddenText in ($forbiddenBuiltHomepageContent + $retiredAuthorityContent)) {
         if ($Content.Contains($forbiddenText, [StringComparison]::Ordinal)) {
             $Errors.Add("built index.html must not contain: $forbiddenText")
         }
@@ -372,6 +383,10 @@ function Invoke-SelfTest {
         @{ Name = 'built homepage missing section'; Check = { param($e) Test-BuiltHomepage $validSite.Replace('id="related-projects"', '') $e }; Pass = $false }
         @{ Name = 'built homepage missing bounded-authority maxim'; Check = { param($e) Test-BuiltHomepage $validSite.Replace($requiredAuthorityContent[0], '') $e }; Pass = $false }
         @{ Name = 'built homepage missing maintainer authority boundary'; Check = { param($e) Test-BuiltHomepage $validSite.Replace($requiredAuthorityContent[1], '') $e }; Pass = $false }
+        @{ Name = 'homepage with retired proposal maxim'; Check = { param($e) Test-Homepage ($validHomepage + "`n" + $retiredAuthorityContent[0]) $e }; Pass = $false }
+        @{ Name = 'homepage with retired host boundary wording'; Check = { param($e) Test-Homepage ($validHomepage + "`n" + $retiredAuthorityContent[1]) $e }; Pass = $false }
+        @{ Name = 'built homepage with retired proposal maxim'; Check = { param($e) Test-BuiltHomepage $validSite.Replace('</main>', $retiredAuthorityContent[0] + '</main>') $e }; Pass = $false }
+        @{ Name = 'built homepage with retired host boundary wording'; Check = { param($e) Test-BuiltHomepage $validSite.Replace('</main>', 'In this community process, the accountable host is the human maintainer: maintainers alone decide whether a proposal becomes organizational work and authorize any downstream action.</main>') $e }; Pass = $false }
         @{ Name = 'built homepage without lang'; Check = { param($e) Test-BuiltHomepage $validSite.Replace('<html lang="en">', '<html>') $e }; Pass = $false }
         @{ Name = 'built homepage with duplicated title'; Check = { param($e) Test-BuiltHomepage $validSite.Replace("<title>$expectedHomepageTitle</title>", '<title>AsiBackbone | AsiBackbone</title>') $e }; Pass = $false }
         @{ Name = 'built homepage without canonical'; Check = { param($e) Test-BuiltHomepage $validSite.Replace("<link rel=`"canonical`" href=`"$siteBaseUrl`">", '') $e }; Pass = $false }
