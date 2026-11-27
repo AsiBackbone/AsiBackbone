@@ -14,13 +14,14 @@
     <CentralPackageTransitivePinningEnabled>false</CentralPackageTransitivePinningEnabled>
   </PropertyGroup>
   <ItemGroup>
-    <PackageVersion Include="Aspire.Hosting.AppHost" Version="13.6.5" />
+    <PackageVersion Include="Aspire.Hosting.AppHost" Version="17.0.0" />
+    <PackageVersion Include="Aspire.Hosting.Dotnet" Version="17.0.0" />
     <PackageVersion Include="BenchmarkDotNet" Version="0.15.8" />
     <PackageVersion Include="MessagePack" Version="3.1.12" />
     <PackageVersion Include="Microsoft.AspNetCore.TestHost" Version="10.0.14" />
     <!-- Keep compiler-facing packages aligned with the Roslyn version shipped by the .NET 10 SDK. -->
-    <PackageVersion Include="Microsoft.CodeAnalysis.Analyzers" Version="5.9.0" />
-    <PackageVersion Include="Microsoft.CodeAnalysis.CSharp" Version="5.9.0" />
+    <PackageVersion Include="Microsoft.CodeAnalysis.Analyzers" Version="5.12.0" />
+    <PackageVersion Include="Microsoft.CodeAnalysis.CSharp" Version="5.12.0" />
     <PackageVersion Include="Microsoft.EntityFrameworkCore" Version="10.0.15" />
     <PackageVersion Include="Microsoft.EntityFrameworkCore.InMemory" Version="10.0.15" />
     <PackageVersion Include="Microsoft.EntityFrameworkCore.Relational" Version="10.0.15" />
@@ -33,8 +34,8 @@
     <PackageVersion Include="System.Security.Cryptography.Pkcs" Version="10.0.15" />
     <PackageVersion Include="xunit.runner.visualstudio" Version="4.0.1" />
     <PackageVersion Include="xunit.v3" Version="4.0.3" />
-    <PackageVersion Include="coverlet.MTP" Version="10.1.0" />
-    <PackageVersion Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="10.0.3" />
+    <PackageVersion Include="coverlet.MTP" Version="10.1.1" />
+    <PackageVersion Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="10.0.4" />
     <PackageVersion Include="SQLitePCLRaw.bundle_e_sqlite3" Version="3.0.5" />
     <PackageVersion Include="FsCheck" Version="3.6.0" />
   </ItemGroup>
