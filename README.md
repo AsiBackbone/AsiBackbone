@@ -27,14 +27,6 @@
 
 AsiBackbone is the implementation package family for Accountable Systems Infrastructure (stable `7.5.x`).
 
-## Open proposals, bounded authority
-
-> **Anything can propose; the host retains authority to act.**
->
-> **Proposal is open. Authority is bounded.**
-
-Humans and AI agents may introduce proposals through [AsiBackbone Organization Discussions](https://github.com/orgs/AsiBackbone/discussions). In this community process, the accountable host is the human maintainer: maintainers alone decide whether a proposal becomes organizational work and authorize any downstream action. See the [public proposal intake guidance](https://github.com/AsiBackbone/.github/blob/main/CONTRIBUTING.md#public-proposal-intake).
-
 ## What AsiBackbone does
 
 AsiBackbone is a .NET toolkit that helps applications decide whether a consequential action should happen, and keep a record of why.
@@ -325,6 +317,12 @@ At this stage, the most useful feedback is from people evaluating the package fa
 | [Architecture & Integration](https://github.com/orgs/AsiBackbone/discussions/categories/architecture-integration) | Where would this policy-as-code and host-owned-execution approach not fit your application? |
 
 Name `AsiBackbone/AsiBackbone` in the discussion when it is specific to this repository. For a reproducible bug, a focused feature request, or a documentation change, use the [issue forms](https://github.com/AsiBackbone/AsiBackbone/issues/new/choose) instead. Report vulnerabilities privately through the [Security Policy](SECURITY.md).
+
+## Open proposals, bounded authority
+
+> **Proposal is open. Authority is bounded.**
+
+Humans and AI agents may introduce proposals through [AsiBackbone Organization Discussions](https://github.com/orgs/AsiBackbone/discussions). In this community process, human maintainers alone decide whether a proposal becomes organizational work and authorize any downstream action. See the [public proposal intake guidance](https://github.com/AsiBackbone/.github/blob/main/CONTRIBUTING.md#public-proposal-intake).
 
 ## Support and project stewardship
 
