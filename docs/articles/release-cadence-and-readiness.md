@@ -30,7 +30,7 @@ The measurable rules for deprecation windows, major-release spacing, advance ann
 
 `7.x` is the stable package line maintained on `main`. [Releases & Compatibility](../releases/index.md) lists the current stable release.
 
-The `7.5.5` release preserves the package IDs, `net10.0` target, public APIs, durable contracts, canonical wire values, documented defaults, and runtime decision behavior. It services .NET 10 dependencies, corrects assembly informational versions, hardens release runners, and strengthens documentation validation.
+The `7.5.6` release preserves the package IDs, `net10.0` target, public APIs, durable contracts, canonical wire values, documented defaults, and runtime decision behavior. It establishes proposal and assurance-agent guardrails, improves project entry points, services development dependencies and GitHub Actions, and proves packaged analyzer execution under the .NET 10 SDK compiler.
 
 Managed assemblies retain binary identity `7.0.0.0` throughout the compatible `7.x` line.
 

@@ -1,8 +1,8 @@
 cff-version: 1.2.0
 message: "If you use this software, please cite it using the metadata below."
 title: "AsiBackbone"
-version: "7.5.5"
-date-released: "2026-11-21"
+version: "7.5.6"
+date-released: "2026-11-27"
 repository-code: "https://github.com/AsiBackbone/AsiBackbone"
 url: "https://asibackbone.github.io/AsiBackbone/"
 type: software
@@ -16,7 +16,7 @@ authors:
   - family-names: "Cavell"
     given-names: "Christopher D."
     orcid: "https://orcid.org/0009-0002-2113-0245"
-abstract: "AsiBackbone 7.5.5 is a backward-compatible .NET 10 dependency, documentation, and release-reliability maintenance patch for the Accountable Systems Infrastructure package family for .NET. It services EF Core and Microsoft.Extensions dependencies, corrects assembly informational versions, hardens release runners, strengthens documentation validation, and preserves public APIs, durable schemas, canonical wire values, package IDs, the net10.0 target, and AssemblyVersion 7.0.0.0."
+abstract: "AsiBackbone 7.5.6 is a backward-compatible governance, dependency, and release-validation maintenance patch for the Accountable Systems Infrastructure package family for .NET. It establishes proposal and assurance-agent guardrails, improves the project landing pages, services development dependencies and GitHub Actions, proves packaged analyzer execution under the .NET 10 SDK compiler, and preserves public APIs, durable schemas, canonical wire values, package IDs, the net10.0 target, and AssemblyVersion 7.0.0.0."
 keywords:
   - asi-backbone
   - dotnet
