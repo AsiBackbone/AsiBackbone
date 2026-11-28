@@ -36,6 +36,9 @@ when its evidence exists.
 - [x] Framework-coupled shipped dependencies remain on .NET 10.
 - [x] Compiler-facing Roslyn dependencies remain aligned with the compiler in
   .NET SDK 10.0.404, and the packed consumer smoke proves analyzer execution.
+- [x] The protected package workflow runs both generated template host styles
+  in locked mode against its exact packed artifacts before attestation or
+  publication.
 - [x] Assurance-agent and proposal guidance preserves exclusive human
   maintainer authority for organizational decisions, merges, and releases.
 - [x] Sigstore bundles remain distinct from NuGet author signing, NuGet.org
@@ -90,6 +93,9 @@ when its evidence exists.
 - [ ] The non-publishing package workflow produces the expected packages,
   SBOMs, hash manifest, and package and SBOM provenance attestations for
   maintainer review.
+- [ ] The protected `v7.5.6` tag workflow passes the locked template restore
+  and build against the exact tag-built packages before attestation or
+  publication.
 - [ ] The tag will be created from the validated commit already merged to
   protected `main`, after CI on that merge commit has completed.
 

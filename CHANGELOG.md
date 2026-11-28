@@ -20,6 +20,9 @@ framework, documented defaults, runtime decision behavior, and binary assembly i
 - Added an external-consumer analyzer probe that must observe `ASIB001` from the packed analyzer before proving the
   corrected consumer builds cleanly. This guards against a package restoring while Roslyn silently cannot execute an
   analyzer compiled against a newer compiler assembly (#984).
+- Added a locked template smoke gate to the protected package workflow after packing and before attestation or
+  publication. The gate restores both generated host styles against the exact packages built by that workflow,
+  preventing stale embedded package hashes from reaching publication.
 
 ### Changed
 

@@ -41,6 +41,9 @@ identity remains `7.0.0.0`.
   `ASIB001` for a deliberately discarded governance decision, then requires a
   clean build after the consumer retains the decision. This detects analyzer
   load failures that package restore alone cannot expose.
+- The protected package workflow now restores and builds both generated
+  template host styles in locked mode against the exact packages it just
+  packed, before attestation or publication can begin.
 - Agent-governance regression self-tests prove weakened fixture configurations
   fail closed before the live repository configuration is validated.
 
