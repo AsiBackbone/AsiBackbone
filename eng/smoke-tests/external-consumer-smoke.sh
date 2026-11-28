@@ -454,6 +454,70 @@ CSHARP
 
 dotnet test --project "$smoke_project" --configuration "$configuration" --verbosity normal
 
+# Prove the packed analyzer loads and executes under the repository SDK's compiler. A package can restore and a
+# consumer can otherwise build while Roslyn skips an analyzer that references a newer compiler assembly, so package
+# presence alone is not sufficient evidence. Promote a deterministic ASIB001 probe to an error, require that exact
+# diagnostic, then replace the probe with a safe continuation and require a clean build.
+analyzer_smoke_dir="$work_root/AnalyzerConsumerSmoke"
+analyzer_smoke_project="$analyzer_smoke_dir/AnalyzerConsumerSmoke.csproj"
+mkdir -p "$analyzer_smoke_dir"
+
+cat > "$analyzer_smoke_project" <<CSPROJ
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <OutputType>Exe</OutputType>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <WarningsAsErrors>ASIB001</WarningsAsErrors>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="AsiBackbone.Core" Version="$package_version" />
+    <PackageReference Include="AsiBackbone.Analyzers" Version="$package_version">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+  </ItemGroup>
+</Project>
+CSPROJ
+
+cat > "$analyzer_smoke_dir/Program.cs" <<'CSHARP'
+using AsiBackbone.Core.Decisions;
+
+GovernanceDecision.Allow();
+CSHARP
+
+set +e
+analyzer_probe_output="$(dotnet build "$analyzer_smoke_project" --configuration "$configuration" --nologo --verbosity minimal 2>&1)"
+analyzer_probe_status=$?
+set -e
+
+printf '%s\n' "$analyzer_probe_output"
+
+if [ "$analyzer_probe_status" -eq 0 ]; then
+  echo "Analyzer consumer probe unexpectedly built without ASIB001. The packed analyzer may not have loaded."
+  exit 1
+fi
+
+if ! grep -qE 'error ASIB001:' <<<"$analyzer_probe_output"; then
+  echo "Analyzer consumer probe failed without the expected ASIB001 diagnostic."
+  exit 1
+fi
+
+cat > "$analyzer_smoke_dir/Program.cs" <<'CSHARP'
+using AsiBackbone.Core.Decisions;
+
+GovernanceDecision decision = GovernanceDecision.Allow();
+Console.WriteLine(decision.Outcome);
+CSHARP
+
+dotnet build "$analyzer_smoke_project" \
+  --configuration "$configuration" \
+  --no-restore \
+  --nologo \
+  --verbosity minimal
+
 # The README's five-minute evaluator is a file-based app pinned to the release version. Copying it outside the
 # repository uses the smoke NuGet.config above, so AsiBackbone.Core restores from the locally packed packages.
 evaluator_dir="$work_root/FiveMinuteEvaluator"
