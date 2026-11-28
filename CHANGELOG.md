@@ -6,6 +6,44 @@ This project follows the spirit of [Keep a Changelog](https://keepachangelog.com
 
 ## [Unreleased]
 
+## [7.5.6] - 2026-11-27
+
+`7.5.6` is a backward-compatible governance, dependency, documentation, and release-validation maintenance patch for
+the stable `7.x` package family. It preserves public APIs, durable schemas, canonical wire values, package IDs, target
+framework, documented defaults, runtime decision behavior, and binary assembly identity.
+
+### Added
+
+- Added four read-only repository assurance-agent profiles for security, architecture, quality, and release review,
+  plus maintainer guidance and a fail-closed validator with regression self-tests. Human maintainers retain merge,
+  release, publication, deployment, settings, secret, and security-response authority (#970, #971).
+- Added an external-consumer analyzer probe that must observe `ASIB001` from the packed analyzer before proving the
+  corrected consumer builds cleanly. This guards against a package restoring while Roslyn silently cannot execute an
+  analyzer compiled against a newer compiler assembly (#984).
+- Added a locked template smoke gate to the protected package workflow after packing and before attestation or
+  publication. The gate restores both generated host styles against the exact packages built by that workflow,
+  preventing stale embedded package hashes from reaching publication.
+
+### Changed
+
+- Established a proposal-first contribution workflow and organization discussion guidance. Public proposals may be
+  prepared with AI assistance, but responsibility, duplicate checks, disclosure, and human-maintainer decision
+  authority remain explicit (#963, #972-#977).
+- Reworked the README and documentation homepage entry points with a plain-language project overview and clearer
+  routes for evaluators, adopters, integrators, contributors, and maintainers (#964).
+- Updated the Aspire AppHost sample from 13.6.5 to 17.0.0, added its split `Aspire.Hosting.Dotnet` dependency, updated
+  Npgsql.EntityFrameworkCore.PostgreSQL from 10.0.3 to 10.0.4, coverlet.MTP from 10.1.0 to 10.1.1, ReportGenerator
+  from 5.6.0 to 5.6.1, and refreshed pinned GitHub Actions. These are sample, test, tool, and workflow dependencies;
+  shipped `AsiBackbone.*` runtime dependency declarations are unchanged (#978-#980, #982, #983).
+- Kept Microsoft.CodeAnalysis.Analyzers and Microsoft.CodeAnalysis.CSharp on 5.9.0 so the shipped analyzer references
+  the same compiler assembly version as .NET SDK 10.0.404 (#981, #984).
+
+### Compatibility
+
+- Package IDs, public APIs, durable schemas, canonical wire values, documented defaults, runtime decision behavior,
+  shipped runtime dependency declarations, the `net10.0` target, and `AssemblyVersion` `7.0.0.0` remain unchanged.
+  Package and file versions advance to `7.5.6` and `7.5.6.0`.
+
 ## [7.5.5] - 2026-11-21
 
 `7.5.5` is a backward-compatible .NET 10 dependency, documentation, and release-reliability maintenance patch for the

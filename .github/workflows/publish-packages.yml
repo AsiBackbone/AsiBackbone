@@ -176,6 +176,10 @@ jobs:
         shell: pwsh
         run: ./scripts/Validate-NuGetPackageMetadata.ps1 -PackageDirectory '${{ env.PACKAGE_OUTPUT }}'
 
+      - name: Validate locked templates against packed artifacts
+        shell: bash
+        run: bash ./eng/smoke-tests/template-package-smoke.sh "$PACKAGE_OUTPUT"
+
       - name: Generate package SBOMs
         shell: pwsh
         run: ./scripts/New-NuGetPackageSbom.ps1 -PackageDirectory '${{ env.PACKAGE_OUTPUT }}' -OutputDirectory '${{ env.SBOM_OUTPUT }}'

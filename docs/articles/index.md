@@ -11,11 +11,12 @@ General architectural education belongs in [AsiBackbone Learning](https://asibac
 
 ## Current stable package posture
 
-Stable `7.x` package family. The current release is `7.5.5`.
+Stable `7.x` package family. The current release is `7.5.6`.
 
-`7.5.5` services .NET 10 dependencies, corrects assembly informational
-versions, hardens release runners, and strengthens documentation validation
-without changing public APIs, durable contracts, or runtime decision behavior.
+`7.5.6` establishes proposal and assurance-agent guardrails, improves project
+entry points, services development dependencies and GitHub Actions, and proves
+packaged analyzer execution under the .NET 10 SDK compiler without changing
+public APIs, durable contracts, or runtime decision behavior.
 
 Managed assemblies retain binary identity `7.0.0.0` throughout the compatible `7.x` line.
 
@@ -35,7 +36,7 @@ packages remain design-only, strategy-only, sample-only, host-owned, or
 future-provider work unless a later stable release explicitly ships them.
 
 The release process includes explicit [Release Cadence and Readiness](release-cadence-and-readiness.md) guidance for patch, minor, and major release selection, package metadata, Source Link, SBOM/provenance, documentation links, and future package identity or namespace changes.
-The current verification evidence is the [7.5.5 Consumer Verification Guide](consumer-verification-755.md).
+The current verification evidence is the [7.5.6 Consumer Verification Guide](consumer-verification-756.md).
 Consumers moving from the previous stable line must also follow the [Upgrade from 6.x to 7.0](upgrade-600-to-700.md) guide.
 
 ## Search and navigation
@@ -149,6 +150,9 @@ These pages cover production hardening, durable audit/outbox behavior, observabi
 
 Start with the current release and compatibility rules. Older release notes, consumer-verification guides, and upgrade records are preserved under [Releases & Compatibility](../releases/index.md) so they remain easy to find without dominating the implementation navigation.
 
+* [7.5.6 Release Notes](release-notes-756.md)
+* [7.5.6 Release Readiness Record](release-readiness-756.md)
+* [7.5.6 Consumer Verification Guide](consumer-verification-756.md)
 * [7.5.5 Release Notes](release-notes-755.md)
 * [7.5.5 Release Readiness Record](release-readiness-755.md)
 * [7.5.5 Consumer Verification Guide](consumer-verification-755.md)

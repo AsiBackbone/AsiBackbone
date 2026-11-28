@@ -119,11 +119,12 @@ The DocFX header search is available for package names, API concepts, and articl
 
 ## Current stable package family
 
-Stable `7.x` package family. The current release is `7.5.5`.
+Stable `7.x` package family. The current release is `7.5.6`.
 
-`7.5.5` services .NET 10 dependencies, corrects assembly informational
-versions, hardens release runners, and strengthens documentation validation
-without changing public APIs, durable contracts, or runtime decision behavior.
+`7.5.6` establishes proposal and assurance-agent guardrails, improves project
+entry points, services development dependencies and GitHub Actions, and proves
+packaged analyzer execution under the .NET 10 SDK compiler without changing
+public APIs, durable contracts, or runtime decision behavior.
 
 Managed assemblies retain binary identity `7.0.0.0` throughout the compatible `7.x` line.
 
@@ -197,6 +198,8 @@ Package-specific READMEs and release notes define which surfaces are stable, opt
 
 ### Releases and compatibility
 
+* [7.5.6 Release Notes](articles/release-notes-756.md)
+* [7.5.6 Consumer Verification Guide](articles/consumer-verification-756.md)
 * [7.5.5 Release Notes](articles/release-notes-755.md)
 * [7.5.5 Consumer Verification Guide](articles/consumer-verification-755.md)
 * [7.5.4 Release Notes](articles/release-notes-754.md)

@@ -10,6 +10,7 @@ These records are public for traceability, but they are not part of the normal c
 
 ## Current release evidence
 
+- [7.5.6 Release Readiness Record](../articles/release-readiness-756.md)
 - [7.5.5 Release Readiness Record](../articles/release-readiness-755.md)
 - [7.5.4 Release Readiness Record](../articles/release-readiness-754.md)
 - [7.5.3 Release Readiness Record](../articles/release-readiness-753.md)
